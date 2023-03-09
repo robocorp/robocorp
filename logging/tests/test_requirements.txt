@@ -1,0 +1,6 @@
+mock
+pytest
+pytest-regressions==1.0.6
+pytest-xdist
+pytest-timeout
+psutil

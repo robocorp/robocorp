@@ -1,0 +1,16 @@
+V 1
+T 2022-11-16T15:35:07.554
+I "sys.platform=win32"
+I "python=3.8.1 (default, Jan  8 2020, 15:55:49) [MSC v.1916 64 bit (AMD64)]"
+I "robot=5.0rc1"
+M b:"Robot1"
+M c:"s1"
+M d:"C:/Users/fabio/AppData/Local/Temp/pytest-of-fabio/pytest-1151/test_robot_out_stream0/test_robot_stream/robot1.robot"
+SS b|c|d|0.055
+M e:"Simple Task"
+M f:"s1-t1"
+ST e|f|16|0.056
+M m:"PASS"
+M h:""
+ET m|h|0.095
+ES Y|0.096

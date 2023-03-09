@@ -1,0 +1,52 @@
+# Set the default behavior for when core.autocrlf is not set
+*               text=auto
+
+# See https://git-scm.com/docs/gitattributes
+# See https://help.github.com/articles/dealing-with-line-endings/
+
+# Source code
+*.c             text
+*.cpp           text
+*.h             text
+*.hpp           text
+*.pxd           text
+*.py            text
+*.pyx           text
+
+# Linux shell scripts
+*.sh            eol=lf
+
+# Windows shell scripts
+*.bat           eol=crlf
+*.cmd           eol=crlf
+*.ps1           eol=crlf
+
+# Configuration files, scripts, documentation
+*.cfg           text
+*.csv           text
+*.ini           text
+*.json          text
+*.md            text
+*.rst           text
+*.txt           text
+*.xml           text
+*.yaml          text
+*.yml           text
+.gitignore      text
+.mu_repo        text
+.project        text
+.pydevproject   text
+
+# Documentation
+*.css           text
+*.html          text
+*.rst           text
+
+# Image
+*.svg           eol=lf
+
+# Binary files
+*.jpeg          binary
+*.jpg           binary
+*.pdf           binary
+*.png           binary
