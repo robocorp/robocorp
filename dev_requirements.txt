@@ -1,0 +1,6 @@
+black==22.12.0
+click==8.1.3
+mypy==0.910
+types-docutils
+types-PyYAML
+fire
