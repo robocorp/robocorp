@@ -9,6 +9,7 @@ class Callback(object):
     """
 
     def __init__(self):
+        self.raise_exceptions = False
         self._callbacks = []
 
     def register(self, callback):
@@ -26,6 +27,8 @@ class Callback(object):
                 c(*args, **kwargs)
             except:
                 traceback.print_exc()
+                if self.raise_exceptions:
+                    raise
 
 
 # Called as: before_method(__package__, filename, name, lineno, args_dict)

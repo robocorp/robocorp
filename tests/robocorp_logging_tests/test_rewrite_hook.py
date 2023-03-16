@@ -88,3 +88,6 @@ def test_rewrite_hook_basic(config):
         ]
     finally:
         sys.meta_path.remove(hook)
+        _rewrite_callbacks.before_method.unregister(before_method)
+        _rewrite_callbacks.after_method.unregister(after_method)
+        _rewrite_callbacks.method_return.unregister(method_return)

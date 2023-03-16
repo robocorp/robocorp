@@ -252,6 +252,9 @@ class _RobotOutputImpl:
     def hide_from_output(self, string_to_hide: str) -> None:
         import re
 
+        if string_to_hide in self._hide_strings:
+            return
+
         self._hide_strings.add(string_to_hide)
         lst = []
         for s in self._hide_strings:

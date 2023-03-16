@@ -28,9 +28,6 @@ Install with:
 * See: [Handling Sensitive Data](/docs/handling_sensitive_data.md)
 
 
-## How
-
-The "how" of the solution is essentially the listener arguments, data format and the parsers:
+## Internal structure
 
 * [Format specification](/docs/format.md)
-* [Listener arguments](/docs/arguments.md)
