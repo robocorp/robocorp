@@ -29,8 +29,8 @@ class _RobocorpLogger:
     def __init__(
         self,
         output_dir: Optional[str] = None,
-        max_file_size: Optional[str] = None,
-        max_files: int = 0,
+        max_file_size: str = "1MB",
+        max_files: int = 5,
         log_html: Optional[Union[Path, str]] = None,
         **kwargs,
     ):

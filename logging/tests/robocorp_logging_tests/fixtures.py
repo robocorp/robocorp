@@ -12,6 +12,15 @@ def resources_dir(tmpdir_factory):
     return resources_dir
 
 
+@pytest.fixture(scope="session", autouse=True)
+def raise_exceptions():
+    from robocorp_logging import _rewrite_callbacks
+
+    _rewrite_callbacks.before_method.raise_exceptions = True
+    _rewrite_callbacks.after_method.raise_exceptions = True
+    _rewrite_callbacks.method_return.raise_exceptions = True
+
+
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
     import subprocess

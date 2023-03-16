@@ -111,6 +111,13 @@ def _register_callbacks(rewrite_hook_config):
     ) -> None:
         args = []
         for key, val in args_dict.items():
+
+            for p in ("password", "passwd"):
+                if p in key:
+                    for rf_stream in __all_logger_instances__:
+                        rf_stream.hide_from_output(val)
+                    break
+
             args.append(f"{key}={val!r}")
         for rf_stream in __all_logger_instances__:
             rf_stream.start_method(
@@ -152,14 +159,28 @@ def setup_auto_logging():
 @contextmanager
 def add_logging_output(
     output_dir: Optional[str] = None,
-    max_file_size: Optional[str] = None,
-    max_files: int = 0,
+    max_file_size: str = "1MB",
+    max_files: int = 5,
     log_html: Optional[Union[str, Path]] = None,
 ):
 
-    from ._logger import _RobocorpLogger
+    from ._logger import _RobocorpLogger  # @Reimport
 
     logger = _RobocorpLogger(output_dir, max_file_size, max_files, log_html)
+    __all_logger_instances__[logger] = 1
+    try:
+        yield
+    finally:
+        __all_logger_instances__.pop(logger)
+        logger.close()
+
+
+@contextmanager
+def add_in_memory_logging_output(write):
+
+    from ._logger import _RobocorpLogger  # @Reimport
+
+    logger = _RobocorpLogger(__write__=write)
     __all_logger_instances__[logger] = 1
     try:
         yield
@@ -202,26 +223,63 @@ def log_end_task(name: str, task_id: str, status: str, message: str):
 # --- Methods related to hiding logging information.
 
 
+@contextmanager
 def stop_logging_methods():
+    """
+    Can be used so that method calls are no longer logged.
+    """
     for rf_stream in __all_logger_instances__:
         rf_stream.stop_logging_methods()
+    try:
+        yield
+    finally:
+        start_logging_methods()
 
 
 def start_logging_methods():
+    """
+    Usually doesn't need to be called as `stop_logging_methods` should be used
+    as a context manager (which would automatically call this method).
+
+    Can still be used if `stop_logging_methods` with a try..finally if
+    `stop_logging_methods` isn't used as a context manager.
+    """
     for rf_stream in __all_logger_instances__:
         rf_stream.start_logging_methods()
 
 
+@contextmanager
 def stop_logging_variables():
+    """
+    Can be used so that variables are no longer logged.
+    """
     for rf_stream in __all_logger_instances__:
         rf_stream.stop_logging_variables()
 
+    try:
+        yield
+    finally:
+        start_logging_variables()
+
 
 def start_logging_variables():
+    """
+    Usually doesn't need to be called as `stop_logging_variables` should be used
+    as a context manager (which would automatically call this method).
+
+    Can still be used if `stop_logging_variables` with a try..finally if
+    `stop_logging_variables` isn't used as a context manager.
+    """
     for rf_stream in __all_logger_instances__:
         rf_stream.start_logging_variables()
 
 
-def hide_from_output(string_to_hide):
+def hide_from_output(string_to_hide: str) -> None:
+    """
+    Should be called to hide sensitive information from appearing in the output.
+
+    :param string_to_hide:
+        The string that should be hidden from the output.
+    """
     for rf_stream in __all_logger_instances__:
         rf_stream.hide_from_output(string_to_hide)

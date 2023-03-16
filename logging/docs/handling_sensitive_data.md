@@ -1,7 +1,10 @@
 ## Handling sensitive data
 
-By default `Robot Framework Output Stream` will show information for all the `Keyword` calls as well as the parameters passed to methods.
-This is very handy but comes with the drawback that some care must be must be taken in order for sensitive data to be kept out of the logs.
+By default `Robocorp Logging` will show information for all method calls in user
+code as well as some selected libraries automatically.
+
+This is very handy but comes with the drawback that some care must be must be taken 
+in order for sensitive data to be kept out of the logs.
 
 The most common use cases and APIs are explained below:
 
@@ -9,7 +12,7 @@ Usernames and passwords
 ------------------------
 
 For usernames and passwords, the preferred approach is that the provider of the sensitive information
-asks for the information and requests `Robot Framework Output Stream` to keep such information out of
+asks for the information and requests `Robocorp Logging` to keep such information out of
 the logs.
 
 The usage for the API is:
@@ -25,20 +28,17 @@ robocorp_logging.hide_from_output(password)
 By calling the `hide_from_output` method, any further occurrence of the `password` contents will be
 automatically changed to `<redacted>`.
 
-Note that any variable in Robot Framework assigned to a variable which has `password` or `passwd` in
-its name is also automatically redacted.
+Note that any argument named `password` or `passwd` in its name is also automatically redacted.
 
 In the example below, the contents of the `${user password}` variable will be automatically added to
 the list of strings to be hidden from the output.
 
-```robotframework
+```python
 
-*** Keyword ***
-Check handling of password
-    ${user password}=    Obtain password
+def check_handling(user_password):
+    ...
 
-    # The contents of ${user password} will be shown as `<redacted>` in the log.
-    Log    ${user password}
+check_handling('the password')
 ```
 
 
@@ -48,77 +48,32 @@ Sensitive data obtained from APIs
 When handling sensitive data from APIs (such as private user information obtained from an API, as the SSN
 or medical data) the preferred API is disabling the logging for variables.
 
-This can be done either through a `log:ignore-variables` tag in the related keyword 
-(which may be preferred as the stop/start is managed) or through the
-`Stop logging variables`, `Start logging variables` APIs.
-
-Example using tag:
-
-```robotframework
-
-*** Keyword ***
-Handle sensitive info
-    [Tags]    log:ignore-variables
-    # Obtain and handle sensitive info
-
-```
+This can be done with the `stop_logging_variables` API (which is usable as a context manager).
 
 Example using API:
 
-```robotframework
+```python
 
-*** Settings ***
-Library     robocorp_logging
-
-*** Keyword ***
-Handle sensitive info
-    Stop logging variables
-    TRY
-        # Obtain and handle sensitive info
-        
-    FINALLY
-        Start logging variables
-    END
-
+def handle_sensitive_info()
+    with stop_logging_variables():
+        ...
 
 ```
 
 
 If even the methods called could be used to compromise some information, it's possible
-to completely stop the logging with the `log:ignore-methods` tag or through the
-`Stop logging methods` and `Start logging methods` APIs. 
+to completely stop the logging with the `stop_logging_methods` APIs. 
 
 Note: this may make debugging a failure harder as keyword calls won't be logged, 
-albeit you may still call `Log` with a log level of `WARN, FAIL or ERROR` to explicitly log something in this case.
-
-Example using tag:
-
-*** Keyword ***
-Handle sensitive info
-    [Tags]    log:ignore-methods
-    # Obtain and handle sensitive info
-
-```
+albeit you may still call `log` with a log level of `WARN, FAIL or ERROR` to explicitly log something in this case.
 
 Example using API:
 
-```robotframework
+```python
 
-*** Settings ***
-Library     robocorp_logging
-
-*** Keyword ***
-Handle sensitive info
-    Stop logging methods
-    TRY
-        # Obtain and handle sensitive info
-        Log     This will appear    level=WARN
-        Log     This will not appear
-        
-    FINALLY
-        Start logging methods
-    END
-
+def handle_sensitive_info()
+    with stop_logging_methods():
+        ...
 
 ```
 
