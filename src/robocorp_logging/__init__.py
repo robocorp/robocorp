@@ -109,7 +109,8 @@ def _register_callbacks(rewrite_hook_config):
     registered = getattr(_register_callbacks, "registered", False)
     if registered:
         import warnings
-        warnings.warn('Auto logging is already setup. 2nd call has no effect.')
+
+        warnings.warn("Auto logging is already setup. 2nd call has no effect.")
         return _OnExitContextManager(lambda: None)
     _register_callbacks.registered = True
 
