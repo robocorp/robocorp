@@ -28,7 +28,7 @@ def _log_error(func):
 class _RobocorpLogger:
     def __init__(
         self,
-        output_dir: Optional[str] = None,
+        output_dir: Optional[Union[str, Path]] = None,
         max_file_size: str = "1MB",
         max_files: int = 5,
         log_html: Optional[Union[Path, str]] = None,
@@ -40,7 +40,11 @@ class _RobocorpLogger:
         # Note: expected to be used just when used in-memory (not part of the public API).
         config = _Config(kwargs.get("__uuid__"))
 
-        config.output_dir = output_dir
+        if output_dir is None:
+            config.output_dir = None
+        else:
+            config.output_dir = str(output_dir)
+
         if log_html is None:
             config.log_html = None
         else:
