@@ -34,7 +34,7 @@ def test_log_api(tmpdir) -> None:
                 start_method_messages.append(v)
 
         assert len(start_method_messages) > 1
-        
+
 
 def test_log_api_without_with_statments(tmpdir) -> None:
     import robocorp_logging
@@ -47,23 +47,23 @@ def test_log_api_without_with_statments(tmpdir) -> None:
     robocorp_logging.setup_auto_logging()
     try:
         check = reload(check)
-    
+
         robocorp_logging.add_log_output(
             tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
         )
-    
+
         robocorp_logging.log_start_suite("Root Suite", "root", str(tmpdir))
         robocorp_logging.log_start_task("my_task", "task_id", 0, [])
-    
+
         check.some_method()
-    
+
         robocorp_logging.log_end_task("my_task", "task_id", "PASS", "Ok")
         robocorp_logging.log_end_suite("Root Suite", "root", str(tmpdir))
-    
+
         assert not log_target.exists()
     finally:
         robocorp_logging.close_log_outputs()
-    
+
     assert log_target.exists()
     start_method_messages = []
     for v in iter_decoded_log_format_from_log_html(log_target):

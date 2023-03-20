@@ -185,15 +185,17 @@ def add_log_output(
 
     return _OnExitContextManager(_exit)
 
+
 def close_log_outputs():
-    '''
+    """
     This method must be called to close loggers (note that some loggers such as
     the one which outputs html needs to bo closed to actually write the output).
-    '''
+    """
     while __all_logger_instances__:
         logger = next(iter(__all_logger_instances__))
         __all_logger_instances__.pop(logger, None)
         logger.close()
+
 
 def add_in_memory_log_output(write):
 
