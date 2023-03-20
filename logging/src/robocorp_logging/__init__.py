@@ -108,6 +108,8 @@ def _register_callbacks(rewrite_hook_config):
     # Make sure that this method should be called only once.
     registered = getattr(_register_callbacks, "registered", False)
     if registered:
+        import warnings
+        warnings.warn('Auto logging is already setup. 2nd call has no effect.')
         return _OnExitContextManager(lambda: None)
     _register_callbacks.registered = True
 
@@ -157,6 +159,7 @@ def _register_callbacks(rewrite_hook_config):
         sys.meta_path.remove(hook)
         before_method.unregister(call_before_method)
         after_method.unregister(call_after_method)
+        _register_callbacks.registered = False
 
     return _OnExitContextManager(_exit)
 
