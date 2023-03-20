@@ -93,12 +93,22 @@ from ._rewrite_callbacks import (
 )
 
 
-@contextmanager
+class _OnExitContextManager:
+    def __init__(self, on_exit):
+        self.on_exit = on_exit
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.on_exit()
+
+
 def _register_callbacks(rewrite_hook_config):
     # Make sure that this method should be called only once.
     registered = getattr(_register_callbacks, "registered", False)
     if registered:
-        return
+        return _OnExitContextManager(lambda: None)
     _register_callbacks.register = True
 
     from robocorp_logging._rewrite_hook import RewriteHook
@@ -138,9 +148,8 @@ def _register_callbacks(rewrite_hook_config):
 
     before_method.register(call_before_method)
     after_method.register(call_after_method)
-    try:
-        yield
-    finally:
+
+    def _exit():
         # If the user actually used the with ... statement we'll remove things now.
         # Note: this is meant only for testing as it has caveats (mainly, modules
         # already loaded won't be rewritten and will have the hooks based on
@@ -149,6 +158,8 @@ def _register_callbacks(rewrite_hook_config):
         before_method.unregister(call_before_method)
         after_method.unregister(call_after_method)
 
+    return _OnExitContextManager(_exit)
+
 
 def setup_auto_logging():
     from robocorp_logging._rewrite_config import ConfigFilesFiltering
@@ -156,7 +167,6 @@ def setup_auto_logging():
     return _register_callbacks(ConfigFilesFiltering())
 
 
-@contextmanager
 def add_logging_output(
     output_dir: Optional[str] = None,
     max_file_size: str = "1MB",
@@ -168,25 +178,26 @@ def add_logging_output(
 
     logger = _RobocorpLogger(output_dir, max_file_size, max_files, log_html)
     __all_logger_instances__[logger] = 1
-    try:
-        yield
-    finally:
+
+    def _exit():
         __all_logger_instances__.pop(logger)
         logger.close()
 
+    return _OnExitContextManager(_exit)
 
-@contextmanager
+
 def add_in_memory_logging_output(write):
 
     from ._logger import _RobocorpLogger  # @Reimport
 
     logger = _RobocorpLogger(__write__=write)
     __all_logger_instances__[logger] = 1
-    try:
-        yield
-    finally:
+
+    def _exit():
         __all_logger_instances__.pop(logger)
         logger.close()
+
+    return _OnExitContextManager(_exit)
 
 
 # --- Actual logging methods
