@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "draft-python-framework"
+version = "0.1.0"
+description = "The automation framework for Python"
+authors = [
+	"Ossi R. <ossi@robocorp.com>",
+	"Fabio Z. <fabio@robocorp.com>",
+	"Kerkko P. <kerkko@robocorp.com>",
+]
+readme = "README.md"
+packages = [{include = "robo"}]
+
+[tool.poetry.scripts]
+robo = "robo.cli:app"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+typer = "^0.7.0"
+rich = "^13.3.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.255"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
