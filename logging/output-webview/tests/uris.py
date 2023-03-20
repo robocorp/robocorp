@@ -44,7 +44,6 @@ if sys.platform == "win32":
             return filename[0].lower() + filename[1:]
         return filename
 
-
 else:
 
     def normalize_drive(filename):
