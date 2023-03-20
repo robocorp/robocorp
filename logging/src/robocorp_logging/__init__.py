@@ -8,6 +8,7 @@ import weakref
 from contextlib import contextmanager
 from pathlib import Path
 import typing
+from ._rewrite_config import Filter
 
 if typing.TYPE_CHECKING:
     from ._logger import _RobocorpLogger
@@ -165,10 +166,36 @@ def _register_callbacks(rewrite_hook_config):
     return _OnExitContextManager(_exit)
 
 
-def setup_auto_logging():
+def setup_auto_logging(
+    tracked_folders: Optional[Sequence[Union[Path, str]]] = None,
+    untracked_folders: Optional[Sequence[Union[Path, str]]] = None,
+    filters: Sequence[Filter] = (),
+):
+    """
+    :param tracked_folders:
+        The folders which must be tracked (by default any folder in the
+        pythonpath which is not in a python-library folder).
+
+    :param untracked_folders:
+        The folders which must not be tracked (by default any folder which is a
+        python-library folder).
+
+    :param filters:
+        Additional filters to add folders/modules to be tracked.
+
+        i.e.:
+
+        [
+            Filter("mymodule.ignore", exclude=True, is_path=False),
+            Filter("mymodule.rpa", exclude=False, is_path=False),
+            Filter("**/check/**", exclude=True, is_path=True),
+        ]
+    """
     from robocorp_logging._rewrite_config import ConfigFilesFiltering
 
-    return _register_callbacks(ConfigFilesFiltering())
+    return _register_callbacks(
+        ConfigFilesFiltering(tracked_folders, untracked_folders, filters)
+    )
 
 
 def add_log_output(
