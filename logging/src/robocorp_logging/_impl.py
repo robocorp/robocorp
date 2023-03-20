@@ -293,7 +293,7 @@ class _RobotOutputImpl:
 
     def _write_on_start_or_after_rotate(self):
         if self._current_file is not None:
-            print("Robocorp Log output: ", self._current_file.absolute())
+            print("Robocorp Log output:", self._current_file.absolute())
 
         self._write_json("V ", 1)
         self._write_with_separator(
