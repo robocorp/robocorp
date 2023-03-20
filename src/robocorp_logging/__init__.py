@@ -193,8 +193,24 @@ def setup_auto_logging(
     """
     from robocorp_logging._rewrite_config import ConfigFilesFiltering
 
+    project_roots: Optional[Sequence[str]]
+    if tracked_folders:
+        project_roots = [
+            (f if isinstance(f, str) else str(f.absolute())) for f in tracked_folders
+        ]
+    else:
+        project_roots = None
+
+    library_roots: Optional[Sequence[str]]
+    if untracked_folders:
+        library_roots = [
+            (f if isinstance(f, str) else str(f.absolute())) for f in untracked_folders
+        ]
+    else:
+        library_roots = None
+
     return _register_callbacks(
-        ConfigFilesFiltering(tracked_folders, untracked_folders, filters)
+        ConfigFilesFiltering(project_roots, library_roots, filters)
     )
 
 
