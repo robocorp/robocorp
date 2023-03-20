@@ -167,7 +167,7 @@ def setup_auto_logging():
     return _register_callbacks(ConfigFilesFiltering())
 
 
-def add_logging_output(
+def add_log_output(
     output_dir: Optional[str] = None,
     max_file_size: str = "1MB",
     max_files: int = 5,
@@ -180,13 +180,22 @@ def add_logging_output(
     __all_logger_instances__[logger] = 1
 
     def _exit():
-        __all_logger_instances__.pop(logger)
+        __all_logger_instances__.pop(logger, None)
         logger.close()
 
     return _OnExitContextManager(_exit)
 
+def close_log_outputs():
+    '''
+    This method must be called to close loggers (note that some loggers such as
+    the one which outputs html needs to bo closed to actually write the output).
+    '''
+    while __all_logger_instances__:
+        logger = next(iter(__all_logger_instances__))
+        __all_logger_instances__.pop(logger, None)
+        logger.close()
 
-def add_in_memory_logging_output(write):
+def add_in_memory_log_output(write):
 
     from ._logger import _RobocorpLogger  # @Reimport
 
@@ -194,7 +203,7 @@ def add_in_memory_logging_output(write):
     __all_logger_instances__[logger] = 1
 
     def _exit():
-        __all_logger_instances__.pop(logger)
+        __all_logger_instances__.pop(logger, None)
         logger.close()
 
     return _OnExitContextManager(_exit)
