@@ -109,7 +109,7 @@ def _register_callbacks(rewrite_hook_config):
     registered = getattr(_register_callbacks, "registered", False)
     if registered:
         return _OnExitContextManager(lambda: None)
-    _register_callbacks.register = True
+    _register_callbacks.registered = True
 
     from robocorp_logging._rewrite_hook import RewriteHook
 
