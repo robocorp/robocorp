@@ -24,7 +24,7 @@ def test_sensitive_data():
     with robocorp_logging.setup_auto_logging():
         check_sensitive_data = reload(check_sensitive_data)
 
-        with robocorp_logging.add_in_memory_logging_output(write):
+        with robocorp_logging.add_in_memory_log_output(write):
             check_sensitive_data.run()
 
     assert "my_pass" not in s.getvalue()
