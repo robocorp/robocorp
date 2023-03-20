@@ -168,13 +168,18 @@ def setup_auto_logging():
 
 
 def add_log_output(
-    output_dir: Optional[str] = None,
+    output_dir: Optional[Union[str, Path]] = None,
     max_file_size: str = "1MB",
     max_files: int = 5,
     log_html: Optional[Union[str, Path]] = None,
 ):
 
     from ._logger import _RobocorpLogger  # @Reimport
+
+    if log_html and not output_dir:
+        raise RuntimeError(
+            "When log_html is specified, the output_dir must also be specified."
+        )
 
     logger = _RobocorpLogger(output_dir, max_file_size, max_files, log_html)
     __all_logger_instances__[logger] = 1

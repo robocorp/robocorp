@@ -26,7 +26,7 @@ def _gen_id(level: int = 1) -> Iterator[str]:
 
 class _Config:
     # Loaded from constructor args
-    output_dir: Optional[str]
+    output_dir: Optional[Union[str, Path]]
     max_file_size_in_bytes: int
     max_files: int
     log_html: Optional[str]
