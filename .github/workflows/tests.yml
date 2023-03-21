@@ -34,5 +34,7 @@ jobs:
       env:
         PYTHONPATH: .
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
-      run: poetry run pytest -rfE -vv robo_tests
+      run: |
+        poetry install
+        poetry run pytest -rfE -vv robo_tests
 
