@@ -1,0 +1,42 @@
+name: Tests
+
+on: ["push", "pull_request"]
+      
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [
+          "ubuntu-py310",
+          "windows-py310",
+        ]
+        
+        include:
+          - name: "ubuntu-py310"
+            python: "3.10"
+            os: ubuntu-latest
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install poetry
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+    - name: Test
+      env:
+        PYTHONPATH: .
+      run: poetry run pytest -rfE -vv robo_tests
+

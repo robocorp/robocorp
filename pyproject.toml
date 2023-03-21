@@ -21,6 +21,9 @@ rich = "^13.3.2"
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 ruff = "^0.0.255"
+pytest = "^7.2.2"
+pytest-xdist = "^3.2.1"
+mypy = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core"]
