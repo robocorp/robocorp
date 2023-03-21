@@ -4,7 +4,7 @@ description = "Very simple automation "
 readme = "README.md"
 
 [tool.robo.dependencies]
-rpaframework=="22.0.0"
+rpaframework="22.0.0"
 
 # Do these come here or do they come from robo
 [tool.robo.dev-dependencies]
