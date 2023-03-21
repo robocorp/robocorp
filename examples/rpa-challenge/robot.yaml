@@ -1,0 +1,12 @@
+tasks:
+  Challenge Python:
+    shell: python -m robo run
+
+condaConfigFile: conda.yaml
+artifactsDir: output
+ignoreFiles:
+  - .gitignore
+PATH:
+  - .
+PYTHONPATH:
+  - .
