@@ -1,6 +1,9 @@
-def task(func):
-    def wrapper(*args, **kwargs):
-        print("decorated")
-        return func(*args, **kwargs)
+from robo._callback import Callback
 
-    return wrapper
+on_task_found = Callback()
+
+
+def task(func):
+    on_task_found(func)
+
+    return func
