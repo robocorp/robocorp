@@ -13,3 +13,20 @@ dependencies:
   - pip:
       # Define pip packages here -> https://pypi.org/
       - rpaframework==22.0.0    # https://rpaframework.org/releasenotes.html
+      - https://github.com/robocorp/robocorp-logging/archive/dc48818.zip
+      # Note: we can't just reference master locally because the RCC will just
+      # cache the first version it sees.
+      # - https://github.com/robocorp/robocorp-logging/archive/master.zip
+      
+      # Add some pytest deps so that testing works in the same environment.
+      - pytest
+      - pytest-regressions==1.0.6
+      - pytest-xdist
+      - pytest-timeout
+      
+      # Code formatting in this environment.
+      - black==22.12.0
+      
+      # Typing in this environment.
+      - mypy==1.1.1
+

@@ -15,3 +15,5 @@ temp/
 testrun/*
 .~lock*
 *.pkl
+/.mypy_cache/
+challenge.xlsx

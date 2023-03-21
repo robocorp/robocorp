@@ -1,6 +1,6 @@
 tasks:
   Challenge Python:
-    shell: python -m robo run
+    shell: python tasks.py
 
 condaConfigFile: conda.yaml
 artifactsDir: output
