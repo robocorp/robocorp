@@ -10,16 +10,16 @@ jobs:
       fail-fast: false
       matrix:
         name: [
-          "ubuntu-py38",
-          "windows-py311",
+          "ubuntu-py310",
+          "windows-py310",
         ]
         
         include:
-          - name: "ubuntu-py38"
-            python: "3.8"
+          - name: "ubuntu-py310"
+            python: "3.10"
             os: ubuntu-latest
-          - name: "windows-py311"
-            python: "3.11"
+          - name: "windows-py310"
+            python: "3.10"
             os: windows-latest
 
 
