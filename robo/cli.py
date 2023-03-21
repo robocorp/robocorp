@@ -21,11 +21,16 @@ def new():
     console.print()
 
     Prompt.ask("[cyan]Project name", default="example")
-    Prompt.ask("[cyan]Project template", choices=["blank", "browser", "desktop"], default="blank")
+    Prompt.ask(
+        "[cyan]Project template",
+        choices=["blank", "browser", "desktop"],
+        default="blank",
+    )
 
     console.print()
     console.print("Initializing project (digest: d4dc98983ae5f86e)")
     with Progress() as progress:
+
         def run_task(name, size):
             task = progress.add_task(name, total=size)
             for _ in range(size):
@@ -43,7 +48,6 @@ def new():
     console.print("Tasks file: [bold]tasks.py[/bold]")
 
 
-
 def robot_run():
     spinner = Spinner("dots", "Running [bold]check-website[/bold]...")
     yield spinner
@@ -51,9 +55,9 @@ def robot_run():
     time.sleep(2)
 
     steps = [
-        'browser.open()',
+        "browser.open()",
         'browser.goto("http://robocorp.com")',
-        'browser.take_screenshot()',
+        "browser.take_screenshot()",
     ]
 
     status_spinner = Spinner("dots")
@@ -84,7 +88,12 @@ def run():
         for step in robot_run():
             live.update(step)
 
-    console.print(Panel.fit(Group("[bold]log.html[/bold]", "browser-screenshot-1.png"), title="Artifacts"))
+    console.print(
+        Panel.fit(
+            Group("[bold]log.html[/bold]", "browser-screenshot-1.png"),
+            title="Artifacts",
+        )
+    )
 
     console.print()
     console.print("Run [bold]check-website[/bold] successful!")
@@ -94,7 +103,9 @@ def run():
 @app.command()
 def deploy():
     console.print()
-    console.print("Deploying [bold]example[/bold] to [underline]https://cloud.robocorp.com/organization/example/[/underline]")
+    console.print(
+        "Deploying [bold]example[/bold] to [underline]https://cloud.robocorp.com/organization/example/[/underline]"
+    )
     console.print()
 
     Confirm.ask("Project already exists, replace?")
@@ -104,7 +115,9 @@ def deploy():
 
     console.print()
     console.print("Deploy of [bold]example[/bold] successful!")
-    console.print("Link: [underline]https://cloud.robocorp.com/organization/example/robots/example[/underline]")
+    console.print(
+        "Link: [underline]https://cloud.robocorp.com/organization/example/robots/example[/underline]"
+    )
     console.print()
 
 
