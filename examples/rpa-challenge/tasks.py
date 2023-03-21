@@ -1,10 +1,11 @@
 from robo import task
 
-from robo.libs import Browser
+# TODO: from robo.libs import
+from RPA.Browser.Selenium import Selenium
 from RPA.Excel.Files import Files
 from RPA.HTTP import HTTP
 
-browser_lib = Browser()
+browser_lib = Selenium()
 
 
 @task
