@@ -1,0 +1,38 @@
+name: Tests
+
+on: ["push", "pull_request"]
+      
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [
+          "ubuntu-py38",
+          "windows-py311",
+        ]
+        
+        include:
+          - name: "ubuntu-py38"
+            python: "3.8"
+            os: ubuntu-latest
+          - name: "windows-py311"
+            python: "3.11"
+            os: windows-latest
+
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Test
+      env:
+        PYTHONPATH: .
+        GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
+      run: poetry run pytest -rfE -vv robo_tests
+
