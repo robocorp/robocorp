@@ -36,6 +36,8 @@ def test_collect_tasks_integrated_error():
 
 
 def test_collect_tasks_integrated(datadir):
+    from robocorp_logging import iter_decoded_log_format_from_log_html
+
     result = run(["run", str(datadir), "main"])
 
     assert (
@@ -44,5 +46,14 @@ def test_collect_tasks_integrated(datadir):
     assert "In some method" in result.stdout.decode("utf-8")
     assert result.returncode == 0
 
-    # log_html = datadir / "output" / "log.html"
-    # assert log_html.exists(), "log.html not generated."
+    log_html = datadir / "output" / "log.html"
+    assert log_html.exists(), "log.html not generated."
+    log_messages = tuple(iter_decoded_log_format_from_log_html(log_html))
+    for log_msg in log_messages:
+        if log_msg["message_type"] == "SK" and log_msg["name"] == "some_method":
+            break
+    else:
+        new_line = "\n"
+        raise AssertionError(
+            f"Did not find SK/some_method message. Found: {new_line.join(str(x) for x in log_messages)}"
+        )

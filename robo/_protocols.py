@@ -24,9 +24,19 @@ def check_implements(x: T) -> T:
     return x
 
 
+class Status:
+    NOT_RUN = "NOT RUN"
+    PASS = "PASS"
+    ERROR = "ERROR"
+
+
 class ITask(typing.Protocol):
     package_name: str
+    filename: str
     method: typing.Callable
+
+    status: str
+    message: str
 
     @property
     def name(self):
@@ -55,4 +65,14 @@ class IOnTaskFuncFoundCallback(ICallback, typing.Protocol):
 
 class IBeforeCollectTasksCallback(ICallback, typing.Protocol):
     def __call__(self, path: Path, task_name: str):
+        pass
+
+
+class IBeforeTaskRunCallback(ICallback, typing.Protocol):
+    def __call__(self, task: ITask):
+        pass
+
+
+class IAfterTaskRunCallback(ICallback, typing.Protocol):
+    def __call__(self, task: ITask):
         pass

@@ -117,7 +117,7 @@ def collect_tasks(path: Path, task_name: str = "") -> Iterator[ITask]:
                 module = import_path(path_with_task, root=path)
 
                 for method in methods_marked_as_tasks_found:
-                    task = Task(module.__name__, method)
+                    task = Task(module, method)
                     if accept_task(task):
                         yield task
 
@@ -126,7 +126,7 @@ def collect_tasks(path: Path, task_name: str = "") -> Iterator[ITask]:
         elif path.is_file():
             module = import_path(path_with_task, root=path.parent)
             for method in methods_marked_as_tasks_found:
-                task = Task(module.__name__, method)
+                task = Task(module, method)
                 if accept_task(task):
                     yield task
 
