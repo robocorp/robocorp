@@ -1,53 +1,61 @@
-import robocorp_logging
-import traceback
-from robocorp_logging import Filter
+from RPA.Browser.Selenium import Selenium
+from RPA.Excel.Files import Files
+from RPA.HTTP import HTTP
 
-# This needs to be called before importing code which needs to show in the log
-# (user or library).
-robocorp_logging.setup_auto_logging(
-    # TODO: Some bug is preventing this from working.
-    # filters=[Filter(name="RPA", exclude=False, is_path=False)]
-)
+from robo import task
+
+browser_lib = Selenium()
 
 
-from pathlib import Path
+def get_the_list_of_people_from_the_excel_file():
+    excel_lib = Files()
+    excel_lib.open_workbook("challenge.xlsx")
+    table = excel_lib.read_worksheet_as_table(header=True)
+    excel_lib.close_workbook()
+    return table
 
-output_dir = Path(__file__).parent / "output"
 
-if __name__ == "__main__":
-    # This could be called after user code is imported (but still prior to its
-    # execution).
-    robocorp_logging.add_log_output(
-        output_dir=output_dir,
-        max_file_size="1MB",
-        max_files=5,
-        log_html=output_dir / "log.html",
+def set_value_by_xpath(xpath, value):
+    script = f"document.evaluate('{xpath}',document.body,null,9,null).singleNodeValue.value='{value}';"
+    return browser_lib.execute_javascript(script)
+
+
+def fill_and_submit_the_form(person):
+    names_and_keys = {
+        "labelFirstName": "First Name",
+        "labelLastName": "Last Name",
+        "labelCompanyName": "Company Name",
+        "labelRole": "Role in Company",
+        "labelAddress": "Address",
+        "labelEmail": "Email",
+        "labelPhone": "Phone Number",
+    }
+    for name, key in names_and_keys.items():
+        set_value_by_xpath(f'//input[@ng-reflect-name="{name}"]', person[key])
+    browser_lib.click_button("Submit")
+
+
+def start_the_challenge():
+    browser_lib.open_available_browser("http://rpachallenge.com/")
+    HTTP().download(
+        "http://rpachallenge.com/assets/downloadFiles/challenge.xlsx", overwrite=True
     )
+    browser_lib.click_button("Start")
 
-    # (Optional) Add a way to collect what's being printed in-memory
-    # robocorp_logging.add_in_memory_log_output(print).
 
-    status = "PASS"
+def fill_the_forms():
+    people = get_the_list_of_people_from_the_excel_file()
+    for person in people:
+        fill_and_submit_the_form(person)
 
-    try:
-        import challenge
-    except Exception as e:
-        # TODO: Add errors during collection to the logging.
-        traceback.print_exc()
-        status = "ERROR"
 
-    else:
-        robocorp_logging.log_start_suite("challenge", "challenge", challenge.__file__)
-        robocorp_logging.log_start_task(
-            "run", "challenge.run", challenge.run.__code__.co_firstlineno, []
-        )
-        try:
-            challenge.run()
-        except:
-            status = "ERROR"
-            # TODO: Check if the auto-logging does the right thing here.
-            traceback.print_exc()
-    finally:
-        robocorp_logging.log_end_task("run", "challenge.run", status, "")
-        robocorp_logging.log_end_suite("challenge", "challenge", status)
-        robocorp_logging.close_log_outputs()
+def collect_the_results():
+    browser_lib.capture_element_screenshot("css:div.congratulations")
+    browser_lib.close_all_browsers()
+
+
+@task
+def challenge():
+    start_the_challenge()
+    fill_the_forms()
+    collect_the_results()

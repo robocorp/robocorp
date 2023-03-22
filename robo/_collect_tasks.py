@@ -124,7 +124,7 @@ def collect_tasks(path: Path, task_name: str = "") -> Iterator[ITask]:
                 del methods_marked_as_tasks_found[:]
 
         elif path.is_file():
-            module = import_path(path_with_task, root=path.parent)
+            module = import_path(path, root=path.parent)
             for method in methods_marked_as_tasks_found:
                 task = Task(module, method)
                 if accept_task(task):

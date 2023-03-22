@@ -30,6 +30,7 @@ def _log_after_task_run(task: ITask):
 def setup_auto_logging():
     import robocorp_logging
     from robo._hooks import before_task_run
+    from robo._hooks import after_task_run
 
     # This needs to be called before importing code which needs to show in the log
     # (user or library).
@@ -39,7 +40,9 @@ def setup_auto_logging():
         # TODO: Some bug is preventing this from working.
         # filters=[Filter(name="RPA", exclude=False, is_path=False)]
     ):
-        with before_task_run.register(_log_before_task_run):
+        with before_task_run.register(_log_before_task_run), after_task_run.register(
+            _log_after_task_run
+        ):
             try:
                 yield
             finally:

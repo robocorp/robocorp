@@ -1,4 +1,4 @@
 if __name__ == "__main__":
-    from robo.cli import app
+    from robo.cli import main
 
-    app()
+    main()

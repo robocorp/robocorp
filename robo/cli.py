@@ -1,18 +1,16 @@
-import typer
 from typing import Tuple
 from pathlib import Path
+import sys
+from robo._argdispatch import arg_dispatch
 
-app = typer.Typer(no_args_is_help=True)
 
-
-@app.command()
 def na():
     # We need at least 2 commands with typer, otherwise it'll pass the command
     # as the first argument to the single command.
     raise RuntimeError("N/A")
 
 
-def _setup_log_output(output_dir):
+def _setup_log_output(output_dir: Path):
     import robocorp_logging
 
     # This can be called after user code is imported (but still prior to its
@@ -25,11 +23,12 @@ def _setup_log_output(output_dir):
     )
 
 
-@app.command()
+# Note: the args must match the 'dest' on the configured argparser.
+@arg_dispatch.register
 def run(
-    path: str = typer.Argument("."),
-    task_name: str = typer.Argument(""),
-    exit: bool = True,
+    output_dir: str,
+    path: str,
+    task_name: str,
 ):
     from robo._collect_tasks import collect_tasks
     from robo._hooks import before_task_run, after_task_run
@@ -38,10 +37,13 @@ def run(
     from robo._task import Context
     from robo._protocols import Status
 
-    with setup_auto_logging(), _setup_log_output(Path(path) / "output"):
-        context = Context()
+    p = Path(path)
+    context = Context()
+    if not p.exists():
+        context.show_error(f"Path: {path} does not exist")
+        return 1
 
-        import sys
+    with setup_auto_logging(), _setup_log_output(Path(output_dir)):
         from robo._exceptions import RoboCollectError
 
         if not task_name:
@@ -50,11 +52,13 @@ def run(
             context.show(f"\nCollecting task {task_name} from: {path}")
 
         try:
-            tasks: Tuple[ITask, ...] = tuple(collect_tasks(Path(path), task_name))
+            tasks: Tuple[ITask, ...] = tuple(collect_tasks(p, task_name))
         except RoboCollectError as e:
             context.show_error(str(e))
-            if exit:
-                sys.exit(1)
+            return 1
+
+        if not tasks:
+            context.show(f"Did not find any tasks in: {path}")
             return 1
 
         for task in tasks:
@@ -68,8 +72,18 @@ def run(
             finally:
                 after_task_run(task)
 
+            returncode = 0 if task.status == Status.PASS else 1
+            return returncode
+
+
+def main(args=None, exit: bool = True) -> int:
+    if args is None:
+        args = sys.argv[1:]
+    returncode = arg_dispatch.process_args(args)
+    if exit:
+        sys.exit(returncode)
+    return returncode
+
 
 if __name__ == "__main__":
-    # import sys
-    # sys.argv.append('--help')
-    app()
+    main()
