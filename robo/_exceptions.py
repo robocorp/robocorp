@@ -3,4 +3,6 @@ class RoboError(RuntimeError):
 
 
 class RoboCollectError(RoboError):
-    pass
+    """
+    Exception given if there was some issue collecting robo tasks.
+    """

@@ -2,27 +2,7 @@ from pathlib import Path
 from typing import Iterator, List, Callable, Dict
 from types import ModuleType
 import sys
-
-
-class Task:
-    def __init__(self, package_name, method):
-        self.package_name = package_name
-        self.method = method
-
-    @property
-    def name(self):
-        return self.method.__code__.co_name
-
-    def run(self):
-        self.method()
-
-
-class Context:
-    def show(self, msg):
-        print(msg)
-
-    def show_error(self, msg):
-        print(msg, file=sys.stderr)
+from robo._protocols import ITask
 
 
 def module_name_from_path(path: Path, root: Path) -> str:
@@ -112,22 +92,24 @@ def import_path(
     return mod
 
 
-def collect_tasks(path: Path, task_name: str = "") -> Iterator[Task]:
+def collect_tasks(path: Path, task_name: str = "") -> Iterator[ITask]:
     """
     Note: collecting tasks is not thread-safe.
     """
+    from robo import _hooks
+    from robo._task import Task
 
-    def accept_task(task: Task):
+    _hooks.before_collect_tasks(path, task_name)
+
+    def accept_task(task: ITask):
         if not task_name:
             return True
 
         return task.name == task_name
 
-    from robo import decorators
-
     methods_marked_as_tasks_found: List[Callable] = []
 
-    decorators.on_task_found.register(methods_marked_as_tasks_found.append)
+    _hooks.on_task_func_found.register(methods_marked_as_tasks_found.append)
 
     try:
         if path.is_dir():
@@ -158,4 +140,4 @@ def collect_tasks(path: Path, task_name: str = "") -> Iterator[Task]:
 
             raise RoboCollectError(f"Expected {path} to map to a directory or file.")
     finally:
-        decorators.on_task_found.unregister(methods_marked_as_tasks_found.append)
+        _hooks.on_task_func_found.unregister(methods_marked_as_tasks_found.append)

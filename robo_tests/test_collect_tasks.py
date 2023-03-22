@@ -43,3 +43,6 @@ def test_collect_tasks_integrated(datadir):
     ), f"Error with command line: {result.args}: {result.stderr.decode('utf-8', 'replace')}"
     assert "In some method" in result.stdout.decode("utf-8")
     assert result.returncode == 0
+
+    # log_html = datadir / "output" / "log.html"
+    # assert log_html.exists(), "log.html not generated."

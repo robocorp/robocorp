@@ -16,8 +16,10 @@ def run(
     task_name: str = typer.Argument(""),
     exit: bool = True,
 ):
-    from robo._collect_tasks import Context, collect_tasks, Task
+    from robo._collect_tasks import collect_tasks
     from typing import Tuple
+    from robo._task import Context
+    from robo._protocols import ITask
 
     context = Context()
 
@@ -31,7 +33,7 @@ def run(
         context.show(f"\nCollecting task {task_name} from: {path}")
 
     try:
-        tasks: Tuple[Task, ...] = tuple(collect_tasks(Path(path), task_name))
+        tasks: Tuple[ITask, ...] = tuple(collect_tasks(Path(path), task_name))
     except RoboCollectError as e:
         context.show_error(str(e))
         if exit:

@@ -1,9 +1,7 @@
-from robo._callback import Callback
-
-on_task_found = Callback()
+from robo import _hooks
 
 
 def task(func):
-    on_task_found(func)
+    _hooks.on_task_func_found(func)
 
     return func
