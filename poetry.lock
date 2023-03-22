@@ -455,6 +455,21 @@ pygments = ">=2.13.0,<3.0.0"
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
+name = "robocorp-logging"
+version = "0.0.0"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dc48818.zip", hash = "sha256:aa8538c9e83be8860f79c1f68455a459b9c03f2608a5ba1c8a3631d891d7c85a"},
+]
+
+[package.source]
+type = "url"
+url = "https://github.com/robocorp/robocorp-logging/archive/dc48818.zip"
+
+[[package]]
 name = "ruff"
 version = "0.0.255"
 description = "An extremely fast Python linter, written in Rust."
@@ -541,4 +556,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "57e7d698a3591874eee1a291b86ed197eccb6baec60ac9111a0f849c35dddb67"
+content-hash = "ba2147ff307758382eef29b4162772025d5fa49b4c329dca1ce228bb8ec8d725"
