@@ -83,6 +83,8 @@ def rewrite_ast_add_callbacks(
     parent: Any
     function: Any
 
+    EMPTY_LIST: list = []
+
     while True:
         try:
             stack, node = next(it)
@@ -146,7 +148,26 @@ def rewrite_ast_add_callbacks(
                         class_name = parent.name + "."
 
                 function_body = function.body
+
+                first_non_constant_stmt_index = 0
+                for stmt in function_body:
+                    if (
+                        stmt.__class__.__name__ == "Expr"
+                        and stmt.value.__class__.__name__ == "Constant"
+                    ):
+                        first_non_constant_stmt_index += 1
+                        continue
+                    break
                 function.body = None  # Proper value will be set later.
+
+                # Separate the docstring.
+                if first_non_constant_stmt_index > 0:
+                    function_body_prefix = function_body[
+                        0:first_non_constant_stmt_index
+                    ]
+                    function_body = function_body[first_non_constant_stmt_index:]
+                else:
+                    function_body_prefix = EMPTY_LIST
 
                 factory = _ast_utils.NodeFactory(
                     function_body[0].lineno, function_body[0].col_offset
@@ -197,7 +218,7 @@ def rewrite_ast_add_callbacks(
 
                 try_finally.finalbody = [factory.Expr(call)]
 
-                function.body = [try_finally]
+                function.body = function_body_prefix + [try_finally]
 
     if DEBUG:
         print("\n============ New AST (with hooks in place) ==============\n")

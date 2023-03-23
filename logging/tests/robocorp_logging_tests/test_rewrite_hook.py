@@ -41,6 +41,7 @@ def test_rewrite_hook_basic(config):
 
     try:
         check = reload(check)
+        assert "call_another_method" in check.call_another_method.__doc__
 
         found = []
 
@@ -62,32 +63,32 @@ def test_rewrite_hook_basic(config):
             assert lineno > 0
             found.append(("return", name, return_value))
 
-        _rewrite_callbacks.before_method.register(before_method)
-        _rewrite_callbacks.after_method.register(after_method)
-        _rewrite_callbacks.method_return.register(method_return)
-
-        check.some_method()
-        check.SomeClass(1, 2)
-        assert found == [
-            ("before", "some_method", {}),
-            (
-                "before",
-                "call_another_method",
-                {
-                    "param0": 1,
-                    "param1": "arg",
-                    "args": (["a", "b"],),
-                    "kwargs": {"c": 3},
-                },
-            ),
-            ("after", "call_another_method"),
-            ("return", "some_method", 22),
-            ("after", "some_method"),
-            ("before", "SomeClass.__init__", {"arg1": 1, "arg2": 2}),
-            ("after", "SomeClass.__init__"),
-        ]
+        with _rewrite_callbacks.before_method.register(
+            before_method
+        ), _rewrite_callbacks.after_method.register(
+            after_method
+        ), _rewrite_callbacks.method_return.register(
+            method_return
+        ):
+            check.some_method()
+            check.SomeClass(1, 2)
+            assert found == [
+                ("before", "some_method", {}),
+                (
+                    "before",
+                    "call_another_method",
+                    {
+                        "param0": 1,
+                        "param1": "arg",
+                        "args": (["a", "b"],),
+                        "kwargs": {"c": 3},
+                    },
+                ),
+                ("after", "call_another_method"),
+                ("return", "some_method", 22),
+                ("after", "some_method"),
+                ("before", "SomeClass.__init__", {"arg1": 1, "arg2": 2}),
+                ("after", "SomeClass.__init__"),
+            ]
     finally:
         sys.meta_path.remove(hook)
-        _rewrite_callbacks.before_method.unregister(before_method)
-        _rewrite_callbacks.after_method.unregister(after_method)
-        _rewrite_callbacks.method_return.unregister(method_return)

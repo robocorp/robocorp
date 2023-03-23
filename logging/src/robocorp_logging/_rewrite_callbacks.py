@@ -1,4 +1,17 @@
-import traceback
+from logging import getLogger
+
+logger = getLogger(__name__)
+
+
+class _OnExitContextManager:
+    def __init__(self, on_exit):
+        self.on_exit = on_exit
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.on_exit()
 
 
 class Callback(object):
@@ -17,6 +30,9 @@ class Callback(object):
         new_callbacks.append(callback)
         self._callbacks = new_callbacks
 
+        # Enable using as a context manager to automatically call the unregister.
+        return _OnExitContextManager(lambda: self.unregister(callback))
+
     def unregister(self, callback):
         new_callbacks = [x for x in self._callbacks if x != callback]
         self._callbacks = new_callbacks
@@ -26,7 +42,7 @@ class Callback(object):
             try:
                 c(*args, **kwargs)
             except:
-                traceback.print_exc()
+                logger.exception("Error in callback.")
                 if self.raise_exceptions:
                     raise
 
