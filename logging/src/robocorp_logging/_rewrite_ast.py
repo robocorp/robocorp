@@ -109,6 +109,9 @@ def rewrite_ast_add_callbacks(
             except StopIteration:
                 pass
 
+            if function.name.startswith("_"):
+                continue
+
             factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
 
             result: list = []
@@ -139,7 +142,11 @@ def rewrite_ast_add_callbacks(
             it.send(result)
 
         elif node.__class__.__name__ == "FunctionDef":
+
             function = node
+            if function.name.startswith("_") and function.name != "__init__":
+                continue
+
             if function.body:
                 class_name = ""
                 if stack:
