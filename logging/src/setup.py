@@ -36,7 +36,7 @@ setup(
     package_data={"robocorp_logging": ["py.typed"]},
     zip_safe=False,
     long_description_content_type="text/markdown",
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     # List run-time dependencies here. These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
@@ -65,8 +65,6 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",

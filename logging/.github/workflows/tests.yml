@@ -10,22 +10,18 @@ jobs:
       fail-fast: false
       matrix:
         name: [
-          "windows-py37",
-          "ubuntu-py38-outviewintegrationtests",
-          "ubuntu-py38",
+          "ubuntu-py39-outviewintegrationtests",
+          "windows-py310",
           "ubuntu-py311",
         ]
         
         include:
-          - name: "windows-py37"
-            python: "3.7"
+          - name: "ubuntu-py39-outviewintegrationtests"
+            python: "3.9"
+            os: ubuntu-latest
+          - name: "windows-py310"
+            python: "3.10"
             os: windows-latest
-          - name: "ubuntu-py38-outviewintegrationtests"
-            python: "3.8"
-            os: ubuntu-latest
-          - name: "ubuntu-py38"
-            python: "3.8"
-            os: ubuntu-latest
           - name: "ubuntu-py311"
             python: "3.11"
             os: ubuntu-latest
