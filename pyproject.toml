@@ -17,7 +17,7 @@ robo = "robo.cli:app"
 python = "^3.10"
 typer = "^0.7.0"
 rich = "^13.3.2"
-robocorp-logging = {url = "https://github.com/robocorp/robocorp-logging/archive/dc48818.zip"}
+robocorp-logging = {url = "https://github.com/robocorp/robocorp-logging/archive/cc5cfea.zip"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
