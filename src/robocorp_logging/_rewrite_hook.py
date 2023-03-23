@@ -44,7 +44,9 @@ from ._rewrite_ast import rewrite_ast_add_callbacks
 
 
 # caches rewritten pycs in pycache dirs
-version = "0.0.1"
+# 0.0.1: Initial version
+# 0.0.2: Bugfix: docstrings must be kept as the first statement
+version = "0.0.2"
 PYTEST_TAG = f"{sys.implementation.cache_tag}-robocorp-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + PYTEST_TAG + PYC_EXT

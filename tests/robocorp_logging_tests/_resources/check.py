@@ -1,4 +1,5 @@
 def call_another_method(param0, param1, *args, **kwargs):
+    "docstring for call_another_method"
     assert 1 == 1
 
 
