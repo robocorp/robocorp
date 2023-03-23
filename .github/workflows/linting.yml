@@ -13,10 +13,10 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
         
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v1
         with:
-          python-version: 3.8
+          python-version: 3.9
           
       - name: Setup node 16.x
         uses: actions/setup-node@v1
@@ -49,8 +49,8 @@ jobs:
           python -m pip install -r dev_requirements.txt
           python -m pip install robotframework
           
-          echo $PWD/src >> .venv/lib/python3.8/site-packages/rf_src.pth
-          echo $PWD/tests >> .venv/lib/python3.8/site-packages/rf_src.pth
+          echo $PWD/src >> .venv/lib/python3.9/site-packages/rf_src.pth
+          echo $PWD/tests >> .venv/lib/python3.9/site-packages/rf_src.pth
           
 
       - name: mypy robocorp-logging
