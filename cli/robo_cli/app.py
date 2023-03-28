@@ -1,5 +1,6 @@
 # A dummy cli showcasing rich and typer.
 import time
+import glob
 
 import typer
 from rich.console import Console, Group
@@ -92,15 +93,16 @@ def run():
     with Live(refresh_per_second=30) as live:
         rcc.run()
 
+    artifacts = glob.glob("output/*")
     console.print(
         Panel.fit(
-            Group("[bold]log.html[/bold]", "browser-screenshot-1.png"),
+            Group(*artifacts),
             title="Artifacts",
         )
     )
 
     console.print()
-    console.print("Run [bold]check-website[/bold] successful!")
+    console.print("Run [bold]<taskname>[/bold] successful!")
     console.print()
 
 

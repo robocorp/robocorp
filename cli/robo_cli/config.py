@@ -6,7 +6,6 @@ import yaml
 def read_toml():
     with open("pyproject.toml", "rb") as f:
         return tomllib.load(f)
-    #     return f.read()
 
 
 def generate_yamls():
