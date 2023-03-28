@@ -6,7 +6,7 @@ import typer
 from rich.console import Console, Group
 from rich.live import Live
 from rich.panel import Panel
-from rich.prompt import Prompt, Confirm
+from rich.prompt import IntPrompt, Prompt, Confirm
 from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
@@ -20,6 +20,7 @@ console = Console()
 
 @app.command()
 def new():
+    """Creates a new project"""
     console.print()
     console.print("This command will guide you through creating your project")
     console.print()
@@ -77,6 +78,7 @@ def robot_run():
 
 @app.command()
 def run():
+    """Runs the robot from current directory"""
     rcc.run()
 
     artifacts = glob.glob("output/*")
@@ -94,25 +96,41 @@ def run():
 
 @app.command()
 def deploy():
+    """Deploys the robot from current directory"""
     console.print()
     console.print()
 
-    # organization, robot_id = rcc.deploy()
+    with console.status("Fetching workspace list"):
+        available_workspaces = rcc.get_workspaces()
+
+    workspace_names = list(available_workspaces.keys())
+    keys = [str(i + 1) for i in range(0, len(workspace_names))]
+    console.print("Available workspaces:")
+    i = 1
+    for name in workspace_names:
+        console.print(f"{i}. {name}")
+        i = i + 1
+    workspace_index = IntPrompt.ask("Workspace to deploy into?", choices=keys) - 1
+    selected_workspace = available_workspaces[workspace_names[workspace_index]]
+    workspace_id = selected_workspace["id"]
+    workspace_url = selected_workspace["url"]
+    # TODO: have option to select from list of robot ids or create new one
+    robot_id = Prompt.ask("Robot id to deploy with?", default="example")
+
     console.print(
-        "Deploying [bold]example[/bold] to [underline]https://cloud.robocorp.com/organization/example/[/underline]"
+        f"Deploying [bold]example[/bold] to [underline]{workspace_url}/robots/{robot_id}/[/underline]"
     )
     console.print()
 
-    Confirm.ask("Project already exists, replace?")
+    # TODO: add an if to check for this
+    # Confirm.ask("Project already exists, replace?")
 
     with console.status("Uploading project"):
-        time.sleep(3)
+        console.print(rcc.deploy(workspace_id, robot_id))
 
     console.print()
     console.print("Deploy of [bold]example[/bold] successful!")
-    console.print(
-        "Link: [underline]https://cloud.robocorp.com/organization/example/robots/example[/underline]"
-    )
+    console.print(f"Link: [underline]{workspace_url}/robots/{robot_id}/[/underline]")
     console.print()
 
 
