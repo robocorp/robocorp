@@ -45,3 +45,6 @@ def new_project(name: str):
         f.write("from robo import task\n\n")
         f.write("def task():\n")
         f.write(f'    print("Hello")\n')
+
+    with open(new_folder / ".gitignore", "w") as f:
+        f.write("output/\n")
