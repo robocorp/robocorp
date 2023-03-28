@@ -6,7 +6,6 @@ import typer
 from rich.console import Console, Group
 from rich.live import Live
 from rich.panel import Panel
-from rich.progress import Progress
 from rich.prompt import Prompt, Confirm
 from rich.spinner import Spinner
 from rich.table import Table
@@ -78,9 +77,7 @@ def robot_run():
 
 @app.command()
 def run():
-    print("run")
-    with Live(refresh_per_second=30) as live:
-        rcc.run()
+    rcc.run()
 
     artifacts = glob.glob("output/*")
     console.print(
