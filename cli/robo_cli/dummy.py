@@ -125,7 +125,7 @@ def dummy_deploy():
 
 
 @app.command()
-def list():
+def dummy_list():
     console.print()
     console.print("> robo run")
 

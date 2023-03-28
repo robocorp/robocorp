@@ -4,12 +4,6 @@ import sys
 from robo._argdispatch import arg_dispatch
 
 
-def na():
-    # We need at least 2 commands with typer, otherwise it'll pass the command
-    # as the first argument to the single command.
-    raise RuntimeError("N/A")
-
-
 def _setup_log_output(output_dir: Path):
     import robocorp_logging
 

@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "robo-cli"
+version = "0.1.0"
+description = ""
+authors = ["Ossi Rajuvaara <ossi@robocorp.com>"]
+readme = "README.md"
+packages = [{include = "robo_cli"}]
+
+[tool.poetry.scripts]
+robo = "robo_cli.dummy:app"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+typer = "^0.7.0"
+rich = "^13.3.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.255"
+mypy = "^1.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
