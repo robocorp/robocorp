@@ -1,0 +1,13 @@
+[tool.robo]
+name = "Simple Automation"
+description = "Very simple automation "
+readme = "README.md"
+
+[tool.robo.dependencies]
+rpaframework="22.0.0"
+
+# Do these come here or do they come from inside robo
+# we generate another RCC conda.yaml / robot.yaml combo from these to run things like lints and formatting / docs generation
+[tool.robo.dev-dependencies]
+ruff="0.0.1"
+black="0.0.1"
