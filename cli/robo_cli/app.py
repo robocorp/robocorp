@@ -11,6 +11,8 @@ from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
 
+from robo_cli import rcc
+
 app = typer.Typer(no_args_is_help=True)
 
 console = Console()
@@ -88,8 +90,7 @@ def robot_run():
 def run():
     print("run")
     with Live(refresh_per_second=30) as live:
-        for step in robot_run():
-            live.update(step)
+        rcc.run()
 
     console.print(
         Panel.fit(
