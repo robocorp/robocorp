@@ -1,44 +1,37 @@
+import json
 import os
 from pathlib import Path
-import json
 
-from robo_cli.config import DEFAULT_PYPROJECT, generate_yamls, delete_yamls
+from robo_cli.config import generate_rcc
+from robo_cli.config.pyproject import DEFAULT_PYPROJECT
 from robo_cli.process import Process
 
 # Convert to absolute path when vendored to not require PATH to be correct
 RCC_EXECUTABLE = "rcc"
 
 
-def _execute(*args, listener=None):
+def _execute(*args):
     cmd = [RCC_EXECUTABLE] + [str(arg).strip() for arg in args]
 
     proc = Process(args=cmd)
-    if listener:
-        proc.add_listener(listener)
+    proc.on_stdout(lambda line: print(line))
+    proc.on_stderr(lambda line: print(line))
 
     stdout, _ = proc.run()
     return "\n".join(stdout)
 
 
 def run():
-    def _print_stderr(line: str):
-        print(line)
-
-    try:
-        generate_yamls()
-        _execute("run", listener=_print_stderr)
-    finally:
-        delete_yamls()
+    with generate_rcc() as (_, robot_config):
+        _execute("run", "--robot", robot_config)
 
 
 def deploy(workspace_id, robot_id):
-    try:
-        generate_yamls()
-        # TODO we need to generate -r robot id and -w workspace or get them from
+    with generate_rcc() as (conda_config, robot_config):
+        # TODO: Copy tempfiles into temporary "deploy" folder with all of the code?
+        # TODO: We need to generate -r robot id and -w workspace or get them from
         # pyproject.toml
         _execute("cloud", "push", "-w", workspace_id, "-r", robot_id)
-    finally:
-        delete_yamls()
 
 
 def new_project(name: str):

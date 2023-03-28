@@ -1,12 +1,11 @@
 # A dummy cli showcasing rich and typer.
-import time
 import glob
+import time
 
 import typer
 from rich.console import Console, Group
-from rich.live import Live
 from rich.panel import Panel
-from rich.prompt import IntPrompt, Prompt, Confirm
+from rich.prompt import Confirm, IntPrompt, Prompt
 from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text

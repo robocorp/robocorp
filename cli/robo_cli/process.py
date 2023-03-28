@@ -1,63 +1,66 @@
+import logging
 import os
 import platform
 import subprocess
+import time
 from pathlib import Path
-from queue import Empty, Queue
 from threading import Event, Thread
-from typing import (
-    IO,
-    Any,
-    Callable,
-    Dict,
-    List,
-    NamedTuple,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import IO, Any, Callable, Dict, List, Optional, Tuple, Union
 
-T = TypeVar("T")
 PathLike = Union[str, Path]
 Listener = Callable[[str], Any]
 
 IS_WINDOWS = platform.system() == "Windows"
+LOGGER = logging.getLogger(__name__)
 
 
-def daemonize(target, *args):
-    thread = Thread(target=target, args=args)
-    thread.daemon = True
-    thread.start()
-    return thread
+class Reader(Thread):
+    def __init__(self, file: IO[str], listeners: List[Listener], interval=0.1):
+        super().__init__()
+        self._file = file
+        self._listeners = listeners
+        self._interval = float(interval)
+        self._lines: List[str] = []
+        self._close = Event()
 
+    @property
+    def lines(self):
+        return list(self._lines)
 
-def exhaust(queue: Queue[T]) -> List[T]:
-    output = []
-    try:
-        while True:
-            event = queue.get_nowait()
-            output.append(event)
-    except Empty:
-        return output
+    def close(self):
+        self._close.set()
 
+    def run(self):
+        try:
+            while not self._close.is_set():
+                self._readlines()
+                time.sleep(self._interval)
+        except ValueError as err:
+            LOGGER.warning("Reading output failed: %s", err)
 
-class Reader(NamedTuple):
-    file: IO[str]
-    thread: Thread
-    queue: Queue[str]
-    close: Event
+        # Ensure everything is read after close
+        self._readlines()
+
+    def _readlines(self):
+        while line := self._file.readline().strip():
+            self._lines.append(line)
+            for listener in self._listeners:
+                try:
+                    listener(line)
+                except Exception as exc:
+                    LOGGER.warning("Unhandled exception in listener: %s", exc)
 
 
 class ProcessError(RuntimeError):
-    def __init__(self, returncode, stderr):
+    def __init__(self, returncode, stdout=None, stderr=None):
         super().__init__()
         self.returncode: int = int(returncode)
-        self.stderr: List[str] = stderr
+        self.stdout: List[str] = stdout or []
+        self.stderr: List[str] = stderr or []
 
     def __str__(self):
         name = self.__class__.__name__
-        lines = "\\n".join(line for line in self.stderr)
-        return f"{name}[returncode={self.returncode},stderr='{lines}']"
+        return f"{name}[returncode={self.returncode}]"
 
 
 class Process:
@@ -66,36 +69,63 @@ class Process:
         args: List[str],
         cwd: Optional[PathLike] = None,
         env: Optional[Dict[str, str]] = None,
+        shell=IS_WINDOWS,  # TODO: Remove later
     ):
         self._args = args
         self._cwd = cwd or Path.cwd()
         self._env = {**os.environ, **(env or {})}
-        self._listeners: List[Listener] = []
+        self._shell = shell
+
+        self._on_stdout: List[Listener] = []
+        self._on_stderr: List[Listener] = []
         self._proc: Optional[subprocess.Popen] = None
 
-    def add_listener(self, listener: Listener):
-        self._listeners.append(listener)
+    def on_stdout(self, listener: Listener):
+        self._on_stdout.append(listener)
+
+    def on_stderr(self, listener: Listener):
+        self._on_stderr.append(listener)
 
     def run(self) -> Tuple[List[str], List[str]]:
-        kwargs = {
+        options = {
             "env": self._env,
             "cwd": str(self._cwd),
-            "shell": IS_WINDOWS,
+            "shell": self._shell,
             "text": True,
+            "bufsize": 1,  # Line buffered
             "encoding": "utf-8",
             "stdout": subprocess.PIPE,
             "stderr": subprocess.PIPE,
         }
 
-        if self._listeners:
-            returncode, stdout, stderr = self._run_stream(self._args, **kwargs)
-        else:
-            returncode, stdout, stderr = self._run_batch(self._args, **kwargs)
+        with subprocess.Popen(self._args, **options) as proc:
+            assert proc.stdout
+            assert proc.stderr
+            assert proc.pid
+
+            stdout = Reader(proc.stdout, self._on_stdout)
+            stderr = Reader(proc.stderr, self._on_stderr)
+
+            stdout.start()
+            stderr.start()
+
+            self._proc = proc
+            self._proc.wait()
+
+            stdout.close()
+            stderr.close()
+
+            stdout.join(timeout=5)
+            stderr.join(timeout=5)
+
+            returncode = self._proc.returncode
+            stdout_lines = stdout.lines
+            stderr_lines = stderr.lines
 
         if returncode != 0:
-            raise ProcessError(returncode, stderr)
+            raise ProcessError(returncode, stdout_lines, stderr_lines)
 
-        return stdout, stderr
+        return stdout_lines, stderr_lines
 
     def stop(self):
         if not self._proc:
@@ -109,66 +139,3 @@ class Process:
             )
         else:
             self._proc.terminate()
-
-    @staticmethod
-    def _run_batch(*args, **kwargs):
-        result = subprocess.run(*args, **kwargs)
-
-        stdout_lines = result.stdout.splitlines()
-        stderr_lines = result.stderr.splitlines()
-
-        return result.returncode, stdout_lines, stderr_lines
-
-    def _run_stream(self, *args, **kwargs):
-        kwargs["bufsize"] = 1  # Line buffered
-
-        with subprocess.Popen(*args, **kwargs) as proc:
-            assert proc.stdout
-            assert proc.stderr
-            assert proc.pid
-
-            self._proc = proc
-
-            stdout = self._create_reader(proc.stdout)
-            stderr = self._create_reader(proc.stderr)
-
-            stderr_lines = []
-
-            def handle_stderr():
-                lines = exhaust(stderr.queue)
-                stderr_lines.extend(lines)
-                for line in lines:
-                    self._dispatch(line)
-
-            while proc.poll() is None:
-                handle_stderr()
-
-            self._proc = None
-            stdout.close.set()
-            stderr.close.set()
-
-            stdout.thread.join(timeout=5)
-            stderr.thread.join(timeout=5)
-
-            stdout_lines = exhaust(stderr.queue)
-            handle_stderr()
-
-            return proc.returncode, stdout_lines, stderr_lines
-
-    def _create_reader(self, file: IO[str]):
-        queue: Queue[str] = Queue()
-        close = Event()
-        thread = daemonize(self._reader, file, queue, close)
-        return Reader(file, thread, queue, close)
-
-    @staticmethod
-    def _reader(file: IO[str], queue: Queue[Any], close: Event):
-        while True:
-            while line := file.readline().strip():
-                queue.put(line)
-            if close.is_set():
-                break
-
-    def _dispatch(self, line: str):
-        for listener in self._listeners:
-            listener(line)
