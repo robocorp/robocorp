@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "robo_cli"}]
 
 [tool.poetry.scripts]
-robo = "robo_cli.dummy:app"
+robo = "robo_cli.app:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"

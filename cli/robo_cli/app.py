@@ -17,7 +17,7 @@ console = Console()
 
 
 @app.command()
-def dummy_new():
+def new():
     console.print()
     console.print("This command will guide you through creating your project")
     console.print()
@@ -50,7 +50,7 @@ def dummy_new():
     console.print("Tasks file: [bold]tasks.py[/bold]")
 
 
-def dummy_robot_run():
+def robot_run():
     spinner = Spinner("dots", "Running [bold]check-website[/bold]...")
     yield spinner
 
@@ -85,10 +85,10 @@ def dummy_robot_run():
 
 
 @app.command()
-def dummy_run():
+def run():
     print("run")
     with Live(refresh_per_second=30) as live:
-        for step in dummy_robot_run():
+        for step in robot_run():
             live.update(step)
 
     console.print(
@@ -104,7 +104,7 @@ def dummy_run():
 
 
 @app.command()
-def dummy_deploy():
+def deploy():
     console.print()
     console.print(
         "Deploying [bold]example[/bold] to [underline]https://cloud.robocorp.com/organization/example/[/underline]"
@@ -125,7 +125,7 @@ def dummy_deploy():
 
 
 @app.command()
-def dummy_list():
+def list():
     console.print()
     console.print("> robo run")
 
