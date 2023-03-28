@@ -135,7 +135,7 @@ def deploy():
 
 
 @app.command()
-def list():
+def list_tasks():
     console.print()
     console.print("> robo run")
 
