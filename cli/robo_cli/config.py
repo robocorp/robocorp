@@ -2,6 +2,16 @@ import os
 import tomllib
 import yaml
 
+DEFAULT_PYPROJECT = """
+[tool.robo]
+name = "Simple Automation"
+description = "Very simple automation "
+readme = "README.md"
+
+[tool.robo.dependencies]
+rpaframework="22.0.0"
+"""
+
 
 def read_toml():
     with open("pyproject.toml", "rb") as f:

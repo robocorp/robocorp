@@ -25,27 +25,16 @@ def new():
     console.print("This command will guide you through creating your project")
     console.print()
 
-    Prompt.ask("[cyan]Project name", default="example")
-    Prompt.ask(
-        "[cyan]Project template",
-        choices=["blank", "browser", "desktop"],
-        default="blank",
-    )
+    project_name = Prompt.ask("[cyan]Project name", default="example")
+    # Prompt.ask(
+    #     "[cyan]Project template",
+    #     choices=["blank", "browser", "desktop"],
+    #     default="blank",
+    # )
 
     console.print()
-    console.print("Initializing project (digest: d4dc98983ae5f86e)")
-    with Progress() as progress:
-
-        def run_task(name, size):
-            task = progress.add_task(name, total=size)
-            for _ in range(size):
-                progress.update(task, advance=1)
-                time.sleep(0.01)
-
-        run_task("[red] Downloading", 200)
-        run_task("[cyan] Installing ", 300)
-        run_task("[green] Finalizing", 100)
-
+    console.print("Initializing project")
+    rcc.new_project(project_name)
     console.print()
     console.print("✨ Project created ✨")
     console.print()
@@ -109,6 +98,9 @@ def run():
 @app.command()
 def deploy():
     console.print()
+    console.print()
+
+    # organization, robot_id = rcc.deploy()
     console.print(
         "Deploying [bold]example[/bold] to [underline]https://cloud.robocorp.com/organization/example/[/underline]"
     )
