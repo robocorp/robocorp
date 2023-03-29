@@ -1,16 +1,16 @@
-# A dummy cli showcasing rich and typer.
 import glob
 import time
+from pathlib import Path
 
 import typer
 from rich.console import Console, Group
 from rich.panel import Panel
-from rich.prompt import Confirm, IntPrompt, Prompt
+from rich.prompt import IntPrompt, Prompt
 from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
 
-from robo_cli import rcc
+from robo_cli import rcc, templates
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -25,15 +25,21 @@ def new():
     console.print()
 
     project_name = Prompt.ask("[cyan]Project name", default="example")
+    project_root = Path(project_name)
+    if project_root.exists():
+        console.print(f"Project folder '{project_root}' already exists!")
+        raise typer.Exit(code=1)
+
+    choices = templates.list_templates()
     template = Prompt.ask(
         "[cyan]Project template",
-        choices=["blank", "browser"],
+        choices=choices,
         default="blank",
     )
 
     console.print()
     console.print("Initializing project")
-    path = rcc.new_project(project_name, template=template)
+    path = templates.copy_template(project_name, template=template)
     console.print()
     console.print("✨ Project created ✨")
     console.print()
@@ -116,7 +122,7 @@ def deploy():
     console.print()
 
     with console.status("Fetching workspace list"):
-        available_workspaces = rcc.get_workspaces()
+        available_workspaces = rcc.list_workspaces()
 
     workspace_names = list(available_workspaces.keys())
     keys = [str(i + 1) for i in range(0, len(workspace_names))]

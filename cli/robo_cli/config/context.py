@@ -1,14 +1,14 @@
 import os
+import shutil
 from contextlib import contextmanager
 from pathlib import Path
-import shutil
 from tempfile import TemporaryDirectory
 
 from . import conda, robot
 
 
 @contextmanager
-def generate_rcc():
+def generate_configs():
     conda_config = None
     robot_config = None
 
@@ -24,16 +24,14 @@ def generate_rcc():
 
 
 @contextmanager
-def temp_robot_folder():
-    try:
-        with generate_rcc() as (conda_config, robot_config):
-            dir = TemporaryDirectory()
-            shutil.copy(conda_config, Path(dir.name) / "conda.yaml")
-            shutil.copy(robot_config, Path(dir.name) / "robot.yaml")
-            shutil.copy(".gitignore", Path(dir.name) / ".gitignore")
+def generate_robot():
+    with TemporaryDirectory() as root:
+        with generate_configs() as (conda_config, robot_config):
+            root = Path(root)
+            shutil.copy(conda_config, root / "conda.yaml")
+            shutil.copy(robot_config, root / "robot.yaml")
+            shutil.copy(".gitignore", root / ".gitignore")
             # TODO: support some kind of discovery for what python files to copy
-            shutil.copy("tasks.py", Path(dir.name) / "tasks.py")
-            shutil.copy("pyproject.toml", Path(dir.name) / "pyproject.toml")
-            yield dir
-    finally:
-        dir.cleanup()
+            shutil.copy("tasks.py", root / "tasks.py")
+            shutil.copy("pyproject.toml", root / "pyproject.toml")
+            yield root

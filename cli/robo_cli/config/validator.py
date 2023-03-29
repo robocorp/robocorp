@@ -63,7 +63,7 @@ def _validate_value(key: str, value: Any, tp: Any):
         invalid()
 
 
-def _ensure_type(key: str, value: Any, options: tuple[Type]):
+def _ensure_type(key: str, value: Any, options: tuple[Type, ...]):
     if Any in options:
         return
     if type(value) in options:

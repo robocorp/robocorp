@@ -1,10 +1,11 @@
 import tomllib
-from typing import TypedDict, NotRequired
 from functools import lru_cache
+from typing import NotRequired, TypedDict
+
 from .validator import validate_schema
 
 TOOL_ROBO = TypedDict(
-    "tool.robo",
+    "TOOL_ROBO",
     {
         "name": str,
         "description": NotRequired[str],

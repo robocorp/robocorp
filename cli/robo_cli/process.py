@@ -52,9 +52,14 @@ class Reader(Thread):
 
 
 class ProcessError(RuntimeError):
-    def __init__(self, returncode, stdout=None, stderr=None):
+    def __init__(
+        self,
+        returncode: int,
+        stdout: Optional[List[str]] = None,
+        stderr: Optional[List[str]] = None,
+    ):
         super().__init__()
-        self.returncode: int = int(returncode)
+        self.returncode = returncode
         self.stdout: List[str] = stdout or []
         self.stderr: List[str] = stderr or []
 

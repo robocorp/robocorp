@@ -1,5 +1,7 @@
+from typing import NotRequired, TypedDict
+
 import pytest
-from typing import TypedDict, NotRequired
+
 from robo_cli.config import validator
 
 SIMPLE = TypedDict(
