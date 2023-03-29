@@ -33,9 +33,11 @@ def new():
 
     console.print()
     console.print("Initializing project")
-    rcc.new_project(project_name, template=template)
+    path = rcc.new_project(project_name, template=template)
     console.print()
     console.print("✨ Project created ✨")
+    console.print()
+    console.print(f"Project path: {path.absolute()}")
     console.print()
     console.print("Configuration file: [bold]pyproject.toml[/bold]")
     console.print("Tasks file: [bold]tasks.py[/bold]")

@@ -1,5 +1,6 @@
 import json
 import os
+from os import PathLike
 from pathlib import Path
 import shutil
 
@@ -48,9 +49,10 @@ def export() -> Path:
         return zip_path
 
 
-def new_project(name: str, template: str):
+def new_project(name: str | PathLike, template: str):
     new_folder = Path(name)
     shutil.copytree(TEMPLATE_PATH / template, new_folder)
+    return new_folder
 
 
 def get_workspaces() -> dict[str, dict[str, str]]:
