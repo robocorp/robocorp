@@ -94,6 +94,19 @@ def run():
 
 
 @app.command()
+def export():
+    """Exports the robot from current directory. Can be used to inspect what contents
+    will be deployed to the cloud.
+    """
+    console.print()
+    with console.status("Exporting robot"):
+        path = rcc.export()
+
+    console.print(f"Exported to {path}")
+    console.print()
+
+
+@app.command()
 def deploy():
     """Deploys the robot from current directory"""
     console.print()

@@ -1,8 +1,10 @@
 import json
 import os
 from pathlib import Path
+import shutil
 
 from robo_cli.config import generate_rcc
+from robo_cli.config.context import temp_robot_folder
 from robo_cli.config.pyproject import DEFAULT_PYPROJECT
 from robo_cli.process import Process
 
@@ -14,8 +16,8 @@ def _execute(*args):
     cmd = [RCC_EXECUTABLE] + [str(arg).strip() for arg in args]
 
     proc = Process(args=cmd)
-    proc.on_stdout(lambda line: print(line))
-    proc.on_stderr(lambda line: print(line))
+    # proc.on_stdout(lambda line: print(line))
+    # proc.on_stderr(lambda line: print(line))
 
     stdout, _ = proc.run()
     return "\n".join(stdout)
@@ -27,11 +29,21 @@ def run():
 
 
 def deploy(workspace_id, robot_id):
-    with generate_rcc() as (conda_config, robot_config):
+    with temp_robot_folder() as dir:
         # TODO: Copy tempfiles into temporary "deploy" folder with all of the code?
-        # TODO: We need to generate -r robot id and -w workspace or get them from
-        # pyproject.toml
-        _execute("cloud", "push", "-w", workspace_id, "-r", robot_id)
+        print(os.listdir(dir.name))
+        _execute(
+            "cloud", "push", "--directory", dir.name, "-w", workspace_id, "-r", robot_id
+        )
+
+
+def export() -> Path:
+    with temp_robot_folder() as dir:
+        _execute("robot", "wrap", "--directory", dir.name)
+        os.mkdir("dist")
+        zip_path = Path("dist") / "robot.zip"
+        path = shutil.move("robot.zip", zip_path)
+        return zip_path
 
 
 def new_project(name: str):
