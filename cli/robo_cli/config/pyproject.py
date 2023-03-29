@@ -3,8 +3,8 @@ from typing import TypedDict, NotRequired
 from functools import lru_cache
 from .validator import validate_schema
 
-ROBO_SECTION = TypedDict(
-    "Schema",
+TOOL_ROBO = TypedDict(
+    "tool.robo",
     {
         "name": str,
         "description": NotRequired[str],
@@ -26,7 +26,7 @@ def load(path="pyproject.toml"):
             raise ValueError("Missing tool.robo section in pyproject.toml") from err
 
         try:
-            if validate_schema(section, ROBO_SECTION):
+            if validate_schema(section, TOOL_ROBO):
                 return section
             raise RuntimeError  # Unreachable code
         except (KeyError, ValueError) as err:
