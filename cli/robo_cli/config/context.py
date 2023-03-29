@@ -25,13 +25,13 @@ def generate_rcc():
 
 @contextmanager
 def temp_robot_folder():
-    # path = "robot"
     try:
         with generate_rcc() as (conda_config, robot_config):
             dir = TemporaryDirectory()
             shutil.copy(conda_config, Path(dir.name) / "conda.yaml")
             shutil.copy(robot_config, Path(dir.name) / "robot.yaml")
             shutil.copy(".gitignore", Path(dir.name) / ".gitignore")
+            # TODO: support some kind of discovery for what python files to copy
             shutil.copy("tasks.py", Path(dir.name) / "tasks.py")
             shutil.copy("pyproject.toml", Path(dir.name) / "pyproject.toml")
             yield dir

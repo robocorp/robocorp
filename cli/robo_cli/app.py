@@ -136,7 +136,7 @@ def deploy():
     )
     console.print()
 
-    # TODO: add an if to check for this
+    # TODO: add an if to check for this. Currently this _only_ works for replacing
     # Confirm.ask("Project already exists, replace?")
 
     with console.status("Uploading project"):

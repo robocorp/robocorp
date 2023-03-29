@@ -32,7 +32,6 @@ def run():
 
 def deploy(workspace_id, robot_id):
     with temp_robot_folder() as dir:
-        # TODO: Copy tempfiles into temporary "deploy" folder with all of the code?
         print(os.listdir(dir.name))
         _execute(
             "cloud", "push", "--directory", dir.name, "-w", workspace_id, "-r", robot_id
