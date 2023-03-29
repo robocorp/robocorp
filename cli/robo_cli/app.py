@@ -169,3 +169,7 @@ def list_tasks():
     console.print()
     Prompt.ask("Select task to run", choices=["1", "2"])
     console.print()
+
+
+if __name__ == "__main__":
+    app()
