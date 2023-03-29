@@ -139,7 +139,8 @@ def deploy():
     robot_id = Prompt.ask("Robot id to deploy with?", default="example")
 
     console.print(
-        f"Deploying [bold]example[/bold] to [underline]{workspace_url}/robots/{robot_id}/[/underline]"
+        "Deploying [bold]example[/bold] to "
+        + f"[underline]{workspace_url}/robots/{robot_id}/[/underline]"
     )
     console.print()
 

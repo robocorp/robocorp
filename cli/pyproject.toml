@@ -24,6 +24,13 @@ isort = "^5.12.0"
 pyinstaller = "^5.9.0"
 types-pyyaml = "^6.0.12.9"
 
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
