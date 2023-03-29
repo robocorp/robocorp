@@ -59,6 +59,7 @@ def new_project(name: str):
 
     with open(new_folder / ".gitignore", "w") as f:
         f.write("output/\n")
+        f.write("dist/\n")
 
 
 def get_workspaces() -> dict[str, dict[str, str]]:
