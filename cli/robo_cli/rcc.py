@@ -40,7 +40,8 @@ def deploy(workspace_id, robot_id):
 def export() -> Path:
     with temp_robot_folder() as dir:
         _execute("robot", "wrap", "--directory", dir.name)
-        os.mkdir("dist")
+        if not os.path.exists("dist/"):
+            os.mkdir("dist")
         zip_path = Path("dist") / "robot.zip"
         path = shutil.move("robot.zip", zip_path)
         return zip_path
