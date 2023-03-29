@@ -5,11 +5,12 @@ import shutil
 
 from robo_cli.config import generate_rcc
 from robo_cli.config.context import temp_robot_folder
-from robo_cli.config.pyproject import DEFAULT_PYPROJECT
 from robo_cli.process import Process
 
 # Convert to absolute path when vendored to not require PATH to be correct
 RCC_EXECUTABLE = "rcc"
+
+TEMPLATE_PATH = Path(__file__).parent.parent / "templates"
 
 
 def _execute(*args):
@@ -47,20 +48,9 @@ def export() -> Path:
         return zip_path
 
 
-def new_project(name: str):
-    os.mkdir(name)
+def new_project(name: str, template: str):
     new_folder = Path(name)
-    with open(new_folder / "pyproject.toml", "w") as f:
-        f.write(DEFAULT_PYPROJECT)
-
-    with open(new_folder / "tasks.py", "w") as f:
-        f.write("from robo import task\n\n")
-        f.write("def task():\n")
-        f.write('    print("Hello")\n')
-
-    with open(new_folder / ".gitignore", "w") as f:
-        f.write("output/\n")
-        f.write("dist/\n")
+    shutil.copytree(TEMPLATE_PATH / template, new_folder)
 
 
 def get_workspaces() -> dict[str, dict[str, str]]:

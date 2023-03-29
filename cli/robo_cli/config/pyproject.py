@@ -1,17 +1,6 @@
 import tomllib
 from functools import lru_cache
 
-# TODO: Move to templates
-DEFAULT_PYPROJECT = """
-[tool.robo]
-name = "Simple Automation"
-description = "Very simple automation "
-python = "3.9.13"
-
-[tool.robo.dependencies]
-rpaframework="22.0.0"
-"""
-
 
 # TODO: Should an absolute path come from some global context/config?
 # TODO: Create a schema/type for our config section

@@ -25,15 +25,15 @@ def new():
     console.print()
 
     project_name = Prompt.ask("[cyan]Project name", default="example")
-    # Prompt.ask(
-    #     "[cyan]Project template",
-    #     choices=["blank", "browser", "desktop"],
-    #     default="blank",
-    # )
+    template = Prompt.ask(
+        "[cyan]Project template",
+        choices=["blank", "browser"],
+        default="blank",
+    )
 
     console.print()
     console.print("Initializing project")
-    rcc.new_project(project_name)
+    rcc.new_project(project_name, template=template)
     console.print()
     console.print("✨ Project created ✨")
     console.print()
