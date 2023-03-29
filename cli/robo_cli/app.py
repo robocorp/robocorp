@@ -80,7 +80,8 @@ def robot_run():
 @app.command()
 def run():
     """Runs the robot from current directory"""
-    rcc.run()
+    with console.status("Running robot"):
+        rcc.run()
 
     artifacts = glob.glob("output/*")
     console.print(

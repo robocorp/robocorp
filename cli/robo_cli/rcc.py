@@ -6,7 +6,7 @@ import shutil
 
 from robo_cli.config import generate_rcc
 from robo_cli.config.context import temp_robot_folder
-from robo_cli.process import Process
+from robo_cli.process import Process, ProcessError
 
 # Convert to absolute path when vendored to not require PATH to be correct
 RCC_EXECUTABLE = "rcc"
@@ -21,7 +21,14 @@ def _execute(*args):
     # proc.on_stdout(lambda line: print(line))
     # proc.on_stderr(lambda line: print(line))
 
-    stdout, _ = proc.run()
+    try:
+        stdout, _ = proc.run()
+    except ProcessError as exc:
+        # If there was an exception we want to avoid the huge CLI traceback and print
+        # the subprocess errors
+        print(("\n").join(exc.stdout))
+        print(("\n").join(exc.stderr))
+        exit(1)
     return "\n".join(stdout)
 
 
