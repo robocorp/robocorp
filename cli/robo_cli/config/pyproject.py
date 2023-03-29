@@ -6,7 +6,7 @@ DEFAULT_PYPROJECT = """
 [tool.robo]
 name = "Simple Automation"
 description = "Very simple automation "
-readme = "README.md"
+python = "3.9.13"
 
 [tool.robo.dependencies]
 rpaframework="22.0.0"
