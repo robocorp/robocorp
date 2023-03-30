@@ -2,6 +2,7 @@ from typing import Tuple
 from pathlib import Path
 import sys
 from robo._argdispatch import arg_dispatch
+import json
 
 
 def _setup_log_output(output_dir: Path):
@@ -18,12 +19,38 @@ def _setup_log_output(output_dir: Path):
 
 
 # Note: the args must match the 'dest' on the configured argparser.
-@arg_dispatch.register
+@arg_dispatch.register(name="list")
+def list_tasks(
+    path: str,
+) -> int:
+    from robo._collect_tasks import collect_tasks
+    from robo._task import Context
+    from robo._protocols import ITask
+
+    p = Path(path)
+    context = Context()
+    if not p.exists():
+        context.show_error(f"Path: {path} does not exist")
+        return 1
+
+    task: ITask
+    tasks_found = []
+    for task in collect_tasks(p):
+        tasks_found.append(
+            {"name": task.name, "line": task.lineno, "file": task.filename}
+        )
+
+    sys.stdout.write(json.dumps(tasks_found))
+    return 0
+
+
+# Note: the args must match the 'dest' on the configured argparser.
+@arg_dispatch.register()
 def run(
     output_dir: str,
     path: str,
     task_name: str,
-):
+) -> int:
     from robo._collect_tasks import collect_tasks
     from robo._hooks import before_task_run, after_task_run
     from robo._logging_setup import setup_auto_logging
@@ -68,6 +95,8 @@ def run(
 
             returncode = 0 if task.status == Status.PASS else 1
             return returncode
+
+        raise AssertionError("Should never get here.")
 
 
 def main(args=None, exit: bool = True) -> int:

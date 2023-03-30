@@ -14,6 +14,35 @@ def examples_dir():
     return examples
 
 
+def robo_run(cmdline, returncode, cwd=None):
+    import subprocess
+
+    cp = os.environ.copy()
+    cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
+    args = [sys.executable, "-m", "robo"] + cmdline
+    result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd)
+    if result.returncode != returncode:
+        env_str = "\n".join(str(x) for x in sorted(cp.items()))
+
+        raise AssertionError(
+            f"""Expected returncode: {returncode}. Found: {result.returncode}.
+=== stdout:
+{result.stdout.decode('utf-8')}
+
+=== stderr:
+{result.stderr.decode('utf-8')}
+
+=== Env:
+{env_str}
+
+=== Args:
+{args}
+
+"""
+        )
+    return result
+
+
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
     import subprocess

@@ -1,5 +1,6 @@
-import subprocess
-import sys
+from robo_tests.fixtures import robo_run
+import json
+import os
 
 
 def test_colect_tasks(datadir):
@@ -18,37 +19,10 @@ def test_colect_tasks(datadir):
     assert len(tasks) == 0
 
 
-def run(cmdline, returncode, cwd=None):
-    import os
-
-    cp = os.environ.copy()
-    cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
-    args = [sys.executable, "-m", "robo"] + cmdline
-    result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd)
-    if result.returncode != returncode:
-        env_str = "\n".join(str(x) for x in sorted(cp.items()))
-
-        raise AssertionError(
-            f"""Expected returncode: {returncode}. Found: {result.returncode}.
-=== stdout:
-{result.stdout.decode('utf-8')}
-
-=== stderr:
-{result.stderr.decode('utf-8')}
-
-=== Env:
-{env_str}
-
-=== Args:
-{args}
-
-"""
-        )
-    return result
-
-
 def test_collect_tasks_integrated_error(tmpdir):
-    result = run(["run", "dir_not_there", "-t=main"], returncode=1, cwd=str(tmpdir))
+    result = robo_run(
+        ["run", "dir_not_there", "-t=main"], returncode=1, cwd=str(tmpdir)
+    )
 
     decoded = result.stderr.decode("utf-8", "replace")
     if "dir_not_there does not exist" not in decoded:
@@ -75,7 +49,7 @@ def verify_log_messages(log_html, expected):
 
 
 def test_collect_tasks_integrated(datadir):
-    result = run(["run", str(datadir), "-t", "main"], returncode=0, cwd=datadir)
+    result = robo_run(["run", str(datadir), "-t", "main"], returncode=0, cwd=datadir)
 
     assert (
         not result.stderr
@@ -95,3 +69,21 @@ def test_collect_tasks_integrated(datadir):
             dict(message_type="ES"),
         ],
     )
+
+
+def test_list_tasks_api(datadir, tmpdir, data_regression):
+    def check(result):
+        output = result.stdout.decode("utf-8")
+        loaded = json.loads(output)
+        assert len(loaded) == 2
+        for entry in loaded:
+            entry["file"] = os.path.basename(entry["file"])
+        data_regression.check(loaded)
+
+    # List with the dir as a target
+    result = robo_run(["list", str(datadir)], returncode=0, cwd=str(tmpdir))
+    check(result)
+
+    # List without the dir as a target (must have the same output).
+    result = robo_run(["list"], returncode=0, cwd=datadir)
+    check(result)
