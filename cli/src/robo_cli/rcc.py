@@ -1,16 +1,23 @@
 import json
+import platform
 import shutil
 from pathlib import Path
 
 from robo_cli.config import generate_configs, generate_robot
 from robo_cli.process import Process, ProcessError
+from robo_cli.resources import resources_path
 
-# Convert to absolute path when vendored to not require PATH to be correct
-RCC_EXECUTABLE = "rcc"
+
+def _resolve_rcc_path():
+    exe = "rcc.exe" if platform.system() == "Windows" else "rcc"
+    return resources_path() / "bin" / exe
+
+
+RCC_PATH = _resolve_rcc_path()
 
 
 def _execute(*args):
-    cmd = [RCC_EXECUTABLE] + [str(arg).strip() for arg in args]
+    cmd = [str(RCC_PATH)] + [str(arg).strip() for arg in args]
 
     proc = Process(args=cmd)
     # proc.on_stdout(lambda line: print(line))

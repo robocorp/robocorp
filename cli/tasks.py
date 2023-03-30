@@ -1,3 +1,7 @@
+import urllib.request
+import os
+import platform
+import stat
 from pathlib import Path
 
 from invoke import task
@@ -5,34 +9,56 @@ from invoke import task
 CURDIR = Path(__file__).parent
 SRC = CURDIR / "src" / "robo_cli"
 
+RCC_URL = {
+    "Windows": "https://downloads.robocorp.com/rcc/releases/v11.28.0/windows64/rcc.exe",
+    "Darwin": "https://downloads.robocorp.com/rcc/releases/v11.28.0/macos64/rcc",
+    "Linux": "https://downloads.robocorp.com/rcc/releases/v11.28.0/linux64/rcc",
+}[platform.system()]
+
 
 def poetry(ctx, *parts):
     args = " ".join(str(part) for part in parts)
-    ctx.run(f"poetry run {args}", pty=True, echo=True)
+    ctx.run(f"poetry {args}", pty=True, echo=True)
+
+
+@task
+def install(ctx):
+    poetry("install")
+
+    # Download RCC
+    filename = "rcc.exe" if platform.system() == "Windows" else "rcc"
+    path = CURDIR / "resources" / "bin" / filename
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    print(f"Downloading '{RCC_URL}' to '{path}'")
+    urllib.request.urlretrieve(RCC_URL, path)
+
+    st = os.stat(path)
+    os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
 @task
 def lint(ctx):
     """Run static analysis and formatting checks"""
-    poetry(ctx, f"ruff {SRC}")
-    poetry(ctx, f"black --check {SRC}")
-    poetry(ctx, f"isort --check {SRC}")
+    poetry(ctx, f"run ruff {SRC}")
+    poetry(ctx, f"run black --check {SRC}")
+    poetry(ctx, f"run isort --check {SRC}")
 
 
 @task
 def test(ctx):
     """Run unittests"""
-    poetry(ctx, "pytest")
+    poetry(ctx, "run pytest")
 
 
 @task
 def pretty(ctx):
     """Automatically format code"""
-    poetry(ctx, f"black {SRC} {CURDIR / 'tests'}")
-    poetry(ctx, f"isort {SRC} {CURDIR / 'tests'}")
+    poetry(ctx, f"run black {SRC} {CURDIR / 'tests'}")
+    poetry(ctx, f"run isort {SRC} {CURDIR / 'tests'}")
 
 
 @task
 def build(ctx):
     """Build executable"""
-    poetry(ctx, f"pyinstaller {CURDIR / 'pyinstaller.spec'}")
+    poetry(ctx, f"run pyinstaller {CURDIR / 'pyinstaller.spec'}")

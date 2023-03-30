@@ -13,7 +13,6 @@ from rich.text import Text
 from robo_cli import rcc, templates
 
 app = typer.Typer(no_args_is_help=True)
-
 console = Console()
 
 

@@ -1,3 +1,6 @@
 # PyInstaller
 build/
 dist/
+
+# Vendored binaries
+resources/bin/

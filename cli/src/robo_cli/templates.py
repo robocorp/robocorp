@@ -1,9 +1,9 @@
 import shutil
 from pathlib import Path
 
-from robo_cli.resources import resource_path
+from robo_cli.resources import resources_path
 
-TEMPLATE_PATH = resource_path("templates")
+TEMPLATE_PATH = resources_path() / "templates"
 
 
 def list_templates():
