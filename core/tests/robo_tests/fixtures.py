@@ -14,11 +14,13 @@ def examples_dir():
     return examples
 
 
-def robo_run(cmdline, returncode, cwd=None):
+def robo_run(cmdline, returncode, cwd=None, additional_env=None):
     import subprocess
 
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
+    if additional_env:
+        cp.update(additional_env)
     args = [sys.executable, "-m", "robo"] + cmdline
     result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd)
     if result.returncode != returncode:

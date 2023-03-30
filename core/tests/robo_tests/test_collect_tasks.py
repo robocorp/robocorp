@@ -48,6 +48,25 @@ def verify_log_messages(log_html, expected):
         )
 
 
+def verify_log_messages_from_str(s, expected):
+    log_messages = []
+    for log_msg in s.splitlines():
+        log_msg = json.loads(log_msg.strip())
+        log_messages.append(log_msg)
+        for expected_dct in expected:
+            for key, val in expected_dct.items():
+                if log_msg.get(key) != val:
+                    break
+            else:
+                expected.remove(expected_dct)
+
+    if expected:
+        new_line = "\n"
+        raise AssertionError(
+            f"Did not find {expected}.\nFound:\n{new_line.join(str(x) for x in log_messages)}"
+        )
+
+
 def test_collect_tasks_integrated(datadir):
     result = robo_run(["run", str(datadir), "-t", "main"], returncode=0, cwd=datadir)
 
@@ -87,3 +106,25 @@ def test_list_tasks_api(datadir, tmpdir, data_regression):
     # List without the dir as a target (must have the same output).
     result = robo_run(["list"], returncode=0, cwd=datadir)
     check(result)
+
+
+def test_provide_output_in_stdout(datadir, tmpdir):
+    result = robo_run(
+        ["run", "-t=main", str(datadir), "--output", str(tmpdir)],
+        returncode=0,
+        additional_env={"RC_LOG_OUTPUT_STDOUT": "1"},
+    )
+
+    # print(result.stderr.decode("utf-8"))
+    # for line in result.stdout.decode("utf-8").splitlines():
+    #     print(line)
+    verify_log_messages_from_str(
+        result.stdout.decode("utf-8"),
+        [
+            dict(message_type="SK", name="some_method"),
+            dict(message_type="ST"),
+            dict(message_type="ET"),
+            dict(message_type="SS"),
+            dict(message_type="ES"),
+        ],
+    )
