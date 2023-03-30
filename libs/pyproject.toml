@@ -1,18 +1,22 @@
 [tool.poetry]
-name = "robo"
+name = "robo-libs"
 version = "0.1.0"
 description = "The automation framework for Python"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
 	"Kerkko P. <kerkko@robocorp.com>",
+    "Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
 packages = [{include = "robo"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-robocorp-logging = {url = "https://github.com/robocorp/robocorp-logging/archive/cc5cfea.zip"}
+python = "^3.9"
+xlrd = "^2.0.1"
+xlwt = "^1.3.0"
+xlutils = "^2.0.0"
+openpyxl = "^3.0.9"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
