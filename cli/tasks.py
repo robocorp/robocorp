@@ -1,4 +1,9 @@
+from pathlib import Path
+
 from invoke import task
+
+CURDIR = Path(__file__).parent
+SRC = CURDIR / "src" / "robo_cli"
 
 
 def poetry(ctx, *parts):
@@ -9,9 +14,9 @@ def poetry(ctx, *parts):
 @task
 def lint(ctx):
     """Run static analysis and formatting checks"""
-    poetry(ctx, "ruff robo_cli")
-    poetry(ctx, "black --check robo_cli")
-    poetry(ctx, "isort --check robo_cli")
+    poetry(ctx, f"ruff {SRC}")
+    poetry(ctx, f"black --check {SRC}")
+    poetry(ctx, f"isort --check {SRC}")
 
 
 @task
@@ -23,11 +28,11 @@ def test(ctx):
 @task
 def pretty(ctx):
     """Automatically format code"""
-    poetry(ctx, "black robo_cli tests")
-    poetry(ctx, "isort robo_cli tests")
+    poetry(ctx, f"black {SRC} {CURDIR / 'tests'}")
+    poetry(ctx, f"isort {SRC} {CURDIR / 'tests'}")
 
 
 @task
 def build(ctx):
     """Build executable"""
-    poetry(ctx, "pyinstaller robo_cli.spec")
+    poetry(ctx, f"pyinstaller {CURDIR / 'pyinstaller.spec'}")

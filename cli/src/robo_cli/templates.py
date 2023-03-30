@@ -1,8 +1,9 @@
 import shutil
 from pathlib import Path
 
-# TODO: Use resource path for bundled project
-TEMPLATE_PATH = Path(__file__).parent.parent / "templates"
+from robo_cli.resources import resource_path
+
+TEMPLATE_PATH = resource_path("templates")
 
 
 def list_templates():

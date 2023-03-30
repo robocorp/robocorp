@@ -1,14 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
+from pathlib import Path
 
+curdir = Path(__file__).parent
 block_cipher = None
+
+datas = []
+for path in (curdir / "resources").iterdir():
+    datas.append((str(path), "resources"))
 
 
 a = Analysis(
     [os.path.join("robo_cli", "app.py")],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=datas,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

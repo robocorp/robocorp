@@ -4,7 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["Ossi Rajuvaara <ossi@robocorp.com>"]
 readme = "README.md"
-packages = [{include = "robo_cli"}]
+packages = [
+	{ include = "robo_cli", from = "src" },
+]
 
 [tool.poetry.scripts]
 robo = "robo_cli.app:app"
@@ -30,6 +32,11 @@ skip-magic-trailing-comma = false
 
 [tool.isort]
 profile = "black"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src",
+]
 
 [build-system]
 requires = ["poetry-core"]
