@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from io import BytesIO
 from typing import Any, List, Optional, Union
 
-from robo.libs.types import PathType
+from robo.libs._types import PathType
 
 import openpyxl
 import xlrd
@@ -16,7 +16,7 @@ from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 
-from robo.libs.tables import Table
+from robo.libs.excel.tables import Table
 
 
 def get_column_index(column: str) -> int:

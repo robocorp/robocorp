@@ -1,7 +1,7 @@
 import pathlib
 from typing import Optional, Union
 
-from robo.libs.types import PathType
+from robo.libs._types import PathType
 
 from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook, load_workbook
 
