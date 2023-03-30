@@ -1,0 +1,6 @@
+[tool.robo]
+name = "Simple Automation"
+description = "Very simple automation "
+python = "3.9.13"
+
+[tool.robo.dependencies]
