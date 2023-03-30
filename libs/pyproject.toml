@@ -9,7 +9,7 @@ authors = [
     "Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
-packages = [{include = "robo"}]
+packages = [{include = "robo", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
