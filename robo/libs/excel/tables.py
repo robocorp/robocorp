@@ -21,7 +21,7 @@ from typing import (
     Union,
 )
 
-from .types import is_dict_like, is_list_like, is_namedtuple
+from robo.libs._types import is_dict_like, is_list_like, is_namedtuple
 
 
 Index = Union[int, str]
