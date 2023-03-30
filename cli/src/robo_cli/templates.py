@@ -10,6 +10,7 @@ def list_templates():
     return [path.name for path in TEMPLATE_PATH.iterdir() if path.is_dir()]
 
 
-def copy_template(dst: Path, template: str):
+def copy_template(dst: Path, template: str) -> Path:
     # TODO: Validate names nicer
     shutil.copytree(TEMPLATE_PATH / template, dst)
+    return dst

@@ -39,7 +39,7 @@ def new():
 
     console.print()
     console.print("Initializing project")
-    path = templates.copy_template(project_name, template=template)
+    path = templates.copy_template(Path(project_name), template=template)
     console.print()
     console.print("✨ Project created ✨")
     console.print()
