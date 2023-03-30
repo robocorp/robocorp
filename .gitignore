@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .coverage
+.idea/
