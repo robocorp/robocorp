@@ -1,7 +1,9 @@
-import os
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import yaml
+
+from robo_cli import paths
 
 from . import pyproject
 
@@ -11,7 +13,7 @@ def _to_pip_deps(dependencies):
     return [f"{k}=={v}" for k, v in dependencies.items()]
 
 
-def generate():
+def generate() -> Path:
     config = pyproject.load()
 
     # TODO: Create some global place where we define this,
@@ -35,7 +37,7 @@ def generate():
 
     tempfile = NamedTemporaryFile(
         delete=False,
-        dir=os.getcwd(),
+        dir=paths.ROOT,
         suffix=".yaml",
         prefix=".conda_",
     )
@@ -43,4 +45,4 @@ def generate():
     with open(tempfile.name, "w") as file:
         yaml.dump(content, file, sort_keys=False)
 
-    return tempfile.name
+    return Path(tempfile.name)

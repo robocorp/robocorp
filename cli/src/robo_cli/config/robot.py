@@ -1,18 +1,18 @@
-import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import yaml
 
+from robo_cli import paths
+
 from . import pyproject
 
 
-def generate(conda_path: str):
-    curdir = os.getcwd()
+def generate(conda_path: Path):
     config = pyproject.load()
 
     # NB: conda.yaml path needs to be relative to robot.yaml
-    conda_config = str(Path(conda_path).relative_to(curdir))
+    conda_config = str(conda_path.relative_to(paths.ROOT))
 
     # TODO: Create some global place where we define this,
     # probably next to the pyproject schema
@@ -30,7 +30,7 @@ def generate(conda_path: str):
 
     tempfile = NamedTemporaryFile(
         delete=False,
-        dir=curdir,
+        dir=paths.ROOT,
         suffix=".yaml",
         prefix=".robot_",
     )
@@ -38,4 +38,4 @@ def generate(conda_path: str):
     with open(tempfile.name, "w") as file:
         yaml.dump(content, file, sort_keys=False)
 
-    return tempfile.name
+    return Path(tempfile.name)

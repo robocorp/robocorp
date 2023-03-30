@@ -55,13 +55,13 @@ class ProcessError(RuntimeError):
     def __init__(
         self,
         returncode: int,
-        stdout: Optional[List[str]] = None,
-        stderr: Optional[List[str]] = None,
+        stdout: Optional[str] = None,
+        stderr: Optional[str] = None,
     ):
         super().__init__()
         self.returncode = returncode
-        self.stdout: List[str] = stdout or []
-        self.stderr: List[str] = stderr or []
+        self.stdout: str = stdout or ""
+        self.stderr: str = stderr or ""
 
     def __str__(self):
         name = self.__class__.__name__
@@ -91,7 +91,7 @@ class Process:
     def on_stderr(self, listener: Listener):
         self._on_stderr.append(listener)
 
-    def run(self) -> Tuple[List[str], List[str]]:
+    def run(self) -> Tuple[str, str]:
         options = {
             "env": self._env,
             "cwd": str(self._cwd),
@@ -108,29 +108,29 @@ class Process:
             assert proc.stderr
             assert proc.pid
 
-            stdout = Reader(proc.stdout, self._on_stdout)
-            stderr = Reader(proc.stderr, self._on_stderr)
+            stdout_reader = Reader(proc.stdout, self._on_stdout)
+            stderr_reader = Reader(proc.stderr, self._on_stderr)
 
-            stdout.start()
-            stderr.start()
+            stdout_reader.start()
+            stderr_reader.start()
 
             self._proc = proc
             self._proc.wait()
 
-            stdout.close()
-            stderr.close()
+            stdout_reader.close()
+            stderr_reader.close()
 
-            stdout.join(timeout=5)
-            stderr.join(timeout=5)
+            stdout_reader.join(timeout=5)
+            stderr_reader.join(timeout=5)
 
             returncode = self._proc.returncode
-            stdout_lines = stdout.lines
-            stderr_lines = stderr.lines
+            stdout = "\n".join(stdout_reader.lines)
+            stderr = "\n".join(stderr_reader.lines)
 
         if returncode != 0:
-            raise ProcessError(returncode, stdout_lines, stderr_lines)
+            raise ProcessError(returncode, stdout, stderr)
 
-        return stdout_lines, stderr_lines
+        return stdout, stderr
 
     def stop(self):
         if not self._proc:
