@@ -3,8 +3,9 @@ import pathlib
 from typing import Any, List, Optional, Union
 from typing_extensions import Literal
 
+from robo.libs._types import PathType
 from robo.libs.excel._worksheet import Worksheet
-from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook, _load_workbook
+from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook
 
 
 class Workbook:
@@ -12,9 +13,9 @@ class Workbook:
         # Internal API, for users there is create_ and open_ workbook functions
         self.excel = excel
 
-    def save(self):
+    def save(self, name: PathType):
         # files.save_workbook()
-        pass
+        self.excel.save(name)
 
     def close(self):
         # Could also be a context manager and auto close

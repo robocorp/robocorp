@@ -69,8 +69,8 @@ def _load_workbook(
     parsed_path = pathlib.Path(path).resolve(strict=True)
 
     try:
-        book = XlsxWorkbook(parsed_path)
-        book.open(data_only=data_only, read_only=read_only)
+        book = XlsxWorkbook()
+        book.open(parsed_path, data_only=data_only, read_only=read_only)
         return book
     except InvalidFileException as exc:
         logging.debug(exc)  # Unsupported extension, silently try xlrd
@@ -82,7 +82,7 @@ def _load_workbook(
 
     try:
         book = XlsWorkbook(parsed_path)
-        book.open()
+        book.open(parsed_path)
         return book
     except Exception as exc:
         logging.info("Failed to open as Excel Binary Format (.xls): %s", exc)
@@ -197,7 +197,7 @@ class XlsxWorkbook(BaseWorkbook):
         self._book = openpyxl.Workbook()
         self._extension = None
 
-    def open(self, path=None, read_only=False, write_only=False, data_only=False):
+    def open(self, path, read_only=False, write_only=False, data_only=False):
         self._read_only = read_only
         if not path:
             raise ValueError("No path defined for workbook")
@@ -233,7 +233,7 @@ class XlsxWorkbook(BaseWorkbook):
         self._validate_content(self._book.properties)
 
     def save(self, path: PathType):
-        path = path
+        path = str(pathlib.Path(path))
         self._book.save(filename=path)
 
     def create_worksheet(self, name):
@@ -488,7 +488,7 @@ class XlsWorkbook(BaseWorkbook):
 
         self._extension = None
 
-    def open(self, path=None, read_only=False, write_only=False, data_only=False):
+    def open(self, path, read_only=False, write_only=False, data_only=False):
         path = path
         if not path:
             raise ValueError("No path defined for workbook")
@@ -539,7 +539,7 @@ class XlsWorkbook(BaseWorkbook):
         self._validate_content(self._book)
 
     def save(self, path: PathType):
-        path = path
+        path = str(pathlib.Path(path))
         if not path:
             raise ValueError("No path defined for workbook")
 

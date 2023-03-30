@@ -1,7 +1,10 @@
-from typing import Any, List, Optional, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Union
 from typing_extensions import deprecated
 
 from robo.libs.excel.tables import Table
+
+if TYPE_CHECKING:
+    from robo.libs.excel.workbook import Workbook
 
 
 class Worksheet:
@@ -17,9 +20,9 @@ class Worksheet:
         self, content: Optional[Table] = None, header=False, start=None
     ) -> "Worksheet":
         # files.append_rows_to_worksheet()
-        if self.name not in self._workbook.sheetnames:
+        if self.name not in self._workbook.list_worksheets():
             self._workbook.create_worksheet(self.name)
-        self._workbook.append_worksheet(self.name, content, header, start)
+        self._workbook.create_worksheet(self.name, content, header, start)
         return self
 
     def insert_image(self):
@@ -28,7 +31,7 @@ class Worksheet:
 
     def as_table(self, header=False, start=None) -> Table:
         # files.read_worksheet_as_table()
-        return Table(self._workbook.read_worksheet(self.name, header, start))
+        return Table(self._workbook.excel.read_worksheet(self.name, header, start))
 
     def read_worksheet(self) -> List[dict]:
         # files.read_worksheet()
