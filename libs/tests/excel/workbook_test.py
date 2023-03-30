@@ -58,8 +58,19 @@ def test_remove_last_worksheet():
         workbook.remove_worksheet(0)
 
 
-def test_remove_worksheet():
+def test_remove_worksheet_by_index():
     workbook = create_workbook("xlsx", "first sheet")
-    assert len(workbook.list_worksheets()) == 1
+    workbook.create_worksheet("second sheet")
+    assert len(workbook.list_worksheets()) == 2
     workbook.remove_worksheet(0)
-    assert len(workbook.list_worksheets()) == 0
+    assert len(workbook.list_worksheets()) == 1
+    assert workbook.list_worksheets()[0] == "second sheet"
+
+
+def test_remove_worksheet_by_name():
+    workbook = create_workbook("xlsx", "first sheet")
+    workbook.create_worksheet("second sheet")
+    assert len(workbook.list_worksheets()) == 2
+    workbook.remove_worksheet("first sheet")
+    assert len(workbook.list_worksheets()) == 1
+    assert workbook.list_worksheets()[0] == "second sheet"

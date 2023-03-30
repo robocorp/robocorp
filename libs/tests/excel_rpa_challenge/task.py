@@ -12,8 +12,6 @@ def create_new_workbook():
     table2.set_column("State Most Sold In", values)
     workbook3 = create_workbook("xlsx", "New Content")
     workbook3.worksheet("New Content").append_rows_to_worksheet(table2, header=True)
-
-    workbook3.worksheet("New Content").append_rows_to_worksheet(table2, header=True)
     workbook3.save("Book3.xlsx")
 
     print(table)

@@ -99,6 +99,7 @@ class BaseWorkbook:
 
     def __init__(self, path: Optional[PathType] = None):
         self.logger = logging.getLogger(__name__)
+        # TODO: type hint these
         self._book = None
         self._extension = None
         self._active = None

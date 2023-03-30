@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 from typing_extensions import deprecated
 
-from robo.libs.excel.tables import Table
+from robo.libs.excel.tables import Table, Tables
 
 if TYPE_CHECKING:
     from robo.libs.excel.workbook import Workbook
@@ -10,32 +10,47 @@ if TYPE_CHECKING:
 class Worksheet:
     """Common worksheet for both .xls and .xlsx files management."""
 
-    def __init__(self, workbook: "Workbook", name: Optional[str]):
+    def __init__(self, workbook: "Workbook", name: str):
         self._workbook = workbook
         # TODO: name should be a property, with setter that also changes it in the excel
-        self.name: str = name or workbook.active
+        self.name: str = name
         assert self.name
 
     def append_rows_to_worksheet(
-        self, content: Optional[Table] = None, header=False, start=None
+        self,
+        content: Any,
+        header: bool = False,
+        start: Optional[int] = None,
+        formatting_as_empty: Optional[bool] = False,
     ) -> "Worksheet":
         # files.append_rows_to_worksheet()
         if self.name not in self._workbook.list_worksheets():
             self._workbook.create_worksheet(self.name)
-        self._workbook.create_worksheet(self.name, content, header, start)
+
+        self._workbook.excel.append_worksheet(
+            self.name, content, header, start, formatting_as_empty
+        )
         return self
 
     def insert_image(self):
         # files.insert_image_to_worksheet()
         pass
 
-    def as_table(self, header=False, start=None) -> Table:
+    def as_table(
+        self,
+        header: bool = False,
+        trim: bool = True,
+        start: Optional[int] = None,
+    ) -> Table:
         # files.read_worksheet_as_table()
-        return Table(self._workbook.excel.read_worksheet(self.name, header, start))
+        tables = Tables()
+        sheet = self._workbook.excel.read_worksheet(self.name, header, start)
+        return tables.create_table(sheet, trim)
 
     def read_worksheet(self) -> List[dict]:
         # files.read_worksheet()
-        return [{}]
+        # FIXME: actually implement
+        return self._workbook.excel.read_worksheet(self.name)
 
     def rename(self):
         # files.rename_worksheet()
