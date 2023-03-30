@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from io import BytesIO
 from typing import Any, List, Optional, Union
 
-from robo.libs._types import PathType
 
 import openpyxl
 import xlrd
@@ -16,10 +15,12 @@ from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 
+from robo.libs._types import PathType
 from robo.libs.excel.tables import Table
+from robo.libs.excel._worksheet import Worksheet
 
 
-def get_column_index(column: str) -> int:
+def _get_column_index(column: str) -> int:
     """Get column index from name, e.g. A -> 1, D -> 4, AC -> 29.
     Reverse of `get_column_letter()`
     """
@@ -33,7 +34,7 @@ def get_column_index(column: str) -> int:
     return col
 
 
-def ensure_unique(values: Any) -> List[Any]:
+def _ensure_unique(values: Any) -> List[Any]:
     """Ensures that each string value in the list is unique.
     Adds a suffix to each value that has duplicates,
     e.g. [Banana, Apple, Lemon, Apple] -> [Banana, Apple, Lemon, Apple_2]
@@ -87,23 +88,6 @@ def load_workbook(
         f"Failed to open Excel file ({path}), "
         "verify that the path and extension are correct"
     )
-
-
-class Worksheet:
-    """Common worksheet for both .xls and .xlsx files management."""
-
-    def __init__(self, workbook: Union["XlsWorkbook", "XlsxWorkbook"], name: str):
-        self._workbook = workbook
-        self._name = name
-
-    def as_table(self, header=False, start=None):
-        return Table(self._workbook.read_worksheet(self._name, header, start))
-
-    def set_content(self, content: Optional[Table] = None, header=False, start=None):
-        if self._name not in self._workbook.sheetnames:
-            self._workbook.create_worksheet(self._name)
-        self._workbook.append_worksheet(self._name, content, header, start)
-        return self
 
 
 class BaseWorkbook:
@@ -273,7 +257,7 @@ class XlsxWorkbook(BaseWorkbook):
             columns = [get_column_letter(i + 1) for i in range(sheet.max_column)]
 
         columns = [str(value) if value is not None else value for value in columns]
-        columns = ensure_unique(columns)
+        columns = _ensure_unique(columns)
 
         data = []
         for cells in sheet.iter_rows(min_row=start):
@@ -481,7 +465,7 @@ class XlsWorkbook(BaseWorkbook):
         try:
             column = int(column)
         except ValueError:
-            column = get_column_index(column)
+            column = _get_column_index(column)
         return row - 1, column - 1
 
     def _to_index(self, value):
@@ -584,7 +568,7 @@ class XlsWorkbook(BaseWorkbook):
 
         columns = [value if value != "" else None for value in columns]
         columns = [str(value) if value is not None else value for value in columns]
-        columns = ensure_unique(columns)
+        columns = _ensure_unique(columns)
 
         data = []
         for r in range(start, sheet.nrows):
