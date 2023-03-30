@@ -1,57 +1,16 @@
 import logging
 import pathlib
-from typing import Any, Optional, Union
+from typing import Any, List, Optional, Union
 from typing_extensions import Literal
 
-from openpyxl.utils.exceptions import InvalidFileException
 from robo.libs.excel._worksheet import Worksheet
-from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook
-
-
-def _load_workbook(
-    path: str, data_only: bool, read_only: bool
-) -> Union[XlsWorkbook, XlsxWorkbook]:
-    # pylint: disable=broad-except
-    parsed_path = pathlib.Path(path).resolve(strict=True)
-
-    try:
-        book = XlsxWorkbook(parsed_path)
-        book.open(data_only=data_only, read_only=read_only)
-        return book
-    except InvalidFileException as exc:
-        logging.debug(exc)  # Unsupported extension, silently try xlrd
-    except Exception as exc:
-        logging.info("Failed to open as Office Open XML (.xlsx) format: %s", exc)
-
-    try:
-        book = XlsWorkbook(parsed_path)
-        book.open()
-        return book
-    except Exception as exc:
-        logging.info("Failed to open as Excel Binary Format (.xls): %s", exc)
-
-    raise ValueError(
-        f"Failed to open Excel file ({path}), "
-        "verify that the path and extension are correct"
-    )
-
-
-def create_workbook(filename: str, fmt: Literal["xlsx", "xls"] = "xlsx"):
-    # Creates a new workbook
-    # files.create_workbook()
-    return Workbook()
-
-
-def open_workbook(filename: str):
-    # Opens an existing workbook
-    # files.open_workbook()
-    return Workbook()
+from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook, _load_workbook
 
 
 class Workbook:
-    def __init__(self):
+    def __init__(self, excel: Union[XlsWorkbook, XlsxWorkbook]):
         # Internal API, for users there is create_ and open_ workbook functions
-        self._excel = None
+        self.excel = excel
 
     def save(self):
         # files.save_workbook()
@@ -62,9 +21,15 @@ class Workbook:
         # files.close_workbook()
         pass
 
-    def worksheet(self, name=None):
+    def worksheet(self, sheet: Union[str, int]) -> Worksheet:
         """If name is not provided take the first worksheet?"""
-        return Worksheet()
+        if isinstance(sheet, int):
+            name = self.list_worksheets()[sheet]
+        else:
+            sheets = self.list_worksheets()
+            name = sheets[sheets.index(sheet)]
+
+        return Worksheet(self, name)
 
     def create_worksheet(
         self,
@@ -73,13 +38,40 @@ class Workbook:
         exist_ok: Optional[bool] = False,
         header: Optional[bool] = False,
     ):
-        return Worksheet()
+        # files.create_worksheet()
+        # TODO: original code: https://github.com/robocorp/rpaframework/blob/dec0053a3aa34da20232f63e1b26e21df98e59e8/packages/main/src/RPA/Excel/Files.py#L539
+        # TODO: implement content and header
+        if exist_ok:
+            if name in self.list_worksheets():
+                return Worksheet(self, name)
+
+        self.excel.create_worksheet(name)
+        return Worksheet(self, name)
+
+    # files.list_worksheets()
+    def list_worksheets(self) -> List[str]:
+        return self.excel.sheetnames
+
+    def worksheet_exists(self, sheet: Union[str, int]) -> bool:
+        # files.worksheet_exists()
+        if isinstance(sheet, int):
+            return len(self.list_worksheets()) > sheet
+        else:
+            return sheet in self.list_worksheets()
+
+    def remove_worksheet(self, sheet: Union[str, int]):
+        # files.remove_worksheet()
+        if isinstance(sheet, int):
+            name = self.list_worksheets()[sheet]
+        else:
+            name = sheet
+
+        self.excel.remove_worksheet(name)
 
 
 # these may be removed, replaced by handling worksheets yourself? or these will go to workbook!
-# files.set_active_worksheet()
-# files.create_worksheet()
-# files.remove_worksheet()
-# files.worksheet_exists()
-# files.list_worksheets()
+
+
+# removed:
 # files.get_active_worksheet()
+# files.set_active_worksheet()

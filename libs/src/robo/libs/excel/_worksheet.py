@@ -7,17 +7,19 @@ from robo.libs.excel.tables import Table
 class Worksheet:
     """Common worksheet for both .xls and .xlsx files management."""
 
-    def __init__(self, workbook: Union["XlsWorkbook", "XlsxWorkbook"], name: str):
+    def __init__(self, workbook: "Workbook", name: Optional[str]):
         self._workbook = workbook
-        self._name = name
+        # TODO: name should be a property, with setter that also changes it in the excel
+        self.name: str = name or workbook.active
+        assert self.name
 
     def append_rows_to_worksheet(
         self, content: Optional[Table] = None, header=False, start=None
     ) -> "Worksheet":
         # files.append_rows_to_worksheet()
-        if self._name not in self._workbook.sheetnames:
-            self._workbook.create_worksheet(self._name)
-        self._workbook.append_worksheet(self._name, content, header, start)
+        if self.name not in self._workbook.sheetnames:
+            self._workbook.create_worksheet(self.name)
+        self._workbook.append_worksheet(self.name, content, header, start)
         return self
 
     def insert_image(self):
@@ -26,7 +28,7 @@ class Worksheet:
 
     def as_table(self, header=False, start=None) -> Table:
         # files.read_worksheet_as_table()
-        return Table(self._workbook.read_worksheet(self._name, header, start))
+        return Table(self._workbook.read_worksheet(self.name, header, start))
 
     def read_worksheet(self) -> List[dict]:
         # files.read_worksheet()

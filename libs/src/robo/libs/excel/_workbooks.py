@@ -62,14 +62,14 @@ def _ensure_unique(values: Any) -> List[Any]:
     return output
 
 
-def load_workbook(
-    path: str, data_only: bool, read_only: bool
+def _load_workbook(
+    path: PathType, data_only: bool, read_only: bool
 ) -> Union["XlsWorkbook", "XlsxWorkbook"]:
     # pylint: disable=broad-except
-    path = pathlib.Path(path).resolve(strict=True)
+    parsed_path = pathlib.Path(path).resolve(strict=True)
 
     try:
-        book = XlsxWorkbook(path)
+        book = XlsxWorkbook(parsed_path)
         book.open(data_only=data_only, read_only=read_only)
         return book
     except InvalidFileException as exc:
@@ -77,15 +77,18 @@ def load_workbook(
     except Exception as exc:
         logging.info("Failed to open as Office Open XML (.xlsx) format: %s", exc)
 
+    if data_only or read_only:
+        raise ValueError("Xls workbooks don't support data_only or read_only options")
+
     try:
-        book = XlsWorkbook(path)
+        book = XlsWorkbook(parsed_path)
         book.open()
         return book
     except Exception as exc:
         logging.info("Failed to open as Excel Binary Format (.xls): %s", exc)
 
     raise ValueError(
-        f"Failed to open Excel file ({path}), "
+        f'Failed to open Excel file ("{path}"), '
         "verify that the path and extension are correct"
     )
 
@@ -96,7 +99,6 @@ class BaseWorkbook:
 
     def __init__(self, path: Optional[PathType] = None):
         self.logger = logging.getLogger(__name__)
-        self.path = path
         self._book = None
         self._extension = None
         self._active = None
@@ -197,7 +199,6 @@ class XlsxWorkbook(BaseWorkbook):
 
     def open(self, path=None, read_only=False, write_only=False, data_only=False):
         self._read_only = read_only
-        path = path or self.path
         if not path:
             raise ValueError("No path defined for workbook")
 
@@ -231,11 +232,8 @@ class XlsxWorkbook(BaseWorkbook):
     def validate_content(self):
         self._validate_content(self._book.properties)
 
-    def save(self, path=None):
-        path = path or self.path
-        if not path:
-            raise ValueError("No path defined for workbook")
-
+    def save(self, path: PathType):
+        path = path
         self._book.save(filename=path)
 
     def create_worksheet(self, name):
@@ -475,6 +473,9 @@ class XlsWorkbook(BaseWorkbook):
         return value
 
     def create(self, sheet="Sheet"):
+        # TODO: make both this and the other create default to `Sheet1` or whatever is
+        # excel default
+
         fd = BytesIO()
         try:
             book = xlwt.Workbook()
@@ -488,7 +489,7 @@ class XlsWorkbook(BaseWorkbook):
         self._extension = None
 
     def open(self, path=None, read_only=False, write_only=False, data_only=False):
-        path = path or self.path
+        path = path
         if not path:
             raise ValueError("No path defined for workbook")
 
@@ -537,8 +538,8 @@ class XlsWorkbook(BaseWorkbook):
     def validate_content(self):
         self._validate_content(self._book)
 
-    def save(self, path=None):
-        path = path or self.path
+    def save(self, path: PathType):
+        path = path
         if not path:
             raise ValueError("No path defined for workbook")
 
