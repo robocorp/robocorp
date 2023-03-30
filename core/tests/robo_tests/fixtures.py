@@ -8,7 +8,7 @@ import pytest
 def examples_dir():
     from pathlib import Path
 
-    examples = Path(__file__).parent.parent / "examples"
+    examples = Path(__file__).parent.parent.parent.parent / "examples"
 
     assert examples.exists()
     return examples

@@ -9,3 +9,4 @@ __pycache__/
 .coverage
 .idea/
 dist/
+.DS_Store
