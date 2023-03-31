@@ -9,7 +9,7 @@ def _registry_chrome_path() -> str:
     if platform.system() == "Windows":
         import winreg
 
-        location = winreg.HKEY_CURRENT_USER
+        location = winreg.HKEY_LOCAL_MACHINE
         chrome_registry = (
             r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"
         )
