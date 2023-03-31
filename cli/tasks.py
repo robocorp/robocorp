@@ -7,7 +7,7 @@ from pathlib import Path
 from invoke import task
 
 CURDIR = Path(__file__).parent
-SRC = CURDIR / "src" / "robo_cli"
+SRC = CURDIR / "src"
 
 RCC_URL = {
     "Windows": "https://downloads.robocorp.com/rcc/releases/v11.28.0/windows64/rcc.exe",
@@ -43,6 +43,11 @@ def lint(ctx):
     poetry(ctx, f"run ruff {SRC}")
     poetry(ctx, f"run black --check {SRC}")
     poetry(ctx, f"run isort --check {SRC}")
+
+
+@task
+def typecheck(ctx):
+    poetry(ctx, f"run mypy {SRC}")
 
 
 @task

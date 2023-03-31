@@ -11,4 +11,4 @@ PATH:
 PYTHONPATH:
   - .
   # We want the 'robo' to be there too.
-  - ../..
+  - ../../core/src

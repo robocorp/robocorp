@@ -39,10 +39,14 @@ class ITask(typing.Protocol):
     message: str
 
     @property
-    def name(self):
+    def name(self) -> str:
         pass
 
-    def run(self):
+    @property
+    def lineno(self) -> int:
+        pass
+
+    def run(self) -> None:
         pass
 
 

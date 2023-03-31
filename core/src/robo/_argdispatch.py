@@ -19,9 +19,15 @@ class _ArgDispatcher:
         dct.pop("command")
         return method(**dct)
 
-    def register(self, func):
-        self._name_to_func[func.__code__.co_name] = func
-        return func
+    def register(self, name=None):
+        def do_register(func):
+            nonlocal name
+            if not name:
+                name = func.__code__.co_name
+            self._name_to_func[name] = func
+            return func
+
+        return do_register
 
     def _create_argparser(self):
         import argparse
@@ -34,6 +40,8 @@ class _ArgDispatcher:
         )
 
         subparsers = parser.add_subparsers(dest="command")
+
+        # Run
         run_parser = subparsers.add_parser(
             "run",
             help="run will collect tasks with the @task decorator and run the first that matches based on the task name filter.",
@@ -41,6 +49,7 @@ class _ArgDispatcher:
         run_parser.add_argument(
             dest="path",
             help="The directory or file with the tasks to run.",
+            nargs="?",
             default=".",
         )
         run_parser.add_argument(
@@ -56,6 +65,18 @@ class _ArgDispatcher:
             dest="output_dir",
             help="The directory where the logging output files will be stored.",
             default="./output",
+        )
+
+        # List tasks
+        list_parser = subparsers.add_parser(
+            "list",
+            help="Provides output to stdout with json contents of the tasks available.",
+        )
+        list_parser.add_argument(
+            dest="path",
+            help="The directory or file from where the tasks should be listed.",
+            nargs="?",
+            default=".",
         )
 
         return parser

@@ -8,10 +8,41 @@ import pytest
 def examples_dir():
     from pathlib import Path
 
-    examples = Path(__file__).parent.parent / "examples"
+    examples = Path(__file__).parent.parent.parent.parent / "examples"
 
     assert examples.exists()
     return examples
+
+
+def robo_run(cmdline, returncode, cwd=None, additional_env=None):
+    import subprocess
+
+    cp = os.environ.copy()
+    cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
+    if additional_env:
+        cp.update(additional_env)
+    args = [sys.executable, "-m", "robo"] + cmdline
+    result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd)
+    if result.returncode != returncode:
+        env_str = "\n".join(str(x) for x in sorted(cp.items()))
+
+        raise AssertionError(
+            f"""Expected returncode: {returncode}. Found: {result.returncode}.
+=== stdout:
+{result.stdout.decode('utf-8')}
+
+=== stderr:
+{result.stderr.decode('utf-8')}
+
+=== Env:
+{env_str}
+
+=== Args:
+{args}
+
+"""
+        )
+    return result
 
 
 @pytest.fixture(scope="session")

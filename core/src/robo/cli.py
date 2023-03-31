@@ -2,6 +2,9 @@ from typing import Tuple
 from pathlib import Path
 import sys
 from robo._argdispatch import arg_dispatch
+import json
+from contextlib import contextmanager
+import os
 
 
 def _setup_log_output(output_dir: Path):
@@ -17,13 +20,71 @@ def _setup_log_output(output_dir: Path):
     )
 
 
+@contextmanager
+def _setup_stdout_logging():
+    import robocorp_logging
+
+    if os.environ.get("RC_LOG_OUTPUT_STDOUT", "").lower() in ("1", "t", "true"):
+        original_stdout = sys.stdout
+
+        # Keep printing anything the user provides to the stderr for now.
+        # TODO: provide messages given to stdout as expected messages in the output?
+        sys.stdout = sys.stderr
+
+        from robocorp_logging._decoder import Decoder
+
+        decoder = Decoder()
+
+        def write(msg):
+            line = msg.strip()
+            if line:
+                message_type, message = line.split(" ", 1)
+                decoded = decoder.decode_message_type(message_type, message)
+                if decoded:
+                    original_stdout.write(f"{json.dumps(decoded)}\n")
+
+        with robocorp_logging.add_in_memory_log_output(write):
+            try:
+                yield
+            finally:
+                sys.stdout = original_stdout
+    else:
+        yield  # Nothing to do but respect the contextmanager.
+
+
 # Note: the args must match the 'dest' on the configured argparser.
-@arg_dispatch.register
+@arg_dispatch.register(name="list")
+def list_tasks(
+    path: str,
+) -> int:
+    from robo._collect_tasks import collect_tasks
+    from robo._task import Context
+    from robo._protocols import ITask
+
+    p = Path(path)
+    context = Context()
+    if not p.exists():
+        context.show_error(f"Path: {path} does not exist")
+        return 1
+
+    task: ITask
+    tasks_found = []
+    for task in collect_tasks(p):
+        tasks_found.append(
+            {"name": task.name, "line": task.lineno, "file": task.filename}
+        )
+
+    sys.stdout.write(json.dumps(tasks_found))
+    return 0
+
+
+# Note: the args must match the 'dest' on the configured argparser.
+@arg_dispatch.register()
 def run(
     output_dir: str,
     path: str,
     task_name: str,
-):
+) -> int:
     from robo._collect_tasks import collect_tasks
     from robo._hooks import before_task_run, after_task_run
     from robo._logging_setup import setup_auto_logging
@@ -37,7 +98,9 @@ def run(
         context.show_error(f"Path: {path} does not exist")
         return 1
 
-    with setup_auto_logging(), _setup_log_output(Path(output_dir)):
+    with setup_auto_logging(), _setup_stdout_logging(), _setup_log_output(
+        Path(output_dir)
+    ):
         from robo._exceptions import RoboCollectError
 
         if not task_name:
@@ -68,6 +131,8 @@ def run(
 
             returncode = 0 if task.status == Status.PASS else 1
             return returncode
+
+        raise AssertionError("Should never get here.")
 
 
 def main(args=None, exit: bool = True) -> int:

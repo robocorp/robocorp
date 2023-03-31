@@ -16,6 +16,10 @@ class Task:
     def name(self):
         return self.method.__code__.co_name
 
+    @property
+    def lineno(self):
+        return self.method.__code__.co_firstlineno
+
     def run(self):
         self.method()
 

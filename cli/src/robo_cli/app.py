@@ -10,7 +10,8 @@ from rich.spinner import Spinner
 from rich.table import Table
 from rich.text import Text
 
-from robo_cli import rcc, templates
+from robo_cli import environment, rcc, templates
+from robo_cli.process import Process, ProcessError
 
 app = typer.Typer(no_args_is_help=True)
 console = Console()
@@ -85,8 +86,21 @@ def robot_run():
 @app.command()
 def run():
     """Runs the robot from current directory"""
-    with console.status("Running robot"):
-        rcc.run()
+    try:
+        with console.status("Building environment"):
+            env = environment.ensure()
+
+        with console.status("Running robot"):
+            # TODO: Figure out what to call from inner framework
+            proc = Process(["python", "tasks.py"], env=env)
+            proc.on_stdout(lambda line: console.print(line))
+            proc.run()
+
+    except ProcessError as exc:
+        console.print(exc.stderr)
+        console.print("---")
+        console.print("Run failed due to unexpected error")
+        raise typer.Exit(code=1)
 
     artifacts = glob.glob("output/*")
     console.print(
@@ -108,7 +122,7 @@ def export():
     """
     console.print()
     with console.status("Exporting robot"):
-        path = rcc.export()
+        path = rcc.robot_wrap()
 
     console.print(f"Exported to {path}")
     console.print()
@@ -121,7 +135,7 @@ def deploy():
     console.print()
 
     with console.status("Fetching workspace list"):
-        available_workspaces = rcc.list_workspaces()
+        available_workspaces = rcc.cloud_workspace()
 
     workspace_names = list(available_workspaces.keys())
     keys = [str(i + 1) for i in range(0, len(workspace_names))]
@@ -147,7 +161,7 @@ def deploy():
     # Confirm.ask("Project already exists, replace?")
 
     with console.status("Uploading project"):
-        console.print(rcc.deploy(workspace_id, robot_id))
+        console.print(rcc.cloud_push(workspace_id, robot_id))
 
     console.print()
     console.print("Deploy of [bold]example[/bold] successful!")
