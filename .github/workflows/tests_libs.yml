@@ -41,15 +41,15 @@ jobs:
     - name: Checkout repository and submodules
       uses: actions/checkout@v2
 
-    - if: matrix.os == "windows-latest"
+    - if: matrix.os == 'windows-latest'
       run: |
         choco install firefox
         choco install googlechrome
-    - if: matrix.os == "macos-latest"
+    - if: matrix.os == 'macos-latest'
       run: |
         brew install --cask google-chrome
         brew install --cask firefox
-    - if: matrix.os == "ubuntu-latest"
+    - if: matrix.os == 'ubuntu-latest'
       uses: browser-actions/setup-chrome@v1
     - run: which chrome
 
