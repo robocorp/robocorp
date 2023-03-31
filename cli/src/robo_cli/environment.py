@@ -11,8 +11,8 @@ Variables = dict[str, str]
 ENV_CACHE = home_path() / ".envcache.json"
 
 
-def ensure() -> Variables:
-    with generate_configs() as (conda_path, _):
+def _ensure(deps) -> Variables:
+    with generate_configs(deps) as (conda_path, _):
         digest = _calculate_hash(ROOT, conda_path)
         cache = _load_cache()
 
@@ -24,6 +24,14 @@ def ensure() -> Variables:
         _save_cache(cache)
 
         return variables
+
+
+def ensure():
+    return _ensure("dependencies")
+
+
+def ensure_devdeps() -> Variables:
+    return _ensure("dev-dependencies")
 
 
 def _load_cache() -> dict[str, Variables]:

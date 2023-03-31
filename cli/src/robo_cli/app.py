@@ -2,6 +2,7 @@ import json
 import shutil
 import time
 from pathlib import Path
+from typing import List
 
 import typer
 from rich.console import Console, Group
@@ -148,7 +149,6 @@ def run():
         with console.status("Building environment"):
             env = environment.ensure()
 
-
         env["RC_LOG_OUTPUT_STDOUT"] = "1"
         proc = Process(
             [
@@ -188,6 +188,7 @@ def run():
             )
 
             stack = []
+
             def handle_line(line: str):
                 try:
                     payload = json.loads(line)
@@ -278,6 +279,66 @@ def deploy():
     console.print()
     console.print("Deploy of [bold]example[/bold] successful!")
     console.print(f"Link: [underline]{workspace_url}/robots/{robot_id}/[/underline]")
+    console.print()
+
+
+def _run(env, args: List[str]):
+    try:
+        proc = Process(args=[*args], env=env)
+
+        try:
+            stdout, stderr = proc.run()
+
+            console.print(stdout)
+            console.print(stderr)
+        except ProcessError as err:
+            console.print(f"Fail during {args[0]}")
+            console.print(err.stdout)
+            console.print(err.stderr)
+            raise typer.Exit(code=1)
+    except ProcessError as exc:
+        print(exc.stderr)
+        console.print("---")
+        console.print("Linting failed due to unexpected error")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def lint(fix=False):
+    """runs lints on the project"""
+    console.print()
+    console.print()
+
+    with console.status("Building environment"):
+        env = environment.ensure_devdeps()
+    ruff_command = (
+        ["ruff", "check", "--fix", "tasks.py"]
+        if fix
+        else [
+            "ruff",
+            "check",
+            "tasks.py",
+        ]
+    )
+    black_command = (
+        ["python", "-m", "black", "tasks.py"]
+        if fix
+        else [
+            "python",
+            "-m",
+            "black",
+            "--check",
+            "tasks.py",
+        ]
+    )
+
+    with console.status("Linting"):
+        _run(env, ruff_command)
+    with console.status("Formatting"):
+        _run(env, black_command)
+
+    console.print()
+    console.print(f"Run [bold]lints[/bold] successful!")
     console.print()
 
 

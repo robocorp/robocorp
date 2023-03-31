@@ -1,5 +1,6 @@
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing_extensions import Literal
 
 import yaml
 
@@ -8,7 +9,7 @@ from robo_cli import paths
 from . import pyproject
 
 
-def generate() -> Path:
+def generate(env: Literal["dependencies", "dev-dependencies"]) -> Path:
     config = pyproject.load()
 
     # TODO: Create some global place where we define this,
@@ -16,7 +17,7 @@ def generate() -> Path:
     python_version = config.get("python", "3.9.13")
     pip_version = "22.1.2"
 
-    dependencies = config.get("dependencies", {})
+    dependencies = config.get(env, {})
     pip_deps = _to_pip_deps(dependencies)
 
     content = {

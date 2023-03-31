@@ -3,17 +3,20 @@ import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Literal
 
 from . import conda, robot
 
 
 @contextmanager
-def generate_configs():
+def generate_configs(
+    deps_type: Literal["dependencies", "dev-dependencies"] = "dependencies"
+):
     conda_config = None
     robot_config = None
 
     try:
-        conda_config = conda.generate()
+        conda_config = conda.generate(deps_type)
         robot_config = robot.generate(conda_config)
         yield conda_config, robot_config
     finally:
