@@ -288,9 +288,11 @@ def _run(env, args: List[str]):
 
         try:
             stdout, stderr = proc.run()
-
-            console.print(stdout)
-            console.print(stderr)
+            # TODO: do we want to let black / ruff stdouts through?
+            # if stdout:
+            #     console.print(stdout)
+            # if stderr:
+            #     console.print(stderr)
         except ProcessError as err:
             console.print(f"Fail during {args[0]}")
             console.print(err.stdout)
@@ -306,11 +308,15 @@ def _run(env, args: List[str]):
 @app.command()
 def lint(fix=False):
     """runs lints on the project"""
-    console.print()
-    console.print()
 
-    with console.status("Building environment"):
-        env = environment.ensure_devdeps()
+    try:
+        with console.status("Building environment"):
+            env = environment.ensure_devdeps()
+    except ProcessError as err:
+        console.print("Error building dev environment")
+        console.print(err.stderr)
+        raise typer.Exit(code=1)
+
     ruff_command = (
         ["ruff", "check", "--fix", "tasks.py"]
         if fix
@@ -332,13 +338,13 @@ def lint(fix=False):
         ]
     )
 
+    console.print()
     with console.status("Linting"):
         _run(env, ruff_command)
     with console.status("Formatting"):
         _run(env, black_command)
-
     console.print()
-    console.print(f"Run [bold]lints[/bold] successful!")
+    console.print("Linting and formatting succesful!")
     console.print()
 
 
