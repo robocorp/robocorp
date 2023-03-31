@@ -313,6 +313,12 @@ def _run(env, args: List[str]):
 def lint(fix: bool = typer.Option(False, "--fix", "-f")):
     """Runs linting and formatting on the project"""
 
+    # TODO: generate ruff settings into the pyproject.toml
+    #
+    #    [tool.ruff]
+    #    # TODO: We should generate this inside the hood
+    #    target-version = "py39"
+
     try:
         with console.status("Building environment"):
             env = environment.ensure_devdeps()
