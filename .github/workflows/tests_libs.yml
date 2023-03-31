@@ -41,17 +41,17 @@ jobs:
     - uses: browser-actions/setup-chrome@v1
     - run: chrome --version
 
+    - name: Install poetry
+      run: pipx install poetry
+
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
-        cache: 'pip'
+        cache: 'poetry'
 
-    - name: Install poetry
-      run: |
-        python -m pip install --upgrade pip
-        pip install poetry
-        poetry install
+    - name: Install project
+      run: poetry install
     - name: Test
       env:
         PYTHONPATH: .
