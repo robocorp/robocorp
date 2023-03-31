@@ -3,10 +3,10 @@ name: Tests
 on:
   push:
     branches: [master]
-    paths: [robo, robo_tests]
+    paths: [core]
   pull_request:
     branches: [master]
-    paths: [robo, robo_tests]
+    paths: [core]
 
 jobs:
   build:
