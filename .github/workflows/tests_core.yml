@@ -2,12 +2,14 @@ name: Core Tests
 
 on:
   push:
-    branches: ["master"]
+    branches:
+      - "master"
     paths:
       - "core/**"
       - ".github/workflows/tests_core.yml"
   pull_request:
-    branches: ["master"]
+    branches:
+      - "master"
     paths:
       - "core/**"
       - ".github/workflows/tests_core.yml"

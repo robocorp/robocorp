@@ -2,12 +2,14 @@ name: Library tests
 
 on:
   push:
-    branches: ["master"]
+    branches:
+      - "master"
     paths:
       - "libs/**"
       - ".github/workflows/tests_libs.yml"
   pull_request:
-    branches: ["master"]
+    branches:
+      - "master"
     paths:
       - "libs/**/"
       - ".github/workflows/tests_libs.yml"
