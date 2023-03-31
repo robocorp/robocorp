@@ -1,6 +1,8 @@
+from pathlib import Path
 import platform
+from typing import Literal
 
-from playwright.sync_api import sync_playwright as _sync_playwright
+from playwright.sync_api import Browser, sync_playwright as _sync_playwright
 
 EXECUTABLE_PATHS = {
     "chromium": {
@@ -16,42 +18,30 @@ EXECUTABLE_PATHS = {
 }
 
 
-def open_available_browser(browser="chromium"):
+def _get_executable_path(browser: Literal["firefox", "chromium"]) -> str:
     system = platform.system()
-    with _sync_playwright() as playwright:
-        browser = playwright.chromium.launch(
-            executable_path=EXECUTABLE_PATHS[browser][system], headless=False
-        )
-        context = browser.new_context()
-        page = context.new_page()
-        page.goto("http://rpachallenge.com/")
-        return page
+    assert browser in EXECUTABLE_PATHS
+    executable_path = EXECUTABLE_PATHS[browser][system]
+    assert Path(executable_path).exists()
+    return executable_path
 
 
-def non_context_managery_playwright():
-    # Based on https://peps.python.org/pep-0343/#specification-the-with-statement
-    mgr = _sync_playwright()
-    exit = type(mgr).__exit__  # Not calling it yet
-    value = type(mgr).__enter__(mgr)
-    exc = True
-    try:
-        try:
-            VAR = value  # Only if "as VAR" is present
-            BLOCK
-        except:
-            # The exceptional case is handled here
-            exc = False
-            if not exit(mgr, *sys.exc_info()):
-                raise
-            # The exception is swallowed if exit() returns true
-    finally:
-        # The normal and non-local-goto cases are handled here
-        if exc:
-            exit(mgr, None, None, None)
+def open_available_browser(
+    browser: Literal["firefox", "chromium"] = "chromium",
+    headless=True
+    # TODO: support more args
+) -> Browser:
+    playwright = _sync_playwright().start()
 
+    assert playwright
+    # TODO: allow user to also pass their own custom path?
+    executable_path = _get_executable_path(browser)
 
-if __name__ == "__main__":
-    open_available_browser()
+    launched_browser = playwright[browser].launch(
+        executable_path=executable_path, headless=headless
+    )
+    return launched_browser
+
 
 #     Open Available Browser    http://rpachallenge.com/
 
