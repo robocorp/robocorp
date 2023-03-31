@@ -5,17 +5,18 @@ from typing import Literal
 from playwright.sync_api import Browser, sync_playwright as _sync_playwright
 
 
-def _registry_chrome_path() -> str:
+def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
     if platform.system() == "Windows":
         import winreg
 
         location = winreg.HKEY_LOCAL_MACHINE
-        chrome_registry = (
-            r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"
+        browser_registry = (
+            rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{browser}.exe"
         )
-        key = winreg.OpenKeyEx(location, chrome_registry)
-        path = winreg.QueryValueEx(key, "Path")
-        assert path, "Could not find chrome path"
+        key = winreg.OpenKeyEx(location, browser_registry)
+        # empty string key gets the (Default) value
+        path = winreg.QueryValueEx(key, "")
+        assert path, f"Could not find {browser} path"
         return path
     raise RuntimeError("Not implemented for this OS")
 
@@ -33,10 +34,10 @@ EXECUTABLE_PATHS = {
 }
 
 
-def _get_executable_path(browser: Literal["firefox", "chromium"]) -> str:
+def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
     system = platform.system()
-    if system == "Windows" and browser == "chromium":
-        return _registry_chrome_path()
+    if system == "Windows":
+        return _registry_path(browser)
 
     system = platform.system()
     assert browser in EXECUTABLE_PATHS
@@ -46,7 +47,7 @@ def _get_executable_path(browser: Literal["firefox", "chromium"]) -> str:
 
 
 def open_available_browser(
-    browser: Literal["firefox", "chromium"] = "chromium",
+    browser: Literal["firefox", "chrome"] = "chrome",
     headless=True
     # TODO: support more args
 ) -> Browser:

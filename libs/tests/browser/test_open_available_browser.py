@@ -4,7 +4,7 @@ from robo.libs.browser.browser import open_available_browser, _get_executable_pa
 
 
 def test_get_executable_path():
-    executable_path = _get_executable_path("chromium")
+    executable_path = _get_executable_path("chrome")
     assert executable_path
 
     executable_path = _get_executable_path("firefox")
