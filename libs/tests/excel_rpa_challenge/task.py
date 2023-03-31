@@ -1,20 +1,8 @@
-from robo.libs.excel import create_workbook, open_workbook, Table
-
-
-def create_new_workbook():
-    workbook1 = open_workbook("Book1.xlsx")
-    table = workbook1.worksheet("Sheet1").as_table(header=True)
-
-    values = table.get_column("State")
-    workbook2 = open_workbook("Book2.xlsx")
-    table2 = workbook2.worksheet("Sheet1").as_table(header=True)
-
-    table2.set_column("State Most Sold In", values)
-    workbook3 = create_workbook("xlsx", "New Content")
-    workbook3.worksheet("New Content").append_rows_to_worksheet(table2, header=True)
-    workbook3.save("Book3.xlsx")
-
-    print(table)
+from pathlib import Path
+from time import sleep
+from playwright.sync_api import Page
+from robo.libs.browser import open_url
+from robo.libs.excel import open_workbook, Table
 
 
 def read_people_from_excel() -> Table:
@@ -22,30 +10,33 @@ def read_people_from_excel() -> Table:
     return table
 
 
-def fill_and_submit_form(person):
-    #     Input Text    alias:First Name    ${person}[First Name]
-    #     Input Text    alias:Last Name    ${person}[Last Name]
+def fill_and_submit_form(page: Page, person):
+    page.fill('//input[@ng-reflect-name="labelFirstName"]', person["First Name"])
+    page.fill('//input[@ng-reflect-name="labelLastName"]', person["Last Name"])
+    page.fill('//input[@ng-reflect-name="labelCompanyName"]', person["Company Name"])
     #     Input Text    alias:Company Name    ${person}[Company Name]
+    page.fill('//input[@ng-reflect-name="labelRole"]', person["Role in Company"])
     #     Input Text    alias:Role in Company    ${person}[Role in Company]
+    page.fill('//input[@ng-reflect-name="labelAddress"]', person["Address"])
     #     Input Text    alias:Address    ${person}[Address]
-    #     Input Text    alias:Email    ${person}[Email]
-    #     Input Text    alias:Phone Number    ${person}[Phone Number]
-    #     Click Button    Submit
-    pass
+    page.fill('//input[@ng-reflect-name="labelEmail"]', person["Email"])
+    page.fill('//input[@ng-reflect-name="labelPhone"]', str(person["Phone Number"]))
+    page.click("text=Submit")
 
 
 def task_solve_challenge():
-    #     Open Available Browser    http://rpachallenge.com/
+    page = open_url("http://rpachallenge.com/", headless=False)
     #     Download    http://rpachallenge.com/assets/downloadFiles/challenge.xlsx    overwrite=${TRUE}
-    #     Click Button    Start
+    page.click("text=Start")
     people = read_people_from_excel()
     for person in people:
-        fill_and_submit_form(person)
-    #     Capture Element Screenshot    alias:Congratulations
-    #     Sleep    2 seconds
-    #     [Teardown]    Close All Browsers
-    pass
+        fill_and_submit_form(page, person)
+    # TODO: get the actual path of ARTIFACTS_DIR
+    element = page.query_selector("css=div.congratulations")
+    element.screenshot(path=Path("output") / "screenshot.png")
+    sleep(2)
+    # Closing is automatic
 
 
 if __name__ == "__main__":
-    create_new_workbook()
+    task_solve_challenge()

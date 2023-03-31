@@ -2,7 +2,7 @@ from pathlib import Path
 import platform
 from typing import Literal
 
-from playwright.sync_api import Browser, sync_playwright as _sync_playwright
+from playwright.sync_api import Browser, Page, sync_playwright as _sync_playwright
 
 
 def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
@@ -47,7 +47,7 @@ def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
     return executable_path
 
 
-def open_available_browser(
+def open_browser(
     browser: Literal["firefox", "chrome"] = "chrome",
     headless=True
     # TODO: support more args
@@ -58,14 +58,23 @@ def open_available_browser(
     # TODO: allow user to also pass their own custom path?
     executable_path = _get_executable_path(browser)
 
+    if browser == "chrome":
+        browser = "chromium"
+
     launched_browser = playwright[browser].launch(
         executable_path=executable_path, headless=headless
     )
     return launched_browser
 
 
-#     Open Available Browser    http://rpachallenge.com/
+def open_url(url: str, headless=True) -> Page:
+    browser = open_browser(headless=headless)
+    page = browser.new_page()
+    page.goto(url)
+    return page
 
+
+# TODO: don't let playwright print directly into stdout, it's breaking console behaviour
 
 # Close All Browsers
 
