@@ -1,62 +1,40 @@
-from RPA.Browser.Selenium import Selenium
-from RPA.Excel.Files import Files
-from RPA.HTTP import HTTP
+from pathlib import Path
+from time import sleep
 
 from robo import task
-
-browser_lib = Selenium()
-
-
-def get_the_list_of_people_from_the_excel_file():
-    excel_lib = Files()
-    excel_lib.open_workbook("challenge.xlsx")
-    table = excel_lib.read_worksheet_as_table(header=True)
-    excel_lib.close_workbook()
-    return table
+from robo.libs.http import download
+from robo.libs.browser import open_url
+from robo.libs.excel import open_workbook
 
 
-def set_value_by_xpath(xpath, value):
-    script = f"document.evaluate('{xpath}',document.body,null,9,null).singleNodeValue.value='{value}';"
-    return browser_lib.execute_javascript(script)
+def read_people_from_excel():
+    return open_workbook("challenge.xlsx").worksheet("Sheet1").as_table(header=True)
 
 
-def fill_and_submit_the_form(person):
-    names_and_keys = {
-        "labelFirstName": "First Name",
-        "labelLastName": "Last Name",
-        "labelCompanyName": "Company Name",
-        "labelRole": "Role in Company",
-        "labelAddress": "Address",
-        "labelEmail": "Email",
-        "labelPhone": "Phone Number",
-    }
-    for name, key in names_and_keys.items():
-        set_value_by_xpath(f'//input[@ng-reflect-name="{name}"]', person[key])
-    browser_lib.click_button("Submit")
-
-
-def start_the_challenge():
-    browser_lib.open_available_browser("http://rpachallenge.com/", headless=True)
-    HTTP().download(
-        "http://rpachallenge.com/assets/downloadFiles/challenge.xlsx", overwrite=True
-    )
-    browser_lib.click_button("Start")
-
-
-def fill_the_forms():
-    people = get_the_list_of_people_from_the_excel_file()
-    for person in people:
-        fill_and_submit_the_form(person)
-
-
-def collect_the_results():
-    browser_lib.capture_element_screenshot("css:div.congratulations")
-    browser_lib.close_all_browsers()
+def fill_and_submit_form(page, person):
+    page.fill('//input[@ng-reflect-name="labelFirstName"]', person["First Name"])
+    page.fill('//input[@ng-reflect-name="labelLastName"]', person["Last Name"])
+    page.fill('//input[@ng-reflect-name="labelCompanyName"]', person["Company Name"])
+    page.fill('//input[@ng-reflect-name="labelRole"]', person["Role in Company"])
+    page.fill('//input[@ng-reflect-name="labelAddress"]', person["Address"])
+    page.fill('//input[@ng-reflect-name="labelEmail"]', person["Email"])
+    page.fill('//input[@ng-reflect-name="labelPhone"]', str(person["Phone Number"]))
+    page.click("input:text('Submit')")
+    sleep(0.5)
 
 
 @task
-def challenge():
-    """Run the RPA challenge"""
-    start_the_challenge()
-    fill_the_forms()
-    collect_the_results()
+def solve_challenge():
+    """Solve the RPA challenge"""
+    page = open_url("http://rpachallenge.com/", headless=True)
+
+    download("http://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
+    people = read_people_from_excel()
+
+    page.click("button:text('Start')")
+    for person in people:
+        fill_and_submit_form(page, person)
+
+    element = page.query_selector("css=div.congratulations")
+    element.screenshot(path=Path("output", "screenshot.png"))
+    sleep(2)
