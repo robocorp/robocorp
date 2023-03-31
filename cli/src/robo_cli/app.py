@@ -12,7 +12,7 @@ from rich.table import Table
 
 from robo_cli import environment, rcc, templates
 from robo_cli.config import pyproject
-from robo_cli.output import KIND_TO_EVENT
+from robo_cli.output import KIND_TO_EVENT, EndKeyword, StartKeyword
 from robo_cli.process import Process, ProcessError
 
 app = typer.Typer(no_args_is_help=True)
@@ -92,7 +92,7 @@ def list():
     table.add_column("Description")
 
     for task in tasks:
-        table.add_row(task["name"], "<No description>")
+        table.add_row(task["name"], task["docs"])
 
     console.print()
     console.print(table)
@@ -148,7 +148,29 @@ def run():
         with console.status("Building environment"):
             env = environment.ensure()
 
-        with console.status("Running robot"):
+
+        env["RC_LOG_OUTPUT_STDOUT"] = "1"
+        proc = Process(
+            [
+                "python",
+                "-m",
+                "robo",
+                "list",
+                "tasks.py",
+            ],
+            env=env,
+        )
+
+        try:
+            stdout, _ = proc.run()
+            tasks = json.loads(stdout)
+        except ProcessError as err:
+            console.print(err.stderr)
+            raise typer.Exit(code=1)
+
+        taskname = tasks[0]["name"]
+
+        with console.status(f"Running [bold]{taskname}[/bold]"):
             env["RC_LOG_OUTPUT_STDOUT"] = "1"
 
             # TODO: Figure out what to call from inner framework
@@ -160,22 +182,30 @@ def run():
                     "run",
                     "tasks.py",
                     "-t",
-                    "hello_world",
+                    taskname,
                 ],
                 env=env,
             )
 
+            stack = []
             def handle_line(line: str):
                 try:
                     payload = json.loads(line)
                     klass = KIND_TO_EVENT[payload["message_type"]]
                     event = klass.parse_obj(payload)
-                    console.print(event)
+                    # console.print(event)
+                    if isinstance(event, StartKeyword):
+                        console.print(f"{len(stack) * '  '}{event.name}")
+                        stack.append(event)
+                    if isinstance(event, EndKeyword):
+                        stack.pop()
                 except ValueError:
-                    console.print(f"Malformed line: {line}")
+                    pass
 
             proc.on_stdout(handle_line)
+            console.print()
             proc.run()
+            console.print()
 
     except ProcessError as exc:
         print(exc.stderr)
@@ -192,7 +222,7 @@ def run():
     )
 
     console.print()
-    console.print("Run [bold]<taskname>[/bold] successful!")
+    console.print(f"Run [bold]{taskname}[/bold] successful!")
     console.print()
 
 

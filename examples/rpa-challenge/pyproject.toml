@@ -4,7 +4,7 @@ description = "A simple example robot that solves the RPA Challenge"
 python = "3.9.13"
 
 [tool.robo.dependencies]
-robo-core="robo-0.1.1-py3-none-any.whl"
+robo-core="robo-0.1.2-py3-none-any.whl"
 rpaframework="22.0.0"
 
 [tool.robo.dev-dependencies]

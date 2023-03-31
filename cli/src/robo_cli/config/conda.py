@@ -46,12 +46,12 @@ def generate() -> Path:
 def _to_pip_deps(robo_deps):
     pip_deps = []
     for key, value in robo_deps.items():
-        key = str(value)
+        key = str(key)
         value = str(value)
         if _is_file_path(value):
             pip_deps.append(value)
         else:
-            pip_deps.append(f"{key}={value}")
+            pip_deps.append(f"{key}=={value}")
     return pip_deps
 
 

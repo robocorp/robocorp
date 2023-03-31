@@ -36,7 +36,7 @@ def fill_and_submit_the_form(person):
 
 
 def start_the_challenge():
-    browser_lib.open_available_browser("http://rpachallenge.com/")
+    browser_lib.open_available_browser("http://rpachallenge.com/", headless=True)
     HTTP().download(
         "http://rpachallenge.com/assets/downloadFiles/challenge.xlsx", overwrite=True
     )
@@ -56,6 +56,7 @@ def collect_the_results():
 
 @task
 def challenge():
+    """Run the RPA challenge"""
     start_the_challenge()
     fill_the_forms()
     collect_the_results()
