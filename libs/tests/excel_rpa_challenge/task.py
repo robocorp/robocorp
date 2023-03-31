@@ -10,9 +10,9 @@ def create_new_workbook():
     table2 = workbook2.worksheet("Sheet1").as_table(header=True)
 
     table2.set_column("State Most Sold In", values)
-    workbook3 = create_workbook("Book3.xlsx")
-    workbook3.worksheet("New Content").set_content(table2, header=True)
-    workbook3.save()
+    workbook3 = create_workbook("xlsx", "New Content")
+    workbook3.worksheet("New Content").append_rows_to_worksheet(table2, header=True)
+    workbook3.save("Book3.xlsx")
 
     print(table)
 

@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from io import BytesIO
 from typing import Any, List, Optional, Union
 
-from robo.libs._types import PathType
 
 import openpyxl
 import xlrd
@@ -16,10 +15,12 @@ from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 
+from robo.libs._types import PathType
 from robo.libs.excel.tables import Table
+from robo.libs.excel._worksheet import Worksheet
 
 
-def get_column_index(column: str) -> int:
+def _get_column_index(column: str) -> int:
     """Get column index from name, e.g. A -> 1, D -> 4, AC -> 29.
     Reverse of `get_column_letter()`
     """
@@ -33,7 +34,7 @@ def get_column_index(column: str) -> int:
     return col
 
 
-def ensure_unique(values: Any) -> List[Any]:
+def _ensure_unique(values: Any) -> List[Any]:
     """Ensures that each string value in the list is unique.
     Adds a suffix to each value that has duplicates,
     e.g. [Banana, Apple, Lemon, Apple] -> [Banana, Apple, Lemon, Apple_2]
@@ -61,49 +62,35 @@ def ensure_unique(values: Any) -> List[Any]:
     return output
 
 
-def load_workbook(
-    path: str, data_only: bool, read_only: bool
+def _load_workbook(
+    path: PathType, data_only: bool, read_only: bool
 ) -> Union["XlsWorkbook", "XlsxWorkbook"]:
     # pylint: disable=broad-except
-    path = pathlib.Path(path).resolve(strict=True)
+    parsed_path = pathlib.Path(path).resolve(strict=True)
 
     try:
-        book = XlsxWorkbook(path)
-        book.open(data_only=data_only, read_only=read_only)
+        book = XlsxWorkbook()
+        book.open(parsed_path, data_only=data_only, read_only=read_only)
         return book
     except InvalidFileException as exc:
         logging.debug(exc)  # Unsupported extension, silently try xlrd
     except Exception as exc:
         logging.info("Failed to open as Office Open XML (.xlsx) format: %s", exc)
 
+    if data_only or read_only:
+        raise ValueError("Xls workbooks don't support data_only or read_only options")
+
     try:
-        book = XlsWorkbook(path)
-        book.open()
+        book = XlsWorkbook(parsed_path)
+        book.open(parsed_path)
         return book
     except Exception as exc:
         logging.info("Failed to open as Excel Binary Format (.xls): %s", exc)
 
     raise ValueError(
-        f"Failed to open Excel file ({path}), "
+        f'Failed to open Excel file ("{path}"), '
         "verify that the path and extension are correct"
     )
-
-
-class Worksheet:
-    """Common worksheet for both .xls and .xlsx files management."""
-
-    def __init__(self, workbook: Union["XlsWorkbook", "XlsxWorkbook"], name: str):
-        self._workbook = workbook
-        self._name = name
-
-    def as_table(self, header=False, start=None):
-        return Table(self._workbook.read_worksheet(self._name, header, start))
-
-    def set_content(self, content: Optional[Table] = None, header=False, start=None):
-        if self._name not in self._workbook.sheetnames:
-            self._workbook.create_worksheet(self._name)
-        self._workbook.append_worksheet(self._name, content, header, start)
-        return self
 
 
 class BaseWorkbook:
@@ -112,7 +99,7 @@ class BaseWorkbook:
 
     def __init__(self, path: Optional[PathType] = None):
         self.logger = logging.getLogger(__name__)
-        self.path = path
+        # TODO: type hint these
         self._book = None
         self._extension = None
         self._active = None
@@ -211,9 +198,8 @@ class XlsxWorkbook(BaseWorkbook):
         self._book = openpyxl.Workbook()
         self._extension = None
 
-    def open(self, path=None, read_only=False, write_only=False, data_only=False):
+    def open(self, path, read_only=False, write_only=False, data_only=False):
         self._read_only = read_only
-        path = path or self.path
         if not path:
             raise ValueError("No path defined for workbook")
 
@@ -247,11 +233,8 @@ class XlsxWorkbook(BaseWorkbook):
     def validate_content(self):
         self._validate_content(self._book.properties)
 
-    def save(self, path=None):
-        path = path or self.path
-        if not path:
-            raise ValueError("No path defined for workbook")
-
+    def save(self, path: PathType):
+        path = str(pathlib.Path(path))
         self._book.save(filename=path)
 
     def create_worksheet(self, name):
@@ -273,7 +256,7 @@ class XlsxWorkbook(BaseWorkbook):
             columns = [get_column_letter(i + 1) for i in range(sheet.max_column)]
 
         columns = [str(value) if value is not None else value for value in columns]
-        columns = ensure_unique(columns)
+        columns = _ensure_unique(columns)
 
         data = []
         for cells in sheet.iter_rows(min_row=start):
@@ -481,7 +464,7 @@ class XlsWorkbook(BaseWorkbook):
         try:
             column = int(column)
         except ValueError:
-            column = get_column_index(column)
+            column = _get_column_index(column)
         return row - 1, column - 1
 
     def _to_index(self, value):
@@ -491,6 +474,9 @@ class XlsWorkbook(BaseWorkbook):
         return value
 
     def create(self, sheet="Sheet"):
+        # TODO: make both this and the other create default to `Sheet1` or whatever is
+        # excel default
+
         fd = BytesIO()
         try:
             book = xlwt.Workbook()
@@ -503,8 +489,8 @@ class XlsWorkbook(BaseWorkbook):
 
         self._extension = None
 
-    def open(self, path=None, read_only=False, write_only=False, data_only=False):
-        path = path or self.path
+    def open(self, path, read_only=False, write_only=False, data_only=False):
+        path = path
         if not path:
             raise ValueError("No path defined for workbook")
 
@@ -553,8 +539,8 @@ class XlsWorkbook(BaseWorkbook):
     def validate_content(self):
         self._validate_content(self._book)
 
-    def save(self, path=None):
-        path = path or self.path
+    def save(self, path: PathType):
+        path = str(pathlib.Path(path))
         if not path:
             raise ValueError("No path defined for workbook")
 
@@ -584,7 +570,7 @@ class XlsWorkbook(BaseWorkbook):
 
         columns = [value if value != "" else None for value in columns]
         columns = [str(value) if value is not None else value for value in columns]
-        columns = ensure_unique(columns)
+        columns = _ensure_unique(columns)
 
         data = []
         for r in range(start, sheet.nrows):

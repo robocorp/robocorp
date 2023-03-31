@@ -1,0 +1,75 @@
+name: Library tests
+
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "libs/**"
+      - ".github/workflows/tests_libs.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "libs/**/"
+      - ".github/workflows/tests_libs.yml"
+
+defaults:
+  run:
+    working-directory: './libs'
+
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "ubuntu-py310"
+            python: "3.10"
+            os: ubuntu-latest
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+          - name: "macos-py310"
+            os: macos-latest
+            python: "3.10"
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+
+    - name: Set up chrome and firefox on windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install firefox
+        choco install googlechrome
+    - name: Set up chrome and firefox on macOS
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install --cask google-chrome
+        brew install --cask firefox
+    - name: Set up chrome on linux
+      if: matrix.os == 'ubuntu-latest'
+      uses: browser-actions/setup-chrome@v1
+    - name: "Document chrome path on linux"
+      if: matrix.os == 'ubuntu-latest'
+      run: which chrome
+
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+        cache: 'poetry'
+
+    - name: Install project
+      run: poetry install
+    - name: Test
+      env:
+        PYTHONPATH: .
+      run: poetry run pytest
