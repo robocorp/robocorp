@@ -42,7 +42,8 @@ class Reader(Thread):
         self._readlines()
 
     def _readlines(self):
-        while line := self._file.readline().strip():
+        while line := self._file.readline():
+            line = line.rstrip()
             self._lines.append(line)
             for listener in self._listeners:
                 try:

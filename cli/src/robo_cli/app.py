@@ -1,4 +1,5 @@
-import glob
+import json
+import shutil
 import time
 from pathlib import Path
 
@@ -8,13 +9,14 @@ from rich.panel import Panel
 from rich.prompt import IntPrompt, Prompt
 from rich.spinner import Spinner
 from rich.table import Table
-from rich.text import Text
 
 from robo_cli import environment, rcc, templates
+from robo_cli.config import pyproject
+from robo_cli.output import KIND_TO_EVENT
 from robo_cli.process import Process, ProcessError
 
 app = typer.Typer(no_args_is_help=True)
-console = Console()
+console = Console(highlight=False)
 
 
 @app.command()
@@ -40,6 +42,10 @@ def new():
     console.print()
     console.print("Initializing project")
     path = templates.copy_template(Path(project_name), template=template)
+
+    with console.status("Building environment"):
+        environment.ensure()
+
     console.print()
     console.print("✨ Project created ✨")
     console.print()
@@ -47,6 +53,42 @@ def new():
     console.print()
     console.print("Configuration file: [bold]pyproject.toml[/bold]")
     console.print("Tasks file: [bold]tasks.py[/bold]")
+
+
+@app.command()
+def list():
+    with console.status("Building environment"):
+        env = environment.ensure()
+
+    env["RC_LOG_OUTPUT_STDOUT"] = "1"
+    proc = Process(
+        [
+            "python",
+            "-m",
+            "robo",
+            "list",
+            "tasks.py",
+        ],
+        env=env,
+    )
+
+    stdout, _ = proc.run()
+    tasks = json.loads(stdout)
+
+    if not tasks:
+        console.print("No tasks defined!")
+        raise typer.Exit(code=1)
+
+    table = Table(title="Available tasks")
+    table.add_column("Name", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Description")
+
+    for task in tasks:
+        table.add_row(task["name"], "<No description>")
+
+    console.print()
+    console.print(table)
+    console.print()
 
 
 def robot_run():
@@ -86,23 +128,54 @@ def robot_run():
 @app.command()
 def run():
     """Runs the robot from current directory"""
+    # TODO: Make global config object with effective values
+    config = pyproject.load()
+
+    # Empty output directory
+    output_dir = Path(config.get("output", "output"))
+    shutil.rmtree(output_dir)
+    output_dir.mkdir()
+
     try:
         with console.status("Building environment"):
             env = environment.ensure()
 
         with console.status("Running robot"):
+            env["RC_LOG_OUTPUT_STDOUT"] = "1"
+
             # TODO: Figure out what to call from inner framework
-            proc = Process(["python", "tasks.py"], env=env)
-            proc.on_stdout(lambda line: console.print(line))
+            proc = Process(
+                [
+                    "python",
+                    "-m",
+                    "robo",
+                    "run",
+                    "tasks.py",
+                    "-t",
+                    "hello_world",
+                ],
+                env=env,
+            )
+
+            def handle_line(line: str):
+                try:
+                    payload = json.loads(line)
+                    klass = KIND_TO_EVENT[payload["message_type"]]
+                    event = klass.parse_obj(payload)
+                    console.print(event)
+                except ValueError:
+                    console.print(f"Malformed line: {line}")
+
+            proc.on_stdout(handle_line)
             proc.run()
 
     except ProcessError as exc:
-        console.print(exc.stderr)
+        print(exc.stderr)
         console.print("---")
         console.print("Run failed due to unexpected error")
         raise typer.Exit(code=1)
 
-    artifacts = glob.glob("output/*")
+    artifacts = [str(name) for name in output_dir.glob("*")]
     console.print(
         Panel.fit(
             Group(*artifacts),
@@ -135,19 +208,20 @@ def deploy():
     console.print()
 
     with console.status("Fetching workspace list"):
-        available_workspaces = rcc.cloud_workspace()
+        workspaces = rcc.cloud_workspace()
 
-    workspace_names = list(available_workspaces.keys())
-    keys = [str(i + 1) for i in range(0, len(workspace_names))]
+    choices = {}
     console.print("Available workspaces:")
-    i = 1
-    for name in workspace_names:
-        console.print(f"{i}. {name}")
-        i = i + 1
-    workspace_index = IntPrompt.ask("Workspace to deploy into?", choices=keys) - 1
-    selected_workspace = available_workspaces[workspace_names[workspace_index]]
-    workspace_id = selected_workspace["id"]
-    workspace_url = selected_workspace["url"]
+    for idx, key in enumerate(workspaces.keys(), 1):
+        console.print(f"{idx}. {key}")
+        choices[str(idx)] = key
+
+    index = IntPrompt.ask("Workspace to deploy into?", choices=choices.keys())
+
+    workspace = workspaces[choices[index]]
+    workspace_id = workspace["id"]
+    workspace_url = workspace["url"]
+
     # TODO: have option to select from list of robot ids or create new one
     robot_id = Prompt.ask("Robot id to deploy with?", default="example")
 
@@ -166,28 +240,6 @@ def deploy():
     console.print()
     console.print("Deploy of [bold]example[/bold] successful!")
     console.print(f"Link: [underline]{workspace_url}/robots/{robot_id}/[/underline]")
-    console.print()
-
-
-@app.command()
-def list_tasks():
-    console.print()
-    console.print("> robo run")
-
-    desc = Text.assemble("\nTasks for handling generated report files\n")
-
-    table = Table(title="Tasks")
-    table.add_column("ID")
-    table.add_column("Name", justify="right", style="cyan", no_wrap=True)
-    table.add_column("Description")
-
-    table.add_row("1", "copy-reports", "Copy reports to output")
-    table.add_row("2", "remove-reports", "Remove generated reports")
-
-    console.print()
-    console.print(Panel.fit(Group(desc, table), title="example"))
-    console.print()
-    Prompt.ask("Select task to run", choices=["1", "2"])
     console.print()
 
 

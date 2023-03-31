@@ -4,7 +4,7 @@ import sys
 from functools import lru_cache
 from pathlib import Path
 
-ROOT = Path(os.getcwd()).resolve()
+ROOT = Path(os.getcwd()).absolute()
 
 
 @lru_cache
@@ -12,10 +12,10 @@ def resources_path() -> Path:
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         # Destination directory for resources defined in robotd.spec
-        return Path(sys._MEIPASS).resolve()  # type: ignore
+        return Path(sys._MEIPASS).absolute()  # type: ignore
     except AttributeError:
         # Development-time location is repository root
-        return Path(__file__).resolve().parent.parent.parent / "resources"
+        return Path(__file__).absolute().parent.parent.parent / "resources"
 
 
 @lru_cache

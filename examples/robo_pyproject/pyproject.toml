@@ -4,10 +4,8 @@ description = "Very simple automation "
 python = "3.9.13"
 
 [tool.robo.dependencies]
-rpaframework="22.0.0"
+robo-core="robo-0.1.1-py3-none-any.whl"
 
-# Do these come here or do they come from inside robo
-# we generate another RCC conda.yaml / robot.yaml combo from these to run things like lints and formatting / docs generation
 [tool.robo.dev-dependencies]
 ruff="0.0.1"
 black="0.0.1"

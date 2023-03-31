@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robo"
-version = "0.1.0"
+version = "0.1.1"
 description = "The automation framework for Python"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
@@ -11,7 +11,7 @@ readme = "README.md"
 packages = [{include = "robo", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 robocorp-logging = {url = "https://github.com/robocorp/robocorp-logging/archive/cc5cfea.zip"}
 
 [tool.poetry.group.dev.dependencies]

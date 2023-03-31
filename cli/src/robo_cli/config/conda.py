@@ -8,11 +8,6 @@ from robo_cli import paths
 from . import pyproject
 
 
-def _to_pip_deps(dependencies):
-    # TODO: Parse different types (path, URL, semver ranges, etc.)
-    return [f"{k}=={v}" for k, v in dependencies.items()]
-
-
 def generate() -> Path:
     config = pyproject.load()
 
@@ -46,3 +41,22 @@ def generate() -> Path:
         yaml.dump(content, file, sort_keys=False)
 
     return Path(tempfile.name)
+
+
+def _to_pip_deps(robo_deps):
+    pip_deps = []
+    for key, value in robo_deps.items():
+        key = str(value)
+        value = str(value)
+        if _is_file_path(value):
+            pip_deps.append(value)
+        else:
+            pip_deps.append(f"{key}={value}")
+    return pip_deps
+
+
+def _is_file_path(name: str):
+    try:
+        return (paths.ROOT / name).is_file() or Path(name).absolute().is_file()
+    except OSError:
+        return False
