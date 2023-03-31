@@ -57,8 +57,12 @@ def new():
 
 @app.command()
 def list():
-    with console.status("Building environment"):
-        env = environment.ensure()
+    try:
+        with console.status("Building environment"):
+            env = environment.ensure()
+    except ProcessError as err:
+        console.print(err.stderr)
+        raise typer.Exit(code=1)
 
     env["RC_LOG_OUTPUT_STDOUT"] = "1"
     proc = Process(
@@ -72,8 +76,12 @@ def list():
         env=env,
     )
 
-    stdout, _ = proc.run()
-    tasks = json.loads(stdout)
+    try:
+        stdout, _ = proc.run()
+        tasks = json.loads(stdout)
+    except ProcessError as err:
+        console.print(err.stderr)
+        raise typer.Exit(code=1)
 
     if not tasks:
         console.print("No tasks defined!")
