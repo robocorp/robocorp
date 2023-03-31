@@ -18,14 +18,13 @@ def test_log_api(tmpdir) -> None:
         with robocorp_logging.add_log_output(
             tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
         ):
-
             robocorp_logging.log_start_suite("Root Suite", "root", str(tmpdir))
             robocorp_logging.log_start_task("my_task", "task_id", 0, [])
 
             check.some_method()
 
             robocorp_logging.log_end_task("my_task", "task_id", "PASS", "Ok")
-            robocorp_logging.log_end_suite("Root Suite", "root", str(tmpdir))
+            robocorp_logging.log_end_suite("Root Suite", "root", "PASS")
 
         assert log_target.exists()
         start_method_messages = []

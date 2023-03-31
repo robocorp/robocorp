@@ -21,6 +21,23 @@ def raise_exceptions():
     _rewrite_callbacks.method_return.raise_exceptions = True
 
 
+@pytest.fixture()
+def log_setup(tmpdir):
+    import robocorp_logging
+    import io
+
+    log_target = Path(tmpdir.join("log.html"))
+
+    stream = io.StringIO()
+
+    with robocorp_logging.setup_auto_logging():
+        with robocorp_logging.add_log_output(
+            tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
+        ):
+            with robocorp_logging.add_in_memory_log_output(write=stream.write):
+                yield {"stream": stream}
+
+
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
     import subprocess

@@ -71,7 +71,7 @@ jobs:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
       run: python -u -m pytest -rfE -vv .
     - uses: actions/upload-artifact@v3
-      if: contains(matrix.name, '-outviewintegrationtests')
+      if: always() && contains(matrix.name, '-outviewintegrationtests')
       with:
         name: robotlog.${{ matrix.name }}.html
         path: output-webview/tests/output/log.html
