@@ -7,7 +7,7 @@ from playwright.sync_api import Browser, sync_playwright as _sync_playwright
 EXECUTABLE_PATHS = {
     "chromium": {
         "Linux": "/usr/bin/chromium-browser",
-        "Windows": "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        "Windows": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         "Darwin": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     },
     "firefox": {
