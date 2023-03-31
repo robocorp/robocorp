@@ -17,6 +17,7 @@ xlrd = "^2.0.1"
 xlwt = "^1.3.0"
 xlutils = "^2.0.0"
 openpyxl = "^3.0.9"
+playwright = "^1.32.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
