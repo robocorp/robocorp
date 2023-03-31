@@ -24,6 +24,7 @@ def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
 EXECUTABLE_PATHS = {
     "chrome": {
         "Linux": "/usr/bin/google-chrome",
+        "Windows": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         "Darwin": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     },
     "firefox": {
@@ -35,6 +36,7 @@ EXECUTABLE_PATHS = {
 
 
 def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
+    browser = browser.lower()
     system = platform.system()
     if system == "Windows":
         return _registry_path(browser)
