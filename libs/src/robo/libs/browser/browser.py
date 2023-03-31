@@ -4,10 +4,25 @@ from typing import Literal
 
 from playwright.sync_api import Browser, sync_playwright as _sync_playwright
 
+
+def _registry_chrome_path() -> str:
+    if platform.system() == "Windows":
+        import winreg
+
+        location = winreg.HKEY_CURRENT_USER
+        chrome_registry = (
+            r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"
+        )
+        key = winreg.OpenKeyEx(location, chrome_registry)
+        path = winreg.QueryValueEx(key, "Path")
+        assert path, "Could not find chrome path"
+        return path
+    raise RuntimeError("Not implemented for this OS")
+
+
 EXECUTABLE_PATHS = {
     "chromium": {
         "Linux": "/usr/bin/chromium-browser",
-        "Windows": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
         "Darwin": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     },
     "firefox": {
@@ -19,6 +34,10 @@ EXECUTABLE_PATHS = {
 
 
 def _get_executable_path(browser: Literal["firefox", "chromium"]) -> str:
+    system = platform.system()
+    if system == "Windows" and browser == "chromium":
+        return _registry_chrome_path()
+
     system = platform.system()
     assert browser in EXECUTABLE_PATHS
     executable_path = EXECUTABLE_PATHS[browser][system]
