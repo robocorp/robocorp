@@ -5,7 +5,7 @@ python = "3.9.13"
 
 [tool.robo.dependencies]
 robo-core="robo-0.1.2-py3-none-any.whl"
-rpaframework="22.0.0"
+robo-libs="robo_libs-0.1.0-py3-none-any.whl"
 
 [tool.robo.dev-dependencies]
 ruff="0.0.1"

@@ -58,31 +58,33 @@ def new():
 
 @app.command()
 def list():
+    """List available tasks"""
     try:
         with console.status("Building environment"):
             env = environment.ensure()
+            env["RC_LOG_OUTPUT_STDOUT"] = "1"
     except ProcessError as err:
         console.print(err.stderr)
         raise typer.Exit(code=1)
 
-    env["RC_LOG_OUTPUT_STDOUT"] = "1"
-    proc = Process(
-        [
-            "python",
-            "-m",
-            "robo",
-            "list",
-            "tasks.py",
-        ],
-        env=env,
-    )
+    with console.status("Parsing tasks"):
+        proc = Process(
+            [
+                "python",
+                "-m",
+                "robo",
+                "list",
+                "tasks.py",
+            ],
+            env=env,
+        )
 
-    try:
-        stdout, _ = proc.run()
-        tasks = json.loads(stdout)
-    except ProcessError as err:
-        console.print(err.stderr)
-        raise typer.Exit(code=1)
+        try:
+            stdout, _ = proc.run()
+            tasks = json.loads(stdout)
+        except ProcessError as err:
+            console.print(err.stderr)
+            raise typer.Exit(code=1)
 
     if not tasks:
         console.print("No tasks defined!")
@@ -142,36 +144,39 @@ def run():
 
     # Empty output directory
     output_dir = Path(config.get("output", "output"))
-    shutil.rmtree(output_dir)
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
     output_dir.mkdir()
 
     try:
         with console.status("Building environment"):
             env = environment.ensure()
+            env["RC_LOG_OUTPUT_STDOUT"] = "1"
 
-        env["RC_LOG_OUTPUT_STDOUT"] = "1"
-        proc = Process(
-            [
-                "python",
-                "-m",
-                "robo",
-                "list",
-                "tasks.py",
-            ],
-            env=env,
-        )
+        with console.status("Parsing tasks"):
+            proc = Process(
+                [
+                    "python",
+                    "-m",
+                    "robo",
+                    "list",
+                    "tasks.py",
+                ],
+                env=env,
+            )
 
-        try:
-            stdout, _ = proc.run()
-            tasks = json.loads(stdout)
-        except ProcessError as err:
-            console.print(err.stderr)
-            raise typer.Exit(code=1)
+            try:
+                stdout, _ = proc.run()
+                tasks = json.loads(stdout)
+            except ProcessError as err:
+                console.print(err.stderr)
+                raise typer.Exit(code=1)
 
         taskname = tasks[0]["name"]
 
         with console.status(f"Running [bold]{taskname}[/bold]"):
             env["RC_LOG_OUTPUT_STDOUT"] = "1"
+            env["PYTHONUNBUFFERED"] = "1"
 
             # TODO: Figure out what to call from inner framework
             proc = Process(
@@ -196,7 +201,7 @@ def run():
                     event = klass.parse_obj(payload)
                     # console.print(event)
                     if isinstance(event, StartKeyword):
-                        console.print(f"{len(stack) * '  '}{event.name}")
+                        console.print(f"{(len(stack) + 1) * '  '}{event.name}")
                         stack.append(event)
                     if isinstance(event, EndKeyword):
                         stack.pop()
@@ -205,6 +210,7 @@ def run():
 
             proc.on_stdout(handle_line)
             console.print()
+            console.print("[bold]Start execution[/bold]")
             proc.run()
             console.print()
 
@@ -229,9 +235,7 @@ def run():
 
 @app.command()
 def export():
-    """Exports the robot from current directory. Can be used to inspect what contents
-    will be deployed to the cloud.
-    """
+    """Exports the robot from current directory to a zip file"""
     console.print()
     with console.status("Exporting robot"):
         path = rcc.robot_wrap()
@@ -242,7 +246,7 @@ def export():
 
 @app.command()
 def deploy():
-    """Deploys the robot from current directory"""
+    """Deploys the robot from current directory to Control Room"""
     console.print()
     console.print()
 
