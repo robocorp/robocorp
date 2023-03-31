@@ -2,11 +2,16 @@ name: Tests
 
 on:
   push:
-    branches: [master]
-    paths: [libs]
+    branches: ["master"]
+    paths: ["libs"]
   pull_request:
-    branches: [master]
-    paths: [libs]
+    branches: ["master"]
+    paths: ["libs"]
+
+defaults:
+  run:
+    working-directory: './libs'
+
 
 jobs:
   build:
@@ -29,6 +34,13 @@ jobs:
     steps:
     - name: Checkout repository and submodules
       uses: actions/checkout@v2
+
+    - uses: browser-actions/setup-firefox@v1
+    - run: firefox --version
+
+    - uses: browser-actions/setup-chrome@v1
+    - run: chrome --version
+
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
@@ -40,9 +52,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install
-      working-directory: libs/
     - name: Test
       env:
         PYTHONPATH: .
       run: poetry run pytest
-      working-directory: libs/
