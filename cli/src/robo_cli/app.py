@@ -306,44 +306,28 @@ def _run(env, args: List[str]):
 
 
 @app.command()
-def lint(fix=False):
-    """runs lints on the project"""
+def lint(fix: bool = typer.Option(False, "--fix", "-f")):
+    """Runs linting and formatting on the project"""
 
     try:
         with console.status("Building environment"):
             env = environment.ensure_devdeps()
     except ProcessError as err:
-        console.print("Error building dev environment")
+        console.print("Error building linting environment")
         console.print(err.stderr)
         raise typer.Exit(code=1)
 
-    ruff_command = (
-        ["ruff", "check", "--fix", "tasks.py"]
-        if fix
-        else [
-            "ruff",
-            "check",
-            "tasks.py",
-        ]
-    )
-    black_command = (
-        ["python", "-m", "black", "tasks.py"]
-        if fix
-        else [
-            "python",
-            "-m",
-            "black",
-            "--check",
-            "tasks.py",
-        ]
-    )
+    ruff_command = ["ruff", "check", "tasks.py"]
+    black_command = ["python", "-m", "black", "tasks.py"]
+
+    if fix:
+        ruff_command.insert(2, "--fix")
+        black_command.insert(3, "--check")
 
     console.print()
-    with console.status("Linting"):
+    with console.status("Linting and formatting"):
         _run(env, ruff_command)
-    with console.status("Formatting"):
         _run(env, black_command)
-    console.print()
     console.print("Linting and formatting succesful!")
     console.print()
 
