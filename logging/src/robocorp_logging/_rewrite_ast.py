@@ -1,5 +1,5 @@
 import ast
-from typing import Optional, Any, Union
+from typing import Optional, Any, Union, List
 import sys
 from . import _ast_utils
 from ._rewrite_config import BaseConfig
@@ -92,7 +92,6 @@ def rewrite_ast_add_callbacks(
             break
 
         if node.__class__.__name__ == "Return":
-
             if not stack:
                 continue
             stack_it = reversed(stack)
@@ -142,7 +141,6 @@ def rewrite_ast_add_callbacks(
             it.send(result)
 
         elif node.__class__.__name__ == "FunctionDef":
-
             function = node
             if function.name.startswith("_") and function.name != "__init__":
                 continue
@@ -224,6 +222,62 @@ def rewrite_ast_add_callbacks(
                 call.args.append(factory.LineConstant())
 
                 try_finally.finalbody = [factory.Expr(call)]
+
+                # Target code:
+                #     import sys as @py_sys
+                #     method_except(@py_sys.exc_info())
+                #     raise
+                #
+                # ExceptHandler
+                #   Import
+                #   Expr
+                #     Call
+                #       Name
+                #         Load
+                #       Call
+                #         Attribute
+                #           Name
+                #             Load
+                #           Load
+                #   Raise
+                if sys.version_info >= (3, 10):
+                    aliases = [
+                        ast.alias("sys", "@py_sys", lineno=lineno, col_offset=0),
+                    ]
+                else:
+                    aliases = [
+                        ast.alias("sys", "@py_sys"),
+                    ]
+
+                imports = [
+                    ast.Import([alias], lineno=lineno, col_offset=0)
+                    for alias in aliases
+                ]
+
+                exc_info_attr = factory.Attribute(
+                    factory.NameLoad("@py_sys"), "exc_info"
+                )
+                call_exc_info = factory.Call()
+                call_exc_info.func = exc_info_attr
+
+                method_except = factory.NameLoadRewriteCallback("method_except")
+                call_method_except = factory.Call()
+                call_method_except.func = method_except
+                call_method_except.args.append(factory.NameLoad("__package__"))
+                call_method_except.args.append(factory.NameLoad("__file__"))
+                call_method_except.args.append(
+                    factory.Str(f"{class_name}{function.name}")
+                )
+                call_method_except.args.append(factory.LineConstant())
+                call_method_except.args.append(call_exc_info)
+
+                except_handler = factory.ExceptHandler()
+                except_handler.body.extend(imports)
+                except_handler.body.append(factory.Expr(call_method_except))
+                except_handler.body.append(factory.Raise())
+
+                handlers: List[ast.ExceptHandler] = [except_handler]
+                try_finally.handlers = handlers
 
                 function.body = function_body_prefix + [try_finally]
 

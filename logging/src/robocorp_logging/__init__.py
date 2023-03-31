@@ -87,13 +87,6 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
 __all_logger_instances__: Dict["_RobocorpLogger", int] = {}
 
 
-from ._rewrite_callbacks import (
-    before_method,
-    after_method,
-    method_return,
-)
-
-
 class _OnExitContextManager:
     def __init__(self, on_exit):
         self.on_exit = on_exit
@@ -116,6 +109,12 @@ def _register_callbacks(rewrite_hook_config):
     _register_callbacks.registered = True
 
     from robocorp_logging._rewrite_hook import RewriteHook
+    from ._rewrite_callbacks import (
+        before_method,
+        after_method,
+        method_return,
+        method_except,
+    )
 
     hook = RewriteHook(rewrite_hook_config)
     sys.meta_path.insert(0, hook)
@@ -125,7 +124,6 @@ def _register_callbacks(rewrite_hook_config):
     ) -> None:
         args = []
         for key, val in args_dict.items():
-
             for p in ("password", "passwd"):
                 if p in key:
                     for rf_stream in __all_logger_instances__:
@@ -150,8 +148,14 @@ def _register_callbacks(rewrite_hook_config):
         for rf_stream in __all_logger_instances__:
             rf_stream.end_method(name, package, "PASS", [])
 
+    def call_on_method_except(
+        package: str, filename: str, name: str, lineno: int
+    ) -> None:
+        pass
+
     before_method.register(call_before_method)
     after_method.register(call_after_method)
+    method_except.register(call_on_method_except)
 
     def _exit():
         # If the user actually used the with ... statement we'll remove things now.
@@ -220,7 +224,6 @@ def add_log_output(
     max_files: int = 5,
     log_html: Optional[Union[str, Path]] = None,
 ):
-
     from ._logger import _RobocorpLogger  # @Reimport
 
     if log_html and not output_dir:
@@ -250,7 +253,6 @@ def close_log_outputs():
 
 
 def add_in_memory_log_output(write):
-
     from ._logger import _RobocorpLogger  # @Reimport
 
     logger = _RobocorpLogger(__write__=write)

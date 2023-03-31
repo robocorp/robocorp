@@ -62,6 +62,9 @@ export interface IContentAdded {
     details: HTMLDetailsElement;
     summary: HTMLElement;
     summaryDiv: HTMLDivElement;
+    // note: besides the span below we actually add multiple other span items
+    // as we're processing items (i.e.: when we see arguments we may add other spam items
+    // and when we see the status we can also add the status).
     span: HTMLElement;
     source: string;
     lineno: number;

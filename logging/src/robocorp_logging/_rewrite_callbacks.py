@@ -55,3 +55,7 @@ after_method = Callback()
 
 # Called as: method_return(__package__, filename, name, lineno, return_value)
 method_return = Callback()
+
+# Called as: method_except(__package__, filename, name, lineno, exc_info)
+# tp, e, tb = exc_info
+method_except = Callback()

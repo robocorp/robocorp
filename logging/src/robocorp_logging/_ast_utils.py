@@ -268,3 +268,9 @@ class NodeFactory:
 
     def NoneConstant(self) -> ast.Constant:
         return self._set_line_col(ast.Constant("None"))
+
+    def ExceptHandler(self) -> ast.ExceptHandler:
+        return self._set_line_col(ast.ExceptHandler(body=[]))
+
+    def Raise(self) -> ast.Raise:
+        return self._set_line_col(ast.Raise())
