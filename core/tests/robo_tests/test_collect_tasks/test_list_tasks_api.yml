@@ -1,6 +1,8 @@
-- file: tasks.py
+- docs: "\n    main method docstring\n    "
+  file: tasks.py
   line: 8
   name: main
-- file: sub_task.py
+- docs: ''
+  file: sub_task.py
   line: 8
   name: sub

@@ -7,4 +7,7 @@ def some_method():
 
 @task
 def main():
+    """
+    main method docstring
+    """
     some_method()

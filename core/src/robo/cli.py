@@ -71,7 +71,12 @@ def list_tasks(
     tasks_found = []
     for task in collect_tasks(p):
         tasks_found.append(
-            {"name": task.name, "line": task.lineno, "file": task.filename}
+            {
+                "name": task.name,
+                "line": task.lineno,
+                "file": task.filename,
+                "docs": getattr(task.method, "__doc__") or "",
+            }
         )
 
     sys.stdout.write(json.dumps(tasks_found))
