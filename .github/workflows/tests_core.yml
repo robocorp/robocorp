@@ -1,4 +1,4 @@
-name: Tests
+name: Core Tests
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
-        cache: 'poetry'
+        cache: 'pip'
     - name: Install poetry
       working-directory: ./core
       run: |
