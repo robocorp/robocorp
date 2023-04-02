@@ -9,12 +9,17 @@ from contextlib import contextmanager
 from pathlib import Path
 import typing
 from ._rewrite_config import Filter
+import threading
+from types import TracebackType
 
 if typing.TYPE_CHECKING:
     from ._logger import _RobocorpLogger
 
 __version__ = "0.0.1"
 version_info = [int(x) for x in __version__.split(".")]
+
+ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
+OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
 
 
 def iter_decoded_log_format(stream) -> Iterator[dict]:
@@ -108,6 +113,8 @@ def _register_callbacks(rewrite_hook_config):
         return _OnExitContextManager(lambda: None)
     _register_callbacks.registered = True
 
+    tid = threading.get_ident()
+
     from robocorp_logging._rewrite_hook import RewriteHook
     from ._rewrite_callbacks import (
         before_method,
@@ -119,9 +126,15 @@ def _register_callbacks(rewrite_hook_config):
     hook = RewriteHook(rewrite_hook_config)
     sys.meta_path.insert(0, hook)
 
+    status_stack = []
+
     def call_before_method(
         package: str, filename: str, name: str, lineno: int, args_dict: dict
     ) -> None:
+        if tid != threading.get_ident():
+            return
+
+        status_stack.append([package, name, "PASS"])
         args = []
         for key, val in args_dict.items():
             for p in ("password", "passwd"):
@@ -145,13 +158,44 @@ def _register_callbacks(rewrite_hook_config):
             )
 
     def call_after_method(package: str, filename: str, name: str, lineno: int) -> None:
+        if tid != threading.get_ident():
+            return
+
+        try:
+            pop_package, pop_name, status = status_stack.pop(-1)
+        except IndexError:
+            # oops, something bad happened, the stack is unsynchronized
+            log_error("On method return the status_stack was empty.")
+            return
+        else:
+            if pop_package != package or pop_name != name:
+                log_error(
+                    f"On method return status stack package/name was: {pop_package}.{pop_name}. Received: {package}.{name}."
+                )
+                return
+
         for rf_stream in __all_logger_instances__:
-            rf_stream.end_method(name, package, "PASS", [])
+            rf_stream.end_method(name, package, status, [])
 
     def call_on_method_except(
-        package: str, filename: str, name: str, lineno: int
+        package: str, filename: str, name: str, lineno: int, exc_info: OptExcInfo
     ) -> None:
-        pass
+        if tid != threading.get_ident():
+            return
+
+        try:
+            pop_package, pop_name, _curr_status = status_stack[-1]
+        except IndexError:
+            # oops, something bad happened, the stack is unsynchronized
+            log_error("On method except the status_stack was empty.")
+            return
+        else:
+            if pop_package != package or pop_name != name:
+                log_error(
+                    f"On method except status stack package/name was: {pop_package}.{pop_name}. Received: {package}.{name}."
+                )
+                return
+            status_stack[-1][2] = Status.ERROR
 
     before_method.register(call_before_method)
     after_method.register(call_after_method)
@@ -269,6 +313,7 @@ def add_in_memory_log_output(write):
 
 
 class Status:
+
     PASS = "PASS"
     ERROR = "ERROR"
     FAIL = "FAIL"
@@ -294,6 +339,24 @@ def log_start_task(name: str, task_id: str, lineno: int, tags: Sequence[str]):
 def log_end_task(name: str, task_id: str, status: str, message: str):
     for rf_stream in __all_logger_instances__:
         rf_stream.end_task(name, task_id, status, message)
+
+
+def log_error(message: str):
+    for rf_stream in __all_logger_instances__:
+        html = False
+        rf_stream.log_message(Status.ERROR, message, html)
+
+
+def log_info(message: str):
+    for rf_stream in __all_logger_instances__:
+        html = False
+        rf_stream.log_message(Status.INFO, message, html)
+
+
+def log_warn(message: str):
+    for rf_stream in __all_logger_instances__:
+        html = False
+        rf_stream.log_message(Status.WARN, message, html)
 
 
 # --- Methods related to hiding logging information.

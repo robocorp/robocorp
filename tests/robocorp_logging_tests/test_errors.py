@@ -2,6 +2,7 @@ def test_errors(log_setup, tmpdir):
     from robocorp_logging_tests._resources import check_traceback
     from imp import reload
     import robocorp_logging
+    from robocorp_logging_tests.fixtures import verify_log_messages
 
     stream = log_setup["stream"]
 
@@ -18,3 +19,15 @@ def test_errors(log_setup, tmpdir):
         robocorp_logging.log_end_suite("Root Suite", "root", "ERROR")
     else:
         raise AssertionError("Expected error and it was not raised.")
+
+    stream.seek(0)
+    verify_log_messages(
+        stream,
+        [
+            dict(message_type="EK", status="ERROR"),
+            dict(message_type="EK", status="ERROR"),
+            dict(message_type="EK", status="ERROR"),
+            dict(message_type="ET", status="ERROR"),
+            dict(message_type="ES", status="ERROR"),
+        ],
+    )
