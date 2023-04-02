@@ -59,3 +59,10 @@ method_return = Callback()
 # Called as: method_except(__package__, filename, name, lineno, exc_info)
 # tp, e, tb = exc_info
 method_except = Callback()
+
+
+def iter_all_callbacks():
+    yield before_method
+    yield after_method
+    yield method_return
+    yield method_except

@@ -16,9 +16,28 @@ def resources_dir(tmpdir_factory):
 def raise_exceptions():
     from robocorp_logging import _rewrite_callbacks
 
-    _rewrite_callbacks.before_method.raise_exceptions = True
-    _rewrite_callbacks.after_method.raise_exceptions = True
-    _rewrite_callbacks.method_return.raise_exceptions = True
+    for callback in _rewrite_callbacks.iter_all_callbacks():
+        callback.raise_exceptions = True
+
+
+def verify_log_messages(stream, expected):
+    from robocorp_logging import iter_decoded_log_format
+
+    log_messages = tuple(iter_decoded_log_format(stream))
+    for log_msg in log_messages:
+        for expected_dct in expected:
+            for key, val in expected_dct.items():
+                if log_msg.get(key) != val:
+                    break
+            else:
+                expected.remove(expected_dct)
+                break
+
+    if expected:
+        new_line = "\n"
+        raise AssertionError(
+            f"Did not find {expected}.\nFound:\n{new_line.join(str(x) for x in log_messages)}"
+        )
 
 
 @pytest.fixture()
