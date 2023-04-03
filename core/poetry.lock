@@ -61,6 +61,7 @@ packaging = ">=22.0"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
 tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
+typing-extensions = {version = ">=3.10.0.0", markers = "python_version < \"3.10\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -397,6 +398,7 @@ files = [
 [package.source]
 type = "url"
 url = "https://github.com/robocorp/robocorp-logging/archive/cc5cfea.zip"
+
 [[package]]
 name = "ruff"
 version = "0.0.255"
@@ -462,5 +464,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.10"
-content-hash = "43c2c09e5d7abfa841fb551b989e806353e14f77dc2b48d14034a2f63063d431"
+python-versions = "^3.9"
+content-hash = "41f7d0f5211d1469bdfd9bed01d5207bb30db68e7a66a06129cb5ee55b2d16a3"
