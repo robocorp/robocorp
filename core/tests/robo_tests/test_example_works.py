@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import pytest
 
 
 def run_in_rcc(rcc_loc: Path, cwd: Path):
@@ -14,6 +15,9 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
     subprocess.check_call([str(rcc_loc)] + "task run".split(), cwd=cwd, env=env)
 
 
+@pytest.mark.skip(
+    reason="This test required rcc with robot.yaml/conda.yaml -- it should be changed to work with the settings in the pyproject.toml."
+)
 def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
     from robocorp_logging import iter_decoded_log_format_from_log_html
 

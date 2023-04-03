@@ -31,6 +31,8 @@
 
 - Logging: Change to use poetry and do first pypi release.
 
+- Create at least basic end-to-end integration test (`test_example_works.py` is currently skipped).
+
 
 # Maybe
 
