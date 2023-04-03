@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Optional, Any, Iterator, List, Sequence, Dict, Union
+from typing import Optional, Any, Iterator, List, Sequence, Dict, Union, Iterable
 import sys
 import functools
 from io import StringIO
@@ -89,7 +89,16 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
 
 
 # We could use a set, but we're using a dict to keep the order.
-__all_logger_instances__: Dict["_RobocorpLogger", int] = {}
+__tlocal_log__ = threading.local()
+
+
+def _get_logger_instances() -> Dict["_RobocorpLogger", int]:
+    instances: Dict["_RobocorpLogger", int]
+    try:
+        instances = __tlocal_log__.instances
+    except AttributeError:
+        instances = __tlocal_log__.instances = {}
+    return instances
 
 
 class _OnExitContextManager:
@@ -139,12 +148,12 @@ def _register_callbacks(rewrite_hook_config):
         for key, val in args_dict.items():
             for p in ("password", "passwd"):
                 if p in key:
-                    for rf_stream in __all_logger_instances__:
+                    for rf_stream in _get_logger_instances():
                         rf_stream.hide_from_output(val)
                     break
 
             args.append(f"{key}={val!r}")
-        for rf_stream in __all_logger_instances__:
+        for rf_stream in _get_logger_instances():
             rf_stream.start_method(
                 name,
                 package,
@@ -174,7 +183,7 @@ def _register_callbacks(rewrite_hook_config):
                 )
                 return
 
-        for rf_stream in __all_logger_instances__:
+        for rf_stream in _get_logger_instances():
             rf_stream.end_method(name, package, status, [])
 
     def call_on_method_except(
@@ -276,10 +285,10 @@ def add_log_output(
         )
 
     logger = _RobocorpLogger(output_dir, max_file_size, max_files, log_html)
-    __all_logger_instances__[logger] = 1
+    _get_logger_instances()[logger] = 1
 
     def _exit():
-        __all_logger_instances__.pop(logger, None)
+        _get_logger_instances().pop(logger, None)
         logger.close()
 
     return _OnExitContextManager(_exit)
@@ -290,9 +299,9 @@ def close_log_outputs():
     This method must be called to close loggers (note that some loggers such as
     the one which outputs html needs to bo closed to actually write the output).
     """
-    while __all_logger_instances__:
-        logger = next(iter(__all_logger_instances__))
-        __all_logger_instances__.pop(logger, None)
+    while _get_logger_instances():
+        logger = next(iter(_get_logger_instances()))
+        _get_logger_instances().pop(logger, None)
         logger.close()
 
 
@@ -300,10 +309,10 @@ def add_in_memory_log_output(write):
     from ._logger import _RobocorpLogger  # @Reimport
 
     logger = _RobocorpLogger(__write__=write)
-    __all_logger_instances__[logger] = 1
+    _get_logger_instances()[logger] = 1
 
     def _exit():
-        __all_logger_instances__.pop(logger, None)
+        _get_logger_instances().pop(logger, None)
         logger.close()
 
     return _OnExitContextManager(_exit)
@@ -322,39 +331,39 @@ class Status:
 
 
 def log_start_suite(name: str, suite_id: str, suite_source: str) -> None:
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.start_suite(name, suite_id, suite_source)
 
 
 def log_end_suite(name: str, suite_id: str, status: str) -> None:
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.end_suite(name, suite_id, status)
 
 
-def log_start_task(name: str, task_id: str, lineno: int, tags: Sequence[str]):
-    for rf_stream in __all_logger_instances__:
+def log_start_task(name: str, task_id: str, lineno: int, tags: Sequence[str]) -> None:
+    for rf_stream in _get_logger_instances():
         rf_stream.start_task(name, task_id, lineno, tags)
 
 
-def log_end_task(name: str, task_id: str, status: str, message: str):
-    for rf_stream in __all_logger_instances__:
+def log_end_task(name: str, task_id: str, status: str, message: str) -> None:
+    for rf_stream in _get_logger_instances():
         rf_stream.end_task(name, task_id, status, message)
 
 
-def log_error(message: str):
-    for rf_stream in __all_logger_instances__:
+def log_error(message: str) -> None:
+    for rf_stream in _get_logger_instances():
         html = False
         rf_stream.log_message(Status.ERROR, message, html)
 
 
-def log_info(message: str):
-    for rf_stream in __all_logger_instances__:
+def log_info(message: str) -> None:
+    for rf_stream in _get_logger_instances():
         html = False
         rf_stream.log_message(Status.INFO, message, html)
 
 
-def log_warn(message: str):
-    for rf_stream in __all_logger_instances__:
+def log_warn(message: str) -> None:
+    for rf_stream in _get_logger_instances():
         html = False
         rf_stream.log_message(Status.WARN, message, html)
 
@@ -367,7 +376,7 @@ def stop_logging_methods():
     """
     Can be used so that method calls are no longer logged.
     """
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.stop_logging_methods()
     try:
         yield
@@ -383,7 +392,7 @@ def start_logging_methods():
     Can still be used if `stop_logging_methods` with a try..finally if
     `stop_logging_methods` isn't used as a context manager.
     """
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.start_logging_methods()
 
 
@@ -392,7 +401,7 @@ def stop_logging_variables():
     """
     Can be used so that variables are no longer logged.
     """
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.stop_logging_variables()
 
     try:
@@ -409,7 +418,7 @@ def start_logging_variables():
     Can still be used if `stop_logging_variables` with a try..finally if
     `stop_logging_variables` isn't used as a context manager.
     """
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.start_logging_variables()
 
 
@@ -420,5 +429,5 @@ def hide_from_output(string_to_hide: str) -> None:
     :param string_to_hide:
         The string that should be hidden from the output.
     """
-    for rf_stream in __all_logger_instances__:
+    for rf_stream in _get_logger_instances():
         rf_stream.hide_from_output(string_to_hide)
