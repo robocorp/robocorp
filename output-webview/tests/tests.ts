@@ -1,4 +1,4 @@
-import { setContents } from "../src/index";
+import { setContents } from "../src/setupWindowAPI";
 import { ISetContentsRequest } from "../src/vscodeComm";
 
 export function setupScenario(scenario) {
