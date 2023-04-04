@@ -15,7 +15,7 @@ from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 
-from robo.libs._types import PathType
+from robo.libs.excel._types import PathType
 from robo.libs.excel.tables import Table
 from robo.libs.excel._worksheet import Worksheet
 

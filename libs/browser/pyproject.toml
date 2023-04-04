@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "libs-devdeps"
+name = "robocorp-browser"
 version = "0.1.0"
-description = "development dependencies for robo libraries"
+description = "Robocorp browser automation library"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
@@ -13,14 +13,10 @@ packages = [{include = "robo", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+playwright = "^1.32.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-ruff = "^0.0.255"
-mypy = "^1.1.1"
-pytest = "^7.2.2"
-pytest-xdist = "^3.2.1"
-pytest-regressions = "1.0.6"
+libs-devdeps = {path = "..", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

@@ -3,7 +3,7 @@ import requests
 from urllib.parse import urlparse
 
 from typing import Any, Optional
-from robo.libs._types import PathType
+from robo.libs.http._types import PathType
 
 
 def _create_or_overwrite_target_file(
