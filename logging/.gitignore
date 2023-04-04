@@ -133,3 +133,5 @@ node_modules
 /tests/playwright-log.txt
 /output-webview/dist-test
 /output-webview/dist
+
+/output-webview/.vscode
