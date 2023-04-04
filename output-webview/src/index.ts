@@ -14,6 +14,7 @@ import {
     ISetContentsRequest,
     IAppendContentsRequest,
     IUpdateLabelRequest,
+    isInVSCode,
 } from "./vscodeComm";
 
 let treeBuilder: TreeBuilder | undefined;
@@ -52,12 +53,22 @@ export function setContents(msg: ISetContentsRequest): void {
     const opts = getOpts();
     opts.runId = msg.runId;
     opts.initialContents = msg.initialContents;
-    opts.onClickReference = onClickReference;
+    if (isInVSCode()) {
+        opts.onClickReference = onClickReference;
+    }
     opts.appendedContents = [];
     opts.allRunIdsToLabel = msg.allRunIdsToLabel;
 
     rebuildRunSelection(opts.allRunIdsToLabel, opts.runId);
     rebuildTreeAndStatusesFromOpts();
+}
+
+export function setShowTime(showTime: boolean): void {
+    getOpts().showTime = showTime;
+}
+
+export function setShowExpand(showExpand: boolean): void {
+    getOpts().showExpand = showExpand;
 }
 
 export function appendContents(msg: IAppendContentsRequest): void {
@@ -100,4 +111,6 @@ function onChangedRun() {
 window["onChangedRun"] = onChangedRun;
 window["onChangedFilterLevel"] = onChangedFilterLevel;
 window["setContents"] = setContents;
+window["setShowTime"] = setShowTime;
+window["setShowExpand"] = setShowExpand;
 window["getSampleContents"] = getSampleContents;

@@ -8,6 +8,8 @@ let _opts: IOpts = {
     onClickReference: undefined,
     appendedContents: [],
     allRunIdsToLabel: {},
+    showTime: true,
+    showExpand: true,
 };
 
 export function getOpts(): IOpts {

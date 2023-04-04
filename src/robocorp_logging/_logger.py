@@ -15,6 +15,7 @@ def _log_error(func):
         except Exception as e:
             s = StringIO()
             traceback.print_exc(file=s)
+            traceback.print_exc()
             self._robot_output_impl.log_message(
                 "ERROR",
                 f"_RobocorpLogger internal error: {e}\n{s.getvalue()}",

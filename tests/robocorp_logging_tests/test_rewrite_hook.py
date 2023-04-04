@@ -146,7 +146,7 @@ def test_rewrite_hook_except(config):
             assert setup_callback.found == [
                 ("before", "main", {}),
                 ("before", "another_method", {}),
-                ("before", "sub_method", {}),
+                ("before", "sub_method", {"arg_name": ("arg", "name", 1)}),
                 ("except", "sub_method", 2),
                 ("after", "sub_method"),
                 ("except", "another_method", 6),

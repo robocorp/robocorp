@@ -88,7 +88,9 @@ export class TreeBuilder {
         this.resetState();
 
         const filterLevelEl: HTMLSelectElement = selectById("filterLevel");
-        filterLevelEl.value = this.opts.state.filterLevel;
+        if (filterLevelEl) {
+            filterLevelEl.value = this.opts.state.filterLevel;
+        }
         const mainDiv = divById("mainTree");
         mainDiv.replaceChildren(); // clear all children
 
@@ -105,7 +107,8 @@ export class TreeBuilder {
             "li": undefined,
             "details": undefined,
             "summary": undefined,
-            "span": undefined,
+            "summaryName": undefined,
+            "summaryInput": undefined,
             "source": undefined,
             "lineno": undefined,
             "decodedMessage": undefined,
@@ -221,7 +224,7 @@ export class TreeBuilder {
                 this.parent = addTreeContent(
                     this.opts,
                     this.parent,
-                    this.suiteName + msg.decoded["name"],
+                    this.suiteName + msg.decoded["name"] + "()",
                     msg,
                     false,
                     this.suiteSource,
@@ -241,7 +244,7 @@ export class TreeBuilder {
                 this.parent = addTreeContent(
                     this.opts,
                     this.parent,
-                    `${msg.decoded["keyword_type"]} - ${libname}${msg.decoded["name"]}`,
+                    `${libname}${msg.decoded["name"]}`,
                     msg,
                     false,
                     msg.decoded["source"],
@@ -263,6 +266,22 @@ export class TreeBuilder {
                 this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currT, this.parent, msg);
                 this.onEndSetStatusOrRemove(this.opts, currT, msg.decoded, this.parent, false);
                 this.summaryBuilder.onTestEndUpdateSummary(msg);
+
+                // JANNE: the initial call, "challenge.run", is a "test"
+                if (msg.decoded.status === "ERROR") {
+                    console.log("END KEYWORD", this.opts, currT, msg.decoded, this.parent, true);
+                    currT.details.open = true;
+                    currT.details.classList.add("errorParent");
+                } else {
+                    currT.details.classList.add("passParent");
+                }
+
+                if (currT.ul.children.length === 0) {
+                    currT.details.classList.add("leafNode");
+                } else {
+                    currT.details.classList.add("parentNode");
+                }
+
                 break;
             case "EK": // end keyword
                 this.messageNode = this.messageNode.parent;
@@ -271,6 +290,19 @@ export class TreeBuilder {
                 this.parent = this.stack.at(-1);
                 this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currK, this.parent, msg);
                 this.onEndSetStatusOrRemove(this.opts, currK, msg.decoded, this.parent, true);
+
+                if (msg.decoded.status === "ERROR") {
+                    currK.details.open = true;
+                    currK.details.classList.add("errorParent");
+                } else {
+                    currK.details.classList.add("passParent");
+                }
+
+                if (currK.ul.children.length === 0) {
+                    currK.details.classList.add("leafNode");
+                } else {
+                    currK.details.classList.add("parentNode");
+                }
 
                 break;
             case "S":
@@ -282,9 +314,12 @@ export class TreeBuilder {
                 break;
             case "KA":
                 const item: IContentAdded = this.stack.at(-1);
-                if (item?.span) {
-                    item.span.textContent += ` | ${msg.decoded["argument"]}`;
+                if (item.summaryInput.textContent.endsWith("—")) {
+                    item.summaryInput.textContent = `${msg.decoded["argument"]}`;
+                } else {
+                    item.summaryInput.textContent += `, ${msg.decoded["argument"]}`;
                 }
+
                 break;
             case "L":
             case "LH":
@@ -309,6 +344,13 @@ export class TreeBuilder {
                     );
                     logContent.maxLevelFoundInHierarchy = iLevel;
                     addLevel(logContent, level);
+                    if (iLevel >= 2) {
+                        logContent.details.classList.add("errorParent");
+                    } else {
+                        logContent.details.classList.add("passParent");
+                    }
+
+                    logContent.details.classList.add("leafNode");
                 }
                 break;
         }
@@ -345,7 +387,7 @@ export class TreeBuilder {
                     // are too many elements under a given parent.
                     const MAX_ELEMENT_COUNT = 50;
                     if (parent.ul.childElementCount > MAX_ELEMENT_COUNT) {
-                        const textContent = current.span.textContent;
+                        const textContent = current.summaryName.textContent;
                         if (textContent && textContent.toLowerCase().includes("iteration")) {
                             const beforeCurrLi: HTMLLIElement = <HTMLLIElement>current.li.previousSibling;
                             const id = getDataTreeId(current.li);
@@ -353,10 +395,10 @@ export class TreeBuilder {
 
                             if (liMarkedAsHidden(beforeCurrLi)) {
                                 const el = beforeCurrLi.getElementsByClassName("FINAL_SPAN")[0];
-                                el.textContent = current.span.textContent;
+                                el.textContent = current.summaryName.textContent;
                             } else {
                                 const created = createLiAndNodesBelow(false, id);
-                                created.span.textContent = current.span.textContent;
+                                created.summaryName.textContent = current.summaryName.textContent;
 
                                 created.summary.classList.add("HIDDEN");
 
@@ -387,15 +429,17 @@ export class TreeBuilder {
             const summary = current.summary;
             addStatus(current, status);
 
-            const startTime: number = current.decodedMessage.decoded["time_delta_in_seconds"];
-            if (startTime && startTime >= 0) {
-                const endTime: number = endDecodedMsg["time_delta_in_seconds"];
-                const diff = endTime - startTime;
-                // if (diff > 0) {
-                //     console.log("Current: ", JSON.stringify(current.decodedMessage), "end", JSON.stringify(endDecodedMsg));
-                //     console.log("Diff: ", diff);
-                // }
-                addTime(current, diff);
+            if (this.opts.showTime) {
+                const startTime: number = current.decodedMessage.decoded["time_delta_in_seconds"];
+                if (startTime && startTime >= 0) {
+                    const endTime: number = endDecodedMsg["time_delta_in_seconds"];
+                    const diff = endTime - startTime;
+                    // if (diff > 0) {
+                    //     console.log("Current: ", JSON.stringify(current.decodedMessage), "end", JSON.stringify(endDecodedMsg));
+                    //     console.log("Diff: ", diff);
+                    // }
+                    addTime(current, diff);
+                }
             }
         } else {
             current.li.remove();

@@ -20,9 +20,12 @@ export class SummaryBuilder {
     }
 
     updateSummary() {
+        const summary = divById("summary");
+        if (!summary) {
+            return;
+        }
         const totalTestsStr = ("" + this.totalTests).padStart(4);
         const totalFailuresStr = ("" + this.totalFailures).padStart(4);
-        const summary = divById("summary");
         summary.textContent = `Total: ${totalTestsStr} Failures: ${totalFailuresStr}`;
 
         if (this.totalFailures == 0 && this.totalTests == 0) {
