@@ -392,13 +392,12 @@ category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "cc5cfea.zip", hash = "sha256:42375731e02bc6b9b2245cf5be3e20435e4c31e0918cefbadadee069bfeac004"},
+    {file = "2379496.zip", hash = "sha256:9d13bcf86e5369bd35a0d90e8c2b910fd3e2f6d00e00c3f01b6f9c79550652f6"},
 ]
 
 [package.source]
 type = "url"
-url = "https://github.com/robocorp/robocorp-logging/archive/cc5cfea.zip"
-
+url = "https://github.com/robocorp/robocorp-logging/archive/2379496.zip"
 [[package]]
 name = "ruff"
 version = "0.0.255"
@@ -465,4 +464,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "41f7d0f5211d1469bdfd9bed01d5207bb30db68e7a66a06129cb5ee55b2d16a3"
+content-hash = "a8afc45e540c3534046a503ea9ff0cae805410ecb62eed3d0bb1fc09880032e5"
