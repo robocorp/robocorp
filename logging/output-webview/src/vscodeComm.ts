@@ -42,7 +42,7 @@ export interface ISetContentsRequest {
     type: "request";
     command: "setContents";
     initialContents: string;
-    runId: string |  undefined;
+    runId: string | undefined;
     allRunIdsToLabel: object | undefined;
 }
 
