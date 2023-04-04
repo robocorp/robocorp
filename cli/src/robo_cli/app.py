@@ -287,8 +287,9 @@ def deploy():
 
 
 def _run(env, args: List[str]):
+    assert len(args) > 0, "Must provide at least one argument"
     try:
-        proc = Process(args=[*args], env=env)
+        proc = Process(args=args, env=env)
 
         try:
             stdout, stderr = proc.run()
