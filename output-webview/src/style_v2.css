@@ -13,14 +13,6 @@ html, body {
 
 :root {  
 
-    --log-color-error: #E84F5C;
-    --log-color-success: #219F7F;
-
-    --log-color-warn: #ff6666;
-    --log-color-disabled: #999999;
-    --log-color-border: #dddddd;
-    --log-color-text: #000000;
-
     --right-column-width: 50vw;
 
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
@@ -30,6 +22,42 @@ html, body {
     --fixed-font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 }
 
+
+
+@media (prefers-color-scheme: light) {
+    :root {  
+        --log-color-error: #E84F5C;
+        --log-color-success: #219F7F;
+
+        --log-color-warn: #ff6666;
+        --log-color-disabled: #999999;
+        --log-color-border: #dddddd;
+
+        --log-color-text: #000000;
+        --log-color-text-weaker: #444444;
+
+        --log-color-bg: #ffffff;
+        --log-color-bg-raised: #f3f3f3;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {  
+        --log-color-error: #E84F5C;
+        --log-color-success: #219F7F;
+
+        --log-color-warn: #ff6666;
+        --log-color-disabled: #666666;
+        --log-color-border: #444444;
+
+        --log-color-text: #eeeeee;
+        --log-color-text-weaker: #bbbbbb;
+
+        --log-color-bg: #222222;
+        --log-color-bg-raised: #333333;
+    }
+}
+
 body {
     display: flex;
     flex-direction: column;
@@ -37,6 +65,7 @@ body {
     font-size: 0.8rem;
     font-family: var(--sans-font-family);
     color: var(--log-color-text);
+    background-color: var(--log-color-bg);
 }
 
 
@@ -91,7 +120,7 @@ details > summary {
 }
 
 details > summary:hover {
-    background-color: #f3f3f3;
+    background-color: var(--log-color-bg-raised);
     border-radius: 2px;
 }
 
@@ -260,7 +289,8 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 .headerSource, .headerInputs {
     font-weight:bold;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    color: var(--log-color-text-weaker);
 }
 
 .headerInputs {
@@ -272,6 +302,7 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 .headerRunDetails {
     margin:0;
     margin-bottom: 1.5rem;
+    color: var(--log-color-text-weaker);
 }
 
 /* LABEL IS THE PASS/ERROR BADGE */
@@ -331,9 +362,9 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 
 .headerTitleSection .label {
     font-size: 0.8rem;
-    padding: 0.1rem 0.3rem;
+    padding: 0.1rem 0.3rem 0.15rem 0.3rem;
     height: auto;
-    margin-left: 0.5rem;
+    margin-left: 0.75rem;
     display: inline-block;
     background-color: var(--log-color-error);
 }
