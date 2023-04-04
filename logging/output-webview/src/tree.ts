@@ -4,6 +4,7 @@
 // https://stackoverflow.com/questions/10813581/can-i-replace-the-expand-icon-of-the-details-element
 
 import { IMessage } from "./decoder";
+import { getOpts } from "./options";
 import { saveTreeStateLater } from "./persistTree";
 import {
     createButton,
@@ -23,8 +24,17 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
     // <li>
     //   <details open>
     //     <summary>
-    //          <span></span>
+    //       <div class="summaryDiv">
+    //          <span class="label">...</span>
+    //          <span class="summaryName">...</span>
+    //          <span class="summaryInput">...</span>
+    //       </div>
     //     </summary>
+    //     <div class="detailContainer">
+    //       <div class="detailInfo"></div>
+    //       <div class="detailInputs"></div>
+    //     </div>
+    //     <ul>...</ul>
     //   </details>
     // </li>
 
@@ -34,20 +44,51 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
     if (open) {
         details.open = open;
     }
+
+    /* ADD DETAILS INTO LI */
+
+    details.classList.add("NO_CHILDREN");
+    li.appendChild(details);
+
+    /* SETUP DETAIL SECTION */
+
+    const detailContainer = createDiv();
+    detailContainer.classList.add("detailContainer");
+
+    /* this is where error could be displayed etc, hiding it for now */
+    const detailInfo = createDiv();
+    detailInfo.classList.add("detailInfo");
+    detailInfo.innerHTML =
+        '<div class="errorHeader">TypeError: NoneType object is not subscriptable</div><div class="errorDetails">set_value_by_xpath(f//input[@ng-reflect-name="{name}"]\',person[key])<br>challenge.py, line 32</div>';
+    detailContainer.appendChild(detailInfo);
+
+    const detailInputs = createDiv();
+    detailInputs.classList.add("detailInputs");
+    detailInputs.textContent = " ";
+    detailContainer.appendChild(detailInputs);
+
+    details.appendChild(detailContainer);
+
+    /* SUMMARY SECTION */
+
     const summary = createSummary();
     const summaryDiv = createDiv();
     summaryDiv.classList.add("summaryDiv");
     summary.appendChild(summaryDiv);
 
-    li.appendChild(details);
+    const summaryName: HTMLSpanElement = createSpan();
+    summaryName.className = "summaryName";
+    summaryName.textContent = "[summaryName]";
+    summaryDiv.appendChild(summaryName);
+
+    const summaryInput: HTMLSpanElement = createSpan();
+    summaryInput.className = "summaryInput";
+    summaryInput.textContent = "—";
+    summaryDiv.appendChild(summaryInput);
+
     details.appendChild(summary);
-    details.classList.add("NO_CHILDREN");
 
-    const span: HTMLSpanElement = createSpan();
-    span.setAttribute("role", "button");
-    summaryDiv.appendChild(span);
-
-    return { li, details, summary, summaryDiv, span };
+    return { li, details, summary, summaryDiv, detailInputs, summaryName, summaryInput };
 }
 
 /**
@@ -88,18 +129,19 @@ export function addTreeContent(
     const details = created.details;
     const summary = created.summary;
     const summaryDiv = created.summaryDiv;
-    const span = created.span;
+    const summaryName = created.summaryName;
+    const summaryInput = created.summaryInput;
 
     if (decodedMessage.message_type === "LH") {
         const htmlContents = htmlToElement(content);
-        span.appendChild(htmlContents);
+        summaryName.appendChild(htmlContents);
     } else {
-        span.textContent = content;
+        summaryName.textContent = content;
     }
 
     if (opts.onClickReference) {
-        span.classList.add("span_link");
-        span.onclick = (ev) => {
+        summaryName.classList.add("span_link");
+        summaryName.onclick = (ev) => {
             const scope = [];
             let p: IMessageNode = messageNode.parent;
             while (p !== undefined && p.message !== undefined) {
@@ -125,7 +167,8 @@ export function addTreeContent(
         li,
         details,
         summary,
-        span,
+        summaryName,
+        summaryInput,
         source,
         lineno,
         appendContentChild: undefined,
@@ -223,8 +266,10 @@ function createUlIfNeededAndAppendChild(child: IContentAdded) {
         bound.details.addEventListener("toggle", function () {
             saveTreeStateLater();
         });
-        bound.summary.addEventListener("mouseover", (event) => {
-            updateOnMouseOver(bound);
-        });
+        if (getOpts().showExpand) {
+            bound.summary.addEventListener("mouseover", (event) => {
+                updateOnMouseOver(bound);
+            });
+        }
     }
 }

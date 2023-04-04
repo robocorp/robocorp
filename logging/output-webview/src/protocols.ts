@@ -30,6 +30,9 @@ export interface IOpts {
     // and then add new messages line by line as it's
     // being tracked afterwards).
     appendedContents: string[];
+
+    showTime: boolean;
+    showExpand: boolean;
 }
 
 export interface ILiNodesCreated {
@@ -38,13 +41,16 @@ export interface ILiNodesCreated {
     //     <summary>
     //          <span></span>
     //     </summary>
+    //     <div></div>
     //   </details>
     // </li>
     li: HTMLLIElement;
     details: HTMLDetailsElement;
     summary: HTMLElement;
     summaryDiv: HTMLDivElement;
-    span: HTMLElement;
+    detailInputs: HTMLDivElement;
+    summaryName: HTMLElement;
+    summaryInput: HTMLElement;
 }
 
 export interface IContentAdded {
@@ -65,7 +71,9 @@ export interface IContentAdded {
     // note: besides the span below we actually add multiple other span items
     // as we're processing items (i.e.: when we see arguments we may add other spam items
     // and when we see the status we can also add the status).
-    span: HTMLElement;
+    summaryName: HTMLElement;
+    summaryInput: HTMLElement;
+
     source: string;
     lineno: number;
 

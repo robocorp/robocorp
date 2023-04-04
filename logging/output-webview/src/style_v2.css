@@ -1,0 +1,283 @@
+/* CONTAINERS ETC */
+
+/* box model reset */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+:root {  
+
+    --log-color-error: #E84F5C;
+    --log-color-success: #219F7F;
+
+    --log-color-warn: #ff6666;
+    --log-color-disabled: #999999;
+    --log-color-border: #dddddd;
+
+    --right-column-width: 50vw;
+
+    font-family: system-ui, "Segoe UI", "Roboto", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    padding: 1.0rem;
+    font-size: 0.8rem;
+}
+
+
+ul {
+    list-style-type: none;
+    padding-inline-start: 0px;
+    margin-block-start: 0px;
+}
+
+#mainTree {
+    white-space: nowrap;
+    overflow: auto;
+    flex-grow: 1;
+}
+
+/* TREE */
+
+.tree li {
+    display: block;
+    position: relative;
+    padding-left: 0px;
+}
+
+/* nesting level vertical line */
+.tree ul:not(:first-child), .detailContainer {
+    border-left: 1px solid var(--log-color-border);
+
+    /* centering the line with the icon */
+    margin-left: 0.65rem;
+
+    /* nesting indentation */
+    padding-left: 0.8rem;
+}
+
+details.errorParent .tree ul:not(:first-child), details.errorParent .detailContainer {
+    border-color: var(--log-color-error);
+}
+
+/* SUMMARY ROW FOR EACH CODE ROW */
+
+details.parentNode > summary, details.errorParent.leafNode > summary {
+    cursor: pointer;
+}
+
+details > summary {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.25rem;
+
+    /* chrome needs this, safari doesn't */
+    list-style: none;
+}
+
+details > summary:hover {
+    background-color: #f3f3f3;
+    border-radius: 2px;
+}
+
+details > summary::-webkit-details-marker {
+    display: none;
+}
+
+details > summary::before {
+    background-color: var(--log-color-success);
+}
+
+details.errorParent > summary::before {
+    background-color: var(--log-color-error);
+}
+
+/* icon from: https://github.com/twbs/icons/blob/main/icons/caret-right-square-fill.svg */
+details > summary::before {
+    position: absolute;
+    left:0.25rem;
+    top:4px;
+
+    /* chrome seems to need the '-webkit' prefix here */
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-caret-right-square-fill" viewBox="0 0 16 16"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm5.5 10a.5.5 0 0 0 .832.374l4.5-4a.5.5 0 0 0 0-.748l-4.5-4A.5.5 0 0 0 5.5 4v8z"/></svg>');
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    content: '';
+    transform-origin: 8px 8px;
+    transform: rotate(0deg);
+    transition: transform 0.3s ease-out !important;
+}
+
+/* filled icon */
+/*details.leafNode.passParent > summary::before {
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16"><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/></svg>');
+}*/
+
+details.leafNode.passParent > summary::before {
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg>');
+}
+
+details[open].parentNode > summary::before, details[open].leafNode.errorParent > summary::before {
+    transform: rotate(90deg);
+}
+
+.summaryDiv {
+    /* aligns code line correctly with the icon */
+    display: flex;
+    margin-left: 1.2rem;
+}
+
+.summaryDiv > .label {
+    order: 2;
+}
+
+.summaryDiv > .summaryName {
+    order: 1;
+    margin-left: 0.25rem;
+}
+
+details.errorParent > summary > .summaryDiv > .summaryName {
+    font-weight: bold;
+}
+
+.summaryDiv > .summaryInput {
+    order: 3;
+    margin-left: auto;
+}
+
+.detailContainer {
+    display: flex;
+}
+
+.detailContainer > .detailInfo {
+    margin-right: auto;
+}
+
+.summaryDiv > .summaryInput, .detailContainer > .detailInputs {
+    width: var(--right-column-width);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media only screen and (max-width : 860px) {
+    .summaryDiv > .summaryInput, .detailContainer > .detailInputs, .headerInputs {
+        display: none;
+    }
+}
+
+/* HACK! hiding details for now */
+.detailInfo {
+    display:none;
+}
+
+/* HACK! let's show the error output only for the leaf node */
+.leafNode.errorParent .detailInfo {
+    display: block;
+}
+
+/* ERROR OUTPUT */
+
+.detailInfo {
+    margin: 0.25rem 0;
+    padding: 0.25rem 0;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.errorHeader {
+    font-weight: bold;
+    margin-bottom: 0.35rem;
+}
+
+.errorDetails {
+
+}
+
+/* HEADERS */
+
+.headers {
+    display: flex;
+    border-bottom: 1px solid var(--log-color-border);
+    padding-bottom: 1.0rem;
+    margin-bottom: 1.0rem;
+}
+
+.headerSource, .headerInputs {
+    font-weight:bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.headerInputs {
+    margin-left: auto;
+    width: var(--right-column-width);
+}
+
+.headerRunDetails {
+    margin:0;
+    margin-bottom: 1.5rem;
+}
+
+h3 {
+    margin:0;
+    padding:0;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+/* LABEL IS THE PASS/ERROR BADGE */
+
+.label {
+    display: inline-block;
+    margin-left: 0.35rem;
+    color: white;
+    font-weight: 600;
+    font-size: 0.60rem;
+    border-radius: 2px;
+    padding: 0px 5px;
+    height: 1rem;
+    line-height: 1rem;
+    display:none;
+}
+
+.errorParent.leafNode .label.F,
+.errorParent.leafNode .label.E,
+.errorParent.leafNode .label.FAIL,
+.errorParent.leafNode .label.ERROR {
+    display: block;
+    background-color: var(--log-color-error);
+}
+
+/* hide labels when everything was successful */
+/*
+.label.PASS,
+.label.I,
+.label.INFO {
+}
+*/
+.errorParent.leafNode .label.W,
+.errorParent.leafNode .label.WARN {
+    background-color: var(--log-color-warn);
+}
+
+.label.NOT_RUN {
+    background-color: var(--log-color-disabled);
+}
+
+h3 .label {
+    font-size: 0.8rem;
+    padding: 0.1rem 0.3rem;
+    height: auto;
+    margin-left: 0.5rem;
+    display: inline-block;
+    background-color: var(--log-color-error);
+}

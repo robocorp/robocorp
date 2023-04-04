@@ -12,6 +12,10 @@ function setVSCodeAPI(api: IVSCode) {
 }
 window["setVSCodeAPI"] = setVSCodeAPI;
 
+export function isInVSCode() {
+    return vscode !== undefined;
+}
+
 // Note how request/response/event follows the same patterns from the
 // DAP (debug adapter protocol).
 export interface IRequestMessage {

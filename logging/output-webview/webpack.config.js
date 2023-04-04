@@ -7,6 +7,8 @@ module.exports = (env) => {
     let devtool;
     let minimize;
 
+    const vtag = env.v2 ? "_v2" : "";
+
     if (env.production) {
         console.log("Building in PRODUCTION mode!");
 
@@ -30,9 +32,9 @@ module.exports = (env) => {
         throw Error("Either production or development need to be specified");
     }
 
-    target = path.resolve(__dirname, "dist");
+    target = path.resolve(__dirname, `dist${vtag}`);
     if (env.test) {
-        target = path.resolve(__dirname, "dist-test");
+        target = path.resolve(__dirname, `dist-test${vtag}`);
     }
 
     let envTarget = env.target;
@@ -45,7 +47,7 @@ module.exports = (env) => {
         // Generates the index.html
         new HtmlWebpackPlugin({
             title: "Robot Output",
-            template: "./src/index.html",
+            template: `./src/index${vtag}.html`,
             scriptLoading: "blocking",
         }),
     ];
@@ -55,6 +57,9 @@ module.exports = (env) => {
     }
 
     let entry = ["./src/index.ts", "./src/style.css"];
+    if (env.v2) {
+        entry = ["./src/index.ts", "./src/style_v2.css"];
+    }
     if (env.test) {
         entry.push("./tests/tests.ts");
     }
