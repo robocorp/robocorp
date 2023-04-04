@@ -137,7 +137,7 @@ details.leafNode.passParent > summary::before {
 details.parentNode > summary::before, details.leafNode.errorParent > summary::before {
     transform-origin: 8px 8px;
     transform: rotate(0deg);
-    transition: all 0.2s ease-out !important;
+    transition: transform 0.2s ease-out !important;
 }
 
 details[open].parentNode > summary::before, details[open].leafNode.errorParent > summary::before {
