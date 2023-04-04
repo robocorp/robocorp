@@ -10,7 +10,3 @@ robo-libs="robo_libs-0.1.0-py3-none-any.whl"
 [tool.robo.dev-dependencies]
 ruff="0.0.260"
 black="23.3.0"
-
-[tool.ruff]
-# TODO: We should generate this inside the hood
-target-version = "py39"

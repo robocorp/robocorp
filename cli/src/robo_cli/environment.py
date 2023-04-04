@@ -2,6 +2,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import yaml
+
 from robo_cli import rcc
 from robo_cli.config.context import generate_configs
 from robo_cli.paths import ROOT, home_path
@@ -11,8 +13,8 @@ Variables = dict[str, str]
 ENV_CACHE = home_path() / ".envcache.json"
 
 
-def _ensure(deps) -> Variables:
-    with generate_configs(deps) as (conda_path, _):
+def ensure(develop=True) -> Variables:
+    with generate_configs(develop) as (conda_path, _):
         digest = _calculate_hash(ROOT, conda_path)
         cache = _load_cache()
 
@@ -24,14 +26,6 @@ def _ensure(deps) -> Variables:
         _save_cache(cache)
 
         return variables
-
-
-def ensure():
-    return _ensure("dependencies")
-
-
-def ensure_devdeps() -> Variables:
-    return _ensure("dev-dependencies")
 
 
 def _load_cache() -> dict[str, Variables]:
@@ -59,7 +53,8 @@ def _calculate_hash(project_path: Path, conda_path: Path) -> str:
     md5.update(str(project_path).encode("utf-8"))
 
     with open(conda_path, "rb") as fd:
-        while chunk := fd.read(8192):
-            md5.update(chunk)
+        conda_config = yaml.safe_load(fd)
+        conda_content = json.dumps(conda_config, sort_keys=True)
+        md5.update(conda_content.encode("utf-8"))
 
     return md5.hexdigest()[:16]

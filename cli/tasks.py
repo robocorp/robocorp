@@ -23,7 +23,7 @@ def poetry(ctx, *parts):
 
 @task
 def install(ctx):
-    poetry("install")
+    poetry(ctx, "install")
 
     # Download RCC
     filename = "rcc.exe" if platform.system() == "Windows" else "rcc"
@@ -54,6 +54,12 @@ def typecheck(ctx):
 def test(ctx):
     """Run unittests"""
     poetry(ctx, "run pytest")
+
+
+@task(lint, typecheck, test)
+def check_all(ctx):
+    """Run all checks"""
+    pass
 
 
 @task
