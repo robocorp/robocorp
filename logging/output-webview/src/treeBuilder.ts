@@ -224,7 +224,7 @@ export class TreeBuilder {
                 this.parent = addTreeContent(
                     this.opts,
                     this.parent,
-                    this.suiteName + msg.decoded["name"] + "()",
+                    this.suiteName + msg.decoded["name"],
                     msg,
                     false,
                     this.suiteSource,

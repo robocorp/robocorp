@@ -129,7 +129,7 @@ Get Text From Elements
     RETURN    ${lst}
 
 Get Text From Tree Items
-    ${txt}=    Get Text From Elements    .span_link
+    ${txt}=    Get Text From Elements    .summaryName
     RETURN    ${txt}
 
 Get Text From Labels

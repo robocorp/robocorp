@@ -42,8 +42,8 @@ export interface ISetContentsRequest {
     type: "request";
     command: "setContents";
     initialContents: string;
-    runId: string;
-    allRunIdsToLabel: object;
+    runId: string |  undefined;
+    allRunIdsToLabel: object | undefined;
 }
 
 export interface IAppendContentsRequest {
