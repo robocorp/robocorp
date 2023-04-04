@@ -12,7 +12,7 @@ packages = [{include = "robo", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-logging = {url = "https://github.com/robocorp/robocorp-logging/archive/cc5cfea.zip"}
+robocorp-logging = {url = "https://github.com/robocorp/robocorp-logging/archive/2379496.zip"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
