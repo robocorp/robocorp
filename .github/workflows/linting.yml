@@ -38,7 +38,7 @@ jobs:
         
       - name: Black check
         run: |
-          black --check src tests --exclude=vendored --exclude=libs --exclude src/robocorp_logging/index.py --exclude src/robocorp_logging/index_v2.py
+          black --check src tests --exclude="index\.py|index_v2\.py"
           
       - name: mypy create env
         run: |

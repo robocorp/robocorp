@@ -10,6 +10,8 @@ import traceback
 from contextlib import contextmanager
 import sys
 import weakref
+from robocorp_logging.protocols import OptExcInfo
+from functools import partial
 
 
 _valid_chars = tuple(string.ascii_letters + string.digits)
@@ -244,6 +246,8 @@ class _RobotOutputImpl:
         self._hide_strings_re: Optional[Pattern[str]] = None
         self._hide_strings: Set[str] = set()
 
+        self._next_int: "partial[int]" = partial(next, itertools.count(0))
+
     def show_error_message(self, msg):
         sys.stderr.write(msg)
         if self.on_show_error_message:
@@ -442,6 +446,111 @@ class _RobotOutputImpl:
             ],
         )
         self._stack_handler.pop("test", test_id)
+
+    def log_method_except(
+        self,
+        package: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        exc_info: OptExcInfo,
+        unhandled: bool,
+    ) -> bool:
+        """
+        :param package:
+            The name of the package where the exception is being handled.
+
+        :param filename:
+            The name of the filename where the exception is being handled.
+
+        :param name:
+            The name of the function where the exception is being handled.
+
+        :param lineno:
+            The line where the exception is being handled.
+
+        :param exc_info:
+            The actual exception information gotten from sys.exc_info().
+
+        :param unhandled:
+            Whether the exception should be considered unhandled at this point.
+            If it's unhandled it'll always be shown (it means it's bubbling up
+            at the task level), otherwise we'll only show the exception if this
+            is the first place where it'd be shown (if it's not the first place
+            and we're dealing with an unhandled exception it won't be logged
+            at this point).
+
+        :returns:
+            Whether the exception was added to the log or not -- this may be
+            because the exc_info is not complete or cases where the exception
+            was already previously logged (see the `unhandled` parameter for
+            details on the use-cases where it may be skipped).
+        """
+        _tp, e, tb = exc_info
+        if e is None or tb is None:
+            return False
+
+        f = tb.tb_frame.f_back
+        stack: List[tuple] = []
+        while f is not None:
+            stack.append((f, f.f_lineno))
+            f = f.f_back
+
+        stack = list(reversed(stack))
+
+        # For the current one the lineno must be gotten from the traceback.
+        stack.append((tb.tb_frame, tb.tb_lineno))
+
+        tb = tb.tb_next
+        while tb is not None:
+            frame, tb_lineno = tb.tb_frame, tb.tb_lineno
+
+            if not unhandled and "@robocorp_rewrite_callbacks" in frame.f_locals:
+                # The exception should've been shown previously, so, don't
+                # show it at this level again.
+                return False
+
+            stack.append((frame, tb_lineno))
+            tb = tb.tb_next
+
+        # Write the stack now.
+        import linecache
+
+        oid = self._obtain_id
+        entry_id = f"tb_{self._next_int()}"
+
+        with self._stack_handler.push_record(
+            "traceback", entry_id, "STB", "RTB", hide_from_logs=False
+        ):
+            self._write_with_separator(
+                "STB ",
+                [oid(str(e)), self._number(self.get_time_delta())],
+            )
+
+            for frame, tb_lineno in stack:
+                code = frame.f_code
+                code_filename = code.co_filename
+                try:
+                    line_content = linecache.getline(code_filename, tb_lineno).strip()
+                except:
+                    line_content = ""  # Unable to get contents.
+
+                self._write_with_separator(
+                    "TBE ",
+                    [
+                        oid(code_filename),
+                        self._number(tb_lineno),
+                        oid(code.co_name),
+                        oid(line_content),
+                    ],
+                )
+
+        stack_entry = self._stack_handler.pop("traceback", entry_id)
+        assert stack_entry
+
+        self._write_with_separator("ETB ", [self._number(self.get_time_delta())])
+
+        return True
 
     def start_method(
         self,

@@ -13,6 +13,11 @@ def some_method():
     return 22
 
 
+def recurse_some_method():
+    for _i in range(1000):
+        some_method()
+
+
 class SomeClass:
     def __init__(self, arg1, arg2):
         pass

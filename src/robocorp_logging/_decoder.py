@@ -71,38 +71,79 @@ def decode_memo(decoder, message):
 
 
 _MESSAGE_TYPE_INFO = {
+    # Version of the log output
     "V": lambda _decoder, message: {"version": message},
+    # Some information message
     "I": lambda _decoder, message: {"info": json.loads(message)},
+    # The log has an id that may be split into multiple parts.
     "ID": _decode("part:int, id:str"),
+    # Time.
     "T": decode_time,
+    # Memorize some word to be used as oid.
     "M": decode_memo,
+    # Log (raw text)
     "L": _decode("level:str, message:oid, time_delta_in_seconds:float"),
+    # Log (html)
     "LH": _decode("level:str, message:oid, time_delta_in_seconds:float"),
+    # Start Suite
     "SS": _decode(
         "name:oid, suite_id:oid, suite_source:oid, time_delta_in_seconds:float",
         level_diff=+1,
     ),
+    # End Suite
     "ES": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
+    # Start Task
     "ST": _decode(
         "name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float", level_diff=+1
     ),
+    # End Task
     "ET": _decode(
         "status:oid, message:oid, time_delta_in_seconds:float", level_diff=-1
     ),
+    # Start Method/Keyword
     "SK": _decode(
         "name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
         level_diff=+1,
     ),
+    # End Method/Keyword
     "EK": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
+    # Keyword argument (the argument message is something as arg=value).
     "KA": _decode("argument:oid"),
+    # Can appear inside keyword scope to note that the keyword result will
+    # be assigned to the given assign name.
     "AS": _decode("assign:oid"),
+    # Tag the current scope with some value.
     "TG": _decode("tag:oid"),
+    # Set some time for the current scope.
     "S": _decode("start_time_delta:float"),
+    # --------------------------------------------------------------- Tracebacks
+    # Start traceback with the exception error message.
+    # Note: it should be possible to start a traceback inside another traceback
+    # for cases where the exception has an exception cause.
+    # Start Traceback
+    "STB": _decode(
+        "message:oid, time_delta_in_seconds:float",
+        level_diff=+1,
+    ),
+    # Traceback Entry
+    "TBE": _decode(
+        "source:oid, lineno:int, method:oid, line_content:oid",
+    ),
+    # Traceback variable
+    "TBV": _decode(
+        "variable:oid",
+    ),
+    # End Traceback
+    "ETB": _decode(
+        "time_delta_in_seconds:float",
+        level_diff=-1,
+    ),
 }
 
 _MESSAGE_TYPE_INFO["RS"] = _MESSAGE_TYPE_INFO["SS"]
 _MESSAGE_TYPE_INFO["RT"] = _MESSAGE_TYPE_INFO["ST"]
 _MESSAGE_TYPE_INFO["RK"] = _MESSAGE_TYPE_INFO["SK"]
+_MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]
 
 
 class Decoder:
@@ -142,7 +183,10 @@ def iter_decoded_log_format(stream):
     for line in stream.readlines():
         line = line.strip()
         if line:
-            message_type, message = line.split(" ", 1)
+            try:
+                message_type, message = line.split(" ", 1)
+            except:
+                raise RuntimeError(f"Error decoding line: {line}")
             decoded = decoder.decode_message_type(message_type, message)
             if decoded:
                 yield decoded

@@ -16,8 +16,7 @@ def test_rotate_logs(tmpdir):
             robocorp_logging.log_start_suite("Root Suite", "root", str(tmpdir))
             robocorp_logging.log_start_task("my_task", "task_id", 0, [])
 
-            for _i in range(1000):
-                check.some_method()
+            check.recurse_some_method()
 
             robocorp_logging.log_end_task("my_task", "task_id", "PASS", "Ok")
             robocorp_logging.log_end_suite("Root Suite", "root", "PASS")
