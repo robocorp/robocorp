@@ -144,6 +144,14 @@ details[open].parentNode > summary::before, details[open].leafNode.errorParent >
     transform: rotate(90deg);
 }
 
+details[open] > summary > .summaryDiv > .summaryInput {
+    /* Display full input parameters when expanded by adjusting the
+       white-space to wrap the contents. This works now only
+       for nodes that have children and thus the expand/collapse triangle.
+       And the input contents push the left-side contents down as well. */
+    white-space: initial;
+}
+
 .summaryDiv {
     /* aligns code line correctly with the icon */
     display: flex;
