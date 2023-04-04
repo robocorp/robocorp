@@ -68,7 +68,6 @@ class _PrinterVisitor(ast_module.NodeVisitor):
             )
             tokens = getattr(node, "tokens", [])
             for token in tokens:
-
                 token_lineno = token.lineno
                 if token_lineno != -1:
                     # Make 0-based

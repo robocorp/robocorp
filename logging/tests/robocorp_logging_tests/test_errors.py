@@ -29,5 +29,12 @@ def test_errors(log_setup, tmpdir):
             dict(message_type="EK", status="ERROR"),
             dict(message_type="ET", status="ERROR"),
             dict(message_type="ES", status="ERROR"),
+            dict(message_type="STB", message="Fail here"),
+            dict(
+                message_type="TBE",
+                method="sub_method",
+                line_content='raise RuntimeError("Fail here")',
+            ),
+            dict(message_type="ETB"),
         ],
     )

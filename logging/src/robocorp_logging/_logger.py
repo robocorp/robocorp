@@ -3,6 +3,7 @@ import functools
 from pathlib import Path
 from typing import Optional, Union, Sequence
 import datetime
+from robocorp_logging.protocols import OptExcInfo
 
 
 def _log_error(func):
@@ -250,6 +251,20 @@ class _RobocorpLogger:
 
         return self._robot_output_impl.log_message(
             level, message, self._get_time_delta(), html
+        )
+
+    @_log_error
+    def log_method_except(
+        self,
+        package: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        exc_info: OptExcInfo,
+        unhandled: bool,
+    ):
+        return self._robot_output_impl.log_method_except(
+            package, filename, name, lineno, exc_info, unhandled
         )
 
     @_log_error

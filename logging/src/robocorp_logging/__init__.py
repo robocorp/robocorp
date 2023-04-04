@@ -10,16 +10,13 @@ from pathlib import Path
 import typing
 from ._rewrite_config import Filter
 import threading
-from types import TracebackType
+from robocorp_logging.protocols import OptExcInfo
 
 if typing.TYPE_CHECKING:
     from ._logger import _RobocorpLogger
 
 __version__ = "0.0.1"
 version_info = [int(x) for x in __version__.split(".")]
-
-ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
-OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
 
 
 def iter_decoded_log_format(stream) -> Iterator[dict]:
@@ -198,13 +195,18 @@ def _register_callbacks(rewrite_hook_config):
             # oops, something bad happened, the stack is unsynchronized
             log_error("On method except the status_stack was empty.")
             return
-        else:
-            if pop_package != package or pop_name != name:
-                log_error(
-                    f"On method except status stack package/name was: {pop_package}.{pop_name}. Received: {package}.{name}."
-                )
-                return
-            status_stack[-1][2] = Status.ERROR
+
+        if pop_package != package or pop_name != name:
+            log_error(
+                f"On method except status stack package/name was: {pop_package}.{pop_name}. Received: {package}.{name}."
+            )
+            return
+        status_stack[-1][2] = Status.ERROR
+
+        for rf_stream in _get_logger_instances():
+            rf_stream.log_method_except(
+                package, filename, name, lineno, exc_info, False
+            )
 
     before_method.register(call_before_method)
     after_method.register(call_after_method)
@@ -322,7 +324,6 @@ def add_in_memory_log_output(write):
 
 
 class Status:
-
     PASS = "PASS"
     ERROR = "ERROR"
     FAIL = "FAIL"
