@@ -58,7 +58,7 @@ module.exports = (env) => {
 
     let entry = ["./src/index.ts", "./src/style.css"];
     if (env.v2) {
-        entry = ["./src/index.ts", "./src/style_v2.css"];
+        entry = ["./src/index_v2.ts", "./src/style_v2.css"];
     }
     if (env.test) {
         entry.push("./tests/tests.ts");
