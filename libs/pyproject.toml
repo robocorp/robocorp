@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "libs-devdeps"
 version = "0.1.0"
-description = "development dependencies for robo libraries"
+description = "Development dependencies for robo libraries. Shouldn't be published or installed on user machiines."
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
@@ -9,12 +9,10 @@ authors = [
     "Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
-packages = [{include = "robo", from="src"}]
+packages = [{include = "_robo", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-
-[tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 ruff = "^0.0.255"
 mypy = "^1.1.1"

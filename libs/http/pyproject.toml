@@ -16,7 +16,7 @@ python = "^3.9"
 requests = "^2.28.2"
 
 [tool.poetry.group.dev.dependencies]
-libs-devdeps = {path = "..", develop = true}
+libs-devdeps = {path = ".."}
 
 [build-system]
 requires = ["poetry-core"]
