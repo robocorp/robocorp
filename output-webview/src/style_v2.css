@@ -134,12 +134,11 @@ details.leafNode.passParent > summary::before {
 details.parentNode > summary::before, details.leafNode.errorParent > summary::before {
     transform-origin: 8px 8px;
     transform: rotate(0deg);
-    transition: all 0.3s ease-out !important;
+    transition: all 0.2s ease-out !important;
 }
 
 details[open].parentNode > summary::before, details[open].leafNode.errorParent > summary::before {
     transform: rotate(90deg);
-    opacity: 0.5;
 }
 
 .summaryDiv {
@@ -150,13 +149,23 @@ details[open].parentNode > summary::before, details[open].leafNode.errorParent >
 
 .summaryDiv > .label {
     order: 2;
+    margin-right: 0.4rem;
 }
 
 .summaryDiv > .summaryName {
     order: 1;
+    
     margin-left: 0.25rem;
     font-family: var(--fixed-font-family);
     font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summaryDiv > .summaryName, .detailContainer > .detailInfo {
+    /* this forces the correct column size, see:
+       https://makandracards.com/makandra/66994-css-flex-and-min-width */
+    min-width: 0;
 }
 
 details.errorParent > summary > .summaryDiv > .summaryName {
@@ -179,7 +188,8 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 }
 
 .summaryDiv > .summaryInput, .detailContainer > .detailInputs {
-    width: var(--right-column-width);
+    flex: 0 0 var(--right-column-width);
+    padding-left: 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -212,11 +222,19 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 .errorHeader {
     font-weight: bold;
     margin-bottom: 0.35rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    /* forces wrapping */
+    white-space: initial;
 }
 
 .errorDetails {
     font-family: var(--fixed-font-family);
     font-size: 0.75rem;
+
+    /* forces wrapping */
+    white-space: initial;
 }
 
 /* HEADERS */
