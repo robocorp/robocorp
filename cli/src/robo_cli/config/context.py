@@ -8,12 +8,12 @@ from . import conda, robot
 
 
 @contextmanager
-def generate_configs():
+def generate_configs(develop=True):
     conda_config = None
     robot_config = None
 
     try:
-        conda_config = conda.generate()
+        conda_config = conda.generate(develop)
         robot_config = robot.generate(conda_config)
         yield conda_config, robot_config
     finally:

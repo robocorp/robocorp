@@ -75,7 +75,7 @@ class Process:
         args: List[str],
         cwd: Optional[PathLike] = None,
         env: Optional[Dict[str, str]] = None,
-        shell=IS_WINDOWS,  # TODO: Remove later
+        shell=False,
     ):
         self._args = args
         self._cwd = cwd or Path.cwd()
@@ -115,11 +115,12 @@ class Process:
             stdout_reader.start()
             stderr_reader.start()
 
-            self._proc = proc
-            self._proc.wait()
-
-            stdout_reader.close()
-            stderr_reader.close()
+            try:
+                self._proc = proc
+                self._proc.wait()
+            finally:
+                stdout_reader.close()
+                stderr_reader.close()
 
             stdout_reader.join(timeout=5)
             stderr_reader.join(timeout=5)

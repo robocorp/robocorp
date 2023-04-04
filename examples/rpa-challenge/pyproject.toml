@@ -10,5 +10,5 @@ robocorp-excel="0.1.0"
 robocorp-http="0.1.0"
 
 [tool.robo.dev-dependencies]
-ruff="0.0.1"
-black="0.0.1"
+ruff="0.0.260"
+black="23.3.0"

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Type
+from typing import Type, Union
 
 from pydantic import BaseModel
 
@@ -108,7 +108,26 @@ class StartTime(BaseModel):
     start_time_delta: float
 
 
-KIND_TO_EVENT: dict[MessageType, Type[BaseModel]] = {
+Event = Union[
+    Version,
+    Info,
+    Id,
+    InitialTime,
+    Log,
+    LogHtml,
+    StartSuite,
+    EndSuite,
+    StartTask,
+    EndTask,
+    StartKeyword,
+    EndKeyword,
+    KeywordArgument,
+    AssignKeyword,
+    Tag,
+    StartTime,
+]
+
+KIND_TO_EVENT: dict[MessageType, Type[Event]] = {
     MessageType.VERSION: Version,
     MessageType.INFO: Info,
     MessageType.ID: Id,

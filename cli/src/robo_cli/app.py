@@ -1,22 +1,35 @@
-import json
+import logging
 import shutil
-import time
+import subprocess
 from pathlib import Path
 
 import typer
 from rich.console import Console, Group
+from rich.logging import RichHandler
 from rich.panel import Panel
 from rich.prompt import IntPrompt, Prompt
-from rich.spinner import Spinner
 from rich.table import Table
 
-from robo_cli import environment, rcc, templates
+from robo_cli import core, environment, rcc, templates
 from robo_cli.config import pyproject
-from robo_cli.output import KIND_TO_EVENT, EndKeyword, StartKeyword
-from robo_cli.process import Process, ProcessError
+from robo_cli.output import EndKeyword, StartKeyword
+from robo_cli.process import ProcessError
 
 app = typer.Typer(no_args_is_help=True)
 console = Console(highlight=False)
+
+
+def ensure_environment() -> dict[str, str]:
+    try:
+        with console.status("Building environment"):
+            env = environment.ensure()
+    except ProcessError as err:
+        console.print(err.stderr)
+        raise typer.Exit(code=1)
+
+    env["RC_LOG_OUTPUT_STDOUT"] = "1"
+    env["PYTHONUNBUFFERED"] = "1"
+    return env
 
 
 @app.command()
@@ -43,8 +56,7 @@ def new():
     console.print("Initializing project")
     path = templates.copy_template(Path(project_name), template=template)
 
-    with console.status("Building environment"):
-        environment.ensure()
+    ensure_environment()
 
     console.print()
     console.print("✨ Project created ✨")
@@ -58,29 +70,11 @@ def new():
 @app.command()
 def list():
     """List available tasks"""
-    try:
-        with console.status("Building environment"):
-            env = environment.ensure()
-            env["RC_LOG_OUTPUT_STDOUT"] = "1"
-    except ProcessError as err:
-        console.print(err.stderr)
-        raise typer.Exit(code=1)
+    env = ensure_environment()
 
     with console.status("Parsing tasks"):
-        proc = Process(
-            [
-                "python",
-                "-m",
-                "robo",
-                "list",
-                "tasks.py",
-            ],
-            env=env,
-        )
-
         try:
-            stdout, _ = proc.run()
-            tasks = json.loads(stdout)
+            tasks = core.list_tasks(env)
         except ProcessError as err:
             console.print(err.stderr)
             raise typer.Exit(code=1)
@@ -101,40 +95,6 @@ def list():
     console.print()
 
 
-def robot_run():
-    spinner = Spinner("dots", "Running [bold]check-website[/bold]...")
-    yield spinner
-
-    time.sleep(2)
-
-    steps = [
-        "browser.open()",
-        'browser.goto("http://robocorp.com")',
-        "browser.take_screenshot()",
-    ]
-
-    status_spinner = Spinner("dots")
-
-    for prog in range(len(steps)):
-        table = Table()
-        table.add_column("Status")
-        table.add_column("Keyword")
-        for idx in range(prog + 1):
-            step = steps[idx]
-            table.add_row("🟢" if idx < prog else status_spinner, step)
-
-        yield Group(table, spinner)
-        time.sleep(2)
-
-    table = Table()
-    table.add_column("Status")
-    table.add_column("Keyword")
-    for step in steps:
-        table.add_row("🟢", step)
-
-    yield table
-
-
 @app.command()
 def run():
     """Runs the robot from current directory"""
@@ -145,77 +105,38 @@ def run():
     output_dir = Path(config.get("output", "output"))
     if output_dir.exists():
         shutil.rmtree(output_dir)
-    output_dir.mkdir()
+    output_dir.mkdir(parents=True)
 
     try:
-        with console.status("Building environment"):
-            env = environment.ensure()
-            env["RC_LOG_OUTPUT_STDOUT"] = "1"
+        env = ensure_environment()
 
         with console.status("Parsing tasks"):
-            proc = Process(
-                [
-                    "python",
-                    "-m",
-                    "robo",
-                    "list",
-                    "tasks.py",
-                ],
-                env=env,
-            )
-
             try:
-                stdout, _ = proc.run()
-                tasks = json.loads(stdout)
+                tasks = core.list_tasks(env)
             except ProcessError as err:
                 console.print(err.stderr)
                 raise typer.Exit(code=1)
 
         taskname = tasks[0]["name"]
+        stack = []
+
+        def on_event(event):
+            if isinstance(event, StartKeyword):
+                console.print(f"{(len(stack) + 1) * '  '}{event.name}")
+                stack.append(event)
+            if isinstance(event, EndKeyword):
+                stack.pop()
 
         with console.status(f"Running [bold]{taskname}[/bold]"):
-            env["RC_LOG_OUTPUT_STDOUT"] = "1"
-            env["PYTHONUNBUFFERED"] = "1"
-
-            # TODO: Figure out what to call from inner framework
-            proc = Process(
-                [
-                    "python",
-                    "-m",
-                    "robo",
-                    "run",
-                    "tasks.py",
-                    "-t",
-                    taskname,
-                ],
-                env=env,
-            )
-
-            stack = []
-            def handle_line(line: str):
-                try:
-                    payload = json.loads(line)
-                    klass = KIND_TO_EVENT[payload["message_type"]]
-                    event = klass.parse_obj(payload)
-                    # console.print(event)
-                    if isinstance(event, StartKeyword):
-                        console.print(f"{(len(stack) + 1) * '  '}{event.name}")
-                        stack.append(event)
-                    if isinstance(event, EndKeyword):
-                        stack.pop()
-                except ValueError:
-                    pass
-
-            proc.on_stdout(handle_line)
             console.print()
             console.print("[bold]Start execution[/bold]")
-            proc.run()
+            core.run_task(env, taskname, on_event)
             console.print()
 
     except ProcessError as exc:
-        print(exc.stderr)
-        console.print("---")
-        console.print("Run failed due to unexpected error")
+        # TODO: Handle this through events instead of printing stderr
+        console.print(exc.stderr)
+        console.print("[bold red]Run failed due to unexpected error[/bold red]")
         raise typer.Exit(code=1)
 
     artifacts = [str(name) for name in output_dir.glob("*")]
@@ -231,10 +152,28 @@ def run():
     console.print()
 
 
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
+)
+def exec(ctx: typer.Context):
+    """Run a command in the appropriate environment"""
+    if not ctx.args:
+        console.print("[bold red]No arguments given![/bold red]")
+        raise typer.Exit(code=1)
+
+    env = ensure_environment()
+
+    try:
+        console.print(f"[bold]{' '.join(ctx.args)}[/bold]")
+        subprocess.run(ctx.args, env=env, check=True)
+    except subprocess.CalledProcessError as err:
+        raise typer.Exit(code=err.returncode)
+
+
 @app.command()
 def export():
     """Exports the robot from current directory to a zip file"""
-    console.print()
+    # TODO: Fix this
     with console.status("Exporting robot"):
         path = rcc.robot_wrap()
 
@@ -245,9 +184,7 @@ def export():
 @app.command()
 def deploy():
     """Deploys the robot from current directory to Control Room"""
-    console.print()
-    console.print()
-
+    # TODO: Fix this
     with console.status("Fetching workspace list"):
         workspaces = rcc.cloud_workspace()
 
@@ -267,10 +204,8 @@ def deploy():
     robot_id = Prompt.ask("Robot id to deploy with?", default="example")
 
     console.print(
-        "Deploying [bold]example[/bold] to "
-        + f"[underline]{workspace_url}/robots/{robot_id}/[/underline]"
+        f"Deploying to [underline]{workspace_url}/robots/{robot_id}/[/underline]"
     )
-    console.print()
 
     # TODO: add an if to check for this. Currently this _only_ works for replacing
     # Confirm.ask("Project already exists, replace?")
@@ -282,6 +217,17 @@ def deploy():
     console.print("Deploy of [bold]example[/bold] successful!")
     console.print(f"Link: [underline]{workspace_url}/robots/{robot_id}/[/underline]")
     console.print()
+
+
+@app.callback()
+def main(verbose: bool = False):
+    level = "NOTSET" if verbose else "ERROR"
+    logging.basicConfig(
+        level=level,
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler()],
+    )
 
 
 if __name__ == "__main__":
