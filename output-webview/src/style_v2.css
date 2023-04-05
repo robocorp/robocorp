@@ -243,13 +243,13 @@ details.errorParent > summary > .summaryDiv > .summaryName {
     text-overflow: ellipsis;
 }
 
-.summaryDiv .timeLabel {
+.summaryDiv .timeLabel, .summaryDiv .summaryFileName {
     order: 3;
     color: var(--log-color-text-weakest);
     margin-left: 0.5rem;
 }
 
-details > summary:hover .timeLabel {
+details > summary:hover .timeLabel, details > summary:hover .summaryFileName {
     color: var(--log-color-text-weaker);
 }
 

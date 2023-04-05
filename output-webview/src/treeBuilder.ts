@@ -430,6 +430,20 @@ export class TreeBuilder {
             const summary = current.summary;
             addStatus(current, status);
 
+            if(current.summaryName.textContent.startsWith("challenge.run")) {
+                const summaryFileName = document.createElement("span");
+                summaryFileName.textContent = "tasks.py";
+                summaryFileName.classList.add("summaryFileName");
+                current.summaryDiv.appendChild(summaryFileName);
+            }
+
+            if(current.summaryName.textContent.startsWith("run")) {
+                const summaryFileName = document.createElement("span");
+                summaryFileName.textContent = "challenge.py";
+                summaryFileName.classList.add("summaryFileName");
+                current.summaryDiv.appendChild(summaryFileName);
+            }
+
             if (this.opts.showTime) {
                 const startTime: number = current.decodedMessage.decoded["time_delta_in_seconds"];
                 if (startTime && startTime >= 0) {
@@ -442,6 +456,7 @@ export class TreeBuilder {
                     addTime(current, diff);
                 }
             }
+
         } else {
             current.li.remove();
         }
