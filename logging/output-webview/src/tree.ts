@@ -18,7 +18,39 @@ import {
     createUL,
     htmlToElement,
 } from "./plainDom";
-import { IContentAdded, ILiNodesCreated, IMessageNode, IOpts, ITreeState } from "./protocols";
+import { IContentAdded, ILiNodesCreated, IMessageNode, IOpts, ITreeState, PythonTraceback } from "./protocols";
+
+export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceback) {
+    const detailInfo = createDiv();
+    detailInfo.classList.add("detailInfo");
+
+    const errorHeader = createDiv();
+    errorHeader.classList.add("errorHeader");
+    errorHeader.textContent = tb.exceptionMsg;
+    detailInfo.appendChild(errorHeader);
+
+    const fullTb: string[] = [];
+    for (const tbEntry of tb.stack) {
+        let s = tbEntry.source;
+        if(s.length > 31){
+            s = `... ${s.substring(27)}`;
+        }
+        fullTb.push(`File "${s}", line ${tbEntry.lineno}, in ${tbEntry.method}\n`);
+        fullTb.push(`    ${tbEntry.lineContent}\n`);
+    }
+    const errorEntry = createDiv();
+    errorEntry.classList.add("errorDetails");
+    errorEntry.style.whiteSpace = "pre";
+    errorEntry.textContent = fullTb.join("");
+    detailInfo.appendChild(errorEntry);
+
+    nodesCreated.detailContainer.appendChild(detailInfo);
+
+    const detailInputs = createDiv();
+    detailInputs.classList.add("detailInputs");
+    detailInputs.textContent = " ";
+    nodesCreated.detailContainer.appendChild(detailInputs);
+}
 
 export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodesCreated {
     // <li>
@@ -55,18 +87,6 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
     const detailContainer = createDiv();
     detailContainer.classList.add("detailContainer");
 
-    /* this is where error could be displayed etc, hiding it for now */
-    const detailInfo = createDiv();
-    detailInfo.classList.add("detailInfo");
-    detailInfo.innerHTML =
-        '<div class="errorHeader">TypeError: NoneType object is not subscriptable</div><div class="errorDetails">set_value_by_xpath(f//input[@ng-reflect-name="{name}"]\',person[key])<br>challenge.py, line 32</div>';
-    detailContainer.appendChild(detailInfo);
-
-    const detailInputs = createDiv();
-    detailInputs.classList.add("detailInputs");
-    detailInputs.textContent = " ";
-    detailContainer.appendChild(detailInputs);
-
     details.appendChild(detailContainer);
 
     /* SUMMARY SECTION */
@@ -88,7 +108,16 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
 
     details.appendChild(summary);
 
-    return { li, details, summary, summaryDiv, detailInputs, summaryName, summaryInput };
+    const nodesCreated: ILiNodesCreated = {
+        li,
+        details,
+        summary,
+        summaryDiv,
+        summaryName,
+        summaryInput,
+        detailContainer,
+    };
+    return nodesCreated;
 }
 
 /**
@@ -127,6 +156,7 @@ export function addTreeContent(
     const created = createLiAndNodesBelow(open, liTreeId);
     const li = created.li;
     const details = created.details;
+    const detailContainer = created.detailContainer;
     const summary = created.summary;
     const summaryDiv = created.summaryDiv;
     const summaryName = created.summaryName;
@@ -166,6 +196,7 @@ export function addTreeContent(
         ul,
         li,
         details,
+        detailContainer,
         summary,
         summaryName,
         summaryInput,

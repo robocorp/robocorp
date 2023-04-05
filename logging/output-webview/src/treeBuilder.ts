@@ -2,10 +2,11 @@ import { Decoder, iter_decoded_log_format, IMessage } from "./decoder";
 import { getIntLevelFromLevelStr, addLevel } from "./handleLevel";
 import { acceptLevel, getIntLevelFromStatus, addStatus, addTime } from "./handleStatus";
 import { getOpts } from "./options";
+import { pathBasename } from "./path";
 import { selectById, divById, createUL, getDataTreeId, createSpan, liMarkedAsHidden } from "./plainDom";
-import { IOpts, IContentAdded, IMessageNode } from "./protocols";
+import { IOpts, IContentAdded, IMessageNode, PythonTraceback } from "./protocols";
 import { SummaryBuilder } from "./summaryBuilder";
-import { addTreeContent, createLiAndNodesBelow } from "./tree";
+import { addExceptionToNode, addTreeContent, createLiAndNodesBelow } from "./tree";
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -18,6 +19,47 @@ function obtainNewLease() {
     globalLeaseId += 1;
     globalCurrentLease = globalLeaseId;
     return globalLeaseId;
+}
+
+class TBHandler {
+    private stack: PythonTraceback[] = [];
+
+    /**
+     * @returns undefined if the traceback is being built, otherwise if the
+     * traceback is fully built the PythonTraceback is provided.
+     */
+    handle(msg: IMessage): PythonTraceback | undefined {
+        let tb: PythonTraceback;
+        switch (msg.message_type) {
+            case "STB": // start
+                this.stack.push(new PythonTraceback(msg.decoded["message"]));
+                return undefined;
+
+            case "RTB": // restart
+                // TODO: Handle restart
+                return undefined;
+
+            case "TBE": // tb entry
+                tb = this.stack.at(-1);
+                tb.pushEntry(
+                    msg.decoded["source"],
+                    msg.decoded["lineno"],
+                    msg.decoded["method"],
+                    msg.decoded["line_content"]
+                );
+                return undefined;
+
+            case "TBV": // variable
+                tb = this.stack.at(-1);
+                // TODO: Handle variable
+                return undefined;
+
+            case "ETB": // tb end
+                tb = this.stack.pop();
+                tb.stack.reverse();
+                return tb;
+        }
+    }
 }
 
 /**
@@ -59,6 +101,8 @@ export class TreeBuilder {
     decoder: Decoder = new Decoder();
 
     seenSuiteOrTestOrKeyword: boolean = false;
+
+    tbHandler = new TBHandler();
 
     constructor() {
         this.opts = getOpts();
@@ -106,6 +150,7 @@ export class TreeBuilder {
             "ul": undefined,
             "li": undefined,
             "details": undefined,
+            "detailContainer": undefined,
             "summary": undefined,
             "summaryName": undefined,
             "summaryInput": undefined,
@@ -176,12 +221,13 @@ export class TreeBuilder {
     private addOneMessageSync(msg: IMessage): void {
         let msgType = msg.message_type;
         switch (msgType) {
-            // if it's a replay suite/test/keyword, skip it if we've already seen
-            // a suit/test/keyword (otherwise, change the replay to the actual
+            // if it's a replay suite/test/keyword/exception, skip it if we've already seen
+            // a suit/test/keyword/exception (otherwise, change the replay to the actual
             // type being replayed to have it properly handled).
             case "SS":
             case "ST":
             case "SK":
+            case "STB":
                 this.seenSuiteOrTestOrKeyword = true;
                 break;
 
@@ -202,6 +248,12 @@ export class TreeBuilder {
                     return;
                 }
                 msgType = "SK";
+                break;
+            case "RTB":
+                if (this.seenSuiteOrTestOrKeyword) {
+                    return;
+                }
+                msgType = "STB";
                 break;
         }
         this.id += 1;
@@ -354,6 +406,15 @@ export class TreeBuilder {
                     logContent.details.classList.add("leafNode");
                 }
                 break;
+            case "STB": // start
+            case "TBE": // tb entry
+            case "TBV": // variable
+            case "ETB": // tb end
+                const tb: PythonTraceback | undefined = this.tbHandler.handle(msg);
+                if (tb) {
+                    addExceptionToNode(this.parent, tb);
+                }
+                break;
         }
     }
 
@@ -431,12 +492,7 @@ export class TreeBuilder {
             addStatus(current, status);
 
             if (current.source != undefined && current.source.length > 0) {
-                let basename = current.source;
-                let index = Math.max(current.source.lastIndexOf("/"), current.source.lastIndexOf("\\"));
-                if (index > 0) {
-                    basename = current.source.substring(index + 1);
-                }
-
+                const basename = pathBasename(current.source);
                 const summaryFileName = document.createElement("span");
                 summaryFileName.textContent = basename;
                 summaryFileName.classList.add("summaryFileName");
