@@ -97,6 +97,11 @@ def run(
     from robo._task import Context
     from robo._protocols import Status
 
+    # Don't show internal machinery on tracebacks:
+    # setting __tracebackhide__ will make it so that robocorp-logging
+    # won't show this frame onwards in the logging.
+    __tracebackhide__ = 1
+
     p = Path(path)
     context = Context()
     if not p.exists():
