@@ -3,16 +3,18 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Robot Output — Python RPA Challenge</title>
+    <title class="suiteHeader">Robocorp Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
 <body>
     <div class="headerTitleSection">
-        <h3>Python RPA Challenge</h3>
-        <span class="label ERROR">Run Failed</span>
+        <h3 class="suiteHeader">Robocorp Log</h3> <!-- Note: should be replaced with the suite name -->
+        <span id="suiteResult" class="label" style="display: none;"></span>
+        <!-- Add ERROR class / Run Failed if it errored -->
     </div>
-    <div class="headerRunDetails">31 March 2023 at 13:30 (UTC+2) — 13 seconds elapsed</div>
+    <div id="suiteRunStart" class="headerRunDetails"></div>
+    <!-- Add date. i.e.: 31 March 2023 at 13:30 (UTC+2) — 13 seconds elapsed -->
 
     <div class="headers">
         <span class="headerSource">Source</span>

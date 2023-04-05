@@ -102,7 +102,9 @@ export class TreeBuilder {
 
     seenSuiteOrTestOrKeyword: boolean = false;
 
-    tbHandler = new TBHandler();
+    tbHandler: TBHandler = new TBHandler();
+
+    suiteErrored: boolean = false;
 
     constructor() {
         this.opts = getOpts();
@@ -265,6 +267,11 @@ export class TreeBuilder {
                 this.messageNode = { "parent": this.messageNode, "message": msg };
                 this.suiteName = msg.decoded["name"] + ".";
                 this.suiteSource = msg.decoded["source"];
+
+                for (const el of document.querySelectorAll(".suiteHeader")) {
+                    el.textContent = msg.decoded["name"];
+                }
+
                 // parent = addTreeContent(opts, parent, msg.decoded["name"], msg, true);
                 // stack.push(parent);
                 break;
@@ -309,6 +316,17 @@ export class TreeBuilder {
             case "ES": // end suite
                 this.messageNode = this.messageNode.parent;
                 this.suiteName = "";
+                {
+                    const div = divById("suiteResult");
+                    div.style.display = "block";
+                    if (this.suiteErrored) {
+                        div.classList.add("ERROR");
+                        div.textContent = "Run Failed";
+                    } else {
+                        div.classList.add("PASS");
+                        div.textContent = "Run Passed";
+                    }
+                }
                 break;
             case "ET": // end test
                 this.messageNode = this.messageNode.parent;
@@ -319,9 +337,8 @@ export class TreeBuilder {
                 this.onEndSetStatusOrRemove(this.opts, currT, msg.decoded, this.parent, false);
                 this.summaryBuilder.onTestEndUpdateSummary(msg);
 
-                // JANNE: the initial call, "challenge.run", is a "test"
                 if (msg.decoded.status === "ERROR") {
-                    console.log("END KEYWORD", this.opts, currT, msg.decoded, this.parent, true);
+                    this.suiteErrored = true;
                     currT.details.open = true;
                     currT.details.classList.add("errorParent");
                 } else {
@@ -413,6 +430,12 @@ export class TreeBuilder {
                 const tb: PythonTraceback | undefined = this.tbHandler.handle(msg);
                 if (tb) {
                     addExceptionToNode(this.parent, tb);
+                }
+                break;
+            case "T":
+                const div = divById("suiteRunStart");
+                if (div) {
+                    div.textContent = msg.decoded["time"];
                 }
                 break;
         }

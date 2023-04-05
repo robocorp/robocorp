@@ -32,7 +32,7 @@ export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceb
     const fullTb: string[] = [];
     for (const tbEntry of tb.stack) {
         let s = tbEntry.source;
-        if(s.length > 31){
+        if (s.length > 31) {
             s = `... ${s.substring(27)}`;
         }
         fullTb.push(`File "${s}", line ${tbEntry.lineno}, in ${tbEntry.method}\n`);

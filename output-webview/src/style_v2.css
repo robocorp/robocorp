@@ -1,4 +1,3 @@
-
 /* ******************************* */
 /* CONTAINERS ETC */
 
@@ -7,28 +6,31 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     height: 100%;
 }
 
-:root {  
+:root {
     --right-column-width-narrow: 40vw;
     --right-column-width-wide: 50vw;
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
-    --sans-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    --sans-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+        "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
-    --fixed-font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+    --fixed-font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono",
+        "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 }
 
 /* ******************************* */
 /* THEMING SUPPORT */
 
 @media (prefers-color-scheme: light) {
-    :root {  
-        --log-color-error: #E84F5C;
-        --log-color-success: #219F7F;
+    :root {
+        --log-color-error: #e84f5c;
+        --log-color-success: #219f7f;
 
         --log-color-warn: #ff6666;
         --log-color-disabled: #999999;
@@ -44,9 +46,9 @@ html, body {
 }
 
 @media (prefers-color-scheme: dark) {
-    :root {  
-        --log-color-error: #E84F5C;
-        --log-color-success: #219F7F;
+    :root {
+        --log-color-error: #e84f5c;
+        --log-color-success: #219f7f;
 
         --log-color-warn: #ff6666;
         --log-color-disabled: #666666;
@@ -64,13 +66,12 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    padding: 1.0rem;
+    padding: 1rem;
     font-size: 0.8rem;
     font-family: var(--sans-font-family);
     color: var(--log-color-text);
     background-color: var(--log-color-bg);
 }
-
 
 ul {
     list-style-type: none;
@@ -94,7 +95,8 @@ ul {
 }
 
 /* nesting level vertical line */
-.tree ul:not(:first-child), .detailContainer {
+.tree ul:not(:first-child),
+.detailContainer {
     border-left: 1px solid var(--log-color-border);
 
     /* centering the line with the icon */
@@ -104,14 +106,16 @@ ul {
     padding-left: 0.8rem;
 }
 
-details.errorParent .tree ul:not(:first-child), details.errorParent .detailContainer {
+details.errorParent .tree ul:not(:first-child),
+details.errorParent .detailContainer {
     border-color: var(--log-color-error);
 }
 
 /* ******************************* */
 /* SUMMARY ROW FOR EACH CODE ROW */
 
-details.parentNode > summary, details.errorParent.leafNode > summary {
+details.parentNode > summary,
+details.errorParent.leafNode > summary {
     cursor: pointer;
 }
 
@@ -134,7 +138,7 @@ details > summary::-webkit-details-marker {
 }
 
 details > summary::marker {
-    display:none;
+    display: none;
 }
 
 details > summary::before {
@@ -148,15 +152,15 @@ details.errorParent > summary::before {
 /* icon from: https://github.com/twbs/icons/blob/main/icons/caret-right-square-fill.svg */
 details > summary::before {
     position: absolute;
-    left:0.25rem;
-    top:4px;
+    left: 0.25rem;
+    top: 4px;
 
     /* chrome seems to need the '-webkit' prefix here */
     -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-caret-right-square-fill" viewBox="0 0 16 16"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm5.5 10a.5.5 0 0 0 .832.374l4.5-4a.5.5 0 0 0 0-.748l-4.5-4A.5.5 0 0 0 5.5 4v8z"/></svg>');
     width: 1rem;
     height: 1rem;
     display: inline-block;
-    content: '';
+    content: "";
 }
 
 /* filled icon */
@@ -168,13 +172,15 @@ details.leafNode.passParent > summary::before {
     -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg>');
 }
 
-details.parentNode > summary::before, details.leafNode.errorParent > summary::before {
+details.parentNode > summary::before,
+details.leafNode.errorParent > summary::before {
     transform-origin: 8px 8px;
     transform: rotate(0deg);
     transition: transform 0.2s ease-out !important;
 }
 
-details[open].parentNode > summary::before, details[open].leafNode.errorParent > summary::before {
+details[open].parentNode > summary::before,
+details[open].leafNode.errorParent > summary::before {
     transform: rotate(90deg);
 }
 
@@ -198,7 +204,7 @@ details[open] > summary > .summaryDiv > .summaryInput {
 
 .summaryDiv > .summaryName {
     order: 1;
-    
+
     margin-left: 0.5rem;
     font-family: var(--fixed-font-family);
     font-size: 0.75rem;
@@ -206,7 +212,8 @@ details[open] > summary > .summaryDiv > .summaryInput {
     text-overflow: ellipsis;
 }
 
-.summaryDiv > .summaryName, .detailContainer > .detailInfo {
+.summaryDiv > .summaryName,
+.detailContainer > .detailInfo {
     /* this forces the correct column size, see:
        https://makandracards.com/makandra/66994-css-flex-and-min-width */
     min-width: 0;
@@ -236,20 +243,23 @@ details.errorParent > summary > .summaryDiv > .summaryName {
     margin-right: auto;
 }
 
-.summaryDiv > .summaryInput, .detailContainer > .detailInputs {
+.summaryDiv > .summaryInput,
+.detailContainer > .detailInputs {
     flex: 0 0 var(--right-column-width-wide);
     padding-left: 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.summaryDiv .timeLabel, .summaryDiv .summaryFileName {
+.summaryDiv .timeLabel,
+.summaryDiv .summaryFileName {
     order: 3;
     color: var(--log-color-text-weakest);
     margin-left: 0.5rem;
 }
 
-details > summary:hover .timeLabel, details > summary:hover .summaryFileName {
+details > summary:hover .timeLabel,
+details > summary:hover .summaryFileName {
     color: var(--log-color-text-weaker);
 }
 
@@ -259,7 +269,7 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 
 /* HACK! hiding details for now */
 .detailInfo {
-    display:none;
+    display: none;
 }
 
 /* HACK! let's show the error output only for the leaf node */
@@ -270,18 +280,21 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 /* ******************************* */
 /* RESPONSIVE SIZING */
 
-@media only screen and (max-width : 840px) {
-    .summaryDiv > .summaryInput, .detailContainer > .detailInputs, .headerInputs {
+@media only screen and (max-width: 840px) {
+    .summaryDiv > .summaryInput,
+    .detailContainer > .detailInputs,
+    .headerInputs {
         display: none;
     }
 }
 
-@media only screen and (max-width : 960px) {
+@media only screen and (max-width: 960px) {
     .headerInputs {
         width: var(--right-column-width-narrow) !important;
     }
-    
-    .summaryDiv > .summaryInput, .detailContainer > .detailInputs {
+
+    .summaryDiv > .summaryInput,
+    .detailContainer > .detailInputs {
         flex: 0 0 var(--right-column-width-narrow) !important;
     }
 }
@@ -313,7 +326,7 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
     /* forces wrapping */
     white-space: initial;
 
-    color: var(--log-color-text-weaker)
+    color: var(--log-color-text-weaker);
 }
 
 /* ******************************* */
@@ -322,11 +335,12 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 .headers {
     display: flex;
     border-bottom: 1px solid var(--log-color-border);
-    padding-bottom: 1.0rem;
-    margin-bottom: 1.0rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
-.headerSource, .headerInputs {
+.headerSource,
+.headerInputs {
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
@@ -341,7 +355,7 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 }
 
 .headerRunDetails {
-    margin:0;
+    margin: 0;
     margin-bottom: 1.5rem;
     color: var(--log-color-text-weaker);
 }
@@ -360,7 +374,7 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
     height: 1rem;
     line-height: 1rem;
     letter-spacing: 0;
-    display:none;
+    display: none;
 }
 
 .errorParent.leafNode .label.F,
@@ -398,16 +412,21 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 }
 
 .headerTitleSection h3 {
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
     font-size: 1.5rem;
 }
 
-.headerTitleSection .label {
+#suiteResult {
     font-size: 0.82rem;
     padding: 0.1rem 0.3rem 0.15rem 0.3rem;
     height: auto;
     margin-left: 0.75rem;
     display: inline-block;
+}
+.headerTitleSection .ERROR {
     background-color: var(--log-color-error);
+}
+.headerTitleSection .PASS {
+    background-color: var(--log-color-success);
 }

@@ -48,7 +48,9 @@ def test_log_html_features(tmpdir) -> None:
         with robocorp_logging.add_log_output(
             tmpdir, max_file_size="500kb", max_files=1, log_html=log_target
         ):
-            robocorp_logging.log_start_suite("Root Suite", "root", str(tmpdir))
+            robocorp_logging.log_start_suite(
+                "Test Log HTML Features", "root", str(tmpdir)
+            )
             robocorp_logging.log_start_task("my_task", "task_id", 0, [])
 
             for _i in range(20):
