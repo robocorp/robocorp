@@ -316,6 +316,7 @@ export class TreeBuilder {
                 const item: IContentAdded = this.stack.at(-1);
                 if (item.summaryInput.textContent.endsWith("—")) {
                     item.summaryInput.textContent = `${msg.decoded["argument"]}`;
+                    item.summaryInput.classList.remove("emptySummaryInput");
                 } else {
                     item.summaryInput.textContent += `, ${msg.decoded["argument"]}`;
                 }

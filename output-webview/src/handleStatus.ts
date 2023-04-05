@@ -10,7 +10,8 @@ export function addStatus(current: IContentAdded | ILiNodesCreated, status: stri
 
 export function addTime(current: IContentAdded, diff: number) {
     const span = document.createElement("span");
-    span.textContent = ` (${diff.toFixed(2)}s)`;
+    //span.textContent = ` (${diff.toFixed(2)}s)`;
+    span.textContent = `${Number(diff.toPrecision(1))}s`;
     span.classList.add("timeLabel");
     current.summaryDiv.appendChild(span);
 }

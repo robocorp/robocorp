@@ -82,7 +82,7 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
     summaryDiv.appendChild(summaryName);
 
     const summaryInput: HTMLSpanElement = createSpan();
-    summaryInput.className = "summaryInput";
+    summaryInput.className = "summaryInput emptySummaryInput";
     summaryInput.textContent = "—";
     summaryDiv.appendChild(summaryInput);
 
