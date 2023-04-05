@@ -8,7 +8,7 @@ import os
 FORCE_REGEN_DEV = False
 
 # Must be set to false when merging to master.
-OPEN_IN_BROWSER = False
+OPEN_IN_BROWSER = True
 
 
 def test_log_html_features(tmpdir) -> None:
