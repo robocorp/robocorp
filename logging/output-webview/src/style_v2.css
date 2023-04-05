@@ -1,3 +1,5 @@
+
+/* ******************************* */
 /* CONTAINERS ETC */
 
 /* box model reset */
@@ -12,16 +14,14 @@ html, body {
 }
 
 :root {  
-
     --right-column-width: 50vw;
-
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
     --sans-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
-
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
     --fixed-font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro","Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 }
 
+/* ******************************* */
 /* THEMING SUPPORT */
 
 @media (prefers-color-scheme: light) {
@@ -35,6 +35,7 @@ html, body {
 
         --log-color-text: #000000;
         --log-color-text-weaker: #444444;
+        --log-color-text-weakest: #666666;
 
         --log-color-bg: #ffffff;
         --log-color-bg-raised: #f3f3f3;
@@ -52,6 +53,7 @@ html, body {
 
         --log-color-text: #eeeeee;
         --log-color-text-weaker: #bbbbbb;
+        --log-color-text-weakest: #666666;
 
         --log-color-bg: #222222;
         --log-color-bg-raised: #333333;
@@ -81,6 +83,7 @@ ul {
     flex-grow: 1;
 }
 
+/* ******************************* */
 /* TREE */
 
 .tree li {
@@ -104,6 +107,7 @@ details.errorParent .tree ul:not(:first-child), details.errorParent .detailConta
     border-color: var(--log-color-error);
 }
 
+/* ******************************* */
 /* SUMMARY ROW FOR EACH CODE ROW */
 
 details.parentNode > summary, details.errorParent.leafNode > summary {
@@ -189,13 +193,12 @@ details[open] > summary > .summaryDiv > .summaryInput {
 
 .summaryDiv > .label {
     order: 2;
-    margin-right: 0.4rem;
 }
 
 .summaryDiv > .summaryName {
     order: 1;
     
-    margin-left: 0.25rem;
+    margin-left: 0.5rem;
     font-family: var(--fixed-font-family);
     font-size: 0.75rem;
     overflow: hidden;
@@ -213,10 +216,15 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 }
 
 .summaryDiv > .summaryInput {
-    order: 3;
+    order: 4;
     margin-left: auto;
     font-family: var(--fixed-font-family);
     font-size: 0.75rem;
+    color: var(--log-color-text-weaker);
+}
+
+.summaryDiv > .summaryInput.emptySummaryInput {
+    color: var(--log-color-text-weakest);
 }
 
 .detailContainer {
@@ -232,6 +240,20 @@ details.errorParent > summary > .summaryDiv > .summaryName {
     padding-left: 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.summaryDiv .timeLabel {
+    order: 3;
+    color: var(--log-color-text-weakest);
+    margin-left: 0.5rem;
+}
+
+details > summary:hover .timeLabel {
+    color: var(--log-color-text-weaker);
+}
+
+details > summary:hover .summaryInput:not(.emptySummaryInput) {
+    color: var(--log-color-text) !important;
 }
 
 @media only screen and (max-width : 860px) {
@@ -250,6 +272,7 @@ details.errorParent > summary > .summaryDiv > .summaryName {
     display: block;
 }
 
+/* ******************************* */
 /* ERROR OUTPUT */
 
 .detailInfo {
@@ -275,8 +298,11 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 
     /* forces wrapping */
     white-space: initial;
+
+    color: var(--log-color-text-weaker)
 }
 
+/* ******************************* */
 /* HEADERS */
 
 .headers {
@@ -287,9 +313,10 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 }
 
 .headerSource, .headerInputs {
-    font-weight:bold;
+    font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
+    letter-spacing: 0.3px;
     color: var(--log-color-text-weaker);
 }
 
@@ -305,11 +332,12 @@ details.errorParent > summary > .summaryDiv > .summaryName {
     color: var(--log-color-text-weaker);
 }
 
+/* ******************************* */
 /* LABEL IS THE PASS/ERROR BADGE */
 
 .label {
     display: inline-block;
-    margin-left: 0.35rem;
+    margin-left: 0.5rem;
     color: white;
     font-weight: 600;
     font-size: 10px;
@@ -345,6 +373,7 @@ details.errorParent > summary > .summaryDiv > .summaryName {
     background-color: var(--log-color-disabled);
 }
 
+/* ******************************* */
 /* HEADER TITLE ROW */
 
 .headerTitleSection {
@@ -361,7 +390,7 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 }
 
 .headerTitleSection .label {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     padding: 0.1rem 0.3rem 0.15rem 0.3rem;
     height: auto;
     margin-left: 0.75rem;
