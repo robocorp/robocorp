@@ -14,7 +14,8 @@ html, body {
 }
 
 :root {  
-    --right-column-width: 50vw;
+    --right-column-width-narrow: 40vw;
+    --right-column-width-wide: 50vw;
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
     --sans-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
     /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
@@ -236,7 +237,7 @@ details.errorParent > summary > .summaryDiv > .summaryName {
 }
 
 .summaryDiv > .summaryInput, .detailContainer > .detailInputs {
-    flex: 0 0 var(--right-column-width);
+    flex: 0 0 var(--right-column-width-wide);
     padding-left: 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -256,12 +257,6 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
     color: var(--log-color-text) !important;
 }
 
-@media only screen and (max-width : 860px) {
-    .summaryDiv > .summaryInput, .detailContainer > .detailInputs, .headerInputs {
-        display: none;
-    }
-}
-
 /* HACK! hiding details for now */
 .detailInfo {
     display:none;
@@ -270,6 +265,25 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 /* HACK! let's show the error output only for the leaf node */
 .leafNode.errorParent .detailInfo {
     display: block;
+}
+
+/* ******************************* */
+/* RESPONSIVE SIZING */
+
+@media only screen and (max-width : 840px) {
+    .summaryDiv > .summaryInput, .detailContainer > .detailInputs, .headerInputs {
+        display: none;
+    }
+}
+
+@media only screen and (max-width : 960px) {
+    .headerInputs {
+        width: var(--right-column-width-narrow) !important;
+    }
+    
+    .summaryDiv > .summaryInput, .detailContainer > .detailInputs {
+        flex: 0 0 var(--right-column-width-narrow) !important;
+    }
 }
 
 /* ******************************* */
@@ -322,7 +336,7 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
 
 .headerInputs {
     margin-left: auto;
-    width: var(--right-column-width);
+    width: var(--right-column-width-wide);
     padding-left: 0.5rem;
 }
 
