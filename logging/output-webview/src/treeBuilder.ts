@@ -430,18 +430,15 @@ export class TreeBuilder {
             const summary = current.summary;
             addStatus(current, status);
 
-            let fileName = undefined;
-            if(current.summaryName.textContent.startsWith("challenge.run")) {
-                fileName = "tasks.py";
-            }
+            if (current.source != undefined && current.source.length > 0) {
+                let basename = current.source;
+                let index = Math.max(current.source.lastIndexOf("/"), current.source.lastIndexOf("\\"));
+                if (index > 0) {
+                    basename = current.source.substring(index + 1);
+                }
 
-            if(current.summaryName.textContent.startsWith("run")) {
-                fileName = "challenge.py";
-            }
-            
-            if(fileName != undefined) {
                 const summaryFileName = document.createElement("span");
-                summaryFileName.textContent = fileName;
+                summaryFileName.textContent = basename;
                 summaryFileName.classList.add("summaryFileName");
                 current.summaryDiv.appendChild(summaryFileName);
             }
@@ -458,7 +455,6 @@ export class TreeBuilder {
                     addTime(current, diff);
                 }
             }
-
         } else {
             current.li.remove();
         }
