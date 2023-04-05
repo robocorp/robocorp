@@ -430,16 +430,18 @@ export class TreeBuilder {
             const summary = current.summary;
             addStatus(current, status);
 
+            let fileName = undefined;
             if(current.summaryName.textContent.startsWith("challenge.run")) {
-                const summaryFileName = document.createElement("span");
-                summaryFileName.textContent = "tasks.py";
-                summaryFileName.classList.add("summaryFileName");
-                current.summaryDiv.appendChild(summaryFileName);
+                fileName = "tasks.py";
             }
 
             if(current.summaryName.textContent.startsWith("run")) {
+                fileName = "challenge.py";
+            }
+            
+            if(fileName != undefined) {
                 const summaryFileName = document.createElement("span");
-                summaryFileName.textContent = "challenge.py";
+                summaryFileName.textContent = fileName;
                 summaryFileName.classList.add("summaryFileName");
                 current.summaryDiv.appendChild(summaryFileName);
             }
