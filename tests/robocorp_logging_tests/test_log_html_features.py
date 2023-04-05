@@ -8,7 +8,7 @@ import os
 FORCE_REGEN_DEV = False
 
 # Must be set to false when merging to master.
-OPEN_IN_BROWSER = True
+OPEN_IN_BROWSER = False
 
 
 def test_log_html_features(tmpdir) -> None:
@@ -36,6 +36,8 @@ def test_log_html_features(tmpdir) -> None:
     from pathlib import Path
     from robocorp_logging import iter_decoded_log_format_from_log_html
 
+    __tracebackhide__ = 1
+
     log_target = Path(tmpdir.join("log.html"))
 
     with robocorp_logging.setup_auto_logging():
@@ -44,7 +46,7 @@ def test_log_html_features(tmpdir) -> None:
         check_traceback = reload(check_traceback)
 
         with robocorp_logging.add_log_output(
-            tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
+            tmpdir, max_file_size="500kb", max_files=1, log_html=log_target
         ):
             robocorp_logging.log_start_suite("Root Suite", "root", str(tmpdir))
             robocorp_logging.log_start_task("my_task", "task_id", 0, [])

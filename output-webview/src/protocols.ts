@@ -39,33 +39,33 @@ export interface ILiNodesCreated {
     // <li>
     //   <details open>
     //     <summary>
-    //          <span></span>
+    //       <div class="summaryDiv">
+    //          <span class="label">...</span>
+    //          <span class="summaryName">...</span>
+    //          <span class="summaryInput">...</span>
+    //       </div>
     //     </summary>
-    //     <div></div>
+    //     <div class="detailContainer">
+    //       <div class="detailInfo"></div>
+    //       <div class="detailInputs"></div>
+    //     </div>
+    //     <ul>...</ul>
     //   </details>
     // </li>
     li: HTMLLIElement;
     details: HTMLDetailsElement;
+    detailContainer: HTMLDivElement;
     summary: HTMLElement;
     summaryDiv: HTMLDivElement;
-    detailInputs: HTMLDivElement;
     summaryName: HTMLElement;
     summaryInput: HTMLElement;
 }
 
 export interface IContentAdded {
-    // <li>
-    //   <details open>
-    //     <summary>
-    //          <span></span>
-    //     </summary>
-    //     <ul>
-    //     </ul>
-    //   </details>
-    // </li>
     ul: HTMLUListElement;
     li: HTMLLIElement;
     details: HTMLDetailsElement;
+    detailContainer: HTMLDivElement;
     summary: HTMLElement;
     summaryDiv: HTMLDivElement;
     // note: besides the span below we actually add multiple other span items
@@ -89,4 +89,22 @@ export interface IContentAdded {
 export interface IMessageNode {
     message: IMessage;
     parent: IMessageNode;
+}
+
+export interface ITracebackEntry {
+    source: string;
+    lineno: number;
+    method: string;
+    lineContent: string;
+}
+
+export class PythonTraceback {
+    exceptionMsg: string;
+    stack: ITracebackEntry[] = [];
+    constructor(exceptionMsg: string) {
+        this.exceptionMsg = exceptionMsg;
+    }
+    pushEntry(source: string, lineno: number, method: string, lineContent: string): void {
+        this.stack.push({ source, lineno, method, lineContent });
+    }
 }

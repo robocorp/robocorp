@@ -486,13 +486,15 @@ class _RobotOutputImpl:
             was already previously logged (see the `unhandled` parameter for
             details on the use-cases where it may be skipped).
         """
-        _tp, e, tb = exc_info
-        if e is None or tb is None:
+        tp, e, tb = exc_info
+        if e is None or tb is None or tp is None:
             return False
 
         f = tb.tb_frame.f_back
         stack: List[tuple] = []
         while f is not None:
+            if "__tracebackhide__" in f.f_locals:
+                break
             stack.append((f, f.f_lineno))
             f = f.f_back
 
@@ -524,7 +526,7 @@ class _RobotOutputImpl:
         ):
             self._write_with_separator(
                 "STB ",
-                [oid(str(e)), self._number(self.get_time_delta())],
+                [oid(f"{tp.__name__}: {e}"), self._number(self.get_time_delta())],
             )
 
             for frame, tb_lineno in stack:
