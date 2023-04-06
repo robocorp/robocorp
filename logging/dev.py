@@ -112,7 +112,7 @@ class Dev(object):
             subprocess.call(["git", "diff"])
             sys.exit(1)
 
-    def build_output_view(self, dev=False):
+    def build_output_view(self, dev=False, version=None):
         """
         Builds the output view in prod mode in `dist`.
         """
@@ -131,7 +131,23 @@ class Dev(object):
 
         print("=== Building with webpack")
 
-        for v in (1, 2):
+        if dev:
+            print("=== Building dev mode")
+        else:
+            print("=== Building production mode")
+
+        versions = [1, 2]
+        if version:
+            if isinstance(version, int):
+                versions = [version]
+            else:
+                assert isinstance(version, (list, tuple))
+                versions = version
+                for el in versions:
+                    assert isinstance(el, int)
+
+        for v in versions:
+            assert v in (1, 2), f"Unexpected version: {v}"
             vtag = "" if v == 1 else "_v2"
             subprocess.check_call(
                 ["yarn", ("build-prod" if not dev else "build-dev")]

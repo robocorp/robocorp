@@ -1,11 +1,16 @@
 import subprocess
 import sys
 import os
+from typing import List, Any
 
 # Must be set to False when merging to master and
 # python -m dev build-output-view
 # must also be manually called afterwards.
-FORCE_REGEN_DEV = False
+FORCE_REGEN: List[Any] = []
+
+# FORCE_REGEN.append("dev")
+# FORCE_REGEN.append(1)
+# FORCE_REGEN.append(2)
 
 # Must be set to false when merging to master.
 OPEN_IN_BROWSER = False
@@ -17,14 +22,19 @@ def test_log_html_features(tmpdir) -> None:
     showcases all the features available.
     """
     cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    if FORCE_REGEN_DEV:
-        subprocess.check_call(
-            [sys.executable, "-m", "dev", "build-output-view", "dev"], cwd=cwd
-        )
-    else:
-        subprocess.check_call(
-            [sys.executable, "-m", "dev", "build-output-view"], cwd=cwd
-        )
+    if FORCE_REGEN:
+        cmd = [sys.executable, "-m", "dev", "build-output-view"]
+        if "dev" in FORCE_REGEN:
+            cmd.append("--dev")
+
+        versions: List[int] = []
+        for setting in FORCE_REGEN:
+            if isinstance(setting, int):
+                versions.append(setting)
+
+        if versions:
+            cmd.append(f"--version={','.join(str(x) for x in versions)}")
+            subprocess.check_call(cmd, cwd=cwd)
 
     import robocorp_logging
     from robocorp_logging_tests._resources import (
@@ -75,7 +85,7 @@ def test_log_html_features(tmpdir) -> None:
             robocorp_logging.log_end_suite("Root Suite", "root", str(tmpdir))
 
         assert log_target.exists()
-        if FORCE_REGEN_DEV:
+        if "dev" in FORCE_REGEN:
             for v in iter_decoded_log_format_from_log_html(
                 Path(os.path.join(os.path.dirname(log_target), "bundle.js"))
             ):
