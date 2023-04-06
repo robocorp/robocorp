@@ -3,7 +3,7 @@ import functools
 from pathlib import Path
 from typing import Optional, Union, Sequence
 import datetime
-from robocorp_logging.protocols import OptExcInfo
+from robocorp_logging.protocols import OptExcInfo, LogHTMLStyle
 
 
 def _log_error(func):
@@ -34,6 +34,7 @@ class _RobocorpLogger:
         max_file_size: str = "1MB",
         max_files: int = 5,
         log_html: Optional[Union[Path, str]] = None,
+        log_html_style: LogHTMLStyle = "standalone",
         **kwargs,
     ):
         from robocorp_logging._impl import _RobotOutputImpl, _Config
@@ -41,6 +42,12 @@ class _RobocorpLogger:
 
         # Note: expected to be used just when used in-memory (not part of the public API).
         config = _Config(kwargs.get("__uuid__"))
+        if log_html_style == "standalone":
+            config.log_html_style = 2
+        elif log_html_style == "vscode":
+            config.log_html_style = 1
+        else:
+            raise ValueError(f"Unexpected log html style: {log_html_style}")
 
         if output_dir is None:
             config.output_dir = None

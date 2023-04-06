@@ -47,7 +47,8 @@ from ._rewrite_ast import rewrite_ast_add_callbacks
 # 0.0.1: Initial version
 # 0.0.2: Bugfix: docstrings must be kept as the first statement
 # 0.0.3: Support for exception handlers
-version = "0.0.3"
+# 0.0.4: Add __name__
+version = "0.0.4"
 PYTEST_TAG = f"{sys.implementation.cache_tag}-robocorp-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + PYTEST_TAG + PYC_EXT

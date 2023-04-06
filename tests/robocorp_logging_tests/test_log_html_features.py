@@ -2,18 +2,29 @@ import subprocess
 import sys
 import os
 from typing import List, Any
+from robocorp_logging.protocols import LogHTMLStyle
 
 # Must be set to False when merging to master and
 # python -m dev build-output-view
 # must also be manually called afterwards.
 FORCE_REGEN: List[Any] = []
 
-# FORCE_REGEN.append("dev")
-# FORCE_REGEN.append(1)
-# FORCE_REGEN.append(2)
-
 # Must be set to false when merging to master.
 OPEN_IN_BROWSER = False
+
+LOG_HTML_STYLE: LogHTMLStyle = "standalone"
+
+if False:
+    FORCE_REGEN.append("dev")
+    OPEN_IN_BROWSER = True
+
+    # LOG_HTML_STYLE = "vscode"
+    LOG_HTML_STYLE = "standalone"
+
+    if LOG_HTML_STYLE == "vscode":
+        FORCE_REGEN.append(1)
+    else:
+        FORCE_REGEN.append(2)
 
 
 def test_log_html_features(tmpdir) -> None:
@@ -56,7 +67,11 @@ def test_log_html_features(tmpdir) -> None:
         check_traceback = reload(check_traceback)
 
         with robocorp_logging.add_log_output(
-            tmpdir, max_file_size="500kb", max_files=1, log_html=log_target
+            tmpdir,
+            max_file_size="500kb",
+            max_files=1,
+            log_html=log_target,
+            log_html_style=LOG_HTML_STYLE,
         ):
             robocorp_logging.log_start_suite(
                 "Test Log HTML Features", "root", str(tmpdir)

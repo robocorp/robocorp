@@ -118,6 +118,7 @@ def rewrite_ast_add_callbacks(
             call = factory.Call()
             call.func = factory.NameLoadRewriteCallback("method_return")
             call.args.append(factory.NameLoad("__package__"))
+            call.args.append(factory.NameLoad("__name__"))
             call.args.append(factory.NameLoad("__file__"))
             call.args.append(factory.Str(f"{class_name}{function.name}"))
             call.args.append(factory.LineConstant())
@@ -182,6 +183,7 @@ def rewrite_ast_add_callbacks(
                 call = factory.Call()
                 call.func = factory.NameLoadRewriteCallback("before_method")
                 call.args.append(factory.NameLoad("__package__"))
+                call.args.append(factory.NameLoad("__name__"))
                 call.args.append(factory.NameLoad("__file__"))
                 call.args.append(factory.Str(f"{class_name}{function.name}"))
                 call.args.append(factory.LineConstant())
@@ -217,6 +219,7 @@ def rewrite_ast_add_callbacks(
                 call = factory.Call()
                 call.func = factory.NameLoadRewriteCallback("after_method")
                 call.args.append(factory.NameLoad("__package__"))
+                call.args.append(factory.NameLoad("__name__"))
                 call.args.append(factory.NameLoad("__file__"))
                 call.args.append(factory.Str(f"{class_name}{function.name}"))
                 call.args.append(factory.LineConstant())
@@ -264,6 +267,7 @@ def rewrite_ast_add_callbacks(
                 call_method_except = factory.Call()
                 call_method_except.func = method_except
                 call_method_except.args.append(factory.NameLoad("__package__"))
+                call_method_except.args.append(factory.NameLoad("__name__"))
                 call_method_except.args.append(factory.NameLoad("__file__"))
                 call_method_except.args.append(
                     factory.Str(f"{class_name}{function.name}")

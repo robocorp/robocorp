@@ -1,6 +1,16 @@
 import datetime
 import json
-from typing import Optional, Any, Iterator, List, Sequence, Dict, Union, Iterable
+from typing import (
+    Optional,
+    Any,
+    Iterator,
+    List,
+    Sequence,
+    Dict,
+    Union,
+    Iterable,
+    Literal,
+)
 import sys
 import functools
 from io import StringIO
@@ -10,7 +20,7 @@ from pathlib import Path
 import typing
 from ._rewrite_config import Filter
 import threading
-from robocorp_logging.protocols import OptExcInfo
+from robocorp_logging.protocols import OptExcInfo, LogHTMLStyle
 
 if typing.TYPE_CHECKING:
     from ._logger import _RobocorpLogger
@@ -135,7 +145,12 @@ def _register_callbacks(rewrite_hook_config):
     status_stack = []
 
     def call_before_method(
-        package: str, filename: str, name: str, lineno: int, args_dict: dict
+        package: str,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        args_dict: dict,
     ) -> None:
         if tid != threading.get_ident():
             return
@@ -153,7 +168,7 @@ def _register_callbacks(rewrite_hook_config):
         for rf_stream in _get_logger_instances():
             rf_stream.start_method(
                 name,
-                package,
+                f"{package}.{mod_name}",
                 filename,
                 lineno,
                 "METHOD",
@@ -163,7 +178,9 @@ def _register_callbacks(rewrite_hook_config):
                 [],
             )
 
-    def call_after_method(package: str, filename: str, name: str, lineno: int) -> None:
+    def call_after_method(
+        package: str, mod_name: str, filename: str, name: str, lineno: int
+    ) -> None:
         if tid != threading.get_ident():
             return
 
@@ -181,10 +198,15 @@ def _register_callbacks(rewrite_hook_config):
                 return
 
         for rf_stream in _get_logger_instances():
-            rf_stream.end_method(name, package, status, [])
+            rf_stream.end_method(name, f"{package}.{mod_name}", status, [])
 
     def call_on_method_except(
-        package: str, filename: str, name: str, lineno: int, exc_info: OptExcInfo
+        package: str,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        exc_info: OptExcInfo,
     ) -> None:
         if tid != threading.get_ident():
             return
@@ -205,7 +227,7 @@ def _register_callbacks(rewrite_hook_config):
 
         for rf_stream in _get_logger_instances():
             rf_stream.log_method_except(
-                package, filename, name, lineno, exc_info, False
+                f"{package}.{mod_name}", filename, name, lineno, exc_info, False
             )
 
     before_method.register(call_before_method)
@@ -278,6 +300,7 @@ def add_log_output(
     max_file_size: str = "1MB",
     max_files: int = 5,
     log_html: Optional[Union[str, Path]] = None,
+    log_html_style: LogHTMLStyle = "standalone",
 ):
     from ._logger import _RobocorpLogger  # @Reimport
 
@@ -286,7 +309,9 @@ def add_log_output(
             "When log_html is specified, the output_dir must also be specified."
         )
 
-    logger = _RobocorpLogger(output_dir, max_file_size, max_files, log_html)
+    logger = _RobocorpLogger(
+        output_dir, max_file_size, max_files, log_html, log_html_style=log_html_style
+    )
     _get_logger_instances()[logger] = 1
 
     def _exit():
