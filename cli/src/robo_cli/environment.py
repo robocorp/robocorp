@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -19,13 +20,13 @@ def ensure(develop=True) -> Variables:
         cache = _load_cache()
 
         if cached := cache.get(digest):
-            return cached
+            return _merge_environment(cached)
 
         variables = _create_environment(conda_path, digest)
         cache[digest] = variables
         _save_cache(cache)
 
-        return variables
+        return _merge_environment(variables)
 
 
 def _load_cache() -> dict[str, Variables]:
@@ -46,6 +47,22 @@ def _create_environment(conda_path: Path, digest: str) -> Variables:
     space = f"robo-{digest}"
     variables = rcc.holotree_variables(conda_path, space)
     return variables
+
+
+def _merge_environment(variables: Variables):
+    # Propagate user environment
+    env = dict(os.environ)
+
+    # Ignore Python-specific overrides
+    env.pop("PYTHONPATH", None)
+    env.pop("PYTHONHOME", None)
+    env.pop("PYTHONSTARTUP", None)
+    env.pop("PYTHONEXECUTABLE", None)
+
+    # Merge with rcc environment
+    env.update(variables)
+
+    return env
 
 
 def _calculate_hash(project_path: Path, conda_path: Path) -> str:
