@@ -50,6 +50,8 @@ export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceb
     detailInputs.classList.add("detailInputs");
     detailInputs.textContent = " ";
     nodesCreated.detailContainer.appendChild(detailInputs);
+
+    nodesCreated.details.classList.add("parentNode");
 }
 
 export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodesCreated {

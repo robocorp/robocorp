@@ -370,10 +370,13 @@ export class TreeBuilder {
                     currK.details.classList.add("passParent");
                 }
 
-                if (currK.ul.children.length === 0) {
-                    currK.details.classList.add("leafNode");
-                } else {
-                    currK.details.classList.add("parentNode");
+                if (!currK.details.classList.contains("parentNode") && !currK.details.classList.contains("leafNode")) {
+                    // If we added an exception it may be already set.
+                    if (currK.ul.children.length === 0) {
+                        currK.details.classList.add("leafNode");
+                    } else {
+                        currK.details.classList.add("parentNode");
+                    }
                 }
 
                 break;
