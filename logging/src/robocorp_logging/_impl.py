@@ -507,7 +507,7 @@ class _RobotOutputImpl:
         while tb is not None:
             frame, tb_lineno = tb.tb_frame, tb.tb_lineno
 
-            if not unhandled and "@robocorp_rewrite_callbacks" in frame.f_locals:
+            if not unhandled and "@py_sys" in frame.f_locals:
                 # The exception should've been shown previously, so, don't
                 # show it at this level again.
                 return False
