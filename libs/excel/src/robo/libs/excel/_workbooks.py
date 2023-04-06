@@ -22,6 +22,7 @@ from robo.libs.excel._worksheet import Worksheet
 
 def _get_column_index(column: str) -> int:
     """Get column index from name, e.g. A -> 1, D -> 4, AC -> 29.
+
     Reverse of `get_column_letter()`
     """
     column = str(column).lower()
@@ -36,6 +37,7 @@ def _get_column_index(column: str) -> int:
 
 def _ensure_unique(values: Any) -> List[Any]:
     """Ensures that each string value in the list is unique.
+
     Adds a suffix to each value that has duplicates,
     e.g. [Banana, Apple, Lemon, Apple] -> [Banana, Apple, Lemon, Apple_2]
     """
@@ -94,7 +96,6 @@ def _load_workbook(
 
 
 class BaseWorkbook:
-
     """Common logic for both .xls and .xlsx files management."""
 
     def __init__(self, path: Optional[PathType] = None):
@@ -121,7 +122,7 @@ class BaseWorkbook:
 
 
 class XlsxWorkbook(BaseWorkbook):
-    """Container for manipulating modern Excel files (.xlsx)"""
+    """Container for manipulating modern Excel files (.xlsx)."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -402,7 +403,7 @@ class XlsxWorkbook(BaseWorkbook):
 
 
 class XlsWorkbook(BaseWorkbook):
-    """Container for manipulating legacy Excel files (.xls)"""
+    """Container for manipulating legacy Excel files (.xls)."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
