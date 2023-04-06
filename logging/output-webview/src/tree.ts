@@ -103,7 +103,7 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
 
     const summaryInput: HTMLSpanElement = createSpan();
     summaryInput.className = "summaryInput emptySummaryInput";
-    summaryInput.textContent = "—";
+    summaryInput.textContent = "";
     summaryDiv.appendChild(summaryInput);
 
     details.appendChild(summary);
@@ -128,6 +128,7 @@ export function addTreeContent(
     opts: IOpts,
     parent: IContentAdded,
     content: string,
+    title: string, // tooltip
     decodedMessage: IMessage,
     open: boolean,
     source: string,
@@ -167,6 +168,9 @@ export function addTreeContent(
         summaryName.appendChild(htmlContents);
     } else {
         summaryName.textContent = content;
+    }
+    if (title) {
+        summaryName.title = title;
     }
 
     if (opts.onClickReference) {

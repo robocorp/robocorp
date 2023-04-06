@@ -284,6 +284,7 @@ export class TreeBuilder {
                     this.opts,
                     this.parent,
                     this.suiteName + msg.decoded["name"],
+                    "",
                     msg,
                     false,
                     this.suiteSource,
@@ -296,14 +297,11 @@ export class TreeBuilder {
             case "SK":
                 // start keyword
                 this.messageNode = { "parent": this.messageNode, "message": msg };
-                let libname = msg.decoded["libname"];
-                if (libname) {
-                    libname += ".";
-                }
                 this.parent = addTreeContent(
                     this.opts,
                     this.parent,
-                    `${libname}${msg.decoded["name"]}`,
+                    msg.decoded["name"],
+                    msg.decoded["libname"],
                     msg,
                     false,
                     msg.decoded["source"],
@@ -388,7 +386,7 @@ export class TreeBuilder {
                 break;
             case "KA":
                 const item: IContentAdded = this.stack.at(-1);
-                if (item.summaryInput.textContent.endsWith("—")) {
+                if (item.summaryInput.classList.contains("emptySummaryInput")) {
                     item.summaryInput.textContent = `${msg.decoded["argument"]}`;
                     item.summaryInput.classList.remove("emptySummaryInput");
                 } else {
@@ -410,6 +408,7 @@ export class TreeBuilder {
                         this.opts,
                         this.parent,
                         msg.decoded["message"],
+                        "",
                         msg,
                         false,
                         undefined,
@@ -524,6 +523,7 @@ export class TreeBuilder {
                 const summaryFileName = document.createElement("span");
                 summaryFileName.textContent = basename;
                 summaryFileName.classList.add("summaryFileName");
+                summaryFileName.title = current.source;
                 current.summaryDiv.appendChild(summaryFileName);
             }
 
