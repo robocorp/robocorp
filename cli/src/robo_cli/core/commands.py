@@ -1,11 +1,9 @@
 import json
-import logging
 from typing import Callable, TypedDict
 
-from .output import KIND_TO_EVENT, Event
-from .process import Process
+from robo_cli.process import Process
 
-LOGGER = logging.getLogger(__name__)
+from .events import TYPE_TO_EVENT, Event
 
 
 class Task(TypedDict):
@@ -32,13 +30,10 @@ def run_task(env: dict[str, str], taskname: str, on_event: Callable[[Event], Non
     )
 
     def handle_line(line: str):
-        try:
-            payload = json.loads(line)
-            klass = KIND_TO_EVENT[payload["message_type"]]
-            event = klass.parse_obj(payload)
-            on_event(event)
-        except Exception as exc:
-            LOGGER.debug(f"Unhandled exception in listener: {exc}")
+        payload = json.loads(line)
+        klass = TYPE_TO_EVENT[payload["message_type"]]
+        event = klass.parse_obj(payload)
+        on_event(event)
 
     proc.on_stdout(handle_line)
     proc.run()

@@ -1,4 +1,3 @@
-import logging
 import os
 import platform
 import subprocess
@@ -7,11 +6,12 @@ from pathlib import Path
 from threading import Event, Thread
 from typing import IO, Any, Callable, Dict, List, Optional, Tuple, Union
 
+from robo_cli.console import console
+
 PathLike = Union[str, Path]
 Listener = Callable[[str], Any]
 
 IS_WINDOWS = platform.system() == "Windows"
-LOGGER = logging.getLogger(__name__)
 
 
 class Reader(Thread):
@@ -36,10 +36,13 @@ class Reader(Thread):
                 self._readlines()
                 time.sleep(self._interval)
         except ValueError as err:
-            LOGGER.warning("Reading output failed: %s", err)
+            console.debug("Reading output failed: %s", err)
 
-        # Ensure everything is read after close
-        self._readlines()
+        try:
+            # Ensure everything is read after close
+            self._readlines()
+        except ValueError:
+            pass
 
     def _readlines(self):
         while line := self._file.readline():
@@ -49,7 +52,7 @@ class Reader(Thread):
                 try:
                     listener(line)
                 except Exception as exc:
-                    LOGGER.warning("Unhandled exception in listener: %s", exc)
+                    console.log("Unhandled exception in listener: %s", exc)
 
 
 class ProcessError(RuntimeError):

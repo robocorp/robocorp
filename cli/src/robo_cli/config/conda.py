@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
@@ -7,8 +6,6 @@ import yaml
 from robo_cli import paths
 
 from . import pyproject
-
-LOGGER = logging.getLogger(__name__)
 
 
 def generate(develop=True) -> Path:
@@ -58,7 +55,6 @@ def _generate_pip_deps(develop: bool) -> list[str]:
             )
         dependencies.update(dev_dependencies)
 
-    LOGGER.debug(dependencies)
     return _to_pip_deps(dependencies)
 
 

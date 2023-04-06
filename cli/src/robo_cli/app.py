@@ -1,22 +1,22 @@
-import logging
 import shutil
 import subprocess
 from pathlib import Path
 
 import typer
-from rich.console import Console, Group
-from rich.logging import RichHandler
+from rich.console import Group
 from rich.panel import Panel
 from rich.prompt import IntPrompt, Prompt
 from rich.table import Table
 
-from robo_cli import core, environment, rcc, templates
+from robo_cli import environment, rcc, templates
 from robo_cli.config import pyproject
-from robo_cli.output import EndKeyword, StartKeyword
+from robo_cli.console import console
+from robo_cli.core import commands
+from robo_cli.core.events import EndKeyword, StartKeyword
 from robo_cli.process import ProcessError
+from robo_cli.settings import get_settings
 
 app = typer.Typer(no_args_is_help=True)
-console = Console(highlight=False)
 
 
 def ensure_environment() -> dict[str, str]:
@@ -27,6 +27,7 @@ def ensure_environment() -> dict[str, str]:
         console.print(err.stderr)
         raise typer.Exit(code=1)
 
+    # Required for communicating with core framework
     env["RC_LOG_OUTPUT_STDOUT"] = "1"
     env["PYTHONUNBUFFERED"] = "1"
     return env
@@ -74,7 +75,7 @@ def list():
 
     with console.status("Parsing tasks"):
         try:
-            tasks = core.list_tasks(env)
+            tasks = commands.list_tasks(env)
         except ProcessError as err:
             console.print(err.stderr)
             raise typer.Exit(code=1)
@@ -112,7 +113,7 @@ def run():
 
         with console.status("Parsing tasks"):
             try:
-                tasks = core.list_tasks(env)
+                tasks = commands.list_tasks(env)
             except ProcessError as err:
                 console.print(err.stderr)
                 raise typer.Exit(code=1)
@@ -130,7 +131,7 @@ def run():
         with console.status(f"Running [bold]{taskname}[/bold]"):
             console.print()
             console.print("[bold]Start execution[/bold]")
-            core.run_task(env, taskname, on_event)
+            commands.run_task(env, taskname, on_event)
             console.print()
 
     except ProcessError as exc:
@@ -221,13 +222,9 @@ def deploy():
 
 @app.callback()
 def main(verbose: bool = False):
-    level = "NOTSET" if verbose else "ERROR"
-    logging.basicConfig(
-        level=level,
-        format="%(message)s",
-        datefmt="[%X]",
-        handlers=[RichHandler()],
-    )
+    settings = get_settings()
+    settings.verbose = verbose
+    console.is_debug = verbose
 
 
 if __name__ == "__main__":

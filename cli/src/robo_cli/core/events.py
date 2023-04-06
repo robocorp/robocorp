@@ -21,6 +21,10 @@ class MessageType(str, Enum):
     ASSIGN_KEYWORD = "AS"
     TAG = "TG"
     START_TIME = "S"
+    START_TRACEBACK = "STB"
+    TRACEBACK_ENTRY = "TBE"
+    TRACEBACK_VARIABLE = "TBV"
+    END_TRACEBACK = "ETB"
 
 
 class Version(BaseModel):
@@ -108,6 +112,26 @@ class StartTime(BaseModel):
     start_time_delta: float
 
 
+class StartTraceback(BaseModel):
+    message: str
+
+
+class TracebackEntry(BaseModel):
+    source: str
+    lineno: int
+    method: str
+    line_content: str
+
+
+class TracebackVariable(BaseModel):
+    variable_name: str
+    variable_value: str
+
+
+class EndTraceback(BaseModel):
+    pass  # No public fields
+
+
 Event = Union[
     Version,
     Info,
@@ -125,9 +149,13 @@ Event = Union[
     AssignKeyword,
     Tag,
     StartTime,
+    StartTraceback,
+    TracebackEntry,
+    TracebackVariable,
+    EndTraceback,
 ]
 
-KIND_TO_EVENT: dict[MessageType, Type[Event]] = {
+TYPE_TO_EVENT: dict[MessageType, Type[Event]] = {
     MessageType.VERSION: Version,
     MessageType.INFO: Info,
     MessageType.ID: Id,
@@ -144,4 +172,8 @@ KIND_TO_EVENT: dict[MessageType, Type[Event]] = {
     MessageType.ASSIGN_KEYWORD: AssignKeyword,
     MessageType.TAG: Tag,
     MessageType.START_TIME: StartTime,
+    MessageType.START_TRACEBACK: StartTraceback,
+    MessageType.TRACEBACK_ENTRY: TracebackEntry,
+    MessageType.TRACEBACK_VARIABLE: TracebackVariable,
+    MessageType.END_TRACEBACK: EndTraceback,
 }
