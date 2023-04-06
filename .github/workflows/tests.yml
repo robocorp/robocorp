@@ -40,11 +40,6 @@ jobs:
         node-version: 16.x
     - name: Upgrade pip
       run: python -m pip install --upgrade pip
-    - name: setup.py install
-      run: |
-        cd src
-        python setup.py install
-        cd ..
     - name: Install test deps
       run: |
         cd tests
@@ -57,6 +52,11 @@ jobs:
         # python -m dev check-no-git-changes -- disabled because
         # building in prod makes changes appear even if the entry
         # code is the same. 
+    - name: setup.py install
+      run: |
+        cd src
+        python setup.py install
+        cd ..
     - name: Build output view
       if: contains(matrix.name, '-outviewintegrationtests')
       working-directory: ./output-webview
