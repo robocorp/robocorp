@@ -267,15 +267,6 @@ details > summary:hover .summaryInput:not(.emptySummaryInput) {
     color: var(--log-color-text) !important;
 }
 
-/* HACK! hiding details for now */
-.detailInfo {
-    display: none;
-}
-
-/* HACK! let's show the error output only for the leaf node */
-.leafNode.errorParent .detailInfo {
-    display: block;
-}
 
 /* ******************************* */
 /* RESPONSIVE SIZING */
