@@ -38,3 +38,4 @@ def test_errors(log_setup, tmpdir):
             dict(message_type="ETB"),
         ],
     )
+    assert stream.getvalue().count("STB") == 1
