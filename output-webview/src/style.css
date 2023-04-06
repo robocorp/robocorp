@@ -41,6 +41,39 @@
     margin-right: 3px;
 }
 
+.summaryFileName {
+    opacity: 0.6;
+    margin-left: 1rem;
+}
+
+.timeLabel {
+    opacity: 0.6;
+}
+
+/* .summaryInput {
+    opacity: 0.6;
+} */
+
+.summaryInput::before {
+    margin-left: 3px;
+    content: "(";
+}
+.summaryInput::after {
+    margin-right: 3px;
+    content: ")";
+}
+
+/* nesting level vertical line */
+.detailInfo {
+    border-left: 1px solid var(--error-background-color);
+
+    /* centering the line with the icon */
+    margin-left: 1.5rem;
+
+    /* nesting indentation */
+    padding-left: 0.8rem;
+}
+
 body {
     font-family: var(--font-family);
     font-size: var(--font-size);
