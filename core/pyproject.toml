@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "robo"
+name = "robocorp-core"
 version = "0.1.2"
 description = "The automation framework for Python"
 authors = [
