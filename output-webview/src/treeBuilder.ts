@@ -326,6 +326,11 @@ export class TreeBuilder {
                         div.classList.add("PASS");
                         div.textContent = "Run Passed";
                     }
+
+                    const timeDiv = divById("suiteRunStart");
+                    if (timeDiv) {
+                        timeDiv.textContent += ` - Finished in: ${msg.decoded["time_delta_in_seconds"].toFixed(2)}s.`;
+                    }
                 }
                 break;
             case "ET": // end test
