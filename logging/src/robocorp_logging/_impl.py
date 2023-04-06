@@ -32,6 +32,7 @@ class _Config:
     max_file_size_in_bytes: int
     max_files: int
     log_html: Optional[str]
+    log_html_style: int
     uuid: str
 
     # Loaded from constructor kwargs (to be used
@@ -679,7 +680,14 @@ class _RobotOutputImpl:
                 os.makedirs(dirname, exist_ok=True)
             print(f"Robocorp Log (html): {target}")
 
-            from robocorp_logging import index_v2 as index
+            if self._config.log_html_style == 1:
+                from robocorp_logging import index
+            elif self._config.log_html_style == 2:
+                from robocorp_logging import index_v2 as index
+            else:
+                raise ValueError(
+                    "Unexpected log html style: {self._config.log_html_style}"
+                )
 
             # from robocorp_logging import index
 

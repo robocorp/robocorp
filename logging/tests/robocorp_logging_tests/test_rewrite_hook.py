@@ -38,28 +38,32 @@ class _SetupCallback:
         self.check = None  # To be set by the test function
         self.found = []
 
-    def before_method(self, package, filename, name, lineno, args_dict):
+    def before_method(self, package, mod_name, filename, name, lineno, args_dict):
         check = self.check
         assert package == check.__package__
         assert filename == check.__file__
+        assert mod_name == check.__name__
         assert lineno > 0
         self.found.append(("before", name, args_dict))
 
-    def after_method(self, package, filename, name, lineno):
+    def after_method(self, package, mod_name, filename, name, lineno):
         assert package == self.check.__package__
         assert filename == self.check.__file__
+        assert mod_name == self.check.__name__
         assert lineno > 0
         self.found.append(("after", name))
 
-    def method_return(self, package, filename, name, lineno, return_value):
+    def method_return(self, package, mod_name, filename, name, lineno, return_value):
         assert package == self.check.__package__
         assert filename == self.check.__file__
+        assert mod_name == self.check.__name__
         assert lineno > 0
         self.found.append(("return", name, return_value))
 
-    def method_except(self, package, filename, name, lineno, exc_info):
+    def method_except(self, package, mod_name, filename, name, lineno, exc_info):
         assert package == self.check.__package__
         assert filename == self.check.__file__
+        assert mod_name == self.check.__name__
         tp, e, tb = exc_info
         assert "Fail here" in str(e)
         assert lineno > 0
