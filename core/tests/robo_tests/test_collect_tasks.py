@@ -1,6 +1,7 @@
 from robo_tests.fixtures import robo_run
 import json
 import os
+from typing import List
 
 
 def test_colect_tasks(datadir):
@@ -10,10 +11,14 @@ def test_colect_tasks(datadir):
     assert len(tasks) == 1
 
     tasks = tuple(collect_tasks(datadir, ""))
-    assert len(tasks) == 2
-    assert {t.name for t in tasks} == {"main", "sub"}
+    assert len(tasks) == 3
+    assert {t.name for t in tasks} == {"main", "sub", "main_errors"}
     name_to_task = dict((t.name, f"{t.package_name}.{t.name}") for t in tasks)
-    assert name_to_task == {"main": "tasks.main", "sub": "sub.sub_task.sub"}
+    assert name_to_task == {
+        "main": "tasks.main",
+        "sub": "sub.sub_task.sub",
+        "main_errors": "tasks.main_errors",
+    }
 
     tasks = tuple(collect_tasks(datadir, "not_there"))
     assert len(tasks) == 0
@@ -48,23 +53,27 @@ def verify_log_messages(log_html, expected):
         )
 
 
-def verify_log_messages_from_str(s, expected):
+def verify_log_messages_from_str(s, expected) -> List[dict]:
     log_messages = []
     for log_msg in s.splitlines():
         log_msg = json.loads(log_msg.strip())
         log_messages.append(log_msg)
+
+    for log_msg in log_messages:
         for expected_dct in expected:
             for key, val in expected_dct.items():
                 if log_msg.get(key) != val:
                     break
             else:
                 expected.remove(expected_dct)
+                break
 
     if expected:
         new_line = "\n"
         raise AssertionError(
             f"Did not find {expected}.\nFound:\n{new_line.join(str(x) for x in log_messages)}"
         )
+    return log_messages
 
 
 def test_collect_tasks_integrated(datadir):
@@ -94,7 +103,7 @@ def test_list_tasks_api(datadir, tmpdir, data_regression):
     def check(result):
         output = result.stdout.decode("utf-8")
         loaded = json.loads(output)
-        assert len(loaded) == 2
+        assert len(loaded) == 3
         for entry in loaded:
             entry["file"] = os.path.basename(entry["file"])
         data_regression.check(loaded)
@@ -115,9 +124,6 @@ def test_provide_output_in_stdout(datadir, tmpdir):
         additional_env={"RC_LOG_OUTPUT_STDOUT": "1"},
     )
 
-    # print(result.stderr.decode("utf-8"))
-    # for line in result.stdout.decode("utf-8").splitlines():
-    #     print(line)
     verify_log_messages_from_str(
         result.stdout.decode("utf-8"),
         [
@@ -128,3 +134,25 @@ def test_provide_output_in_stdout(datadir, tmpdir):
             dict(message_type="ES"),
         ],
     )
+
+
+def test_error_in_stdout(datadir, tmpdir):
+    result = robo_run(
+        ["run", "-t=main_errors", str(datadir), "--output", str(tmpdir)],
+        returncode=1,
+        additional_env={"RC_LOG_OUTPUT_STDOUT": "1"},
+    )
+
+    msgs = verify_log_messages_from_str(
+        result.stdout.decode("utf-8"),
+        [
+            dict(message_type="SK", name="main_errors"),
+            dict(message_type="ST"),
+            dict(message_type="ET"),
+            dict(message_type="SS"),
+            dict(message_type="ES"),
+            dict(message_type="STB"),
+        ],
+    )
+
+    assert str(msgs).count("STB") == 1, "Only one Start Traceback message expected."
