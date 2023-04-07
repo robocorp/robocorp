@@ -51,7 +51,7 @@ Test Scenario 4 screenshot
     Setup Scenario    ${CURDIR}/_resources/case4.rfstream
     Check Image
     Check Tree Items Text    Scenario Generator.Screenshot test
-    ...    KEYWORD - RPA.Desktop.Take Screenshot | output/test_screenshot.png | embed\=True
+    ...    Take Screenshot output/test_screenshot.png, embed\=True
     ...    Saved screenshot as 'output\\test_screenshot.png'
     ...    ${EMPTY}
 
@@ -129,8 +129,15 @@ Get Text From Elements
     RETURN    ${lst}
 
 Get Text From Tree Items
-    ${txt}=    Get Text From Elements    .summaryName
-    RETURN    ${txt}
+    ${names}=    Get Text From Elements    .summaryName
+    ${inputs}=    Get Text From Elements    .summaryInput
+    ${lst}=    Create List
+    FOR    ${name}    ${input}    IN ZIP    ${names}    ${inputs}
+        ${v}=    Set Variable    ${name} ${input}
+        ${v}=    Evaluate    $v.strip()
+        Append To List    ${lst}    ${v}
+    END
+    RETURN    ${lst}
 
 Get Text From Labels
     ${txt}=    Get Text From Elements    .label
