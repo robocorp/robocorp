@@ -137,7 +137,7 @@ const _MESSAGE_TYPE_INFO = {
     "STB": _decode("message:oid, time_delta_in_seconds:float"),
     "RTB": _decode("message:oid, time_delta_in_seconds:float"),
     "TBE": _decode("source:oid, lineno:int, method:oid, line_content:oid"),
-    "TBV": _decode("name: oid, type:oid, value:oid"),
+    "TBV": _decode("name:oid, type:oid, value:oid"),
     "ETB": _decode("time_delta_in_seconds:float"),
 };
 

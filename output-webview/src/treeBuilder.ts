@@ -51,7 +51,8 @@ class TBHandler {
 
             case "TBV": // variable
                 tb = this.stack.at(-1);
-                // TODO: Handle variable
+                tb.pushVar(msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
+
                 return undefined;
 
             case "ETB": // tb end

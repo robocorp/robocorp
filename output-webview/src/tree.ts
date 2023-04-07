@@ -37,6 +37,9 @@ export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceb
         }
         fullTb.push(`File "${s}", line ${tbEntry.lineno}, in ${tbEntry.method}\n`);
         fullTb.push(`    ${tbEntry.lineContent}\n`);
+        for (const [name, val] of tbEntry.variables.entries()) {
+            fullTb.push(`        💠 ${name} = ${val}\n`);
+        }
     }
     const errorEntry = createDiv();
     errorEntry.classList.add("errorDetails");
