@@ -169,6 +169,7 @@ export function addTreeContent(
     const summaryInput = created.summaryInput;
 
     if (decodedMessage.message_type === "LH") {
+        summaryName.textContent = "";
         const htmlContents = htmlToElement(content);
         summaryName.appendChild(htmlContents);
     } else {
