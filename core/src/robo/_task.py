@@ -6,7 +6,7 @@ from robo._protocols import Status
 
 class Task:
     def __init__(self, module: ModuleType, method: typing.Callable):
-        self.package_name = module.__name__
+        self.module_name = module.__name__
         self.filename = module.__file__ or "<filename unavailable>"
         self.method = method
         self.status = Status.NOT_RUN

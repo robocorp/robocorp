@@ -31,7 +31,7 @@ class Status:
 
 
 class ITask(typing.Protocol):
-    package_name: str
+    module_name: str
     filename: str
     method: typing.Callable
 
