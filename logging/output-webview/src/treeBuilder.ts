@@ -259,6 +259,7 @@ export class TreeBuilder {
                 break;
         }
         this.id += 1;
+        let isError: boolean;
 
         switch (msgType) {
             case "SS":
@@ -340,18 +341,10 @@ export class TreeBuilder {
                 this.onEndSetStatusOrRemove(this.opts, currT, msg.decoded, this.parent, false);
                 this.summaryBuilder.onTestEndUpdateSummary(msg);
 
-                if (msg.decoded.status === "ERROR") {
+                isError = this.addDetailsCSSClasses(msg.decoded.status, currT);
+                if (isError) {
                     this.suiteErrored = true;
                     currT.details.open = true;
-                    currT.details.classList.add("errorParent");
-                } else {
-                    currT.details.classList.add("passParent");
-                }
-
-                if (currT.ul.children.length === 0) {
-                    currT.details.classList.add("leafNode");
-                } else {
-                    currT.details.classList.add("parentNode");
                 }
 
                 break;
@@ -363,20 +356,9 @@ export class TreeBuilder {
                 this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currK, this.parent, msg);
                 this.onEndSetStatusOrRemove(this.opts, currK, msg.decoded, this.parent, true);
 
-                if (msg.decoded.status === "ERROR") {
+                isError = this.addDetailsCSSClasses(msg.decoded.status, currK);
+                if (isError) {
                     currK.details.open = true;
-                    currK.details.classList.add("errorParent");
-                } else {
-                    currK.details.classList.add("passParent");
-                }
-
-                if (!currK.details.classList.contains("parentNode") && !currK.details.classList.contains("leafNode")) {
-                    // If we added an exception it may be already set.
-                    if (currK.ul.children.length === 0) {
-                        currK.details.classList.add("leafNode");
-                    } else {
-                        currK.details.classList.add("parentNode");
-                    }
                 }
 
                 break;
@@ -421,13 +403,7 @@ export class TreeBuilder {
                     );
                     logContent.maxLevelFoundInHierarchy = iLevel;
                     addLevel(logContent, level);
-                    if (iLevel >= 2) {
-                        logContent.details.classList.add("errorParent");
-                    } else {
-                        logContent.details.classList.add("passParent");
-                    }
-
-                    logContent.details.classList.add("leafNode");
+                    this.addDetailsCSSClasses(iLevel, logContent);
                 }
                 break;
             case "STB": // start
@@ -446,6 +422,36 @@ export class TreeBuilder {
                 }
                 break;
         }
+    }
+
+    addDetailsCSSClasses(statusOrLevel: string | number, curr: IContentAdded): boolean {
+        let isError: boolean = false;
+
+        let level: number;
+        if (typeof statusOrLevel === "string") {
+            level = getIntLevelFromStatus(statusOrLevel);
+        } else {
+            level = statusOrLevel;
+        }
+
+        if (level >= 2) {
+            curr.details.classList.add("errorParent");
+            isError = true;
+        } else if (level == 1) {
+            curr.details.classList.add("warnParent");
+        } else {
+            curr.details.classList.add("passParent");
+        }
+
+        if (!curr.details.classList.contains("parentNode") && !curr.details.classList.contains("leafNode")) {
+            // If we added an exception it may be already set.
+            if (curr.ul.children.length === 0) {
+                curr.details.classList.add("leafNode");
+            } else {
+                curr.details.classList.add("parentNode");
+            }
+        }
+        return isError;
     }
 
     private onEndUpdateMaxLevelFoundInHierarchyFromStatus(current: IContentAdded, parent: IContentAdded, msg: any) {
