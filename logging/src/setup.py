@@ -25,7 +25,7 @@ for path in [_thirdparty, _license, _copyright]:
 
 setup(
     name="robocorp-logging",
-    version="0.0.1",
+    version="0.0.2",
     description="Structured logging for Robocorp Robots.",
     long_description=_readme.read_text(),
     url="https://github.com/robocorp/robocorp-logging",

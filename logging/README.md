@@ -1,6 +1,6 @@
 # Logging for python based Robocorp projects
 
-A logging which focused on RPA projects for Robocorp robots.
+Logging focused on RPA projects for Robocorp robots.
 
 > Note: The current version is still pre-alpha and the [format specified](/docs/format.md) may still change.
 
@@ -13,7 +13,8 @@ provide a nice representation. Also, the format may end up using a big amount of
 while also providing a viewer for the generated content.
 
 Also, it provides utilities to setup logging so that logging is done automatically without having
-to explicitly add calls to add content to the logging.
+to explicitly add calls to add content to the logging (although it's still possible to do so
+when needed).
 
 
 ### Installation
