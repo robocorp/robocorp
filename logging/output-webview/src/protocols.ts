@@ -96,6 +96,7 @@ export interface ITracebackEntry {
     lineno: number;
     method: string;
     lineContent: string;
+    variables: Map<string, string>;
 }
 
 export class PythonTraceback {
@@ -105,6 +106,12 @@ export class PythonTraceback {
         this.exceptionMsg = exceptionMsg;
     }
     pushEntry(source: string, lineno: number, method: string, lineContent: string): void {
-        this.stack.push({ source, lineno, method, lineContent });
+        const variables: Map<string, string> = new Map();
+        this.stack.push({ source, lineno, method, lineContent, variables });
+    }
+
+    pushVar(name: string, type: string, value: string): void {
+        const variables = this.stack.at(-1).variables;
+        variables.set(name, `${value} (${type})`);
     }
 }
