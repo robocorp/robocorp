@@ -548,6 +548,24 @@ class _RobotOutputImpl:
                     ],
                 )
 
+                for key, val in tuple(frame.f_locals.items()):
+                    if key.startswith("@"):
+                        # Skip our own variables.
+                        continue
+                    try:
+                        val_type = val.__class__.__name__
+                    except:
+                        val_type = str(type(val))
+
+                    self._write_with_separator(
+                        "TBV ",
+                        [
+                            oid(str(key)),
+                            oid(val_type),
+                            oid(repr(val)),
+                        ],
+                    )
+
         stack_entry = self._stack_handler.pop("traceback", entry_id)
         assert stack_entry
 

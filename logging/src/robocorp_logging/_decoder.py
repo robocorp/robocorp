@@ -131,7 +131,7 @@ _MESSAGE_TYPE_INFO = {
     ),
     # Traceback variable
     "TBV": _decode(
-        "variable:oid",
+        "name:oid, type:oid, value:oid",
     ),
     # End Traceback
     "ETB": _decode(
