@@ -21,7 +21,7 @@ def test_errors(log_setup, tmpdir):
         raise AssertionError("Expected error and it was not raised.")
 
     stream.seek(0)
-    verify_log_messages(
+    msgs = verify_log_messages(
         stream,
         [
             dict(message_type="EK", status="ERROR"),
@@ -36,6 +36,14 @@ def test_errors(log_setup, tmpdir):
                 line_content='raise RuntimeError("Fail here")',
             ),
             dict(message_type="ETB"),
+            {
+                "message_type": "TBV",
+                "name": "arg_name",
+                "type": "tuple",
+                "value": "('arg', 'name', 1)",
+            },
         ],
     )
     assert stream.getvalue().count("STB") == 1
+    # for m in msgs:
+    #     print()
