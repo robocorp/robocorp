@@ -112,6 +112,6 @@ export class PythonTraceback {
 
     pushVar(name: string, type: string, value: string): void {
         const variables = this.stack.at(-1).variables;
-        variables.set(name, `${value} (${type})`);
+        variables.set(`${name} (${type})`, `${value}`);
     }
 }
