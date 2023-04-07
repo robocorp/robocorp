@@ -55,25 +55,27 @@ Test Scenario 4 screenshot
     ...    Saved screenshot as 'output\\test_screenshot.png'
     ...    ${EMPTY}
 
-Test Scenario 5 filtering NOT RUN
-    [Documentation]
-    ...    A scenario with many elements in a FOR (some not run).
-    Open Output View For Tests
-    Setup Scenario    ${CURDIR}/_resources/case5.rfstream
-    # Default filtering is PASS.
-    Check Labels From Pass Onwards
 
-    # Change filtering to NOT RUN.
-    RPA.Browser.Playwright.Select Options By    \#filterLevel    value    NOT RUN
-    Check Labels From Not Run Onwards
+# NOT_RUN doesn't make sense for the python version.
+# Test Scenario 5 filtering NOT RUN
+#     [Documentation]
+#     ...    A scenario with many elements in a FOR (some not run).
+#     Open Output View For Tests
+#     Setup Scenario    ${CURDIR}/_resources/case5.rfstream
+#     # Default filtering is PASS.
+#     Check Labels From Pass Onwards
+#     # Change filtering to NOT RUN.
+#     RPA.Browser.Playwright.Select Options By    \#filterLevel    value    NOT RUN
+#     Check Labels From Not Run Onwards
 
-Test Scenario 5 hide too many loops
-    [Documentation]
-    ...    A scenario with many elements in a FOR (some not run).
-    Open Output View For Tests
-    Setup Scenario    ${CURDIR}/_resources/case5.rfstream
-    ${text_items}=    Get Text From Labels
-    BuiltIn.Should Contain X Times    ${text_items}    HIDDEN    19
+# This capability is not currently available (loops still not handled in the python version).
+# Test Scenario 5 hide too many loops
+#     [Documentation]
+#     ...    A scenario with many elements in a FOR (some not run).
+#     Open Output View For Tests
+#     Setup Scenario    ${CURDIR}/_resources/case5.rfstream
+#     ${text_items}=    Get Text From Labels
+#     BuiltIn.Should Contain X Times    ${text_items}    HIDDEN    19
 
 
 *** Keywords ***
