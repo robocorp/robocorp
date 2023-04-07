@@ -6,11 +6,11 @@ def _log_before_task_run(task: ITask):
     import robocorp_logging
 
     robocorp_logging.log_start_suite(
-        task.package_name, task.package_name, task.filename
+        task.module_name, task.module_name, task.filename
     )
     robocorp_logging.log_start_task(
         task.name,
-        f"{task.package_name}.{task.name}",
+        f"{task.module_name}.{task.name}",
         task.method.__code__.co_firstlineno,
         [],
     )
@@ -21,9 +21,9 @@ def _log_after_task_run(task: ITask):
 
     status = task.status
     robocorp_logging.log_end_task(
-        task.name, f"{task.package_name}.{task.name}", status, task.message
+        task.name, f"{task.module_name}.{task.name}", status, task.message
     )
-    robocorp_logging.log_end_suite(task.package_name, task.package_name, status)
+    robocorp_logging.log_end_suite(task.module_name, task.module_name, status)
 
 
 @contextmanager

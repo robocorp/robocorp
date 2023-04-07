@@ -13,7 +13,7 @@ def test_colect_tasks(datadir):
     tasks = tuple(collect_tasks(datadir, ""))
     assert len(tasks) == 3
     assert {t.name for t in tasks} == {"main", "sub", "main_errors"}
-    name_to_task = dict((t.name, f"{t.package_name}.{t.name}") for t in tasks)
+    name_to_task = dict((t.name, f"{t.module_name}.{t.name}") for t in tasks)
     assert name_to_task == {
         "main": "tasks.main",
         "sub": "sub.sub_task.sub",
