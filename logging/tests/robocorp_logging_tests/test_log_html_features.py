@@ -32,6 +32,10 @@ def test_log_html_features(tmpdir) -> None:
     This is a test which should generate an output for a log.html which
     showcases all the features available.
     """
+    from robocorp_logging_tests.fixtures import (
+        verify_log_messages_from_messages_iterator,
+    )
+
     cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if FORCE_REGEN:
         cmd = [sys.executable, "-m", "dev", "build-output-view"]
@@ -78,7 +82,7 @@ def test_log_html_features(tmpdir) -> None:
             )
             robocorp_logging.log_start_task("my_task", "task_id", 0, [])
 
-            for _i in range(20):
+            for _i in range(2):
                 check.some_method()
                 robocorp_logging.log_error("Some log error")
                 robocorp_logging.log_warn("Some log warn")
@@ -87,6 +91,12 @@ def test_log_html_features(tmpdir) -> None:
                 try:
                     check_traceback.main()
                 except RuntimeError:
+                    pass
+                else:
+                    raise AssertionError("Expected RuntimeError.")
+                try:
+                    check_traceback.call_exc_with_context()
+                except ValueError:
                     pass
                 else:
                     raise AssertionError("Expected RuntimeError.")
@@ -101,13 +111,42 @@ def test_log_html_features(tmpdir) -> None:
 
         assert log_target.exists()
         if "dev" in FORCE_REGEN:
-            for v in iter_decoded_log_format_from_log_html(
+            messages_iterator = iter_decoded_log_format_from_log_html(
                 Path(os.path.join(os.path.dirname(log_target), "bundle.js"))
-            ):
-                print(v)
+            )
         else:
-            for v in iter_decoded_log_format_from_log_html(log_target):
-                print(v)
+            messages_iterator = iter_decoded_log_format_from_log_html(log_target)
+
+        msgs = verify_log_messages_from_messages_iterator(
+            messages_iterator,
+            [
+                {
+                    "message_type": "L",
+                    "level": "E",
+                    "message": "Some log error",
+                },
+                {
+                    "message_type": "L",
+                    "level": "W",
+                    "message": "Some log warn",
+                },
+                {
+                    "message_type": "L",
+                    "level": "I",
+                    "message": "Some log info",
+                },
+                {
+                    "message_type": "STB",
+                    "message": "RuntimeError: initial exc",
+                },
+                {
+                    "message_type": "STB",
+                    "message": "ValueError: final exc",
+                },
+            ],
+        )
+        for m in msgs:
+            print(m)
 
         if OPEN_IN_BROWSER:
             import webbrowser
