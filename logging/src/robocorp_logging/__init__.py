@@ -160,13 +160,13 @@ def _register_callbacks(rewrite_hook_config):
         for key, val in args_dict.items():
             for p in ("password", "passwd"):
                 if p in key:
-                    for rf_stream in _get_logger_instances():
-                        rf_stream.hide_from_output(val)
+                    for robo_logger in _get_logger_instances():
+                        robo_logger.hide_from_output(val)
                     break
 
             args.append(f"{key}={val!r}")
-        for rf_stream in _get_logger_instances():
-            rf_stream.start_method(
+        for robo_logger in _get_logger_instances():
+            robo_logger.start_method(
                 name,
                 f"{package}.{mod_name}",
                 filename,
@@ -197,8 +197,8 @@ def _register_callbacks(rewrite_hook_config):
                 )
                 return
 
-        for rf_stream in _get_logger_instances():
-            rf_stream.end_method(name, f"{package}.{mod_name}", status, [])
+        for robo_logger in _get_logger_instances():
+            robo_logger.end_method(name, f"{package}.{mod_name}", status, [])
 
     def call_on_method_except(
         package: str,
@@ -225,8 +225,8 @@ def _register_callbacks(rewrite_hook_config):
             return
         status_stack[-1][2] = Status.ERROR
 
-        for rf_stream in _get_logger_instances():
-            rf_stream.log_method_except(
+        for robo_logger in _get_logger_instances():
+            robo_logger.log_method_except(
                 f"{package}.{mod_name}", filename, name, lineno, exc_info, False
             )
 
@@ -357,41 +357,41 @@ class Status:
 
 
 def log_start_suite(name: str, suite_id: str, suite_source: str) -> None:
-    for rf_stream in _get_logger_instances():
-        rf_stream.start_suite(name, suite_id, suite_source)
+    for robo_logger in _get_logger_instances():
+        robo_logger.start_suite(name, suite_id, suite_source)
 
 
 def log_end_suite(name: str, suite_id: str, status: str) -> None:
-    for rf_stream in _get_logger_instances():
-        rf_stream.end_suite(name, suite_id, status)
+    for robo_logger in _get_logger_instances():
+        robo_logger.end_suite(name, suite_id, status)
 
 
 def log_start_task(name: str, task_id: str, lineno: int, tags: Sequence[str]) -> None:
-    for rf_stream in _get_logger_instances():
-        rf_stream.start_task(name, task_id, lineno, tags)
+    for robo_logger in _get_logger_instances():
+        robo_logger.start_task(name, task_id, lineno, tags)
 
 
 def log_end_task(name: str, task_id: str, status: str, message: str) -> None:
-    for rf_stream in _get_logger_instances():
-        rf_stream.end_task(name, task_id, status, message)
+    for robo_logger in _get_logger_instances():
+        robo_logger.end_task(name, task_id, status, message)
 
 
 def log_error(message: str) -> None:
-    for rf_stream in _get_logger_instances():
+    for robo_logger in _get_logger_instances():
         html = False
-        rf_stream.log_message(Status.ERROR, message, html)
+        robo_logger.log_message(Status.ERROR, message, html)
 
 
 def log_info(message: str) -> None:
-    for rf_stream in _get_logger_instances():
+    for robo_logger in _get_logger_instances():
         html = False
-        rf_stream.log_message(Status.INFO, message, html)
+        robo_logger.log_message(Status.INFO, message, html)
 
 
 def log_warn(message: str) -> None:
-    for rf_stream in _get_logger_instances():
+    for robo_logger in _get_logger_instances():
         html = False
-        rf_stream.log_message(Status.WARN, message, html)
+        robo_logger.log_message(Status.WARN, message, html)
 
 
 # --- Methods related to hiding logging information.
@@ -402,8 +402,8 @@ def stop_logging_methods():
     """
     Can be used so that method calls are no longer logged.
     """
-    for rf_stream in _get_logger_instances():
-        rf_stream.stop_logging_methods()
+    for robo_logger in _get_logger_instances():
+        robo_logger.stop_logging_methods()
     try:
         yield
     finally:
@@ -418,8 +418,8 @@ def start_logging_methods():
     Can still be used if `stop_logging_methods` with a try..finally if
     `stop_logging_methods` isn't used as a context manager.
     """
-    for rf_stream in _get_logger_instances():
-        rf_stream.start_logging_methods()
+    for robo_logger in _get_logger_instances():
+        robo_logger.start_logging_methods()
 
 
 @contextmanager
@@ -427,8 +427,8 @@ def stop_logging_variables():
     """
     Can be used so that variables are no longer logged.
     """
-    for rf_stream in _get_logger_instances():
-        rf_stream.stop_logging_variables()
+    for robo_logger in _get_logger_instances():
+        robo_logger.stop_logging_variables()
 
     try:
         yield
@@ -444,8 +444,8 @@ def start_logging_variables():
     Can still be used if `stop_logging_variables` with a try..finally if
     `stop_logging_variables` isn't used as a context manager.
     """
-    for rf_stream in _get_logger_instances():
-        rf_stream.start_logging_variables()
+    for robo_logger in _get_logger_instances():
+        robo_logger.start_logging_variables()
 
 
 def hide_from_output(string_to_hide: str) -> None:
@@ -455,5 +455,5 @@ def hide_from_output(string_to_hide: str) -> None:
     :param string_to_hide:
         The string that should be hidden from the output.
     """
-    for rf_stream in _get_logger_instances():
-        rf_stream.hide_from_output(string_to_hide)
+    for robo_logger in _get_logger_instances():
+        robo_logger.hide_from_output(string_to_hide)
