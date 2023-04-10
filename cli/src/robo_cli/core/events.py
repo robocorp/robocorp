@@ -84,7 +84,7 @@ class EndTask(BaseModel):
 class StartElement(BaseModel):
     name: str
     libname: str
-    keyword_type: str
+    type: str
     doc: str
     source: str
     lineno: int
