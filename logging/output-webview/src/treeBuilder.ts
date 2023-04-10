@@ -35,10 +35,6 @@ class TBHandler {
                 this.stack.push(new PythonTraceback(msg.decoded["message"]));
                 return undefined;
 
-            case "RTB": // restart
-                // TODO: Handle restart
-                return undefined;
-
             case "TBE": // tb entry
                 tb = this.stack.at(-1);
                 tb.pushEntry(
@@ -101,7 +97,7 @@ export class TreeBuilder {
 
     decoder: Decoder = new Decoder();
 
-    seenSuiteOrTestOrKeyword: boolean = false;
+    seenSuiteTaskOrElement: boolean = false;
 
     tbHandler: TBHandler = new TBHandler();
 
@@ -116,7 +112,7 @@ export class TreeBuilder {
     }
 
     resetState() {
-        this.seenSuiteOrTestOrKeyword = false;
+        this.seenSuiteTaskOrElement = false;
     }
 
     /**
@@ -231,29 +227,29 @@ export class TreeBuilder {
             case "ST":
             case "SE":
             case "STB":
-                this.seenSuiteOrTestOrKeyword = true;
+                this.seenSuiteTaskOrElement = true;
                 break;
 
             case "RS":
-                if (this.seenSuiteOrTestOrKeyword) {
+                if (this.seenSuiteTaskOrElement) {
                     return;
                 }
                 msgType = "SS";
                 break;
             case "RT":
-                if (this.seenSuiteOrTestOrKeyword) {
+                if (this.seenSuiteTaskOrElement) {
                     return;
                 }
                 msgType = "ST";
                 break;
-            case "RK":
-                if (this.seenSuiteOrTestOrKeyword) {
+            case "RE":
+                if (this.seenSuiteTaskOrElement) {
                     return;
                 }
                 msgType = "SE";
                 break;
             case "RTB":
-                if (this.seenSuiteOrTestOrKeyword) {
+                if (this.seenSuiteTaskOrElement) {
                     return;
                 }
                 msgType = "STB";
@@ -370,13 +366,13 @@ export class TreeBuilder {
                     this.parent.decodedMessage.decoded["time_delta_in_seconds"] = start;
                 }
                 break;
-            case "KA":
+            case "EA":
                 const item: IContentAdded = this.stack.at(-1);
                 if (item.summaryInput.classList.contains("emptySummaryInput")) {
-                    item.summaryInput.textContent = `${msg.decoded["argument"]}`;
+                    item.summaryInput.textContent = `${msg.decoded["name"]}=${msg.decoded["value"]}`;
                     item.summaryInput.classList.remove("emptySummaryInput");
                 } else {
-                    item.summaryInput.textContent += `, ${msg.decoded["argument"]}`;
+                    item.summaryInput.textContent += `, ${msg.decoded["name"]}=${msg.decoded["value"]}`;
                 }
 
                 break;

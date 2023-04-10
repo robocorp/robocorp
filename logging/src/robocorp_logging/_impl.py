@@ -573,7 +573,7 @@ class _RobotOutputImpl:
 
         return True
 
-    def start_method(
+    def start_element(
         self,
         name,
         libname,
@@ -588,9 +588,9 @@ class _RobotOutputImpl:
     ):
         element_type = element_type.upper()
         oid = self._obtain_id
-        keyword_id = f"{libname}.{name}"
+        element_id = f"{libname}.{name}"
         with self._stack_handler.push_record(
-            "keyword", keyword_id, "SE", "RK", hide_from_logs
+            "element", element_id, "SE", "RE", hide_from_logs
         ):
             if hide_from_logs:
                 # I.e.: add to internal stack but don't write it.
@@ -615,7 +615,7 @@ class _RobotOutputImpl:
                     for p in ("password", "passwd"):
                         if p in lower_assign:
                             if args:
-                                for arg in args:
+                                for _, arg in args:
                                     self.hide_from_output(arg)
                             break
 
@@ -626,22 +626,23 @@ class _RobotOutputImpl:
                         ],
                     )
             if args:
-                for arg in args:
+                for name, arg in args:
                     hide_strings_re = self._hide_strings_re
                     if hide_strings_re:
                         arg = hide_strings_re.sub("<redacted>", arg)
 
                     self._write_with_separator(
-                        "KA ",
+                        "EA ",
                         [
+                            oid(name),
                             oid(arg),
                         ],
                     )
 
     def end_method(self, name, libname, status, time_delta):
-        keyword_id = f"{libname}.{name}"
+        element_id = f"{libname}.{name}"
         oid = self._obtain_id
-        stack_entry = self._stack_handler.pop("keyword", keyword_id)
+        stack_entry = self._stack_handler.pop("element", element_id)
         if stack_entry is None or stack_entry.hide_from_logs:
             # If the start wasn't logged, the stop shouldn't be logged either
             # (and if it was logged, the stop should be also logged).

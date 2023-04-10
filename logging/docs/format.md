@@ -157,20 +157,20 @@ Basic message types are:
     
     `SE a|b|c|d|e|22|0.444`
 
-## RK: Replay Keyword
+## RE: Replay Element
 
     Same as "SE" but used just to replay the content to specify the context
     when the log starts being written in a new file.
 
-### KA: Keyword argument
+### EA: Element argument
 
     Spec: `argument:oid`
     
     Example:
     
-    `KA f`
+    `EA f`
 
-### AS: Assign keyword call result to a variable
+### AS: Assign the result of some element (such as a method) to a variable.
 
     Spec: `assign:oid`
     

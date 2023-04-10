@@ -36,11 +36,11 @@ def test_sensitive_data():
 
     found = []
     for v in iter_decoded_log_format(s):
-        if v["message_type"] == "KA":
+        if v["message_type"] == "EA":
             found.append(v)
 
     assert found == [
-        {"message_type": "KA", "argument": "user_password='<redacted>'"},
-        {"message_type": "KA", "argument": "arg='<redacted>'"},
-        {"argument": "<redacted>", "message_type": "KA"},
+        {"message_type": "EA", "name": "user_password", "value": "'<redacted>'"},
+        {"message_type": "EA", "name": "arg", "value": "'<redacted>'"},
+        {"message_type": "EA", "name": "some_arg", "value": "<redacted>"},
     ]
