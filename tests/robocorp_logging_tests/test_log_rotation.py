@@ -27,19 +27,19 @@ def test_rotate_logs(tmpdir):
     assert len(files) == 2, f"Found: {files}"
 
     name_to_file = dict((f.name, f) for f in files)
-    assert set(name_to_file.keys()) == {"output_9.rfstream", "output_10.rfstream"}
-    output_9 = name_to_file["output_9.rfstream"]
+    assert set(name_to_file.keys()) == {"output_10.rfstream", "output_11.rfstream"}
+    output_at_step = name_to_file["output_10.rfstream"]
 
     # Check that replay suite/test/keyword are properly sent on rotate.
-    expect_types = {"RS", "RT", "RK"}
-    found_ids_part_9 = []
-    with output_9.open("r") as stream:
+    expect_types = {"RS", "RT", "RE"}
+    found_ids_at_step = []
+    with output_at_step.open("r") as stream:
         for msg in iter_decoded_log_format(stream):
             if msg["message_type"] == "ID":
-                found_ids_part_9.append(msg)
+                found_ids_at_step.append(msg)
             expect_types.discard(msg["message_type"])
             if not expect_types:
                 break
         else:
             raise AssertionError(f"Some expected messages not found: {expect_types}")
-    assert found_ids_part_9[0]["part"] == 9
+    assert found_ids_at_step[0]["part"] == 10

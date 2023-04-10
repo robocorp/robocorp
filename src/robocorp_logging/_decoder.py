@@ -107,10 +107,10 @@ _MESSAGE_TYPE_INFO = {
     ),
     # End Element
     "EE": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
-    # Keyword argument (the argument message is something as arg=value).
-    "KA": _decode("argument:oid"),
-    # Can appear inside keyword scope to note that the keyword result will
-    # be assigned to the given assign name.
+    # Element/method argument (name and value of the argument).
+    "EA": _decode("name:oid, value:oid"),
+    # Can appear before element (method) to note that the result will
+    # be assigned to the given name.
     "AS": _decode("assign:oid"),
     # Tag the current scope with some value.
     "TG": _decode("tag:oid"),
@@ -142,7 +142,7 @@ _MESSAGE_TYPE_INFO = {
 
 _MESSAGE_TYPE_INFO["RS"] = _MESSAGE_TYPE_INFO["SS"]
 _MESSAGE_TYPE_INFO["RT"] = _MESSAGE_TYPE_INFO["ST"]
-_MESSAGE_TYPE_INFO["RK"] = _MESSAGE_TYPE_INFO["SE"]
+_MESSAGE_TYPE_INFO["RE"] = _MESSAGE_TYPE_INFO["SE"]
 _MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]
 
 

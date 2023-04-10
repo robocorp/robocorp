@@ -28,7 +28,9 @@ def test_impl_recovery_matches_task():
     impl = _RobotOutputImpl(config)
     impl.start_suite("My Suite", "suite1", "", 0)
     impl.start_task("My Test", "test1", 0, 0, [])
-    impl.start_method("My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], [])
+    impl.start_element(
+        "My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], []
+    )
     assert len(impl._stack_handler._queue) == 3
 
     # Unsynchronized end task (clear until we reach it).
@@ -49,7 +51,9 @@ def test_impl_recovery_does_not_match_test():
     impl = _RobotOutputImpl(config)
     impl.start_suite("My Suite", "suite1", "", 0)
     impl.start_task("My Test", "test1", 0, 0, [])
-    impl.start_method("My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], [])
+    impl.start_element(
+        "My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], []
+    )
     assert len(impl._stack_handler._queue) == 3
 
     # Unsynchronized end task (clear all methods).

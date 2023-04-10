@@ -164,9 +164,9 @@ def _register_callbacks(rewrite_hook_config):
                         robo_logger.hide_from_output(val)
                     break
 
-            args.append(f"{key}={val!r}")
+            args.append((f"{key}", f"{val!r}"))
         for robo_logger in _get_logger_instances():
-            robo_logger.start_method(
+            robo_logger.start_element(
                 name,
                 f"{package}.{mod_name}",
                 filename,

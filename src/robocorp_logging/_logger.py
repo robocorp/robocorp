@@ -1,7 +1,7 @@
 from io import StringIO
 import functools
 from pathlib import Path
-from typing import Optional, Union, Sequence
+from typing import Optional, Union, Sequence, Tuple
 import datetime
 from robocorp_logging.protocols import OptExcInfo, LogHTMLStyle
 
@@ -175,27 +175,27 @@ class _RobocorpLogger:
         )
 
     @_log_error
-    def start_method(
+    def start_element(
         self,
         name: str,
         libname: str,
         source: str,
         lineno: int,
-        method_type: str,  # METHOD/IF/WHILE,etc.
+        element_type: str,  # METHOD/IF/WHILE,etc.
         doc: str,
-        args: Sequence[str],
+        args: Sequence[Tuple[str, str]],
         assign_targets: Sequence[str],
         tags: Sequence[str],
     ):
         """
         Example:
 
-        start_method(
+        start_element(
             "close_browser",
             "RPA.Browser",
             "c:/my/browser.py",
             lineno=1,
-            method_type="METHOD",
+            element_type="METHOD",
             doc="Closes Browser",
             args=["force=True"],
             assign_targets=[],
@@ -218,12 +218,12 @@ class _RobocorpLogger:
 
         if args:
             if self._skip_log_arguments or name == "hide_from_output":
-                args = ("<redacted>",)
+                args = [(name, "<redacted>") for name, _value in args]
 
-        return self._robot_output_impl.start_method(
+        return self._robot_output_impl.start_element(
             name,
             libname,
-            method_type,
+            element_type,
             doc,
             source,
             lineno,
