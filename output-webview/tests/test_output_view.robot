@@ -22,7 +22,7 @@ Test Scenario 1 simple
     ...    A simple scenario where the output view is opened with a
     ...    single test which passed without any keywords.
     Open Output View For Tests
-    Setup Scenario    ${CURDIR}/_resources/case1.rfstream
+    Setup Scenario    ${CURDIR}/_resources/case1.robolog
     Check Labels    1
     Check Tree Items Text    Robot1.Simple Task
 
@@ -31,7 +31,7 @@ Test Scenario 2 restart
     ...    A simple scenario where the output view is opened with a
     ...    single test which passed without any keywords (with ignored restart).
     Open Output View For Tests
-    Setup Scenario    ${CURDIR}/_resources/case2.rfstream
+    Setup Scenario    ${CURDIR}/_resources/case2.robolog
     Check Labels    1
     Check Tree Items Text    Robot1.Simple Task
 
@@ -40,7 +40,7 @@ Test Scenario 3 only restart
     ...    A simple scenario where the output view is opened with a
     ...    single test which passed without any keywords (just with restart).
     Open Output View For Tests
-    Setup Scenario    ${CURDIR}/_resources/case3.rfstream
+    Setup Scenario    ${CURDIR}/_resources/case3.robolog
     Check Labels    1
     Check Tree Items Text    Robot1.Simple Task
 
@@ -48,7 +48,7 @@ Test Scenario 4 screenshot
     [Documentation]
     ...    A scenario with a screenshot.
     Open Output View For Tests
-    Setup Scenario    ${CURDIR}/_resources/case4.rfstream
+    Setup Scenario    ${CURDIR}/_resources/case4.robolog
     Check Image
     Check Tree Items Text    Scenario Generator.Screenshot test
     ...    Take Screenshot path=output/test_screenshot.png, embed\=True
@@ -61,7 +61,7 @@ Test Scenario 4 screenshot
 #     [Documentation]
 #     ...    A scenario with many elements in a FOR (some not run).
 #     Open Output View For Tests
-#     Setup Scenario    ${CURDIR}/_resources/case5.rfstream
+#     Setup Scenario    ${CURDIR}/_resources/case5.robolog
 #     # Default filtering is PASS.
 #     Check Labels From Pass Onwards
 #     # Change filtering to NOT RUN.
@@ -73,7 +73,7 @@ Test Scenario 4 screenshot
 #     [Documentation]
 #     ...    A scenario with many elements in a FOR (some not run).
 #     Open Output View For Tests
-#     Setup Scenario    ${CURDIR}/_resources/case5.rfstream
+#     Setup Scenario    ${CURDIR}/_resources/case5.robolog
 #     ${text_items}=    Get Text From Labels
 #     BuiltIn.Should Contain X Times    ${text_items}    HIDDEN    19
 
