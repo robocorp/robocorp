@@ -577,7 +577,7 @@ class _RobotOutputImpl:
         self,
         name,
         libname,
-        keyword_type,
+        element_type,
         doc,
         source,
         lineno,
@@ -586,7 +586,7 @@ class _RobotOutputImpl:
         assigns,
         hide_from_logs=False,
     ):
-        keyword_type = keyword_type.upper()
+        element_type = element_type.upper()
         oid = self._obtain_id
         keyword_id = f"{libname}.{name}"
         with self._stack_handler.push_record(
@@ -601,7 +601,7 @@ class _RobotOutputImpl:
                 [
                     oid(name),
                     oid(libname),
-                    oid(keyword_type),
+                    oid(element_type),
                     oid(doc),
                     oid(source),
                     self._number(lineno),

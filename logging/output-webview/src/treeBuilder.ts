@@ -297,7 +297,7 @@ export class TreeBuilder {
                 this.stack.push(this.parent);
                 break;
             case "SE":
-                // start keyword
+                // start element
                 this.messageNode = { "parent": this.messageNode, "message": msg };
                 this.parent = addTreeContent(
                     this.opts,
@@ -349,7 +349,7 @@ export class TreeBuilder {
                 }
 
                 break;
-            case "EE": // end keyword
+            case "EE": // end element
                 this.messageNode = this.messageNode.parent;
                 let currK = this.parent;
                 this.stack.pop();

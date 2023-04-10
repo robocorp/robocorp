@@ -102,7 +102,7 @@ _MESSAGE_TYPE_INFO = {
     ),
     # Start Element (some element we're tracking such as method, for, while, etc).
     "SE": _decode(
-        "name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+        "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
         level_diff=+1,
     ),
     # End Element
