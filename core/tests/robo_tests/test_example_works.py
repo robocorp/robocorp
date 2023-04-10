@@ -36,10 +36,10 @@ def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
 
     log_messages = tuple(iter_decoded_log_format_from_log_html(log_html))
     for log_msg in log_messages:
-        if log_msg["message_type"] == "SK" and log_msg["name"] == "start_the_challenge":
+        if log_msg["message_type"] == "SE" and log_msg["name"] == "start_the_challenge":
             break
     else:
         new_line = "\n"
         raise AssertionError(
-            f"Did not find SK/some_method message. Found: {new_line.join(str(x) for x in log_messages)}"
+            f"Did not find SE/some_method message. Found: {new_line.join(str(x) for x in log_messages)}"
         )

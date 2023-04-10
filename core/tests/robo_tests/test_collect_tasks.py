@@ -90,7 +90,7 @@ def test_collect_tasks_integrated(datadir):
     verify_log_messages(
         log_html,
         [
-            dict(message_type="SK", name="some_method"),
+            dict(message_type="SE", name="some_method"),
             dict(message_type="ST"),
             dict(message_type="ET"),
             dict(message_type="SS"),
@@ -127,7 +127,7 @@ def test_provide_output_in_stdout(datadir, tmpdir):
     verify_log_messages_from_str(
         result.stdout.decode("utf-8"),
         [
-            dict(message_type="SK", name="some_method"),
+            dict(message_type="SE", name="some_method"),
             dict(message_type="ST"),
             dict(message_type="ET"),
             dict(message_type="SS"),
@@ -146,7 +146,7 @@ def test_error_in_stdout(datadir, tmpdir):
     msgs = verify_log_messages_from_str(
         result.stdout.decode("utf-8"),
         [
-            dict(message_type="SK", name="main_errors"),
+            dict(message_type="SE", name="main_errors"),
             dict(message_type="ST"),
             dict(message_type="ET"),
             dict(message_type="SS"),

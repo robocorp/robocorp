@@ -12,7 +12,7 @@ from robo_cli import environment, rcc, templates
 from robo_cli.config import pyproject
 from robo_cli.console import console
 from robo_cli.core import commands
-from robo_cli.core.events import EndKeyword, StartKeyword
+from robo_cli.core.events import EndElement, StartElement
 from robo_cli.process import ProcessError
 from robo_cli.settings import get_settings
 
@@ -122,10 +122,10 @@ def run():
         stack = []
 
         def on_event(event):
-            if isinstance(event, StartKeyword):
+            if isinstance(event, StartElement):
                 console.print(f"{(len(stack) + 1) * '  '}{event.name}")
                 stack.append(event)
-            if isinstance(event, EndKeyword):
+            if isinstance(event, EndElement):
                 stack.pop()
 
         with console.status(f"Running [bold]{taskname}[/bold]"):

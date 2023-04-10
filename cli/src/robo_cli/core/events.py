@@ -15,8 +15,8 @@ class MessageType(str, Enum):
     END_SUITE = "ES"
     START_TASK = "ST"
     END_TASK = "ET"
-    START_KEYWORD = "SK"
-    END_KEYWORD = "EK"
+    START_ELEMENT = "SE"
+    END_ELEMENT = "EE"
     KEYWORD_ARGUMENT = "KA"
     ASSIGN_KEYWORD = "AS"
     TAG = "TG"
@@ -81,7 +81,7 @@ class EndTask(BaseModel):
     time_delta_in_seconds: float
 
 
-class StartKeyword(BaseModel):
+class StartElement(BaseModel):
     name: str
     libname: str
     keyword_type: str
@@ -91,7 +91,7 @@ class StartKeyword(BaseModel):
     time_delta_in_seconds: float
 
 
-class EndKeyword(BaseModel):
+class EndElement(BaseModel):
     status: str
     time_delta_in_seconds: float
 
@@ -143,8 +143,8 @@ Event = Union[
     EndSuite,
     StartTask,
     EndTask,
-    StartKeyword,
-    EndKeyword,
+    StartElement,
+    EndElement,
     KeywordArgument,
     AssignKeyword,
     Tag,
@@ -166,8 +166,8 @@ TYPE_TO_EVENT: dict[MessageType, Type[Event]] = {
     MessageType.END_SUITE: EndSuite,
     MessageType.START_TASK: StartTask,
     MessageType.END_TASK: EndTask,
-    MessageType.START_KEYWORD: StartKeyword,
-    MessageType.END_KEYWORD: EndKeyword,
+    MessageType.START_ELEMENT: StartElement,
+    MessageType.END_ELEMENT: EndElement,
     MessageType.KEYWORD_ARGUMENT: KeywordArgument,
     MessageType.ASSIGN_KEYWORD: AssignKeyword,
     MessageType.TAG: Tag,
