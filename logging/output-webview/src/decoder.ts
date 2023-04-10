@@ -99,15 +99,15 @@ const start_suite = _decode("name:oid, suite_id:oid, suite_source:oid, time_delt
 
 const end_suite = _decode("status:oid, time_delta_in_seconds:float");
 
-const start_task_or_test = _decode("name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float");
+const start_task = _decode("name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float");
 
-const end_task_or_test = _decode("status:oid, message:oid, time_delta_in_seconds:float");
+const end_task = _decode("status:oid, message:oid, time_delta_in_seconds:float");
 
-const start_keyword = _decode(
+const start_element = _decode(
     "name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float"
 );
 
-const end_keyword = _decode("status:oid, time_delta_in_seconds:float");
+const end_element = _decode("status:oid, time_delta_in_seconds:float");
 
 const decode_log = _decode("level:str, message:oid, time_delta_in_seconds:float");
 
@@ -122,12 +122,12 @@ const _MESSAGE_TYPE_INFO = {
     "SS": start_suite,
     "RS": start_suite,
     "ES": end_suite,
-    "ST": start_task_or_test,
-    "RT": start_task_or_test,
-    "ET": end_task_or_test,
-    "SK": start_keyword,
-    "RK": start_keyword,
-    "EK": end_keyword,
+    "ST": start_task,
+    "RT": start_task,
+    "ET": end_task,
+    "SE": start_element,
+    "RK": start_element,
+    "EE": end_element,
     "KA": _decode("argument:oid"),
     "L": decode_log,
     "LH": decode_log,

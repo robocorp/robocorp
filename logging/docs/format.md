@@ -125,7 +125,7 @@ Basic message types are:
     
     `ES a|0.222`
 
-### ST: Start Task/test
+### ST: Start Task
 
     Spec: `name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float`
     
@@ -135,13 +135,13 @@ Basic message types are:
     
     `ST a|b|22|0.332`
 
-## RT: Replay Start Task/test
+## RT: Replay Start Task
 
     Same as "ST" but used just to replay the content to specify the context
     when the log starts being written in a new file.
 
 
-### ET: End Task/Test
+### ET: End Task
 
     Spec: `status:oid, message:oid, time_delta_in_seconds:float`
     
@@ -149,17 +149,17 @@ Basic message types are:
     
     `ET a|b|0.332`
 
-### SK: Start Keyword
+### SE: Start Element
 
     Spec: `name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float`
     
     Example:
     
-    `SK a|b|c|d|e|22|0.444`
+    `SE a|b|c|d|e|22|0.444`
 
 ## RK: Replay Keyword
 
-    Same as "SK" but used just to replay the content to specify the context
+    Same as "SE" but used just to replay the content to specify the context
     when the log starts being written in a new file.
 
 ### KA: Keyword argument
@@ -178,13 +178,13 @@ Basic message types are:
     
     `AS f`
 
-### EK: End Keyword
+### EE: End Element
 
     Spec: `status:oid, time_delta_in_seconds:float`
     
     Example:
     
-    `EK a|0.333`
+    `EE a|0.333`
 
 ### L: Provide a log message
 

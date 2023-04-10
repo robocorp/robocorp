@@ -24,9 +24,9 @@ def test_errors(log_setup, tmpdir):
     msgs = verify_log_messages(
         stream,
         [
-            dict(message_type="EK", status="ERROR"),
-            dict(message_type="EK", status="ERROR"),
-            dict(message_type="EK", status="ERROR"),
+            dict(message_type="EE", status="ERROR"),
+            dict(message_type="EE", status="ERROR"),
+            dict(message_type="EE", status="ERROR"),
             dict(message_type="ET", status="ERROR"),
             dict(message_type="ES", status="ERROR"),
             dict(message_type="STB", message="RuntimeError: Fail here"),
