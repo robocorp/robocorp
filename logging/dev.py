@@ -78,10 +78,17 @@ class Dev(object):
         stdout, stderr = popen.communicate()
 
         # Something as: b'robocorp-logging-0.0.1'
-        if sys.version_info[0] >= 3:
-            stdout = stdout.decode("utf-8")
-        stdout = stdout.strip()
-        return stdout
+        return stdout.decode("utf-8").strip()
+
+    def get_all_tags(self):
+        import subprocess
+
+        # i.e.: Gets the last tagged version
+        cmd = "git tag".split()
+        popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        stdout, stderr = popen.communicate()
+
+        return stdout.decode("utf-8").strip()
 
     def check_tag_version(self):
         """
@@ -96,8 +103,8 @@ class Dev(object):
             sys.exit(0)
         else:
             sys.stderr.write(
-                "Version does not match (robocorp-logging: %s != repo tag: %s) (exit(1))\n"
-                % (robocorp_logging.__version__, version)
+                "Version does not match (robocorp-logging: %s != repo tag: %s).\nTags:%s(exit(1))\n"
+                % (robocorp_logging.__version__, self.get_all_tags(), version)
             )
             sys.exit(1)
 
