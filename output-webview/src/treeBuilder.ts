@@ -229,7 +229,7 @@ export class TreeBuilder {
             // type being replayed to have it properly handled).
             case "SS":
             case "ST":
-            case "SK":
+            case "SE":
             case "STB":
                 this.seenSuiteOrTestOrKeyword = true;
                 break;
@@ -250,7 +250,7 @@ export class TreeBuilder {
                 if (this.seenSuiteOrTestOrKeyword) {
                     return;
                 }
-                msgType = "SK";
+                msgType = "SE";
                 break;
             case "RTB":
                 if (this.seenSuiteOrTestOrKeyword) {
@@ -296,7 +296,7 @@ export class TreeBuilder {
                 );
                 this.stack.push(this.parent);
                 break;
-            case "SK":
+            case "SE":
                 // start keyword
                 this.messageNode = { "parent": this.messageNode, "message": msg };
                 this.parent = addTreeContent(
@@ -349,7 +349,7 @@ export class TreeBuilder {
                 }
 
                 break;
-            case "EK": // end keyword
+            case "EE": // end keyword
                 this.messageNode = this.messageNode.parent;
                 let currK = this.parent;
                 this.stack.pop();

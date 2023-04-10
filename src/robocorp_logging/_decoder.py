@@ -100,13 +100,13 @@ _MESSAGE_TYPE_INFO = {
     "ET": _decode(
         "status:oid, message:oid, time_delta_in_seconds:float", level_diff=-1
     ),
-    # Start Method/Keyword
-    "SK": _decode(
+    # Start Element (some element we're tracking such as method, for, while, etc).
+    "SE": _decode(
         "name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
         level_diff=+1,
     ),
-    # End Method/Keyword
-    "EK": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
+    # End Element
+    "EE": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
     # Keyword argument (the argument message is something as arg=value).
     "KA": _decode("argument:oid"),
     # Can appear inside keyword scope to note that the keyword result will
@@ -142,7 +142,7 @@ _MESSAGE_TYPE_INFO = {
 
 _MESSAGE_TYPE_INFO["RS"] = _MESSAGE_TYPE_INFO["SS"]
 _MESSAGE_TYPE_INFO["RT"] = _MESSAGE_TYPE_INFO["ST"]
-_MESSAGE_TYPE_INFO["RK"] = _MESSAGE_TYPE_INFO["SK"]
+_MESSAGE_TYPE_INFO["RK"] = _MESSAGE_TYPE_INFO["SE"]
 _MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]
 
 

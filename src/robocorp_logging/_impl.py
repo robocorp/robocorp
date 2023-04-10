@@ -590,14 +590,14 @@ class _RobotOutputImpl:
         oid = self._obtain_id
         keyword_id = f"{libname}.{name}"
         with self._stack_handler.push_record(
-            "keyword", keyword_id, "SK", "RK", hide_from_logs
+            "keyword", keyword_id, "SE", "RK", hide_from_logs
         ):
             if hide_from_logs:
                 # I.e.: add to internal stack but don't write it.
                 return
 
             self._write_with_separator(
-                "SK ",
+                "SE ",
                 [
                     oid(name),
                     oid(libname),
@@ -648,7 +648,7 @@ class _RobotOutputImpl:
             return
 
         self._write_with_separator(
-            "EK ",
+            "EE ",
             [
                 oid(status),
                 self._number(time_delta),

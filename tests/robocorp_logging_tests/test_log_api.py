@@ -49,8 +49,8 @@ def test_log_api(tmpdir) -> None:
         messages = verify_log_messages_from_messages_iterator(
             iter_decoded_log_format_from_log_html(log_target),
             [
-                dict(message_type="SK", name="some_method"),
-                dict(message_type="SK", name="call_another_method"),
+                dict(message_type="SE", name="some_method"),
+                dict(message_type="SE", name="call_another_method"),
                 dict(message_type="L", level="I", message="Some message"),
                 dict(message_type="L", level="E", message="Some e message"),
                 dict(message_type="L", level="W", message="Some w message"),
@@ -95,7 +95,7 @@ def test_log_api_without_with_statments(tmpdir) -> None:
 
         assert log_target.exists()
         verify_log_messages_from_messages_iterator(
-            iter_decoded_log_format_from_log_html(log_target), [dict(message_type="SK")]
+            iter_decoded_log_format_from_log_html(log_target), [dict(message_type="SE")]
         )
     finally:
         ctx.__exit__(None, None, None)
