@@ -12,7 +12,7 @@ packages = [{include = "robo", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-logging = "^0.0.2"
+robocorp-logging = "^0.0.3"
 
 
 [tool.poetry.group.dev.dependencies]

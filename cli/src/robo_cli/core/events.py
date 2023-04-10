@@ -17,8 +17,8 @@ class MessageType(str, Enum):
     END_TASK = "ET"
     START_ELEMENT = "SE"
     END_ELEMENT = "EE"
-    KEYWORD_ARGUMENT = "KA"
-    ASSIGN_KEYWORD = "AS"
+    ELEMENT_ARGUMENT = "EA"
+    ASSIGN = "AS"
     TAG = "TG"
     START_TIME = "S"
     START_TRACEBACK = "STB"
@@ -96,11 +96,12 @@ class EndElement(BaseModel):
     time_delta_in_seconds: float
 
 
-class KeywordArgument(BaseModel):
-    argument: str
+class ElementArgument(BaseModel):
+    name: str
+    value: str
 
 
-class AssignKeyword(BaseModel):
+class Assign(BaseModel):
     assign: str
 
 
@@ -145,8 +146,8 @@ Event = Union[
     EndTask,
     StartElement,
     EndElement,
-    KeywordArgument,
-    AssignKeyword,
+    ElementArgument,
+    Assign,
     Tag,
     StartTime,
     StartTraceback,
@@ -168,8 +169,8 @@ TYPE_TO_EVENT: dict[MessageType, Type[Event]] = {
     MessageType.END_TASK: EndTask,
     MessageType.START_ELEMENT: StartElement,
     MessageType.END_ELEMENT: EndElement,
-    MessageType.KEYWORD_ARGUMENT: KeywordArgument,
-    MessageType.ASSIGN_KEYWORD: AssignKeyword,
+    MessageType.ELEMENT_ARGUMENT: ElementArgument,
+    MessageType.ASSIGN: Assign,
     MessageType.TAG: Tag,
     MessageType.START_TIME: StartTime,
     MessageType.START_TRACEBACK: StartTraceback,

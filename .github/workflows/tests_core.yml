@@ -43,28 +43,28 @@ jobs:
     - name: Checkout repository and submodules
       uses: actions/checkout@v2
       
-    - name: Clone the robocorp-logging repository so that we can use it in the core tests.
-      uses: actions/checkout@v2
-      with:
-        repository: robocorp/robocorp-logging
-        path: robocorp-logging
-        ref: ${{ github.ref }}
     
     
-    # Setup to use the dev version of robocorp-logging.    
-    - name: Setup node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 16.x
-    - name: Print robocorp-logging info and build the output view.
-      env:
-        PYTHONPATH: ./core/src${{ matrix.PATH_SEPARATOR }}../robocorp-logging/src
-      run: |
-        python -c "import sys;print(sys.path)"
-        python -c "import robocorp_logging;print(robocorp_logging.__file__)"
-        cd ../robocorp-logging
-        pip install fire
-        python -m dev build-output-view
+    # Uncomment setup below to use the dev version of robocorp-logging.    
+#     - name: Clone the robocorp-logging repository so that we can use it in the core tests.
+#       uses: actions/checkout@v2
+#       with:
+#         repository: robocorp/robocorp-logging
+#         path: robocorp-logging
+#         ref: ${{ github.ref }}
+#     - name: Setup node
+#       uses: actions/setup-node@v1
+#       with:
+#         node-version: 16.x
+#     - name: Print robocorp-logging info and build the output view.
+#       env:
+#         PYTHONPATH: ./core/src${{ matrix.PATH_SEPARATOR }}../robocorp-logging/src
+#       run: |
+#         python -c "import sys;print(sys.path)"
+#         python -c "import robocorp_logging;print(robocorp_logging.__file__)"
+#         cd ../robocorp-logging
+#         pip install fire
+#         python -m dev build-output-view
     
     
     # Use poetry
