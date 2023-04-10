@@ -104,7 +104,7 @@ const start_task = _decode("name:oid, suite_id:oid, lineno:int, time_delta_in_se
 const end_task = _decode("status:oid, message:oid, time_delta_in_seconds:float");
 
 const start_element = _decode(
-    "name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float"
+    "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float"
 );
 
 const end_element = _decode("status:oid, time_delta_in_seconds:float");

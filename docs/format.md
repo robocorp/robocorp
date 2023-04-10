@@ -151,7 +151,7 @@ Basic message types are:
 
 ### SE: Start Element
 
-    Spec: `name:oid, libname:oid, keyword_type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float`
+    Spec: `name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float`
     
     Example:
     
