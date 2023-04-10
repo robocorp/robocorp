@@ -16,9 +16,7 @@ jobs:
 
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v1
-      with:
-        submodules: recursive
+      uses: actions/checkout@v2
 
     - name: Setup node
       uses: actions/setup-node@v1
@@ -37,9 +35,6 @@ jobs:
     - name: Embed output view in index.py
       run: |
         python -m dev build-output-view
-        # python -m dev check-no-git-changes -- disabled because
-        # building in prod makes changes appear even if the entry
-        # code is the same. 
 
     - name: Build wheel
       working-directory: ./src

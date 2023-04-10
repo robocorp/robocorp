@@ -96,7 +96,7 @@ class Dev(object):
             sys.exit(0)
         else:
             sys.stderr.write(
-                "Version does not match (robot out stream: %s != tag: %s) (exit(1))\n"
+                "Version does not match (robocorp-logging: %s != repo tag: %s) (exit(1))\n"
                 % (robocorp_logging.__version__, version)
             )
             sys.exit(1)
