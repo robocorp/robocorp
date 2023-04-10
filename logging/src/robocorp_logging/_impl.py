@@ -282,10 +282,10 @@ class _RobotOutputImpl:
             self._current_entry += 1
             if self._current_entry != 1:
                 self._current_file = (
-                    self._output_dir / f"output_{self._current_entry}.rfstream"
+                    self._output_dir / f"output_{self._current_entry}.robolog"
                 )
             else:
-                self._current_file = self._output_dir / f"output.rfstream"
+                self._current_file = self._output_dir / f"output.robolog"
 
             if self._stream is not None:
                 self._stream.close()

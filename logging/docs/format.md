@@ -1,4 +1,4 @@
-# The `.rfstream` format
+# The `.robolog` format
 
 ## Requirements
 
@@ -7,8 +7,8 @@ The requirements for the generated log files are the following:
 1. Compact log:
 
     The files generated should be as compact as possible. Reading the file
-    may require a separate application (although the idea is still trying
-    to keep to ASCII instead of a binary format).
+    may require a separate application (although the idea is still -- initially
+    -- trying to keep to ASCII instead of a binary format).
 
 2. Log streaming:
 
@@ -20,8 +20,7 @@ The requirements for the generated log files are the following:
 
     While the format of the log should be as compact as possible, it should 
     be able to provide the needed information to debug an issue, so,
-    it must track almost all information currently available in the Robot 
-    output.xml.
+    it must track quite a bit of information from a python run.
 
 4. Log file rotation:
 
@@ -36,9 +35,9 @@ The requirements for the generated log files are the following:
 The basic log can actually be split into multiple files.
 Such files are splitted in the following files (the idea is that it can be split when it becomes too big).
 
-- `output.rfstream`
-- `output_2.rfstream`
-- `output_3.rfstream`
+- `output.robolog`
+- `output_2.robolog`
+- `output_3.robolog`
 - ...
 
 The file should be always written and flushed at each log entry and it should be consistent even if the process crashes in the meanwhile (meaning that all entries written are valid up to the point of the crash).
@@ -164,11 +163,11 @@ Basic message types are:
 
 ### EA: Element argument
 
-    Spec: `argument:oid`
+    Spec: `name:oid, value:oid`
     
     Example:
     
-    `EA f`
+    `EA f|g`
 
 ### AS: Assign the result of some element (such as a method) to a variable.
 

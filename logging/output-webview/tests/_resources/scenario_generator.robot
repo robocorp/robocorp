@@ -5,7 +5,7 @@ Library     RPA.Desktop
 *** Test Cases ***
 My Test
     [Documentation]    Note that this test can be changed as needed. The idea
-    ...    is that it can be changed as needed to provide .rfstream
+    ...    is that it can be changed as needed to provide .robolog
     ...    files as needed.
     FOR    ${counter}    IN RANGE    1    1000
         ${show_err}=    Evaluate    $counter % 50 == 0
