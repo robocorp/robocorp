@@ -74,9 +74,12 @@ jobs:
       if: contains(matrix.name, '-logindev')
       env:
         PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../logging/src
+        GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
       run: poetry run pytest -rfE -vv tests/robo_tests
 
     - name: Test (logging from pypi)
+      env:
+        GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
       if: contains(matrix.name, '-logindev') == false
       run: poetry run pytest -rfE -vv tests/robo_tests
 

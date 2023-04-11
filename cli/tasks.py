@@ -2,6 +2,7 @@ import urllib.request
 import os
 import platform
 import stat
+import sys
 from pathlib import Path
 
 from invoke import task
@@ -18,7 +19,7 @@ RCC_URL = {
 
 def poetry(ctx, *parts):
     args = " ".join(str(part) for part in parts)
-    ctx.run(f"poetry {args}", pty=True, echo=True)
+    ctx.run(f"poetry {args}", pty=sys.platform != "win32", echo=True)
 
 
 @task

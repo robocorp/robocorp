@@ -1,16 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?eclipse-pydev version="1.0"?><pydev_project>
-                
-    
-    
+<?xml version="1.0" encoding="UTF-8"?><pydev_project>
     <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python interpreter</pydev_property>
-                
-    
-    
     <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
-                
-    
-    
     <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
         <path>/${PROJECT_DIR_NAME}/examples/rpa-challenge</path>
         <path>/${PROJECT_DIR_NAME}/cli/src</path>
@@ -19,8 +9,6 @@
         <path>/${PROJECT_DIR_NAME}/core/tests</path>
         <path>/${PROJECT_DIR_NAME}/logging/src</path>
         <path>/${PROJECT_DIR_NAME}/logging/tests</path>
+        <path>/${PROJECT_DIR_NAME}/examples/rpa-challenge-rcc</path>
     </pydev_pathproperty>
-            
-
-
 </pydev_project>

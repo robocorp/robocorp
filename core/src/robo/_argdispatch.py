@@ -66,6 +66,19 @@ class _ArgDispatcher:
             help="The directory where the logging output files will be stored.",
             default="./output",
         )
+        run_parser.add_argument(
+            "--max-log-files",
+            dest="max_log_files",
+            type=int,
+            help="The maximum number of output files to store the logs.",
+            default=5,
+        )
+        run_parser.add_argument(
+            "--max-log-file-size",
+            dest="max_log_file_size",
+            help="The maximum size for the log files (i.e.: 1MB, 500kb).",
+            default="1MB",
+        )
 
         # List tasks
         list_parser = subparsers.add_parser(

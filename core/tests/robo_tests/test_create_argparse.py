@@ -29,6 +29,14 @@ def test_argparse():
     assert parsed.output_dir == "./out"
     assert parsed.task_name == "task-name"
 
+    parsed = parser.parse_args(
+        ["run", "target_dir", "--max-log-files=5", "--max-log-file-size=2MB"]
+    )
+    assert parsed.command == "run"
+    assert parsed.path == "target_dir"
+    assert parsed.max_log_files == 5
+    assert parsed.max_log_file_size == "2MB"
+
 
 def test_argparse_command_invalid():
     from robo.cli import main

@@ -31,7 +31,6 @@ def ensure_environment() -> dict[str, str]:
 
     # Required for communicating with core framework
     env["RC_LOG_OUTPUT_STDOUT"] = "1"
-    env["PYTHONUNBUFFERED"] = "1"
     return env
 
 

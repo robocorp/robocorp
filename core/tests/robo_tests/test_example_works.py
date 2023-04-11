@@ -15,13 +15,15 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
     subprocess.check_call([str(rcc_loc)] + "task run".split(), cwd=cwd, env=env)
 
 
-@pytest.mark.skip(
-    reason="This test required rcc with robot.yaml/conda.yaml -- it should be changed to work with the settings in the pyproject.toml."
-)
 def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
+    matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
+    if matrix_name:
+        if "logindev" not in matrix_name:
+            pytest.skip(f"Disabled for matrix name: {matrix_name}")
+
     from robo_log import iter_decoded_log_format_from_log_html
 
-    rpa_challenge_dir = examples_dir / "rpa-challenge"
+    rpa_challenge_dir = examples_dir / "rpa-challenge-rcc"
     assert rpa_challenge_dir.exists()
     output_dir = rpa_challenge_dir / "output"
     log_html = output_dir / "log.html"
