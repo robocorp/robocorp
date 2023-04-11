@@ -4,8 +4,9 @@ from typing import Union
 from pydantic import BaseModel
 
 from .events import (
-    AssignKeyword,
-    EndKeyword,
+    Assign,
+    ElementArgument,
+    EndElement,
     EndSuite,
     EndTask,
     EndTraceback,
@@ -13,10 +14,9 @@ from .events import (
     Id,
     Info,
     InitialTime,
-    KeywordArgument,
     Log,
     LogHtml,
-    StartKeyword,
+    StartElement,
     StartSuite,
     StartTask,
     StartTime,
@@ -37,16 +37,16 @@ class Status(str, Enum):
 # TODO: Rename these to match pythonic things
 
 
-class Keyword(BaseModel):
+class Element(BaseModel):
     name: str
     status: Status
-    body: list["Keyword"]
+    body: list["Element"]
 
 
 class Task(BaseModel):
     name: str
     status: Status
-    body: list[Keyword]
+    body: list[Element]
 
 
 class Suite(BaseModel):
@@ -61,7 +61,7 @@ class Model(BaseModel):
     body: list[Suite]
 
 
-TreeItems = Union[Model, Suite, Task, Keyword]
+TreeItems = Union[Model, Suite, Task, Element]
 
 
 def flatten_model(model: TreeItems, depth=0):
@@ -130,21 +130,21 @@ class Builder:
         model = self._stack.pop()
         model.status = Status.ERROR if event.status == "ERROR" else Status.PASS
 
-    def handle_StartKeyword(self, event: StartKeyword):
-        model = Keyword(name=event.name, status=Status.RUNNING, body=[])
+    def handle_StartElement(self, event: StartElement):
+        model = Element(name=event.name, status=Status.RUNNING, body=[])
 
-        assert isinstance(self._stack[-1], (Task, Keyword))
+        assert isinstance(self._stack[-1], (Task, Element))
         self._stack[-1].body.append(model)
         self._stack.append(model)
 
-    def handle_EndKeyword(self, event: EndKeyword):
+    def handle_EndElement(self, event: EndElement):
         model = self._stack.pop()
         model.status = Status.ERROR if event.status == "ERROR" else Status.PASS
 
-    def handle_KeywordArgument(self, event: KeywordArgument):
+    def handle_ElementArgument(self, event: ElementArgument):
         pass
 
-    def handle_AssignKeyword(self, event: AssignKeyword):
+    def handle_Assign(self, event: Assign):
         pass
 
     def handle_Tag(self, event: Tag):
