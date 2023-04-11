@@ -52,7 +52,7 @@ class Reader(Thread):
                 try:
                     listener(line)
                 except Exception as exc:
-                    console.log("Unhandled exception in listener: %s", exc)
+                    console.log("Unhandled exception in listener:", exc)
 
 
 class ProcessError(RuntimeError):

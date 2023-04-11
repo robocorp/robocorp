@@ -4,15 +4,17 @@ from pathlib import Path
 
 import typer
 from rich.console import Group
+from rich.live import Live
 from rich.panel import Panel
 from rich.prompt import IntPrompt, Prompt
+from rich.spinner import Spinner
 from rich.table import Table
 
 from robo_cli import environment, rcc, templates
 from robo_cli.config import pyproject
 from robo_cli.console import console
 from robo_cli.core import commands
-from robo_cli.core.events import EndElement, StartElement
+from robo_cli.core.builder import Builder, Model, Status, flatten_model
 from robo_cli.process import ProcessError
 from robo_cli.settings import get_settings
 
@@ -119,26 +121,45 @@ def run():
                 raise typer.Exit(code=1)
 
         taskname = tasks[0]["name"]
-        stack = []
+        model = Model(name=taskname, status=Status.RUNNING, body=[])
+        builder = Builder(model)
 
-        def on_event(event):
-            if isinstance(event, StartElement):
-                console.print(f"{(len(stack) + 1) * '  '}{event.name}")
-                stack.append(event)
-            if isinstance(event, EndElement):
-                stack.pop()
+        console.print()
+        with Live(refresh_per_second=30) as live:
 
-        with console.status(f"Running [bold]{taskname}[/bold]"):
-            console.print()
-            console.print("[bold]Start execution[/bold]")
+            def on_event(event):
+                builder.handle_event(event)
+
+                spinner = Spinner("dots", f"Running [bold]{taskname}[/bold]")
+                spinner_status = Spinner("dots")
+
+                table = Table()
+                table.add_column("Status")
+                table.add_column("Name")
+
+                flat = flatten_model(model)
+                root, rows = flat[0], flat[1:]
+
+                for name, status, depth in rows:
+                    if status == Status.RUNNING:
+                        status_icon = spinner_status
+                    elif status == Status.ERROR:
+                        status_icon = "🔴"
+                    else:
+                        status_icon = "🟢"
+                    status_name = "  " * depth + name
+                    table.add_row(status_icon, status_name)
+
+                if root[1] == Status.RUNNING:
+                    live.update(Group(table, spinner))
+                else:
+                    live.update(table)
+
             commands.run_task(env, taskname, on_event)
-            console.print()
+        console.print()
 
-    except ProcessError as exc:
-        # TODO: Handle this through events instead of printing stderr
-        console.print(exc.stderr)
-        console.print("[bold red]Run failed due to unexpected error[/bold red]")
-        raise typer.Exit(code=1)
+    except ProcessError:
+        pass  # Errors are handled through output strewam
 
     artifacts = [str(name) for name in output_dir.glob("*")]
     console.print(
