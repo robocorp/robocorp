@@ -34,6 +34,9 @@ jobs:
           python-version: 3.9
           cache: 'poetry'
           
+      - name: Install project
+        run: poetry install
+          
       - name: Setup node 16.x
         uses: actions/setup-node@v3
         with:

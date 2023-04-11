@@ -33,12 +33,12 @@ class ConfigFilesFiltering(BaseConfig):
         library_roots: Optional[Sequence[str]] = None,
         filters: Sequence[Filter] = (),
     ):
-        from robocorp_logging._rewrite_filtering import FilesFiltering
+        from robo_log._rewrite_filtering import FilesFiltering
 
         self._files_filtering = FilesFiltering(project_roots, library_roots, filters)
 
     def can_rewrite_module_name(self, module_name: str) -> bool:
-        if module_name.startswith("robocorp_logging"):
+        if module_name.startswith("robo_log"):
             # We can't rewrite our own modules (we could end up recursing).
             if "check" in module_name:
                 # Exception just for testing.

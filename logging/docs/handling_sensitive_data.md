@@ -21,8 +21,8 @@ The usage for the API is:
 
 password = request_password()
 
-import robocorp_logging
-robocorp_logging.hide_from_output(password)
+import robo_log
+robo_log.hide_from_output(password)
 ```
 
 By calling the `hide_from_output` method, any further occurrence of the `password` contents will be

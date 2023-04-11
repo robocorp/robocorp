@@ -2,12 +2,12 @@ from io import StringIO
 
 import pytest
 
-from robocorp_logging._rewrite_config import BaseConfig, ConfigFilesFiltering
+from robo_log._rewrite_config import BaseConfig, ConfigFilesFiltering
 from contextlib import contextmanager
 
 
 def test_ast_utils():
-    from robocorp_logging import _ast_utils
+    from robo_log import _ast_utils
     import ast
 
     node = ast.parse(
@@ -72,7 +72,7 @@ class _SetupCallback:
 
 @contextmanager
 def _setup_test_callbacks():
-    from robocorp_logging import _rewrite_callbacks
+    from robo_log import _rewrite_callbacks
 
     setup_callback = _SetupCallback()
 
@@ -90,10 +90,10 @@ def _setup_test_callbacks():
 
 @pytest.mark.parametrize("config", [ConfigForTest(), ConfigFilesFiltering()])
 def test_rewrite_hook_basic(config):
-    from robocorp_logging._rewrite_hook import RewriteHook
+    from robo_log._rewrite_hook import RewriteHook
     import sys
     from imp import reload
-    from robocorp_logging_tests._resources import check
+    from robo_log_tests._resources import check
 
     hook = RewriteHook(config)
     sys.meta_path.insert(0, hook)
@@ -129,10 +129,10 @@ def test_rewrite_hook_basic(config):
 
 @pytest.mark.parametrize("config", [ConfigForTest()])
 def test_rewrite_hook_except(config):
-    from robocorp_logging._rewrite_hook import RewriteHook
+    from robo_log._rewrite_hook import RewriteHook
     import sys
     from imp import reload
-    from robocorp_logging_tests._resources import check_traceback
+    from robo_log_tests._resources import check_traceback
 
     hook = RewriteHook(config)
     sys.meta_path.insert(0, hook)

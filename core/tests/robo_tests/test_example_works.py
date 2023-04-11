@@ -19,7 +19,7 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
     reason="This test required rcc with robot.yaml/conda.yaml -- it should be changed to work with the settings in the pyproject.toml."
 )
 def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
-    from robocorp_logging import iter_decoded_log_format_from_log_html
+    from robo_log import iter_decoded_log_format_from_log_html
 
     rpa_challenge_dir = examples_dir / "rpa-challenge"
     assert rpa_challenge_dir.exists()

@@ -3,7 +3,7 @@ import functools
 from pathlib import Path
 from typing import Optional, Union, Sequence, Tuple
 import datetime
-from robocorp_logging.protocols import OptExcInfo, LogHTMLStyle
+from robo_log.protocols import OptExcInfo, LogHTMLStyle
 
 
 def _log_error(func):
@@ -37,8 +37,8 @@ class _RobocorpLogger:
         log_html_style: LogHTMLStyle = "standalone",
         **kwargs,
     ):
-        from robocorp_logging._impl import _RobotOutputImpl, _Config
-        from robocorp_logging._convert_units import _convert_to_bytes
+        from robo_log._impl import _RobotOutputImpl, _Config
+        from robo_log._convert_units import _convert_to_bytes
 
         # Note: expected to be used just when used in-memory (not part of the public API).
         config = _Config(kwargs.get("__uuid__"))

@@ -3,12 +3,13 @@ name = "robocorp-logging"
 version = "0.0.3"
 description = "Automatic trace logging for Python"
 authors = [
-    "Ossi R. <ossi@robocorp.com>",
     "Fabio Z. <fabio@robocorp.com>",
+    "Ossi R. <ossi@robocorp.com>",
     "Kerkko P. <kerkko@robocorp.com>",
 ]
 readme = "README.md"
-packages = [{include = "robocorp_logging", from = "src"}]
+packages = [{include = "robo_log", from = "src"}]
+include = ["**/index.py", "**/index_v2.py"]
 
 [tool.mypy]
 mypy_path = "logging/src:logging/tests"
@@ -39,3 +40,4 @@ fire = "^0.5.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

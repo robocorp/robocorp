@@ -1,5 +1,5 @@
-import robocorp_logging
-from robocorp_logging._rewrite_config import BaseConfig
+import robo_log
+from robo_log._rewrite_config import BaseConfig
 
 
 class ConfigForTest(BaseConfig):
@@ -12,19 +12,19 @@ class ConfigForTest(BaseConfig):
 
 def test_sensitive_data():
     from imp import reload
-    from robocorp_logging_tests._resources import check_sensitive_data
+    from robo_log_tests._resources import check_sensitive_data
     from io import StringIO
-    from robocorp_logging import iter_decoded_log_format
+    from robo_log import iter_decoded_log_format
 
     s = StringIO()
 
     def write(msg):
         s.write(msg)
 
-    with robocorp_logging.setup_auto_logging():
+    with robo_log.setup_auto_logging():
         check_sensitive_data = reload(check_sensitive_data)
 
-        with robocorp_logging.add_in_memory_log_output(write):
+        with robo_log.add_in_memory_log_output(write):
             check_sensitive_data.run()
 
     assert "my_pass" not in s.getvalue()

@@ -10,7 +10,7 @@ import traceback
 from contextlib import contextmanager
 import sys
 import weakref
-from robocorp_logging.protocols import OptExcInfo
+from robo_log.protocols import OptExcInfo
 from functools import partial
 
 
@@ -700,15 +700,15 @@ class _RobotOutputImpl:
             print(f"Robocorp Log (html): {target}")
 
             if self._config.log_html_style == 1:
-                from robocorp_logging import index
+                from robo_log import index
             elif self._config.log_html_style == 2:
-                from robocorp_logging import index_v2 as index
+                from robo_log import index_v2 as index
             else:
                 raise ValueError(
                     "Unexpected log html style: {self._config.log_html_style}"
                 )
 
-            # from robocorp_logging import index
+            # from robo_log import index
 
             has_separate_bundle_js = "bundle.js" in index.FILE_CONTENTS
 

@@ -1,5 +1,5 @@
 def test_impl_recovery_matches_suite():
-    from robocorp_logging._impl import _RobotOutputImpl, _Config
+    from robo_log._impl import _RobotOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
@@ -18,7 +18,7 @@ def test_impl_recovery_matches_suite():
 
 
 def test_impl_recovery_matches_task():
-    from robocorp_logging._impl import _RobotOutputImpl, _Config
+    from robo_log._impl import _RobotOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
@@ -41,7 +41,7 @@ def test_impl_recovery_matches_task():
 
 
 def test_impl_recovery_does_not_match_test():
-    from robocorp_logging._impl import _RobotOutputImpl, _Config
+    from robo_log._impl import _RobotOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
@@ -64,7 +64,7 @@ def test_impl_recovery_does_not_match_test():
 
 
 def test_impl_recovery_do_nothing():
-    from robocorp_logging._impl import _RobotOutputImpl, _Config
+    from robo_log._impl import _RobotOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None

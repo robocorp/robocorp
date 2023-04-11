@@ -1,3 +1,3 @@
 pytest_plugins = [
-    "robocorp_logging_tests.fixtures",
+    "robo_log_tests.fixtures",
 ]

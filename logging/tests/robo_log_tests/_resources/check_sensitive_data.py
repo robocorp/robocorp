@@ -1,4 +1,4 @@
-import robocorp_logging
+import robo_log
 
 
 def login(user_password):
@@ -14,7 +14,7 @@ def dont_log_args(some_arg):
 
 
 def something():
-    with robocorp_logging.stop_logging_variables():
+    with robo_log.stop_logging_variables():
         dont_log_args(some_arg="dont_log_this_arg")
 
 
@@ -27,9 +27,9 @@ def run():
     login(password)
 
     s = "this should not be shown"
-    robocorp_logging.hide_from_output(s)
+    robo_log.hide_from_output(s)
     method(s)
     something()
 
-    with robocorp_logging.stop_logging_methods():
+    with robo_log.stop_logging_methods():
         dont_log_this_method()

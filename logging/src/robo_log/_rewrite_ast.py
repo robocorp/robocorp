@@ -61,7 +61,7 @@ def rewrite_ast_add_callbacks(
         aliases = [
             ast.alias("builtins", "@py_builtins", lineno=lineno, col_offset=0),
             ast.alias(
-                "robocorp_logging._rewrite_callbacks",
+                "robo_log._rewrite_callbacks",
                 "@robocorp_rewrite_callbacks",
                 lineno=lineno,
                 col_offset=0,
@@ -71,7 +71,7 @@ def rewrite_ast_add_callbacks(
         aliases = [
             ast.alias("builtins", "@py_builtins"),
             ast.alias(
-                "robocorp_logging._rewrite_callbacks", "@robocorp_rewrite_callbacks"
+                "robo_log._rewrite_callbacks", "@robocorp_rewrite_callbacks"
             ),
         ]
 

@@ -135,5 +135,5 @@ node_modules
 /output-webview/dist
 
 /output-webview/.vscode
-/src/robocorp_logging/index.py
-/src/robocorp_logging/index_v2.py
+/src/robo_log/index.py
+/src/robo_log/index_v2.py

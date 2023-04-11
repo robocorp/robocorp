@@ -35,7 +35,7 @@ def test_collect_tasks_integrated_error(tmpdir):
 
 
 def verify_log_messages(log_html, expected):
-    from robocorp_logging import iter_decoded_log_format_from_log_html
+    from robo_log import iter_decoded_log_format_from_log_html
 
     log_messages = tuple(iter_decoded_log_format_from_log_html(log_html))
     for log_msg in log_messages:

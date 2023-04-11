@@ -1,5 +1,5 @@
 def test_gen_id(data_regression):
-    from robocorp_logging._impl import _gen_id
+    from robo_log._impl import _gen_id
 
     iter_in = _gen_id()
     generated = []
@@ -10,7 +10,7 @@ def test_gen_id(data_regression):
 
 
 def test_convert():
-    from robocorp_logging._convert_units import _convert_to_bytes
+    from robo_log._convert_units import _convert_to_bytes
 
     assert _convert_to_bytes("100") == 100
     assert _convert_to_bytes("100kb") == 100000

@@ -65,7 +65,7 @@ jobs:
         PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../logging/src
       run: |
         python -c "import sys;print(sys.path)"
-        python -c "import robocorp_logging;print(robocorp_logging.__file__)"
+        python -c "import robo_log;print(robo_log.__file__)"
         cd ../logging
         pip install fire
         python -m dev build-output-view

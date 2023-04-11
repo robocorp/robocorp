@@ -1,5 +1,5 @@
 def test_rewrite_filtering() -> None:
-    from robocorp_logging._rewrite_filtering import FilesFiltering, Filter
+    from robo_log._rewrite_filtering import FilesFiltering, Filter
     import threading
     import email
 

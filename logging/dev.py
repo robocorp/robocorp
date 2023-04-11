@@ -22,11 +22,11 @@ import fire
 
 
 try:
-    import robocorp_logging
+    import robo_log
 except ImportError:
     # I.e.: add relative path (the cwd must be the directory containing this file).
     sys.path.append("src")
-    import robocorp_logging
+    import robo_log
 
 
 def _fix_contents_version(contents, version):
@@ -64,10 +64,8 @@ class Dev(object):
                 with open(filepath, "w") as stream:
                     stream.write(new_contents)
 
-        update_version(version, os.path.join(".", "src", "setup.py"))
-        update_version(
-            version, os.path.join(".", "src", "robocorp_logging", "__init__.py")
-        )
+        update_version(version, "pyproject.toml")
+        update_version(version, os.path.join(".", "src", "robo_log", "__init__.py"))
 
     def get_tag(self):
         import subprocess
@@ -98,13 +96,13 @@ class Dev(object):
         tag = self.get_tag()
         version = tag[tag.rfind("-") + 1 :]
 
-        if robocorp_logging.__version__ == version:
+        if robo_log.__version__ == version:
             sys.stderr.write("Version matches (%s) (exit(0))\n" % (version,))
             sys.exit(0)
         else:
             sys.stderr.write(
                 "Version does not match (robocorp-logging: %s != repo tag: %s).\nTags:%s\n(exit(1))\n"
-                % (robocorp_logging.__version__, version, self.get_all_tags())
+                % (robo_log.__version__, version, self.get_all_tags())
             )
             sys.exit(1)
 
@@ -173,7 +171,7 @@ class Dev(object):
                 os.path.join(
                     os.path.dirname(__file__),
                     "src",
-                    "robocorp_logging",
+                    "robo_log",
                     f"index{vtag}.py",
                 )
             )

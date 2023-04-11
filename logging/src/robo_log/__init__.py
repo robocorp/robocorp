@@ -20,7 +20,7 @@ from pathlib import Path
 import typing
 from ._rewrite_config import Filter
 import threading
-from robocorp_logging.protocols import OptExcInfo, LogHTMLStyle
+from robo_log.protocols import OptExcInfo, LogHTMLStyle
 
 if typing.TYPE_CHECKING:
     from ._logger import _RobocorpLogger
@@ -131,7 +131,7 @@ def _register_callbacks(rewrite_hook_config):
 
     tid = threading.get_ident()
 
-    from robocorp_logging._rewrite_hook import RewriteHook
+    from robo_log._rewrite_hook import RewriteHook
     from ._rewrite_callbacks import (
         before_method,
         after_method,
@@ -272,7 +272,7 @@ def setup_auto_logging(
             Filter("**/check/**", exclude=True, is_path=True),
         ]
     """
-    from robocorp_logging._rewrite_config import ConfigFilesFiltering
+    from robo_log._rewrite_config import ConfigFilesFiltering
 
     project_roots: Optional[Sequence[str]]
     if tracked_folders:

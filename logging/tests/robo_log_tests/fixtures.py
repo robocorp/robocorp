@@ -15,7 +15,7 @@ def resources_dir(tmpdir_factory):
 
 @pytest.fixture(scope="session", autouse=True)
 def raise_exceptions():
-    from robocorp_logging import _rewrite_callbacks
+    from robo_log import _rewrite_callbacks
 
     for callback in _rewrite_callbacks.iter_all_callbacks():
         callback.raise_exceptions = True
@@ -45,7 +45,7 @@ def verify_log_messages_from_messages_iterator(
 
 
 def verify_log_messages(stream, expected: Sequence[dict]) -> Sequence[dict]:
-    from robocorp_logging import iter_decoded_log_format
+    from robo_log import iter_decoded_log_format
 
     return verify_log_messages_from_messages_iterator(
         iter_decoded_log_format(stream), expected
@@ -54,18 +54,18 @@ def verify_log_messages(stream, expected: Sequence[dict]) -> Sequence[dict]:
 
 @pytest.fixture()
 def log_setup(tmpdir):
-    import robocorp_logging
+    import robo_log
     import io
 
     log_target = Path(tmpdir.join("log.html"))
 
     stream = io.StringIO()
 
-    with robocorp_logging.setup_auto_logging():
-        with robocorp_logging.add_log_output(
+    with robo_log.setup_auto_logging():
+        with robo_log.add_log_output(
             tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
         ):
-            with robocorp_logging.add_in_memory_log_output(write=stream.write):
+            with robo_log.add_in_memory_log_output(write=stream.write):
                 yield {"stream": stream}
 
 

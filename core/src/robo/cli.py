@@ -8,11 +8,11 @@ import os
 
 
 def _setup_log_output(output_dir: Path):
-    import robocorp_logging
+    import robo_log
 
     # This can be called after user code is imported (but still prior to its
     # execution).
-    return robocorp_logging.add_log_output(
+    return robo_log.add_log_output(
         output_dir=output_dir,
         max_file_size="1MB",
         max_files=5,
@@ -22,7 +22,7 @@ def _setup_log_output(output_dir: Path):
 
 @contextmanager
 def _setup_stdout_logging():
-    import robocorp_logging
+    import robo_log
 
     if os.environ.get("RC_LOG_OUTPUT_STDOUT", "").lower() in ("1", "t", "true"):
         original_stdout = sys.stdout
@@ -31,7 +31,7 @@ def _setup_stdout_logging():
         # TODO: provide messages given to stdout as expected messages in the output?
         sys.stdout = sys.stderr
 
-        from robocorp_logging._decoder import Decoder
+        from robo_log._decoder import Decoder
 
         decoder = Decoder()
 
@@ -43,7 +43,7 @@ def _setup_stdout_logging():
                 if decoded:
                     original_stdout.write(f"{json.dumps(decoded)}\n")
 
-        with robocorp_logging.add_in_memory_log_output(write):
+        with robo_log.add_in_memory_log_output(write):
             try:
                 yield
             finally:
