@@ -8,24 +8,24 @@ Steps to do a new release
 
 - When leaving pre-alpha: Update classifier in setup.py (currently in pre-alpha) and notes regarding being alpha in README.md.
 
-- Update version (`python -m dev set-version 0.0.4`).
+- Update version (`python -m dev set-version 0.0.5`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-logging`).
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
 - Push contents, and check if tests passed in https://github.com/robocorp/robotframework-lsp/actions.
-  - `mu acp robocorp-logging release 0.0.4`
+  - `mu acp robocorp-logging release 0.0.5`
 
 - Rebase with master (`git checkout master&git rebase release-robocorp-logging`).
 
-- Create a tag (`git tag robocorp-logging-0.0.4`) and push it.
+- Create a tag (`git tag robocorp-logging-0.0.5`) and push it.
 
 - Send release msg. i.e.:
 
 Hi @channel,
 
-I'm happy to announce the release of `Robocorp Logging 0.0.4`.
+I'm happy to announce the release of `Robocorp Logging 0.0.5`.
 
 *## Changes*
 
