@@ -58,8 +58,8 @@ def open_workbook(
     The file can be in either ``.xlsx`` or ``.xls`` format.
 
     Args:
-        :param path: path to Excel file
-        :param data_only: controls whether cells with formulas have either
+        path: path to Excel file
+        data_only: controls whether cells with formulas have either
          the formula (default, False) or the value stored the last time Excel
          read the sheet (True). Affects only ``.xlsx`` files.
 

@@ -16,6 +16,8 @@ def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
         key = winreg.OpenKeyEx(location, browser_registry)
         # empty string key gets the (Default) value
         path = winreg.QueryValueEx(key, "")
+        if isinstance(path, tuple):
+            path = path[0]
         assert path, f"Could not find {browser} path"
         return path
     raise RuntimeError("Not implemented for this OS")
@@ -44,7 +46,7 @@ def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
     assert browser in EXECUTABLE_PATHS
     executable_path = EXECUTABLE_PATHS[browser][system]
     assert Path(executable_path).exists()
-    return executable_path
+    return str(executable_path)
 
 
 def open_browser(
