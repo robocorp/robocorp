@@ -49,7 +49,6 @@ jobs:
       run: poetry build
       
     - name: Upload to PyPI
-      run: poetry publish
-      env:
-        PYPI_USERNAME: __token__
-        PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN_ROBOCORP_LOGGING }}
+      run: |
+        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_LOGGING }}
+        poetry publish
