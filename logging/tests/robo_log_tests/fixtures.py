@@ -15,9 +15,9 @@ def resources_dir(tmpdir_factory):
 
 @pytest.fixture(scope="session", autouse=True)
 def raise_exceptions():
-    from robo_log import _rewrite_callbacks
+    from robo_log import _lifecycle_hooks
 
-    for callback in _rewrite_callbacks.iter_all_callbacks():
+    for callback in _lifecycle_hooks.iter_all_callbacks():
         callback.raise_exceptions = True
 
 

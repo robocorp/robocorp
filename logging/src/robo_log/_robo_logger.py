@@ -19,7 +19,7 @@ def _log_error(func):
             traceback.print_exc()
             self._robot_output_impl.log_message(
                 "ERROR",
-                f"_RobocorpLogger internal error: {e}\n{s.getvalue()}",
+                f"_RoboLogger internal error: {e}\n{s.getvalue()}",
                 self._robot_output_impl.get_time_delta(),
                 False,
             )
@@ -27,7 +27,7 @@ def _log_error(func):
     return new_func
 
 
-class _RobocorpLogger:
+class _RoboLogger:
     def __init__(
         self,
         output_dir: Optional[Union[str, Path]] = None,
@@ -37,7 +37,7 @@ class _RobocorpLogger:
         log_html_style: LogHTMLStyle = "standalone",
         **kwargs,
     ):
-        from robo_log._impl import _RobotOutputImpl, _Config
+        from robo_log._robo_output_impl import _RoboOutputImpl, _Config
         from robo_log._convert_units import _convert_to_bytes
 
         # Note: expected to be used just when used in-memory (not part of the public API).
@@ -74,7 +74,7 @@ class _RobocorpLogger:
         config.initial_time = kwargs.get("__initial_time__")
         config.additional_info = kwargs.get("__additional_info__")
 
-        self._robot_output_impl = _RobotOutputImpl(config)
+        self._robot_output_impl = _RoboOutputImpl(config)
         self._skip_log_methods = 0
         self._skip_log_arguments = 0
 
@@ -96,7 +96,7 @@ class _RobocorpLogger:
         if self._skip_log_methods <= 0:
             self._robot_output_impl.log_message(
                 "ERROR",
-                f"_RobocorpLogger error: start_logging_methods() called before stop_logging_methods() (call is ignored as logging is already on).",
+                f"_RoboLogger error: start_logging_methods() called before stop_logging_methods() (call is ignored as logging is already on).",
                 self._robot_output_impl.get_time_delta(),
                 False,
             )
@@ -111,7 +111,7 @@ class _RobocorpLogger:
         if self._skip_log_arguments <= 0:
             self._robot_output_impl.log_message(
                 "ERROR",
-                f"_RobocorpLogger error: start_logging_variables() called before stop_logging_variables() (call is ignored as logging is already on).",
+                f"_RoboLogger error: start_logging_variables() called before stop_logging_variables() (call is ignored as logging is already on).",
                 self._robot_output_impl.get_time_delta(),
                 False,
             )

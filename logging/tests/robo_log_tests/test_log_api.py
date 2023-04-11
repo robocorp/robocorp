@@ -22,28 +22,26 @@ def test_log_api(tmpdir) -> None:
         with robo_log.add_log_output(
             tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
         ):
-            robo_log.log_start_suite("Root Suite", "root", str(tmpdir))
-            robo_log.log_start_task("my_task", "task_id", 0, [])
+            robo_log.start_suite("Root Suite", "root", str(tmpdir))
+            robo_log.start_task("my_task", "task_id", 0, [])
 
             check.some_method()
 
-            robo_log.log_info("Some message")
-            robo_log.log_error("Some e message")
-            robo_log.log_warn("Some w message")
+            robo_log.info("Some message")
+            robo_log.critical("Some e message")
+            robo_log.warn("Some w message")
 
             # Calls from thread won't appear in the auto-logging right now.
             t = threading.Thread(target=check.some_method, args=())
             t.start()
             t.join(10)
 
-            t = threading.Thread(
-                target=robo_log.log_info, args=("SHOULD NOT APPEAR",)
-            )
+            t = threading.Thread(target=robo_log.info, args=("SHOULD NOT APPEAR",))
             t.start()
             t.join(10)
 
-            robo_log.log_end_task("my_task", "task_id", "PASS", "Ok")
-            robo_log.log_end_suite("Root Suite", "root", "PASS")
+            robo_log.end_task("my_task", "task_id", "PASS", "Ok")
+            robo_log.end_suite("Root Suite", "root", "PASS")
 
         assert log_target.exists()
         messages = verify_log_messages_from_messages_iterator(
@@ -81,13 +79,13 @@ def test_log_api_without_with_statments(tmpdir) -> None:
                 tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
             )
 
-            robo_log.log_start_suite("Root Suite", "root", str(tmpdir))
-            robo_log.log_start_task("my_task", "task_id", 0, [])
+            robo_log.start_suite("Root Suite", "root", str(tmpdir))
+            robo_log.start_task("my_task", "task_id", 0, [])
 
             check.some_method()
 
-            robo_log.log_end_task("my_task", "task_id", "PASS", "Ok")
-            robo_log.log_end_suite("Root Suite", "root", str(tmpdir))
+            robo_log.end_task("my_task", "task_id", "PASS", "Ok")
+            robo_log.end_suite("Root Suite", "root", str(tmpdir))
 
             assert not log_target.exists()
         finally:

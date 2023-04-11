@@ -1,5 +1,5 @@
 def test_gen_id(data_regression):
-    from robo_log._impl import _gen_id
+    from robo_log._robo_output_impl import _gen_id
 
     iter_in = _gen_id()
     generated = []

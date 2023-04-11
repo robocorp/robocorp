@@ -2,7 +2,7 @@ import ast
 from typing import Optional, Any, Union, List
 import sys
 from . import _ast_utils
-from ._rewrite_config import BaseConfig
+from ._config import BaseConfig
 
 DEBUG = False
 
@@ -61,7 +61,7 @@ def rewrite_ast_add_callbacks(
         aliases = [
             ast.alias("builtins", "@py_builtins", lineno=lineno, col_offset=0),
             ast.alias(
-                "robo_log._rewrite_callbacks",
+                "robo_log._lifecycle_hooks",
                 "@robocorp_rewrite_callbacks",
                 lineno=lineno,
                 col_offset=0,
@@ -70,9 +70,7 @@ def rewrite_ast_add_callbacks(
     else:
         aliases = [
             ast.alias("builtins", "@py_builtins"),
-            ast.alias(
-                "robo_log._rewrite_callbacks", "@robocorp_rewrite_callbacks"
-            ),
+            ast.alias("robo_log._lifecycle_hooks", "@robocorp_rewrite_callbacks"),
         ]
 
     imports = [ast.Import([alias], lineno=lineno, col_offset=0) for alias in aliases]

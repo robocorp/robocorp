@@ -1,5 +1,5 @@
 import robo_log
-from robo_log._rewrite_config import BaseConfig
+from robo_log._config import BaseConfig
 
 
 class ConfigForTest(BaseConfig):

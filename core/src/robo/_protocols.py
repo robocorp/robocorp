@@ -25,9 +25,12 @@ def check_implements(x: T) -> T:
 
 
 class Status:
-    NOT_RUN = "NOT RUN"
+    NOT_RUN = "NOT_RUN"  # Initial status for a task which is not run.
     PASS = "PASS"
     ERROR = "ERROR"
+    FAIL = "FAIL"
+    INFO = "INFO"
+    WARN = "WARN"
 
 
 class ITask(typing.Protocol):

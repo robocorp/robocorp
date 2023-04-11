@@ -13,13 +13,13 @@ def test_rotate_logs(tmpdir):
         with robo_log.add_log_output(
             tmpdir, max_file_size="10kb", max_files=2, log_html=log_target
         ):
-            robo_log.log_start_suite("Root Suite", "root", str(tmpdir))
-            robo_log.log_start_task("my_task", "task_id", 0, [])
+            robo_log.start_suite("Root Suite", "root", str(tmpdir))
+            robo_log.start_task("my_task", "task_id", 0, [])
 
             check.recurse_some_method()
 
-            robo_log.log_end_task("my_task", "task_id", "PASS", "Ok")
-            robo_log.log_end_suite("Root Suite", "root", "PASS")
+            robo_log.end_task("my_task", "task_id", "PASS", "Ok")
+            robo_log.end_suite("Root Suite", "root", "PASS")
 
         assert log_target.exists()
 

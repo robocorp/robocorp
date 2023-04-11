@@ -197,7 +197,7 @@ class _StackHandler:
             yield stack_entry
 
 
-class _RobotOutputImpl:
+class _RoboOutputImpl:
     def __init__(self, config: _Config):
         self._written_initial = False
         self._closed = False

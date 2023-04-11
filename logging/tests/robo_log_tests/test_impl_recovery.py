@@ -1,12 +1,12 @@
 def test_impl_recovery_matches_suite():
-    from robo_log._impl import _RobotOutputImpl, _Config
+    from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
     config.max_file_size_in_bytes = 9999999999
     config.max_files = 1
     config.log_html = None
-    impl = _RobotOutputImpl(config)
+    impl = _RoboOutputImpl(config)
     impl.start_suite("My Suite", "suite1", "", 0)
     impl.start_task("My Test", "test1", 0, 0, [])
     assert len(impl._stack_handler._queue) == 2
@@ -18,14 +18,14 @@ def test_impl_recovery_matches_suite():
 
 
 def test_impl_recovery_matches_task():
-    from robo_log._impl import _RobotOutputImpl, _Config
+    from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
     config.max_file_size_in_bytes = 9999999999
     config.max_files = 1
     config.log_html = None
-    impl = _RobotOutputImpl(config)
+    impl = _RoboOutputImpl(config)
     impl.start_suite("My Suite", "suite1", "", 0)
     impl.start_task("My Test", "test1", 0, 0, [])
     impl.start_element(
@@ -41,14 +41,14 @@ def test_impl_recovery_matches_task():
 
 
 def test_impl_recovery_does_not_match_test():
-    from robo_log._impl import _RobotOutputImpl, _Config
+    from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
     config.max_file_size_in_bytes = 9999999999
     config.max_files = 1
     config.log_html = None
-    impl = _RobotOutputImpl(config)
+    impl = _RoboOutputImpl(config)
     impl.start_suite("My Suite", "suite1", "", 0)
     impl.start_task("My Test", "test1", 0, 0, [])
     impl.start_element(
@@ -64,13 +64,13 @@ def test_impl_recovery_does_not_match_test():
 
 
 def test_impl_recovery_do_nothing():
-    from robo_log._impl import _RobotOutputImpl, _Config
+    from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
     config.output_dir = None
     config.max_file_size_in_bytes = 9999999999
     config.max_files = 1
     config.log_html = None
-    impl = _RobotOutputImpl(config)
+    impl = _RoboOutputImpl(config)
     impl.end_suite("suite1", "PASS", 0)
     assert len(impl._stack_handler._queue) == 0

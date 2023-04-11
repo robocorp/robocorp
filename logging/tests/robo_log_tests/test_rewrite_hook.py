@@ -2,7 +2,7 @@ from io import StringIO
 
 import pytest
 
-from robo_log._rewrite_config import BaseConfig, ConfigFilesFiltering
+from robo_log._config import BaseConfig, ConfigFilesFiltering
 from contextlib import contextmanager
 
 
@@ -72,17 +72,17 @@ class _SetupCallback:
 
 @contextmanager
 def _setup_test_callbacks():
-    from robo_log import _rewrite_callbacks
+    from robo_log import _lifecycle_hooks
 
     setup_callback = _SetupCallback()
 
-    with _rewrite_callbacks.before_method.register(
+    with _lifecycle_hooks.before_method.register(
         setup_callback.before_method
-    ), _rewrite_callbacks.after_method.register(
+    ), _lifecycle_hooks.after_method.register(
         setup_callback.after_method
-    ), _rewrite_callbacks.method_return.register(
+    ), _lifecycle_hooks.method_return.register(
         setup_callback.method_return
-    ), _rewrite_callbacks.method_except.register(
+    ), _lifecycle_hooks.method_except.register(
         setup_callback.method_except
     ):
         yield setup_callback
@@ -90,7 +90,7 @@ def _setup_test_callbacks():
 
 @pytest.mark.parametrize("config", [ConfigForTest(), ConfigFilesFiltering()])
 def test_rewrite_hook_basic(config):
-    from robo_log._rewrite_hook import RewriteHook
+    from robo_log._rewrite_importhook import RewriteHook
     import sys
     from imp import reload
     from robo_log_tests._resources import check
@@ -129,7 +129,7 @@ def test_rewrite_hook_basic(config):
 
 @pytest.mark.parametrize("config", [ConfigForTest()])
 def test_rewrite_hook_except(config):
-    from robo_log._rewrite_hook import RewriteHook
+    from robo_log._rewrite_importhook import RewriteHook
     import sys
     from imp import reload
     from robo_log_tests._resources import check_traceback

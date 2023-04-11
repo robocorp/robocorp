@@ -5,10 +5,10 @@ from robo._protocols import ITask
 def _log_before_task_run(task: ITask):
     import robo_log
 
-    robo_log.log_start_suite(
+    robo_log.start_suite(
         task.module_name, task.module_name, task.filename
     )
-    robo_log.log_start_task(
+    robo_log.start_task(
         task.name,
         f"{task.module_name}.{task.name}",
         task.method.__code__.co_firstlineno,
@@ -20,10 +20,10 @@ def _log_after_task_run(task: ITask):
     import robo_log
 
     status = task.status
-    robo_log.log_end_task(
+    robo_log.end_task(
         task.name, f"{task.module_name}.{task.name}", status, task.message
     )
-    robo_log.log_end_suite(task.module_name, task.module_name, status)
+    robo_log.end_suite(task.module_name, task.module_name, status)
 
 
 @contextmanager

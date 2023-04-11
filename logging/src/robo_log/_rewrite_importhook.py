@@ -39,8 +39,8 @@ from typing import Optional
 from typing import Sequence
 from typing import Tuple
 from typing import Union
-from ._rewrite_config import BaseConfig
-from ._rewrite_ast import rewrite_ast_add_callbacks
+from ._config import BaseConfig
+from ._rewrite_ast_add_callbacks import rewrite_ast_add_callbacks
 
 
 # caches rewritten pycs in pycache dirs
@@ -48,8 +48,9 @@ from ._rewrite_ast import rewrite_ast_add_callbacks
 # 0.0.2: Bugfix: docstrings must be kept as the first statement
 # 0.0.3: Support for exception handlers
 # 0.0.4: Add __name__
-version = "0.0.4"
-PYTEST_TAG = f"{sys.implementation.cache_tag}-robocorp-{version}"
+# 0.0.5: Renames of internal modules.
+version = "0.0.5"
+PYTEST_TAG = f"{sys.implementation.cache_tag}-robo_log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + PYTEST_TAG + PYC_EXT
 

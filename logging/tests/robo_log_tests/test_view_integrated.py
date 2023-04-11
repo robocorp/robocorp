@@ -21,6 +21,15 @@ def test_output_view_integrated(rcc_loc: str, path_for_tests_robot: Path):
         if "outviewintegrationtests" not in matrix_name:
             pytest.skip(f"Disabled for matrix name: {matrix_name}")
 
+    p = Path(__file__)
+    p = p.absolute()
+    logging_root: Path = p.parent.parent.parent
+    test_index = logging_root / "output-webview" / "dist-test" / "index.html"
+    if not test_index.exists():
+        raise AssertionError(
+            f"{test_index} does not exist. Generate with 'yarn build-test' in the 'output-webview' folder."
+        )
+
     robot_yaml = path_for_tests_robot / "robot.yaml"
     assert robot_yaml.exists()
     run_in_rcc(rcc_loc, str(path_for_tests_robot))

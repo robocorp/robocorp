@@ -7,7 +7,7 @@ import platform
 import logging
 from typing import Sequence, Optional, List, Dict, Any
 import threading
-from ._rewrite_config import Filter
+from ._config import Filter
 
 log = logging.getLogger(__name__)
 

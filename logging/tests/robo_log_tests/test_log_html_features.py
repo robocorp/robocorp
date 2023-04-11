@@ -77,16 +77,14 @@ def test_log_html_features(tmpdir) -> None:
             log_html=log_target,
             log_html_style=LOG_HTML_STYLE,
         ):
-            robo_log.log_start_suite(
-                "Test Log HTML Features", "root", str(tmpdir)
-            )
-            robo_log.log_start_task("my_task", "task_id", 0, [])
+            robo_log.start_suite("Test Log HTML Features", "root", str(tmpdir))
+            robo_log.start_task("my_task", "task_id", 0, [])
 
             for _i in range(2):
                 check.some_method()
-                robo_log.log_error("Some log error")
-                robo_log.log_warn("Some log warn")
-                robo_log.log_info("Some log info")
+                robo_log.critical("Some log error")
+                robo_log.warn("Some log warn")
+                robo_log.info("Some log info")
                 check_sensitive_data.run()
                 try:
                     check_traceback.main()
@@ -101,13 +99,13 @@ def test_log_html_features(tmpdir) -> None:
                 else:
                     raise AssertionError("Expected RuntimeError.")
 
-            robo_log.log_end_task(
+            robo_log.end_task(
                 "my_task",
                 "task_id",
                 "ERROR",
                 "Marking that it exited with error due to some reason...",
             )
-            robo_log.log_end_suite("Root Suite", "root", str(tmpdir))
+            robo_log.end_suite("Root Suite", "root", str(tmpdir))
 
         assert log_target.exists()
         if "dev" in FORCE_REGEN:
