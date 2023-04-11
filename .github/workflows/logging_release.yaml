@@ -1,0 +1,52 @@
+name: Logging Release
+
+on:
+  push:
+    branches:
+      - "release-robocorp-logging"
+    tags:
+      - "robocorp-logging-*"
+
+defaults:
+  run:
+    working-directory: './logging'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: true
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+    
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Install project
+      run: poetry install
+
+    - name: Embed output view in index.py
+      run: poetry run python -m dev build-output-view
+        
+    - name: Check tag version
+      run: python -m dev check-tag-version
+      
+#     - name: Upload to PyPI
+#       working-directory: ./src
+#       run: twine upload dist/*
+#       env:
+#         TWINE_USERNAME: __token__
+#         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

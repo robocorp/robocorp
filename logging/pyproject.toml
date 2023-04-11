@@ -1,5 +1,17 @@
+[tool.poetry]
+name = "robocorp-logging"
+version = "0.0.3"
+description = "Automatic trace logging for Python"
+authors = [
+    "Ossi R. <ossi@robocorp.com>",
+    "Fabio Z. <fabio@robocorp.com>",
+    "Kerkko P. <kerkko@robocorp.com>",
+]
+readme = "README.md"
+packages = [{include = "robocorp_logging", from = "src"}]
+
 [tool.mypy]
-mypy_path = "robocorp-logging/src:robocorp-logging/tests"
+mypy_path = "logging/src:logging/tests"
 
 [[tool.mypy.overrides]]
 module = "setuptools.*"
@@ -13,3 +25,17 @@ ignore_missing_imports = true
 module = "pytest_timeout.*"
 ignore_missing_imports = true
 
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+mypy = "^1.1.1"
+pytest = "^7.2.2"
+pytest-xdist = "^3.2.1"
+pytest-regressions = "1.0.6"
+fire = "^0.5.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

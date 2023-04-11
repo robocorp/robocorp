@@ -1,0 +1,58 @@
+name: Logging Lint
+
+on:
+  push:
+    paths:
+      - "logging/**"
+      - ".github/workflows/logging_lint.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "logging/**"
+      - ".github/workflows/logging_lint.yml"
+      
+defaults:
+  run:
+    working-directory: './logging'
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+        
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+          cache: 'poetry'
+          
+      - name: Setup node 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          
+      - name: Install prettier
+        run: |
+          npm install -g prettier@2.4.1
+          
+      - name: TS Format (yarn prettier --write **/*.ts to format files locally)
+        working-directory: ./logging/output-webview/
+        run: prettier --check **/*.ts
+        
+      - name: Black check
+        run: |
+          poetry run black --check src tests --exclude="index\.py|index_v2\.py"
+          
+      - name: mypy robocorp-logging
+        run: |
+          poetry run mypy --follow-imports=silent --show-column-numbers src tests
+          
+          

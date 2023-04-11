@@ -1,0 +1,82 @@
+name: Core Tests
+
+on:
+  push:
+    paths:
+      - "core/**"
+      - "logging/**"
+      - ".github/workflows/core_tests.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "core/**"
+      - "logging/**"
+      - ".github/workflows/core_tests.yml"
+
+defaults:
+  run:
+    working-directory: './core'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [
+          "ubuntu-py39-logindev",
+          "windows-py310",
+        ]
+
+        include:
+          - name: "ubuntu-py39-logindev"
+            python: "3.9"
+            os: ubuntu-latest
+            PATH_SEPARATOR: ":"
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+            PATH_SEPARATOR: ";"
+
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+      
+    # Use poetry
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+        cache: 'poetry'
+
+    - name: Install project
+      run: poetry install
+      
+    # Uncomment setup below to use the dev version of robocorp-logging.    
+    - name: Print robocorp-logging info and build the output view.
+      if: contains(matrix.name, '-logindev')
+      env:
+        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../logging/src
+      run: |
+        python -c "import sys;print(sys.path)"
+        python -c "import robocorp_logging;print(robocorp_logging.__file__)"
+        cd ../logging
+        pip install fire
+        python -m dev build-output-view
+
+    - name: Test (dev)
+      if: contains(matrix.name, '-logindev')
+      env:
+        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../logging/src
+      run: poetry run pytest -rfE -vv tests/robo_tests
+
+    - name: Test (logging from pypi)
+      if: contains(matrix.name, '-logindev') == false
+      run: poetry run pytest -rfE -vv tests/robo_tests
+
