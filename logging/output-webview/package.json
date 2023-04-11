@@ -1,0 +1,46 @@
+{
+    "name": "output-webview",
+    "version": "0.0.1",
+    "description": "A custom view to show Robot Framework output.",
+    "private": true,
+    "scripts": {
+        "build-prod": "webpack --env production",
+        "build-prod-v2": "webpack --env production --env v2",
+        "build-dev": "webpack --env development",
+        "build-test": "webpack --env test",
+        "watch-build-dev": "webpack --watch --env development",
+        "watch-build-dev-v2": "webpack --watch --env development --env v2",
+        "watch-build-test": "webpack --watch --env test",
+        "build": "webpack",
+        "start": "webpack serve --hot --inline --progress --port 8886"
+    },
+    "scriptsComments": {
+        "Comment1": "To develop the library run `yarn install`/`yarn watch-build-dev` to automatically",
+        "Comment2": "regenerate the contents when the webview contents are changed."
+    },
+    "keywords": [],
+    "author": "Fabio Zadrozny",
+    "publisher": "robocorp",
+    "license": "Apache 2.0",
+    "prettier": {
+        "tabWidth": 4,
+        "printWidth": 120,
+        "quoteProps": "preserve"
+    },
+    "devDependencies": {
+        "css-loader": "^5.2.6",
+        "html-inline-script-webpack-plugin": "^3.1.0",
+        "html-webpack-plugin": "^5.3.1",
+        "prettier": "2.4.1",
+        "style-loader": "^2.0.0",
+        "ts-loader": "^9.2.3",
+        "typescript": "^4.3.2",
+        "webpack": "^5.38.1",
+        "webpack-cli": "^4.7.2",
+        "webpack-dev-server": "^3.11.2",
+        "esbuild-loader": "^3.0.1"
+    },
+    "dependencies": {
+        "date-fns": "^2.29.3"
+    }
+}

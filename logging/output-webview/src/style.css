@@ -1,0 +1,267 @@
+:root {
+    --fg-color: var(--vscode-editor-foreground, black);
+    --bg-color: var(--vscode-editor-background, white);
+    --font-family: var(--vscode-editor-font-family, monospace, courier);
+    --font-size: var(--vscode-editor-font-size, 14px);
+    --font-weight: var(--vscode-font-weight);
+    --menu-background: var(--vscode-menu-background, rgb(235, 235, 235));
+    --menu-foreground: var(--vscode-menu-foreground, rgb(0, 0, 0));
+
+    /* background-color: var(--vscode-editorError-foreground); */
+    /* background-color: var(--vscode-inputValidation-errorBorder);  high-contrast doesn't have a good color */
+    /* background-color: var(--vscode-testing-iconErrored);  red and green always (not always ideal...) */
+    --error-background-color: var(--vscode-terminalCommandDecoration-errorBackground, rgb(201, 28, 28));
+    --error-color: var(--vscode-button-foreground, white);
+
+    --hidden-background-color: var(--vscode-foobarcolornotthere, rgb(243, 152, 16));
+    --hidden-color: var(--vscode-button-foreground, white);
+
+    /* background-color: var(--vscode-inputValidation-infoBorder); */
+    /* background-color: var(--vscode-testing-iconPassed); */
+    --pass-background-color: var(--vscode-terminalCommandDecoration-successBackground, rgb(36, 47, 202));
+    --pass-color: var(--vscode-button-foreground, white);
+
+    --warn-background-color: var(--vscode-debugConsole-warningForeground, rgb(190, 159, 20));
+    --warn-color: var(--vscode-button-foreground, white);
+
+    --not-run-background-color: var(--vscode-editor-foreground, rgb(102, 102, 102));
+    --not-run-color: var(--vscode-editor-background, white);
+
+    --summary-hover-background-color: var(--vscode-editor-hoverHighlightBackground, rgb(222, 222, 222));
+
+    /* 
+    --fg-color: white;
+    --bg-color: #4b4a4a;
+    --font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+    */
+}
+
+.summaryField {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.summaryFileName {
+    opacity: 0.6;
+    margin-left: 1rem;
+}
+
+.timeLabel {
+    opacity: 0.6;
+}
+
+/* .summaryInput {
+    opacity: 0.6;
+} */
+
+.summaryInput::before {
+    margin-left: 3px;
+    content: "(";
+}
+.summaryInput::after {
+    margin-right: 3px;
+    content: ")";
+}
+
+/* nesting level vertical line */
+.detailInfo {
+    border-left: 1px solid var(--error-background-color);
+
+    /* centering the line with the icon */
+    margin-left: 1.5rem;
+
+    /* nesting indentation */
+    padding-left: 0.8rem;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size);
+    font-weight: var(--font-weight);
+    color: var(--fg-color);
+    background-color: var(--bg-color);
+}
+
+#mainTree {
+    margin-top: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding-inline-start: 0px;
+    margin-block-start: 0px;
+}
+
+div ul:not(:first-child) {
+    border-left: 1px dotted rgb(141, 141, 141);
+}
+
+.tree li {
+    display: block;
+    position: relative;
+    padding-left: 0px;
+}
+
+.tree ul {
+    margin-left: 10px;
+    padding-left: 0;
+}
+
+.toolbarButton {
+    display: inline;
+    border-radius: 5px;
+    background: var(--bg-color);
+    color: var(--fg-color);
+    margin-left: 3px;
+    width: 15px;
+    height: 15px;
+    border: 0;
+    padding: 0;
+    vertical-align: middle;
+}
+
+.toolbarContainer {
+    display: inline-block;
+}
+
+.summaryDiv {
+    display: inline;
+}
+
+details > summary {
+    /* Note: couldn't get proper color with the svg approach */
+    /* list-style-image: url("data:image/svg+xml;utf8,<svg width='12px' height='12px' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><g data-name='Layer 2'><g data-name='arrow-ios-forward'><rect width='24' height='24' transform='rotate(-90 12 12)' opacity='0'/><path fill='currentColor' stroke='currentColor' d='M10 19a1 1 0 0 1-.64-.23 1 1 0 0 1-.13-1.41L13.71 12 9.39 6.63a1 1 0 0 1 .15-1.41 1 1 0 0 1 1.46.15l4.83 6a1 1 0 0 1 0 1.27l-5 6A1 1 0 0 1 10 19z'/></g></g></svg>"); */
+    /* list-style-type: "⮞ "; */
+    /* list-style-type: "⏵"; */
+    list-style-type: "+ ";
+}
+
+details[open] > summary {
+    /* list-style-image: url("data:image/svg+xml;utf8,<svg width='12px' height='12px' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><g data-name='Layer 2'><g data-name='arrow-ios-downward'><rect width='24' height='24' opacity='0'/><path fill='currentColor' stroke='currentColor' d='M12 16a1 1 0 0 1-.64-.23l-6-5a1 1 0 1 1 1.28-1.54L12 13.71l5.36-4.32a1 1 0 0 1 1.41.15 1 1 0 0 1-.14 1.46l-6 4.83A1 1 0 0 1 12 16z'/></g></g></svg>"); */
+    /* list-style-type: "⮟ "; */
+    /* list-style-type: "⏷"; */
+    list-style-type: "- ";
+}
+
+.NO_CHILDREN > summary {
+    list-style-type: "  " !important;
+}
+
+select {
+    background-color: var(--menu-background);
+    color: var(--menu-foreground);
+}
+
+summary {
+    padding: 3px;
+}
+
+a:link {
+    color: var(--fg-color);
+}
+
+a:visited {
+    color: var(--fg-color);
+}
+
+a:hover {
+    color: var(--fg-color);
+}
+
+a:active {
+    color: var(--fg-color);
+}
+
+.label {
+    padding: 2px 2px;
+    font-size: 0.65em;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    border-radius: 3px;
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+.timeLabel {
+    padding: 2px 2px;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    border-radius: 3px;
+    margin-right: 5px;
+    font-weight: lighter;
+}
+
+.label.F,
+.label.E,
+.label.FAIL,
+.label.ERROR {
+    border-radius: 3px;
+    background-color: var(--error-background-color);
+    color: var(--error-color);
+    font-weight: bolder;
+}
+
+.label.PASS,
+.label.I,
+.label.INFO {
+    border-radius: 3px;
+    background-color: var(--pass-background-color);
+    color: var(--pass-color);
+    font-weight: bolder;
+}
+
+.label.W,
+.label.WARN {
+    border-radius: 3px;
+    background-color: var(--warn-background-color);
+    color: var(--warn-color);
+    font-weight: bolder;
+}
+
+.label.HIDDEN {
+    border-radius: 3px;
+    background-color: var(--hidden-background-color);
+    color: var(--hidden-color);
+    font-weight: bolder;
+}
+.label.HIDDEN.inline {
+    margin-left: 5px;
+}
+
+summary.HIDDEN {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.label.NOT_RUN {
+    border-radius: 3px;
+    background-color: var(--not-run-background-color);
+    color: var(--not-run-color);
+    font-weight: bolder;
+}
+
+#summary.FAIL,
+#summary.ERROR {
+    border-bottom: 5px solid var(--error-background-color);
+}
+
+#summary.PASS {
+    border-bottom: 5px solid var(--pass-background-color);
+}
+
+#summary.NOT_RUN {
+    border-bottom: 5px solid var(--not-run-background-color);
+}
+
+/* .span_link::after {
+    content: " ⮳";
+} */
+.span_link {
+    cursor: pointer;
+    /* text-decoration: underline; */
+}
+
+summary:hover {
+    background-color: var(--summary-hover-background-color);
+}

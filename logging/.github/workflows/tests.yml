@@ -1,0 +1,78 @@
+name: Tests - Robocorp Logging
+
+on: ["push", "pull_request"]
+      
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [
+          "ubuntu-py39-outviewintegrationtests",
+          "windows-py310",
+          "ubuntu-py311",
+        ]
+        
+        include:
+          - name: "ubuntu-py39-outviewintegrationtests"
+            python: "3.9"
+            os: ubuntu-latest
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+          - name: "ubuntu-py311"
+            python: "3.11"
+            os: ubuntu-latest
+
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
+    - name: Install test deps
+      run: |
+        cd tests
+        pip install -r test_requirements.txt
+        pip install fire
+        cd ..
+    - name: Embed output view in index.py
+      run: |
+        python -m dev build-output-view
+        # python -m dev check-no-git-changes -- disabled because
+        # building in prod makes changes appear even if the entry
+        # code is the same. 
+    - name: setup.py install
+      run: |
+        cd src
+        python setup.py install
+        cd ..
+    - name: Build output view
+      if: contains(matrix.name, '-outviewintegrationtests')
+      working-directory: ./output-webview
+      run: |
+        yarn install
+        yarn build-test
+    - name: Test
+      working-directory: ./tests
+      env:
+        PYTHONPATH: .
+        RUN_TESTS_TIMEOUT: 10000
+        GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
+      run: python -u -m pytest -rfE -vv .
+    - uses: actions/upload-artifact@v3
+      if: always() && contains(matrix.name, '-outviewintegrationtests')
+      with:
+        name: robotlog.${{ matrix.name }}.html
+        path: output-webview/tests/output/log.html
+

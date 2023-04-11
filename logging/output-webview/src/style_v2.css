@@ -1,0 +1,436 @@
+/* ******************************* */
+/* CONTAINERS ETC */
+
+/* box model reset */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+:root {
+    --right-column-width-narrow: 40vw;
+    --right-column-width-wide: 50vw;
+    /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
+    --sans-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+        "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    /* from here: https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/ */
+    --fixed-font-family: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono", "Oxygen Mono",
+        "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+}
+
+/* ******************************* */
+/* THEMING SUPPORT */
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --log-color-error: #e84f5c;
+        --log-color-success: #219f7f;
+
+        --log-color-warn: #93801c;
+        --log-color-disabled: #999999;
+        --log-color-border: #dddddd;
+
+        --log-color-text: #000000;
+        --log-color-text-weaker: #444444;
+        --log-color-text-weakest: #666666;
+
+        --log-color-bg: #ffffff;
+        --log-color-bg-raised: #f3f3f3;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --log-color-error: #e84f5c;
+        --log-color-success: #219f7f;
+        --log-color-warn: #fff565;
+
+        --log-color-disabled: #666666;
+        --log-color-border: #444444;
+
+        --log-color-text: #eeeeee;
+        --log-color-text-weaker: #bbbbbb;
+        --log-color-text-weakest: #666666;
+
+        --log-color-bg: #222222;
+        --log-color-bg-raised: #333333;
+    }
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    font-size: 0.8rem;
+    font-family: var(--sans-font-family);
+    color: var(--log-color-text);
+    background-color: var(--log-color-bg);
+}
+
+ul {
+    list-style-type: none;
+    padding-inline-start: 0px;
+    margin-block-start: 0px;
+}
+
+#mainTree {
+    white-space: nowrap;
+    overflow: auto;
+    flex-grow: 1;
+}
+
+/* ******************************* */
+/* TREE */
+
+.tree li {
+    display: block;
+    position: relative;
+    padding-left: 0px;
+}
+
+/* nesting level vertical line */
+.tree ul:not(:first-child),
+.detailContainer {
+    border-left: 1px solid var(--log-color-border);
+
+    /* centering the line with the icon */
+    margin-left: 0.65rem;
+
+    /* nesting indentation */
+    padding-left: 0.8rem;
+}
+
+details.errorParent .tree ul:not(:first-child),
+details.errorParent .detailContainer {
+    border-color: var(--log-color-error);
+}
+
+/* ******************************* */
+/* SUMMARY ROW FOR EACH CODE ROW */
+
+details.parentNode > summary,
+details.errorParent.leafNode > summary {
+    cursor: pointer;
+}
+
+details > summary {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.25rem;
+
+    /* chrome needs this, safari doesn't */
+    list-style: none;
+}
+
+details > summary:hover {
+    background-color: var(--log-color-bg-raised);
+    border-radius: 2px;
+}
+
+details > summary::-webkit-details-marker {
+    display: none;
+}
+
+details > summary::marker {
+    display: none;
+}
+
+details > summary::before {
+    background-color: var(--log-color-success);
+}
+
+details.errorParent > summary::before {
+    background-color: var(--log-color-error);
+}
+
+details.warnParent > summary::before {
+    background-color: var(--log-color-warn);
+}
+
+/* icon from: https://github.com/twbs/icons/blob/main/icons/caret-right-square-fill.svg */
+details > summary::before {
+    position: absolute;
+    left: 0.25rem;
+    top: 4px;
+
+    /* chrome seems to need the '-webkit' prefix here */
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" class="bi bi-caret-right-square-fill" viewBox="0 0 16 16"><path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm5.5 10a.5.5 0 0 0 .832.374l4.5-4a.5.5 0 0 0 0-.748l-4.5-4A.5.5 0 0 0 5.5 4v8z"/></svg>');
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+    content: "";
+}
+
+/* filled icon */
+/*details.leafNode.passParent > summary::before {
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16"><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/></svg>');
+}*/
+
+details.leafNode.passParent > summary::before {
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg>');
+}
+
+/* https://www.svgrepo.com/collection/codicons-coding-icons/ (error) */
+details.leafNode.errorParent > summary::before {
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.6 1c1.6.1 3.1.9 4.2 2 1.3 1.4 2 3.1 2 5.1 0 1.6-.6 3.1-1.6 4.4-1 1.2-2.4 2.1-4 2.4-1.6.3-3.2.1-4.6-.7-1.4-.8-2.5-2-3.1-3.5C.9 9.2.8 7.5 1.3 6c.5-1.6 1.4-2.9 2.8-3.8C5.4 1.3 7 .9 8.6 1zm.5 12.9c1.3-.3 2.5-1 3.4-2.1.8-1.1 1.3-2.4 1.2-3.8 0-1.6-.6-3.2-1.7-4.3-1-1-2.2-1.6-3.6-1.7-1.3-.1-2.7.2-3.8 1-1.1.8-1.9 1.9-2.3 3.3-.4 1.3-.4 2.7.2 4 .6 1.3 1.5 2.3 2.7 3 1.2.7 2.6.9 3.9.6zM7.9 7.5L10.3 5l.7.7-2.4 2.5 2.4 2.5-.7.7-2.4-2.5-2.4 2.5-.7-.7 2.4-2.5-2.4-2.5.7-.7 2.4 2.5z"/></svg>');
+}
+
+/* https://www.svgrepo.com/collection/codicons-coding-icons/ (warn) */
+details.leafNode.warnParent > summary::before {
+    -webkit-mask: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.56 1h.88l6.54 12.26-.44.74H1.44L1 13.26 7.56 1zM8 2.28L2.28 13H13.7L8 2.28zM8.625 12v-1h-1.25v1h1.25zm-1.25-2V6h1.25v4h-1.25z"/></svg>');
+}
+
+details.parentNode > summary::before,
+details.parentNode.errorParent > summary::before {
+    transform-origin: 8px 8px;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease-out !important;
+}
+
+details[open].parentNode > summary::before,
+details[open].parentNode.errorParent > summary::before {
+    transform: rotate(90deg);
+}
+
+details[open] > summary > .summaryDiv > .summaryInput {
+    /* Display full input parameters when expanded by adjusting the
+       white-space to wrap the contents. Even nodes that don't have
+       children can be expanded in this way, but it is not obvious
+       since there is no triangle icon next to them. */
+    white-space: initial;
+}
+
+.summaryDiv {
+    /* aligns code line correctly with the icon */
+    display: flex;
+    margin-left: 1.2rem;
+}
+
+.summaryDiv > .label {
+    order: 2;
+}
+
+.summaryDiv > .summaryName {
+    order: 1;
+
+    margin-left: 0.5rem;
+    font-family: var(--fixed-font-family);
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summaryDiv > .summaryName,
+.detailContainer > .detailInfo {
+    /* this forces the correct column size, see:
+       https://makandracards.com/makandra/66994-css-flex-and-min-width */
+    min-width: 0;
+}
+
+details.errorParent > summary > .summaryDiv > .summaryName {
+    font-weight: bold;
+}
+
+.summaryDiv > .summaryInput {
+    order: 4;
+    margin-left: auto;
+    font-family: var(--fixed-font-family);
+    font-size: 0.75rem;
+    color: var(--log-color-text-weaker);
+}
+
+.summaryDiv > .summaryInput.emptySummaryInput {
+    color: var(--log-color-text-weakest);
+}
+
+.detailContainer {
+    display: flex;
+}
+
+.detailContainer > .detailInfo {
+    margin-right: auto;
+}
+
+.summaryDiv > .summaryInput,
+.detailContainer > .detailInputs {
+    flex: 0 0 var(--right-column-width-wide);
+    padding-left: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summaryDiv .timeLabel,
+.summaryDiv .summaryFileName {
+    order: 3;
+    color: var(--log-color-text-weakest);
+    margin-left: 0.5rem;
+}
+
+details > summary:hover .timeLabel,
+details > summary:hover .summaryFileName {
+    color: var(--log-color-text-weaker);
+}
+
+details > summary:hover .summaryInput:not(.emptySummaryInput) {
+    color: var(--log-color-text) !important;
+}
+
+/* ******************************* */
+/* RESPONSIVE SIZING */
+
+@media only screen and (max-width: 840px) {
+    .summaryDiv > .summaryInput,
+    .detailContainer > .detailInputs,
+    .headerInputs {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 960px) {
+    .headerInputs {
+        width: var(--right-column-width-narrow) !important;
+    }
+
+    .summaryDiv > .summaryInput,
+    .detailContainer > .detailInputs {
+        flex: 0 0 var(--right-column-width-narrow) !important;
+    }
+}
+
+/* ******************************* */
+/* ERROR OUTPUT */
+
+.detailInfo {
+    margin: 0.25rem 0;
+    padding: 0.25rem 0;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.errorHeader {
+    font-weight: bold;
+    margin-bottom: 0.35rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    /* forces wrapping */
+    white-space: initial;
+}
+
+.errorDetails {
+    font-family: var(--fixed-font-family);
+    font-size: 0.75rem;
+
+    /* forces wrapping */
+    white-space: initial;
+
+    color: var(--log-color-text-weaker);
+}
+
+/* ******************************* */
+/* HEADERS */
+
+.headers {
+    display: flex;
+    border-bottom: 1px solid var(--log-color-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.headerSource,
+.headerInputs {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+    color: var(--log-color-text-weaker);
+}
+
+.headerInputs {
+    margin-left: auto;
+    width: var(--right-column-width-wide);
+    padding-left: 0.5rem;
+}
+
+.headerRunDetails {
+    margin: 0;
+    margin-bottom: 1.5rem;
+    color: var(--log-color-text-weaker);
+}
+
+/* ******************************* */
+/* LABEL IS THE PASS/ERROR BADGE */
+
+.label {
+    display: inline-block;
+    margin-left: 0.5rem;
+    color: white;
+    font-weight: 600;
+    font-size: 10px;
+    border-radius: 2px;
+    padding: 0 4px;
+    height: 1rem;
+    line-height: 1rem;
+    letter-spacing: 0;
+    display: none;
+}
+
+.errorParent.leafNode .label.F,
+.errorParent.leafNode .label.E,
+.errorParent.leafNode .label.FAIL,
+.errorParent.leafNode .label.ERROR {
+    display: block;
+    background-color: var(--log-color-error);
+}
+
+/* hide labels when everything was successful */
+/*
+.label.PASS,
+.label.I,
+.label.INFO {
+}
+*/
+.errorParent.leafNode .label.W,
+.errorParent.leafNode .label.WARN {
+    background-color: var(--log-color-warn);
+}
+
+.label.NOT_RUN {
+    background-color: var(--log-color-disabled);
+}
+
+/* ******************************* */
+/* HEADER TITLE ROW */
+
+.headerTitleSection {
+    display: flex;
+    align-items: center;
+    margin-top: 0.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.headerTitleSection h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.5rem;
+}
+
+#suiteResult {
+    font-size: 0.82rem;
+    padding: 0.1rem 0.3rem 0.15rem 0.3rem;
+    height: auto;
+    margin-left: 0.75rem;
+    display: inline-block;
+}
+.headerTitleSection .ERROR {
+    background-color: var(--log-color-error);
+}
+.headerTitleSection .PASS {
+    background-color: var(--log-color-success);
+}

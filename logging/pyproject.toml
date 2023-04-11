@@ -1,0 +1,15 @@
+[tool.mypy]
+mypy_path = "robocorp-logging/src:robocorp-logging/tests"
+
+[[tool.mypy.overrides]]
+module = "setuptools.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytest_timeout.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytest_timeout.*"
+ignore_missing_imports = true
+
