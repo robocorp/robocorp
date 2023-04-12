@@ -153,6 +153,11 @@ def test_log_html_features(tmpdir) -> None:
                     "message_type": "STB",
                     "message": "ValueError: final exc",
                 },
+                {
+                    "message_type": "T",
+                    # i.e.: check for the utc timezone (+00:00) in the time.
+                    "__check__": lambda msg: msg["initial_time"].endswith("+00:00"),
+                },
             ],
         )
         for m in msgs:

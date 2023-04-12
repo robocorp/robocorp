@@ -30,7 +30,11 @@ def verify_log_messages_from_messages_iterator(
     for log_msg in log_messages:
         for expected_dct in expected_lst:
             for key, val in expected_dct.items():
-                if log_msg.get(key) != val:
+                if key == "__check__":
+                    if not val(log_msg):
+                        break
+
+                elif log_msg.get(key) != val:
                     break
             else:
                 expected_lst.remove(expected_dct)

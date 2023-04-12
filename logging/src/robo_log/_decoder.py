@@ -1,26 +1,53 @@
 import datetime
 import json
+from typing import Optional, List, Callable, Any, Dict, Iterator
 
 
-def _decode_oid(decoder, oid):
+class Decoder:
+    def __init__(self):
+        self.memo: Dict[str, str] = {}
+
+    def decode_message_type(self, message_type: str, message: str) -> Optional[dict]:
+        handler = _MESSAGE_TYPE_INFO[message_type]
+        ret = {"message_type": message_type}
+        try:
+            r = handler(self, message)
+            if not r:
+                if message_type == "M":
+                    return None
+                raise RuntimeError(
+                    f"No return when decoding: {message_type} - {message}"
+                )
+                if not isinstance(r, dict):
+                    ret[
+                        "error"
+                    ] = f"Expected dict return when decoding: {message_type} - {message}. Found: {ret}"
+
+            ret.update(r)
+        except Exception as e:
+            ret["error"] = f"Error decoding: {message_type}: {e}"
+        return ret
+
+
+def _decode_oid(decoder: Decoder, oid: str) -> str:
     return decoder.memo[oid]
 
 
-def _decode_float(decoder, msg):
+def _decode_float(decoder: Decoder, msg: str) -> float:
     return float(msg)
 
 
-def _decode_int(decoder, msg):
+def _decode_int(decoder: Decoder, msg: str) -> int:
     return int(msg)
 
 
-def _decode_str(decoder, msg):
+def _decode_str(decoder: Decoder, msg: str) -> str:
     return msg
 
 
-def _decode(message_definition, level_diff=0):
-    names = []
-    name_to_decode = {}
+def _decode(message_definition: str) -> Callable[[Decoder, str], Any]:
+    names: List[str] = []
+    name_to_decode: dict = {}
     for s in message_definition.split(","):
         s = s.strip()
         i = s.find(":")
@@ -43,8 +70,7 @@ def _decode(message_definition, level_diff=0):
         else:
             raise RuntimeError(f"Unexpected: {decode}")
 
-    def dec_impl(decoder, message):
-        decoder.level += level_diff
+    def dec_impl(decoder: Decoder, message: str):
         splitted = message.split("|", len(names) - 1)
         ret = {}
         for i, s in enumerate(splitted):
@@ -58,19 +84,28 @@ def _decode(message_definition, level_diff=0):
     return dec_impl
 
 
-def decode_time(decoder, time):
-    decoder.initial_time = datetime.datetime.fromisoformat(time)
+def decode_time(decoder: Decoder, time: str):
+    d: datetime.datetime = datetime.datetime.fromisoformat(time)
+
+    # The internal time is in utc, so, we need to decode it to the current timezone.
+    d = d.astimezone()
+
     return {"initial_time": time}
 
 
-def decode_memo(decoder, message):
+def decode_memo(decoder: Decoder, message: str) -> None:
+    memo_id: str
+    memo_value: str
+
     memo_id, memo_value = message.split(":", 1)
+
+    # Note: while the json.loads could actually load anything, in the spec we only
+    # have oid for string messages (which is why it's ok to type it as that).
     memo_value = json.loads(memo_value)
     decoder.memo[memo_id] = memo_value
-    return None
 
 
-_MESSAGE_TYPE_INFO = {
+_MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     # Version of the log output
     "V": lambda _decoder, message: {"version": message},
     # Some information message
@@ -92,25 +127,21 @@ _MESSAGE_TYPE_INFO = {
     # Start Suite
     "SS": _decode(
         "name:oid, suite_id:oid, suite_source:oid, time_delta_in_seconds:float",
-        level_diff=+1,
     ),
     # End Suite
-    "ES": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
+    "ES": _decode("status:oid, time_delta_in_seconds:float"),
     # Start Task
     "ST": _decode(
-        "name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float", level_diff=+1
+        "name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float",
     ),
     # End Task
-    "ET": _decode(
-        "status:oid, message:oid, time_delta_in_seconds:float", level_diff=-1
-    ),
+    "ET": _decode("status:oid, message:oid, time_delta_in_seconds:float"),
     # Start Element (some element we're tracking such as method, for, while, etc).
     "SE": _decode(
         "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
-        level_diff=+1,
     ),
     # End Element
-    "EE": _decode("status:oid, time_delta_in_seconds:float", level_diff=-1),
+    "EE": _decode("status:oid, time_delta_in_seconds:float"),
     # Element/method argument (name and value of the argument).
     "EA": _decode("name:oid, value:oid"),
     # Can appear before element (method) to note that the result will
@@ -127,7 +158,6 @@ _MESSAGE_TYPE_INFO = {
     # Start Traceback
     "STB": _decode(
         "message:oid, time_delta_in_seconds:float",
-        level_diff=+1,
     ),
     # Traceback Entry
     "TBE": _decode(
@@ -140,7 +170,6 @@ _MESSAGE_TYPE_INFO = {
     # End Traceback
     "ETB": _decode(
         "time_delta_in_seconds:float",
-        level_diff=-1,
     ),
 }
 
@@ -150,40 +179,13 @@ _MESSAGE_TYPE_INFO["RE"] = _MESSAGE_TYPE_INFO["SE"]
 _MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]
 
 
-class Decoder:
-    def __init__(self):
-        self.memo = {}
-        self.initial_time = None
-        self.level = 0
+def iter_decoded_log_format(stream) -> Iterator[dict]:
+    decoder: Decoder = Decoder()
+    line: str
+    message_type: str
+    message: str
+    decoded: Optional[dict]
 
-    @property
-    def ident(self):
-        return "    " * self.level
-
-    def decode_message_type(self, message_type, message):
-        handler = _MESSAGE_TYPE_INFO[message_type]
-        ret = {"message_type": message_type}
-        try:
-            r = handler(self, message)
-            if not r:
-                if message_type == "M":
-                    return None
-                raise RuntimeError(
-                    f"No return when decoding: {message_type} - {message}"
-                )
-                if not isinstance(r, dict):
-                    ret[
-                        "error"
-                    ] = f"Expected dict return when decoding: {message_type} - {message}. Found: {ret}"
-
-            ret.update(r)
-        except Exception as e:
-            ret["error"] = f"Error decoding: {message_type}: {e}"
-        return ret
-
-
-def iter_decoded_log_format(stream):
-    decoder = Decoder()
     for line in stream.readlines():
         line = line.strip()
         if line:

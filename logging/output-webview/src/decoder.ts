@@ -17,8 +17,10 @@ function simple_decode(decoder, message) {
 }
 
 function decode_time(decoder, time) {
-    decoder.initial_time = parseISO(time);
-    return { time };
+    const parsedTime = parseISO(time);
+    // Note: doing toString() in an utc time (which ends with +00:00)
+    // will convert it to the local timezone.
+    return { time: parsedTime.toString() };
 }
 
 function decode_memo(decoder, message) {
@@ -143,15 +145,9 @@ const _MESSAGE_TYPE_INFO = {
 
 export class Decoder {
     memo;
-    initial_time;
-    level;
-    ident;
 
     constructor() {
         this.memo = {};
-        this.initial_time = null;
-        this.level = 0;
-        this.ident = "";
     }
 
     decode_message_type(message_type, message) {

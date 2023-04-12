@@ -12,6 +12,8 @@ import sys
 import weakref
 from robo_log.protocols import OptExcInfo
 from functools import partial
+import time
+from datetime import timezone
 
 
 _valid_chars = tuple(string.ascii_letters + string.digits)
@@ -226,9 +228,10 @@ class _RoboOutputImpl:
         self._stream = None
 
         if config.initial_time is None:
-            self._initial_time = datetime.datetime.now()
+            self._initial_time = datetime.datetime.now(timezone.utc)
         else:
             self._initial_time = config.initial_time
+        self._initial_time_in_seconds = time.time()
 
         self._stack_handler = _StackHandler(self)
 
@@ -343,8 +346,8 @@ class _RoboOutputImpl:
         return s
 
     def get_time_delta(self) -> float:
-        delta = datetime.datetime.now() - self._initial_time
-        return round(delta.total_seconds(), 3)
+        delta = time.time() - self._initial_time_in_seconds
+        return round(delta, 3)
 
     def _move_old_runs(self):
         pass
