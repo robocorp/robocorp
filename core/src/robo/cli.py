@@ -145,7 +145,9 @@ def run(
         return 1
 
     with setup_auto_logging(), _setup_stdout_logging(), _setup_log_output(
-        Path(output_dir)
+        output_dir=Path(output_dir),
+        max_files=max_log_files,
+        max_file_size=max_log_file_size,
     ):
         from robo._exceptions import RoboCollectError
 

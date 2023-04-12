@@ -656,7 +656,7 @@ class _RoboOutputImpl:
             ],
         )
 
-    def log_message(self, level, message, time_delta, html):
+    def log_message(self, level, message, html, source, lineno, time_delta):
         oid = self._obtain_id
 
         msg_type = "L "
@@ -681,6 +681,8 @@ class _RoboOutputImpl:
                 # WARN = W
                 level[0].upper(),
                 oid(message),
+                oid(source),
+                self._number(lineno),
                 self._number(time_delta),
             ],
         )

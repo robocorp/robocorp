@@ -87,6 +87,7 @@ def test_log_html_features(tmpdir) -> None:
                 robo_log.critical("Some log error")
                 robo_log.warn("Some log warn")
                 robo_log.info("Some log info")
+                HTML_MESSAGE_LINENO = sys._getframe().f_lineno + 1
                 robo_log.info(HTML_MESSAGE, html=True)
                 check_sensitive_data.run()
                 try:
@@ -135,11 +136,14 @@ def test_log_html_features(tmpdir) -> None:
                     "message_type": "L",
                     "level": "I",
                     "message": "Some log info",
+                    "source": __file__,
                 },
                 {
                     "message_type": "LH",
                     "level": "I",
                     "message": HTML_MESSAGE,
+                    "source": __file__,
+                    "lineno": HTML_MESSAGE_LINENO,
                 },
                 {
                     "message_type": "STB",

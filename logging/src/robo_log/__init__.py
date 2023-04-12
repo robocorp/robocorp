@@ -35,6 +35,15 @@ version_info = [int(x) for x in __version__.split(".")]
 # --- Logging methods for custom messaging.
 
 
+def _log(level, message: str, html: bool = False) -> None:
+    back_frame = sys._getframe(2)
+    source = back_frame.f_code.co_filename
+    lineno = back_frame.f_lineno
+
+    for robo_logger in _get_logger_instances():
+        robo_logger.log_message(level, message, html, source, lineno)
+
+
 def critical(message: str, html: bool = False) -> None:
     """
     Adds a new logging message with a critical (error) level.
@@ -43,9 +52,7 @@ def critical(message: str, html: bool = False) -> None:
         message: The message which should be logged.
         html: If True the message passed should be rendered as HTML.
     """
-    for robo_logger in _get_logger_instances():
-        html = False
-        robo_logger.log_message(Status.ERROR, message, html)
+    _log(Status.ERROR, message, html)
 
 
 def warn(message: str, html: bool = False) -> None:
@@ -56,9 +63,7 @@ def warn(message: str, html: bool = False) -> None:
         message: The message which should be logged.
         html: If True the message passed should be rendered as HTML.
     """
-    for robo_logger in _get_logger_instances():
-        html = False
-        robo_logger.log_message(Status.WARN, message, html)
+    _log(Status.WARN, message, html)
 
 
 def info(message: str, html: bool = False) -> None:
@@ -69,8 +74,7 @@ def info(message: str, html: bool = False) -> None:
         message: The message which should be logged.
         html: If True the message passed should be rendered as HTML.
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.log_message(Status.INFO, message, html)
+    _log(Status.INFO, message, html)
 
 
 # --- Methods related to hiding logging information.

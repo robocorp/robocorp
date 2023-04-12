@@ -109,7 +109,7 @@ const start_element = _decode(
 
 const end_element = _decode("status:oid, time_delta_in_seconds:float");
 
-const decode_log = _decode("level:str, message:oid, time_delta_in_seconds:float");
+const decode_log = _decode("level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float");
 
 const id_decode = _decode("part:int, id:str");
 

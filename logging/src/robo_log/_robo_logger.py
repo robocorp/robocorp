@@ -247,17 +247,11 @@ class _RoboLogger:
                     self._skip_log_arguments -= 1
 
     @_log_error
-    def log_message(self, level: str, message: str, html: bool):
-        if level not in ("ERROR", "FAIL", "WARN", "INFO"):
-            # Exclude TRACE/DEBUG/HTML for now (we could make that configurable...)
-            return
-
-        if self._skip_log_methods:
-            if level not in ("ERROR", "FAIL", "WARN"):
-                return
-
+    def log_message(
+        self, level: str, message: str, html: bool, source: str, lineno: int
+    ):
         return self._robot_output_impl.log_message(
-            level, message, self._get_time_delta(), html
+            level, message, html, source, lineno, self._get_time_delta()
         )
 
     @_log_error

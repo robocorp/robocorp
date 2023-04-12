@@ -82,9 +82,13 @@ _MESSAGE_TYPE_INFO = {
     # Memorize some word to be used as oid.
     "M": decode_memo,
     # Log (raw text)
-    "L": _decode("level:str, message:oid, time_delta_in_seconds:float"),
+    "L": _decode(
+        "level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"
+    ),
     # Log (html)
-    "LH": _decode("level:str, message:oid, time_delta_in_seconds:float"),
+    "LH": _decode(
+        "level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"
+    ),
     # Start Suite
     "SS": _decode(
         "name:oid, suite_id:oid, suite_source:oid, time_delta_in_seconds:float",

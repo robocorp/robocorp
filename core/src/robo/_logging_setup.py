@@ -5,9 +5,7 @@ from robo._protocols import ITask
 def _log_before_task_run(task: ITask):
     import robo_log
 
-    robo_log.start_suite(
-        task.module_name, task.module_name, task.filename
-    )
+    robo_log.start_suite(task.module_name, task.module_name, task.filename)
     robo_log.start_task(
         task.name,
         f"{task.module_name}.{task.name}",
@@ -37,7 +35,6 @@ def setup_auto_logging():
     from robo_log import Filter
 
     with robo_log.setup_auto_logging(
-        # TODO: Some bug is preventing this from working.
         # filters=[Filter(name="RPA", exclude=False, is_path=False)]
     ):
         with before_task_run.register(_log_before_task_run), after_task_run.register(
