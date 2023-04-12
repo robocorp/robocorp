@@ -34,9 +34,8 @@ def test_log_html_features(tmpdir) -> None:
     This is a test which should generate an output for a log.html which
     showcases all the features available.
     """
-    from robo_log_tests.fixtures import (
-        verify_log_messages_from_messages_iterator,
-    )
+    from robo_log import Filter
+    from robo_log import verify_log_messages_from_log_html
 
     cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if FORCE_REGEN:
@@ -61,13 +60,16 @@ def test_log_html_features(tmpdir) -> None:
     )
     from imp import reload
     from pathlib import Path
-    from robo_log import iter_decoded_log_format_from_log_html
 
     __tracebackhide__ = 1
 
     log_target = Path(tmpdir.join("log.html"))
 
-    with robo_log.setup_auto_logging():
+    with robo_log.setup_auto_logging(
+        filters=[
+            Filter("difflib", exclude=False, is_path=False),
+        ]
+    ):
         check = reload(check)
         check_sensitive_data = reload(check_sensitive_data)
         check_traceback = reload(check_traceback)
@@ -79,6 +81,15 @@ def test_log_html_features(tmpdir) -> None:
             log_html=log_target,
             log_html_style=LOG_HTML_STYLE,
         ):
+            robo_log.start_task("Setup", "setup", 0, [])
+            import difflib
+
+            difflib = reload(difflib)
+
+            diff = difflib.ndiff("aaaa bbb ccc ddd".split(), "aaaa bbb eee ddd".split())
+            "".join(diff)
+            robo_log.end_task("Setup", "setup", "PASS", "end msg")
+
             robo_log.start_suite("Test Log HTML Features", "root", str(tmpdir))
             robo_log.start_task("my_task", "task_id", 0, [])
 
@@ -112,15 +123,9 @@ def test_log_html_features(tmpdir) -> None:
             robo_log.end_suite("Root Suite", "root", str(tmpdir))
 
         assert log_target.exists()
-        if "dev" in FORCE_REGEN:
-            messages_iterator = iter_decoded_log_format_from_log_html(
-                Path(os.path.join(os.path.dirname(log_target), "bundle.js"))
-            )
-        else:
-            messages_iterator = iter_decoded_log_format_from_log_html(log_target)
 
-        msgs = verify_log_messages_from_messages_iterator(
-            messages_iterator,
+        msgs = verify_log_messages_from_log_html(
+            log_target,
             [
                 {
                     "message_type": "L",

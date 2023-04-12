@@ -24,6 +24,7 @@ from typing import (
 from ._config import Filter
 from ._logger_instances import _get_logger_instances
 from .protocols import OptExcInfo, LogHTMLStyle, Status
+from robo_log.protocols import IReadLines
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
@@ -75,6 +76,22 @@ def info(message: str, html: bool = False) -> None:
         html: If True the message passed should be rendered as HTML.
     """
     _log(Status.INFO, message, html)
+
+
+def exception(message: Optional[str] = None, html: bool = False):
+    """
+    Adds to the logging the exceptions that's currently raised.
+
+    Args:
+        message: If given an additional error message to be shown.
+        html: If True the message passed should be rendered as HTML.
+    """
+    if message:
+        _log(Status.ERROR, message, html)
+
+    exc_info = sys.exc_info()
+    for robo_logger in _get_logger_instances():
+        robo_logger.log_method_except(exc_info, unhandled=True)
 
 
 # --- Methods related to hiding logging information.
@@ -165,7 +182,7 @@ def end_task(name: str, task_id: str, status: str, message: str) -> None:
         robo_logger.end_task(name, task_id, status, message)
 
 
-def iter_decoded_log_format(stream) -> Iterator[dict]:
+def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
     """
     :param stream:
         The stream which should be iterated in (anything with a `readlines()` method).
@@ -213,6 +230,14 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
     i = txt.find("let chunks = [")
     j = txt.find("];", i)
 
+    if i < 0 or j < 0:
+        # It may be that we're in dev mode and the target should be the bundle.js
+        bundle_js = log_html.parent / "bundle.js"
+        if bundle_js.exists():
+            txt = bundle_js.read_text(encoding="utf-8")
+            i = txt.find("let chunks = [")
+            j = txt.find("];", i)
+
     assert i > 0, "Could not find the chunks in the file."
     assert j > 0, "Could not find the end of the chunks in the file."
 
@@ -228,7 +253,71 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         stream.write(decoded.decode("utf-8"))
 
     stream.seek(0)
-    yield from iter_decoded_log_format(stream)
+    yield from iter_decoded_log_format_from_stream(stream)
+
+
+def verify_log_messages_from_messages_iterator(
+    messages_iterator: Iterator[dict], expected: Sequence[dict]
+) -> List[dict]:
+    """
+    A helper for checking that the expected messages are found in the
+    given messages iterator.
+
+    Args:
+        messages_iterator: An
+        expected:
+
+    Example:
+
+    """
+    expected_lst: List[dict] = list(expected)
+    log_messages = list(messages_iterator)
+    log_msg: dict
+    for log_msg in log_messages:
+        for expected_dct in expected_lst:
+            for key, val in expected_dct.items():
+                if key == "__check__":
+                    if not val(log_msg):
+                        break
+
+                elif log_msg.get(key) != val:
+                    break
+            else:
+                expected_lst.remove(expected_dct)
+                break
+
+    if expected_lst:
+        new_line = "\n"
+        raise AssertionError(
+            f"Did not find {expected_lst}.\nFound:\n{new_line.join(str(x) for x in log_messages)}"
+        )
+    return log_messages
+
+
+def verify_log_messages_from_decoded_str(
+    s: str, expected: Sequence[dict]
+) -> List[dict]:
+    log_messages: List[dict] = []
+    for log_msg in s.splitlines():
+        log_msg_dict: dict = json.loads(log_msg.strip())
+        log_messages.append(log_msg_dict)
+
+    return verify_log_messages_from_messages_iterator(iter(log_messages), expected)
+
+
+def verify_log_messages_from_log_html(
+    log_html: Path, expected: Sequence[dict]
+) -> List[dict]:
+    iter_in = iter_decoded_log_format_from_log_html(log_html)
+    return verify_log_messages_from_messages_iterator(iter_in, expected)
+
+
+def verify_log_messages_from_stream(
+    stream: IReadLines, expected: Sequence[dict]
+) -> Sequence[dict]:
+    return verify_log_messages_from_messages_iterator(
+        iter_decoded_log_format_from_stream(stream), expected
+    )
 
 
 def setup_auto_logging(

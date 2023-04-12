@@ -453,26 +453,10 @@ class _RoboOutputImpl:
 
     def log_method_except(
         self,
-        package: str,
-        filename: str,
-        name: str,
-        lineno: int,
         exc_info: OptExcInfo,
         unhandled: bool,
     ) -> bool:
         """
-        :param package:
-            The name of the package where the exception is being handled.
-
-        :param filename:
-            The name of the filename where the exception is being handled.
-
-        :param name:
-            The name of the function where the exception is being handled.
-
-        :param lineno:
-            The line where the exception is being handled.
-
         :param exc_info:
             The actual exception information gotten from sys.exc_info().
 

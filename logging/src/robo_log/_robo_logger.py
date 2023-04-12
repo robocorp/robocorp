@@ -257,16 +257,10 @@ class _RoboLogger:
     @_log_error
     def log_method_except(
         self,
-        package: str,
-        filename: str,
-        name: str,
-        lineno: int,
         exc_info: OptExcInfo,
         unhandled: bool,
     ):
-        return self._robot_output_impl.log_method_except(
-            package, filename, name, lineno, exc_info, unhandled
-        )
+        return self._robot_output_impl.log_method_except(exc_info, unhandled)
 
     @_log_error
     def close(self):

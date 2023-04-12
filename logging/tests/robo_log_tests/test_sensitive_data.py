@@ -14,7 +14,7 @@ def test_sensitive_data():
     from imp import reload
     from robo_log_tests._resources import check_sensitive_data
     from io import StringIO
-    from robo_log import iter_decoded_log_format
+    from robo_log import iter_decoded_log_format_from_stream
 
     s = StringIO()
 
@@ -35,7 +35,7 @@ def test_sensitive_data():
     s.seek(0)
 
     found = []
-    for v in iter_decoded_log_format(s):
+    for v in iter_decoded_log_format_from_stream(s):
         if v["message_type"] == "EA":
             found.append(v)
 

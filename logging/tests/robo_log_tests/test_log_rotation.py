@@ -3,7 +3,7 @@ def test_rotate_logs(tmpdir):
     from robo_log_tests._resources import check
     from imp import reload
     from pathlib import Path
-    from robo_log import iter_decoded_log_format
+    from robo_log import iter_decoded_log_format_from_stream
 
     log_target = Path(tmpdir.join("log.html"))
 
@@ -34,7 +34,7 @@ def test_rotate_logs(tmpdir):
     expect_types = {"RS", "RT", "RE"}
     found_ids_at_step = []
     with output_at_step.open("r") as stream:
-        for msg in iter_decoded_log_format(stream):
+        for msg in iter_decoded_log_format_from_stream(stream):
             if msg["message_type"] == "ID":
                 found_ids_at_step.append(msg)
             expect_types.discard(msg["message_type"])

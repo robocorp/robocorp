@@ -535,7 +535,7 @@ export class TreeBuilder {
 
             if (this.opts.showTime) {
                 const startTime: number = current.decodedMessage.decoded["time_delta_in_seconds"];
-                if (startTime && startTime >= 0) {
+                if (startTime !== undefined && startTime >= 0) {
                     const endTime: number = endDecodedMsg["time_delta_in_seconds"];
                     const diff = endTime - startTime;
                     // if (diff > 0) {

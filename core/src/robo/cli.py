@@ -5,6 +5,7 @@ from robo._argdispatch import arg_dispatch
 import json
 from contextlib import contextmanager
 import os
+import traceback
 
 
 def _setup_log_output(
@@ -48,8 +49,6 @@ def _setup_stdout_logging():
         EXIT = object()
 
         def in_thread():
-            import traceback
-
             while True:
                 msg = q.get(block=True)
                 if msg is EXIT:
@@ -126,12 +125,14 @@ def run(
     max_log_files: int = 5,
     max_log_file_size: str = "1MB",
 ) -> int:
-    from robo._collect_tasks import collect_tasks
-    from robo._hooks import before_task_run, after_task_run
-    from robo._logging_setup import setup_auto_logging
-    from robo._protocols import ITask
-    from robo._task import Context
-    from robo._protocols import Status
+    from ._collect_tasks import collect_tasks
+    from ._hooks import before_task_run, after_task_run
+    from ._logging_setup import setup_auto_logging
+    from ._protocols import ITask
+    from ._task import Context
+    from ._protocols import Status
+    from ._exceptions import RoboCollectError
+    from typing import List
 
     # Don't show internal machinery on tracebacks:
     # setting __tracebackhide__ will make it so that robocorp-logging
@@ -144,27 +145,51 @@ def run(
         context.show_error(f"Path: {path} does not exist")
         return 1
 
-    with setup_auto_logging(), _setup_stdout_logging(), _setup_log_output(
+    from robo_log import Filter
+    import robo_log
+
+    filters: List[Filter] = [
+        # Filter(name="RPA", exclude=False, is_path=False)
+    ]
+
+    with setup_auto_logging(
+        filters=filters
+    ), _setup_stdout_logging(), _setup_log_output(
         output_dir=Path(output_dir),
         max_files=max_log_files,
         max_file_size=max_log_file_size,
     ):
-        from robo._exceptions import RoboCollectError
+        status = "PASS"
+        setup_message = ""
 
-        if not task_name:
-            context.show(f"\nCollecting tasks from: {path}")
-        else:
-            context.show(f"\nCollecting task {task_name} from: {path}")
-
+        robo_log.start_task("Setup", "setup", 0, [])
         try:
-            tasks: Tuple[ITask, ...] = tuple(collect_tasks(p, task_name))
-        except RoboCollectError as e:
-            context.show_error(str(e))
-            return 1
+            if not task_name:
+                context.show(f"\nCollecting tasks from: {path}")
+            else:
+                context.show(f"\nCollecting task {task_name} from: {path}")
 
-        if not tasks:
-            context.show(f"Did not find any tasks in: {path}")
+            tasks: Tuple[ITask, ...] = tuple(collect_tasks(p, task_name))
+
+            if not tasks:
+                raise RoboCollectError(f"Did not find any tasks in: {path}")
+            if len(tasks) > 1:
+                raise RoboCollectError(
+                    f"Expected only 1 task to be run. Found: {', '.join(t.name for t in tasks)}"
+                )
+        except Exception as e:
+            status = "ERROR"
+            setup_message = str(e)
+            robo_log.exception()
+
+            if not isinstance(e, RoboCollectError):
+                traceback.print_exc()
+            else:
+                context.show_error(setup_message)
+
             return 1
+        finally:
+            robo_log.end_task("Setup", "setup", status, setup_message)
 
         for task in tasks:
             before_task_run(task)

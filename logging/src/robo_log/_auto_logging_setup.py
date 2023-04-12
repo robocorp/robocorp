@@ -124,9 +124,7 @@ def register_auto_logging_callbacks(rewrite_hook_config):
         status_stack[-1][2] = Status.ERROR
 
         for robo_logger in _get_logger_instances():
-            robo_logger.log_method_except(
-                f"{package}.{mod_name}", filename, name, lineno, exc_info, False
-            )
+            robo_logger.log_method_except(exc_info, unhandled=False)
 
     before_method.register(call_before_method)
     after_method.register(call_after_method)
