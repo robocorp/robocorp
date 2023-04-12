@@ -1,10 +1,15 @@
 from types import TracebackType
-from typing import Union, Literal
+from typing import Union, Literal, Protocol, List
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
 
 LogHTMLStyle = Literal["standalone", "vscode"]
+
+
+class IReadLines(Protocol):
+    def readlines(self) -> List[str]:
+        pass
 
 
 class Status:

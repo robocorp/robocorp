@@ -16,12 +16,12 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
 
 
 def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
+    from robo_log import verify_log_messages_from_log_html
+
     matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
     if matrix_name:
         if "logindev" not in matrix_name:
             pytest.skip(f"Disabled for matrix name: {matrix_name}")
-
-    from robo_log import iter_decoded_log_format_from_log_html
 
     rpa_challenge_dir = examples_dir / "rpa-challenge-rcc"
     assert rpa_challenge_dir.exists()
@@ -36,12 +36,6 @@ def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
     if not log_html.exists():
         raise AssertionError(f"Expected: {log_html} to exist.")
 
-    log_messages = tuple(iter_decoded_log_format_from_log_html(log_html))
-    for log_msg in log_messages:
-        if log_msg["message_type"] == "SE" and log_msg["name"] == "start_the_challenge":
-            break
-    else:
-        new_line = "\n"
-        raise AssertionError(
-            f"Did not find SE/some_method message. Found: {new_line.join(str(x) for x in log_messages)}"
-        )
+    verify_log_messages_from_log_html(
+        log_html, [{"message_type": "SE", "name": "start_the_challenge"}]
+    )

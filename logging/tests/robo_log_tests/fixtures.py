@@ -2,7 +2,6 @@ import pytest
 import os
 import sys
 from pathlib import Path
-from typing import List, Sequence
 
 
 @pytest.fixture(scope="session")
@@ -19,41 +18,6 @@ def raise_exceptions():
 
     for callback in _lifecycle_hooks.iter_all_callbacks():
         callback.raise_exceptions = True
-
-
-def verify_log_messages_from_messages_iterator(
-    messages_iterator, expected: Sequence[dict]
-) -> Sequence[dict]:
-    expected_lst: List[dict] = list(expected)
-    log_messages = tuple(messages_iterator)
-    log_msg: dict
-    for log_msg in log_messages:
-        for expected_dct in expected_lst:
-            for key, val in expected_dct.items():
-                if key == "__check__":
-                    if not val(log_msg):
-                        break
-
-                elif log_msg.get(key) != val:
-                    break
-            else:
-                expected_lst.remove(expected_dct)
-                break
-
-    if expected_lst:
-        new_line = "\n"
-        raise AssertionError(
-            f"Did not find {expected_lst}.\nFound:\n{new_line.join(str(x) for x in log_messages)}"
-        )
-    return log_messages
-
-
-def verify_log_messages(stream, expected: Sequence[dict]) -> Sequence[dict]:
-    from robo_log import iter_decoded_log_format
-
-    return verify_log_messages_from_messages_iterator(
-        iter_decoded_log_format(stream), expected
-    )
 
 
 @pytest.fixture()

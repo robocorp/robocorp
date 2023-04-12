@@ -2,7 +2,7 @@ def test_errors(log_setup, tmpdir):
     from robo_log_tests._resources import check_traceback
     from imp import reload
     import robo_log
-    from robo_log_tests.fixtures import verify_log_messages
+    from robo_log import verify_log_messages_from_stream
 
     stream = log_setup["stream"]
 
@@ -21,7 +21,7 @@ def test_errors(log_setup, tmpdir):
         raise AssertionError("Expected error and it was not raised.")
 
     stream.seek(0)
-    msgs = verify_log_messages(
+    msgs = verify_log_messages_from_stream(
         stream,
         [
             dict(message_type="EE", status="ERROR"),

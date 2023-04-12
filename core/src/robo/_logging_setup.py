@@ -1,5 +1,12 @@
 from contextlib import contextmanager
+from pathlib import Path
+from typing import Optional, Sequence, Union
+
 from robo._protocols import ITask
+import typing
+
+if typing.TYPE_CHECKING:
+    from robo_log import Filter
 
 
 def _log_before_task_run(task: ITask):
@@ -25,17 +32,22 @@ def _log_after_task_run(task: ITask):
 
 
 @contextmanager
-def setup_auto_logging():
+def setup_auto_logging(
+    tracked_folders: Optional[Sequence[Union[Path, str]]] = None,
+    untracked_folders: Optional[Sequence[Union[Path, str]]] = None,
+    filters: Sequence["Filter"] = (),
+):
+    # This needs to be called before importing code which needs to show in the log
+    # (user or library).
+
     import robo_log
     from robo._hooks import before_task_run
     from robo._hooks import after_task_run
 
-    # This needs to be called before importing code which needs to show in the log
-    # (user or library).
-    from robo_log import Filter
-
     with robo_log.setup_auto_logging(
-        # filters=[Filter(name="RPA", exclude=False, is_path=False)]
+        tracked_folders=tracked_folders,
+        untracked_folders=untracked_folders,
+        filters=filters,
     ):
         with before_task_run.register(_log_before_task_run), after_task_run.register(
             _log_after_task_run

@@ -9,10 +9,7 @@ def test_log_api(tmpdir) -> None:
     from robo_log_tests._resources import check
     from imp import reload
     from pathlib import Path
-    from robo_log import iter_decoded_log_format_from_log_html
-    from robo_log_tests.fixtures import (
-        verify_log_messages_from_messages_iterator,
-    )
+    from robo_log import verify_log_messages_from_log_html
 
     log_target = Path(tmpdir.join("log.html"))
 
@@ -44,8 +41,8 @@ def test_log_api(tmpdir) -> None:
             robo_log.end_suite("Root Suite", "root", "PASS")
 
         assert log_target.exists()
-        messages = verify_log_messages_from_messages_iterator(
-            iter_decoded_log_format_from_log_html(log_target),
+        messages = verify_log_messages_from_log_html(
+            log_target,
             [
                 dict(message_type="SE", name="some_method"),
                 dict(message_type="SE", name="call_another_method"),
@@ -64,10 +61,7 @@ def test_log_api_without_with_statments(tmpdir) -> None:
     from robo_log_tests._resources import check
     from imp import reload
     from pathlib import Path
-    from robo_log import iter_decoded_log_format_from_log_html
-    from robo_log_tests.fixtures import (
-        verify_log_messages_from_messages_iterator,
-    )
+    from robo_log import verify_log_messages_from_log_html
 
     log_target = Path(tmpdir.join("log.html"))
     ctx = robo_log.setup_auto_logging()
@@ -92,8 +86,6 @@ def test_log_api_without_with_statments(tmpdir) -> None:
             robo_log.close_log_outputs()
 
         assert log_target.exists()
-        verify_log_messages_from_messages_iterator(
-            iter_decoded_log_format_from_log_html(log_target), [dict(message_type="SE")]
-        )
+        verify_log_messages_from_log_html(log_target, [dict(message_type="SE")])
     finally:
         ctx.__exit__(None, None, None)

@@ -1,6 +1,7 @@
 import datetime
 import json
 from typing import Optional, List, Callable, Any, Dict, Iterator
+from robo_log.protocols import IReadLines
 
 
 class Decoder:
@@ -179,7 +180,7 @@ _MESSAGE_TYPE_INFO["RE"] = _MESSAGE_TYPE_INFO["SE"]
 _MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]
 
 
-def iter_decoded_log_format(stream) -> Iterator[dict]:
+def iter_decoded_log_format(stream: IReadLines) -> Iterator[dict]:
     decoder: Decoder = Decoder()
     line: str
     message_type: str
