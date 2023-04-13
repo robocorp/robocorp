@@ -12,6 +12,7 @@ import sys
 import os
 import traceback
 import subprocess
+from pathlib import Path
 
 __file__ = os.path.abspath(__file__)
 
@@ -41,10 +42,16 @@ def _fix_contents_version(contents, version):
     contents = re.sub(
         r"(\"version\"\s*:\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
     )
-    contents = re.sub(
-        r"(blob/robotframework-lsp)-\d+\.\d+\.\d+", r"\1-%s" % (version,), contents
-    )
 
+    return contents
+
+
+def _fix_contents_version_in_poetry(contents, version):
+    import re
+
+    contents = re.sub(
+        r"(robocorp-logging\s*=\s*)\"\^\d+\.\d+\.\d+", r'\1"^%s' % (version,), contents
+    )
     return contents
 
 
@@ -66,6 +73,9 @@ class Dev(object):
 
         update_version(version, "pyproject.toml")
         update_version(version, os.path.join(".", "src", "robo_log", "__init__.py"))
+        logging_dir = Path(".").absolute()
+        core_poetry = logging_dir.parent / "core" / "pyproject.toml"
+        update_version(version, core_poetry, _fix_contents_version_in_poetry)
 
     def get_tag(self):
         import subprocess
@@ -202,58 +212,15 @@ FILE_CONTENTS = {repr(file_contents)}
                 )
 
 
-def test_lines():
-    """
-    Check that the replace matches what we expect.
-
-    Things we must match:
-
-        version="0.0.1"
-        "version": "0.0.1",
-        __version__ = "0.0.1"
-        https://github.com/robocorp/robotframework-lsp/blob/robotframework-lsp-0.1.1/robotframework-ls/README.md
-    """
-    from robocorp_ls_core.unittest_tools.compare import compare_lines
-
-    contents = _fix_contents_version(
-        """
-        version="0.0.198"
-        version = "0.0.1"
-        "version": "0.0.1",
-        "version":"0.0.1",
-        "version" :"0.0.1",
-        __version__ = "0.0.1"
-        https://github.com/robocorp/robotframework-lsp/blob/robotframework-lsp-0.1.1/robotframework-ls/README.md
-        """,
-        "3.7.1",
-    )
-
-    expected = """
-        version="3.7.1"
-        version = "3.7.1"
-        "version": "3.7.1",
-        "version":"3.7.1",
-        "version" :"3.7.1",
-        __version__ = "3.7.1"
-        https://github.com/robocorp/robotframework-lsp/blob/robotframework-lsp-3.7.1/robotframework-ls/README.md
-        """
-
-    compare_lines(contents.splitlines(), expected.splitlines())
-
-
 if __name__ == "__main__":
-    TEST = False
-    if TEST:
-        test_lines()
-    else:
-        # Workaround so that fire always prints the output.
-        # See: https://github.com/google/python-fire/issues/188
-        def Display(lines, out):
-            text = "\n".join(lines) + "\n"
-            out.write(text)
+    # Workaround so that fire always prints the output.
+    # See: https://github.com/google/python-fire/issues/188
+    def Display(lines, out):
+        text = "\n".join(lines) + "\n"
+        out.write(text)
 
-        from fire import core
+    from fire import core
 
-        core.Display = Display
+    core.Display = Display
 
-        fire.Fire(Dev())
+    fire.Fire(Dev())
