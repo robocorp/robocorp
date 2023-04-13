@@ -54,6 +54,17 @@ def open_browser(
     headless=True
     # TODO: support more args
 ) -> Browser:
+    """Launches a Playwright browser instance.
+
+    Args:
+        browser: Specifies which browser to use. Supported browsers are: ``chrome`` and ``firefox``.
+        headless: If set to False a GUI is provided, otherwise it is hidden.
+
+    Returns:
+        Browser: A Browser instance.
+
+    """
+
     playwright = _sync_playwright().start()
 
     assert playwright
@@ -70,6 +81,19 @@ def open_browser(
 
 
 def open_url(url: str, headless=True) -> Page:
+    """Launches a Playwright browser instance and opens the given URL.
+
+    Note:
+        Uses the ``chrome`` browser.
+
+    Args:
+        url: Navigates to the provided URL.
+        headless: If set to False a GUI is provided, otherwise it is hidden.
+
+    Returns:
+        Page: A Page instance.
+
+    """
     browser = open_browser(headless=headless)
     page = browser.new_page()
     page.goto(url)

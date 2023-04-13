@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class Worksheet:
-    """Common worksheet for both .xls and .xlsx files management."""
+    """Common class for worksheets to manage the worksheet's content."""
 
     def __init__(self, workbook: "Workbook", name: str):
         self._workbook = workbook

@@ -17,7 +17,7 @@ from openpyxl.utils.exceptions import InvalidFileException
 
 from robo.libs.excel._types import PathType
 from robo.libs.excel.tables import Table
-from robo.libs.excel._worksheet import Worksheet
+from robo.libs.excel.worksheet import Worksheet
 
 
 def _get_column_index(column: str) -> int:
