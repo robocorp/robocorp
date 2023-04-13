@@ -2,8 +2,8 @@ name: Logging Release
 
 on:
   push:
-    branches:
-      - "release-robocorp-logging"
+#     branches:
+#       - "release-robocorp-logging"
     tags:
       - "robocorp-logging-*"
 
