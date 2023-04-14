@@ -1,18 +1,42 @@
 from typing import Optional, Sequence
 from collections import namedtuple
+import enum
 
 # Examples:
-# Filter("mymodule.ignore", exclude=True, is_path=False)
-# Filter("mymodule.rpa", exclude=False, is_path=False)
-# Filter("**/check/**", exclude=True, is_path=True)
-Filter = namedtuple("Filter", "name, exclude, is_path")
+# Filter("mymodule.ignore", kind="exclude")
+# Filter("mymodule.rpa", kind="full_log")
+# Filter("RPA", kind="log_on_project_call")
+Filter = namedtuple("Filter", "name, kind")
+
+
+class FilterKind(enum.Enum):
+    full_log = "full"
+    log_on_project_call = "call"
+    exclude = "exc"
 
 
 class BaseConfig:
-    def can_rewrite_module_name(self, module_name: str) -> bool:
+    def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
+        """
+        Args:
+            module_name: the name of the module to check.
+
+        Returns:
+            The filter kind or None if the filter kind couldn't be discovered
+            just with the module name.
+        """
         raise NotImplementedError()
 
-    def can_rewrite_module(self, module_name: str, filename: str) -> bool:
+    def get_filter_kind_by_module_name_and_path(
+        self, module_name: str, filename: str
+    ) -> FilterKind:
+        """
+        Args:
+            module_name: the name of the module to check.
+
+        Returns:
+            The filter kind to be applied.
+        """
         raise NotImplementedError()
 
 
@@ -32,20 +56,29 @@ class ConfigFilesFiltering(BaseConfig):
         project_roots: Optional[Sequence[str]] = None,
         library_roots: Optional[Sequence[str]] = None,
         filters: Sequence[Filter] = (),
+        set_as_global: bool = False,
     ):
         from robo_log._rewrite_filtering import FilesFiltering
 
         self._files_filtering = FilesFiltering(project_roots, library_roots, filters)
+        if set_as_global:
+            import robo_log
 
-    def can_rewrite_module_name(self, module_name: str) -> bool:
+            robo_log._in_project_roots = self._files_filtering.in_project_roots
+
+    def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
         if module_name.startswith("robo_log"):
             # We can't rewrite our own modules (we could end up recursing).
             if "check" in module_name:
                 # Exception just for testing.
-                return True
-            return False
+                return FilterKind.full_log
+            return FilterKind.exclude
 
-        return self._files_filtering.accept_module_name(module_name)
+        return self._files_filtering.get_modname_filter_kind(module_name)
 
-    def can_rewrite_module(self, module_name: str, filename: str) -> bool:
-        return self._files_filtering.accept(filename, module_name)
+    def get_filter_kind_by_module_name_and_path(
+        self, module_name: str, filename: str
+    ) -> FilterKind:
+        return self._files_filtering.get_modname_or_file_filter_kind(
+            filename, module_name
+        )

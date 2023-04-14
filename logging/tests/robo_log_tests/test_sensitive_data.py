@@ -1,13 +1,4 @@
 import robo_log
-from robo_log._config import BaseConfig
-
-
-class ConfigForTest(BaseConfig):
-    def can_rewrite_module_name(self, module_name: str) -> bool:
-        return "check" in module_name
-
-    def can_rewrite_module(self, module_name: str, filename: str) -> bool:
-        return "check" in module_name
 
 
 def test_sensitive_data():

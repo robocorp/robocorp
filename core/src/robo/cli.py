@@ -133,6 +133,7 @@ def run(
     from ._protocols import Status
     from ._exceptions import RoboCollectError
     from typing import List
+    from robo_log._config import FilterKind
 
     # Don't show internal machinery on tracebacks:
     # setting __tracebackhide__ will make it so that robocorp-logging
@@ -148,11 +149,16 @@ def run(
     from robo_log import Filter
     import robo_log
 
+    # TODO: This config should come from a configuration file (pyproject.toml probably).
     filters: List[Filter] = [
-        # Filter(name="RPA", exclude=False, is_path=False)
+        Filter(name="RPA", kind=FilterKind.log_on_project_call),
+        Filter("selenium", FilterKind.log_on_project_call),
+        Filter("SeleniumLibrary", FilterKind.log_on_project_call),
     ]
 
     with setup_auto_logging(
+        # Note: we can't customize what's a "project" file or a "library" file, right now
+        # the customizations are all based on module names.
         filters=filters
     ), _setup_stdout_logging(), _setup_log_output(
         output_dir=Path(output_dir),

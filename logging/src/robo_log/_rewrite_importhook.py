@@ -39,7 +39,7 @@ from typing import Optional
 from typing import Sequence
 from typing import Tuple
 from typing import Union
-from ._config import BaseConfig
+from ._config import BaseConfig, FilterKind
 from ._rewrite_ast_add_callbacks import rewrite_ast_add_callbacks
 
 
@@ -49,7 +49,8 @@ from ._rewrite_ast_add_callbacks import rewrite_ast_add_callbacks
 # 0.0.3: Support for exception handlers
 # 0.0.4: Add __name__
 # 0.0.5: Renames of internal modules.
-version = "0.0.5"
+# 0.0.6: Option to log just 1 level deep into library modules.
+version = "0.0.6"
 PYTEST_TAG = f"{sys.implementation.cache_tag}-robo_log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + PYTEST_TAG + PYC_EXT
@@ -90,8 +91,15 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
     ) -> Optional[importlib.machinery.ModuleSpec]:
         if self._writing_pyc:
             return None
-        if self._early_rewrite_bailout(name):
-            return None
+
+        filter_kind: Optional[FilterKind] = self.config.get_filter_kind_by_module_name(
+            name
+        )
+        if filter_kind is not None:
+            # Try to bail out as early as possible as the slow part is the "_find_spec".
+            if filter_kind == FilterKind.exclude:
+                return None
+
         trace("find_module called for: %s" % name)
 
         # Type ignored because mypy is confused about the `self` binding here.
@@ -111,8 +119,10 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
         else:
             fn = spec.origin
 
-        if not self._should_rewrite(name, fn):
-            return None
+        if filter_kind is None:
+            filter_kind = self.config.get_filter_kind_by_module_name_and_path(name, fn)
+            if filter_kind == FilterKind.exclude:
+                return None
 
         return importlib.util.spec_from_file_location(
             name,
@@ -149,7 +159,12 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
                 write = False
                 trace(f"read only directory: {cache_dir}")
 
-        cache_name = fn.name[:-3] + PYC_TAIL
+        filter_kind: FilterKind = self.config.get_filter_kind_by_module_name_and_path(
+            module.__name__, module.__spec__.origin
+        )
+
+        cache_name = fn.name[:-3] + filter_kind.value + PYC_TAIL
+
         pyc = cache_dir / cache_name
         # Notice that even if we're in a read-only directory, I'm going
         # to check for a cached pyc. This may not be optimal...
@@ -159,7 +174,7 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
             co = _read_pyc(fn, pyc, trace)
         if co is None:
             trace(f"rewriting {fn!r}")
-            source_stat, co = _rewrite(fn, self.config)
+            source_stat, co, _tree = _rewrite(fn, self.config, filter_kind)
             if write:
                 self._writing_pyc = True
                 try:
@@ -169,19 +184,6 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
         else:
             trace(f"found cached rewritten pyc for {fn}")
         exec(co, module.__dict__)
-
-    def _early_rewrite_bailout(self, module_name: str) -> bool:
-        """A fast way to get out of rewriting modules.
-
-        Profiling has shown that the call to PathFinder.find_spec (inside of
-        the find_spec from this class) is a major slowdown, so, this method
-        tries to filter what we're sure won't be rewritten before getting to
-        it.
-        """
-        return not self.config.can_rewrite_module_name(module_name)
-
-    def _should_rewrite(self, module_name: str, filename: str) -> bool:
-        return self.config.can_rewrite_module(module_name, filename)
 
     def get_data(self, pathname: Union[str, bytes]) -> bytes:
         """Optional PEP302 get_data API."""
@@ -247,15 +249,17 @@ def _write_pyc(
     return True
 
 
-def _rewrite(fn: Path, config: BaseConfig) -> Tuple[os.stat_result, types.CodeType]:
+def _rewrite(
+    fn: Path, config: BaseConfig, filter_kind: FilterKind
+) -> Tuple[os.stat_result, types.CodeType, ast.AST]:
     """Read and rewrite *fn* and return the code object."""
     stat = os.stat(fn)
     source = fn.read_bytes()
     strfn = str(fn)
     tree = ast.parse(source, filename=strfn)
-    rewrite_ast_add_callbacks(tree, source, strfn, config)
+    rewrite_ast_add_callbacks(tree, filter_kind, source, strfn, config)
     co = compile(tree, strfn, "exec", dont_inherit=True)
-    return stat, co
+    return stat, co, tree
 
 
 def _read_pyc(

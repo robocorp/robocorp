@@ -21,13 +21,14 @@ from typing import (
     Iterable,
     Literal,
 )
-from ._config import Filter
+from ._config import Filter, FilterKind
 from ._logger_instances import _get_logger_instances
 from .protocols import OptExcInfo, LogHTMLStyle, Status
 from robo_log.protocols import IReadLines
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
+    from ._rewrite_filtering import FilesFiltering
 
 __version__ = "0.0.6"
 version_info = [int(x) for x in __version__.split(".")]
@@ -365,7 +366,7 @@ def setup_auto_logging(
         library_roots = None
 
     return register_auto_logging_callbacks(
-        ConfigFilesFiltering(project_roots, library_roots, filters)
+        ConfigFilesFiltering(project_roots, library_roots, filters, set_as_global=True)
     )
 
 
@@ -419,3 +420,17 @@ def add_in_memory_log_output(write):
         logger.close()
 
     return OnExitContextManager(_exit)
+
+
+# Not part of the API, used to determine whether a file is a project file
+# or a library file when running with the FilterKind.log_on_project_call kind.
+# Only set/used when setting up auto-logging (changed at runtime).
+def _in_project_roots(filename: str) -> bool:
+    return False
+
+
+def _caller_in_project_roots() -> bool:
+    try:
+        return _in_project_roots(sys._getframe(2).f_code.co_filename)
+    except ValueError:  # call stack is not deep enough
+        return False

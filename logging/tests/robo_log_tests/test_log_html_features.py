@@ -34,8 +34,7 @@ def test_log_html_features(tmpdir) -> None:
     This is a test which should generate an output for a log.html which
     showcases all the features available.
     """
-    from robo_log import Filter
-    from robo_log import verify_log_messages_from_log_html
+    from robo_log import Filter, FilterKind, verify_log_messages_from_log_html
 
     cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     if FORCE_REGEN:
@@ -67,7 +66,7 @@ def test_log_html_features(tmpdir) -> None:
 
     with robo_log.setup_auto_logging(
         filters=[
-            Filter("difflib", exclude=False, is_path=False),
+            Filter("difflib", FilterKind.log_on_project_call),
         ]
     ):
         check = reload(check)

@@ -116,11 +116,6 @@ def register_auto_logging_callbacks(rewrite_hook_config):
             critical("On method except the status_stack was empty.")
             return
 
-        if pop_package != package or pop_name != name:
-            critical(
-                f"On method except status stack package/name was: {pop_package}.{pop_name}. Received: {package}.{name}."
-            )
-            return
         status_stack[-1][2] = Status.ERROR
 
         for robo_logger in _get_logger_instances():

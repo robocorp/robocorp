@@ -1,7 +1,29 @@
-import pytest
 import os
-import sys
 from pathlib import Path
+import sys
+from typing import Optional
+
+import pytest
+
+from robo_log._config import BaseConfig, FilterKind
+
+
+class ConfigForTest(BaseConfig):
+    def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
+        if "check_lib_lib" in module_name:
+            return FilterKind.log_on_project_call
+
+        if "check" in module_name:
+            return FilterKind.full_log
+
+        return FilterKind.exclude
+
+    def get_filter_kind_by_module_name_and_path(
+        self, module_name: str, filename: str
+    ) -> FilterKind:
+        filter_kind = self.get_filter_kind_by_module_name(module_name)
+        assert filter_kind
+        return filter_kind
 
 
 @pytest.fixture(scope="session")
