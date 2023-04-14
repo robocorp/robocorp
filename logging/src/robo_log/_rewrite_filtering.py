@@ -1,13 +1,11 @@
-import fnmatch
-import glob
 import os.path
 import sys
 
 import platform
 import logging
-from typing import Sequence, Optional, List, Dict, Any
+from typing import Sequence, Optional, List, Dict
 import threading
-from ._config import Filter
+from ._config import Filter, FilterKind
 
 log = logging.getLogger(__name__)
 
@@ -37,65 +35,6 @@ def _convert_to_str_and_clear_empty(roots):
     return new_roots
 
 
-def _check_matches(patterns, paths):
-    if not patterns and not paths:
-        # Matched to the end.
-        return True
-
-    if (not patterns and paths) or (patterns and not paths):
-        return False
-
-    pattern = normcase(patterns[0])
-    path = normcase(paths[0])
-
-    if not glob.has_magic(pattern):
-        if pattern != path:
-            return False
-
-    elif pattern == "**":
-        if len(patterns) == 1:
-            return True  # if ** is the last one it matches anything to the right.
-
-        for i in range(len(paths)):
-            # Recursively check the remaining patterns as the
-            # current pattern could match any number of paths.
-            if _check_matches(patterns[1:], paths[i:]):
-                return True
-
-    elif not fnmatch.fnmatch(path, pattern):
-        # Current part doesn't match.
-        return False
-
-    return _check_matches(patterns[1:], paths[1:])
-
-
-def glob_matches_path(path, pattern, sep=os.sep, altsep=os.altsep):
-    if altsep:
-        pattern = pattern.replace(altsep, sep)
-        path = path.replace(altsep, sep)
-
-    drive = ""
-    if len(path) > 1 and path[1] == ":":
-        drive, path = path[0], path[2:]
-
-    if drive and len(pattern) > 1:
-        if pattern[1] == ":":
-            if drive.lower() != pattern[0].lower():
-                return False
-            pattern = pattern[2:]
-
-    patterns = pattern.split(sep)
-    paths = path.split(sep)
-    if paths:
-        if paths[0] == "":
-            paths = paths[1:]
-    if patterns:
-        if patterns[0] == "":
-            patterns = patterns[1:]
-
-    return _check_matches(patterns, paths)
-
-
 class FilesFiltering(object):
     """
     Usage is something as:
@@ -115,7 +54,9 @@ class FilesFiltering(object):
         self._filters = filters
         self._project_roots: List[str] = []
         self._library_roots: List[str] = []
-        self._cache: Dict[Any, bool] = {}
+        self._cache_modname_to_kind: Dict[str, Optional[FilterKind]] = {}
+        self._cache_filename_to_kind: Dict[str, FilterKind] = {}
+        self._cache_in_project_roots: Dict[str, bool] = {}
 
         if project_roots is not None:
             self._set_project_roots(project_roots)
@@ -198,14 +139,21 @@ class FilesFiltering(object):
                 new_roots.append(path + "/")
         return new_roots
 
-    def _absolute_normalized_path(self, filename):
+    def _absolute_normalized_path(self, filename, cache={}):
         """
         Provides a version of the filename that's absolute and normalized.
         """
-        if filename.startswith("<"):
-            return normcase(filename)
+        try:
+            return cache[filename]
+        except KeyError:
+            pass
 
-        return normcase(os.path.abspath(filename))
+        if filename.startswith("<"):
+            cache[filename] = normcase(filename)
+            return cache[filename]
+
+        cache[filename] = normcase(os.path.abspath(filename))
+        return cache[filename]
 
     def _set_project_roots(self, project_roots):
         self._project_roots = self._fix_roots(project_roots)
@@ -221,11 +169,9 @@ class FilesFiltering(object):
     def _get_library_roots(self):
         return self._library_roots
 
-    def _in_project_roots(self, received_filename):
+    def _in_project_roots(self, received_filename: str) -> bool:
         """
-        Note: don't call directly. Use PyDb.in_project_scope (there's no caching here and it doesn't
-        handle all possibilities for knowing whether a project is actually in the scope, it
-        just handles the heuristics based on the absolute_normalized_filename without the actual frame).
+        Note: uncached. Use `in_project_roots`.
         """
         DEBUG = False
 
@@ -308,53 +254,59 @@ class FilesFiltering(object):
 
         return in_project
 
-    def _exclude_by_filter(self, absolute_filename: Optional[str], module_name: str):
+    def in_project_roots(self, filename: str) -> bool:
+        try:
+            return self._cache_in_project_roots[filename]
+        except KeyError:
+            pass
+
+        in_project_roots = self._in_project_roots(filename)
+        self._cache_in_project_roots[filename] = in_project_roots
+        return in_project_roots
+
+    def _compute_filter_kind(self, module_name: str) -> Optional[FilterKind]:
         """
         :return: True if it should be excluded, False if it should be included and None
             if no rule matched the given file.
         """
-        for exclude_filter in self._filters:  # : :type exclude_filter: Filter
-            if exclude_filter.is_path:
-                if not absolute_filename:
-                    continue
-                if glob_matches_path(absolute_filename, exclude_filter.name):
-                    return exclude_filter.exclude
-            else:
-                # Module filter.
-                if exclude_filter.name == module_name or module_name.startswith(
-                    exclude_filter.name + "."
-                ):
-                    return exclude_filter.exclude
+        for exclude_filter in self._filters:
+            if exclude_filter.name == module_name or module_name.startswith(
+                exclude_filter.name + "."
+            ):
+                return exclude_filter.kind
         return None
 
-    def accept_module_name(self, module_name: str) -> bool:
+    def get_modname_filter_kind(self, module_name: str) -> Optional[FilterKind]:
         cache_key = module_name
         try:
-            return self._cache[cache_key]
+            return self._cache_modname_to_kind[cache_key]
         except KeyError:
             pass
 
-        exclude = self._exclude_by_filter(None, module_name)
-        if exclude is None:
-            exclude = False
+        filter_kind = self._compute_filter_kind(module_name)
+        self._cache_modname_to_kind[cache_key] = filter_kind
+        return filter_kind
 
-        accept = not exclude
-        self._cache[cache_key] = accept
-        return accept
+    def get_modname_or_file_filter_kind(
+        self, filename: str, module_name: str
+    ) -> FilterKind:
+        filter_kind = self.get_modname_filter_kind(module_name)
+        if filter_kind is not None:
+            return filter_kind
 
-    def accept(self, filename: str, module_name: str) -> bool:
         absolute_filename = self._absolute_normalized_path(filename)
 
-        cache_key = (absolute_filename, module_name)
+        cache_key = absolute_filename
         try:
-            return self._cache[cache_key]
+            return self._cache_filename_to_kind[cache_key]
         except KeyError:
             pass
 
-        exclude = self._exclude_by_filter(absolute_filename, module_name)
-        if exclude is None:
-            exclude = not self._in_project_roots(absolute_filename)
+        exclude = not self.in_project_roots(absolute_filename)
+        if exclude:
+            filter_kind = FilterKind.exclude
+        else:
+            filter_kind = FilterKind.full_log
 
-        accept = not exclude
-        self._cache[cache_key] = accept
-        return accept
+        self._cache_filename_to_kind[cache_key] = filter_kind
+        return filter_kind

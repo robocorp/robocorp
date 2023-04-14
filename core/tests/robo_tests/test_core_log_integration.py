@@ -46,3 +46,30 @@ def test_core_log_integration_error_in_import(datadir):
         import webbrowser
 
         webbrowser.open(log_target.as_uri())
+
+
+def test_core_log_integration_config_log(datadir):
+    from robo_log import verify_log_messages_from_log_html
+
+    result = robo_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    print(decoded)
+    decoded = result.stdout.decode("utf-8", "replace")
+    print(decoded)
+
+    log_target = datadir / "output" / "log.html"
+    assert log_target.exists()
+
+    msgs = verify_log_messages_from_log_html(
+        log_target,
+        [],
+    )
+
+    if False:  # Manually debugging
+        for m in msgs:
+            print(m)
+
+        import webbrowser
+
+        webbrowser.open(log_target.as_uri())

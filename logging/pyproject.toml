@@ -28,6 +28,7 @@ ignore_missing_imports = true
 
 [tool.poetry.dependencies]
 python = "^3.9"
+tomli = { version = "^2.0.1", python = "<3.11" }
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"

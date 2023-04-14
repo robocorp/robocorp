@@ -234,23 +234,35 @@ class NodeFactory:
 
     def NameTempStore(self) -> ast.Name:
         name = f"@tmp_{self.next_var_id()}"
+        return self.NameStore(name)
+
+    def NameStore(self, name) -> ast.Name:
         return self._set_line_col(ast.Name(name, ast.Store()))
 
     def Attribute(self, name: ast.AST, attr_name: str) -> ast.Attribute:
         return self._set_line_col(ast.Attribute(name, attr_name, ast.Load()))
 
-    def NameLoadBuiltin(self, builtin_name: str) -> ast.Attribute:
-        builtin_ref = self.NameLoad("@py_builtins")
-
-        return self._set_line_col(self.Attribute(builtin_ref, builtin_name))
-
     def NameLoadRewriteCallback(self, builtin_name: str) -> ast.Attribute:
-        builtin_ref = self.NameLoad("@robocorp_rewrite_callbacks")
+        ref = self.NameLoad("@robocorp_rewrite_callbacks")
 
-        return self._set_line_col(self.Attribute(builtin_ref, builtin_name))
+        return self._set_line_col(self.Attribute(ref, builtin_name))
+
+    def NameLoadRobo(self, builtin_name: str) -> ast.Attribute:
+        ref = self.NameLoad("@robo_log")
+
+        return self._set_line_col(self.Attribute(ref, builtin_name))
 
     def Str(self, s) -> ast.Str:
         return self._set_line_col(ast.Str(s))
+
+    def If(self, cond) -> ast.If:
+        return self._set_line_col(ast.If(cond))
+
+    def AndExpr(self, expr1, expr2) -> ast.Expr:
+        andop = self._set_line_col(ast.And())
+        bool_op = self._set_line_col(ast.BoolOp(op=andop, values=[expr1, expr2]))
+
+        return self.Expr(bool_op)
 
     def Expr(self, expr) -> ast.Expr:
         return self._set_line_col(ast.Expr(expr))

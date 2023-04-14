@@ -39,3 +39,8 @@ def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
     verify_log_messages_from_log_html(
         log_html, [{"message_type": "SE", "name": "start_the_challenge"}]
     )
+
+    if False:
+        import webbrowser
+
+        webbrowser.open(log_html.as_uri())

@@ -1,36 +1,9 @@
-from io import StringIO
+from contextlib import contextmanager
 
 import pytest
 
-from robo_log._config import BaseConfig, ConfigFilesFiltering
-from contextlib import contextmanager
-
-
-def test_ast_utils():
-    from robo_log import _ast_utils
-    import ast
-
-    node = ast.parse(
-        """
-try:
-    print({'a': c, 1: d})
-except:
-    on_except(sys.exc_info())
-    raise
-""",
-        filename="<string>",
-    )
-    s = StringIO()
-    _ast_utils.print_ast(node, stream=s)
-    assert "Name" in s.getvalue()
-
-
-class ConfigForTest(BaseConfig):
-    def can_rewrite_module_name(self, module_name: str) -> bool:
-        return "check" in module_name
-
-    def can_rewrite_module(self, module_name: str, filename: str) -> bool:
-        return "check" in module_name
+from robo_log._config import ConfigFilesFiltering
+from robo_log_tests.fixtures import ConfigForTest
 
 
 class _SetupCallback:
@@ -40,30 +13,37 @@ class _SetupCallback:
 
     def before_method(self, package, mod_name, filename, name, lineno, args_dict):
         check = self.check
-        assert package == check.__package__
-        assert filename == check.__file__
-        assert mod_name == check.__name__
-        assert lineno > 0
+        if check:
+            assert package == check.__package__
+            assert filename == check.__file__
+            assert mod_name == check.__name__
+            assert lineno > 0
         self.found.append(("before", name, args_dict))
 
     def after_method(self, package, mod_name, filename, name, lineno):
-        assert package == self.check.__package__
-        assert filename == self.check.__file__
-        assert mod_name == self.check.__name__
-        assert lineno > 0
+        check = self.check
+        if check:
+            assert package == check.__package__
+            assert filename == check.__file__
+            assert mod_name == check.__name__
+            assert lineno > 0
         self.found.append(("after", name))
 
     def method_return(self, package, mod_name, filename, name, lineno, return_value):
-        assert package == self.check.__package__
-        assert filename == self.check.__file__
-        assert mod_name == self.check.__name__
-        assert lineno > 0
+        check = self.check
+        if check:
+            assert package == check.__package__
+            assert filename == check.__file__
+            assert mod_name == check.__name__
+            assert lineno > 0
         self.found.append(("return", name, return_value))
 
     def method_except(self, package, mod_name, filename, name, lineno, exc_info):
-        assert package == self.check.__package__
-        assert filename == self.check.__file__
-        assert mod_name == self.check.__name__
+        check = self.check
+        if check:
+            assert package == check.__package__
+            assert filename == check.__file__
+            assert mod_name == check.__name__
         tp, e, tb = exc_info
         assert "Fail here" in str(e)
         assert lineno > 0
@@ -127,12 +107,13 @@ def test_rewrite_hook_basic(config):
         sys.meta_path.remove(hook)
 
 
-@pytest.mark.parametrize("config", [ConfigForTest()])
-def test_rewrite_hook_except(config):
+def test_rewrite_hook_except():
     from robo_log._rewrite_importhook import RewriteHook
     import sys
     from imp import reload
     from robo_log_tests._resources import check_traceback
+
+    config = ConfigForTest()
 
     hook = RewriteHook(config)
     sys.meta_path.insert(0, hook)
@@ -158,5 +139,42 @@ def test_rewrite_hook_except(config):
                 ("except", "main", 10),
                 ("after", "main"),
             ]
+    finally:
+        sys.meta_path.remove(hook)
+
+
+def test_rewrite_hook_log_on_project_call():
+    from robo_log._rewrite_importhook import RewriteHook
+    import sys
+    from imp import reload
+    from robo_log_tests._resources import check_lib_lib
+    from robo_log_tests._resources import check_lib_main
+    import robo_log
+    from unittest import mock
+
+    config = ConfigForTest()
+
+    hook = RewriteHook(config)
+    sys.meta_path.insert(0, hook)
+
+    try:
+        check_lib_lib = reload(check_lib_lib)
+        check_lib_main = reload(check_lib_main)
+
+        def dummy_in_project_roots(filename):
+            if "check_lib_lib.py" in filename:
+                return False
+            return True
+
+        with mock.patch.object(robo_log, "_in_project_roots", dummy_in_project_roots):
+            with _setup_test_callbacks() as setup_callback:
+                check_lib_main.main()
+
+                assert setup_callback.found == [
+                    ("before", "main", {}),
+                    ("before", "in_lib", {}),
+                    ("after", "in_lib"),
+                    ("after", "main"),
+                ]
     finally:
         sys.meta_path.remove(hook)

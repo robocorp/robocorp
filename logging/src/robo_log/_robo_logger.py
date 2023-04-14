@@ -3,7 +3,8 @@ import functools
 from pathlib import Path
 from typing import Optional, Union, Sequence, Tuple
 import datetime
-from robo_log.protocols import OptExcInfo, LogHTMLStyle
+from robo_log.protocols import OptExcInfo, LogHTMLStyle, Status
+import sys
 
 
 def _log_error(func):
@@ -18,10 +19,12 @@ def _log_error(func):
             traceback.print_exc(file=s)
             traceback.print_exc()
             self._robot_output_impl.log_message(
-                "ERROR",
+                Status.ERROR,
                 f"_RoboLogger internal error: {e}\n{s.getvalue()}",
-                self._robot_output_impl.get_time_delta(),
                 False,
+                __file__,
+                sys._getframe().f_lineno,
+                self._robot_output_impl.get_time_delta(),
             )
 
     return new_func
@@ -97,8 +100,10 @@ class _RoboLogger:
             self._robot_output_impl.log_message(
                 "ERROR",
                 f"_RoboLogger error: start_logging_methods() called before stop_logging_methods() (call is ignored as logging is already on).",
-                self._robot_output_impl.get_time_delta(),
                 False,
+                __file__,
+                sys._getframe().f_lineno,
+                self._robot_output_impl.get_time_delta(),
             )
             return
 
@@ -112,8 +117,10 @@ class _RoboLogger:
             self._robot_output_impl.log_message(
                 "ERROR",
                 f"_RoboLogger error: start_logging_variables() called before stop_logging_variables() (call is ignored as logging is already on).",
-                self._robot_output_impl.get_time_delta(),
                 False,
+                __file__,
+                sys._getframe().f_lineno,
+                self._robot_output_impl.get_time_delta(),
             )
             return
 
