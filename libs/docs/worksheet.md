@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 # <kbd>module</kbd> `worksheet`
 
@@ -14,12 +14,12 @@
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Worksheet`
 Common class for worksheets to manage the worksheet's content. 
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L13"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L13"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -36,7 +36,7 @@ __init__(workbook: 'Workbook', name: str)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `append_rows_to_worksheet`
 
@@ -55,7 +55,7 @@ append_rows_to_worksheet(
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L39"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L39"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `as_table`
 
@@ -73,7 +73,7 @@ as_table(
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L64"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L64"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `auto_size_columns`
 
@@ -87,7 +87,7 @@ auto_size_columns(start_column, end_column, width)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L146"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L146"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `clear_cell_range`
 
@@ -101,7 +101,7 @@ clear_cell_range()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L142"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L142"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `copy_cell_values`
 
@@ -115,7 +115,7 @@ copy_cell_values()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L60"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L60"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `delete_columns`
 
@@ -129,7 +129,7 @@ delete_columns(start, end)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L85"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L85"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `delete_rows`
 
@@ -143,7 +143,7 @@ delete_rows(start, end) → None
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `find_empty_row`
 
@@ -157,7 +157,7 @@ find_empty_row(name) → int
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L110"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L110"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_cell_value`
 
@@ -171,7 +171,7 @@ get_cell_value()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\.venv\lib\site-packages\typing_extensions.py#L114"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\.venv\lib\site-packages\typing_extensions.py#L114"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_value`
 
@@ -185,7 +185,7 @@ get_value(row, column) → Any
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L68"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L68"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `hide_columns`
 
@@ -199,7 +199,7 @@ hide_columns(start_column, end_column)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `insert_columns_after`
 
@@ -213,7 +213,7 @@ insert_columns_after(column, amount)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L76"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L76"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `insert_columns_before`
 
@@ -227,7 +227,7 @@ insert_columns_before(column, amount) → None
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L35"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L35"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `insert_image`
 
@@ -241,7 +241,7 @@ insert_image()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L93"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L93"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `insert_rows_after`
 
@@ -255,7 +255,7 @@ insert_rows_after(row, amount) → None
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L97"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L97"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `insert_rows_before`
 
@@ -269,7 +269,7 @@ insert_rows_before(row, amount) → None
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L102"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L102"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `move_range`
 
@@ -283,7 +283,7 @@ move_range(range_string, rows, columns, translate) → None
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L50"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L50"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `read_worksheet`
 
@@ -297,7 +297,7 @@ read_worksheet() → List[dict]
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `rename`
 
@@ -311,7 +311,7 @@ rename()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L134"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L134"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_cell_format`
 
@@ -325,7 +325,7 @@ set_cell_format()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L138"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L138"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_cell_formula`
 
@@ -339,7 +339,7 @@ set_cell_formula()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L120"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L120"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_cell_value`
 
@@ -353,7 +353,7 @@ set_cell_value()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L130"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L130"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_cell_values`
 
@@ -367,7 +367,7 @@ set_cell_values()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L106"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L106"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_styles`
 
@@ -381,7 +381,7 @@ set_styles(args) → None
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\.venv\lib\site-packages\typing_extensions.py#L124"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\.venv\lib\site-packages\typing_extensions.py#L124"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_value`
 
@@ -395,7 +395,7 @@ set_value()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\worksheet.py#L80"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\worksheet.py#L80"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `unhide_columns`
 

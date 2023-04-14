@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\browser\src\robo\libs\browser\browser.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\browser\src\robo\libs\browser\browser.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 # <kbd>module</kbd> `browser`
 
@@ -13,7 +13,7 @@
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\browser\src\robo\libs\browser\browser.py#L52"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\browser\src\robo\libs\browser\browser.py#L52"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `open_browser`
 
@@ -42,7 +42,7 @@ Launches a Playwright browser instance.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\browser\src\robo\libs\browser\browser.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\browser\src\robo\libs\browser\browser.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `open_url`
 
