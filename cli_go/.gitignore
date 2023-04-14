@@ -1,0 +1,6 @@
+*.exe
+*.zip
+*.test
+*.out
+build/
+.DS_Store
