@@ -24,9 +24,10 @@ pydocstyle = "6.3.0"
 mkdocs-awesome-pages-plugin="2.8.0"
 
 [tool.poetry.group.dev.dependencies]
-robocorp-excel = {path = "excel", develop = true}
 robocorp-browser = {path = "browser", develop = true}
+robocorp-excel = {path = "excel", develop = true}
 robocorp-http = {path = "http", develop = true}
+robocorp-cr = {path = "robocorp", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

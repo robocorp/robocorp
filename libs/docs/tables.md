@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 # <kbd>module</kbd> `tables`
 
@@ -10,7 +10,7 @@
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L35"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L35"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `return_table_as_raw_list`
 
@@ -25,7 +25,7 @@ return_table_as_raw_list(table, heading=False)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L47"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L47"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `to_list`
 
@@ -38,7 +38,7 @@ Convert (possibly scalar) value to list of `size`.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `to_identifier`
 
@@ -51,7 +51,7 @@ Convert string to valid identifier.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L71"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L71"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `to_condition`
 
@@ -64,7 +64,7 @@ Convert string operator into callable condition function.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L95"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L95"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `if_none`
 
@@ -77,7 +77,7 @@ Return default if value is None.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `uniq`
 
@@ -92,7 +92,7 @@ Values must be hashable.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L114"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L114"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Dialect`
 CSV dialect. 
@@ -103,7 +103,7 @@ CSV dialect.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L122"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L122"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Table`
 Container class for tabular data. 
@@ -116,7 +116,7 @@ Container class for tabular data.
 >- empty: None values populated according to columns/index - list: list of data Rows - dict: Dictionary of columns as keys and Rows as values - table: An existing Table 
 >Row: a namedtuple, dictionary, list or a tuple 
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L137"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L137"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -181,7 +181,7 @@ Creates a Table object.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L702"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L702"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `append_column`
 
@@ -195,7 +195,7 @@ append_column(column=None, values=None)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L693"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L693"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `append_row`
 
@@ -207,7 +207,7 @@ Append new row to table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L697"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L697"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `append_rows`
 
@@ -219,7 +219,7 @@ Append multiple rows to table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L735"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L735"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `append_table`
 
@@ -231,7 +231,7 @@ Append data from table to current data.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L468"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L468"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `clear`
 
@@ -243,7 +243,7 @@ Remove all rows from this table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L384"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L384"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `column_location`
 
@@ -255,7 +255,7 @@ Find location for column value.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L464"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L464"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `copy`
 
@@ -267,7 +267,7 @@ Create a copy of this table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L720"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L720"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `delete_columns`
 
@@ -279,7 +279,7 @@ Remove columns with matching names.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L708"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L708"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `delete_rows`
 
@@ -291,7 +291,7 @@ Remove rows with matching indexes.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L806"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L806"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `filter_all`
 
@@ -307,7 +307,7 @@ The filtering will be done in-place and all the rows evaluating as falsy through
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L819"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L819"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `filter_by_column`
 
@@ -321,7 +321,7 @@ The filtering will be done in-place and all the rows where it evaluates to falsy
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L482"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L482"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get`
 
@@ -347,7 +347,7 @@ If both `indexes` and `columns` are lists:  Returns a new Table instance with ma
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L511"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L511"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_cell`
 
@@ -359,7 +359,7 @@ Get single cell value.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L542"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L542"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_column`
 
@@ -379,7 +379,7 @@ Get row values from column.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L518"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L518"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_row`
 
@@ -399,7 +399,7 @@ Get column values from row.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L585"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L585"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_slice`
 
@@ -411,7 +411,7 @@ Get a new table from rows between start and end index.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L566"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L566"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_table`
 
@@ -427,7 +427,7 @@ Get a new table from all cells matching indexes and columns.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L785"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L785"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `group_by_column`
 
@@ -439,7 +439,7 @@ Group rows by column value and return as list of tables.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L472"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L472"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `head`
 
@@ -451,7 +451,7 @@ Return first n rows of table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L367"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L367"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `index_location`
 
@@ -465,7 +465,7 @@ index_location(value: Union[int, str]) → int
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L840"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L840"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `iter_dicts`
 
@@ -479,7 +479,7 @@ Iterate rows with values as dicts.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L832"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L832"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `iter_lists`
 
@@ -491,7 +491,7 @@ Iterate rows with values as lists.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L848"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L848"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `iter_tuples`
 
@@ -505,7 +505,7 @@ Converts column names to valid Python identifiers, e.g. "First Name" -> "First_N
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L625"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L625"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set`
 
@@ -521,7 +521,7 @@ If ``values`` is scalar, all matching cells will be set to that value. Otherwise
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L649"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L649"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_cell`
 
@@ -535,7 +535,7 @@ If either index or column is missing, they are created.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L678"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L678"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_column`
 
@@ -547,7 +547,7 @@ Set values in column. If column is missing, it is created.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L666"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L666"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_row`
 
@@ -559,7 +559,7 @@ Set values in row. If index is missing, it is created.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L747"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L747"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `sort_by_column`
 
@@ -571,7 +571,7 @@ Sort table by columns.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L477"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L477"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `tail`
 
@@ -583,7 +583,7 @@ Return last n rows of table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L878"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L878"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `to_dict`
 
@@ -595,7 +595,7 @@ Convert table to dict representation.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L864"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L864"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `to_list`
 
@@ -608,7 +608,7 @@ Convert table to list representation.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L896"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L896"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Tables`
 ``Tables`` is a library for manipulating tabular data. 
@@ -657,7 +657,7 @@ For instance, in a table with five rows, the first row could be referred to with
 
  customers = tables.group_table_by_column(rows, "mail")  for customer in customers:  for order in customer:  add_cart(order)  make_order() 
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L977"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L977"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -674,7 +674,7 @@ __init__()
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1250"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1250"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `add_table_column`
 
@@ -709,7 +709,7 @@ The ``values`` can either be a list of values, one for each row, or one single v
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1283"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1283"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `add_table_row`
 
@@ -743,7 +743,7 @@ It can also be a single value that is set for all columns, which is ``None`` by 
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1080"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1080"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `clear_table`
 
@@ -768,7 +768,7 @@ tables = Tables() tables.clear_table(table)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1067"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1067"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `copy_table`
 
@@ -792,7 +792,7 @@ Make a copy of a table object.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L985"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L985"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `create_table`
 
@@ -837,7 +837,7 @@ See the main documentation for more information about supported data types.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1031"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1031"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `export_table`
 
@@ -879,7 +879,7 @@ export = tables.export_table(table)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1840"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1840"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `filter_empty_rows`
 
@@ -906,7 +906,7 @@ The filtering will be done in-place.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1741"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1741"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `filter_table_by_column`
 
@@ -945,7 +945,7 @@ The filtering will be done in-place.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1778"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1778"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `filter_table_with_function`
 
@@ -971,7 +971,7 @@ The row object will be given as the first argument to the filtering keyword.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1632"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1632"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `find_table_rows`
 
@@ -1018,7 +1018,7 @@ Returns the matches as a new `Table` instance.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1574"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1574"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_table_cell`
 
@@ -1061,7 +1061,7 @@ Get a cell value from a table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1341"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1341"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_table_column`
 
@@ -1093,7 +1093,7 @@ Get all values for a single column in a table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_table_dimensions`
 
@@ -1124,7 +1124,7 @@ Return table dimensions, as (rows, columns).
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1314"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1314"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_table_row`
 
@@ -1163,7 +1163,7 @@ Get a single row from a table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1480"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1480"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_table_slice`
 
@@ -1206,7 +1206,7 @@ If ``start`` is not defined, starts from the first row. If ``end`` is not define
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1713"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1713"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `group_table_by_column`
 
@@ -1238,7 +1238,7 @@ Group a table by ``column`` and return a list of grouped Tables.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1804"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1804"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `map_column_values`
 
@@ -1274,7 +1274,7 @@ The cell value will be given as the first argument to the mapping keyword.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1097"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1097"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `merge_tables`
 
@@ -1316,7 +1316,7 @@ products = tables.merge_tables(prices, stock, index="Name") for product in produ
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1448"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1448"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `pop_table_column`
 
@@ -1353,7 +1353,7 @@ Remove column from table and return it.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1418"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1418"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `pop_table_row`
 
@@ -1392,7 +1392,7 @@ Remove row from table and return it.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1912"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1912"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `read_table_from_csv`
 
@@ -1445,7 +1445,7 @@ If the source data has a header and rows have more fields than the header define
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1205"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1205"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `rename_table_columns`
 
@@ -1482,7 +1482,7 @@ The renaming will be done in-place.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1512"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1512"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_row_as_column_names`
 
@@ -1508,7 +1508,7 @@ Set existing row as names for columns.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1604"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1604"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_table_cell`
 
@@ -1547,7 +1547,7 @@ Set a cell value in a table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1393"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1393"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_table_column`
 
@@ -1578,7 +1578,7 @@ The ``values`` can either be a list of values, one for each row, or one single v
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1361"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1361"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_table_row`
 
@@ -1615,7 +1615,7 @@ It can also be a single value that is set for all columns.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1690"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1690"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `sort_table_by_column`
 
@@ -1648,7 +1648,7 @@ Sort a table in-place according to ``column``.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1529"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1529"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `table_head`
 
@@ -1683,7 +1683,7 @@ Return first ``count`` rows from a table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1551"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1551"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `table_tail`
 
@@ -1720,7 +1720,7 @@ Return last ``count`` rows from a table.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1888"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1888"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `trim_column_names`
 
@@ -1747,7 +1747,7 @@ The filtering will be done in-place.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1863"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1863"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `trim_empty_rows`
 
@@ -1774,7 +1774,7 @@ The filtering will be done in-place.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/tree/master/libs\excel\src\robo\libs\excel\tables.py#L1999"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\excel\src\robo\libs\excel\tables.py#L1999"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `write_table_to_csv`
 

@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "robocorp-cr"
+version = "0.1.0"
+description = "Robocorp Control Room API integration library"
+authors = [
+	"Ossi R. <ossi@robocorp.com>",
+	"Fabio Z. <fabio@robocorp.com>",
+	"Kerkko P. <kerkko@robocorp.com>",
+    "Antero V. <antero@robocorp.com>",
+]
+readme = "README.md"
+packages = [{include = "robo", from="src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+cryptography = "^39.0.1"
+
+[tool.poetry.group.dev.dependencies]
+libs-devdeps = {path = ".."}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
