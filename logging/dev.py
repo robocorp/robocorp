@@ -50,7 +50,7 @@ def _fix_contents_version_in_poetry(contents, version):
     import re
 
     contents = re.sub(
-        r"(robocorp-logging\s*=\s*)\"\^\d+\.\d+\.\d+", r'\1"^%s' % (version,), contents
+        r"(robocorp-logging\s*=\s*)\"\^?\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
     )
     return contents
 
