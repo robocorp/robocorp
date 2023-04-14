@@ -69,17 +69,7 @@ jobs:
 
     - name: Install project
       run: poetry install
-    - name: Test Excel
-      working-directory: ./libs/excel
+    - name: Run tests
       env:
         PYTHONPATH: .
-      run: |
-        poetry install
-        poetry run pytest
-    - name: Test Browser
-      working-directory: ./libs/browser
-      env:
-        PYTHONPATH: .
-      run: |
-        poetry install
-        poetry run pytest
+      run: poetry run pytest

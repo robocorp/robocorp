@@ -1,11 +1,13 @@
 from typing import Any, List, Optional, Union
 
 from robo.libs.excel._types import PathType
-from robo.libs.excel._worksheet import Worksheet
+from robo.libs.excel.worksheet import Worksheet
 from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook
 
 
 class Workbook:
+    """Manager class for both .xls and .xlsx Excel files."""
+
     def __init__(self, excel: Union[XlsWorkbook, XlsxWorkbook]):
         # Internal API, for users there is create_ and open_ workbook functions
         self.excel = excel

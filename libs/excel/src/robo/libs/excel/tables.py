@@ -894,7 +894,7 @@ class Table:
 
 
 class Tables:
-    """``Tables`` is a library for manipulating tabular data inside Robot Framework.
+    """``Tables`` is a library for manipulating tabular data.
 
     It can import data from various sources and apply different operations to it.
     Common use-cases are reading and writing CSV files, inspecting files in

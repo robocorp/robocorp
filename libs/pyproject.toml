@@ -21,6 +21,12 @@ pytest-xdist = "^3.2.1"
 pytest-regressions = "1.0.6"
 lazydocs = "0.4.8"
 pydocstyle = "6.3.0"
+mkdocs-awesome-pages-plugin="2.8.0"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-excel = {path = "excel", develop = true}
+robocorp-browser = {path = "browser", develop = true}
+robocorp-http = {path = "http", develop = true}
 
 [build-system]
 requires = ["poetry-core"]
