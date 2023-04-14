@@ -54,17 +54,19 @@ def test_core_log_integration_config_log(datadir):
     result = robo_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
 
     decoded = result.stderr.decode("utf-8", "replace")
-    print(decoded)
+    assert not decoded.strip()
     decoded = result.stdout.decode("utf-8", "replace")
-    print(decoded)
+    assert "Robocorp Log (html)" in decoded
 
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()
 
     msgs = verify_log_messages_from_log_html(
         log_target,
-        [],
+        [{"message_type": "SE", "name": "ndiff"}],
     )
+
+    assert "SequenceMatcher.__init__" not in str(msgs)
 
     if False:  # Manually debugging
         for m in msgs:

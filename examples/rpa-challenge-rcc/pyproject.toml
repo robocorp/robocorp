@@ -41,5 +41,7 @@
 #     In this case all methods of the given module will not be tracked.
 #     (default for all files considered library files).
 log_filter_rules = [
-    {name = "difflib", kind = "log_on_project_call"}
+    {name = "RPA", kind = "log_on_project_call"},
+    {name = "selenium", kind = "log_on_project_call"},
+    {name = "SeleniumLibrary", kind = "log_on_project_call"},
 ]
