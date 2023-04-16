@@ -162,6 +162,12 @@ def test_log_html_features(tmpdir) -> None:
                     # i.e.: check for the utc timezone (+00:00) in the time.
                     "__check__": lambda msg: msg["initial_time"].endswith("+00:00"),
                 },
+                {
+                    "message_type": "SE",
+                    "name": "another_method",
+                    "libname": "robo_log_tests._resources.check_traceback",
+                    "type": "METHOD",
+                },
             ],
         )
         for m in msgs:

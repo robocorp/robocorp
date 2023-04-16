@@ -59,7 +59,6 @@ def _rewrite_return(function, class_name, node) -> Optional[list]:
 
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("method_return")
-    call.args.append(factory.NameLoad("__package__"))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
     call.args.append(factory.Str(f"{class_name}{function.name}"))
@@ -89,7 +88,7 @@ _EMPTY_LIST: list = []
 def _create_before_method_ast(factory, class_name, function, filter_kind) -> list:
     # Target code:
     # def method(a, b):
-    #     before_method(__package__, __name, __file__, "method_name", 11, {'a': a, 'b': b})
+    #     before_method(__name, __file__, "method_name", 11, {'a': a, 'b': b})
     stmts: list = []
 
     if filter_kind == FilterKind.log_on_project_call:
@@ -106,7 +105,6 @@ def _create_before_method_ast(factory, class_name, function, filter_kind) -> lis
 
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("before_method")
-    call.args.append(factory.NameLoad("__package__"))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
     call.args.append(factory.Str(f"{class_name}{function.name}"))
@@ -188,7 +186,6 @@ def _create_except_handler_ast(
     method_except = factory.NameLoadRewriteCallback("method_except")
     call_method_except = factory.Call()
     call_method_except.func = method_except
-    call_method_except.args.append(factory.NameLoad("__package__"))
     call_method_except.args.append(factory.NameLoad("__name__"))
     call_method_except.args.append(factory.NameLoad("__file__"))
     call_method_except.args.append(factory.Str(f"{class_name}{function.name}"))
@@ -205,7 +202,6 @@ def _create_except_handler_ast(
 def _create_after_method_ast(factory, class_name, function, filter_kind):
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("after_method")
-    call.args.append(factory.NameLoad("__package__"))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
     call.args.append(factory.Str(f"{class_name}{function.name}"))

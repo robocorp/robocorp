@@ -43,7 +43,6 @@ def register_auto_logging_callbacks(rewrite_hook_config):
     status_stack = []
 
     def call_before_method(
-        package: str,
         mod_name: str,
         filename: str,
         name: str,
@@ -53,7 +52,7 @@ def register_auto_logging_callbacks(rewrite_hook_config):
         if tid != threading.get_ident():
             return
 
-        status_stack.append([package, name, "PASS"])
+        status_stack.append([mod_name, name, "PASS"])
         args = []
         for key, val in args_dict.items():
             for p in ("password", "passwd"):
@@ -66,7 +65,7 @@ def register_auto_logging_callbacks(rewrite_hook_config):
         for robo_logger in _get_logger_instances():
             robo_logger.start_element(
                 name,
-                f"{package}.{mod_name}",
+                mod_name,
                 filename,
                 lineno,
                 "METHOD",
@@ -76,30 +75,27 @@ def register_auto_logging_callbacks(rewrite_hook_config):
                 [],
             )
 
-    def call_after_method(
-        package: str, mod_name: str, filename: str, name: str, lineno: int
-    ) -> None:
+    def call_after_method(mod_name: str, filename: str, name: str, lineno: int) -> None:
         if tid != threading.get_ident():
             return
 
         try:
-            pop_package, pop_name, status = status_stack.pop(-1)
+            pop_mod_name, pop_name, status = status_stack.pop(-1)
         except IndexError:
             # oops, something bad happened, the stack is unsynchronized
             critical("On method return the status_stack was empty.")
             return
         else:
-            if pop_package != package or pop_name != name:
+            if pop_mod_name != mod_name or pop_name != name:
                 critical(
-                    f"On method return status stack package/name was: {pop_package}.{pop_name}. Received: {package}.{name}."
+                    f"On method return status stack package/name was: {pop_mod_name}.{pop_name}. Received: {mod_name}.{name}."
                 )
                 return
 
         for robo_logger in _get_logger_instances():
-            robo_logger.end_method(name, f"{package}.{mod_name}", status, [])
+            robo_logger.end_method(name, mod_name, status, [])
 
     def call_on_method_except(
-        package: str,
         mod_name: str,
         filename: str,
         name: str,
@@ -110,7 +106,7 @@ def register_auto_logging_callbacks(rewrite_hook_config):
             return
 
         try:
-            pop_package, pop_name, _curr_status = status_stack[-1]
+            pop_modname, pop_name, _curr_status = status_stack[-1]
         except IndexError:
             # oops, something bad happened, the stack is unsynchronized
             critical("On method except the status_stack was empty.")

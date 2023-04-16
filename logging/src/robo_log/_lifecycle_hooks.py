@@ -47,16 +47,16 @@ class Callback(object):
                     raise
 
 
-# Called as: before_method(__package__, __name__, filename, name, lineno, args_dict)
+# Called as: before_method(__name__, filename, name, lineno, args_dict)
 before_method = Callback()
 
-# Called as: after_method(__package__, __name__, filename, name, lineno)
+# Called as: after_method(__name__, filename, name, lineno)
 after_method = Callback()
 
-# Called as: method_return(__package__, __name__, filename, name, lineno, return_value)
+# Called as: method_return(__name__, filename, name, lineno, return_value)
 method_return = Callback()
 
-# Called as: method_except(__package__, __name__, filename, name, lineno, exc_info)
+# Called as: method_except(__name__, filename, name, lineno, exc_info)
 # tp, e, tb = exc_info
 method_except = Callback()
 
