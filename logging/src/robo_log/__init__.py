@@ -163,24 +163,26 @@ def hide_from_output(string_to_hide: str) -> None:
 # --- Logging methods usually called automatically from the framework.
 
 
-def start_suite(name: str, suite_id: str, suite_source: str) -> None:
+def start_run(name: str) -> None:
     for robo_logger in _get_logger_instances():
-        robo_logger.start_suite(name, suite_id, suite_source)
+        robo_logger.start_run(name)
 
 
-def end_suite(name: str, suite_id: str, status: str) -> None:
+def end_run(name: str, status: str) -> None:
     for robo_logger in _get_logger_instances():
-        robo_logger.end_suite(name, suite_id, status)
+        robo_logger.end_run(name, status)
 
 
-def start_task(name: str, task_id: str, lineno: int, tags: Sequence[str]) -> None:
+def start_task(
+    name: str, libname: str, source: str, lineno: int, tags: Sequence[str]
+) -> None:
     for robo_logger in _get_logger_instances():
-        robo_logger.start_task(name, task_id, lineno, tags)
+        robo_logger.start_task(name, libname, source, lineno, tags)
 
 
-def end_task(name: str, task_id: str, status: str, message: str) -> None:
+def end_task(name: str, libname: str, status: str, message: str) -> None:
     for robo_logger in _get_logger_instances():
-        robo_logger.end_task(name, task_id, status, message)
+        robo_logger.end_task(name, libname, status, message)
 
 
 def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
@@ -197,8 +199,8 @@ def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
         {'message_type': 'V', 'version': '1'}
         {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
-        {'message_type': 'SS', 'name': 'Robot Check', 'suite_id': 's1', 'suite_source': 'x:\\vscode-robot\\local_test\\robot_check', 'time_delta_in_seconds': 0.3}
-        {'message_type': 'ST', 'name': 'My task', 'suite_id': 's1-s1-t1', 'lineno': 5, 'time_delta_in_seconds': 0.2}
+        {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
+        {'message_type': 'ST', 'name': 'My task', 'libname': 'foo', 'source': 'x:\\vscode-robot\\local_test\\robot_check', 'lineno': 5, 'time_delta_in_seconds': 0.2}
     """
     from ._decoder import iter_decoded_log_format
 
@@ -219,8 +221,8 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         {'message_type': 'V', 'version': '1'}
         {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
-        {'message_type': 'SS', 'name': 'Robot Check', 'suite_id': 's1', 'suite_source': 'x:\\vscode-robot\\local_test\\robot_check', 'time_delta_in_seconds': 0.3}
-        {'message_type': 'ST', 'name': 'My task', 'suite_id': 's1-s1-t1', 'lineno': 5, 'time_delta_in_seconds': 0.2}
+        {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
+        {'message_type': 'ST', 'name': 'My task', 'libname': 'foo', 'source': 'x:\\vscode-robot\\local_test\\robot_check', 'lineno': 5, 'time_delta_in_seconds': 0.2}
 
     """
     import zlib

@@ -125,15 +125,15 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     "LH": _decode(
         "level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"
     ),
-    # Start Suite
-    "SS": _decode(
-        "name:oid, suite_id:oid, suite_source:oid, time_delta_in_seconds:float",
+    # Start Run
+    "SR": _decode(
+        "name:oid, time_delta_in_seconds:float",
     ),
-    # End Suite
-    "ES": _decode("status:oid, time_delta_in_seconds:float"),
+    # End Run
+    "ER": _decode("status:oid, time_delta_in_seconds:float"),
     # Start Task
     "ST": _decode(
-        "name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float",
+        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
     ),
     # End Task
     "ET": _decode("status:oid, message:oid, time_delta_in_seconds:float"),
@@ -174,7 +174,7 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     ),
 }
 
-_MESSAGE_TYPE_INFO["RS"] = _MESSAGE_TYPE_INFO["SS"]
+_MESSAGE_TYPE_INFO["RR"] = _MESSAGE_TYPE_INFO["SR"]
 _MESSAGE_TYPE_INFO["RT"] = _MESSAGE_TYPE_INFO["ST"]
 _MESSAGE_TYPE_INFO["RE"] = _MESSAGE_TYPE_INFO["SE"]
 _MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]

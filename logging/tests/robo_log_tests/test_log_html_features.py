@@ -80,7 +80,7 @@ def test_log_html_features(tmpdir) -> None:
             log_html=log_target,
             log_html_style=LOG_HTML_STYLE,
         ):
-            robo_log.start_task("Setup", "setup", 0, [])
+            robo_log.start_task("Setup", "setup", str(tmpdir), 0, [])
             import difflib
 
             difflib = reload(difflib)
@@ -89,8 +89,8 @@ def test_log_html_features(tmpdir) -> None:
             "".join(diff)
             robo_log.end_task("Setup", "setup", "PASS", "end msg")
 
-            robo_log.start_suite("Test Log HTML Features", "root", str(tmpdir))
-            robo_log.start_task("my_task", "task_id", 0, [])
+            robo_log.start_run("Test Log HTML Features")
+            robo_log.start_task("my_task", "modname", str(tmpdir), 0, [])
 
             for _i in range(2):
                 check.some_method()
@@ -115,11 +115,11 @@ def test_log_html_features(tmpdir) -> None:
 
             robo_log.end_task(
                 "my_task",
-                "task_id",
+                "modname",
                 "ERROR",
                 "Marking that it exited with error due to some reason...",
             )
-            robo_log.end_suite("Root Suite", "root", str(tmpdir))
+            robo_log.end_run("Test Log HTML Features", "PASS")
 
         assert log_target.exists()
 

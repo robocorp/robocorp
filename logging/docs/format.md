@@ -94,9 +94,9 @@ Basic message types are:
     
     `T 2022-10-03T11:30:54.927`
 
-### SS: Start Suite
+### SR: Start Run
 
-    Spec: `name:oid, suite_id:oid, suite_source:oid, time_delta_in_seconds:float`
+    Spec: `name:oid, time_delta_in_seconds:float`
     
     Note: references to oid mean a reference to a previously memorized name.
     
@@ -105,16 +105,16 @@ Basic message types are:
     when converting to xml where the status only appears later on in the file
     along with the status and not at the suite definition).
     
-    Example (were a, b and c are references to previously memorized names):
+    Example (were a is a reference to a previously memorized name):
     
-    `SS a|b|c|0.333`
+    `SR a|0.333`
 
-## RS: Replay Start Suite
+## RR: Replay Start Run
 
-    Same as "SS" but used just to replay the content to specify the context
+    Same as "SR" but used just to replay the content to specify the context
     when the log starts being written in a new file.
 
-### ES: End Suite
+### ER: End Run
 
     Spec: `status:oid, time_delta_in_seconds:float`
     
@@ -122,7 +122,7 @@ Basic message types are:
     
     Example:
     
-    `ES a|0.222`
+    `ER a|0.222`
 
 ### ST: Start Task
 

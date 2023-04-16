@@ -10,7 +10,7 @@ M e:"Simple Task"
 M f:"s1-t1"
 M m:"PASS"
 M h:""
-RS b|c|d|0.055
-RT e|f|16|0.056
+RR b|0.055
+RT e|b|d|16|0.056
 ET m|h|0.095
-ES Y|0.096
+ER Y|0.096

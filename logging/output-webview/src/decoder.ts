@@ -97,11 +97,11 @@ function _decode(message_definiton) {
     return _decImpl;
 }
 
-const start_suite = _decode("name:oid, suite_id:oid, suite_source:oid, time_delta_in_seconds:float");
+const start_run = _decode("name:oid, time_delta_in_seconds:float");
 
-const end_suite = _decode("status:oid, time_delta_in_seconds:float");
+const end_run = _decode("status:oid, time_delta_in_seconds:float");
 
-const start_task = _decode("name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float");
+const start_task = _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float");
 
 const end_task = _decode("status:oid, message:oid, time_delta_in_seconds:float");
 
@@ -121,9 +121,9 @@ const _MESSAGE_TYPE_INFO = {
     "I": simple_decode,
     "T": decode_time,
     "M": decode_memo,
-    "SS": start_suite,
-    "RS": start_suite,
-    "ES": end_suite,
+    "SR": start_run,
+    "RR": start_run,
+    "ER": end_run,
     "ST": start_task,
     "RT": start_task,
     "ET": end_task,

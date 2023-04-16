@@ -7,7 +7,7 @@ from .events import (
     Assign,
     ElementArgument,
     EndElement,
-    EndSuite,
+    EndRun,
     EndTask,
     EndTraceback,
     Event,
@@ -17,7 +17,7 @@ from .events import (
     Log,
     LogHtml,
     StartElement,
-    StartSuite,
+    StartRun,
     StartTask,
     StartTime,
     StartTraceback,
@@ -104,14 +104,14 @@ class Builder:
     def handle_LogHtml(self, event: LogHtml):
         pass
 
-    def handle_StartSuite(self, event: StartSuite):
+    def handle_StartRun(self, event: StartRun):
         model = Suite(name=event.name, status=Status.RUNNING, body=[])
 
         assert isinstance(self._stack[-1], Model)
         self._stack[-1].body.append(model)
         self._stack.append(model)
 
-    def handle_EndSuite(self, event: EndSuite):
+    def handle_EndRun(self, event: EndRun):
         model = self._stack.pop()
         model.status = Status.ERROR if event.status == "ERROR" else Status.PASS
 

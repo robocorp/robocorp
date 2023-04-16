@@ -6,10 +6,10 @@ I "robot=5.0.1"
 M a:"Scenario Generator"
 M b:"s1"
 M c:"x:\\vscode-robot\\robotframework-lsp\\robotframework-output-stream\\output-webview\\tests\\_resources\\scenario_generator.robot"
-SS a|b|c|0.776
+SR a|0.776
 M d:"Screenshot test"
 M e:"s1-t1"
-ST d|e|15|0.777
+ST d|a|c|15|0.777
 M f:"Take Screenshot"
 M g:"RPA.Desktop"
 M h:"KEYWORD"
@@ -29,4 +29,4 @@ M n:"PASS"
 EE n|1.197
 M o:""
 ET n|o|1.198
-ES n|1.201
+ER n|1.201

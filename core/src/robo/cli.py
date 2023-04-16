@@ -158,53 +158,59 @@ def run(
         max_files=max_log_files,
         max_file_size=max_log_file_size,
     ):
-        status = "PASS"
+        run_status = "PASS"
         setup_message = ""
 
-        robo_log.start_task("Setup", "setup", 0, [])
+        run_name = f"{os.path.basename(path)} - {task_name}"
+        robo_log.start_run(run_name)
+
         try:
-            if not task_name:
-                context.show(f"\nCollecting tasks from: {path}")
-            else:
-                context.show(f"\nCollecting task {task_name} from: {path}")
-
-            tasks: Tuple[ITask, ...] = tuple(collect_tasks(p, task_name))
-
-            if not tasks:
-                raise RoboCollectError(f"Did not find any tasks in: {path}")
-            if len(tasks) > 1:
-                raise RoboCollectError(
-                    f"Expected only 1 task to be run. Found: {', '.join(t.name for t in tasks)}"
-                )
-        except Exception as e:
-            status = "ERROR"
-            setup_message = str(e)
-            robo_log.exception()
-
-            if not isinstance(e, RoboCollectError):
-                traceback.print_exc()
-            else:
-                context.show_error(setup_message)
-
-            return 1
-        finally:
-            robo_log.end_task("Setup", "setup", status, setup_message)
-
-        for task in tasks:
-            before_task_run(task)
+            robo_log.start_task("Collect tasks", "setup", "", 0, [])
             try:
-                task.run()
-                task.status = Status.PASS
+                if not task_name:
+                    context.show(f"\nCollecting tasks from: {path}")
+                else:
+                    context.show(f"\nCollecting task {task_name} from: {path}")
+
+                tasks: Tuple[ITask, ...] = tuple(collect_tasks(p, task_name))
+
+                if not tasks:
+                    raise RoboCollectError(f"Did not find any tasks in: {path}")
+                if len(tasks) > 1:
+                    raise RoboCollectError(
+                        f"Expected only 1 task to be run. Found: {', '.join(t.name for t in tasks)}"
+                    )
             except Exception as e:
-                task.status = Status.ERROR
-                task.message = str(e)
+                run_status = "ERROR"
+                setup_message = str(e)
+                robo_log.exception()
+
+                if not isinstance(e, RoboCollectError):
+                    traceback.print_exc()
+                else:
+                    context.show_error(setup_message)
+
+                return 1
             finally:
-                after_task_run(task)
+                robo_log.end_task("Collect tasks", "setup", run_status, setup_message)
 
-            returncode = 0 if task.status == Status.PASS else 1
-            return returncode
+            for task in tasks:
+                before_task_run(task)
+                try:
+                    task.run()
+                    run_status = task.status = Status.PASS
+                except Exception as e:
+                    run_status = task.status = Status.ERROR
+                    task.message = str(e)
+                finally:
+                    after_task_run(task)
 
-        raise AssertionError("Should never get here.")
+                returncode = 0 if task.status == Status.PASS else 1
+                return returncode
+
+            raise AssertionError("Should never get here.")
+        finally:
+            robo_log.end_run(run_name, run_status)
 
 
 def main(args=None, exit: bool = True) -> int:

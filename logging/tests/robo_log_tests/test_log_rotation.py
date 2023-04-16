@@ -1,4 +1,4 @@
-def test_rotate_logs(tmpdir):
+def test_rotate_logs(tmpdir) -> None:
     import robo_log
     from robo_log_tests._resources import check
     from imp import reload
@@ -13,13 +13,13 @@ def test_rotate_logs(tmpdir):
         with robo_log.add_log_output(
             tmpdir, max_file_size="10kb", max_files=2, log_html=log_target
         ):
-            robo_log.start_suite("Root Suite", "root", str(tmpdir))
-            robo_log.start_task("my_task", "task_id", 0, [])
+            robo_log.start_run("Root Suite")
+            robo_log.start_task("my_task", "task_mod", __file__, 0, [])
 
             check.recurse_some_method()
 
-            robo_log.end_task("my_task", "task_id", "PASS", "Ok")
-            robo_log.end_suite("Root Suite", "root", "PASS")
+            robo_log.end_task("my_task", "task_mod", "PASS", "Ok")
+            robo_log.end_run("Root Suite", "PASS")
 
         assert log_target.exists()
 
@@ -31,7 +31,7 @@ def test_rotate_logs(tmpdir):
     output_at_step = name_to_file["output_10.robolog"]
 
     # Check that replay suite/test/keyword are properly sent on rotate.
-    expect_types = {"RS", "RT", "RE"}
+    expect_types = {"RR", "RT", "RE"}
     found_ids_at_step = []
     with output_at_step.open("r") as stream:
         for msg in iter_decoded_log_format_from_stream(stream):

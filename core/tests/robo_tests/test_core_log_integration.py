@@ -27,8 +27,8 @@ def test_core_log_integration_error_in_import(datadir):
             # Note: the setup is a task which doesn't have a suite!
             {
                 "message_type": "ST",
-                "name": "Setup",
-                "suite_id": "setup",
+                "name": "Collect tasks",
+                "libname": "setup",
                 "lineno": 0,
             },
             {

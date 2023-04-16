@@ -19,8 +19,8 @@ def test_log_api(tmpdir) -> None:
         with robo_log.add_log_output(
             tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
         ):
-            robo_log.start_suite("Root Suite", "root", str(tmpdir))
-            robo_log.start_task("my_task", "task_id", 0, [])
+            robo_log.start_run("Run name")
+            robo_log.start_task("my_task", "modname", __file__, 0, [])
 
             check.some_method()
 
@@ -37,8 +37,8 @@ def test_log_api(tmpdir) -> None:
             t.start()
             t.join(10)
 
-            robo_log.end_task("my_task", "task_id", "PASS", "Ok")
-            robo_log.end_suite("Root Suite", "root", "PASS")
+            robo_log.end_task("my_task", "modname", "PASS", "Ok")
+            robo_log.end_run("Run name", "PASS")
 
         assert log_target.exists()
         messages = verify_log_messages_from_log_html(
@@ -73,13 +73,13 @@ def test_log_api_without_with_statments(tmpdir) -> None:
                 tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
             )
 
-            robo_log.start_suite("Root Suite", "root", str(tmpdir))
-            robo_log.start_task("my_task", "task_id", 0, [])
+            robo_log.start_run("Run name")
+            robo_log.start_task("my_task", "modname", __file__, 0, [])
 
             check.some_method()
 
-            robo_log.end_task("my_task", "task_id", "PASS", "Ok")
-            robo_log.end_suite("Root Suite", "root", str(tmpdir))
+            robo_log.end_task("my_task", "modname", "PASS", "Ok")
+            robo_log.end_run("Run name", "PASS")
 
             assert not log_target.exists()
         finally:

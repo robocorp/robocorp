@@ -52,8 +52,8 @@ def test_collect_tasks_integrated(datadir):
             dict(message_type="SE", name="some_method"),
             dict(message_type="ST"),
             dict(message_type="ET"),
-            dict(message_type="SS"),
-            dict(message_type="ES"),
+            dict(message_type="SR"),
+            dict(message_type="ER"),
         ],
     )
 
@@ -91,8 +91,8 @@ def test_provide_output_in_stdout(datadir, tmpdir):
             dict(message_type="SE", name="some_method"),
             dict(message_type="ST"),
             dict(message_type="ET"),
-            dict(message_type="SS"),
-            dict(message_type="ES"),
+            dict(message_type="SR"),
+            dict(message_type="ER"),
         ],
     )
 
@@ -112,8 +112,8 @@ def test_error_in_stdout(datadir, tmpdir):
             dict(message_type="SE", name="main_errors"),
             dict(message_type="ST"),
             dict(message_type="ET"),
-            dict(message_type="SS"),
-            dict(message_type="ES"),
+            dict(message_type="SR"),
+            dict(message_type="ER"),
             dict(message_type="STB"),
         ],
     )

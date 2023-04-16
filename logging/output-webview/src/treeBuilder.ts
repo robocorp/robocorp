@@ -76,12 +76,6 @@ export class TreeBuilder {
     // The current parent and message.
     messageNode: IMessageNode = { "parent": undefined, message: undefined };
 
-    // Current suite name.
-    suiteName = "";
-
-    // Current suite source.
-    suiteSource = "";
-
     // A unique incremental id.
     id = 0;
 
@@ -223,18 +217,18 @@ export class TreeBuilder {
             // if it's a replay suite/test/keyword/exception, skip it if we've already seen
             // a suit/test/keyword/exception (otherwise, change the replay to the actual
             // type being replayed to have it properly handled).
-            case "SS":
+            case "SR":
             case "ST":
             case "SE":
             case "STB":
                 this.seenSuiteTaskOrElement = true;
                 break;
 
-            case "RS":
+            case "RR":
                 if (this.seenSuiteTaskOrElement) {
                     return;
                 }
-                msgType = "SS";
+                msgType = "SR";
                 break;
             case "RT":
                 if (this.seenSuiteTaskOrElement) {
@@ -259,12 +253,10 @@ export class TreeBuilder {
         let isError: boolean;
 
         switch (msgType) {
-            case "SS":
-                // start suite
+            case "SR":
+                // start run
 
                 this.messageNode = { "parent": this.messageNode, "message": msg };
-                this.suiteName = msg.decoded["name"] + ".";
-                this.suiteSource = msg.decoded["source"];
 
                 for (const el of document.querySelectorAll(".suiteHeader")) {
                     el.textContent = msg.decoded["name"];
@@ -281,11 +273,11 @@ export class TreeBuilder {
                 this.parent = addTreeContent(
                     this.opts,
                     this.parent,
-                    this.suiteName + msg.decoded["name"],
+                    `${msg.decoded["libname"]}.${msg.decoded["name"]}`,
                     "",
                     msg,
                     false,
-                    this.suiteSource,
+                    msg.decoded["source"],
                     msg.decoded["lineno"],
                     this.messageNode,
                     this.id.toString()
@@ -309,9 +301,8 @@ export class TreeBuilder {
                 );
                 this.stack.push(this.parent);
                 break;
-            case "ES": // end suite
+            case "ER": // end run
                 this.messageNode = this.messageNode.parent;
-                this.suiteName = "";
                 {
                     const div = divById("suiteResult");
                     div.style.display = "block";

@@ -165,7 +165,7 @@ class _StackHandler:
                         # The current one (which is a match).
                         return self._queue.pop(-1)
 
-                if entry_type in ("test", "suite"):
+                if entry_type in ("task", "run"):
                     for i, stack_entry in enumerate(reversed(self._queue)):
                         if stack_entry.entry_type == entry_type:
                             for _ in range(i):
@@ -383,39 +383,47 @@ class _RoboOutputImpl:
     def _number(self, v):
         return str(v)
 
-    def start_suite(self, name, suite_id, suite_source, time_delta):
+    def start_run(self, name: str, time_delta: float) -> None:
         oid = self._obtain_id
-        with self._stack_handler.push_record("suite", suite_id, "SS", "RS"):
+        with self._stack_handler.push_record("run", name, "SR", "RR"):
             self._write_with_separator(
-                "SS ",
+                "SR ",
                 [
                     oid(name),
-                    oid(suite_id),
-                    oid(suite_source),
                     self._number(time_delta),
                 ],
             )
 
-    def end_suite(self, suite_id, status, time_delta):
+    def end_run(self, name: str, status: str, time_delta: float) -> None:
         oid = self._obtain_id
         self._write_with_separator(
-            "ES ",
+            "ER ",
             [
                 oid(status),
                 self._number(time_delta),
             ],
         )
-        self._stack_handler.pop("suite", suite_id)
+        self._stack_handler.pop("run", name)
 
-    def start_task(self, name, test_id, test_line, time_delta, tags):
+    def start_task(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        line: int,
+        time_delta: float,
+        tags: Sequence[str],
+    ):
         oid = self._obtain_id
-        with self._stack_handler.push_record("test", test_id, "ST", "RT"):
+        task_id = f"{libname}.{name}"
+        with self._stack_handler.push_record("task", task_id, "ST", "RT"):
             self._write_with_separator(
                 "ST ",
                 [
                     oid(name),
-                    oid(test_id),
-                    self._number(test_line),
+                    oid(libname),
+                    oid(source),
+                    self._number(line),
                     self._number(time_delta),
                 ],
             )
@@ -439,7 +447,9 @@ class _RoboOutputImpl:
     def send_start_time_delta(self, time_delta_in_seconds: float):
         self._write_with_separator("S ", (self._number(time_delta_in_seconds),))
 
-    def end_task(self, test_id, status, message, time_delta):
+    def end_task(
+        self, name: str, libname: str, status: str, message: str, time_delta: float
+    ):
         oid = self._obtain_id
         self._write_with_separator(
             "ET ",
@@ -449,7 +459,8 @@ class _RoboOutputImpl:
                 self._number(time_delta),
             ],
         )
-        self._stack_handler.pop("test", test_id)
+        task_id = f"{libname}.{name}"
+        self._stack_handler.pop("task", task_id)
 
     def log_method_except(
         self,

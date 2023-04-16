@@ -120,10 +120,10 @@ def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
 def _log_before_task_run(task: ITask):
     import robo_log
 
-    robo_log.start_suite(task.module_name, task.module_name, task.filename)
     robo_log.start_task(
         task.name,
-        f"{task.module_name}.{task.name}",
+        task.module_name,
+        task.filename,
         task.method.__code__.co_firstlineno,
         [],
     )
@@ -133,10 +133,7 @@ def _log_after_task_run(task: ITask):
     import robo_log
 
     status = task.status
-    robo_log.end_task(
-        task.name, f"{task.module_name}.{task.name}", status, task.message
-    )
-    robo_log.end_suite(task.module_name, task.module_name, status)
+    robo_log.end_task(task.name, task.module_name, status, task.message)
 
 
 @contextmanager

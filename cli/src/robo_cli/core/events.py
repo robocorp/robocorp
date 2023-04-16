@@ -11,8 +11,8 @@ class MessageType(str, Enum):
     INITIAL_TIME = "T"
     LOG = "L"
     LOG_HTML = "LH"
-    START_SUITE = "SS"
-    END_SUITE = "ES"
+    START_RUN = "SR"
+    END_RUN = "ER"
     START_TASK = "ST"
     END_TASK = "ET"
     START_ELEMENT = "SE"
@@ -56,21 +56,20 @@ class LogHtml(BaseModel):
     time_delta_in_seconds: float
 
 
-class StartSuite(BaseModel):
+class StartRun(BaseModel):
     name: str
-    suite_id: str
-    suite_source: str
     time_delta_in_seconds: float
 
 
-class EndSuite(BaseModel):
+class EndRun(BaseModel):
     status: str
     time_delta_in_seconds: float
 
 
 class StartTask(BaseModel):
     name: str
-    suite_id: str
+    libname: str
+    source: str
     lineno: int
     time_delta_in_seconds: float
 
@@ -140,8 +139,8 @@ Event = Union[
     InitialTime,
     Log,
     LogHtml,
-    StartSuite,
-    EndSuite,
+    StartRun,
+    EndRun,
     StartTask,
     EndTask,
     StartElement,
@@ -163,8 +162,8 @@ TYPE_TO_EVENT: dict[MessageType, Type[Event]] = {
     MessageType.INITIAL_TIME: InitialTime,
     MessageType.LOG: Log,
     MessageType.LOG_HTML: LogHtml,
-    MessageType.START_SUITE: StartSuite,
-    MessageType.END_SUITE: EndSuite,
+    MessageType.START_RUN: StartRun,
+    MessageType.END_RUN: EndRun,
     MessageType.START_TASK: StartTask,
     MessageType.END_TASK: EndTask,
     MessageType.START_ELEMENT: StartElement,

@@ -6,11 +6,11 @@ I "robot=5.0rc1"
 M b:"Robot1"
 M c:"s1"
 M d:"C:/Users/fabio/AppData/Local/Temp/pytest-of-fabio/pytest-1151/test_robot_out_stream0/test_robot_stream/robot1.robot"
-SS b|c|d|0.055
+SR b|0.055
 M e:"Simple Task"
 M f:"s1-t1"
-ST e|f|16|0.056
+ST e|b|d|16|0.056
 M m:"PASS"
 M h:""
 ET m|h|0.095
-ES Y|0.096
+ER Y|0.096

@@ -130,25 +130,24 @@ class _RoboLogger:
         self._skip_log_arguments += 1
 
     @_log_error
-    def start_suite(self, name: str, suite_id: str, suite_source: str) -> None:
-        return self._robot_output_impl.start_suite(
+    def start_run(self, name: str) -> None:
+        return self._robot_output_impl.start_run(
             name,
-            suite_id,
-            suite_source,
             self._get_time_delta(),
         )
 
     @_log_error
-    def end_suite(self, name: str, suite_id: str, status: str):
-        return self._robot_output_impl.end_suite(
-            suite_id, status, self._get_time_delta()
-        )
+    def end_run(self, name: str, status: str):
+        return self._robot_output_impl.end_run(name, status, self._get_time_delta())
 
     @_log_error
-    def start_task(self, name: str, task_id: str, lineno: int, tags: Sequence[str]):
+    def start_task(
+        self, name: str, libname: str, source: str, lineno: int, tags: Sequence[str]
+    ):
         return self._robot_output_impl.start_task(
             name,
-            task_id,
+            libname,
+            source,
             lineno,
             self._get_time_delta(),
             tags,
@@ -173,9 +172,10 @@ class _RoboLogger:
         return self._robot_output_impl.send_start_time_delta(time_delta_in_seconds)
 
     @_log_error
-    def end_task(self, name: str, task_id: str, status: str, message: str):
+    def end_task(self, name: str, libname: str, status: str, message: str):
         return self._robot_output_impl.end_task(
-            task_id,
+            name,
+            libname,
             status,
             message,
             self._get_time_delta(),

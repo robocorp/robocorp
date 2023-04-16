@@ -1,4 +1,4 @@
-def test_impl_recovery_matches_suite():
+def test_impl_recovery_matches_suite() -> None:
     from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
@@ -7,17 +7,17 @@ def test_impl_recovery_matches_suite():
     config.max_files = 1
     config.log_html = None
     impl = _RoboOutputImpl(config)
-    impl.start_suite("My Suite", "suite1", "", 0)
-    impl.start_task("My Test", "test1", 0, 0, [])
+    impl.start_run("suite1", 0)
+    impl.start_task("test1", "modname", __file__, 0, 0, [])
     assert len(impl._stack_handler._queue) == 2
 
     # Unsynchronized end suite (clear until we reach it).
-    impl.end_suite("suite1", "PASS", 0)
+    impl.end_run("suite1", "PASS", 0)
 
     assert len(impl._stack_handler._queue) == 0
 
 
-def test_impl_recovery_matches_task():
+def test_impl_recovery_matches_task() -> None:
     from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
@@ -26,21 +26,21 @@ def test_impl_recovery_matches_task():
     config.max_files = 1
     config.log_html = None
     impl = _RoboOutputImpl(config)
-    impl.start_suite("My Suite", "suite1", "", 0)
-    impl.start_task("My Test", "test1", 0, 0, [])
+    impl.start_run("suite1", 0)
+    impl.start_task("test1", "modname", "source", 0, 0, [])
     impl.start_element(
         "My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], []
     )
     assert len(impl._stack_handler._queue) == 3
 
     # Unsynchronized end task (clear until we reach it).
-    impl.end_task("test1", "PASS", "", 0)
+    impl.end_task("test1", "modname", "PASS", "", 0)
     assert len(impl._stack_handler._queue) == 1
-    impl.end_suite("suite1", "PASS", 0)
+    impl.end_run("suite1", "PASS", 0)
     assert len(impl._stack_handler._queue) == 0
 
 
-def test_impl_recovery_does_not_match_test():
+def test_impl_recovery_does_not_match_test() -> None:
     from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
@@ -49,21 +49,21 @@ def test_impl_recovery_does_not_match_test():
     config.max_files = 1
     config.log_html = None
     impl = _RoboOutputImpl(config)
-    impl.start_suite("My Suite", "suite1", "", 0)
-    impl.start_task("My Test", "test1", 0, 0, [])
+    impl.start_run("suite1", 0)
+    impl.start_task("test1", "modname", "source", 0, 0, [])
     impl.start_element(
         "My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], []
     )
     assert len(impl._stack_handler._queue) == 3
 
     # Unsynchronized end task (clear all methods).
-    impl.end_task("no-match", "PASS", "", 0)
+    impl.end_task("no-match", "modname", "PASS", "", 0)
     assert len(impl._stack_handler._queue) == 1
-    impl.end_suite("suite1", "PASS", 0)
+    impl.end_run("suite1", "PASS", 0)
     assert len(impl._stack_handler._queue) == 0
 
 
-def test_impl_recovery_do_nothing():
+def test_impl_recovery_do_nothing() -> None:
     from robo_log._robo_output_impl import _RoboOutputImpl, _Config
 
     config = _Config("uuid")
@@ -72,5 +72,5 @@ def test_impl_recovery_do_nothing():
     config.max_files = 1
     config.log_html = None
     impl = _RoboOutputImpl(config)
-    impl.end_suite("suite1", "PASS", 0)
+    impl.end_run("suite1", "PASS", 0)
     assert len(impl._stack_handler._queue) == 0
