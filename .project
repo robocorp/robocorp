@@ -2,9 +2,6 @@
 <projectDescription>
 	<name>draft-python-framework</name>
 	<comment></comment>
-	<projects>
-		<project>robocorp-logging</project>
-	</projects>
 	<buildSpec>
 		<buildCommand>
 			<name>org.python.pydev.PyDevBuilder</name>
