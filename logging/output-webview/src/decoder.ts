@@ -173,15 +173,20 @@ export function* iter_decoded_log_format(stream: string, decoder: Decoder) {
         line = line.trim();
 
         if (line) {
-            const split = splitInChar(line, " ");
-            if (split) {
-                [message_type, message] = split;
-                decoded = decoder.decode_message_type(message_type, message);
+            try {
+                const split = splitInChar(line, " ");
+                if (split) {
+                    [message_type, message] = split;
+                    decoded = decoder.decode_message_type(message_type, message);
 
-                if (decoded) {
-                    const m: IMessage = { "message_type": message_type, "decoded": decoded };
-                    yield m;
+                    if (decoded) {
+                        const m: IMessage = { "message_type": message_type, "decoded": decoded };
+                        yield m;
+                    }
                 }
+            } catch (err) {
+                console.log("Unable to decode message: " + line);
+                console.log(err);
             }
         }
     }
