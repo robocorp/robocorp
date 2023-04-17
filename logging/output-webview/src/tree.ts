@@ -125,6 +125,15 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
     return nodesCreated;
 }
 
+export function addArgumentsToTreeContent(item: IContentAdded, name: string, type: string, value: string) {
+    if (item.summaryInput.classList.contains("emptySummaryInput")) {
+        item.summaryInput.textContent = `${name} (${type}) = ${"value"}`;
+        item.summaryInput.classList.remove("emptySummaryInput");
+    } else {
+        item.summaryInput.textContent += `, ${name} (${type}) = ${"value"}`;
+    }
+}
+
 /**
  * When we add content we initially add it as an item with the NO_CHILDREN class
  * and later we have to remove that class if it has children.

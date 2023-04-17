@@ -6,7 +6,7 @@ import { pathBasename } from "./path";
 import { selectById, divById, createUL, getDataTreeId, createSpan, liMarkedAsHidden } from "./plainDom";
 import { IOpts, IContentAdded, IMessageNode, PythonTraceback } from "./protocols";
 import { SummaryBuilder } from "./summaryBuilder";
-import { addExceptionToNode, addTreeContent, createLiAndNodesBelow } from "./tree";
+import { addArgumentsToTreeContent, addExceptionToNode, addTreeContent, createLiAndNodesBelow } from "./tree";
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -359,13 +359,7 @@ export class TreeBuilder {
                 break;
             case "EA":
                 const item: IContentAdded = this.stack.at(-1);
-                if (item.summaryInput.classList.contains("emptySummaryInput")) {
-                    item.summaryInput.textContent = `${msg.decoded["name"]} (${msg.decoded["type"]}) = ${msg.decoded["value"]}`;
-                    item.summaryInput.classList.remove("emptySummaryInput");
-                } else {
-                    item.summaryInput.textContent += `, ${msg.decoded["name"]} (${msg.decoded["type"]}) = ${msg.decoded["value"]}`;
-                }
-
+                addArgumentsToTreeContent(item, msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
                 break;
             case "L":
             case "LH":
