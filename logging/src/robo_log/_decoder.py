@@ -5,7 +5,7 @@ from robo_log.protocols import IReadLines
 
 
 class Decoder:
-    def __init__(self):
+    def __init__(self) -> None:
         self.memo: Dict[str, str] = {}
 
     def decode_message_type(self, message_type: str, message: str) -> Optional[dict]:
@@ -144,10 +144,7 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     # End Element
     "EE": _decode("status:oid, time_delta_in_seconds:float"),
     # Element/method argument (name and value of the argument).
-    "EA": _decode("name:oid, value:oid"),
-    # Can appear before element (method) to note that the result will
-    # be assigned to the given name.
-    "AS": _decode("assign:oid"),
+    "EA": _decode("name:oid, type:oid, value:oid"),
     # Tag the current scope with some value.
     "TG": _decode("tag:oid"),
     # Set some time for the current scope.

@@ -163,11 +163,11 @@ Basic message types are:
 
 ### EA: Element argument
 
-    Spec: `name:oid, value:oid`
+    Spec: `name:oid, type:oid, value:oid`
     
     Example:
     
-    `EA f|g`
+    `EA f|g|h`
 
 ### AS: Assign the result of some element (such as a method) to a variable.
 

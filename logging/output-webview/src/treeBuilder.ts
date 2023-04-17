@@ -360,10 +360,10 @@ export class TreeBuilder {
             case "EA":
                 const item: IContentAdded = this.stack.at(-1);
                 if (item.summaryInput.classList.contains("emptySummaryInput")) {
-                    item.summaryInput.textContent = `${msg.decoded["name"]}=${msg.decoded["value"]}`;
+                    item.summaryInput.textContent = `${msg.decoded["name"]} (${msg.decoded["type"]}) = ${msg.decoded["value"]}`;
                     item.summaryInput.classList.remove("emptySummaryInput");
                 } else {
-                    item.summaryInput.textContent += `, ${msg.decoded["name"]}=${msg.decoded["value"]}`;
+                    item.summaryInput.textContent += `, ${msg.decoded["name"]} (${msg.decoded["type"]}) = ${msg.decoded["value"]}`;
                 }
 
                 break;

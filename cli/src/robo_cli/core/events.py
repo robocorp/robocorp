@@ -97,6 +97,7 @@ class EndElement(BaseModel):
 
 class ElementArgument(BaseModel):
     name: str
+    type: str
     value: str
 
 

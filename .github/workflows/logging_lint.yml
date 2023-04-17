@@ -52,7 +52,7 @@ jobs:
         
       - name: Black check
         run: |
-          poetry run black --check src tests --exclude="index\.py|index_v2\.py"
+          poetry run black --check src tests --exclude="_index\.py|_index_v2\.py"
           
       - name: mypy robocorp-logging
         run: |

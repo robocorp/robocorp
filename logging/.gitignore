@@ -137,3 +137,5 @@ node_modules
 /output-webview/.vscode
 /src/robo_log/index.py
 /src/robo_log/index_v2.py
+/src/robo_log/_index.py
+/src/robo_log/_index_v2.py

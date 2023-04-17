@@ -9,7 +9,7 @@ authors = [
 ]
 readme = "README.md"
 packages = [{include = "robo_log", from = "src"}]
-include = ["**/index.py", "**/index_v2.py"]
+include = ["**/_index.py", "**/_index_v2.py"]
 
 [tool.mypy]
 mypy_path = "logging/src:logging/tests"

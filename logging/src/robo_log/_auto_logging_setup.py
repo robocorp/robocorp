@@ -4,6 +4,7 @@ from robo_log.protocols import OptExcInfo
 from robo_log._logger_instances import _get_logger_instances
 from robo_log import critical
 from .protocols import Status
+from typing import Tuple, List
 
 
 class OnExitContextManager:
@@ -49,11 +50,13 @@ def register_auto_logging_callbacks(rewrite_hook_config):
         lineno: int,
         args_dict: dict,
     ) -> None:
+        from robo_log._obj_info_repr import get_obj_type_and_repr
+
         if tid != threading.get_ident():
             return
 
         status_stack.append([mod_name, name, "PASS"])
-        args = []
+        args: List[Tuple[str, str, str]] = []
         for key, val in args_dict.items():
             for p in ("password", "passwd"):
                 if p in key:
@@ -61,7 +64,9 @@ def register_auto_logging_callbacks(rewrite_hook_config):
                         robo_logger.hide_from_output(val)
                     break
 
-            args.append((f"{key}", f"{val!r}"))
+            obj_type, obj_repr = get_obj_type_and_repr(val)
+            args.append((f"{key}", obj_type, obj_repr))
+
         for robo_logger in _get_logger_instances():
             robo_logger.start_element(
                 name,
@@ -71,7 +76,6 @@ def register_auto_logging_callbacks(rewrite_hook_config):
                 "METHOD",
                 "",
                 args,
-                [],
                 [],
             )
 

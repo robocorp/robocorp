@@ -31,7 +31,17 @@ def test_sensitive_data():
             found.append(v)
 
     assert found == [
-        {"message_type": "EA", "name": "user_password", "value": "'<redacted>'"},
-        {"message_type": "EA", "name": "arg", "value": "'<redacted>'"},
-        {"message_type": "EA", "name": "some_arg", "value": "<redacted>"},
+        {
+            "message_type": "EA",
+            "name": "user_password",
+            "type": "str",
+            "value": "'<redacted>'",
+        },
+        {"message_type": "EA", "name": "arg", "type": "str", "value": "'<redacted>'"},
+        {
+            "message_type": "EA",
+            "name": "some_arg",
+            "type": "str",
+            "value": "<redacted>",
+        },
     ]

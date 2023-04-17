@@ -182,7 +182,7 @@ class Dev(object):
                     os.path.dirname(__file__),
                     "src",
                     "robo_log",
-                    f"index{vtag}.py",
+                    f"_index{vtag}.py",
                 )
             )
 

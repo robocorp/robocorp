@@ -6,6 +6,41 @@ from typing import Optional
 import pytest
 
 from robo_log._config import BaseConfig, FilterKind
+from contextlib import contextmanager
+
+
+class _SetupInfo:
+    def __init__(self, log_target):
+        self.log_target = log_target
+
+    def open_log_target(self):
+        import webbrowser
+
+        webbrowser.open(self.log_target.as_uri())
+
+
+@contextmanager
+def basic_log_setup(tmpdir, max_file_size="1MB", max_files=5):
+    import robo_log
+
+    log_target = Path(tmpdir.join("log.html"))
+
+    with robo_log.setup_auto_logging():
+        with robo_log.add_log_output(
+            tmpdir,
+            max_file_size=max_file_size,
+            max_files=max_files,
+            log_html=log_target,
+        ):
+            robo_log.start_run("Root Suite")
+            robo_log.start_task("my_task", "task_mod", __file__, 0, [])
+
+            yield _SetupInfo(log_target)
+
+            robo_log.end_task("my_task", "task_mod", "PASS", "Ok")
+            robo_log.end_run("Root Suite", "PASS")
+
+        assert log_target.exists()
 
 
 class ConfigForTest(BaseConfig):

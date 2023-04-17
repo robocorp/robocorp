@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Iterator, List, Sequence, Set, Pattern
+from typing import Dict, Iterator, List, Sequence, Set, Pattern, Tuple
 import json
 import itertools
 import string
@@ -485,6 +485,8 @@ class _RoboOutputImpl:
             was already previously logged (see the `unhandled` parameter for
             details on the use-cases where it may be skipped).
         """
+        from robo_log._obj_info_repr import get_obj_type_and_repr
+
         tp, e, tb = exc_info
         if e is None or tb is None or tp is None:
             return False
@@ -550,17 +552,14 @@ class _RoboOutputImpl:
                     if key.startswith("@"):
                         # Skip our own variables.
                         continue
-                    try:
-                        val_type = val.__class__.__name__
-                    except:
-                        val_type = str(type(val))
 
+                    obj_type, obj_repr = get_obj_type_and_repr(val)
                     self._write_with_separator(
                         "TBV ",
                         [
                             oid(str(key)),
-                            oid(val_type),
-                            oid(repr(val)),
+                            oid(obj_type),
+                            oid(obj_repr),
                         ],
                     )
 
@@ -573,17 +572,16 @@ class _RoboOutputImpl:
 
     def start_element(
         self,
-        name,
-        libname,
-        element_type,
-        doc,
-        source,
-        lineno,
-        start_time_delta,
-        args,
-        assigns,
-        hide_from_logs=False,
-    ):
+        name: str,
+        libname: str,
+        element_type: str,
+        doc: str,
+        source: str,
+        lineno: int,
+        start_time_delta: float,
+        args: Sequence[Tuple[str, str, str]],
+        hide_from_logs: bool = False,
+    ) -> None:
         element_type = element_type.upper()
         oid = self._obtain_id
         element_id = f"{libname}.{name}"
@@ -607,24 +605,8 @@ class _RoboOutputImpl:
                 ],
             )
 
-            if assigns:
-                for assign in assigns:
-                    lower_assign = assign.lower()
-                    for p in ("password", "passwd"):
-                        if p in lower_assign:
-                            if args:
-                                for _, arg in args:
-                                    self.hide_from_output(arg)
-                            break
-
-                    self._write_with_separator(
-                        "AS ",
-                        [
-                            oid(assign),
-                        ],
-                    )
             if args:
-                for name, arg in args:
+                for name, arg_type, arg in args:
                     hide_strings_re = self._hide_strings_re
                     if hide_strings_re:
                         arg = hide_strings_re.sub("<redacted>", arg)
@@ -633,6 +615,7 @@ class _RoboOutputImpl:
                         "EA ",
                         [
                             oid(name),
+                            oid(arg_type),
                             oid(arg),
                         ],
                     )
@@ -700,9 +683,9 @@ class _RoboOutputImpl:
             print(f"Robocorp Log (html): {target}")
 
             if self._config.log_html_style == 1:
-                from robo_log import index
+                from robo_log import _index as index
             elif self._config.log_html_style == 2:
-                from robo_log import index_v2 as index
+                from robo_log import _index_v2 as index
             else:
                 raise ValueError(
                     "Unexpected log html style: {self._config.log_html_style}"

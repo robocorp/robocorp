@@ -49,13 +49,13 @@ def _get_function_and_class_name(stack) -> Optional[Tuple[Any, str]]:
     return function, class_name
 
 
-def _rewrite_return(function, class_name, node) -> Optional[list]:
+def _rewrite_return(function, class_name, node: ast.Return) -> Optional[list]:
     if function.name.startswith("_"):
         return None
 
     factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
 
-    result: list = []
+    result: List[ast.stmt] = []
 
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("method_return")
@@ -143,7 +143,7 @@ def _create_except_handler_ast(
     function: ast.FunctionDef,
     last_body_lineno,
     filter_kind: FilterKind,
-):
+) -> ast.ExceptHandler:
     # Target code:
     #     import sys as @py_sys
     #     method_except(@py_sys.exc_info())
@@ -199,7 +199,7 @@ def _create_except_handler_ast(
     return except_handler
 
 
-def _create_after_method_ast(factory, class_name, function, filter_kind):
+def _create_after_method_ast(factory, class_name, function, filter_kind) -> ast.Expr:
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("after_method")
     call.args.append(factory.NameLoad("__name__"))
@@ -213,7 +213,7 @@ def _create_after_method_ast(factory, class_name, function, filter_kind):
         return factory.Expr(call)
 
 
-def _rewrite_funcdef(stack, node, filter_kind):
+def _rewrite_funcdef(stack, node, filter_kind) -> None:
     parent: Any
     function: ast.FunctionDef = node
     if function.name.startswith("_") and function.name != "__init__":
@@ -230,17 +230,15 @@ def _rewrite_funcdef(stack, node, filter_kind):
             class_name = parent.name + "."
 
     first_non_constant_stmt_index = 0
+    stmt: ast.stmt
     for stmt in function.body:
-        if (
-            stmt.__class__.__name__ == "Expr"
-            and stmt.value.__class__.__name__ == "Constant"
-        ):
+        if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant):
             first_non_constant_stmt_index += 1
             continue
         break
 
     function_body = function.body
-    function.body = None  # Proper value will be set later.
+    function.body = []  # Proper value will be set later.
 
     # Separate the docstring.
     if first_non_constant_stmt_index > 0:
@@ -345,7 +343,7 @@ def rewrite_ast_add_callbacks(
         except StopIteration:
             break
 
-        if node.__class__.__name__ == "Return":
+        if isinstance(node, ast.Return):
             func_and_class_name = _get_function_and_class_name(stack)
             if not func_and_class_name:
                 continue

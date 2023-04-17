@@ -27,8 +27,8 @@ def test_rotate_logs(tmpdir) -> None:
     assert len(files) == 2, f"Found: {files}"
 
     name_to_file = dict((f.name, f) for f in files)
-    assert set(name_to_file.keys()) == {"output_10.robolog", "output_11.robolog"}
-    output_at_step = name_to_file["output_10.robolog"]
+    assert set(name_to_file.keys()) == {"output_11.robolog", "output_12.robolog"}
+    output_at_step = name_to_file["output_11.robolog"]
 
     # Check that replay suite/test/keyword are properly sent on rotate.
     expect_types = {"RR", "RT", "RE"}
@@ -42,4 +42,4 @@ def test_rotate_logs(tmpdir) -> None:
                 break
         else:
             raise AssertionError(f"Some expected messages not found: {expect_types}")
-    assert found_ids_at_step[0]["part"] == 10
+    assert found_ids_at_step[0]["part"] == 11

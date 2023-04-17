@@ -51,7 +51,7 @@ Test Scenario 4 screenshot
     Setup Scenario    ${CURDIR}/_resources/case4.robolog
     Check Image
     Check Tree Items Text    Scenario Generator.Screenshot test
-    ...    Take Screenshot path=output/test_screenshot.png, embed\=True
+    ...    Take Screenshot path (str) = output/test_screenshot.png, embed (bool) \= True
     ...    Saved screenshot as 'output\\test_screenshot.png'
     ...    ${EMPTY}
 

@@ -190,8 +190,7 @@ class _RoboLogger:
         lineno: int,
         element_type: str,  # METHOD/IF/WHILE,etc.
         doc: str,
-        args: Sequence[Tuple[str, str]],
-        assign_targets: Sequence[str],
+        args: Sequence[Tuple[str, str, str]],
         tags: Sequence[str],
     ):
         """
@@ -204,8 +203,7 @@ class _RoboLogger:
             lineno=1,
             element_type="METHOD",
             doc="Closes Browser",
-            args=["force=True"],
-            assign_targets=[],
+            args=[("force", "boolean", "True")],
             tags=["some-tag"],
         )
         """
@@ -225,7 +223,7 @@ class _RoboLogger:
 
         if args:
             if self._skip_log_arguments or name == "hide_from_output":
-                args = [(name, "<redacted>") for name, _value in args]
+                args = [(name, tp, "<redacted>") for name, tp, _value in args]
 
         return self._robot_output_impl.start_element(
             name,
@@ -236,7 +234,6 @@ class _RoboLogger:
             lineno,
             self._get_time_delta(),
             args,
-            assign_targets,
             hide_from_logs=hide_from_logs,
         )
 
