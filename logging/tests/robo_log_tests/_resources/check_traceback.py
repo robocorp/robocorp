@@ -14,13 +14,15 @@ def main():
 
 
 def initial_exc():
-    v0 = "in initial value"
+    initial0 = "in initial value"
+    initial1 = "another var"
     raise RuntimeError("initial exc")
 
 
 def new_exc_while_handling_exc():
     try:
-        v1 = {"1": 1, "2": 2}
+        another0 = {"1": 1, "2": 2}
+        bar = ["aabb"] * 80
         initial_exc()
     except RuntimeError:
         raise ValueError("final exc")

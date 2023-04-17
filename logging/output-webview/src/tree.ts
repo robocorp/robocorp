@@ -30,17 +30,23 @@ export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceb
     detailInfo.appendChild(errorHeader);
 
     const fullTb: string[] = [];
-    for (const tbEntry of tb.stack) {
+    if (tb.stack.length > 0) {
+        const tbEntry = tb.stack[0];
         let s = tbEntry.source;
-        if (s.length > 31) {
-            s = `... ${s.substring(27)}`;
-        }
-        fullTb.push(`File "${s}", line ${tbEntry.lineno}, in ${tbEntry.method}\n`);
-        fullTb.push(`    ${tbEntry.lineContent}\n`);
-        for (const [name, val] of tbEntry.variables.entries()) {
-            fullTb.push(`        💠 ${name} = ${val}\n`);
+        for (const [name, [type, val]] of tbEntry.variables.entries()) {
+            fullTb.push(`💠 ${name} (${type}) = ${val}\n`);
         }
     }
+
+    // Code below could be used to generate a stack trace.
+    // for (const tbEntry of tb.stack) {
+    // if (s.length > 31) {
+    //     s = `... ${s.substring(27)}`;
+    // }
+    // fullTb.push(`File "${s}", line ${tbEntry.lineno}, in ${tbEntry.method}\n`);
+    // fullTb.push(`    ${tbEntry.lineContent}\n`);
+    // }
+
     const errorEntry = createDiv();
     errorEntry.classList.add("errorDetails");
     errorEntry.style.whiteSpace = "pre";
@@ -51,7 +57,7 @@ export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceb
 
     const detailInputs = createDiv();
     detailInputs.classList.add("detailInputs");
-    detailInputs.textContent = " ";
+    detailInputs.textContent = "";
     nodesCreated.detailContainer.appendChild(detailInputs);
 
     nodesCreated.details.classList.add("parentNode");
@@ -127,10 +133,10 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
 
 export function addArgumentsToTreeContent(item: IContentAdded, name: string, type: string, value: string) {
     if (item.summaryInput.classList.contains("emptySummaryInput")) {
-        item.summaryInput.textContent = `${name} (${type}) = ${"value"}`;
+        item.summaryInput.textContent = `${name} (${type}) = ${value}`;
         item.summaryInput.classList.remove("emptySummaryInput");
     } else {
-        item.summaryInput.textContent += `, ${name} (${type}) = ${"value"}`;
+        item.summaryInput.textContent += `, ${name} (${type}) = ${value}`;
     }
 }
 
