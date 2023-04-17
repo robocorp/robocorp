@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Sequence, Union, List
+from typing import Optional, Sequence, Union, List, Any
 
 from ._protocols import ITask
 import typing
@@ -34,6 +34,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
     except Exception:
         raise OSError(f"Could not read the contents of: {pyproject}.")
 
+    obj: Any
     try:
         try:
             import tomllib  # type: ignore
@@ -48,7 +49,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
     # Filter("selenium", FilterKind.log_on_project_call),
     # Filter("SeleniumLibrary", FilterKind.log_on_project_call),
 
-    read_parts = []
+    read_parts: List[str] = []
     for part in "tool.robo.log.log_filter_rules".split("."):
         read_parts.append(part)
 

@@ -1,88 +1,12 @@
-from typing import Tuple
 from pathlib import Path
-import sys
-from robo._argdispatch import arg_dispatch
+from typing import Tuple
+
 import json
-from contextlib import contextmanager
 import os
+import sys
 import traceback
 
-
-def _setup_log_output(
-    output_dir: Path,
-    max_file_size: str = "1MB",
-    max_files: int = 5,
-    log_name: str = "log.html",
-):
-    import robo_log
-
-    # This can be called after user code is imported (but still prior to its
-    # execution).
-    return robo_log.add_log_output(
-        output_dir=output_dir,
-        max_file_size=max_file_size,
-        max_files=max_files,
-        log_html=output_dir / log_name,
-    )
-
-
-@contextmanager
-def _setup_stdout_logging():
-    import robo_log
-    import threading
-
-    if os.environ.get("RC_LOG_OUTPUT_STDOUT", "").lower() in ("1", "t", "true"):
-        original_stdout = sys.stdout
-
-        # Keep printing anything the user provides to the stderr for now.
-        # TODO: provide messages given to stdout as expected messages in the output?
-        sys.stdout = sys.stderr
-
-        from robo_log._decoder import Decoder
-
-        decoder = Decoder()
-
-        import queue
-
-        q = queue.Queue()
-
-        EXIT = object()
-
-        def in_thread():
-            while True:
-                msg = q.get(block=True)
-                if msg is EXIT:
-                    return
-
-                try:
-                    line = msg.strip()
-                    if line:
-                        message_type, message = line.split(" ", 1)
-                        decoded = decoder.decode_message_type(message_type, message)
-                        if decoded:
-                            original_stdout.write(f"{json.dumps(decoded)}\n")
-                            # Flush (so, clients don't need to execute as unbuffered).
-                            original_stdout.flush()
-                except:
-                    traceback.print_exc(file=sys.stderr)
-
-        # Note: not daemon, we want all messages to be sent prior to exiting.
-        threading.Thread(
-            target=in_thread, daemon=False, name="RoboLogStdoutThread"
-        ).start()
-
-        def write(msg):
-            q.put(msg)
-
-        with robo_log.add_in_memory_log_output(write):
-            try:
-                yield
-            finally:
-                q.put(EXIT)
-                sys.stdout = original_stdout
-
-    else:
-        yield  # Nothing to do but respect the contextmanager.
+from ._argdispatch import arg_dispatch
 
 
 # Note: the args must match the 'dest' on the configured argparser.
@@ -90,6 +14,22 @@ def _setup_stdout_logging():
 def list_tasks(
     path: str,
 ) -> int:
+    """
+    Prints the tasks available at a given path to the stdout in json format.
+
+    [
+        {
+            "name": "task_name",
+            "line": 10,
+            "file": "/usr/code/projects/tasks.py",
+            "docs": "Task docstring",
+        },
+        ...
+    ]
+
+    Args:
+        path: The path (file or directory) from where tasks should be collected.
+    """
     from robo._collect_tasks import collect_tasks
     from robo._task import Context
     from robo._protocols import ITask
@@ -125,14 +65,29 @@ def run(
     max_log_files: int = 5,
     max_log_file_size: str = "1MB",
 ) -> int:
+    """
+    Runs a task.
+
+    Args:
+        output_dir: The directory where output should be put.
+        path: The path (file or directory where the tasks should be collected from.
+        task_name: The name of the task to run.
+        max_log_files: The maximum number of log files to be created (if more would
+            be needed the oldest one is deleted).
+        max_log_file_size: The maximum size for the created log files.
+
+    Returns:
+        0 if everything went well.
+        1 if there was some error running the task.
+    """
     from ._collect_tasks import collect_tasks
     from ._hooks import before_task_run, after_task_run
-    from ._logging_setup import setup_auto_logging
     from ._protocols import ITask
     from ._task import Context
     from ._protocols import Status
     from ._exceptions import RoboCollectError
-    from ._logging_setup import read_filters_from_pyproject_toml
+    from ._log_auto_setup import setup_auto_logging, read_filters_from_pyproject_toml
+    from ._log_output_setup import setup_log_output, setup_stdout_logging
 
     # Don't show internal machinery on tracebacks:
     # setting __tracebackhide__ will make it so that robocorp-logging
@@ -153,7 +108,7 @@ def run(
         # Note: we can't customize what's a "project" file or a "library" file, right now
         # the customizations are all based on module names.
         filters=filters
-    ), _setup_stdout_logging(), _setup_log_output(
+    ), setup_stdout_logging(), setup_log_output(
         output_dir=Path(output_dir),
         max_files=max_log_files,
         max_file_size=max_log_file_size,
