@@ -81,6 +81,7 @@ def method():
         )
         assert "if @caller_in_proj:" in unparsed
         assert "@robocorp_rewrite_callbacks.method_except" in unparsed
+        assert "after_assign" not in unparsed
 
 
 def test_rewrite_simple_full(tmpdir):
@@ -108,3 +109,4 @@ def method():
         unparsed = ast.unparse(mod)
         assert "@caller_in_proj" not in unparsed
         assert "before_method" in unparsed
+        assert "after_assign" in unparsed

@@ -79,7 +79,7 @@ class _RoboLogger:
 
         self._robot_output_impl = _RoboOutputImpl(config)
         self._skip_log_methods = 0
-        self._skip_log_arguments = 0
+        self._skip_log_variables = 0
 
     def hide_from_output(self, string_to_hide: str) -> None:
         self._robot_output_impl.hide_from_output(string_to_hide)
@@ -113,7 +113,7 @@ class _RoboLogger:
         self._skip_log_methods += 1
 
     def start_logging_variables(self):
-        if self._skip_log_arguments <= 0:
+        if self._skip_log_variables <= 0:
             self._robot_output_impl.log_message(
                 "ERROR",
                 f"_RoboLogger error: start_logging_variables() called before stop_logging_variables() (call is ignored as logging is already on).",
@@ -124,10 +124,10 @@ class _RoboLogger:
             )
             return
 
-        self._skip_log_arguments -= 1
+        self._skip_log_variables -= 1
 
     def stop_logging_variables(self):
-        self._skip_log_arguments += 1
+        self._skip_log_variables += 1
 
     @_log_error
     def start_run(self, name: str) -> None:
@@ -212,7 +212,7 @@ class _RoboLogger:
             if "log:ignore-methods" in tags:
                 self._skip_log_methods += 1
             if "log:ignore-variables" in tags:
-                self._skip_log_arguments += 1
+                self._skip_log_variables += 1
 
         if self._skip_log_methods:
             if name not in (
@@ -222,7 +222,7 @@ class _RoboLogger:
                 hide_from_logs = True
 
         if args:
-            if self._skip_log_arguments or name == "hide_from_output":
+            if self._skip_log_variables or name == "hide_from_output":
                 args = [(name, tp, "<redacted>") for name, tp, _value in args]
 
         return self._robot_output_impl.start_element(
@@ -238,6 +238,27 @@ class _RoboLogger:
         )
 
     @_log_error
+    def after_assign(
+        self,
+        filename: str,
+        lineno: int,
+        assign_name: str,
+        assign_type: str,
+        assign_repr: str,
+    ):
+        if self._skip_log_variables:
+            return
+
+        return self._robot_output_impl.after_assign(
+            filename,
+            lineno,
+            assign_name,
+            assign_type,
+            assign_repr,
+            self._get_time_delta(),
+        )
+
+    @_log_error
     def end_method(self, name: str, libname: str, status: str, tags: Sequence[str]):
         try:
             return self._robot_output_impl.end_method(
@@ -248,7 +269,7 @@ class _RoboLogger:
                 if "log:ignore-methods" in tags:
                     self._skip_log_methods -= 1
                 if "log:ignore-variables" in tags:
-                    self._skip_log_arguments -= 1
+                    self._skip_log_variables -= 1
 
     @_log_error
     def log_message(

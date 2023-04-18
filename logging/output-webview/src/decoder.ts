@@ -131,6 +131,7 @@ const _MESSAGE_TYPE_INFO = {
     "RE": start_element,
     "EE": end_element,
     "EA": _decode("name:oid, type:oid, value:oid"),
+    "AS": _decode("source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"),
     "L": decode_log,
     "LH": decode_log,
     "TG": _decode("tag:oid"),

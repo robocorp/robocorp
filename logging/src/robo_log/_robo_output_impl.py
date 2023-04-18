@@ -1,19 +1,19 @@
 from pathlib import Path
-from typing import Dict, Iterator, List, Sequence, Set, Pattern, Tuple
-import json
-import itertools
-import string
-import datetime
-from typing import Optional, Callable
-import os
-import traceback
 from contextlib import contextmanager
-import sys
-import weakref
-from robo_log.protocols import OptExcInfo
-from functools import partial
-import time
 from datetime import timezone
+from functools import partial
+from robo_log.protocols import OptExcInfo
+from typing import Dict, Iterator, List, Sequence, Set, Pattern, Tuple
+from typing import Optional, Callable
+import datetime
+import itertools
+import json
+import os
+import string
+import sys
+import time
+import traceback
+import weakref
 
 WRITE_CONTENTS_TO_STDERR: bool = False
 
@@ -87,7 +87,9 @@ class _RotateHandler:
 
 
 class _StackEntry:
-    def __init__(self, entry_type, entry_id, msg_type, new_msg_type, hide_from_logs):
+    def __init__(
+        self, entry_type, entry_id, msg_type, new_msg_type, hide_from_logs
+    ) -> None:
         self.entry_type = entry_type
         self.entry_id = entry_id
         self.msg_type = msg_type
@@ -120,7 +122,12 @@ class _StackHandler:
 
     @contextmanager
     def push_record(
-        self, entry_type, entry_id, msg_type, new_msg_type, hide_from_logs=False
+        self,
+        entry_type: str,
+        entry_id: str,
+        msg_type: str,
+        new_msg_type: str,
+        hide_from_logs: bool = False,
     ):
         self.recording_writes = True
         self._record_to = _StackEntry(
@@ -635,6 +642,33 @@ class _RoboOutputImpl:
             "EE ",
             [
                 oid(status),
+                self._number(time_delta),
+            ],
+        )
+
+    def after_assign(
+        self,
+        filename: str,
+        lineno: int,
+        assign_name: str,
+        assign_type: str,
+        assign_repr: str,
+        time_delta: float,
+    ):
+        oid = self._obtain_id
+
+        hide_strings_re = self._hide_strings_re
+        if hide_strings_re:
+            assign_repr = hide_strings_re.sub("<redacted>", assign_repr)
+
+        self._write_with_separator(
+            "AS ",
+            [
+                oid(filename),
+                self._number(lineno),
+                oid(assign_name),
+                oid(assign_type),
+                oid(assign_repr),
                 self._number(time_delta),
             ],
         )

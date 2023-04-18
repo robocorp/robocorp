@@ -143,6 +143,10 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     ),
     # End Element
     "EE": _decode("status:oid, time_delta_in_seconds:float"),
+    # Assign
+    "AS": _decode(
+        "source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"
+    ),
     # Element/method argument (name and value of the argument).
     "EA": _decode("name:oid, type:oid, value:oid"),
     # Tag the current scope with some value.

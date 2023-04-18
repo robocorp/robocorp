@@ -35,7 +35,7 @@ def test_sensitive_data():
             "message_type": "EA",
             "name": "user_password",
             "type": "str",
-            "value": "'<redacted>'",
+            "value": "<redacted>",
         },
         {"message_type": "EA", "name": "arg", "type": "str", "value": "'<redacted>'"},
         {

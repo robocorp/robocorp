@@ -6,7 +6,7 @@ import { pathBasename } from "./path";
 import { selectById, divById, createUL, getDataTreeId, createSpan, liMarkedAsHidden } from "./plainDom";
 import { IOpts, IContentAdded, IMessageNode, PythonTraceback } from "./protocols";
 import { SummaryBuilder } from "./summaryBuilder";
-import { addArgumentsToTreeContent, addExceptionToNode, addTreeContent, createLiAndNodesBelow } from "./tree";
+import { addArgumentsToTreeContent, addTreeContent, addValueToTreeContent, createLiAndNodesBelow } from "./tree";
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -46,9 +46,10 @@ class TBHandler {
                 return undefined;
 
             case "TBV": // variable
-                tb = this.stack.at(-1);
-                tb.pushVar(msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
-
+                // We no longer push variabes into the stack because we're not using them
+                // right now (as we record assigns as they happen in a scope).
+                // tb = this.stack.at(-1);
+                // tb.pushVar(msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
                 return undefined;
 
             case "ETB": // tb end
@@ -252,6 +253,8 @@ export class TreeBuilder {
         this.id += 1;
         let isError: boolean;
 
+        let item: IContentAdded;
+
         switch (msgType) {
             case "SR":
                 // start run
@@ -266,9 +269,25 @@ export class TreeBuilder {
                 // stack.push(parent);
                 break;
 
+            case "AS":
+                // assign
+                item = addTreeContent(
+                    this.opts,
+                    this.parent,
+                    `${msg.decoded["target"]} = `,
+                    `Assign to name: ${msg.decoded["target"]}\nAn object of type: ${msg.decoded["type"]}\nWith representation:\n${msg.decoded["value"]}`,
+                    msg,
+                    false,
+                    msg.decoded["source"],
+                    msg.decoded["lineno"],
+                    this.messageNode,
+                    this.id.toString()
+                );
+                addValueToTreeContent(item, msg.decoded["value"]);
+                this.addAssignCssClass(item);
+                break;
             case "ST":
-                // start test
-
+                // start task
                 this.messageNode = { "parent": this.messageNode, "message": msg };
                 this.parent = addTreeContent(
                     this.opts,
@@ -320,7 +339,7 @@ export class TreeBuilder {
                     }
                 }
                 break;
-            case "ET": // end test
+            case "ET": // end task
                 this.messageNode = this.messageNode.parent;
                 const currT = this.parent;
                 this.stack.pop();
@@ -358,7 +377,8 @@ export class TreeBuilder {
                 }
                 break;
             case "EA":
-                const item: IContentAdded = this.stack.at(-1);
+                // Element arguments
+                item = this.stack.at(-1);
                 addArgumentsToTreeContent(item, msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
                 break;
             case "L":
@@ -378,8 +398,8 @@ export class TreeBuilder {
                         "",
                         msg,
                         false,
-                        undefined,
-                        undefined,
+                        msg.decoded["source"],
+                        msg.decoded["lineno"],
                         this.messageNode,
                         this.id.toString()
                     );
@@ -394,7 +414,22 @@ export class TreeBuilder {
             case "ETB": // tb end
                 const tb: PythonTraceback | undefined = this.tbHandler.handle(msg);
                 if (tb) {
-                    addExceptionToNode(this.parent, tb);
+                    if (tb.stack.length > 0) {
+                        const tbEntry = tb.stack[0];
+                        item = addTreeContent(
+                            this.opts,
+                            this.parent,
+                            tb.exceptionMsg,
+                            "",
+                            msg,
+                            false,
+                            tbEntry.source,
+                            tbEntry.lineno,
+                            this.messageNode,
+                            this.id.toString()
+                        );
+                        this.addExceptionCssClass(item);
+                    }
                 }
                 break;
             case "T":
@@ -404,6 +439,16 @@ export class TreeBuilder {
                 }
                 break;
         }
+    }
+
+    addAssignCssClass(curr: IContentAdded) {
+        curr.details.classList.add("variableParent");
+        curr.details.classList.add("leafNode");
+    }
+
+    addExceptionCssClass(curr: IContentAdded) {
+        curr.details.classList.add("exceptionParent");
+        curr.details.classList.add("leafNode");
     }
 
     addDetailsCSSClasses(statusOrLevel: string | number, curr: IContentAdded): boolean {

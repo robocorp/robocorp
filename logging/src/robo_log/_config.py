@@ -13,12 +13,22 @@ Filter = namedtuple("Filter", "name, kind")
 
 
 class FilterKind(enum.Enum):
+    # Note: the values are the name which appears in the .pyc cache.
     full_log = "full"
     log_on_project_call = "call"
     exclude = "exc"
 
 
 class BaseConfig:
+    def get_log_rewrite_assigns(self) -> bool:
+        """
+        Returns:
+            Whether assigns should be tracked. When assigns are tracked,
+            any assign in a module which has mapped to `FilterKind.full_log`
+            will be logged.
+        """
+        return True
+
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
         """
         Args:

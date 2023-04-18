@@ -60,6 +60,9 @@ method_return = Callback()
 # tp, e, tb = exc_info
 method_except = Callback()
 
+# Called as: after_assign(__name__, filename, name, lineno, assign_name, assign_value)
+after_assign = Callback()
+
 
 def iter_all_callbacks():
     yield before_method

@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Union, List, Optional, Tuple
+from typing import Any, Union, List, Optional, Tuple, Dict, Callable
 from . import _ast_utils
 from ._config import BaseConfig, FilterKind
 
@@ -79,6 +79,27 @@ def _rewrite_return(function, class_name, node: ast.Return) -> Optional[list]:
 
     result.append(factory.Expr(call))
     result.append(node)
+    return result
+
+
+def _rewrite_assign(function, class_name, node: ast.Assign) -> Optional[list]:
+    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+
+    result: List[ast.stmt] = []
+
+    for target in node.targets:
+        if isinstance(target, ast.Name):
+            call = factory.Call()
+            call.func = factory.NameLoadRewriteCallback("after_assign")
+            call.args.append(factory.NameLoad("__name__"))
+            call.args.append(factory.NameLoad("__file__"))
+            call.args.append(factory.Str(f"{class_name}{function.name}"))
+            call.args.append(factory.LineConstant())
+            call.args.append(factory.Str(target.id))
+            call.args.append(factory.NameLoad(target.id))
+
+    result.append(node)
+    result.append(factory.Expr(call))
     return result
 
 
@@ -343,32 +364,63 @@ def rewrite_ast_add_callbacks(
         except StopIteration:
             break
 
-        if isinstance(node, ast.Return):
-            func_and_class_name = _get_function_and_class_name(stack)
-            if not func_and_class_name:
-                continue
-            function, class_name = func_and_class_name
-
-            try:
-                result = _rewrite_return(function, class_name, node)
-            except Exception:
-                raise RuntimeError(
-                    f"Error when rewriting function return: {function.name} line: {node.lineno} at: {module_path}"
-                )
-
-            if result is None:
-                continue
-            it.send(result)
-
-        elif node.__class__.__name__ == "FunctionDef":
-            try:
-                _rewrite_funcdef(stack, node, filter_kind)
-            except Exception:
-                raise RuntimeError(
-                    f"Error when rewriting function: {node.name} line: {node.lineno} at: {module_path}"
-                )
+        handler = _dispatch.get(node.__class__)
+        if handler:
+            result = handler(config, module_path, stack, filter_kind, node)
+            if result is not None:
+                it.send(result)
 
     if DEBUG:
         print("\n============ New AST (with hooks in place) ==============\n")
         # Note: only python 3.9 onwards.
         print(ast.unparse(mod))  # type: ignore
+
+
+def _handle_funcdef(config, module_path, stack, filter_kind, node):
+    try:
+        _rewrite_funcdef(stack, node, filter_kind)
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting function: {node.name} line: {node.lineno} at: {module_path}"
+        )
+
+
+def _handle_return(config, module_path, stack, filter_kind, node):
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+
+    try:
+        return _rewrite_return(function, class_name, node)
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting function return: {function.name} line: {node.lineno} at: {module_path}"
+        )
+
+
+def _handle_assign(config, module_path, stack, filter_kind, node):
+    if filter_kind != FilterKind.full_log:
+        return None
+
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+
+    try:
+        return _rewrite_assign(function, class_name, node)
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"
+        )
+
+
+_dispatch: Dict[
+    type, Callable[[BaseConfig, str, list, FilterKind, Any], Optional[list]]
+] = {}
+_dispatch[ast.Return] = _handle_return
+_dispatch[ast.Assign] = _handle_assign
+_dispatch[ast.FunctionDef] = _handle_funcdef

@@ -1,4 +1,4 @@
-from typing import Tuple, List
+from typing import Tuple, List, Any
 import sys
 import threading
 
@@ -38,6 +38,7 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         after_method,
         method_return,
         method_except,
+        after_assign,
     )
 
     hook = RewriteHook(rewrite_hook_config)
@@ -60,13 +61,16 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         status_stack.append([mod_name, name, "PASS"])
         args: List[Tuple[str, str, str]] = []
         for key, val in args_dict.items():
+            obj_type, obj_repr = get_obj_type_and_repr(val)
+
             for p in ("password", "passwd"):
                 if p in key:
                     for robo_logger in _get_logger_instances():
-                        robo_logger.hide_from_output(val)
+                        robo_logger.hide_from_output(obj_repr)
+                        if isinstance(val, str):
+                            robo_logger.hide_from_output(val)
                     break
 
-            obj_type, obj_repr = get_obj_type_and_repr(val)
             args.append((f"{key}", obj_type, obj_repr))
 
         for robo_logger in _get_logger_instances():
@@ -101,6 +105,34 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         for robo_logger in _get_logger_instances():
             robo_logger.end_method(name, mod_name, status, [])
 
+    def call_after_assign(
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        assign_name: str,
+        assign_value: Any,
+    ) -> None:
+        if tid != threading.get_ident():
+            return
+
+        from robo_log._obj_info_repr import get_obj_type_and_repr
+
+        assign_type, assign_repr = get_obj_type_and_repr(assign_value)
+        for p in ("password", "passwd"):
+            if p in assign_name:
+                for robo_logger in _get_logger_instances():
+                    robo_logger.hide_from_output(assign_repr)
+                    if isinstance(assign_value, str):
+                        # Also do it with the version without the 'repr'
+                        robo_logger.hide_from_output(assign_value)
+                break
+
+        for robo_logger in _get_logger_instances():
+            robo_logger.after_assign(
+                filename, lineno, assign_name, assign_type, assign_repr
+            )
+
     def call_on_method_except(
         mod_name: str,
         filename: str,
@@ -124,6 +156,7 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
             robo_logger.log_method_except(exc_info, unhandled=False)
 
     before_method.register(call_before_method)
+    after_assign.register(call_after_assign)
     after_method.register(call_after_method)
     method_except.register(call_on_method_except)
 
@@ -134,6 +167,7 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         # the config which was set when it was loaded).
         sys.meta_path.remove(hook)
         before_method.unregister(call_before_method)
+        after_assign.unregister(call_after_assign)
         after_method.unregister(call_after_method)
         register_auto_logging_callbacks.registered = False
 

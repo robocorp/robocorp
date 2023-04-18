@@ -26,7 +26,9 @@ def run():
     password = "my_pass"
     login(password)
 
-    s = "this should not be shown"
+    with robo_log.stop_logging_variables():
+        s = "this should not be shown"
+
     robo_log.hide_from_output(s)
     method(s)
     something()

@@ -20,49 +20,6 @@ import {
 } from "./plainDom";
 import { IContentAdded, ILiNodesCreated, IMessageNode, IOpts, ITreeState, PythonTraceback } from "./protocols";
 
-export function addExceptionToNode(nodesCreated: IContentAdded, tb: PythonTraceback) {
-    const detailInfo = createDiv();
-    detailInfo.classList.add("detailInfo");
-
-    const errorHeader = createDiv();
-    errorHeader.classList.add("errorHeader");
-    errorHeader.textContent = tb.exceptionMsg;
-    detailInfo.appendChild(errorHeader);
-
-    const fullTb: string[] = [];
-    if (tb.stack.length > 0) {
-        const tbEntry = tb.stack[0];
-        let s = tbEntry.source;
-        for (const [name, [type, val]] of tbEntry.variables.entries()) {
-            fullTb.push(`💠 ${name} (${type}) = ${val}\n`);
-        }
-    }
-
-    // Code below could be used to generate a stack trace.
-    // for (const tbEntry of tb.stack) {
-    // if (s.length > 31) {
-    //     s = `... ${s.substring(27)}`;
-    // }
-    // fullTb.push(`File "${s}", line ${tbEntry.lineno}, in ${tbEntry.method}\n`);
-    // fullTb.push(`    ${tbEntry.lineContent}\n`);
-    // }
-
-    const errorEntry = createDiv();
-    errorEntry.classList.add("errorDetails");
-    errorEntry.style.whiteSpace = "pre";
-    errorEntry.textContent = fullTb.join("");
-    detailInfo.appendChild(errorEntry);
-
-    nodesCreated.detailContainer.appendChild(detailInfo);
-
-    const detailInputs = createDiv();
-    detailInputs.classList.add("detailInputs");
-    detailInputs.textContent = "";
-    nodesCreated.detailContainer.appendChild(detailInputs);
-
-    nodesCreated.details.classList.add("parentNode");
-}
-
 export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodesCreated {
     // <li>
     //   <details open>
@@ -137,6 +94,15 @@ export function addArgumentsToTreeContent(item: IContentAdded, name: string, typ
         item.summaryInput.classList.remove("emptySummaryInput");
     } else {
         item.summaryInput.textContent += `, ${name} (${type}) = ${value}`;
+    }
+}
+
+export function addValueToTreeContent(item: IContentAdded, value: string) {
+    if (item.summaryInput.classList.contains("emptySummaryInput")) {
+        item.summaryInput.textContent = `${value}`;
+        item.summaryInput.classList.remove("emptySummaryInput");
+    } else {
+        item.summaryInput.textContent += `, ${value}`;
     }
 }
 
