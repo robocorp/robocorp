@@ -408,8 +408,6 @@ def setup_auto_logging(config: Optional[BaseConfig] = None):
     else:
         use_config = config
 
-    use_config.set_as_global()
-
     return register_auto_logging_callbacks(use_config)
 
 
@@ -496,9 +494,10 @@ def add_in_memory_log_output(write):
 
 # Not part of the API, used to determine whether a file is a project file
 # or a library file when running with the FilterKind.log_on_project_call kind.
-# Only set/used when setting up auto-logging (changed at runtime).
-def _in_project_roots(filename: str) -> bool:
-    return False
+from robo_log._rewrite_filtering import FilesFiltering
+
+_files_filtering = FilesFiltering()
+_in_project_roots = _files_filtering.in_project_roots
 
 
 def _caller_in_project_roots() -> bool:

@@ -5,7 +5,6 @@ import platform
 import logging
 from typing import Sequence, Optional, List, Dict
 import threading
-from ._config import Filter, FilterKind
 
 log = logging.getLogger(__name__)
 
@@ -41,12 +40,6 @@ class FilesFiltering(object):
 
     files_filtering = FilesFiltering(...)
 
-    # This one could return None if unable to decide.
-    file_filter = files_filtering.get_modname_or_file_filter_kind(mod.__file__, mod.__name__)
-
-    # This one cannot return None and always has to decide.
-    file_filter = files_filtering.get_modname_or_file_filter_kind(mod.__name__)
-
     # Detects if a given file is user-code.
     files_filtering.in_project_roots(mod.__file__)
     """
@@ -55,13 +48,9 @@ class FilesFiltering(object):
         self,
         project_roots: Optional[Sequence[str]] = None,
         library_roots: Optional[Sequence[str]] = None,
-        filters: Sequence[Filter] = (),
     ):
-        self._filters = filters
         self._project_roots: List[str] = []
         self._library_roots: List[str] = []
-        self._cache_modname_to_kind: Dict[str, Optional[FilterKind]] = {}
-        self._cache_filename_to_kind: Dict[str, FilterKind] = {}
         self._cache_in_project_roots: Dict[str, bool] = {}
 
         if project_roots is not None:
@@ -269,50 +258,3 @@ class FilesFiltering(object):
         in_project_roots = self._in_project_roots(filename)
         self._cache_in_project_roots[filename] = in_project_roots
         return in_project_roots
-
-    def _compute_filter_kind(self, module_name: str) -> Optional[FilterKind]:
-        """
-        :return: True if it should be excluded, False if it should be included and None
-            if no rule matched the given file.
-        """
-        for exclude_filter in self._filters:
-            if exclude_filter.name == module_name or module_name.startswith(
-                exclude_filter.name + "."
-            ):
-                return exclude_filter.kind
-        return None
-
-    def get_modname_filter_kind(self, module_name: str) -> Optional[FilterKind]:
-        cache_key = module_name
-        try:
-            return self._cache_modname_to_kind[cache_key]
-        except KeyError:
-            pass
-
-        filter_kind = self._compute_filter_kind(module_name)
-        self._cache_modname_to_kind[cache_key] = filter_kind
-        return filter_kind
-
-    def get_modname_or_file_filter_kind(
-        self, filename: str, module_name: str
-    ) -> FilterKind:
-        filter_kind = self.get_modname_filter_kind(module_name)
-        if filter_kind is not None:
-            return filter_kind
-
-        absolute_filename = self._absolute_normalized_path(filename)
-
-        cache_key = absolute_filename
-        try:
-            return self._cache_filename_to_kind[cache_key]
-        except KeyError:
-            pass
-
-        exclude = not self.in_project_roots(absolute_filename)
-        if exclude:
-            filter_kind = FilterKind.exclude
-        else:
-            filter_kind = FilterKind.full_log
-
-        self._cache_filename_to_kind[cache_key] = filter_kind
-        return filter_kind
