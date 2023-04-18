@@ -90,10 +90,12 @@ export function createLiAndNodesBelow(open: boolean, liTreeId: string): ILiNodes
 
 export function addArgumentsToTreeContent(item: IContentAdded, name: string, type: string, value: string) {
     if (item.summaryInput.classList.contains("emptySummaryInput")) {
-        item.summaryInput.textContent = `${name} (${type}) = ${value}`;
+        item.summaryInput.textContent = `${name} = ${value}`;
+        item.summaryInput.title = `Argument: ${name}\nArgument type: ${type}\nRepresentation:\n${value}`;
         item.summaryInput.classList.remove("emptySummaryInput");
     } else {
-        item.summaryInput.textContent += `, ${name} (${type}) = ${value}`;
+        item.summaryInput.title += `\n\nArgument: ${name}\nArgument type: ${type}\nRepresentation:\n${value}`;
+        item.summaryInput.textContent += `, ${name} = ${value}`;
     }
 }
 
