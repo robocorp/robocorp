@@ -1,3 +1,5 @@
+import pathlib
+from io import BytesIO
 from typing import Any, List, Optional, Union
 
 from robo.libs.excel._types import PathType
@@ -12,8 +14,12 @@ class Workbook:
         # Internal API, for users there is create_ and open_ workbook functions
         self.excel = excel
 
-    def save(self, name: PathType):
+    def save(self, name: Union[PathType, BytesIO], overwrite=True):
         # files.save_workbook()
+        if not isinstance(name, BytesIO):
+            if not overwrite and pathlib.Path(name).exists():
+                raise FileExistsError
+        self.excel.validate_content()
         self.excel.save(name)
 
     def close(self):
@@ -41,11 +47,14 @@ class Workbook:
         # files.create_worksheet()
         # TODO: original code: https://github.com/robocorp/rpaframework/blob/dec0053a3aa34da20232f63e1b26e21df98e59e8/packages/main/src/RPA/Excel/Files.py#L539
         # TODO: implement content and header
-        if exist_ok:
-            if name in self.list_worksheets():
-                return Worksheet(self, name)
+        if name in self.list_worksheets():
+            if not exist_ok:
+                raise ValueError(f"Duplicate worksheet name '{name}'")
+            return Worksheet(self, name)
 
         self.excel.create_worksheet(name)
+        if content:
+            self.excel.append_worksheet(name, content, header)
         return Worksheet(self, name)
 
     # files.list_worksheets()

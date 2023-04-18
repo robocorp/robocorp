@@ -1,5 +1,8 @@
+from PIL import Image
+
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 from typing_extensions import deprecated
+from robo.libs.excel._types import PathType
 
 from robo.libs.excel.tables import Table, Tables
 
@@ -32,9 +35,20 @@ class Worksheet:
         )
         return self
 
-    def insert_image(self):
+    def insert_image(
+        self, row: int, column: Union[int, str], path: PathType, scale: float = 1.0
+    ):
         # files.insert_image_to_worksheet()
-        pass
+        image = Image.open(path)
+        if scale != 1.0:
+            fmt = image.format
+            width = int(image.width * float(scale))
+            height = int(image.height * float(scale))
+            image = image.resize((width, height), Image.LANCZOS)
+            image.format = fmt
+
+        self._workbook.excel.insert_image(row, column, image, self.name)
+        return self
 
     def as_table(
         self,
@@ -47,14 +61,16 @@ class Worksheet:
         sheet = self._workbook.excel.read_worksheet(self.name, header, start)
         return tables.create_table(sheet, trim)
 
-    def read_worksheet(self) -> List[dict]:
+    def as_list(self, header=False, start=None) -> List[dict]:
         # files.read_worksheet()
         # FIXME: actually implement
-        return self._workbook.excel.read_worksheet(self.name)
+        return self._workbook.excel.read_worksheet(self.name, header, start)
 
-    def rename(self):
+    def rename(self, name):
         # files.rename_worksheet()
-        pass
+        self._workbook.excel.rename_worksheet(name, self.name)
+        self.name = name
+        return self
 
     # Column operations
     def delete_columns(self, start, end):
@@ -86,9 +102,9 @@ class Worksheet:
         # files.delete_rows()
         pass
 
-    def find_empty_row(self, name) -> int:
+    def find_empty_row(self) -> int:
         # files.find_empty_row()
-        return 0
+        return self._workbook.excel.find_empty_row(self.name)
 
     def insert_rows_after(self, row, amount) -> None:
         # files.insert_rows_after()
@@ -107,33 +123,51 @@ class Worksheet:
         # files.set_styles()
         pass
 
-    def get_cell_value(self):
+    def get_cell_value(self, row, column):
         # files.get_cell_value()
-        pass
+        return self._workbook.excel.get_cell_value(row, column, self.name)
 
     @deprecated("Use get_cell_value instead")
     def get_value(self, row, column) -> Any:
         # files.get_worksheet_value()
         # This was actually an alias for get cell value
-        return None
+        return self.get_cell_value(row, column)
 
-    def set_cell_value(self):
+    def set_cell_value(
+        self,
+        row: int,
+        column: Union[str, int],
+        value: Any,
+        fmt: Optional[Union[str, float]] = None,
+    ):
         # files.set_cell_value()
-        pass
+        self._workbook.excel.set_cell_value(row, column, value, self.name)
+        if fmt:
+            self.set_cell_format(row, column, fmt)
+        return self
 
     @deprecated("Use set_cell_value instead")
-    def set_value(self):
+    def set_value(
+        self,
+        row: int,
+        column: Union[str, int],
+        value: Any,
+        fmt: Optional[Union[str, float]] = None,
+    ):
         # files.set_worksheet_value()
         # This was actually just an alias for set cell value
-        pass
+        return self.set_cell_value(row, column, value, fmt)
 
     def set_cell_values(self):
         # files.set_cell_values()
         pass
 
-    def set_cell_format(self):
+    def set_cell_format(
+        self, row: int, column: Union[str, int], fmt: Optional[Union[str, float]]
+    ):
         # files.set_cell_format()
-        pass
+        self._workbook.excel.set_cell_format(row, column, fmt, self.name)
+        return self
 
     def set_cell_formula(self):
         # files.set_cell_formula()

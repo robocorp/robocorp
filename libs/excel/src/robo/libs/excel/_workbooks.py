@@ -101,6 +101,7 @@ class BaseWorkbook:
     def __init__(self, path: Optional[PathType] = None):
         self.logger = logging.getLogger(__name__)
         # TODO: type hint these
+        self.path = path
         self._book = None
         self._extension = None
         self._active = None
@@ -108,6 +109,9 @@ class BaseWorkbook:
     @property
     def book(self):
         return self._book
+
+    def open(self, path, read_only=False, write_only=False, data_only=False):
+        self.path = path
 
     def worksheet(self, name: str) -> Worksheet:
         return Worksheet(self, name)
@@ -224,6 +228,7 @@ class XlsxWorkbook(BaseWorkbook):
 
         self._book = openpyxl.load_workbook(**options)
         self._extension = extension
+        super().open(path, read_only, write_only, data_only)
 
     def close(self):
         self._book.close()
@@ -234,8 +239,12 @@ class XlsxWorkbook(BaseWorkbook):
     def validate_content(self):
         self._validate_content(self._book.properties)
 
-    def save(self, path: PathType):
-        path = str(pathlib.Path(path))
+    def save(self, path: Union[PathType, BytesIO]):
+        if not isinstance(path, BytesIO):
+            path = str(pathlib.Path(path))
+        if not path:
+            raise ValueError("No path defined for workbook")
+
         self._book.save(filename=path)
 
     def create_worksheet(self, name):
@@ -444,7 +453,7 @@ class XlsWorkbook(BaseWorkbook):
         self._active = value
 
     @property
-    def extension(self):
+    def extension(self) -> Optional[str]:
         return self._extension
 
     def _get_sheetname(self, name):
@@ -540,8 +549,9 @@ class XlsWorkbook(BaseWorkbook):
     def validate_content(self):
         self._validate_content(self._book)
 
-    def save(self, path: PathType):
-        path = str(pathlib.Path(path))
+    def save(self, path: Union[PathType, BytesIO]):
+        if not isinstance(path, BytesIO):
+            path = str(pathlib.Path(path))
         if not path:
             raise ValueError("No path defined for workbook")
 
