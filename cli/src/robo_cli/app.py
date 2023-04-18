@@ -124,7 +124,7 @@ def run():
         builder = Builder(model)
 
         console.print()
-        with Live(refresh_per_second=30) as live:
+        with Live(refresh_per_second=30, console=console) as live:
 
             def on_event(event):
                 builder.handle_event(event)
