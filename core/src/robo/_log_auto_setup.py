@@ -1,19 +1,13 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, Sequence, Union, List, Any
+from typing import Optional, List, Any
 
 from ._protocols import ITask
-import typing
-
-if typing.TYPE_CHECKING:
-    from robo_log import Filter  # @UnusedImport
+import robo_log
 
 
-def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
-    from robo_log import Filter  # @Reimport
-    from robo_log._config import FilterKind
-
-    filters: List[Filter] = []
+def read_filters_from_pyproject_toml(context, path: Path) -> robo_log.BaseConfig:
+    filters: List[robo_log.Filter] = []
 
     while True:
         pyproject = path / "pyproject.toml"
@@ -26,7 +20,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
         parent = path.parent
         if parent == path or not parent:
             # Couldn't find pyproject.toml
-            return filters
+            return robo_log.ConfigFilesFiltering()
         path = parent
 
     try:
@@ -50,35 +44,33 @@ def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
     # Filter("SeleniumLibrary", FilterKind.log_on_project_call),
 
     read_parts: List[str] = []
-    for part in "tool.robo.log.log_filter_rules".split("."):
+    for part in "tool.robo.log".split("."):
         read_parts.append(part)
 
         obj = obj.get(part)
         if not obj:
-            return filters
-
-        if part == "log_filter_rules":
-            if not isinstance(obj, (list, tuple)):
-                context.show_error(
-                    f"Expected {'.'.join(read_parts)} to be a list in {pyproject}."
-                )
-                return filters
-            log_filter_rule = obj
             break
 
         elif not isinstance(obj, dict):
             context.show_error(
                 f"Expected {'.'.join(read_parts)} to be a dict in {pyproject}."
             )
-            return filters
+            break
+
+    log_filter_rules: list = []
+    obj = obj.get("log_filter_rules")
+    if obj:
+        if isinstance(obj, list):
+            log_filter_rules = obj
+        else:
+            context.show_error(
+                f"Expected {'.'.join(read_parts)} to be a list in {pyproject}."
+            )
 
     # If we got here we have the 'log_filter_rules', which should be a list of
     # dicts in a structure such as: {name = "difflib", kind = "log_on_project_call"}
     # expected kinds are the values of the FilterKind.
-    if not isinstance(log_filter_rule, (list, tuple)):
-        return filters
-
-    for rule in log_filter_rule:
+    for rule in log_filter_rules:
         if isinstance(rule, dict):
             name = rule.get("name")
             kind = rule.get("kind")
@@ -106,21 +98,19 @@ def read_filters_from_pyproject_toml(context, path: Path) -> List["Filter"]:
                 )
                 continue
 
-            f: Optional[FilterKind] = getattr(FilterKind, kind, None)
+            f: Optional[robo_log.FilterKind] = getattr(robo_log.FilterKind, kind, None)
             if f is None:
                 context.show_error(
                     f"Rule from 'tool.robo.log.log_filter_rules' has invalid 'kind': >>{kind}<< in {pyproject}."
                 )
                 continue
 
-            filters.append(Filter(name, f))
+            filters.append(robo_log.Filter(name, f))
 
-    return filters
+    return robo_log.ConfigFilesFiltering(filters=filters)
 
 
 def _log_before_task_run(task: ITask):
-    import robo_log
-
     robo_log.start_task(
         task.name,
         task.module_name,
@@ -131,30 +121,19 @@ def _log_before_task_run(task: ITask):
 
 
 def _log_after_task_run(task: ITask):
-    import robo_log
-
     status = task.status
     robo_log.end_task(task.name, task.module_name, status, task.message)
 
 
 @contextmanager
-def setup_auto_logging(
-    tracked_folders: Optional[Sequence[Union[Path, str]]] = None,
-    untracked_folders: Optional[Sequence[Union[Path, str]]] = None,
-    filters: Sequence["Filter"] = (),
-):
+def setup_cli_auto_logging(config: Optional[robo_log.BaseConfig]):
     # This needs to be called before importing code which needs to show in the log
     # (user or library).
 
-    import robo_log
     from robo._hooks import before_task_run
     from robo._hooks import after_task_run
 
-    with robo_log.setup_auto_logging(
-        tracked_folders=tracked_folders,
-        untracked_folders=untracked_folders,
-        filters=filters,
-    ):
+    with robo_log.setup_auto_logging(config):
         with before_task_run.register(_log_before_task_run), after_task_run.register(
             _log_after_task_run
         ):

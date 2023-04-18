@@ -1,6 +1,9 @@
 from typing import Optional, Sequence
 from collections import namedtuple
 import enum
+import robo_log
+
+_ROBO_LOG_MODULE_NAME = robo_log.__name__
 
 # Examples:
 # Filter("mymodule.ignore", kind="exclude")
@@ -39,6 +42,12 @@ class BaseConfig:
         """
         raise NotImplementedError()
 
+    def set_as_global(self):
+        """
+        May be used to set this config as the global one to determine if a
+        given file is in the project or not.
+        """
+
 
 class ConfigFilesFiltering(BaseConfig):
     """
@@ -56,18 +65,16 @@ class ConfigFilesFiltering(BaseConfig):
         project_roots: Optional[Sequence[str]] = None,
         library_roots: Optional[Sequence[str]] = None,
         filters: Sequence[Filter] = (),
-        set_as_global: bool = False,
     ):
         from robo_log._rewrite_filtering import FilesFiltering
 
         self._files_filtering = FilesFiltering(project_roots, library_roots, filters)
-        if set_as_global:
-            import robo_log
 
-            robo_log._in_project_roots = self._files_filtering.in_project_roots
+    def set_as_global(self):
+        robo_log._in_project_roots = self._files_filtering.in_project_roots
 
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
-        if module_name.startswith("robo_log"):
+        if module_name.startswith(_ROBO_LOG_MODULE_NAME):
             # We can't rewrite our own modules (we could end up recursing).
             if "check" in module_name:
                 # Exception just for testing.

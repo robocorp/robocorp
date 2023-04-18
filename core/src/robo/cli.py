@@ -86,7 +86,10 @@ def run(
     from ._task import Context
     from ._protocols import Status
     from ._exceptions import RoboCollectError
-    from ._log_auto_setup import setup_auto_logging, read_filters_from_pyproject_toml
+    from ._log_auto_setup import (
+        setup_cli_auto_logging,
+        read_filters_from_pyproject_toml,
+    )
     from ._log_output_setup import setup_log_output, setup_stdout_logging
 
     # Don't show internal machinery on tracebacks:
@@ -102,12 +105,12 @@ def run(
 
     import robo_log
 
-    filters = read_filters_from_pyproject_toml(context, p)
+    config = read_filters_from_pyproject_toml(context, p)
 
-    with setup_auto_logging(
+    with setup_cli_auto_logging(
         # Note: we can't customize what's a "project" file or a "library" file, right now
         # the customizations are all based on module names.
-        filters=filters
+        config
     ), setup_stdout_logging(), setup_log_output(
         output_dir=Path(output_dir),
         max_files=max_log_files,

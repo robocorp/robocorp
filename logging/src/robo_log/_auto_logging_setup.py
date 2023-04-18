@@ -1,10 +1,12 @@
+from typing import Tuple, List
 import sys
 import threading
-from robo_log.protocols import OptExcInfo
-from robo_log._logger_instances import _get_logger_instances
+
+from ._config import BaseConfig
+from ._logger_instances import _get_logger_instances
+from .protocols import OptExcInfo, Status
+
 from robo_log import critical
-from .protocols import Status
-from typing import Tuple, List
 
 
 class OnExitContextManager:
@@ -18,7 +20,7 @@ class OnExitContextManager:
         self.on_exit()
 
 
-def register_auto_logging_callbacks(rewrite_hook_config):
+def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
     # Make sure that this method should be called only once.
     registered = getattr(register_auto_logging_callbacks, "registered", False)
     if registered:
@@ -26,7 +28,7 @@ def register_auto_logging_callbacks(rewrite_hook_config):
 
         warnings.warn("Auto logging is already setup. 2nd call has no effect.")
         return OnExitContextManager(lambda: None)
-    register_auto_logging_callbacks.registered = True
+    register_auto_logging_callbacks.registered = True  # type: ignore
 
     tid = threading.get_ident()
 

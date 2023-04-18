@@ -41,8 +41,14 @@ class FilesFiltering(object):
 
     files_filtering = FilesFiltering(...)
 
-    if files_filtering.accept(mod.__file__, mod.__name__):
-        ...
+    # This one could return None if unable to decide.
+    file_filter = files_filtering.get_modname_or_file_filter_kind(mod.__file__, mod.__name__)
+
+    # This one cannot return None and always has to decide.
+    file_filter = files_filtering.get_modname_or_file_filter_kind(mod.__name__)
+
+    # Detects if a given file is user-code.
+    files_filtering.in_project_roots(mod.__file__)
     """
 
     def __init__(

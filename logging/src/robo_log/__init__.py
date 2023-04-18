@@ -21,17 +21,18 @@ from typing import (
     Iterable,
     Literal,
 )
-from ._config import Filter, FilterKind
 from ._logger_instances import _get_logger_instances
-from .protocols import OptExcInfo, LogHTMLStyle, Status
-from robo_log.protocols import IReadLines
+from .protocols import OptExcInfo, LogHTMLStyle, Status, IReadLines
+
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
-    from ._rewrite_filtering import FilesFiltering
 
 __version__ = "0.0.8"
 version_info = [int(x) for x in __version__.split(".")]
+
+# --- Make these a part of the public API.
+from ._config import Filter, FilterKind, BaseConfig, ConfigFilesFiltering
 
 
 # --- Logging methods for custom messaging.
@@ -102,6 +103,10 @@ def exception(message: Optional[str] = None, html: bool = False):
 def stop_logging_methods():
     """
     Can be used so that method calls are no longer logged.
+
+    i.e.:
+        with stop_logging_methods():
+            ...
     """
     for robo_logger in _get_logger_instances():
         robo_logger.stop_logging_methods()
@@ -126,7 +131,11 @@ def start_logging_methods():
 @contextmanager
 def stop_logging_variables():
     """
-    Can be used so that variables are no longer logged.
+    Can be used (as a context manager) so that variables are no longer logged.
+
+    i.e.:
+        with stop_logging_variables():
+            ...
     """
     for robo_logger in _get_logger_instances():
         robo_logger.stop_logging_variables()
@@ -153,8 +162,8 @@ def hide_from_output(string_to_hide: str) -> None:
     """
     Should be called to hide sensitive information from appearing in the output.
 
-    :param string_to_hide:
-        The string that should be hidden from the output.
+    Args:
+        string_to_hide: The string that should be hidden from the output.
     """
     for robo_logger in _get_logger_instances():
         robo_logger.hide_from_output(string_to_hide)
@@ -187,10 +196,11 @@ def end_task(name: str, libname: str, status: str, message: str) -> None:
 
 def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
     """
-    :param stream:
-        The stream which should be iterated in (anything with a `readlines()` method).
+    Args:
+        stream: The stream which should be iterated in (anything with a
+            `readlines()` method).
 
-    :returns:
+    Returns:
         An iterator which will decode the messages and provides a dictionary for
         each message found.
 
@@ -212,7 +222,7 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
     This function will read the chunks saved in the log html and provide
     an iterator which will provide the messages which were encoded into it.
 
-    :returns:
+    Returns:
         An iterator which will decode the messages and provides a dictionary for
         each message found.
 
@@ -267,11 +277,32 @@ def verify_log_messages_from_messages_iterator(
     given messages iterator.
 
     Args:
-        messages_iterator: An
-        expected:
+        messages_iterator: An iterator over the messages found.
+        expected: The messages wich are expected to be found. If some message
+            expected to be found is not found an AssertionError will be raised.
 
     Example:
+        verify_log_messages_from_messages_iterator(
+        messages_iterator,
+        [
+            {'message_type': 'V', 'version': '1'}
+            {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
+        ]
 
+    Note: if one of the key entries is `__check__` the value will be considered
+    a callable which should return `True` or `False` to determine if a match was
+    made.
+
+    Example:
+        verify_log_messages_from_messages_iterator(
+        messages_iterator,
+        [
+            {
+                "message_type": "T",
+                # i.e.: check for the utc timezone (+00:00) in the time.
+                "__check__": lambda msg: msg["initial_time"].endswith("+00:00"),
+            },
+        ]
     """
     expected_lst: List[dict] = list(expected)
     log_messages = list(messages_iterator)
@@ -300,6 +331,15 @@ def verify_log_messages_from_messages_iterator(
 def verify_log_messages_from_decoded_str(
     s: str, expected: Sequence[dict]
 ) -> List[dict]:
+    """
+    Args:
+        s: A string with the messages already decoded (where messages are
+        separated by lines and each message is a json string to be decoded).
+        expected: The messages expected.
+
+    See: `verify_log_messages_from_messages_iterator` for more details on the
+        matching of messages.
+    """
     log_messages: List[dict] = []
     for log_msg in s.splitlines():
         log_msg_dict: dict = json.loads(log_msg.strip())
@@ -311,6 +351,14 @@ def verify_log_messages_from_decoded_str(
 def verify_log_messages_from_log_html(
     log_html: Path, expected: Sequence[dict]
 ) -> List[dict]:
+    """
+    Args:
+        log_html: The path to the log_html where messages were embedded.
+        expected: The messages expected.
+
+    See: `verify_log_messages_from_messages_iterator` for more details on the
+        matching of messages.
+    """
     iter_in = iter_decoded_log_format_from_log_html(log_html)
     return verify_log_messages_from_messages_iterator(iter_in, expected)
 
@@ -318,74 +366,85 @@ def verify_log_messages_from_log_html(
 def verify_log_messages_from_stream(
     stream: IReadLines, expected: Sequence[dict]
 ) -> Sequence[dict]:
+    """
+    Args:
+        stream: A stream from where the encoded messages are expected to be read
+            from.
+        expected: The messages expected.
+
+    See: `verify_log_messages_from_messages_iterator` for more details on the
+        matching of messages.
+    """
     return verify_log_messages_from_messages_iterator(
         iter_decoded_log_format_from_stream(stream), expected
     )
 
 
-def setup_auto_logging(
-    tracked_folders: Optional[Sequence[Union[Path, str]]] = None,
-    untracked_folders: Optional[Sequence[Union[Path, str]]] = None,
-    filters: Sequence[Filter] = (),
-):
+def setup_auto_logging(config: Optional[BaseConfig] = None):
     """
-    :param tracked_folders:
-        The folders which must be tracked (by default any folder in the
-        pythonpath which is not in a python-library folder).
+    Sets up automatic logging.
 
-    :param untracked_folders:
-        The folders which must not be tracked (by default any folder which is a
-        python-library folder).
+    This must be called prior to actually importing the modules which should
+    be automatically logged.
 
-    :param filters:
-        Additional filters to add folders/modules to be tracked.
+    Args:
+        config: The configuration specifying how modules should be automatically
+            logged.
 
-        i.e.:
+            If not passed, by default all files which are library files (i.e.:
+            in the python `Lib` or `site-packages`) won't be logged and all files
+            which are not library files will be fully logged.
 
-        [
-            Filter("mymodule.ignore", exclude=True, is_path=False),
-            Filter("mymodule.rpa", exclude=False, is_path=False),
-            Filter("**/check/**", exclude=True, is_path=True),
-        ]
+    Returns a context manager which will stop applying the auto-logging to new
+    loaded modules. Note that modules which are already being tracked won't
+    stop being tracked.
     """
-    from ._config import ConfigFilesFiltering
     from ._auto_logging_setup import register_auto_logging_callbacks
 
-    project_roots: Optional[Sequence[str]]
-    if tracked_folders:
-        project_roots = [
-            (f if isinstance(f, str) else str(f.absolute())) for f in tracked_folders
-        ]
+    use_config: BaseConfig
+    if config is None:
+        # If not passed, use default.
+        use_config = ConfigFilesFiltering()
     else:
-        project_roots = None
+        use_config = config
 
-    library_roots: Optional[Sequence[str]]
-    if untracked_folders:
-        library_roots = [
-            (f if isinstance(f, str) else str(f.absolute())) for f in untracked_folders
-        ]
-    else:
-        library_roots = None
+    use_config.set_as_global()
 
-    return register_auto_logging_callbacks(
-        ConfigFilesFiltering(project_roots, library_roots, filters, set_as_global=True)
-    )
+    return register_auto_logging_callbacks(use_config)
 
 
 def add_log_output(
-    output_dir: Optional[Union[str, Path]] = None,
+    output_dir: Union[str, Path],
     max_file_size: str = "1MB",
     max_files: int = 5,
     log_html: Optional[Union[str, Path]] = None,
     log_html_style: LogHTMLStyle = "standalone",
 ):
+    """
+    Adds a log output which will write the contents to the given output
+    directory. Optionally it's possible to collect all the output when the run
+    is finished and put it into a log.html file.
+
+    Args:
+        output_dir: The output directory where the log contents should be saved.
+        max_file_size: The maximum file size for one log file.
+        max_files: The maximum amount of files which can be added (if more would
+            be needed the oldest one is erased).
+        log_html: If given this is the path (file) where the log.html contents
+            should be written (the log.html will include all the logs from the
+            run along with a viewer for such logs).
+        log_html_style: The style to be used for the log.html.
+
+    Note:
+        It's Ok to add more than one log output, but if 2 log outputs point
+        to the same directory there will be conflicts (in the future this should
+        generate an error).
+    """
     from ._robo_logger import _RoboLogger  # @Reimport
     from robo_log._auto_logging_setup import OnExitContextManager
 
-    if log_html and not output_dir:
-        raise RuntimeError(
-            "When log_html is specified, the output_dir must also be specified."
-        )
+    if not output_dir:
+        raise RuntimeError("The output directory must be specified.")
 
     logger = _RoboLogger(
         output_dir, max_file_size, max_files, log_html, log_html_style=log_html_style
@@ -411,6 +470,17 @@ def close_log_outputs():
 
 
 def add_in_memory_log_output(write):
+    """
+    Adds a log output which is in-memory.
+
+    Args:
+        write: A callable which will be called as `write(msg)` whenever
+        a message is sent from the logging.
+
+    Returns:
+        A context manager which can be used to automatically remove and
+        close the related logger.
+    """
     from ._robo_logger import _RoboLogger  # @Reimport
     from robo_log._auto_logging_setup import OnExitContextManager
 
