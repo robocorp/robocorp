@@ -20,14 +20,28 @@ class FilterKind(enum.Enum):
 
 
 class BaseConfig:
-    def get_log_rewrite_assigns(self) -> bool:
+    def __init__(self, rewrite_assigns=True, rewrite_yields=True):
+        self.rewrite_assigns = rewrite_assigns
+        self.rewrite_yields = rewrite_yields
+
+    def get_rewrite_yields(self) -> bool:
+        """
+        Returns:
+            Whether yield pauses and resumes should be tracked. Note that
+            not tracking those with user code which actually has yields may
+            show weird representations as the contents of the caller of a
+            generator function will show inside the generator.
+        """
+        return self.rewrite_yields
+
+    def get_rewrite_assigns(self) -> bool:
         """
         Returns:
             Whether assigns should be tracked. When assigns are tracked,
             any assign in a module which has mapped to `FilterKind.full_log`
             will be logged.
         """
-        return True
+        return self.rewrite_assigns
 
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
         """
@@ -58,14 +72,6 @@ class BaseConfig:
         given file is in the project or not.
         """
 
-    def get_rewrite_assigns(self) -> bool:
-        """
-        Returns:
-            True if assign statements should be rewritten so that assigns
-            appear in the log and False otherwise.
-        """
-        raise NotImplementedError()
-
 
 class ConfigFilesFiltering(BaseConfig):
     """
@@ -81,7 +87,10 @@ class ConfigFilesFiltering(BaseConfig):
     def __init__(
         self,
         filters: Sequence[Filter] = (),
+        rewrite_assigns=True,
+        rewrite_yields=True,
     ):
+        super().__init__(rewrite_assigns=rewrite_assigns, rewrite_yields=rewrite_yields)
         self._filters = filters
         self._cache_modname_to_kind: Dict[str, Optional[FilterKind]] = {}
         self._cache_filename_to_kind: Dict[str, FilterKind] = {}

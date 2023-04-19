@@ -1,7 +1,8 @@
 import ast
-from typing import Any, Union, List, Optional, Tuple, Dict, Callable
+from typing import Any, Union, List, Optional, Tuple, Dict, Callable, Sequence
 from . import _ast_utils
 from ._config import BaseConfig, FilterKind
+import typing
 
 DEBUG = False
 
@@ -14,7 +15,7 @@ def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
     aliases = [
         ast.alias(
             "robo_log._lifecycle_hooks",
-            "@robocorp_rewrite_callbacks",
+            "@robo_lifecycle_hooks",
             lineno=lineno,
             col_offset=0,
         ),
@@ -87,19 +88,99 @@ def _rewrite_assign(function, class_name, node: ast.Assign) -> Optional[list]:
 
     result: List[ast.stmt] = []
 
-    for target in node.targets:
-        if isinstance(target, ast.Name):
-            call = factory.Call()
-            call.func = factory.NameLoadRewriteCallback("after_assign")
-            call.args.append(factory.NameLoad("__name__"))
-            call.args.append(factory.NameLoad("__file__"))
-            call.args.append(factory.Str(f"{class_name}{function.name}"))
-            call.args.append(factory.LineConstant())
-            call.args.append(factory.Str(target.id))
-            call.args.append(factory.NameLoad(target.id))
+    if isinstance(node.value, ast.Yield):
+        result.extend(_make_before_yield_exprs(factory, function, class_name, node))
 
     result.append(node)
-    result.append(factory.Expr(call))
+
+    if isinstance(node.value, ast.Yield):
+        result.append(_make_after_yield_expr(factory, function, class_name))
+
+    for target in node.targets:
+        if isinstance(target, ast.Name):
+            call = _make_func_with_args(
+                factory,
+                "after_assign",
+                factory.NameLoad("__name__"),
+                factory.NameLoad("__file__"),
+                factory.Str(f"{class_name}{function.name}"),
+                factory.LineConstant(),
+                factory.Str(target.id),
+                factory.NameLoad(target.id),
+            )
+
+            result.append(factory.Expr(call))
+
+    return result
+
+
+def _make_func_with_args(factory, func_name, *args):
+    call = factory.Call()
+    call.func = factory.NameLoadRewriteCallback(func_name)
+    call.args.extend(args)
+    return call
+
+
+class INodeWithValueExpr(typing.Protocol):
+    value: ast.expr
+
+
+def _make_before_yield_exprs(
+    factory, function, class_name, node_with_yield_val: INodeWithValueExpr
+) -> Sequence[ast.Expr]:
+    assert isinstance(node_with_yield_val.value, ast.Yield)
+    yield_expr: ast.Yield = node_with_yield_val.value
+
+    result = []
+    if yield_expr.value is not None:
+        assign = factory.Assign()
+        store_name = factory.NameTempStore()
+        assign.targets = [store_name]
+        assign.value = yield_expr.value
+
+        yield_expr.value = factory.NameLoad(store_name.id)
+
+        value_yielded = factory.NameLoad(store_name.id)
+        result.append(assign)
+    else:
+        value_yielded = factory.NoneConstant()
+
+    result.append(
+        factory.Expr(
+            _make_func_with_args(
+                factory,
+                "before_yield",
+                factory.NameLoad("__name__"),
+                factory.NameLoad("__file__"),
+                factory.Str(f"{class_name}{function.name}"),
+                factory.LineConstant(),
+                value_yielded,
+            )
+        )
+    )
+    return result
+
+
+def _make_after_yield_expr(factory, function, class_name):
+    return factory.Expr(
+        _make_func_with_args(
+            factory,
+            "after_yield",
+            factory.NameLoad("__name__"),
+            factory.NameLoad("__file__"),
+            factory.Str(f"{class_name}{function.name}"),
+            factory.LineConstant(),
+        )
+    )
+
+
+def _rewrite_yield(function, class_name, node: ast.Expr) -> Optional[list]:
+    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+
+    result: List[ast.stmt] = []
+    result.extend(_make_before_yield_exprs(factory, function, class_name, node))
+    result.append(node)
+    result.append(_make_after_yield_expr(factory, function, class_name))
     return result
 
 
@@ -400,8 +481,8 @@ def _handle_return(config, module_path, stack, filter_kind, node):
         )
 
 
-def _handle_assign(config, module_path, stack, filter_kind, node):
-    if filter_kind != FilterKind.full_log:
+def _handle_assign(config: BaseConfig, module_path, stack, filter_kind, node):
+    if filter_kind != FilterKind.full_log or not config.get_rewrite_assigns():
         return None
 
     func_and_class_name = _get_function_and_class_name(stack)
@@ -418,9 +499,34 @@ def _handle_assign(config, module_path, stack, filter_kind, node):
         )
 
 
+def _handle_expr(config, module_path, stack, filter_kind, node: ast.Expr):
+    if isinstance(node.value, ast.Yield):
+        if filter_kind != FilterKind.full_log:
+            return None
+
+        func_and_class_name = _get_function_and_class_name(stack)
+        if not func_and_class_name:
+            return None
+
+        function, class_name = func_and_class_name
+
+        try:
+            return _rewrite_yield(function, class_name, node)
+        except Exception:
+            raise RuntimeError(
+                f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"
+            )
+
+
 _dispatch: Dict[
     type, Callable[[BaseConfig, str, list, FilterKind, Any], Optional[list]]
 ] = {}
 _dispatch[ast.Return] = _handle_return
 _dispatch[ast.Assign] = _handle_assign
 _dispatch[ast.FunctionDef] = _handle_funcdef
+
+# We can't deal with the Yield directly because it's a field of the Expr statement
+# and we can't rewrite a field (so, we have to go to the stmt level to be able to
+# rewrite it and then check if it's some expr we want to deal with -- and we also
+# need to check whether a yield appears in an assign).
+_dispatch[ast.Expr] = _handle_expr

@@ -52,10 +52,11 @@ from ._rewrite_ast_add_callbacks import rewrite_ast_add_callbacks
 # 0.0.6: Option to log just 1 level deep into library modules.
 # 0.0.7: Just include __name__, note __package__.
 # 0.0.9: Rewrite assign statements
-version = "0.0.9"
-PYTEST_TAG = f"{sys.implementation.cache_tag}-robo_log-{version}"
+# 0.0.10: Rewrite yields
+version = "0.0.10"
+NAME_WITH_TAG = f"{sys.implementation.cache_tag}-robo_log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
-PYC_TAIL = "." + PYTEST_TAG + PYC_EXT
+PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT
 
 FORCE_CODE_GENERATION = False
 DEBUG = False

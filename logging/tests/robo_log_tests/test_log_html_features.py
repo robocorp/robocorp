@@ -1,39 +1,10 @@
-import subprocess
 import sys
-import os
-from typing import List, Any
-from robo_log.protocols import LogHTMLStyle
 
-# Must be set to False when merging to master and
-# python -m dev build-output-view
-# must also be manually called afterwards.
-FORCE_REGEN: List[Any] = []
-
-# Must be set to false when merging to master.
-OPEN_IN_BROWSER = False
-
-LOG_HTML_STYLE: LogHTMLStyle = "standalone"
-
-if False:
-    OPEN_IN_BROWSER = True
-
-    # LOG_HTML_STYLE = "vscode"
-    LOG_HTML_STYLE = "standalone"
-
-    FORCE_REGEN.append("dev")
-    if LOG_HTML_STYLE == "vscode":
-        FORCE_REGEN.append(1)
-    else:
-        FORCE_REGEN.append(2)
-
-# Uncomment to get new contents to be added to `samples.ts / getSampleContents()`.
-# from robo_log import _robo_output_impl
-# _robo_output_impl.WRITE_CONTENTS_TO_STDERR = True
 
 HTML_MESSAGE = '<p>Image is: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAApgAAAKYB3X3/OAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJtZZPbBtFFMZ/M7ubXdtdb1xSFyeilBapySVU8h8OoFaooFSqiihIVIpQBKci6KEg9Q6H9kovIHoCIVQJJCKE1ENFjnAgcaSGC6rEnxBwA04Tx43t2FnvDAfjkNibxgHxnWb2e/u992bee7tCa00YFsffekFY+nUzFtjW0LrvjRXrCDIAaPLlW0nHL0SsZtVoaF98mLrx3pdhOqLtYPHChahZcYYO7KvPFxvRl5XPp1sN3adWiD1ZAqD6XYK1b/dvE5IWryTt2udLFedwc1+9kLp+vbbpoDh+6TklxBeAi9TL0taeWpdmZzQDry0AcO+jQ12RyohqqoYoo8RDwJrU+qXkjWtfi8Xxt58BdQuwQs9qC/afLwCw8tnQbqYAPsgxE1S6F3EAIXux2oQFKm0ihMsOF71dHYx+f3NND68ghCu1YIoePPQN1pGRABkJ6Bus96CutRZMydTl+TvuiRW1m3n0eDl0vRPcEysqdXn+jsQPsrHMquGeXEaY4Yk4wxWcY5V/9scqOMOVUFthatyTy8QyqwZ+kDURKoMWxNKr2EeqVKcTNOajqKoBgOE28U4tdQl5p5bwCw7BWquaZSzAPlwjlithJtp3pTImSqQRrb2Z8PHGigD4RZuNX6JYj6wj7O4TFLbCO/Mn/m8R+h6rYSUb3ekokRY6f/YukArN979jcW+V/S8g0eT/N3VN3kTqWbQ428m9/8k0P/1aIhF36PccEl6EhOcAUCrXKZXXWS3XKd2vc/TRBG9O5ELC17MmWubD2nKhUKZa26Ba2+D3P+4/MNCFwg59oWVeYhkzgN/JDR8deKBoD7Y+ljEjGZ0sosXVTvbc6RHirr2reNy1OXd6pJsQ+gqjk8VWFYmHrwBzW/n+uMPFiRwHB2I7ih8ciHFxIkd/3Omk5tCDV1t+2nNu5sxxpDFNx+huNhVT3/zMDz8usXC3ddaHBj1GHj/As08fwTS7Kt1HBTmyN29vdwAw+/wbwLVOJ3uAD1wi/dUH7Qei66PfyuRj4Ik9is+hglfbkbfR3cnZm7chlUWLdwmprtCohX4HUtlOcQjLYCu+fzGJH2QRKvP3UNz8bWk1qMxjGTOMThZ3kvgLI5AzFfo379UAAAAASUVORK5CYII="></p>'
 
 
-def test_log_html_features(tmpdir) -> None:
+def test_log_html_features(tmpdir, ui_regenerate) -> None:
     """
     This is a test which should generate an output for a log.html which
     showcases all the features available.
@@ -44,21 +15,6 @@ def test_log_html_features(tmpdir) -> None:
         verify_log_messages_from_log_html,
         ConfigFilesFiltering,
     )
-
-    cwd = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    if FORCE_REGEN:
-        cmd = [sys.executable, "-m", "dev", "build-output-view"]
-        if "dev" in FORCE_REGEN:
-            cmd.append("--dev")
-
-        versions: List[int] = []
-        for setting in FORCE_REGEN:
-            if isinstance(setting, int):
-                versions.append(setting)
-
-        if versions:
-            cmd.append(f"--version={','.join(str(x) for x in versions)}")
-            subprocess.check_call(cmd, cwd=cwd)
 
     import robo_log
     from robo_log_tests._resources import (
@@ -89,7 +45,7 @@ def test_log_html_features(tmpdir) -> None:
             max_file_size="500kb",
             max_files=1,
             log_html=log_target,
-            log_html_style=LOG_HTML_STYLE,
+            log_html_style=ui_regenerate.LOG_HTML_STYLE,
         ):
             robo_log.start_task("Setup", "setup", str(tmpdir), 0, [])
             import difflib
@@ -130,7 +86,7 @@ def test_log_html_features(tmpdir) -> None:
                 "ERROR",
                 "Marking that it exited with error due to some reason...",
             )
-            robo_log.end_run("Test Log HTML Features", "PASS")
+            robo_log.end_run("Test Log HTML Features", "ERROR")
 
         assert log_target.exists()
 
@@ -182,7 +138,7 @@ def test_log_html_features(tmpdir) -> None:
             ],
         )
 
-        if OPEN_IN_BROWSER:
+        if ui_regenerate.OPEN_IN_BROWSER:
             for m in msgs:
                 print(m)
 

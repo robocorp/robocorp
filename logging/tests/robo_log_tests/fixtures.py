@@ -1,12 +1,13 @@
-import os
-from pathlib import Path
-import sys
-from typing import Optional
-
-import pytest
-
-from robo_log._config import BaseConfig, FilterKind
 from contextlib import contextmanager
+from pathlib import Path
+from robo_log import BaseConfig, FilterKind
+from robo_log.protocols import LogHTMLStyle
+from typing import Optional, List
+
+import os
+import pytest
+import sys
+import typing
 
 
 class _SetupInfo:
@@ -17,6 +18,60 @@ class _SetupInfo:
         import webbrowser
 
         webbrowser.open(self.log_target.as_uri())
+
+
+class UIRegenerateFixture:
+    # Must be set to False when merging to master and
+    # python -m dev build-output-view
+    # must also be manually called afterwards.
+    FORCE_REGEN: List[typing.Union[str, int]] = []
+
+    # Must be set to false when merging to master.
+    OPEN_IN_BROWSER = False
+
+    LOG_HTML_STYLE: LogHTMLStyle = "standalone"
+
+    if False:
+        OPEN_IN_BROWSER = True
+
+        # LOG_HTML_STYLE = "vscode"
+        LOG_HTML_STYLE = "standalone"
+
+        FORCE_REGEN.append("dev")
+        if LOG_HTML_STYLE == "vscode":
+            FORCE_REGEN.append(1)
+        else:
+            FORCE_REGEN.append(2)
+
+    def regenerate(self) -> None:
+        import subprocess
+
+        cwd = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
+        cmd = [sys.executable, "-m", "dev", "build-output-view"]
+        if "dev" in self.FORCE_REGEN:
+            cmd.append("--dev")
+
+        versions: List[int] = []
+        for setting in self.FORCE_REGEN:
+            if isinstance(setting, int):
+                versions.append(setting)
+
+        if versions:
+            cmd.append(f"--version={','.join(str(x) for x in versions)}")
+            subprocess.check_call(cmd, cwd=cwd)
+
+
+@pytest.fixture
+def ui_regenerate():
+    # Uncomment to get new contents to be added to `samples.ts / getSampleContents()`.
+    # from robo_log import _robo_output_impl
+    #
+    # _robo_output_impl.WRITE_CONTENTS_TO_STDERR = True
+
+    uiregenerate_fixture = UIRegenerateFixture()
+    return uiregenerate_fixture
 
 
 @contextmanager
@@ -91,7 +146,7 @@ def log_setup(tmpdir):
             tmpdir, max_file_size="30kb", max_files=1, log_html=log_target
         ):
             with robo_log.add_in_memory_log_output(write=stream.write):
-                yield {"stream": stream}
+                yield {"stream": stream, "log_target": log_target}
 
 
 @pytest.fixture(scope="session")

@@ -243,7 +243,7 @@ class NodeFactory:
         return self._set_line_col(ast.Attribute(name, attr_name, ast.Load()))
 
     def NameLoadRewriteCallback(self, builtin_name: str) -> ast.Attribute:
-        ref = self.NameLoad("@robocorp_rewrite_callbacks")
+        ref = self.NameLoad("@robo_lifecycle_hooks")
 
         return self._set_line_col(self.Attribute(ref, builtin_name))
 
