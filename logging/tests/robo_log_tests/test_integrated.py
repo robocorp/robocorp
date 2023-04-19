@@ -1,7 +1,7 @@
 from robo_log import verify_log_messages_from_log_html
 
 
-def test_log_with_iterators(tmpdir):
+def test_log_with_iterators(tmpdir, ui_regenerate):
     from robo_log_tests._resources import check_iterators
     from imp import reload
     from robo_log_tests.fixtures import basic_log_setup
@@ -16,4 +16,4 @@ def test_log_with_iterators(tmpdir):
         log_target,
         [],
     )
-    # setup_info.open_log_target()
+    setup_info.open_log_target()

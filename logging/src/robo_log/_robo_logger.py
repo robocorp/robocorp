@@ -222,7 +222,10 @@ class _RoboLogger:
                 hide_from_logs = True
 
         if args:
-            if self._skip_log_variables or name == "hide_from_output":
+            if self._skip_log_variables:
+                args = []
+
+            elif name == "hide_from_output":
                 args = [(name, tp, "<redacted>") for name, tp, _value in args]
 
         return self._robot_output_impl.start_element(
@@ -234,7 +237,51 @@ class _RoboLogger:
             lineno,
             self._get_time_delta(),
             args,
-            hide_from_logs=hide_from_logs,
+            hide_from_logs,
+        )
+
+    def yield_resume(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
+    ):
+        hide_from_logs = False
+
+        if self._skip_log_methods:
+            hide_from_logs = True
+
+        return self._robot_output_impl.yield_resume(
+            name,
+            libname,
+            source,
+            lineno,
+            self._get_time_delta(),
+            hide_from_logs,
+        )
+
+    def yield_suspend(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
+        yielded_value_type: str,
+        yielded_value_repr: str,
+    ):
+        if self._skip_log_variables:
+            yielded_value_type = ""
+            yielded_value_repr = ""
+
+        return self._robot_output_impl.yield_suspend(
+            name,
+            libname,
+            source,
+            lineno,
+            yielded_value_type,
+            yielded_value_repr,
+            self._get_time_delta(),
         )
 
     @_log_error

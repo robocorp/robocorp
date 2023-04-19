@@ -38,10 +38,4 @@ def test_sensitive_data():
             "value": "<redacted>",
         },
         {"message_type": "EA", "name": "arg", "type": "str", "value": "'<redacted>'"},
-        {
-            "message_type": "EA",
-            "name": "some_arg",
-            "type": "str",
-            "value": "<redacted>",
-        },
     ]

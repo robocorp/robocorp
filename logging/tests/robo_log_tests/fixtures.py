@@ -44,6 +44,9 @@ class UIRegenerateFixture:
             FORCE_REGEN.append(2)
 
     def regenerate(self) -> None:
+        if not self.FORCE_REGEN:
+            return
+
         import subprocess
 
         cwd = os.path.dirname(
@@ -71,6 +74,7 @@ def ui_regenerate():
     # _robo_output_impl.WRITE_CONTENTS_TO_STDERR = True
 
     uiregenerate_fixture = UIRegenerateFixture()
+    uiregenerate_fixture.regenerate()
     return uiregenerate_fixture
 
 

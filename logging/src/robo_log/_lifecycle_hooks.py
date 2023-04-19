@@ -42,7 +42,7 @@ class Callback(object):
             try:
                 c(*args, **kwargs)
             except:
-                logger.exception("Error in callback.")
+                logger.exception(f"Error calling: {c}.")
                 if self.raise_exceptions:
                     raise
 
@@ -62,6 +62,12 @@ method_except = Callback()
 
 # Called as: after_assign(__name__, filename, name, lineno, assign_name, assign_value)
 after_assign = Callback()
+
+# Called as: before_yield(__name__, filename, name, lineno, yielded_value)
+before_yield = Callback()
+
+# Called as: after_yield(__name__, filename, name, lineno)
+after_yield = Callback()
 
 
 def iter_all_callbacks():

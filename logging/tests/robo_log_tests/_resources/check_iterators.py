@@ -9,9 +9,7 @@ def create_iterator(steps: int):
     for step in range(steps):
         internal_value = step
         call_in_iterator(internal_value)
-        robo_log.info("pause")
         yield internal_value
-        robo_log.info("resume")
 
 
 def call_in_main(value):

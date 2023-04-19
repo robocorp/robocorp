@@ -304,12 +304,17 @@ export class TreeBuilder {
                 this.stack.push(this.parent);
                 break;
             case "SE":
+            case "YR":
                 // start element
                 this.messageNode = { "parent": this.messageNode, "message": msg };
+                let name = msg.decoded["name"];
+                if (msgType == "YR") {
+                    name += " (resumed)";
+                }
                 this.parent = addTreeContent(
                     this.opts,
                     this.parent,
-                    msg.decoded["name"],
+                    name,
                     msg.decoded["libname"],
                     msg,
                     false,
@@ -318,6 +323,10 @@ export class TreeBuilder {
                     this.messageNode,
                     this.id.toString()
                 );
+                if (msgType == "YR") {
+                    this.addResumedCSSClass(this.parent);
+                }
+
                 this.stack.push(this.parent);
                 break;
             case "ER": // end run
@@ -356,8 +365,27 @@ export class TreeBuilder {
 
                 break;
             case "EE": // end element
+            case "YS": // end element
+                if (msgType == "YS") {
+                    const yieldedItem = addTreeContent(
+                        this.opts,
+                        this.parent,
+                        "Yielded",
+                        `Suspending function with yield.\nYielding an object of type: ${msg.decoded["type"]}\nWith representation:\n${msg.decoded["value"]}`,
+                        msg,
+                        false,
+                        msg.decoded["source"],
+                        msg.decoded["lineno"],
+                        this.messageNode,
+                        this.id.toString()
+                    );
+                    this.addYieldedCSSClass(yieldedItem);
+                    addValueToTreeContent(yieldedItem, msg.decoded["value"]);
+                }
+
                 this.messageNode = this.messageNode.parent;
                 let currK = this.parent;
+
                 this.stack.pop();
                 this.parent = this.stack.at(-1);
                 this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currK, this.parent, msg);
@@ -449,6 +477,15 @@ export class TreeBuilder {
     addExceptionCssClass(curr: IContentAdded) {
         curr.details.classList.add("exceptionParent");
         curr.details.classList.add("leafNode");
+    }
+
+    addYieldedCSSClass(curr: IContentAdded) {
+        curr.details.classList.add("yiededParent");
+        curr.details.classList.add("leafNode");
+    }
+
+    addResumedCSSClass(curr: IContentAdded) {
+        curr.details.classList.add("resumedParent");
     }
 
     addDetailsCSSClasses(statusOrLevel: string | number, curr: IContentAdded): boolean {

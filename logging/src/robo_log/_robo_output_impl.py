@@ -579,6 +579,39 @@ class _RoboOutputImpl:
 
         return True
 
+    def yield_resume(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
+        time_delta: float,
+        hide_from_logs: bool,
+    ):
+        """
+        Note that a yield resume is semantically very close to a start element
+        but it doesn't have any arguments.
+        """
+        oid = self._obtain_id
+        element_id = f"{libname}.{name}"
+        with self._stack_handler.push_record(
+            "element", element_id, "YR", "RYR", hide_from_logs
+        ):
+            if hide_from_logs:
+                # I.e.: add to internal stack but don't write it.
+                return
+
+            self._write_with_separator(
+                "YR ",
+                [
+                    oid(name),
+                    oid(libname),
+                    oid(source),
+                    self._number(lineno),
+                    self._number(time_delta),
+                ],
+            )
+
     def start_element(
         self,
         name: str,
@@ -589,7 +622,7 @@ class _RoboOutputImpl:
         lineno: int,
         start_time_delta: float,
         args: Sequence[Tuple[str, str, str]],
-        hide_from_logs: bool = False,
+        hide_from_logs: bool,
     ) -> None:
         element_type = element_type.upper()
         oid = self._obtain_id
@@ -642,6 +675,46 @@ class _RoboOutputImpl:
             "EE ",
             [
                 oid(status),
+                self._number(time_delta),
+            ],
+        )
+
+    def yield_suspend(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
+        yielded_value_type: str,
+        yielded_value_repr: str,
+        time_delta: float,
+    ):
+        """
+        Note: the yield_suspend is effectively the same thing as the `end_method`
+        because we're leaving the method (the difference being that it can be
+        resumed afterwards and we have the yielded value right now).
+        """
+
+        element_id = f"{libname}.{name}"
+        stack_entry = self._stack_handler.pop("element", element_id)
+        if stack_entry is None or stack_entry.hide_from_logs:
+            # If the start wasn't logged, the stop shouldn't be logged either
+            # (and if it was logged, the stop should be also logged).
+            return
+
+        oid = self._obtain_id
+
+        hide_strings_re = self._hide_strings_re
+        if hide_strings_re:
+            yielded_value_repr = hide_strings_re.sub("<redacted>", yielded_value_repr)
+
+        self._write_with_separator(
+            "YS ",
+            [
+                oid(source),
+                self._number(lineno),
+                oid(yielded_value_type),
+                oid(yielded_value_repr),
                 self._number(time_delta),
             ],
         )

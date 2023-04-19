@@ -122,13 +122,10 @@ const _MESSAGE_TYPE_INFO = {
     "T": decode_time,
     "M": decode_memo,
     "SR": start_run,
-    "RR": start_run,
     "ER": end_run,
     "ST": start_task,
-    "RT": start_task,
     "ET": end_task,
     "SE": start_element,
-    "RE": start_element,
     "EE": end_element,
     "EA": _decode("name:oid, type:oid, value:oid"),
     "AS": _decode("source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"),
@@ -141,7 +138,14 @@ const _MESSAGE_TYPE_INFO = {
     "TBE": _decode("source:oid, lineno:int, method:oid, line_content:oid"),
     "TBV": _decode("name:oid, type:oid, value:oid"),
     "ETB": _decode("time_delta_in_seconds:float"),
+    "YS": _decode("source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float"),
+    "YR": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
 };
+
+_MESSAGE_TYPE_INFO["RR"] = _MESSAGE_TYPE_INFO["SR"];
+_MESSAGE_TYPE_INFO["RT"] = _MESSAGE_TYPE_INFO["ST"];
+_MESSAGE_TYPE_INFO["RE"] = _MESSAGE_TYPE_INFO["SE"];
+_MESSAGE_TYPE_INFO["RYR"] = _MESSAGE_TYPE_INFO["YR"];
 
 export class Decoder {
     memo;

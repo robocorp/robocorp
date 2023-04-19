@@ -7,6 +7,7 @@ from ._logger_instances import _get_logger_instances
 from .protocols import OptExcInfo, Status
 
 from robo_log import critical
+from ._obj_info_repr import get_obj_type_and_repr
 
 
 class OnExitContextManager:
@@ -18,6 +19,19 @@ class OnExitContextManager:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.on_exit()
+
+
+def _get_obj_type_and_repr_and_hide_if_needed(key, val):
+    obj_type, obj_repr = get_obj_type_and_repr(val)
+
+    for p in ("password", "passwd"):
+        if p in key:
+            for robo_logger in _get_logger_instances():
+                robo_logger.hide_from_output(obj_repr)
+                if isinstance(val, str):
+                    robo_logger.hide_from_output(val)
+            break
+    return obj_type, obj_repr
 
 
 def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
@@ -38,6 +52,8 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         after_method,
         method_return,
         method_except,
+        before_yield,
+        after_yield,
         after_assign,
     )
 
@@ -53,24 +69,13 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         lineno: int,
         args_dict: dict,
     ) -> None:
-        from robo_log._obj_info_repr import get_obj_type_and_repr
-
         if tid != threading.get_ident():
             return
 
         status_stack.append([mod_name, name, "PASS"])
         args: List[Tuple[str, str, str]] = []
         for key, val in args_dict.items():
-            obj_type, obj_repr = get_obj_type_and_repr(val)
-
-            for p in ("password", "passwd"):
-                if p in key:
-                    for robo_logger in _get_logger_instances():
-                        robo_logger.hide_from_output(obj_repr)
-                        if isinstance(val, str):
-                            robo_logger.hide_from_output(val)
-                    break
-
+            obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
             args.append((f"{key}", obj_type, obj_repr))
 
         for robo_logger in _get_logger_instances():
@@ -84,6 +89,50 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
                 args,
                 [],
             )
+
+    def call_before_yield(
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        yielded_value: Any,
+    ) -> None:
+        if tid != threading.get_ident():
+            return
+
+        try:
+            pop_mod_name, pop_name, status = status_stack.pop(-1)
+        except IndexError:
+            # oops, something bad happened, the stack is unsynchronized
+            critical("On before yield the status_stack was empty.")
+            return
+        else:
+            if pop_mod_name != mod_name or pop_name != name:
+                critical(
+                    f"On before yield status stack package/name was: {pop_mod_name}.{pop_name}. Received: {mod_name}.{name}."
+                )
+                return
+
+        yielded_value_type, yielded_value_repr = get_obj_type_and_repr(yielded_value)
+
+        for robo_logger in _get_logger_instances():
+            robo_logger.yield_suspend(
+                name, mod_name, filename, lineno, yielded_value_type, yielded_value_repr
+            )
+
+    def call_after_yield(
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+    ) -> None:
+        if tid != threading.get_ident():
+            return
+
+        status_stack.append([mod_name, name, "PASS"])
+
+        for robo_logger in _get_logger_instances():
+            robo_logger.yield_resume(name, mod_name, filename, lineno)
 
     def call_after_method(mod_name: str, filename: str, name: str, lineno: int) -> None:
         if tid != threading.get_ident():
@@ -116,17 +165,9 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         if tid != threading.get_ident():
             return
 
-        from robo_log._obj_info_repr import get_obj_type_and_repr
-
-        assign_type, assign_repr = get_obj_type_and_repr(assign_value)
-        for p in ("password", "passwd"):
-            if p in assign_name:
-                for robo_logger in _get_logger_instances():
-                    robo_logger.hide_from_output(assign_repr)
-                    if isinstance(assign_value, str):
-                        # Also do it with the version without the 'repr'
-                        robo_logger.hide_from_output(assign_value)
-                break
+        assign_type, assign_repr = _get_obj_type_and_repr_and_hide_if_needed(
+            assign_name, assign_value
+        )
 
         for robo_logger in _get_logger_instances():
             robo_logger.after_assign(
@@ -159,6 +200,8 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
     after_assign.register(call_after_assign)
     after_method.register(call_after_method)
     method_except.register(call_on_method_except)
+    before_yield.register(call_before_yield)
+    after_yield.register(call_after_yield)
 
     def _exit():
         # If the user actually used the with ... statement we'll remove things now.
@@ -169,6 +212,8 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
         before_method.unregister(call_before_method)
         after_assign.unregister(call_after_assign)
         after_method.unregister(call_after_method)
+        before_yield.unregister(call_before_yield)
+        after_yield.unregister(call_after_yield)
         register_auto_logging_callbacks.registered = False
 
     return OnExitContextManager(_exit)

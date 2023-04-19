@@ -141,8 +141,16 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     "SE": _decode(
         "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
     ),
+    # Yield Resume (coming back to a suspended frame).
+    "YR": _decode(
+        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+    ),
     # End Element
     "EE": _decode("status:oid, time_delta_in_seconds:float"),
+    # Yield Suspend
+    "YS": _decode(
+        "source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float",
+    ),
     # Assign
     "AS": _decode(
         "source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"
@@ -179,6 +187,7 @@ _MESSAGE_TYPE_INFO["RR"] = _MESSAGE_TYPE_INFO["SR"]
 _MESSAGE_TYPE_INFO["RT"] = _MESSAGE_TYPE_INFO["ST"]
 _MESSAGE_TYPE_INFO["RE"] = _MESSAGE_TYPE_INFO["SE"]
 _MESSAGE_TYPE_INFO["RTB"] = _MESSAGE_TYPE_INFO["STB"]
+_MESSAGE_TYPE_INFO["RYR"] = _MESSAGE_TYPE_INFO["YR"]
 
 
 def iter_decoded_log_format(stream: IReadLines) -> Iterator[dict]:
