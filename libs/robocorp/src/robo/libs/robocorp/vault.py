@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import traceback
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Tuple
 
 import requests
@@ -16,7 +16,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
 from robo.libs.robocorp._utils import (
     import_by_name,
     required_env,

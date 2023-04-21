@@ -1,22 +1,31 @@
+import copy
 import fnmatch
 import json
 import logging
 import os
+from abc import ABC, abstractmethod
+from enum import Enum
 from glob import glob
+from pathlib import Path
+from shutil import copy2
 from threading import Event
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import yaml
-from robo.libs.robocorp._utils import import_by_name, required_env
-from robo.libs.robocorp.adapter import (
-    UNDEFINED,
-    BaseAdapter,
-    EmptyQueue,
-    FileAdapter,
-    RobocorpAdapter,
+from robo.libs.robocorp._utils import (
+    JSONType,
+    Requests,
+    deprecation,
+    import_by_name,
+    is_json_equal,
+    json_dumps,
+    required_env,
+    resolve_path,
+    truncate,
+    url_join,
 )
-from robo.libs.robocorp.workitem import Error, State, WorkItem
 
+UNDEFINED = object()  # Undefined default value
 ENCODING = "utf-8"
 
 _STRINGS_TYPE = Union[str, Tuple[str, ...]]
@@ -29,7 +38,687 @@ AUTO_PARSE_EMAIL_DEFAULT = {
 }
 
 
-class _WorkItems:
+class State(Enum):
+    """Work item state. (set when released)"""
+
+    DONE = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class Error(Enum):
+    """Failed work item error type."""
+
+    BUSINESS = "BUSINESS"  # wrong/missing data, shouldn't be retried
+    APPLICATION = "APPLICATION"  # logic issue/timeout, can be retried
+
+
+class EmptyQueue(IndexError):
+    """Raised when trying to load an input item and none available."""
+
+
+class BaseAdapter(ABC):
+    """Abstract base class for work item adapters."""
+
+    @abstractmethod
+    def reserve_input(self) -> str:
+        """Get next work item ID from the input queue and reserve it."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def release_input(
+        self, item_id: str, state: State, exception: Optional[dict] = None
+    ):
+        """Release the lastly retrieved input work item and set state."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def create_output(self, parent_id: str, payload: Optional[JSONType] = None) -> str:
+        """Create new output for work item, and return created ID."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def load_payload(self, item_id: str) -> JSONType:
+        """Load JSON payload from work item."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def save_payload(self, item_id: str, payload: JSONType):
+        """Save JSON payload to work item."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def list_files(self, item_id: str) -> List[str]:
+        """List attached files in work item."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_file(self, item_id: str, name: str) -> bytes:
+        """Read file's contents from work item."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def add_file(self, item_id: str, name: str, *, original_name: str, content: bytes):
+        """Attach file to work item."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def remove_file(self, item_id: str, name: str):
+        """Remove attached file from work item."""
+        raise NotImplementedError
+
+
+class RobocorpAdapter(BaseAdapter):
+    """Adapter for saving/loading work items from Robocorp Control Room.
+
+    Required environment variables:
+
+    * RC_API_WORKITEM_HOST:     Work item API hostname
+    * RC_API_WORKITEM_TOKEN:    Work item API access token
+
+    * RC_API_PROCESS_HOST:      Process API hostname
+    * RC_API_PROCESS_TOKEN:     Process API access token
+
+    * RC_WORKSPACE_ID:          Control room workspace ID
+    * RC_PROCESS_ID:            Control room process ID
+    * RC_PROCESS_RUN_ID:        Control room process run ID
+    * RC_ROBOT_RUN_ID:          Control room robot run ID
+
+    * RC_WORKITEM_ID:           Control room work item ID (input)
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # IDs identifying the current robot run and its input.
+        self._workspace_id = required_env("RC_WORKSPACE_ID")
+        self._process_run_id = required_env("RC_PROCESS_RUN_ID")
+        self._step_run_id = required_env("RC_ACTIVITY_RUN_ID")
+        self._initial_item_id: Optional[str] = required_env("RC_WORKITEM_ID")
+
+        self._workitem_requests = self._process_requests = None
+        self._init_workitem_requests()
+        self._init_process_requests()
+
+    def _init_workitem_requests(self):
+        # Endpoint for old work items API.
+        workitem_host = required_env("RC_API_WORKITEM_HOST")
+        workitem_token = required_env("RC_API_WORKITEM_TOKEN")
+        route_prefix = (
+            url_join(
+                workitem_host, "json-v1", "workspaces", self._workspace_id, "workitems"
+            )
+            + "/"
+        )
+        default_headers = {
+            "Authorization": f"Bearer {workitem_token}",
+            "Content-Type": "application/json",
+        }
+        logging.info("Work item API route prefix: %s", route_prefix)
+        self._workitem_requests = Requests(
+            route_prefix, default_headers=default_headers
+        )
+
+    def _init_process_requests(self):
+        # Endpoint for the new process API.
+        process_host = required_env("RC_API_PROCESS_HOST")
+        process_token = required_env("RC_API_PROCESS_TOKEN")
+        process_id = required_env("RC_PROCESS_ID")
+        route_prefix = (
+            url_join(
+                process_host,
+                "process-v1",
+                "workspaces",
+                self._workspace_id,
+                "processes",
+                process_id,
+            )
+            + "/"
+        )
+        default_headers = {
+            "Authorization": f"Bearer {process_token}",
+            "Content-Type": "application/json",
+        }
+        logging.info("Process API route prefix: %s", route_prefix)
+        self._process_requests = Requests(route_prefix, default_headers=default_headers)
+
+    def _pop_item(self):
+        # Get the next input work item from the cloud queue.
+        url = url_join(
+            "runs",
+            self._process_run_id,
+            "robotRuns",
+            self._step_run_id,
+            "reserve-next-work-item",
+        )
+        logging.info("Reserving new input work item from: %s", url)
+        response = self._process_requests.post(url)
+        return response.json()["workItemId"]
+
+    def reserve_input(self) -> str:
+        if self._initial_item_id:
+            item_id = self._initial_item_id
+            self._initial_item_id = None
+            return item_id
+
+        item_id = self._pop_item()
+        if not item_id:
+            raise EmptyQueue("No work items in the input queue")
+        return item_id
+
+    def release_input(
+        self, item_id: str, state: State, exception: Optional[dict] = None
+    ):
+        # Release the current input work item in the cloud queue.
+        url = url_join(
+            "runs",
+            self._process_run_id,
+            "robotRuns",
+            self._step_run_id,
+            "release-work-item",
+        )
+        body = {"workItemId": item_id, "state": state.value}
+        if exception:
+            for key, value in list(exception.items()):
+                # All values are (and should be) strings (if not `None`).
+                value = value.strip() if value else value
+                if value:
+                    exception[key] = value  # keep the stripped string value
+                else:
+                    # Exclude `None` & empty string values.
+                    del exception[key]
+            body["exception"] = exception
+
+        log_func = logging.error if state == State.FAILED else logging.info
+        log_func(
+            "Releasing %s input work item %r into %r with exception: %s",
+            state.value,
+            item_id,
+            url,
+            exception,
+        )
+        self._process_requests.post(url, json=body)
+
+    def create_output(self, parent_id: str, payload: Optional[JSONType] = None) -> str:
+        # Putting "output" for the current input work item identified by `parent_id`.
+        url = url_join("work-items", parent_id, "output")
+        body = {"payload": payload}
+
+        logging.info("Creating output item: %s", url)
+        response = self._process_requests.post(url, json=body)
+        return response.json()["id"]
+
+    def load_payload(self, item_id: str) -> JSONType:
+        url = url_join(item_id, "data")
+
+        def handle_error(resp):
+            # NOTE: The API might return 404 if no payload is attached to the work
+            # item.
+            if not (resp.ok or resp.status_code == 404):
+                self._workitem_requests.handle_error(resp)
+
+        logging.info("Loading work item payload from: %s", url)
+        response = self._workitem_requests.get(url, _handle_error=handle_error)
+        return response.json() if response.ok else {}
+
+    def save_payload(self, item_id: str, payload: JSONType):
+        url = url_join(item_id, "data")
+
+        logging.info("Saving work item payload to: %s", url)
+        self._workitem_requests.put(url, json=payload)
+
+    def list_files(self, item_id: str) -> List[str]:
+        url = url_join(item_id, "files")
+
+        logging.info("Listing work item files at: %s", url)
+        response = self._workitem_requests.get(url)
+
+        return [item["fileName"] for item in response.json()]
+
+    def get_file(self, item_id: str, name: str) -> bytes:
+        # Robocorp API returns URL for S3 download.
+        file_id = self.file_id(item_id, name)
+        url = url_join(item_id, "files", file_id)
+
+        logging.info("Downloading work item file at: %s", url)
+        response = self._workitem_requests.get(url)
+        file_url = response.json()["url"]
+
+        # Perform the actual file download.
+        response = self._workitem_requests.get(
+            file_url,
+            _handle_error=lambda resp: resp.raise_for_status(),
+            _sensitive=True,
+            headers={},
+        )
+        return response.content
+
+    def add_file(self, item_id: str, name: str, *, original_name: str, content: bytes):
+        # Note that here the `original_name` is useless here. (used with `FileAdapter`
+        #   only)
+        del original_name
+
+        # Robocorp API returns pre-signed POST details for S3 upload.
+        url = url_join(item_id, "files")
+        body = {"fileName": str(name), "fileSize": len(content)}
+        logging.info(
+            "Adding work item file into: %s (name: %s, size: %d)",
+            url,
+            body["fileName"],
+            body["fileSize"],
+        )
+        response = self._workitem_requests.post(url, json=body)
+        data = response.json()
+
+        # Perform the actual file upload.
+        url = data["url"]
+        fields = data["fields"]
+        files = {"file": (name, content)}
+        self._workitem_requests.post(
+            url,
+            _handle_error=lambda resp: resp.raise_for_status(),
+            _sensitive=True,
+            headers={},
+            data=fields,
+            files=files,
+        )
+
+    def remove_file(self, item_id: str, name: str):
+        file_id = self.file_id(item_id, name)
+        url = url_join(item_id, "files", file_id)
+        self._workitem_requests.delete(url)
+
+    def file_id(self, item_id: str, name: str) -> str:
+        url = url_join(item_id, "files")
+        response = self._workitem_requests.get(url)
+
+        files = response.json()
+        if not files:
+            raise FileNotFoundError("No files in work item")
+
+        matches = [item for item in files if item["fileName"] == name]
+        if not matches:
+            raise FileNotFoundError(
+                "File with name '{name}' not in: {names}".format(
+                    name=name, names=", ".join(item["fileName"] for item in files)
+                )
+            )
+
+        # Duplicate filenames should never exist,
+        # but use last item just in case
+        return matches[-1]["fileId"]
+
+
+class FileAdapter(BaseAdapter):
+    """Adapter for simulating work item input queues.
+
+    Reads inputs from the given database file, and writes
+    all created output items into an adjacent file
+    with the suffix ``<filename>.output.json``. If the output path is provided by an
+    env var explicitly, then the file will be saved with the provided path and name.
+
+    Reads and writes all work item files from/to the same parent
+    folder as the given input database.
+
+    Optional environment variables:
+
+    * RPA_INPUT_WORKITEM_PATH:  Path to work items input database file
+    * RPA_OUTPUT_WORKITEM_PATH:  Path to work items output database file
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._input_path = UNDEFINED
+        self._output_path = UNDEFINED
+
+        self.inputs: List[Dict[str, Any]] = self.load_database()
+        self.outputs: List[Dict[str, Any]] = []
+        self.index: int = 0
+
+    def _get_item(self, item_id: str) -> Tuple[str, Dict[str, Any]]:
+        # The work item ID is analogue to inputs/outputs list queues index.
+        idx = int(item_id)
+        if idx < len(self.inputs):
+            return "input", self.inputs[idx]
+
+        if idx < (len(self.inputs) + len(self.outputs)):
+            return "output", self.outputs[idx - len(self.inputs)]
+
+        raise ValueError(f"Unknown work item ID: {item_id}")
+
+    def reserve_input(self) -> str:
+        if self.index >= len(self.inputs):
+            raise EmptyQueue("No work items in the input queue")
+
+        try:
+            return str(self.index)
+        finally:
+            self.index += 1
+
+    def release_input(
+        self, item_id: str, state: State, exception: Optional[dict] = None
+    ):
+        # Nothing happens for now on releasing local dev input Work Items.
+        log_func = logging.error if state == State.FAILED else logging.info
+        log_func(
+            "Releasing item %r with %s state and exception: %s",
+            item_id,
+            state.value,
+            exception,
+        )
+
+    @property
+    def input_path(self) -> Optional[Path]:
+        if self._input_path is UNDEFINED:
+            # pylint: disable=invalid-envvar-default
+            old_path = os.getenv("RPA_WORKITEMS_PATH")
+            if old_path:
+                deprecation(
+                    "Work items load - Old path style usage detected, please use the "
+                    "'RPA_INPUT_WORKITEM_PATH' env var instead "
+                    "(more details under documentation: https://robocorp.com/docs/development-guide/control-room/data-pipeline#developing-with-work-items-locally)"  # noqa: E501
+                )
+            path = os.getenv("RPA_INPUT_WORKITEM_PATH", default=old_path)
+            if path:
+                logging.info("Resolving input path: %s", path)
+                self._input_path = resolve_path(path)
+            else:
+                # Will raise `TypeError` during inputs loading and will populate the
+                # list with one empty initial input.
+                self._input_path = None
+
+        return self._input_path
+
+    @property
+    def output_path(self) -> Path:
+        if self._output_path is UNDEFINED:
+            # This is usually set once per loaded input work item.
+            new_path = os.getenv("RPA_OUTPUT_WORKITEM_PATH")
+            if new_path:
+                self._output_path = resolve_path(new_path)
+                self._output_path.parent.mkdir(parents=True, exist_ok=True)
+            else:
+                deprecation(
+                    "Work items save - Old path style usage detected, please use the "
+                    "'RPA_OUTPUT_WORKITEM_PATH' env var instead "
+                    "(more details under documentation: https://robocorp.com/docs/development-guide/control-room/data-pipeline#developing-with-work-items-locally)"  # noqa: E501
+                )
+                if not self.input_path:
+                    raise RuntimeError(
+                        "You must provide a path for at least one of the input or "
+                        "output work items files"
+                    )
+                self._output_path = self.input_path.with_suffix(".output.json")
+
+        return self._output_path
+
+    def _save_to_disk(self, source: str) -> None:
+        if source == "input":
+            if not self.input_path:
+                raise RuntimeError(
+                    "Can't save an input item without a path defined, use "
+                    "'RPA_INPUT_WORKITEM_PATH' env for this matter"
+                )
+            path = self.input_path
+            data = self.inputs
+        else:
+            path = self.output_path
+            data = self.outputs
+
+        with open(path, "w", encoding=ENCODING) as fd:
+            fd.write(json_dumps(data, indent=4))
+
+        logging.info("Saved into %s file: %s", source, path)
+
+    def create_output(self, _: str, payload: Optional[JSONType] = None) -> str:
+        # Note that the `parent_id` is not used during local development.
+        item: Dict[str, Any] = {"payload": payload, "files": {}}
+        self.outputs.append(item)
+
+        self._save_to_disk("output")
+        return str(len(self.inputs) + len(self.outputs) - 1)  # new output work item ID
+
+    def load_payload(self, item_id: str) -> JSONType:
+        _, item = self._get_item(item_id)
+        return item.get("payload", {})
+
+    def save_payload(self, item_id: str, payload: JSONType):
+        source, item = self._get_item(item_id)
+        item["payload"] = payload
+        self._save_to_disk(source)
+
+    def list_files(self, item_id: str) -> List[str]:
+        _, item = self._get_item(item_id)
+        files = item.get("files", {})
+        return list(files.keys())
+
+    def get_file(self, item_id: str, name: str) -> bytes:
+        source, item = self._get_item(item_id)
+        files = item.get("files", {})
+
+        path = files[name]
+        if not Path(path).is_absolute():
+            parent = (
+                self.input_path.parent if source == "input" else self.output_path.parent
+            )
+            path = parent / path
+
+        with open(path, "rb") as infile:
+            return infile.read()
+
+    def add_file(self, item_id: str, name: str, *, original_name: str, content: bytes):
+        source, item = self._get_item(item_id)
+        files = item.setdefault("files", {})
+
+        parent = (
+            self.input_path.parent if source == "input" else self.output_path.parent
+        )
+        path = parent / original_name  # the file on disk will keep its original name
+        with open(path, "wb") as fd:
+            fd.write(content)
+        logging.info("Created file: %s", path)
+        files[name] = original_name  # file path relative to the work item
+
+        self._save_to_disk(source)
+
+    def remove_file(self, item_id: str, name: str):
+        source, item = self._get_item(item_id)
+        files = item.get("files", {})
+
+        path = files[name]
+        logging.info("Would remove file: %s", path)
+        # Note that the file doesn't get removed from disk as well.
+        del files[name]
+
+        self._save_to_disk(source)
+
+    def load_database(self) -> List:
+        try:
+            try:
+                with open(self.input_path, "r", encoding=ENCODING) as infile:
+                    data = json.load(infile)
+            except (TypeError, FileNotFoundError):
+                logging.warning("No input work items file found: %s", self.input_path)
+                data = []
+
+            if isinstance(data, list):
+                assert all(
+                    isinstance(d, dict) for d in data
+                ), "Items should be dictionaries"
+                if len(data) == 0:
+                    data.append({"payload": {}})
+                return data
+
+            # Attempt to migrate from old format
+            assert isinstance(data, dict), "Not a list or dictionary"
+            deprecation("Work items file as mapping is deprecated")
+            workspace = next(iter(data.values()))
+            work_item = next(iter(workspace.values()))
+            return [{"payload": work_item}]
+        except Exception as exc:  # pylint: disable=broad-except
+            logging.exception("Invalid work items file because of: %s", exc)
+            return [{"payload": {}}]
+
+
+class WorkItem:
+    """Base class for input and output work items.
+
+    :param adapter:   Adapter instance
+    :param item_id:   Work item ID (optional)
+    :param parent_id: Parent work item's ID (optional)
+    """
+
+    def __init__(self, adapter, item_id=None, parent_id=None):
+        #: Adapter for loading/saving content
+        self.adapter = adapter
+        #: This item's and/or parent's ID
+        self.id: Optional[str] = item_id
+        self.parent_id: Optional[str] = parent_id
+        assert self.id is not None or self.parent_id is not None
+        #: Item's state on release; can be set once
+        self.state: Optional[State] = None
+        #: Remote JSON payload, and queued changes
+        self._payload: JSONType = {}
+        self._payload_cache: JSONType = {}
+        #: Remote attached files, and queued changes
+        self._files: List[str] = []
+        self._files_to_add: Dict[str, Path] = {}
+        self._files_to_remove: List[str] = []
+
+    def __repr__(self):
+        payload = truncate(str(self.payload), 64)
+        files = len(self.files)
+        return f"WorkItem(id={self.id}, payload={payload}, files={files})"
+
+    @property
+    def is_dirty(self):
+        """Check if work item has unsaved changes."""
+        return (
+            self.id is None
+            or not is_json_equal(self._payload, self._payload_cache)
+            or self._files_to_add
+            or self._files_to_remove
+        )
+
+    @property
+    def payload(self):
+        return self._payload_cache
+
+    @payload.setter
+    def payload(self, value):
+        self._payload_cache = value
+
+    @property
+    def files(self):
+        """List of filenames, including local files pending upload and
+        excluding files pending removal.
+        """
+        current = [item for item in self._files if item not in self._files_to_remove]
+        current.extend(self._files_to_add)
+        return list(sorted(set(current)))
+
+    def load(self):
+        """Load data payload and list of files."""
+        self._payload = self.adapter.load_payload(self.id)
+        self._payload_cache = copy.deepcopy(self._payload)
+
+        self._files = self.adapter.list_files(self.id)
+        self._files_to_add = {}
+        self._files_to_remove = []
+
+    def save(self):
+        """Save data payload and attach/remove files."""
+        if self.id is None:
+            self.id = self.adapter.create_output(self.parent_id, payload=self.payload)
+        else:
+            self.adapter.save_payload(self.id, self.payload)
+
+        for name in self._files_to_remove:
+            self.adapter.remove_file(self.id, name)
+
+        for name, path in self._files_to_add.items():
+            with open(path, "rb") as infile:
+                self.adapter.add_file(
+                    self.id, name, original_name=path.name, content=infile.read()
+                )
+
+        # Empty unsaved values
+        self._payload = self._payload_cache
+        self._payload_cache = copy.deepcopy(self._payload)
+
+        self._files = self.files
+        self._files_to_add = {}
+        self._files_to_remove = []
+
+    def get_file(self, name, path=None) -> str:
+        """Load an attached file and store it on the local filesystem.
+
+        :param name: Name of attached file
+        :param path: Destination path. Default to current working directory.
+        :returns:    Path to created file
+        """
+        if name not in self.files:
+            raise FileNotFoundError(f"No such file: {name}")
+
+        if not path:
+            root = os.getenv("ROBOT_ROOT", "")
+            path = os.path.join(root, name)
+
+        if name in self._files_to_add:
+            local_path = self._files_to_add[name]
+            if Path(local_path).resolve() != Path(path).resolve():
+                copy2(local_path, path)
+        else:
+            content = self.adapter.get_file(self.id, name)
+            with open(path, "wb") as outfile:
+                outfile.write(content)
+
+        # Always return absolute path
+        return str(Path(path).resolve())
+
+    def add_file(self, path, name=None):
+        """Add file to current work item. Does not upload
+        until ``save()`` is called.
+
+        :param path: Path to file to upload
+        :param name: Name of file in work item. If not given,
+                     name of file on disk is used.
+        """
+        path = Path(path).resolve()
+
+        if path in self._files_to_add.values():
+            logging.warning("File already added: %s", path)
+
+        if not path.is_file():
+            raise FileNotFoundError(f"Not a valid file: {path}")
+
+        name = name or path.name
+        self._files_to_add[name] = path
+
+        if name in self._files_to_remove:
+            self._files_to_remove.remove(name)
+
+        return name
+
+    def remove_file(self, name, missing_ok=True):
+        """Remove file from current work item. Change is not applied
+        until ``save()`` is called.
+
+        :param name: Name of attached file
+        """
+        if not missing_ok and name not in self.files:
+            raise FileNotFoundError(f"No such file: {name}")
+
+        if name in self._files:
+            self._files_to_remove.append(name)
+
+        if name in self._files_to_add:
+            del self._files_to_add[name]
+
+        return name
+
+
+class WorkItems:
     """A library for interacting with Control Room work items.
 
     Work items are used for managing data that go through multiple
@@ -291,23 +980,22 @@ class _WorkItems:
 
         return adapter
 
-    # TODO: Implement proper email parsing
-    # @classmethod
-    # def _interpret_content(cls, body: str) -> Union[dict, str]:
-    #     for name, loader in cls.EMAIL_BODY_LOADERS:
-    #         try:
-    #             body = loader(body)
-    #         except Exception as exc:  # pylint: disable=broad-except
-    #             logging.debug(
-    #                 "Failed deserializing input e-mail body content with loader %r "
-    #                 "due to: %s",
-    #                 name,
-    #                 exc,
-    #             )
-    #         else:
-    #             break
-    #
-    #     return body
+    @classmethod
+    def _interpret_content(cls, body: str) -> Union[dict, str]:
+        for name, loader in cls.EMAIL_BODY_LOADERS:
+            try:
+                body = loader(body)
+            except Exception as exc:  # pylint: disable=broad-except
+                logging.debug(
+                    "Failed deserializing input e-mail body content with loader %r "
+                    "due to: %s",
+                    name,
+                    exc,
+                )
+            else:
+                break
+
+        return body
 
     # TODO: Implement proper email parsing
     # def _get_email_content(
@@ -380,7 +1068,6 @@ class _WorkItems:
     #         # pylint: disable=undefined-loop-variable
     #         self.set_work_item_variable(keys[0], parsed_email)
 
-    # TODO: Add to init
     def _start_suite(self, *_):
         """Robot Framework listener method, called when suite starts."""
         if not self.autoload:
@@ -394,7 +1081,6 @@ class _WorkItems:
         finally:
             self.autoload = False
 
-    # TODO: Proper handling in case of failure
     def _release_on_failure(self, attributes):
         """Automatically releases current input Work Item when encountering failures
         with tasks and/or suites.
@@ -411,7 +1097,6 @@ class _WorkItems:
             _auto_release=True,
         )
 
-    # TODO: Add atexit handler?
     def _end_suite(self, _, attributes):
         """Robot Framework listener method, called when the suite ends."""
         # pylint: disable=unused-argument
@@ -984,7 +1669,7 @@ class _WorkItems:
 
     def for_each_input_work_item(
         self,
-        func: Union[str, Callable],
+        keyword_or_func: Union[str, Callable],
         *args,
         items_limit: int = 0,
         return_results: bool = True,
@@ -995,7 +1680,7 @@ class _WorkItems:
         Automatically collects and returns a list of results, switch
         ``return_results`` to ``False`` for avoiding this.
 
-        :param func: The RF keyword or Py function you want to map through
+        :param keyword_or_func: The RF keyword or Py function you want to map through
             all the work items
         :param args: Variable list of arguments that go into the called keyword/function
         :param kwargs: Variable list of keyword arguments that go into the called
@@ -1045,17 +1730,31 @@ class _WorkItems:
 
         self._raise_under_iteration("iterate input work items")
 
-        to_call = lambda: func(*args, **kwargs)  # noqa: E731
+        to_call = lambda: keyword_or_func(*args, **kwargs)  # noqa: E731
         results = []
 
-        for _ in self.iter_input_work_item(items_limit):
-            result = to_call()
-            if return_results:
-                results.append(result)
+        try:
+            self._under_iteration.set()
+            count = 0
+            while True:
+                input_ensured = self._ensure_input_for_iteration()
+                if not input_ensured:
+                    break
+
+                result = to_call()
+                if return_results:
+                    results.append(result)
+                self.release_input_work_item(State.DONE, _auto_release=True)
+
+                count += 1
+                if items_limit and count >= items_limit:
+                    break
+        finally:
+            self._under_iteration.clear()
 
         return results if return_results else None
 
-    def iter_input_work_item(
+    def input_workitem_iter(
         self,
         items_limit: int = 0,
     ) -> WorkItem:
@@ -1223,23 +1922,5 @@ class _WorkItems:
         return self.current
 
 
-class _WorkItemsContainer:
-    _workItems_intance: Optional[_WorkItems] = None
-
-    def __init__(self):
-        raise RuntimeError("Call instance() instead")
-
-    @classmethod
-    def instance(
-        cls,
-        autoload: bool = True,
-        root: Optional[str] = None,
-        default_adapter: Union[Type[BaseAdapter], str] = RobocorpAdapter,
-        # pylint: disable=dangerous-default-value
-        auto_parse_email: AUTO_PARSE_EMAIL_TYPE = AUTO_PARSE_EMAIL_DEFAULT,
-    ) -> _WorkItems:
-        if cls._workItems_intance is None:
-            cls._workItems_intance = _WorkItems(
-                autoload, root, default_adapter, auto_parse_email
-            )
-        return cls._workItems_intance
+def get_workitems():
+    return WorkItems()
