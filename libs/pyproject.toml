@@ -11,9 +11,17 @@ authors = [
 readme = "README.md"
 packages = [{include = "_robo", from="src"}]
 
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
 [tool.poetry.dependencies]
 python = "^3.9"
 black = "^23.1.0"
+isort = "^5.9.3"
 ruff = "^0.0.255"
 mypy = "^1.1.1"
 pytest = "^7.2.2"

@@ -14,6 +14,8 @@ packages = [{include = "robo", from="src"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 cryptography = "^39.0.1"
+requests = "^2.28.2"
+tenacity = "^8.0.1"
 
 [tool.poetry.group.dev.dependencies]
 libs-devdeps = {path = ".."}
