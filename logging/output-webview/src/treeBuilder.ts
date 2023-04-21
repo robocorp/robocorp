@@ -306,28 +306,46 @@ export class TreeBuilder {
             case "SE":
             case "YR":
                 // start element
-                this.messageNode = { "parent": this.messageNode, "message": msg };
-                let name = msg.decoded["name"];
-                if (msgType == "YR") {
-                    name += " (resumed)";
-                }
-                this.parent = addTreeContent(
-                    this.opts,
-                    this.parent,
-                    name,
-                    msg.decoded["libname"],
-                    msg,
-                    false,
-                    msg.decoded["source"],
-                    msg.decoded["lineno"],
-                    this.messageNode,
-                    this.id.toString()
-                );
-                if (msgType == "YR") {
-                    this.addResumedCSSClass(this.parent);
+                const raiseStack = msgType != "SE" || msg.decoded["type"] != "UNTRACKED_GENERATOR";
+                if (!raiseStack) {
+                    const item = addTreeContent(
+                        this.opts,
+                        this.parent,
+                        `Create Generator: ${msg.decoded["name"]}`,
+                        "",
+                        msg,
+                        false,
+                        msg.decoded["source"],
+                        msg.decoded["lineno"],
+                        this.messageNode,
+                        this.id.toString()
+                    );
+                    this.addGeneratorCSSClass(item);
+                } else {
+                    this.messageNode = { "parent": this.messageNode, "message": msg };
+                    let name = msg.decoded["name"];
+                    if (msgType == "YR") {
+                        name += " (resumed)";
+                    }
+                    this.parent = addTreeContent(
+                        this.opts,
+                        this.parent,
+                        name,
+                        msg.decoded["libname"],
+                        msg,
+                        false,
+                        msg.decoded["source"],
+                        msg.decoded["lineno"],
+                        this.messageNode,
+                        this.id.toString()
+                    );
+                    if (msgType == "YR") {
+                        this.addResumedCSSClass(this.parent);
+                    }
+
+                    this.stack.push(this.parent);
                 }
 
-                this.stack.push(this.parent);
                 break;
             case "ER": // end run
                 this.messageNode = this.messageNode.parent;
@@ -366,34 +384,40 @@ export class TreeBuilder {
                 break;
             case "EE": // end element
             case "YS": // end element
-                if (msgType == "YS") {
-                    const yieldedItem = addTreeContent(
-                        this.opts,
-                        this.parent,
-                        "Yielded",
-                        `Suspending function with yield.\nYielding an object of type: ${msg.decoded["type"]}\nWith representation:\n${msg.decoded["value"]}`,
-                        msg,
-                        false,
-                        msg.decoded["source"],
-                        msg.decoded["lineno"],
-                        this.messageNode,
-                        this.id.toString()
-                    );
-                    this.addYieldedCSSClass(yieldedItem);
-                    addValueToTreeContent(yieldedItem, msg.decoded["value"]);
-                }
+                const popStack = msgType != "EE" || msg.decoded["type"] != "UNTRACKED_GENERATOR";
+                if (!popStack) {
+                    // The generator finished, but we don't even have its name... maybe we should have
+                    // a different message for this case?
+                } else {
+                    if (msgType == "YS") {
+                        const yieldedItem = addTreeContent(
+                            this.opts,
+                            this.parent,
+                            "Yielded",
+                            `Suspending function with yield.\nYielding an object of type: ${msg.decoded["type"]}\nWith representation:\n${msg.decoded["value"]}`,
+                            msg,
+                            false,
+                            msg.decoded["source"],
+                            msg.decoded["lineno"],
+                            this.messageNode,
+                            this.id.toString()
+                        );
+                        this.addYieldedCSSClass(yieldedItem);
+                        addValueToTreeContent(yieldedItem, msg.decoded["value"]);
+                    }
 
-                this.messageNode = this.messageNode.parent;
-                let currK = this.parent;
+                    this.messageNode = this.messageNode.parent;
+                    let currK = this.parent;
 
-                this.stack.pop();
-                this.parent = this.stack.at(-1);
-                this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currK, this.parent, msg);
-                this.onEndSetStatusOrRemove(this.opts, currK, msg.decoded, this.parent, true);
+                    this.stack.pop();
+                    this.parent = this.stack.at(-1);
+                    this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currK, this.parent, msg);
+                    this.onEndSetStatusOrRemove(this.opts, currK, msg.decoded, this.parent, true);
 
-                isError = this.addDetailsCSSClasses(msg.decoded.status, currK);
-                if (isError) {
-                    currK.details.open = true;
+                    isError = this.addDetailsCSSClasses(msg.decoded.status, currK);
+                    if (isError) {
+                        currK.details.open = true;
+                    }
                 }
 
                 break;
@@ -486,6 +510,11 @@ export class TreeBuilder {
 
     addResumedCSSClass(curr: IContentAdded) {
         curr.details.classList.add("resumedParent");
+    }
+
+    addGeneratorCSSClass(curr: IContentAdded) {
+        curr.details.classList.add("generatorParent");
+        curr.details.classList.add("leafNode");
     }
 
     addDetailsCSSClasses(statusOrLevel: string | number, curr: IContentAdded): boolean {

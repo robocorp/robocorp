@@ -29,7 +29,7 @@ def test_impl_recovery_matches_task() -> None:
     impl.start_run("suite1", 0)
     impl.start_task("test1", "modname", "source", 0, 0, [])
     impl.start_element(
-        "My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], False
+        "My Keyword", "libname", "METHOD", "doc", "source", 0, 0, [], False
     )
     assert len(impl._stack_handler._queue) == 3
 
@@ -52,7 +52,7 @@ def test_impl_recovery_does_not_match_test() -> None:
     impl.start_run("suite1", 0)
     impl.start_task("test1", "modname", "source", 0, 0, [])
     impl.start_element(
-        "My Keyword", "libname", "KEYWORD", "doc", "source", 0, 0, [], False
+        "My Keyword", "libname", "METHOD", "doc", "source", 0, 0, [], False
     )
     assert len(impl._stack_handler._queue) == 3
 

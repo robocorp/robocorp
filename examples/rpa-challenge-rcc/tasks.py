@@ -50,9 +50,13 @@ def start_the_challenge():
     browser_lib.click_button("Start")
 
 
+def iter_people_from_excel():
+    for person in get_the_list_of_people_from_the_excel_file():
+        yield person
+
+
 def fill_the_forms():
-    people = get_the_list_of_people_from_the_excel_file()
-    for person in people:
+    for person in iter_people_from_excel():
         fill_and_submit_the_form(person)
 
 

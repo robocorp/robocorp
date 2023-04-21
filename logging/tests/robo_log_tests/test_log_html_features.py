@@ -21,6 +21,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
         check,
         check_sensitive_data,
         check_traceback,
+        check_iterators,
     )
     from imp import reload
     from pathlib import Path
@@ -39,6 +40,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
         check = reload(check)
         check_sensitive_data = reload(check_sensitive_data)
         check_traceback = reload(check_traceback)
+        check_iterators = reload(check_iterators)
 
         with robo_log.add_log_output(
             tmpdir,
@@ -59,26 +61,26 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
             robo_log.start_run("Test Log HTML Features")
             robo_log.start_task("my_task", "modname", str(tmpdir), 0, [])
 
-            for _i in range(2):
-                check.some_method()
-                robo_log.critical("Some log error")
-                robo_log.warn("Some log warn")
-                robo_log.info("Some log info")
-                HTML_MESSAGE_LINENO = sys._getframe().f_lineno + 1
-                robo_log.info(HTML_MESSAGE, html=True)
-                check_sensitive_data.run()
-                try:
-                    check_traceback.main()
-                except RuntimeError:
-                    pass
-                else:
-                    raise AssertionError("Expected RuntimeError.")
-                try:
-                    check_traceback.call_exc_with_context()
-                except ValueError:
-                    pass
-                else:
-                    raise AssertionError("Expected RuntimeError.")
+            check.some_method()
+            robo_log.critical("Some log error")
+            robo_log.warn("Some log warn")
+            robo_log.info("Some log info")
+            HTML_MESSAGE_LINENO = sys._getframe().f_lineno + 1
+            robo_log.info(HTML_MESSAGE, html=True)
+            check_sensitive_data.run()
+            check_iterators.main()
+            try:
+                check_traceback.main()
+            except RuntimeError:
+                pass
+            else:
+                raise AssertionError("Expected RuntimeError.")
+            try:
+                check_traceback.call_exc_with_context()
+            except ValueError:
+                pass
+            else:
+                raise AssertionError("Expected RuntimeError.")
 
             robo_log.end_task(
                 "my_task",
@@ -136,6 +138,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
                     "type": "METHOD",
                 },
             ],
+            [],
         )
 
         if ui_regenerate.OPEN_IN_BROWSER:

@@ -269,8 +269,13 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
     yield from iter_decoded_log_format_from_stream(stream)
 
 
+_DEFAULT_NOT_EXPECTED: Sequence[dict] = ({"message_type": "L", "level": "E"},)
+
+
 def verify_log_messages_from_messages_iterator(
-    messages_iterator: Iterator[dict], expected: Sequence[dict]
+    messages_iterator: Iterator[dict],
+    expected: Sequence[dict],
+    not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
     A helper for checking that the expected messages are found in the
@@ -278,8 +283,9 @@ def verify_log_messages_from_messages_iterator(
 
     Args:
         messages_iterator: An iterator over the messages found.
-        expected: The messages wich are expected to be found. If some message
+        expected: The messages which are expected to be found. If some message
             expected to be found is not found an AssertionError will be raised.
+        not_expected: The messages that should not appear.
 
     Example:
         verify_log_messages_from_messages_iterator(
@@ -308,6 +314,20 @@ def verify_log_messages_from_messages_iterator(
     log_messages = list(messages_iterator)
     log_msg: dict
     for log_msg in log_messages:
+        for not_expected_dct in not_expected:
+            for key, val in not_expected_dct.items():
+                if key == "__check__":
+                    if not val(log_msg):
+                        break
+
+                elif log_msg.get(key) != val:
+                    break
+            else:
+                new_line = "\n"
+                raise AssertionError(
+                    f"Found unexpected message: {not_expected_dct}.\nFound:\n{new_line.join(str(x) for x in log_messages)}"
+                )
+
         for expected_dct in expected_lst:
             for key, val in expected_dct.items():
                 if key == "__check__":
@@ -329,13 +349,16 @@ def verify_log_messages_from_messages_iterator(
 
 
 def verify_log_messages_from_decoded_str(
-    s: str, expected: Sequence[dict]
+    s: str,
+    expected: Sequence[dict],
+    not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
     Args:
         s: A string with the messages already decoded (where messages are
         separated by lines and each message is a json string to be decoded).
         expected: The messages expected.
+        not_expected: The messages that should not appear.
 
     See: `verify_log_messages_from_messages_iterator` for more details on the
         matching of messages.
@@ -345,38 +368,46 @@ def verify_log_messages_from_decoded_str(
         log_msg_dict: dict = json.loads(log_msg.strip())
         log_messages.append(log_msg_dict)
 
-    return verify_log_messages_from_messages_iterator(iter(log_messages), expected)
+    return verify_log_messages_from_messages_iterator(
+        iter(log_messages), expected, not_expected
+    )
 
 
 def verify_log_messages_from_log_html(
-    log_html: Path, expected: Sequence[dict]
+    log_html: Path,
+    expected: Sequence[dict],
+    not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
     Args:
         log_html: The path to the log_html where messages were embedded.
         expected: The messages expected.
+        not_expected: The messages that should not appear.
 
     See: `verify_log_messages_from_messages_iterator` for more details on the
         matching of messages.
     """
     iter_in = iter_decoded_log_format_from_log_html(log_html)
-    return verify_log_messages_from_messages_iterator(iter_in, expected)
+    return verify_log_messages_from_messages_iterator(iter_in, expected, not_expected)
 
 
 def verify_log_messages_from_stream(
-    stream: IReadLines, expected: Sequence[dict]
+    stream: IReadLines,
+    expected: Sequence[dict],
+    not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> Sequence[dict]:
     """
     Args:
         stream: A stream from where the encoded messages are expected to be read
             from.
         expected: The messages expected.
+        not_expected: The messages that should not appear.
 
     See: `verify_log_messages_from_messages_iterator` for more details on the
         matching of messages.
     """
     return verify_log_messages_from_messages_iterator(
-        iter_decoded_log_format_from_stream(stream), expected
+        iter_decoded_log_format_from_stream(stream), expected, not_expected
     )
 
 

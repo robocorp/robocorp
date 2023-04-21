@@ -4,6 +4,7 @@ import pytest
 
 from robo_log._config import ConfigFilesFiltering
 from robo_log_tests.fixtures import ConfigForTest
+from robo_log.protocols import LogElementType
 
 
 class _SetupCallback:
@@ -11,7 +12,9 @@ class _SetupCallback:
         self.check = None  # To be set by the test function
         self.found = []
 
-    def before_method(self, mod_name, filename, name, lineno, args_dict):
+    def before_method(
+        self, method_type: LogElementType, mod_name, filename, name, lineno, args_dict
+    ):
         check = self.check
         if check:
             assert filename == check.__file__
@@ -19,7 +22,9 @@ class _SetupCallback:
             assert lineno > 0
         self.found.append(("before", name, args_dict))
 
-    def after_method(self, mod_name, filename, name, lineno):
+    def after_method(
+        self, method_type: LogElementType, mod_name, filename, name, lineno
+    ):
         check = self.check
         if check:
             assert filename == check.__file__
@@ -35,7 +40,9 @@ class _SetupCallback:
             assert lineno > 0
         self.found.append(("return", name, return_value))
 
-    def method_except(self, mod_name, filename, name, lineno, exc_info):
+    def method_except(
+        self, method_type: LogElementType, mod_name, filename, name, lineno, exc_info
+    ):
         check = self.check
         if check:
             assert filename == check.__file__

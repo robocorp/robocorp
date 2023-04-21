@@ -8,10 +8,6 @@ export interface IMessage {
     readonly decoded: any;
 }
 
-function version_decode(decoder, message) {
-    return { message };
-}
-
 function simple_decode(decoder, message) {
     return JSON.parse(message);
 }
@@ -97,40 +93,24 @@ function _decode(message_definiton) {
     return _decImpl;
 }
 
-const start_run = _decode("name:oid, time_delta_in_seconds:float");
-
-const end_run = _decode("status:oid, time_delta_in_seconds:float");
-
-const start_task = _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float");
-
-const end_task = _decode("status:oid, message:oid, time_delta_in_seconds:float");
-
-const start_element = _decode(
-    "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float"
-);
-
-const end_element = _decode("status:oid, time_delta_in_seconds:float");
-
-const decode_log = _decode("level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float");
-
 const id_decode = _decode("part:int, id:str");
 
 const _MESSAGE_TYPE_INFO = {
-    "V": version_decode,
+    "V": _decode("version:str"),
     "ID": id_decode,
     "I": simple_decode,
     "T": decode_time,
     "M": decode_memo,
-    "SR": start_run,
-    "ER": end_run,
-    "ST": start_task,
-    "ET": end_task,
-    "SE": start_element,
-    "EE": end_element,
+    "SR": _decode("name:oid, time_delta_in_seconds:float"),
+    "ER": _decode("status:oid, time_delta_in_seconds:float"),
+    "ST": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "ET": _decode("status:oid, message:oid, time_delta_in_seconds:float"),
+    "SE": _decode("name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "EE": _decode("type:oid, status:oid, time_delta_in_seconds:float"),
     "EA": _decode("name:oid, type:oid, value:oid"),
     "AS": _decode("source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"),
-    "L": decode_log,
-    "LH": decode_log,
+    "L": _decode("level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "LH": _decode("level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
     "TG": _decode("tag:oid"),
     "S": _decode("start_time_delta:float"),
     "STB": _decode("message:oid, time_delta_in_seconds:float"),

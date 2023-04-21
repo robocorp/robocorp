@@ -53,7 +53,8 @@ from ._rewrite_ast_add_callbacks import rewrite_ast_add_callbacks
 # 0.0.7: Just include __name__, note __package__.
 # 0.0.9: Rewrite assign statements
 # 0.0.10: Rewrite yields
-version = "0.0.10"
+# 0.0.11: Add method type as first parameter for start_method/except/end_method
+version = "0.0.11"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-robo_log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT

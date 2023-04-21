@@ -1,5 +1,10 @@
 # The `.robolog` format
 
+## Disclaimer
+
+The format documented below may not be stable across versions and compatibility
+may be broken as the format evolves.
+
 ## Requirements
 
 The requirements for the generated log files are the following:
@@ -61,7 +66,7 @@ Basic message types are:
     
     Example:
     
-    `V 1`             - Identifies version 1 of the log
+    `V 0.0.1`             - Identifies version 1 of the log
 
 ### ID: Identifier and part for this run.
 
@@ -179,7 +184,7 @@ Basic message types are:
 
 ### EE: End Element
 
-    Spec: `status:oid, time_delta_in_seconds:float`
+    Spec: `type:oid, status:oid, time_delta_in_seconds:float`
     
     Example:
     

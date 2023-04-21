@@ -1,4 +1,5 @@
 from logging import getLogger
+from typing import Iterator, Tuple
 
 logger = getLogger(__name__)
 
@@ -23,19 +24,16 @@ class Callback(object):
 
     def __init__(self):
         self.raise_exceptions = False
-        self._callbacks = []
+        self._callbacks = ()
 
     def register(self, callback):
-        new_callbacks = self._callbacks[:]
-        new_callbacks.append(callback)
-        self._callbacks = new_callbacks
+        self._callbacks = self._callbacks + (callback,)
 
         # Enable using as a context manager to automatically call the unregister.
         return _OnExitContextManager(lambda: self.unregister(callback))
 
     def unregister(self, callback):
-        new_callbacks = [x for x in self._callbacks if x != callback]
-        self._callbacks = new_callbacks
+        self._callbacks = tuple(x for x in self._callbacks if x != callback)
 
     def __call__(self, *args, **kwargs):
         for c in self._callbacks:
@@ -70,8 +68,13 @@ before_yield = Callback()
 after_yield = Callback()
 
 
-def iter_all_callbacks():
-    yield before_method
-    yield after_method
-    yield method_return
-    yield method_except
+def iter_all_callbacks() -> Iterator[Callback]:
+    for _key, val in globals().items():
+        if isinstance(val, Callback):
+            yield val
+
+
+def iter_all_name_and_callback() -> Iterator[Tuple[str, Callback]]:
+    for key, val in globals().items():
+        if isinstance(val, Callback):
+            yield (key, val)

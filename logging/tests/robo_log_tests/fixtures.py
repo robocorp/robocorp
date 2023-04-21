@@ -79,12 +79,14 @@ def ui_regenerate():
 
 
 @contextmanager
-def basic_log_setup(tmpdir, max_file_size="1MB", max_files=5):
+def basic_log_setup(
+    tmpdir, max_file_size="1MB", max_files=5, config: Optional[BaseConfig] = None
+):
     import robo_log
 
     log_target = Path(tmpdir.join("log.html"))
 
-    with robo_log.setup_auto_logging():
+    with robo_log.setup_auto_logging(config):
         with robo_log.add_log_output(
             tmpdir,
             max_file_size=max_file_size,
@@ -104,7 +106,7 @@ def basic_log_setup(tmpdir, max_file_size="1MB", max_files=5):
 
 class ConfigForTest(BaseConfig):
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
-        if "check_lib_lib" in module_name:
+        if "check_lib_lib" in module_name or "check_iterators_lib" in module_name:
             return FilterKind.log_on_project_call
 
         if "check" in module_name:

@@ -3,7 +3,7 @@ import functools
 from pathlib import Path
 from typing import Optional, Union, Sequence, Tuple
 import datetime
-from robo_log.protocols import OptExcInfo, LogHTMLStyle, Status
+from robo_log.protocols import OptExcInfo, LogHTMLStyle, Status, LogElementType
 import sys
 
 
@@ -188,10 +188,9 @@ class _RoboLogger:
         libname: str,
         source: str,
         lineno: int,
-        element_type: str,  # METHOD/IF/WHILE,etc.
+        element_type: LogElementType,
         doc: str,
         args: Sequence[Tuple[str, str, str]],
-        tags: Sequence[str],
     ):
         """
         Example:
@@ -204,16 +203,9 @@ class _RoboLogger:
             element_type="METHOD",
             doc="Closes Browser",
             args=[("force", "boolean", "True")],
-            tags=["some-tag"],
         )
         """
         hide_from_logs = False
-        if tags:
-            if "log:ignore-methods" in tags:
-                self._skip_log_methods += 1
-            if "log:ignore-variables" in tags:
-                self._skip_log_variables += 1
-
         if self._skip_log_methods:
             if name not in (
                 "stop_logging_methods",
@@ -306,10 +298,17 @@ class _RoboLogger:
         )
 
     @_log_error
-    def end_method(self, name: str, libname: str, status: str, tags: Sequence[str]):
+    def end_method(
+        self,
+        element_type: LogElementType,
+        name: str,
+        libname: str,
+        status: str,
+        tags: Sequence[str],
+    ):
         try:
             return self._robot_output_impl.end_method(
-                name, libname, status, self._get_time_delta()
+                element_type, name, libname, status, self._get_time_delta()
             )
         finally:
             if tags:

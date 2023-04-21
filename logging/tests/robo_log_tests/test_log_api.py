@@ -38,6 +38,7 @@ def test_log_api(tmpdir) -> None:
             dict(message_type="L", level="E", message="Some e message"),
             dict(message_type="L", level="W", message="Some w message"),
         ],
+        [],
     )
     # Calls in thread not logged.
     assert str(messages).count("call_another_method") == 1
@@ -74,6 +75,6 @@ def test_log_api_without_with_statments(tmpdir) -> None:
             robo_log.close_log_outputs()
 
         assert log_target.exists()
-        verify_log_messages_from_log_html(log_target, [dict(message_type="SE")])
+        verify_log_messages_from_log_html(log_target, [dict(message_type="SE")], [])
     finally:
         ctx.__exit__(None, None, None)

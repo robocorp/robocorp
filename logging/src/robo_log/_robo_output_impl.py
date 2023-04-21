@@ -2,8 +2,8 @@ from pathlib import Path
 from contextlib import contextmanager
 from datetime import timezone
 from functools import partial
-from robo_log.protocols import OptExcInfo
-from typing import Dict, Iterator, List, Sequence, Set, Pattern, Tuple
+from robo_log.protocols import OptExcInfo, LogElementType
+from typing import Dict, Iterator, List, Sequence, Set, Pattern, Tuple, Any
 from typing import Optional, Callable
 import datetime
 import itertools
@@ -309,10 +309,12 @@ class _RoboOutputImpl:
             self._write_on_start_or_after_rotate()
 
     def _write_on_start_or_after_rotate(self):
+        from ._decoder import DOC_VERSION
+
         if self._current_file is not None:
             print("Robocorp Log output:", self._current_file.absolute())
 
-        self._write_json("V ", 1)
+        self._write_with_separator("V ", (DOC_VERSION,))
         self._write_with_separator(
             "T ", (self._initial_time.isoformat(timespec="milliseconds"),)
         )
@@ -616,7 +618,7 @@ class _RoboOutputImpl:
         self,
         name: str,
         libname: str,
-        element_type: str,
+        element_type: LogElementType,
         doc: str,
         source: str,
         lineno: int,
@@ -624,12 +626,20 @@ class _RoboOutputImpl:
         args: Sequence[Tuple[str, str, str]],
         hide_from_logs: bool,
     ) -> None:
-        element_type = element_type.upper()
+        from ._null import NULL
+
         oid = self._obtain_id
         element_id = f"{libname}.{name}"
-        with self._stack_handler.push_record(
-            "element", element_id, "SE", "RE", hide_from_logs
-        ):
+
+        ctx: Any = NULL
+        if element_type != "UNTRACKED_GENERATOR":
+            # We don't change the scope for untracked generators as
+            # we have no idea when it'll pause/resume.
+            ctx = self._stack_handler.push_record(
+                "element", element_id, "SE", "RE", hide_from_logs
+            )
+
+        with ctx:
             if hide_from_logs:
                 # I.e.: add to internal stack but don't write it.
                 return
@@ -662,18 +672,28 @@ class _RoboOutputImpl:
                         ],
                     )
 
-    def end_method(self, name, libname, status, time_delta):
+    def end_method(
+        self,
+        element_type: LogElementType,
+        name: str,
+        libname: str,
+        status: str,
+        time_delta: float,
+    ):
         element_id = f"{libname}.{name}"
-        oid = self._obtain_id
-        stack_entry = self._stack_handler.pop("element", element_id)
-        if stack_entry is None or stack_entry.hide_from_logs:
-            # If the start wasn't logged, the stop shouldn't be logged either
-            # (and if it was logged, the stop should be also logged).
-            return
 
+        if element_type != "UNTRACKED_GENERATOR":
+            stack_entry = self._stack_handler.pop("element", element_id)
+            if stack_entry is None or stack_entry.hide_from_logs:
+                # If the start wasn't logged, the stop shouldn't be logged either
+                # (and if it was logged, the stop should also be logged).
+                return
+
+        oid = self._obtain_id
         self._write_with_separator(
             "EE ",
             [
+                oid(element_type),
                 oid(status),
                 self._number(time_delta),
             ],

@@ -106,9 +106,12 @@ def decode_memo(decoder: Decoder, message: str) -> None:
     decoder.memo[memo_id] = memo_value
 
 
+# Whenever the decoding changes we should bump up this version.
+DOC_VERSION = "0.0.1"
+
 _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     # Version of the log output
-    "V": lambda _decoder, message: {"version": message},
+    "V": _decode("version:str"),
     # Some information message
     "I": lambda _decoder, message: {"info": json.loads(message)},
     # The log has an id that may be split into multiple parts.
@@ -146,7 +149,7 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
         "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
     ),
     # End Element
-    "EE": _decode("status:oid, time_delta_in_seconds:float"),
+    "EE": _decode("type:oid, status:oid, time_delta_in_seconds:float"),
     # Yield Suspend
     "YS": _decode(
         "source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float",

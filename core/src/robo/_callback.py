@@ -23,25 +23,22 @@ class Callback(object):
 
     def __init__(self):
         self.raise_exceptions = False
-        self._callbacks = []
+        self._callbacks = ()
 
     def register(self, callback):
-        new_callbacks = self._callbacks[:]
-        new_callbacks.append(callback)
-        self._callbacks = new_callbacks
+        self._callbacks = self._callbacks + (callback,)
 
         # Enable using as a context manager to automatically call the unregister.
         return _OnExitContextManager(lambda: self.unregister(callback))
 
     def unregister(self, callback):
-        new_callbacks = [x for x in self._callbacks if x != callback]
-        self._callbacks = new_callbacks
+        self._callbacks = tuple(x for x in self._callbacks if x != callback)
 
     def __call__(self, *args, **kwargs):
         for c in self._callbacks:
             try:
                 c(*args, **kwargs)
             except:
-                logger.exception("Error in callback.")
+                logger.exception(f"Error calling: {c}.")
                 if self.raise_exceptions:
                     raise

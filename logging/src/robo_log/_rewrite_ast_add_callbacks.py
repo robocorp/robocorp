@@ -1,14 +1,34 @@
 import ast
-from typing import Any, Union, List, Optional, Tuple, Dict, Callable, Sequence
+from typing import Any, Union, List, Optional, Tuple, Dict, Callable, Sequence, Iterator
 from . import _ast_utils
 from ._config import BaseConfig, FilterKind
 import typing
+from robo_log.protocols import LogElementType
 
 DEBUG = False
 
 
 def is_rewrite_disabled(docstring: str) -> bool:
     return "NO_LOG" in docstring
+
+
+class _RewriteCtx:
+    def __init__(self):
+        self._memo = {}
+
+    def save_func_to_before_method_call(
+        self, function: ast.FunctionDef, call: ast.Call
+    ):
+        self._memo.setdefault(function, []).append(call)
+
+    def save_func_to_except_method_call(self, function, call):
+        self._memo.setdefault(function, []).append(call)
+
+    def save_func_to_after_method_call(self, function, call):
+        self._memo.setdefault(function, []).append(call)
+
+    def iter_func_calls_from_func(self, func: ast.FunctionDef) -> Iterator[ast.Call]:
+        yield from iter(self._memo[func])
 
 
 def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
@@ -187,7 +207,9 @@ def _rewrite_yield(function, class_name, node: ast.Expr) -> Optional[list]:
 _EMPTY_LIST: list = []
 
 
-def _create_before_method_ast(factory, class_name, function, filter_kind) -> list:
+def _create_before_method_ast(
+    rewrite_ctx: _RewriteCtx, factory, class_name, function, filter_kind
+) -> list:
     # Target code:
     # def method(a, b):
     #     before_method(__name, __file__, "method_name", 11, {'a': a, 'b': b})
@@ -207,10 +229,14 @@ def _create_before_method_ast(factory, class_name, function, filter_kind) -> lis
 
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("before_method")
+    log_method_type: LogElementType = "METHOD"
+    call.args.append(factory.Str(log_method_type))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
     call.args.append(factory.Str(f"{class_name}{function.name}"))
     call.args.append(factory.LineConstant())
+
+    rewrite_ctx.save_func_to_before_method_call(function, call)
 
     dct = factory.Dict()
     keys: list[Union[ast.expr, None]] = []
@@ -240,6 +266,7 @@ def _create_before_method_ast(factory, class_name, function, filter_kind) -> lis
 
 
 def _create_except_handler_ast(
+    rewrite_ctx: _RewriteCtx,
     factory,
     class_name: str,
     function: ast.FunctionDef,
@@ -288,11 +315,14 @@ def _create_except_handler_ast(
     method_except = factory.NameLoadRewriteCallback("method_except")
     call_method_except = factory.Call()
     call_method_except.func = method_except
+    log_method_type: LogElementType = "METHOD"
+    call_method_except.args.append(factory.Str(log_method_type))
     call_method_except.args.append(factory.NameLoad("__name__"))
     call_method_except.args.append(factory.NameLoad("__file__"))
     call_method_except.args.append(factory.Str(f"{class_name}{function.name}"))
     call_method_except.args.append(factory.LineConstant())
     call_method_except.args.append(call_exc_info)
+    rewrite_ctx.save_func_to_except_method_call(function, call_method_except)
 
     add_to_body.extend(imports)
     add_to_body.append(factory.Expr(call_method_except))
@@ -301,13 +331,19 @@ def _create_except_handler_ast(
     return except_handler
 
 
-def _create_after_method_ast(factory, class_name, function, filter_kind) -> ast.Expr:
+def _create_after_method_ast(
+    rewrite_ctx: _RewriteCtx, factory, class_name, function, filter_kind
+) -> ast.Expr:
     call = factory.Call()
     call.func = factory.NameLoadRewriteCallback("after_method")
+    log_method_type: LogElementType = "METHOD"
+    call.args.append(factory.Str(log_method_type))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
     call.args.append(factory.Str(f"{class_name}{function.name}"))
     call.args.append(factory.LineConstant())
+
+    rewrite_ctx.save_func_to_after_method_call(function, call)
 
     if filter_kind == FilterKind.log_on_project_call:
         return factory.AndExpr(factory.NameLoad("@caller_in_proj"), call)
@@ -315,14 +351,19 @@ def _create_after_method_ast(factory, class_name, function, filter_kind) -> ast.
         return factory.Expr(call)
 
 
-def _rewrite_funcdef(stack, node, filter_kind) -> None:
-    parent: Any
-    function: ast.FunctionDef = node
+def _accept_function_rewrite(function: ast.FunctionDef):
     if function.name.startswith("_") and function.name != "__init__":
-        return
+        return False
 
     if not function.body:
-        return
+        return False
+    return True
+
+
+def _rewrite_funcdef(
+    rewrite_ctx: _RewriteCtx, stack, function: ast.FunctionDef, filter_kind
+) -> None:
+    parent: Any
     # Only rewrite functions which actually have some content.
 
     class_name = ""
@@ -360,7 +401,7 @@ def _rewrite_funcdef(stack, node, filter_kind) -> None:
     )
 
     before_method_stmts = _create_before_method_ast(
-        factory, class_name, function, filter_kind
+        rewrite_ctx, factory, class_name, function, filter_kind
     )
 
     for stmt in reversed(before_method_stmts):
@@ -373,11 +414,18 @@ def _rewrite_funcdef(stack, node, filter_kind) -> None:
         function_body[-1].lineno, function_body[-1].col_offset
     )
 
-    after_expr = _create_after_method_ast(factory, class_name, function, filter_kind)
+    after_expr = _create_after_method_ast(
+        rewrite_ctx, factory, class_name, function, filter_kind
+    )
     try_finally.finalbody = [after_expr]
 
     except_handler = _create_except_handler_ast(
-        factory, class_name, function, function_body[-1].lineno, filter_kind
+        rewrite_ctx,
+        factory,
+        class_name,
+        function,
+        function_body[-1].lineno,
+        filter_kind,
     )
 
     handlers: List[ast.ExceptHandler] = [except_handler]
@@ -439,6 +487,7 @@ def rewrite_ast_add_callbacks(
     it: Any = _ast_utils.iter_and_replace_nodes(mod)
     node: Any
 
+    rewrite_ctx = _RewriteCtx()
     while True:
         try:
             stack, node = next(it)
@@ -447,7 +496,7 @@ def rewrite_ast_add_callbacks(
 
         handler = _dispatch.get(node.__class__)
         if handler:
-            result = handler(config, module_path, stack, filter_kind, node)
+            result = handler(rewrite_ctx, config, module_path, stack, filter_kind, node)
             if result is not None:
                 it.send(result)
 
@@ -457,21 +506,31 @@ def rewrite_ast_add_callbacks(
         print(ast.unparse(mod))  # type: ignore
 
 
-def _handle_funcdef(config, module_path, stack, filter_kind, node):
+def _handle_funcdef(
+    rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node
+):
     try:
-        _rewrite_funcdef(stack, node, filter_kind)
+        function: ast.FunctionDef = node
+        if not _accept_function_rewrite(function):
+            return
+
+        _rewrite_funcdef(rewrite_ctx, stack, node, filter_kind)
     except Exception:
         raise RuntimeError(
             f"Error when rewriting function: {node.name} line: {node.lineno} at: {module_path}"
         )
 
 
-def _handle_return(config, module_path, stack, filter_kind, node):
+def _handle_return(
+    rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node
+):
     func_and_class_name = _get_function_and_class_name(stack)
     if not func_and_class_name:
         return None
 
     function, class_name = func_and_class_name
+    if not _accept_function_rewrite(function):
+        return
 
     try:
         return _rewrite_return(function, class_name, node)
@@ -481,7 +540,9 @@ def _handle_return(config, module_path, stack, filter_kind, node):
         )
 
 
-def _handle_assign(config: BaseConfig, module_path, stack, filter_kind, node):
+def _handle_assign(
+    rewrite_ctx: _RewriteCtx, config: BaseConfig, module_path, stack, filter_kind, node
+):
     if filter_kind != FilterKind.full_log or not config.get_rewrite_assigns():
         return None
 
@@ -490,6 +551,8 @@ def _handle_assign(config: BaseConfig, module_path, stack, filter_kind, node):
         return None
 
     function, class_name = func_and_class_name
+    if not _accept_function_rewrite(function):
+        return
 
     try:
         return _rewrite_assign(function, class_name, node)
@@ -499,18 +562,32 @@ def _handle_assign(config: BaseConfig, module_path, stack, filter_kind, node):
         )
 
 
-def _handle_expr(config, module_path, stack, filter_kind, node: ast.Expr):
+def _handle_expr(
+    rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node: ast.Expr
+):
     if isinstance(node.value, ast.Yield):
-        if filter_kind != FilterKind.full_log:
-            return None
-
         func_and_class_name = _get_function_and_class_name(stack)
         if not func_and_class_name:
             return None
 
         function, class_name = func_and_class_name
+        if not _accept_function_rewrite(function):
+            return
 
         try:
+            before_call: ast.Call
+            for before_call in rewrite_ctx.iter_func_calls_from_func(function):
+                assert isinstance(before_call.args[0], ast.Str)
+                before_call_method_type: ast.Str = before_call.args[0]
+
+                log_method_type: LogElementType = "GENERATOR"
+                if filter_kind == FilterKind.log_on_project_call:
+                    log_method_type = "UNTRACKED_GENERATOR"
+                before_call_method_type.s = log_method_type
+
+            if filter_kind != FilterKind.full_log:
+                return None
+
             return _rewrite_yield(function, class_name, node)
         except Exception:
             raise RuntimeError(
@@ -519,7 +596,8 @@ def _handle_expr(config, module_path, stack, filter_kind, node: ast.Expr):
 
 
 _dispatch: Dict[
-    type, Callable[[BaseConfig, str, list, FilterKind, Any], Optional[list]]
+    type,
+    Callable[[_RewriteCtx, BaseConfig, str, list, FilterKind, Any], Optional[list]],
 ] = {}
 _dispatch[ast.Return] = _handle_return
 _dispatch[ast.Assign] = _handle_assign

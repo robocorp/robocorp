@@ -19,3 +19,12 @@ class Status:
     FAIL = "FAIL"
     INFO = "INFO"
     WARN = "WARN"
+
+
+# 'METHOD': means that we entered a regular method which should be added to the stack.
+# 'GENERATOR': means that we entered method which is actually a generator for which we'll
+#              track yield pause/resume so we should add it to the stack.
+# 'UNTRACKED_GENERATOR': A generator for which we'll not track pause and resume (thus
+#                        it should not be added to the stack, but we can signal that
+#                        it was created/finished).
+LogElementType = Literal["METHOD", "GENERATOR", "UNTRACKED_GENERATOR"]
