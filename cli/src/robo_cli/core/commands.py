@@ -15,7 +15,7 @@ class Task(TypedDict):
 
 def list_tasks(env: dict[str, str]) -> list[Task]:
     proc = Process(
-        ["python", "-m", "robo", "list", "tasks.py"],
+        ["python", "-m", "robocorp.tasks", "list", "tasks.py"],
         env=env,
     )
     stdout, _ = proc.run()
@@ -25,7 +25,7 @@ def list_tasks(env: dict[str, str]) -> list[Task]:
 
 def run_task(env: dict[str, str], taskname: str, on_event: Callable[[Event], None]):
     proc = Process(
-        ["python", "-m", "robo", "run", "tasks.py", "-t", taskname],
+        ["python", "-m", "robocorp.tasks", "run", "tasks.py", "-t", taskname],
         env=env,
     )
 

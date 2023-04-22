@@ -76,8 +76,8 @@ class Dev(object):
             version, os.path.join(".", "src", "robocorp", "robolog", "__init__.py")
         )
         logging_dir = Path(".").absolute()
-        core_poetry = logging_dir.parent / "core" / "pyproject.toml"
-        update_version(version, core_poetry, _fix_contents_version_in_poetry)
+        tasks_poetry = logging_dir.parent / "tasks" / "pyproject.toml"
+        update_version(version, tasks_poetry, _fix_contents_version_in_poetry)
 
     def get_tag(self):
         import subprocess

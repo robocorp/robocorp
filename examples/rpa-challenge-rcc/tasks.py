@@ -1,4 +1,4 @@
-from robo import task
+from robocorp.tasks import task
 
 from RPA.Browser.Selenium import Selenium
 from RPA.Excel.Files import Files

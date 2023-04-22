@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "libs-devdeps"
 version = "0.1.0"
-description = "Development dependencies for robo libraries. Shouldn't be published or installed on user machiines."
+description = "Development dependencies for robocorp libraries. Shouldn't be published or installed on user machines."
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",

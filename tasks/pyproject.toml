@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "robocorp-tasks"
+version = "0.1.4"
+description = "The automation framework for Python"
+authors = [
+	"Fabio Zadrozny <fabio@robocorp.com>",
+]
+readme = "README.md"
+packages = [{include = "robocorp/tasks", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+robocorp-robolog = "0.0.10"
+
+[tool.mypy]
+mypy_path = "src:tests"
+
+[[tool.mypy.overrides]]
+module = "setuptools.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytest_timeout.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytest_timeout.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "module_that_does_not_exist"
+ignore_missing_imports = true
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.255"
+mypy = "^1.1.1"
+pytest = "^7.2.2"
+pytest-xdist = "^3.2.1"
+pytest-regressions = "1.0.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

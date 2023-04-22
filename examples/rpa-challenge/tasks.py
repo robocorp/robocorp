@@ -1,7 +1,7 @@
 from pathlib import Path
 from time import sleep
 
-from robo import task
+from robocorp.tasks import task
 from robo.libs.http import download
 from robo.libs.browser import open_url
 from robo.libs.excel import open_workbook

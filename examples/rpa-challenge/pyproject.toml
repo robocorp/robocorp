@@ -4,7 +4,7 @@ description = "A simple example robot that solves the RPA Challenge"
 python = "3.9.13"
 
 [tool.robo.dependencies]
-robocorp-core="0.1.3"
+robocorp-tasks="0.1.3"
 robocorp-browser="0.1.0"
 robocorp-excel="0.1.0"
 robocorp-http="0.1.0"

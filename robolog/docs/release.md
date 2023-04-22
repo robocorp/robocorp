@@ -2,11 +2,7 @@
 Steps to do a new release
 ---------------------------
 
-- Open a shell at the proper place (something as `X:/robocorpws/draft-python-framework/robolog`)
-
-- Create release branch (`git branch -D release-robocorp-robolog&git checkout -b release-robocorp-robolog`)
-
-- When leaving pre-alpha: Update classifier in setup.py (currently in pre-alpha) and notes regarding being alpha in README.md.
+- Open a shell at the proper place (something as `X:/robocorpws/robo/robolog`)
 
 - Update version (`python -m dev set-version 0.0.10`).
 
@@ -14,14 +10,14 @@ Steps to do a new release
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
-- Push contents, and check if tests passed in https://github.com/robocorp/robotframework-lsp/actions.
+- Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
   - `mu acp robocorp-robolog release 0.0.10`
-
-- Rebase with master (`git checkout master&git rebase release-robocorp-robolog`).
 
 - Create a tag (`git tag robocorp-robolog-0.0.10`) and push it.
 
-- After published in PyPi, head over to the core module and run: `poetry lock` (then a new core release may be done).
+- After published in PyPi, head over to the tasks module and run: `poetry lock` (then a new tasks release may be done).
+
+- Rebase with master (`git checkout master&git rebase release-robocorp-robolog`).
 
 - Send release msg. i.e.:
 
