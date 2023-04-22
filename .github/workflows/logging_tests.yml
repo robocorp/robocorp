@@ -3,18 +3,18 @@ name: Logging Tests
 on:
   push:
     paths:
-      - "logging/**"
+      - "robolog/**"
       - ".github/workflows/logging_tests.yml"
   pull_request:
     branches:
       - "master"
     paths:
-      - "logging/**"
+      - "robolog/**"
       - ".github/workflows/logging_tests.yml"
       
 defaults:
   run:
-    working-directory: './logging'
+    working-directory: './robolog'
     
 jobs:
   build:
@@ -67,13 +67,13 @@ jobs:
       
     - name: Build output view
       if: contains(matrix.name, '-outviewintegrationtests')
-      working-directory: ./logging/output-webview
+      working-directory: ./robolog/output-webview
       run: |
         yarn install
         yarn build-test
 
     - name: Test
-      working-directory: ./logging/tests
+      working-directory: ./robolog/tests
       env:
         PYTHONPATH: .
         RUN_TESTS_TIMEOUT: 10000
@@ -84,5 +84,5 @@ jobs:
       if: always() && contains(matrix.name, '-outviewintegrationtests')
       with:
         name: robotlog.${{ matrix.name }}.html
-        path: logging/output-webview/tests/output/log.html
+        path: robolog/output-webview/tests/output/log.html
 

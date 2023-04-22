@@ -15,7 +15,7 @@ MULTI_BLOCK_COMMENT_CHAR: =
 MULTI_BLOCK_COMMENT_SHOW_ONLY_CLASS_NAME: true
 MULTI_BLOCK_COMMENT_SHOW_ONLY_FUNCTION_NAME: true
 MYPY_ADD_PROJECT_FOLDERS_TO_MYPYPATH: true
-MYPY_ARGS: --follow-imports=silent --show-column-numbers
+MYPY_ARGS: --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases
 MYPY_FILE_LOCATION: ''
 MYPY_USE_CONSOLE: true
 PYDEV_TEST_RUNNER: '2'

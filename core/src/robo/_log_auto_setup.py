@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Optional, List, Any
 
 from ._protocols import ITask
-import robo_log
+from robocorp import robolog
 
 
-def read_filters_from_pyproject_toml(context, path: Path) -> robo_log.BaseConfig:
-    filters: List[robo_log.Filter] = []
+def read_filters_from_pyproject_toml(context, path: Path) -> robolog.BaseConfig:
+    filters: List[robolog.Filter] = []
 
     while True:
         pyproject = path / "pyproject.toml"
@@ -20,7 +20,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> robo_log.BaseConfig
         parent = path.parent
         if parent == path or not parent:
             # Couldn't find pyproject.toml
-            return robo_log.ConfigFilesFiltering()
+            return robolog.ConfigFilesFiltering()
         path = parent
 
     try:
@@ -98,20 +98,20 @@ def read_filters_from_pyproject_toml(context, path: Path) -> robo_log.BaseConfig
                 )
                 continue
 
-            f: Optional[robo_log.FilterKind] = getattr(robo_log.FilterKind, kind, None)
+            f: Optional[robolog.FilterKind] = getattr(robolog.FilterKind, kind, None)
             if f is None:
                 context.show_error(
                     f"Rule from 'tool.robo.log.log_filter_rules' has invalid 'kind': >>{kind}<< in {pyproject}."
                 )
                 continue
 
-            filters.append(robo_log.Filter(name, f))
+            filters.append(robolog.Filter(name, f))
 
-    return robo_log.ConfigFilesFiltering(filters=filters)
+    return robolog.ConfigFilesFiltering(filters=filters)
 
 
 def _log_before_task_run(task: ITask):
-    robo_log.start_task(
+    robolog.start_task(
         task.name,
         task.module_name,
         task.filename,
@@ -122,22 +122,22 @@ def _log_before_task_run(task: ITask):
 
 def _log_after_task_run(task: ITask):
     status = task.status
-    robo_log.end_task(task.name, task.module_name, status, task.message)
+    robolog.end_task(task.name, task.module_name, status, task.message)
 
 
 @contextmanager
-def setup_cli_auto_logging(config: Optional[robo_log.BaseConfig]):
+def setup_cli_auto_logging(config: Optional[robolog.BaseConfig]):
     # This needs to be called before importing code which needs to show in the log
     # (user or library).
 
     from robo._hooks import before_task_run
     from robo._hooks import after_task_run
 
-    with robo_log.setup_auto_logging(config):
+    with robolog.setup_auto_logging(config):
         with before_task_run.register(_log_before_task_run), after_task_run.register(
             _log_after_task_run
         ):
             try:
                 yield
             finally:
-                robo_log.close_log_outputs()
+                robolog.close_log_outputs()

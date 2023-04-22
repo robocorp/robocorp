@@ -12,11 +12,11 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
     env.pop("VIRTUAL_ENV", "")
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUNBUFFERED"] = "1"
-    subprocess.check_call([str(rcc_loc)] + "task run".split(), cwd=cwd, env=env)
+    subprocess.check_call([str(rcc_loc)] + "task run --trace".split(), cwd=cwd, env=env)
 
 
 def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
-    from robo_log import verify_log_messages_from_log_html
+    from robocorp.robolog import verify_log_messages_from_log_html
 
     matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
     if matrix_name:

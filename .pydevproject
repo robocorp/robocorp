@@ -7,8 +7,8 @@
         <path>/${PROJECT_DIR_NAME}/cli/tests</path>
         <path>/${PROJECT_DIR_NAME}/core/src</path>
         <path>/${PROJECT_DIR_NAME}/core/tests</path>
-        <path>/${PROJECT_DIR_NAME}/logging/src</path>
-        <path>/${PROJECT_DIR_NAME}/logging/tests</path>
+        <path>/${PROJECT_DIR_NAME}/robolog/src</path>
+        <path>/${PROJECT_DIR_NAME}/robolog/tests</path>
         <path>/${PROJECT_DIR_NAME}/examples/rpa-challenge-rcc</path>
     </pydev_pathproperty>
 </pydev_project>

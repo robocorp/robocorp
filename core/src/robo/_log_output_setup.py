@@ -12,11 +12,11 @@ def setup_log_output(
     max_files: int = 5,
     log_name: str = "log.html",
 ):
-    import robo_log
+    from robocorp import robolog
 
     # This can be called after user code is imported (but still prior to its
     # execution).
-    return robo_log.add_log_output(
+    return robolog.add_log_output(
         output_dir=output_dir,
         max_file_size=max_file_size,
         max_files=max_files,
@@ -26,7 +26,7 @@ def setup_log_output(
 
 @contextmanager
 def setup_stdout_logging():
-    import robo_log
+    from robocorp import robolog
     import threading
 
     if os.environ.get("RC_LOG_OUTPUT_STDOUT", "").lower() in ("1", "t", "true"):
@@ -36,7 +36,7 @@ def setup_stdout_logging():
         # TODO: provide messages given to stdout as expected messages in the output?
         sys.stdout = sys.stderr
 
-        from robo_log._decoder import Decoder
+        from robocorp.robolog._decoder import Decoder
 
         decoder = Decoder()
 
@@ -72,7 +72,7 @@ def setup_stdout_logging():
         def write(msg):
             q.put(msg)
 
-        with robo_log.add_in_memory_log_output(write):
+        with robolog.add_in_memory_log_output(write):
             try:
                 yield
             finally:

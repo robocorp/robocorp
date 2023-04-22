@@ -3,13 +3,13 @@ name: Logging Release
 on:
   push:
 #     branches:
-#       - "release-robocorp-logging"
+#       - "release-robocorp-robolog"
     tags:
-      - "robocorp-logging-*"
+      - "robocorp-robolog-*"
 
 defaults:
   run:
-    working-directory: './logging'
+    working-directory: './robolog'
 
 jobs:
   deploy:
@@ -50,5 +50,5 @@ jobs:
       
     - name: Upload to PyPI
       run: |
-        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_LOGGING }}
+        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_ROBOLOG }}
         poetry publish
