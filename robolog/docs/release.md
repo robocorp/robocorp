@@ -8,18 +8,18 @@ Steps to do a new release
 
 - When leaving pre-alpha: Update classifier in setup.py (currently in pre-alpha) and notes regarding being alpha in README.md.
 
-- Update version (`python -m dev set-version 0.0.9`).
+- Update version (`python -m dev set-version 0.0.10`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-robolog`).
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
 - Push contents, and check if tests passed in https://github.com/robocorp/robotframework-lsp/actions.
-  - `mu acp robocorp-robolog release 0.0.9`
+  - `mu acp robocorp-robolog release 0.0.10`
 
 - Rebase with master (`git checkout master&git rebase release-robocorp-robolog`).
 
-- Create a tag (`git tag robocorp-robolog-0.0.9`) and push it.
+- Create a tag (`git tag robocorp-robolog-0.0.10`) and push it.
 
 - After published in PyPi, head over to the core module and run: `poetry lock` (then a new core release may be done).
 
@@ -27,7 +27,7 @@ Steps to do a new release
 
 Hi @channel,
 
-I'm happy to announce the release of `Robocorp Logging 0.0.9`.
+I'm happy to announce the release of `Robocorp Logging 0.0.10`.
 
 *## Changes*
 
