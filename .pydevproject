@@ -11,8 +11,8 @@
         <path>/${PROJECT_DIR_NAME}/cli/tests</path>
         <path>/${PROJECT_DIR_NAME}/tasks/src</path>
         <path>/${PROJECT_DIR_NAME}/tasks/tests</path>
-        <path>/${PROJECT_DIR_NAME}/robolog/src</path>
-        <path>/${PROJECT_DIR_NAME}/robolog/tests</path>
+        <path>/${PROJECT_DIR_NAME}/log/src</path>
+        <path>/${PROJECT_DIR_NAME}/log/tests</path>
         <path>/${PROJECT_DIR_NAME}/examples/rpa-challenge-rcc</path>
     </pydev_pathproperty>
     

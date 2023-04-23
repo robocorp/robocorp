@@ -1,4 +1,4 @@
-[tool.robocorp.robolog]
+[tool.robocorp.log]
 # It's possible to customize what's logged or not through log filter rules.
 #
 # Note: by default all files which are in the python "Lib" or "site-packages"

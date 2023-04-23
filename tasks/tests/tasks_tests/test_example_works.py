@@ -16,7 +16,7 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
 
 
 def test_rpa_challenge_works(rcc_loc: Path, examples_dir: Path):
-    from robocorp.robolog import verify_log_messages_from_log_html
+    from robocorp.log import verify_log_messages_from_log_html
 
     matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
     if matrix_name:

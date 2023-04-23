@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Optional, List, Any
 
 from ._protocols import ITask
-from robocorp import robolog
+from robocorp import log
 
 
-def read_filters_from_pyproject_toml(context, path: Path) -> robolog.BaseConfig:
-    filters: List[robolog.Filter] = []
+def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
+    filters: List[log.Filter] = []
 
     while True:
         pyproject = path / "pyproject.toml"
@@ -20,7 +20,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> robolog.BaseConfig:
         parent = path.parent
         if parent == path or not parent:
             # Couldn't find pyproject.toml
-            return robolog.ConfigFilesFiltering()
+            return log.ConfigFilesFiltering()
         path = parent
 
     try:
@@ -44,7 +44,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> robolog.BaseConfig:
     # Filter("SeleniumLibrary", FilterKind.log_on_project_call),
 
     read_parts: List[str] = []
-    for part in "tool.robocorp.robolog".split("."):
+    for part in "tool.robocorp.log".split("."):
         read_parts.append(part)
 
         obj = obj.get(part)
@@ -76,42 +76,42 @@ def read_filters_from_pyproject_toml(context, path: Path) -> robolog.BaseConfig:
             kind = rule.get("kind")
             if not name:
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.robolog.log_filter_rules' to have a 'name' in {pyproject}."
+                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have a 'name' in {pyproject}."
                 )
                 continue
 
             if not kind:
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.robolog.log_filter_rules' to have a 'kind' in {pyproject}."
+                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have a 'kind' in {pyproject}."
                 )
                 continue
 
             if not isinstance(name, str):
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.robolog.log_filter_rules' to have 'name' as a str in {pyproject}."
+                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have 'name' as a str in {pyproject}."
                 )
                 continue
 
             if not isinstance(kind, str):
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.robolog.log_filter_rules' to have 'kind' as a str in {pyproject}."
+                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have 'kind' as a str in {pyproject}."
                 )
                 continue
 
-            f: Optional[robolog.FilterKind] = getattr(robolog.FilterKind, kind, None)
+            f: Optional[log.FilterKind] = getattr(log.FilterKind, kind, None)
             if f is None:
                 context.show_error(
-                    f"Rule from 'tool.robocorp.robolog.log_filter_rules' has invalid 'kind': >>{kind}<< in {pyproject}."
+                    f"Rule from 'tool.robocorp.log.log_filter_rules' has invalid 'kind': >>{kind}<< in {pyproject}."
                 )
                 continue
 
-            filters.append(robolog.Filter(name, f))
+            filters.append(log.Filter(name, f))
 
-    return robolog.ConfigFilesFiltering(filters=filters)
+    return log.ConfigFilesFiltering(filters=filters)
 
 
 def _log_before_task_run(task: ITask):
-    robolog.start_task(
+    log.start_task(
         task.name,
         task.module_name,
         task.filename,
@@ -122,22 +122,22 @@ def _log_before_task_run(task: ITask):
 
 def _log_after_task_run(task: ITask):
     status = task.status
-    robolog.end_task(task.name, task.module_name, status, task.message)
+    log.end_task(task.name, task.module_name, status, task.message)
 
 
 @contextmanager
-def setup_cli_auto_logging(config: Optional[robolog.BaseConfig]):
+def setup_cli_auto_logging(config: Optional[log.BaseConfig]):
     # This needs to be called before importing code which needs to show in the log
     # (user or library).
 
     from robocorp.tasks._hooks import before_task_run
     from robocorp.tasks._hooks import after_task_run
 
-    with robolog.setup_auto_logging(config):
+    with log.setup_auto_logging(config):
         with before_task_run.register(_log_before_task_run), after_task_run.register(
             _log_after_task_run
         ):
             try:
                 yield
             finally:
-                robolog.close_log_outputs()
+                log.close_log_outputs()

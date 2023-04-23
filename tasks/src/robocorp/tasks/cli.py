@@ -93,7 +93,7 @@ def run(
     from ._log_output_setup import setup_log_output, setup_stdout_logging
 
     # Don't show internal machinery on tracebacks:
-    # setting __tracebackhide__ will make it so that robocorp-robolog
+    # setting __tracebackhide__ will make it so that robocorp-log
     # won't show this frame onwards in the logging.
     __tracebackhide__ = 1
 
@@ -103,7 +103,7 @@ def run(
         context.show_error(f"Path: {path} does not exist")
         return 1
 
-    from robocorp import robolog
+    from robocorp import log
 
     config = read_filters_from_pyproject_toml(context, p)
 
@@ -120,10 +120,10 @@ def run(
         setup_message = ""
 
         run_name = f"{os.path.basename(path)} - {task_name}"
-        robolog.start_run(run_name)
+        log.start_run(run_name)
 
         try:
-            robolog.start_task("Collect tasks", "setup", "", 0, [])
+            log.start_task("Collect tasks", "setup", "", 0, [])
             try:
                 if not task_name:
                     context.show(f"\nCollecting tasks from: {path}")
@@ -141,7 +141,7 @@ def run(
             except Exception as e:
                 run_status = "ERROR"
                 setup_message = str(e)
-                robolog.exception()
+                log.exception()
 
                 if not isinstance(e, RoboCollectError):
                     traceback.print_exc()
@@ -150,7 +150,7 @@ def run(
 
                 return 1
             finally:
-                robolog.end_task("Collect tasks", "setup", run_status, setup_message)
+                log.end_task("Collect tasks", "setup", run_status, setup_message)
 
             for task in tasks:
                 before_task_run(task)
@@ -168,7 +168,7 @@ def run(
 
             raise AssertionError("Should never get here.")
         finally:
-            robolog.end_run(run_name, run_status)
+            log.end_run(run_name, run_status)
 
 
 def main(args=None, exit: bool = True) -> int:

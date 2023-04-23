@@ -4,14 +4,14 @@ on:
   push:
     paths:
       - "tasks/**"
-      - "robolog/**"
+      - "log/**"
       - ".github/workflows/tasks_tests.yml"
   pull_request:
     branches:
       - "master"
     paths:
       - "tasks/**"
-      - "robolog/**"
+      - "log/**"
       - ".github/workflows/tasks_tests.yml"
 
 defaults:
@@ -58,26 +58,26 @@ jobs:
     - name: Install project
       run: poetry install
       
-    # Uncomment setup below to use the dev version of robocorp-robolog.    
-    - name: Print robocorp-robolog info and build the output view.
+    # Uncomment setup below to use the dev version of robocorp-log.    
+    - name: Print robocorp-log info and build the output view.
       if: contains(matrix.name, '-logindev')
       env:
-        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../robolog/src
+        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../log/src
       run: |
         python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
-        python -c "from robocorp import robolog;print(robolog.__file__)"
-        cd ../robolog
+        python -c "from robocorp import log;print(log.__file__)"
+        cd ../log
         pip install fire
         python -m dev build-output-view
 
     - name: Test (dev)
       if: contains(matrix.name, '-logindev')
       env:
-        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../robolog/src
+        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../log/src
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
       run: poetry run pytest -rfE -vv tests/tasks_tests
 
-    - name: Test (robolog from pypi)
+    - name: Test (log from pypi)
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
       if: contains(matrix.name, '-logindev') == false

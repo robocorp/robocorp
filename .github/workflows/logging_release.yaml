@@ -3,13 +3,13 @@ name: Logging Release
 on:
   push:
 #     branches:
-#       - "release-robocorp-robolog"
+#       - "release-robocorp-log"
     tags:
-      - "robocorp-robolog-*"
+      - "robocorp-log-*"
 
 defaults:
   run:
-    working-directory: './robolog'
+    working-directory: './log'
 
 jobs:
   deploy:

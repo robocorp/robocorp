@@ -2,7 +2,7 @@ from tasks_tests.fixtures import robo_run
 
 
 def test_core_log_integration_error_in_import(datadir):
-    from robocorp.robolog import verify_log_messages_from_log_html
+    from robocorp.log import verify_log_messages_from_log_html
 
     result = robo_run(
         ["run", "main_with_error_in_import.py"], returncode=1, cwd=str(datadir)
@@ -49,7 +49,7 @@ def test_core_log_integration_error_in_import(datadir):
 
 
 def test_core_log_integration_config_log(datadir):
-    from robocorp.robolog import verify_log_messages_from_log_html
+    from robocorp.log import verify_log_messages_from_log_html
 
     result = robo_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
 

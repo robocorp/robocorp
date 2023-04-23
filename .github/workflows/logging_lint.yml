@@ -3,18 +3,18 @@ name: Logging Lint
 on:
   push:
     paths:
-      - "robolog/**"
+      - "log/**"
       - ".github/workflows/logging_lint.yml"
   pull_request:
     branches:
       - "master"
     paths:
-      - "robolog/**"
+      - "log/**"
       - ".github/workflows/logging_lint.yml"
       
 defaults:
   run:
-    working-directory: './robolog'
+    working-directory: './log'
 
 jobs:
   run-linters:
@@ -47,14 +47,14 @@ jobs:
           npm install -g prettier@2.4.1
           
       - name: TS Format (yarn prettier --write **/*.ts to format files locally)
-        working-directory: ./robolog/output-webview/
+        working-directory: ./log/output-webview/
         run: prettier --check **/*.ts
         
       - name: Black check
         run: |
           poetry run black --check src tests --exclude="_index\.py|_index_v2\.py"
           
-      - name: mypy robocorp-robolog
+      - name: mypy robocorp-log
         run: |
           poetry run mypy --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases src tests
           

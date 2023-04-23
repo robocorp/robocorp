@@ -1,16 +1,13 @@
 [tool.poetry]
-name = "robocorp-tasks"
-version = "0.1.4"
-description = "The automation framework for Python"
+name = "robocorp-log"
+version = "0.0.10"
+description = "Automatic trace logging for Python"
 authors = [
-	"Fabio Zadrozny <fabio@robocorp.com>",
+    "Fabio Zadrozny <fabio@robocorp.com>",
 ]
 readme = "README.md"
-packages = [{include = "robocorp/tasks", from = "src"}]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-robocorp-log = "0.0.10"
+packages = [{include = "robocorp/log", from = "src"}]
+include = ["**/_index.py", "**/_index_v2.py"]
 
 [tool.mypy]
 mypy_path = "src:tests"
@@ -27,18 +24,19 @@ ignore_missing_imports = true
 module = "pytest_timeout.*"
 ignore_missing_imports = true
 
-[[tool.mypy.overrides]]
-module = "module_that_does_not_exist"
-ignore_missing_imports = true
+[tool.poetry.dependencies]
+python = "^3.9"
+tomli = { version = "^2.0.1", python = "<3.11" }
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
-ruff = "^0.0.255"
 mypy = "^1.1.1"
 pytest = "^7.2.2"
 pytest-xdist = "^3.2.1"
 pytest-regressions = "1.0.6"
+fire = "^0.5.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
