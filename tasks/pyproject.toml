@@ -10,7 +10,7 @@ packages = [{include = "robocorp/tasks", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-log = "0.0.10"
+robocorp-log = "0.0.11"
 
 [tool.mypy]
 mypy_path = "src:tests"

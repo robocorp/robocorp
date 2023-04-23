@@ -50,5 +50,5 @@ jobs:
       
     - name: Upload to PyPI
       run: |
-        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_ROBOLOG }}
+        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_LOG }}
         poetry publish

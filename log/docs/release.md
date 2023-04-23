@@ -4,16 +4,16 @@ Steps to do a new release
 
 - Open a shell at the proper place (something as `X:/robocorpws/robo/log`)
 
-- Update version (`python -m dev set-version 0.0.10`).
+- Update version (`python -m dev set-version 0.0.11`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-log`).
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
 - Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
-  - `mu acp robocorp-log release 0.0.10`
+  - `mu acp robocorp-log release 0.0.11`
 
-- Create a tag (`git tag robocorp-log-0.0.10`) and push it.
+- Create a tag (`git tag robocorp-log-0.0.11`) and push it.
 
 - After published in PyPi, head over to the tasks module and run: `poetry lock` (then a new tasks release may be done).
 
@@ -23,7 +23,7 @@ Steps to do a new release
 
 Hi @channel,
 
-I'm happy to announce the release of `Robocorp Logging 0.0.10`.
+I'm happy to announce the release of `Robocorp Logging 0.0.11`.
 
 *## Changes*
 
