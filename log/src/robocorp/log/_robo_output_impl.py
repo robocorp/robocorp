@@ -423,7 +423,6 @@ class _RoboOutputImpl:
         source: str,
         line: int,
         time_delta: float,
-        tags: Sequence[str],
     ):
         oid = self._obtain_id
         task_id = f"{libname}.{name}"
@@ -438,19 +437,6 @@ class _RoboOutputImpl:
                     self._number(time_delta),
                 ],
             )
-
-            if tags:
-                for tag in tags:
-                    self.send_tag(tag)
-
-    def send_tag(self, tag: str):
-        oid = self._obtain_id
-        self._write_with_separator(
-            "TG ",
-            [
-                oid(tag),
-            ],
-        )
 
     def send_info(self, info: str):
         self._write_json("I ", info)

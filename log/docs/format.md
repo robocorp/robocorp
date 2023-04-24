@@ -174,14 +174,10 @@ Basic message types are:
     
     `EA f|g|h`
 
-### AS: Assign the result of some element (such as a method) to a variable.
+### AS: Assign some content to a variable.
 
-    Spec: `assign:oid`
+    Spec: `source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float`
     
-    Example:
-    
-    `AS f`
-
 ### EE: End Element
 
     Spec: `type:oid, status:oid, time_delta_in_seconds:float`
@@ -215,19 +211,10 @@ Basic message types are:
     
     In which case the img would be embedded as an image in the final log.html.
 
-### S: Specify the start time (of the containing suite/test/task/keyword)
+### S: Specify the start time (of the containing run/task/element)
 
     Spec: `start_time_delta:float`
     
     Example:
     
     `S 2.456`
-
-### TG: Apply tag
-
-    Spec: `tag:oid`
-    
-    Example:
-    
-    `TG a`
-

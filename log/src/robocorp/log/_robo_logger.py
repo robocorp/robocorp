@@ -141,24 +141,14 @@ class _RoboLogger:
         return self._robot_output_impl.end_run(name, status, self._get_time_delta())
 
     @_log_error
-    def start_task(
-        self, name: str, libname: str, source: str, lineno: int, tags: Sequence[str]
-    ):
+    def start_task(self, name: str, libname: str, source: str, lineno: int):
         return self._robot_output_impl.start_task(
             name,
             libname,
             source,
             lineno,
             self._get_time_delta(),
-            tags,
         )
-
-    @_log_error
-    def send_tag(self, tag: str):
-        if self._skip_log_methods:
-            return
-
-        return self._robot_output_impl.send_tag(tag)
 
     @_log_error
     def send_info(self, info: str):
@@ -205,20 +195,11 @@ class _RoboLogger:
             args=[("force", "boolean", "True")],
         )
         """
-        hide_from_logs = False
-        if self._skip_log_methods:
-            if name not in (
-                "stop_logging_methods",
-                "start_logging_methods",
-            ):
-                hide_from_logs = True
+        hide_from_logs = bool(self._skip_log_methods)
 
         if args:
             if self._skip_log_variables:
                 args = []
-
-            elif name == "hide_from_output":
-                args = [(name, tp, "<redacted>") for name, tp, _value in args]
 
         return self._robot_output_impl.start_element(
             name,
@@ -239,10 +220,7 @@ class _RoboLogger:
         source: str,
         lineno: int,
     ):
-        hide_from_logs = False
-
-        if self._skip_log_methods:
-            hide_from_logs = True
+        hide_from_logs = bool(self._skip_log_methods)
 
         return self._robot_output_impl.yield_resume(
             name,
@@ -304,18 +282,10 @@ class _RoboLogger:
         name: str,
         libname: str,
         status: str,
-        tags: Sequence[str],
     ):
-        try:
-            return self._robot_output_impl.end_method(
-                element_type, name, libname, status, self._get_time_delta()
-            )
-        finally:
-            if tags:
-                if "log:ignore-methods" in tags:
-                    self._skip_log_methods -= 1
-                if "log:ignore-variables" in tags:
-                    self._skip_log_variables -= 1
+        return self._robot_output_impl.end_method(
+            element_type, name, libname, status, self._get_time_delta()
+        )
 
     @_log_error
     def log_message(

@@ -20,9 +20,13 @@ from typing import (
     Union,
     Iterable,
     Literal,
+    overload,
+    Callable,
+    Protocol,
 )
 from ._logger_instances import _get_logger_instances
 from .protocols import OptExcInfo, LogHTMLStyle, Status, IReadLines
+from ._suppress_helper import SuppressHelper as _SuppressHelper
 
 
 if typing.TYPE_CHECKING:
@@ -31,8 +35,14 @@ if typing.TYPE_CHECKING:
 __version__ = "0.0.11"
 version_info = [int(x) for x in __version__.split(".")]
 
+from . import _config
+
 # --- Make these a part of the public API.
-from ._config import Filter, FilterKind, BaseConfig, ConfigFilesFiltering
+
+Filter = _config.Filter
+FilterKind = _config.FilterKind
+BaseConfig = _config.BaseConfig
+ConfigFilesFiltering = _config.ConfigFilesFiltering
 
 
 # --- Logging methods for custom messaging.
@@ -100,67 +110,182 @@ def exception(message: Optional[str] = None, html: bool = False):
 
 
 @contextmanager
-def stop_logging_methods():
-    """
-    Can be used so that method calls are no longer logged.
-
-    i.e.:
-        with stop_logging_methods():
-            ...
-    """
-    for robo_logger in _get_logger_instances():
-        robo_logger.stop_logging_methods()
-    try:
-        yield
-    finally:
-        start_logging_methods()
-
-
-def start_logging_methods():
-    """
-    Usually doesn't need to be called as `stop_logging_methods` should be used
-    as a context manager (which would automatically call this method).
-
-    Can still be used if `stop_logging_methods` with a try..finally if
-    `stop_logging_methods` isn't used as a context manager.
-    """
-    for robo_logger in _get_logger_instances():
-        robo_logger.start_logging_methods()
-
-
-@contextmanager
-def stop_logging_variables():
-    """
-    Can be used (as a context manager) so that variables are no longer logged.
-
-    i.e.:
-        with stop_logging_variables():
-            ...
-    """
-    for robo_logger in _get_logger_instances():
-        robo_logger.stop_logging_variables()
+def _suppress_contextmanager(variables=True, methods=True):
+    instances = _get_logger_instances()
+    for robo_logger in instances:
+        if variables:
+            robo_logger.stop_logging_variables()
+        if methods:
+            robo_logger.stop_logging_methods()
 
     try:
         yield
     finally:
-        start_logging_variables()
+        for robo_logger in instances:
+            if variables:
+                robo_logger.start_logging_variables()
+            if methods:
+                robo_logger.start_logging_methods()
 
 
-def start_logging_variables():
+_suppress_helper = _SuppressHelper(_suppress_contextmanager)
+
+
+def suppress_methods():
     """
-    Usually doesn't need to be called as `stop_logging_variables` should be used
-    as a context manager (which would automatically call this method).
+    Can be used as a context manager or decorator so that methods are no
+    longer logged.
 
-    Can still be used if `stop_logging_variables` with a try..finally if
-    `stop_logging_variables` isn't used as a context manager.
+    i.e.:
+        @suppress_methods
+        def method():
+            ...
+
+        or
+
+        with suppress_methods():
+            ...
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.start_logging_variables()
+    return suppress(variables=False, methods=True)
+
+
+def suppress_variables():
+    """
+    Can be used as a context manager or decorator so that variables are no
+    longer logged.
+
+    i.e.:
+        @suppress_variables
+        def method():
+            ...
+
+        or
+
+        with suppress_variables():
+            ...
+    """
+    return suppress(variables=True, methods=False)
+
+
+class _AnyCall(Protocol):
+    def __call__(self, *args, **kwargs) -> Any:
+        pass
+
+
+@overload
+def suppress(*, variables: bool = True, methods: bool = True) -> _AnyCall:
+    """
+    Arguments when used as a decorator or context manager with parameters.
+
+    Suppresses everything except the arguments marked as "False"
+    """
+
+
+@overload
+def suppress(func: Callable[[], Any]) -> _AnyCall:
+    """
+    Arguments when used as a decorator without any arguments (where it just
+    receives a function).
+    """
+
+
+def suppress(*args, **kwargs):
+    """
+    API to suppress logging to be used as a context manager or decorator.
+
+    By default suppresses everything and its actual API is something as:
+
+    def suppress(variables:bool = True, methods:bool = True):
+        ...
+
+    Args:
+        variables: Whether variables should be suppressed in the scope.
+
+        methods: Whether method calls should be suppressed in the scope.
+
+    Usage as a decorator:
+
+        from robocorp import log
+
+        @log.suppress
+        def func():
+            ....
+
+    Usage as a decorator suppressing only variables:
+
+        from robocorp import log
+
+        @log.suppress(methods=False)
+        def func():
+            ....
+
+    Usage as a context manager:
+
+        from robocorp import log
+
+        with log.suppress(methods=False):
+            ....
+    """
+    return _suppress_helper.handle(*args, **kwargs)
+
+
+from ._sensitive_variable_names import (
+    SensitiveVariableNames as _SensitiveVariableNames,
+)
+
+_sensitive_names = _SensitiveVariableNames(("password", "passwd"))
+
+
+def is_sensitive_variable_name(variable_name: str) -> bool:
+    """
+    Args:
+        variable_name: The variable name to be checked.
+
+    Returns:
+        True if the given variable name is considered to be sensitive (in which
+        case its value should be redacted) and False otherwise.
+    """
+    return _sensitive_names.is_sensitive_variable_name(variable_name)
+
+
+def add_sensitive_variable_name(variable_name: str) -> None:
+    """
+    Marks a given variable name as sensitive (in which case any variable
+    containing the given `variable_name` will be redacted).
+
+    Note that this will add a patterns where any variable containing the given
+    variable name even as a substring will be considered sensitive.
+
+    Args:
+        variable_name: The variable name to be considered sensitive.
+    """
+    _sensitive_names.add_sensitive_variable_name(variable_name)
+
+
+def add_sensitive_variable_name_pattern(variable_name_pattern: str) -> None:
+    """
+    Adds a given pattern to consider a variable name as sensitive. Any variable
+    name matching the given pattern will have its value redacted.
+
+    Args:
+        variable_name_pattern: The variable name pattern to be considered
+        sensitive.
+    """
+    _sensitive_names.add_sensitive_variable_name_pattern(variable_name_pattern)
 
 
 def hide_from_output(string_to_hide: str) -> None:
     """
     Should be called to hide sensitive information from appearing in the output.
+
+    Note that any variable assign or argument which is set to a name containing
+    the string:
+
+    'password' or 'passwd'
+
+    Will be automatically hidden and it's also possible to add new names to
+    be automatically redacted withe the methods: `add_sensitive_variable_name`
+    and `add_sensitive_variable_name_pattern`.
 
     Args:
         string_to_hide: The string that should be hidden from the output.
@@ -173,32 +298,73 @@ def hide_from_output(string_to_hide: str) -> None:
 
 
 def start_run(name: str) -> None:
+    """
+    Starts a run session (adds the related event to the log).
+
+    Args:
+        name: The name of the run.
+
+    Note: robocorp-tasks calls this method automatically.
+    """
     for robo_logger in _get_logger_instances():
         robo_logger.start_run(name)
 
 
 def end_run(name: str, status: str) -> None:
+    """
+    Finishes a run session (adds the related event to the log).
+
+    Args:
+        name: The name of the run.
+        status: The run status.
+
+    Note: robocorp-tasks calls this method automatically.
+    """
     for robo_logger in _get_logger_instances():
         robo_logger.end_run(name, status)
 
 
-def start_task(
-    name: str, libname: str, source: str, lineno: int, tags: Sequence[str]
-) -> None:
+def start_task(name: str, libname: str, source: str, lineno: int) -> None:
+    """
+    Starts a task (adds the related event to the log).
+
+    Args:
+        name: The name of the task.
+        libname: The library (module name) where the task is defined.
+        source: The source of the task.
+        lineno: The line number of the task in the given source.
+
+    Note: robocorp-tasks calls this method automatically.
+    """
     for robo_logger in _get_logger_instances():
-        robo_logger.start_task(name, libname, source, lineno, tags)
+        robo_logger.start_task(name, libname, source, lineno)
 
 
 def end_task(name: str, libname: str, status: str, message: str) -> None:
+    """
+    Ends a task (adds the related event to the log).
+
+    Args:
+        name: The name of the task.
+        libname: The library (module name) where the task is defined.
+        status: The source of the task.
+        message: The line number of the task in the given source.
+
+    Note: robocorp-tasks calls this method automatically.
+    """
     for robo_logger in _get_logger_instances():
         robo_logger.end_task(name, libname, status, message)
+
+
+# ---- APIs to decode existing log files
 
 
 def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
     """
     Args:
         stream: The stream which should be iterated in (anything with a
-            `readlines()` method).
+            `readlines()` method which should provide the messages encoded
+            in the internal format).
 
     Returns:
         An iterator which will decode the messages and provides a dictionary for
@@ -210,7 +376,10 @@ def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
         {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
         {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
-        {'message_type': 'ST', 'name': 'My task', 'libname': 'foo', 'source': 'x:\\vscode-robot\\local_test\\robot_check', 'lineno': 5, 'time_delta_in_seconds': 0.2}
+        ...
+
+        Note: the exact format of the messages provided is not stable across
+        releases.
     """
     from ._decoder import iter_decoded_log_format
 
@@ -219,8 +388,8 @@ def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
 
 def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
     """
-    This function will read the chunks saved in the log html and provide
-    an iterator which will provide the messages which were encoded into it.
+    This function will read the data saved in the log html and provide an
+    iterator which will provide the decoded messages which were encoded into it.
 
     Returns:
         An iterator which will decode the messages and provides a dictionary for
@@ -232,8 +401,10 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
         {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
-        {'message_type': 'ST', 'name': 'My task', 'libname': 'foo', 'source': 'x:\\vscode-robot\\local_test\\robot_check', 'lineno': 5, 'time_delta_in_seconds': 0.2}
+        ...
 
+        Note: the exact format of the messages provided is not stable across
+        releases.
     """
     import zlib
     import base64
@@ -278,8 +449,8 @@ def verify_log_messages_from_messages_iterator(
     not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
-    A helper for checking that the expected messages are found in the
-    given messages iterator.
+    A helper for checking that the expected messages are found (or not found) in
+    the given messages iterator.
 
     Args:
         messages_iterator: An iterator over the messages found.
@@ -411,6 +582,9 @@ def verify_log_messages_from_stream(
     )
 
 
+# --- APIs to setup the logging
+
+
 def setup_auto_logging(config: Optional[BaseConfig] = None):
     """
     Sets up automatic logging.
@@ -522,6 +696,8 @@ def add_in_memory_log_output(write):
 
     return OnExitContextManager(_exit)
 
+
+# --- Private APIs
 
 # Not part of the API, used to determine whether a file is a project file
 # or a library file when running with the FilterKind.log_on_project_call kind.

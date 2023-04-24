@@ -123,7 +123,7 @@ def run(
         log.start_run(run_name)
 
         try:
-            log.start_task("Collect tasks", "setup", "", 0, [])
+            log.start_task("Collect tasks", "setup", "", 0)
             try:
                 if not task_name:
                     context.show(f"\nCollecting tasks from: {path}")

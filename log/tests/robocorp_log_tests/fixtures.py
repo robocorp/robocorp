@@ -94,7 +94,7 @@ def basic_log_setup(
             log_html=log_target,
         ):
             log.start_run("Root Suite")
-            log.start_task("my_task", "task_mod", __file__, 0, [])
+            log.start_task("my_task", "task_mod", __file__, 0)
 
             yield _SetupInfo(log_target)
 

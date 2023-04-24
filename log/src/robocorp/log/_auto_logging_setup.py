@@ -1,4 +1,4 @@
-from robocorp.log import critical
+from robocorp.log import critical, is_sensitive_variable_name
 from ._config import BaseConfig
 from ._logger_instances import _get_logger_instances
 from ._obj_info_repr import get_obj_type_and_repr
@@ -24,13 +24,11 @@ class OnExitContextManager:
 def _get_obj_type_and_repr_and_hide_if_needed(key, val):
     obj_type, obj_repr = get_obj_type_and_repr(val)
 
-    for p in ("password", "passwd"):
-        if p in key:
-            for robo_logger in _get_logger_instances():
-                robo_logger.hide_from_output(obj_repr)
-                if isinstance(val, str):
-                    robo_logger.hide_from_output(val)
-            break
+    if is_sensitive_variable_name(key):
+        for robo_logger in _get_logger_instances():
+            robo_logger.hide_from_output(obj_repr)
+            if isinstance(val, str):
+                robo_logger.hide_from_output(val)
     return obj_type, obj_repr
 
 
@@ -138,7 +136,7 @@ class _AutoLogging:
             status = pop_stack_entry.status
 
         for robo_logger in _get_logger_instances():
-            robo_logger.end_method(method_type, name, mod_name, status, [])
+            robo_logger.end_method(method_type, name, mod_name, status)
 
     def call_before_yield(
         self,

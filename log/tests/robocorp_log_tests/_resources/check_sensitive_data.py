@@ -14,7 +14,7 @@ def dont_log_args(some_arg):
 
 
 def something():
-    with log.stop_logging_variables():
+    with log.suppress_variables():
         dont_log_args(some_arg="dont_log_this_arg")
 
 
@@ -22,16 +22,41 @@ def dont_log_this_method():
     pass
 
 
+@log.suppress_methods()
+def dont_log_this_method2():
+    pass
+
+
+@log.suppress(methods=True)
+def dont_log_this_method3():
+    pass
+
+
+@log.suppress
+def dont_log_this_method4():
+    pass
+
+
 def run():
     password = "my_pass"
     login(password)
 
-    with log.stop_logging_variables():
+    with log.suppress_variables():
         s = "this should not be shown"
 
     log.hide_from_output(s)
     method(s)
     something()
 
-    with log.stop_logging_methods():
+    with log.suppress_methods():
         dont_log_this_method()
+
+        with log.suppress_methods():
+            dont_log_this_method()
+
+    with log.suppress(methods=True):
+        dont_log_this_method()
+
+    dont_log_this_method2()
+    dont_log_this_method3()
+    dont_log_this_method4()

@@ -116,7 +116,6 @@ def _log_before_task_run(task: ITask):
         task.module_name,
         task.filename,
         task.method.__code__.co_firstlineno,
-        [],
     )
 
 

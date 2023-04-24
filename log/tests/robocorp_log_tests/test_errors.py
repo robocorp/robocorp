@@ -11,7 +11,7 @@ def test_errors(log_setup, tmpdir):
     check_traceback = reload(check_traceback)
 
     log.start_run("My Run")
-    log.start_task("task", "modname", str(tmpdir), 0, [])
+    log.start_task("task", "modname", str(tmpdir), 0)
 
     try:
         check_traceback.main()

@@ -1,4 +1,5 @@
 from robocorp import log as robolog
+from contextlib import contextmanager
 
 
 def test_sensitive_data():
@@ -39,3 +40,44 @@ def test_sensitive_data():
         },
         {"message_type": "EA", "name": "arg", "type": "str", "value": "'<redacted>'"},
     ]
+
+
+def test_func_or_dec():
+    outer_var = []
+
+    @contextmanager
+    def ctx(variables=True, methods=True):
+        msg = "start"
+        if variables:
+            msg += "_v"
+        if methods:
+            msg += "_m"
+        outer_var.append(msg)
+        yield
+        outer_var.append("stop")
+
+    def suppress(*args, **kwargs):
+        from robocorp.log._suppress_helper import SuppressHelper
+
+        helper = SuppressHelper(ctx)
+        return helper.handle(*args, **kwargs)
+
+    @suppress
+    def some_func():
+        outer_var.append("inside")
+
+    some_func()
+    assert outer_var == ["start_v_m", "inside", "stop"]
+    del outer_var[:]
+
+    with suppress(variables=False):
+        outer_var.append("with")
+    assert outer_var == ["start_m", "with", "stop"]
+    del outer_var[:]
+
+    @suppress(methods=False)
+    def another_func(y):
+        outer_var.append("args")
+
+    another_func(y=22)
+    assert outer_var == ["start_v", "args", "stop"]

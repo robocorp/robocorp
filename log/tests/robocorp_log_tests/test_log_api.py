@@ -63,7 +63,7 @@ def test_log_api_without_with_statments(tmpdir) -> None:
             )
 
             log.start_run("Run name")
-            log.start_task("my_task", "modname", __file__, 0, [])
+            log.start_task("my_task", "modname", __file__, 0)
 
             check.some_method()
 

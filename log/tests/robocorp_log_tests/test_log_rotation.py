@@ -14,7 +14,7 @@ def test_rotate_logs(tmpdir) -> None:
             tmpdir, max_file_size="10kb", max_files=2, log_html=log_target
         ):
             robolog.start_run("Root Suite")
-            robolog.start_task("my_task", "task_mod", __file__, 0, [])
+            robolog.start_task("my_task", "task_mod", __file__, 0)
 
             check.recurse_some_method()
 

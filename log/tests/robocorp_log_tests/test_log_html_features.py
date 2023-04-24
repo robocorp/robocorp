@@ -49,7 +49,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
             log_html=log_target,
             log_html_style=ui_regenerate.LOG_HTML_STYLE,
         ):
-            log.start_task("Setup", "setup", str(tmpdir), 0, [])
+            log.start_task("Setup", "setup", str(tmpdir), 0)
             import difflib
 
             difflib = reload(difflib)
@@ -59,7 +59,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
             log.end_task("Setup", "setup", "PASS", "end msg")
 
             log.start_run("Test Log HTML Features")
-            log.start_task("my_task", "modname", str(tmpdir), 0, [])
+            log.start_task("my_task", "modname", str(tmpdir), 0)
 
             check.some_method()
             log.critical("Some log error")
