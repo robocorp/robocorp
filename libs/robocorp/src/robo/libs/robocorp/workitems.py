@@ -1,6 +1,10 @@
 from typing import Any, Callable, Generator, List, Optional, Union
 
-from robo.libs.robocorp._workitems import _WorkItemsContainer
+from robo.libs.robocorp._workitems import (
+    _WorkItemsContainer,
+    _WorkItemsInputs,
+    _WorkItemsOutputs,
+)
 from robo.libs.robocorp.workitem import Error, State, WorkItem
 
 
@@ -54,3 +58,7 @@ def release_input_work_item(
 ):
     wi = _WorkItemsContainer.instance()
     wi.release_input_work_item(state, exception_type, code, message, _auto_release)
+
+
+inputs = _WorkItemsInputs()
+outputs = _WorkItemsOutputs()

@@ -7,6 +7,8 @@ from robo.libs.robocorp.workitems import (
     get_inputs,
     get_next_input,
     get_outputs,
+    inputs,
     iter_input_work_items,
+    outputs,
     release_input_work_item,
 )

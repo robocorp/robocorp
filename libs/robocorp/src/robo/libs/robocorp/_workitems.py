@@ -1243,3 +1243,35 @@ class _WorkItemsContainer:
                 autoload, root, default_adapter, auto_parse_email
             )
         return cls._workItems_intance
+
+
+class _WorkItemsInputs:
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        wi = _WorkItemsContainer.instance()
+        try:
+            return wi.get_input_work_item()
+        except EmptyQueue:
+            raise StopIteration
+
+    @property
+    def current(self) -> WorkItem:
+        wi = _WorkItemsContainer.instance()
+        return wi.current
+
+
+class _WorkItemsOutputs:
+    def __iter__(self):
+        wi = _WorkItemsContainer.instance()
+        return iter(wi.outputs)
+
+    @staticmethod
+    def create(
+        variables: Optional[dict] = None,
+        files: Optional[Union[str, List[str]]] = None,
+        save: bool = False,
+    ) -> WorkItem:
+        wi = _WorkItemsContainer.instance()
+        return wi.create_output_work_item(variables, files, save)

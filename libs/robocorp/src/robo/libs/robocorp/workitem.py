@@ -4,7 +4,7 @@ import os
 from enum import Enum
 from pathlib import Path
 from shutil import copy2
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from robo.libs.robocorp._utils import JSONType, is_json_equal, truncate
 
@@ -79,6 +79,10 @@ class WorkItem:
         current = [item for item in self._files if item not in self._files_to_remove]
         current.extend(self._files_to_add)
         return list(sorted(set(current)))
+
+    @property
+    def released(self):
+        return self.state is not None
 
     def load(self):
         """Load data payload and list of files."""
@@ -179,3 +183,48 @@ class WorkItem:
             del self._files_to_add[name]
 
         return name
+
+    def done(self):
+        """Mark item status as DONE."""
+        if self.state is not None:
+            raise RuntimeError("Input work item already released")
+
+        assert self.parent_id is None, "set state on output item"
+        assert self.id is not None, "set state on input item with null ID"
+
+        state = State.DONE
+
+        self.adapter.release_input(self.id, state, exception=None)
+        self.state = state
+
+    def fail(
+        self,
+        exception_type: Optional[Union[Error, str]] = None,
+        code: Optional[str] = None,
+        message: Optional[str] = None,
+    ):
+        if self.state is not None:
+            raise RuntimeError("Input work item already released")
+
+        assert self.parent_id is None, "set state on output item"
+        assert self.id is not None, "set state on input item with null ID"
+
+        state = State.FAILED
+
+        if exception_type:
+            exception_type: Error = (
+                exception_type
+                if isinstance(exception_type, Error)
+                else Error(exception_type.upper())
+            )
+            exception = {
+                "type": exception_type.value,
+                "code": code,
+                "message": message,
+            }
+        elif code or message:
+            exc_types = ", ".join(list(Error.__members__))
+            raise RuntimeError(f"Must specify failure type from: {exc_types}")
+
+        self.adapter.release_input(self.id, state, exception=exception)
+        self.state = state
