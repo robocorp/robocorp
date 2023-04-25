@@ -15,9 +15,9 @@ from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
 
-from robo.libs.excel._types import PathType
-from robo.libs.excel.tables import Table
-from robo.libs.excel.worksheet import Worksheet
+from robocorp.excel._types import PathType
+from robocorp.excel.tables import Table
+from robocorp.excel.worksheet import Worksheet
 
 
 def _get_column_index(column: str) -> int:

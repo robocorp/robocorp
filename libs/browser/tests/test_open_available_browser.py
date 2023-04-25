@@ -1,6 +1,7 @@
 import pytest
 
-from robo.libs.browser.browser import open_browser, _get_executable_path
+from robocorp.browser import open_browser
+from robocorp.browser.browser import _get_executable_path
 
 
 def test_get_executable_path():

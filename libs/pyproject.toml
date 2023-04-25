@@ -9,7 +9,7 @@ authors = [
     "Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
-packages = [{include = "_robo", from="src"}]
+packages = [{include = "_robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -27,7 +27,7 @@ mkdocs-awesome-pages-plugin="2.8.0"
 robocorp-browser = {path = "browser", develop = true}
 robocorp-excel = {path = "excel", develop = true}
 robocorp-http = {path = "http", develop = true}
-robocorp-cr = {path = "robocorp", develop = true}
+robocorp-vault = {path = "vault", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

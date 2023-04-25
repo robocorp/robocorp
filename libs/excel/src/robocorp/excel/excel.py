@@ -1,9 +1,9 @@
 from typing import Literal, Optional
 
-from robo.libs.excel._types import PathType
+from robocorp.excel._types import PathType
 
-from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook, _load_workbook
-from robo.libs.excel.workbook import Workbook
+from robocorp.excel._workbooks import XlsWorkbook, XlsxWorkbook, _load_workbook
+from robocorp.excel.workbook import Workbook
 
 
 def create_workbook(

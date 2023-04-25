@@ -21,7 +21,7 @@ from typing import (
     Union,
 )
 
-from robo.libs.excel._types import is_dict_like, is_list_like, is_namedtuple
+from robocorp.excel._types import is_dict_like, is_list_like, is_namedtuple
 
 
 Index = Union[int, str]
@@ -959,7 +959,7 @@ class Tables:
 
         .. code-block:: python
 
-            from robo.libs.excel.tables import Tables
+            from robocorp.excel.tables import Tables
 
             tables = Tables()
             orders = tables.read_table_from_csv(
@@ -1007,7 +1007,7 @@ class Tables:
 
                 # Create a new table using a Dictionary of Lists
                 # Because of the dictionary keys the column names will be automatically set
-                from robo.libs.excel.tables import Tables
+                from robocorp.excel.tables import Tables
 
                 tables = Tables()
 
@@ -1044,7 +1044,7 @@ class Tables:
         Example:
         .. code-block:: python
 
-            from robo.libs.excel.tables import Tables
+            from robocorp.excel.tables import Tables
 
             tables = Tables()
 
@@ -1085,7 +1085,7 @@ class Tables:
 
         Example:
         .. code-block:: python
-            from robo.libs.excel.tables import Tables
+            from robocorp.excel.tables import Tables
 
             tables = Tables()
             tables.clear_table(table)
@@ -1130,7 +1130,7 @@ class Tables:
             ====== =====
 
         .. code-block:: python
-            from robo.libs.excel.tables import Tables
+            from robocorp.excel.tables import Tables
 
             tables = Tables()
 

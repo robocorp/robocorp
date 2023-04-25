@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from robo.libs.robocorp._utils import (
+from robocorp.vault._utils import (
     import_by_name,
     required_env,
     resolve_path,

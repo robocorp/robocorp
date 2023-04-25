@@ -4,9 +4,9 @@ from io import BytesIO
 from pathlib import Path
 
 import pytest
-from robo.libs.excel.workbook import XlsxWorkbook, XlsWorkbook
-from robo.libs.excel import create_workbook, open_workbook, Table
-from robo.libs.excel._workbooks import _ensure_unique
+from robocorp.excel.workbook import XlsxWorkbook, XlsWorkbook
+from robocorp.excel import create_workbook, open_workbook, Table
+from robocorp.excel._workbooks import _ensure_unique
 
 
 from . import RESOURCES_DIR, RESULTS_DIR

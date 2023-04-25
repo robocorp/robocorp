@@ -4,7 +4,7 @@ from collections import namedtuple, OrderedDict
 from contextlib import contextmanager
 
 import pytest
-from robo.libs.excel.tables import Table, Tables, Dialect
+from robocorp.excel.tables import Table, Tables, Dialect
 
 from . import RESOURCES_DIR
 

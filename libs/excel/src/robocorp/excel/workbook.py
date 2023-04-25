@@ -2,9 +2,9 @@ import pathlib
 from io import BytesIO
 from typing import Any, List, Optional, Union
 
-from robo.libs.excel._types import PathType
-from robo.libs.excel.worksheet import Worksheet
-from robo.libs.excel._workbooks import XlsWorkbook, XlsxWorkbook
+from robocorp.excel._types import PathType
+from robocorp.excel.worksheet import Worksheet
+from robocorp.excel._workbooks import XlsWorkbook, XlsxWorkbook
 
 
 class Workbook:
