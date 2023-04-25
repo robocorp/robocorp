@@ -1,5 +1,5 @@
-from robocorp.tasks._callback import Callback
-from robocorp.tasks._protocols import (
+from ._callback import Callback
+from ._protocols import (
     IOnTaskFuncFoundCallback,
     IBeforeCollectTasksCallback,
     IBeforeTaskRunCallback,

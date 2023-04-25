@@ -1,8 +1,8 @@
-class RoboError(RuntimeError):
+class RobocorpTasksError(RuntimeError):
     pass
 
 
-class RoboCollectError(RoboError):
+class RobocorpTasksCollectError(RobocorpTasksError):
     """
     Exception given if there was some issue collecting tasks.
     """

@@ -7,6 +7,13 @@ authors = [
 ]
 readme = "README.md"
 packages = [{include = "robocorp/tasks", from = "src"}]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"

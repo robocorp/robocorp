@@ -35,8 +35,7 @@ class _ArgDispatcher:
         parser = argparse.ArgumentParser(
             prog="robocorp.tasks",
             description="Robocorp framework for RPA development using Python.",
-            # TODO: Add a proper epilog once we have an actual url to point to.
-            # epilog="View https://github.com/robocorp/draft-python-framework/ for more information",
+            epilog="View https://github.com/robocorp/robo for more information",
         )
 
         subparsers = parser.add_subparsers(dest="command")

@@ -133,11 +133,13 @@ def collect_tasks(path: Path, task_name: str = "") -> Iterator[ITask]:
             del methods_marked_as_tasks_found[:]
 
         else:
-            from ._exceptions import RoboCollectError
+            from ._exceptions import RobocorpTasksCollectError
 
             if not path.exists():
-                raise RoboCollectError(f"Path: {path} does not exist")
+                raise RobocorpTasksCollectError(f"Path: {path} does not exist")
 
-            raise RoboCollectError(f"Expected {path} to map to a directory or file.")
+            raise RobocorpTasksCollectError(
+                f"Expected {path} to map to a directory or file."
+            )
     finally:
         _hooks.on_task_func_found.unregister(methods_marked_as_tasks_found.append)
