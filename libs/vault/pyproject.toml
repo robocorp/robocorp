@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "robocorp-cr"
+name = "robocorp-vault"
 version = "0.1.0"
 description = "Robocorp Control Room API integration library"
 authors = [
@@ -9,7 +9,7 @@ authors = [
     "Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
-packages = [{include = "robo", from="src"}]
+packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
