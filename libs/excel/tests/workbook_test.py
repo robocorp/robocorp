@@ -1,6 +1,6 @@
 import pytest
 
-from robo.libs.excel.excel import create_workbook
+from robocorp.excel.excel import create_workbook
 
 # create workbook tests
 

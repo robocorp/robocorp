@@ -2,12 +2,12 @@ from PIL import Image
 
 from typing import TYPE_CHECKING, Any, List, Optional, Union
 from typing_extensions import deprecated
-from robo.libs.excel._types import PathType
+from robocorp.excel._types import PathType
 
-from robo.libs.excel.tables import Table, Tables
+from robocorp.excel.tables import Table, Tables
 
 if TYPE_CHECKING:
-    from robo.libs.excel.workbook import Workbook
+    from robocorp.excel.workbook import Workbook
 
 
 class Worksheet:
