@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-tasks"
-version = "0.1.4"
+version = "0.1.5"
 description = "The automation framework for Python"
 authors = [
 	"Fabio Zadrozny <fabio@robocorp.com>",
