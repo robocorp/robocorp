@@ -279,7 +279,6 @@ class _RoboLogger:
         source: str,
         lineno: int,
     ):
-
         return self._robot_output_impl.yield_from_suspend(
             name,
             libname,

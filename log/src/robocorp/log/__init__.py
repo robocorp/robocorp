@@ -48,49 +48,79 @@ ConfigFilesFiltering = _config.ConfigFilesFiltering
 # --- Logging methods for custom messaging.
 
 
-def _log(level, message: str, html: bool = False) -> None:
+def _log(level, message: Sequence[Any], html: bool = False) -> None:
     back_frame = sys._getframe(2)
     source = back_frame.f_code.co_filename
     lineno = back_frame.f_lineno
 
+    m = " ".join(str(x) for x in message)
     for robo_logger in _get_logger_instances():
-        robo_logger.log_message(level, message, html, source, lineno)
+        robo_logger.log_message(level, m, html, source, lineno)
 
 
-def critical(message: str, html: bool = False) -> None:
+def critical(*message: Any) -> None:
     """
     Adds a new logging message with a critical (error) level.
 
     Args:
         message: The message which should be logged.
         html: If True the message passed should be rendered as HTML.
+
+    Example:
+        critical('Failed because', obj, 'is not', expected)
+
+    Note:
+        Formatting converts all objects given to `str`. If you need custom
+        formatting please pre-format the string.
+        i.e.:
+        critical(f'Failed because {obj!r} is not {expected!r}.')
     """
-    _log(Status.ERROR, message, html)
+    _log(Status.ERROR, message)
 
 
-def warn(message: str, html: bool = False) -> None:
+def warn(*message: Any) -> None:
     """
     Adds a new logging message with a warn level.
 
     Args:
         message: The message which should be logged.
         html: If True the message passed should be rendered as HTML.
+
+    Example:
+        warn('Did not expect', obj)
+
+    Note:
+        Formatting converts all objects given to `str`. If you need custom
+        formatting please pre-format the string.
+        i.e.:
+        warn(f'Did not expect {obj!r}.')
     """
-    _log(Status.WARN, message, html)
+    _log(Status.WARN, message)
 
 
-def info(message: str, html: bool = False) -> None:
+def info(*message: Any) -> None:
     """
     Adds a new logging message with an info level.
 
     Args:
         message: The message which should be logged.
         html: If True the message passed should be rendered as HTML.
+
+
+    Example:
+        info('Received value', obj)
+
+    Note:
+        Formatting converts all objects given to `str`. If you need custom
+        formatting please pre-format the string.
+        i.e.:
+        info(f'Received value {obj!r}.')
+
     """
-    _log(Status.INFO, message, html)
+    _log(Status.INFO, message)
 
 
-def exception(message: Optional[str] = None, html: bool = False):
+def exception(*message: Any):
     """
     Adds to the logging the exceptions that's currently raised.
 
@@ -99,11 +129,30 @@ def exception(message: Optional[str] = None, html: bool = False):
         html: If True the message passed should be rendered as HTML.
     """
     if message:
-        _log(Status.ERROR, message, html)
+        _log(Status.ERROR, message)
 
     exc_info = sys.exc_info()
     for robo_logger in _get_logger_instances():
         robo_logger.log_method_except(exc_info, unhandled=True)
+
+
+def html(html: str, level: str = "INFO"):
+    """
+    Adds html contents to the log.
+
+    Args:
+        html: The html content to be embedded in the page.
+        level: The level of the message ("INFO", "WARN" or "ERROR")
+
+    Example adding an image:
+
+        html(
+            '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="/>'
+        )
+    """
+
+    assert level in ("ERROR", "WARN", "INFO")
+    _log(level, (html,), html=True)
 
 
 # --- Methods related to hiding logging information.
