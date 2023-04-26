@@ -31,7 +31,7 @@ class UIRegenerateFixture:
 
     LOG_HTML_STYLE: LogHTMLStyle = "standalone"
 
-    if True:
+    if False:
         OPEN_IN_BROWSER = True
 
         # LOG_HTML_STYLE = "vscode"
