@@ -184,6 +184,47 @@ class _AutoLogging:
         for robo_logger in _get_logger_instances():
             robo_logger.yield_resume(name, mod_name, filename, lineno)
 
+    def call_before_yield_from(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+
+        try:
+            pop_stack_entry = self.status_stack.pop(-1)
+        except IndexError:
+            # oops, something bad happened, the stack is unsynchronized
+            critical("On before yield from the status_stack was empty.")
+            return
+        else:
+            if pop_stack_entry.mod_name != mod_name or pop_stack_entry.name != name:
+                critical(
+                    f"On before yield from status stack package/name was: {pop_stack_entry.mod_name}.{pop_stack_entry.name}. Received: {mod_name}.{name}."
+                )
+                return
+
+        for robo_logger in _get_logger_instances():
+            robo_logger.yield_from_suspend(name, mod_name, filename, lineno)
+
+    def call_after_yield_from(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+
+        self.status_stack.append(_StackEntry(mod_name, name, "PASS"))
+
+        for robo_logger in _get_logger_instances():
+            robo_logger.yield_from_resume(name, mod_name, filename, lineno)
+
     def call_after_assign(
         self,
         mod_name: str,

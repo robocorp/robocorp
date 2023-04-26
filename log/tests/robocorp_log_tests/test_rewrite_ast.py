@@ -150,6 +150,35 @@ def method():
         assert unparsed.count("after_assign") == 1
 
 
+def test_rewrite_yield_from(tmpdir):
+    from robocorp.log._config import FilterKind
+    from robocorp.log._rewrite_importhook import _rewrite
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def method():
+    x = yield from foo()
+    yield from another()
+"""
+    )
+
+    mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[-1]
+    import ast
+
+    if hasattr(ast, "unparse"):  # 3.9 onwards
+        unparsed = ast.unparse(mod)
+        assert unparsed.count("before_method('GENERATOR'") == 1
+        assert unparsed.count("after_method('GENERATOR'") == 1
+        assert unparsed.count("method_except('GENERATOR'") == 1
+        assert unparsed.count("before_yield_from") == 2
+        assert unparsed.count("after_yield_from") == 2
+        assert unparsed.count("after_assign") == 1
+
+
 def test_handle_iterators_on_log_project_call(tmpdir):
     # We have a problem here: if we're dealing with a generator function which
     # is from a library, we cannot do a before_method/after_method because
@@ -168,6 +197,37 @@ def test_handle_iterators_on_log_project_call(tmpdir):
 def method():
     yield 2
     a = yield 3
+"""
+    )
+
+    mod = _rewrite(target, config, filter_kind=FilterKind.log_on_project_call)[-1]
+    import ast
+
+    if hasattr(ast, "unparse"):  # 3.9 onwards
+        unparsed = ast.unparse(mod)
+        assert unparsed.count("before_method('UNTRACKED_GENERATOR'") == 1
+        assert unparsed.count("method_except('UNTRACKED_GENERATOR'") == 1
+        assert unparsed.count("after_method('UNTRACKED_GENERATOR'") == 1
+
+
+def test_handle_yield_from_on_log_project_call(tmpdir):
+    # We have a problem here: if we're dealing with a generator function which
+    # is from a library, we cannot do a before_method/after_method because
+    # the stack will be unsynchronized, so, we have to do something as
+    # library generator start/generator end (as we won't log things inside
+    # it, this should be ok).
+    from robocorp.log._config import FilterKind
+    from robocorp.log._rewrite_importhook import _rewrite
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def method():
+    yield from foo()
+    a = yield from bar()
 """
     )
 

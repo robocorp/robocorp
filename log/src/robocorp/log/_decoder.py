@@ -109,6 +109,11 @@ def decode_memo(decoder: Decoder, message: str) -> None:
 # Whenever the decoding changes we should bump up this version.
 DOC_VERSION = "0.0.1"
 
+MESSAGE_TYPE_YIELD_RESUME = "YR"
+MESSAGE_TYPE_YIELD_SUSPEND = "YS"
+MESSAGE_TYPE_YIELD_FROM_RESUME = "YFR"
+MESSAGE_TYPE_YIELD_FROM_SUSPEND = "YFS"
+
 _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     # Version of the log output
     "V": _decode("version:str"),
@@ -145,14 +150,22 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
         "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
     ),
     # Yield Resume (coming back to a suspended frame).
-    "YR": _decode(
+    MESSAGE_TYPE_YIELD_RESUME: _decode(
+        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+    ),
+    # Yield From Resume (coming back to a suspended frame).
+    MESSAGE_TYPE_YIELD_FROM_RESUME: _decode(
         "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
     ),
     # End Element
     "EE": _decode("type:oid, status:oid, time_delta_in_seconds:float"),
-    # Yield Suspend
-    "YS": _decode(
-        "source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float",
+    # Yield Suspend (pausing a frame)
+    MESSAGE_TYPE_YIELD_SUSPEND: _decode(
+        "name:oid, libname:oid, source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float",
+    ),
+    # Yield From Suspend (pausing a frame)
+    MESSAGE_TYPE_YIELD_FROM_SUSPEND: _decode(
+        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
     ),
     # Assign
     "AS": _decode(

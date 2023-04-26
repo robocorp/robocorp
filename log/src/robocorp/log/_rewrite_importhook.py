@@ -49,7 +49,8 @@ from ._config import BaseConfig, FilterKind
 # 0.0.11: Add method type as first parameter for start_method/except/end_method
 # 0.0.12: Changed to use robocorp namespace.
 # 0.0.13: Changed to use robocorp.log name.
-version = "0.0.13"
+# 0.0.14: Rewrite yield from
+version = "0.0.14"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT
@@ -259,6 +260,9 @@ def _rewrite(
     strfn = str(fn)
     tree = ast.parse(source, filename=strfn)
     rewrite_ast_add_callbacks(tree, filter_kind, source, strfn, config)
+    if DEBUG:
+        print(f"Changed {strfn} to:")
+        print(ast.unparse(tree))
     co = compile(tree, strfn, "exec", dont_inherit=True)
     return stat, co, tree
 

@@ -50,7 +50,7 @@ class _PrinterVisitor(ast_module.NodeVisitor):
                 # Make 0-based
                 node_lineno -= 1
             node_end_lineno = getattr(node, "end_lineno", -1)
-            if node_end_lineno != -1:
+            if node_end_lineno != -1 and node_end_lineno is not None:
                 # Make 0-based
                 node_end_lineno -= 1
             self._stream.write(

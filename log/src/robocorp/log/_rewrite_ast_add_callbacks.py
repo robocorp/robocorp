@@ -112,11 +112,17 @@ def _rewrite_assign(function, class_name, node: ast.Assign) -> Optional[list]:
 
     if isinstance(node.value, ast.Yield):
         result.extend(_make_before_yield_exprs(factory, function, class_name, node))
+    elif isinstance(node.value, ast.YieldFrom):
+        result.extend(
+            _make_before_yield_from_exprs(factory, function, class_name, node)
+        )
 
     result.append(node)
 
     if isinstance(node.value, ast.Yield):
         result.append(_make_after_yield_expr(factory, function, class_name))
+    elif isinstance(node.value, ast.YieldFrom):
+        result.append(_make_after_yield_from_expr(factory, function, class_name))
 
     for target in node.targets:
         if isinstance(target, ast.Name):
@@ -183,11 +189,44 @@ def _make_before_yield_exprs(
     return result
 
 
+def _make_before_yield_from_exprs(
+    factory, function, class_name, node_with_yield_val: INodeWithValueExpr
+) -> Sequence[ast.Expr]:
+    assert isinstance(node_with_yield_val.value, ast.YieldFrom)
+    result = [
+        factory.Expr(
+            _make_func_with_args(
+                factory,
+                "before_yield_from",
+                factory.NameLoad("__name__"),
+                factory.NameLoad("__file__"),
+                factory.Str(f"{class_name}{function.name}"),
+                factory.LineConstant(),
+            )
+        )
+    ]
+
+    return result
+
+
 def _make_after_yield_expr(factory, function, class_name):
     return factory.Expr(
         _make_func_with_args(
             factory,
             "after_yield",
+            factory.NameLoad("__name__"),
+            factory.NameLoad("__file__"),
+            factory.Str(f"{class_name}{function.name}"),
+            factory.LineConstant(),
+        )
+    )
+
+
+def _make_after_yield_from_expr(factory, function, class_name):
+    return factory.Expr(
+        _make_func_with_args(
+            factory,
+            "after_yield_from",
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
             factory.Str(f"{class_name}{function.name}"),
@@ -203,6 +242,16 @@ def _rewrite_yield(function, class_name, node: ast.Expr) -> Optional[list]:
     result.extend(_make_before_yield_exprs(factory, function, class_name, node))
     result.append(node)
     result.append(_make_after_yield_expr(factory, function, class_name))
+    return result
+
+
+def _rewrite_yield_from(function, class_name, node: ast.Expr) -> Optional[list]:
+    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+
+    result: List[ast.stmt] = []
+    result.extend(_make_before_yield_from_exprs(factory, function, class_name, node))
+    result.append(node)
+    result.append(_make_after_yield_from_expr(factory, function, class_name))
     return result
 
 
@@ -564,10 +613,24 @@ def _handle_assign(
         )
 
 
+def _update_calls_from_func_to_generator(
+    rewrite_ctx: _RewriteCtx, function, filter_kind: FilterKind
+):
+    before_call: ast.Call
+    for before_call in rewrite_ctx.iter_func_calls_from_func(function):
+        assert isinstance(before_call.args[0], ast.Str)
+        before_call_method_type: ast.Str = before_call.args[0]
+
+        log_method_type: LogElementType = "GENERATOR"
+        if filter_kind == FilterKind.log_on_project_call:
+            log_method_type = "UNTRACKED_GENERATOR"
+        before_call_method_type.s = log_method_type
+
+
 def _handle_expr(
     rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node: ast.Expr
 ):
-    if isinstance(node.value, ast.Yield):
+    if isinstance(node.value, (ast.Yield, ast.YieldFrom)):
         func_and_class_name = _get_function_and_class_name(stack)
         if not func_and_class_name:
             return None
@@ -577,20 +640,15 @@ def _handle_expr(
             return
 
         try:
-            before_call: ast.Call
-            for before_call in rewrite_ctx.iter_func_calls_from_func(function):
-                assert isinstance(before_call.args[0], ast.Str)
-                before_call_method_type: ast.Str = before_call.args[0]
-
-                log_method_type: LogElementType = "GENERATOR"
-                if filter_kind == FilterKind.log_on_project_call:
-                    log_method_type = "UNTRACKED_GENERATOR"
-                before_call_method_type.s = log_method_type
+            _update_calls_from_func_to_generator(rewrite_ctx, function, filter_kind)
 
             if filter_kind != FilterKind.full_log:
                 return None
 
-            return _rewrite_yield(function, class_name, node)
+            if isinstance(node.value, ast.Yield):
+                return _rewrite_yield(function, class_name, node)
+            else:
+                return _rewrite_yield_from(function, class_name, node)
         except Exception:
             raise RuntimeError(
                 f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"

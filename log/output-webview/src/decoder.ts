@@ -118,8 +118,10 @@ const _MESSAGE_TYPE_INFO = {
     "TBE": _decode("source:oid, lineno:int, method:oid, line_content:oid"),
     "TBV": _decode("name:oid, type:oid, value:oid"),
     "ETB": _decode("time_delta_in_seconds:float"),
-    "YS": _decode("source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float"),
+    "YS": _decode("name:oid, libname:oid, source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float"),
     "YR": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "YFS": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "YFR": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
 };
 
 _MESSAGE_TYPE_INFO["RR"] = _MESSAGE_TYPE_INFO["SR"];

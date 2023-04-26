@@ -67,6 +67,12 @@ before_yield = Callback()
 # Called as: after_yield(__name__, filename, name, lineno)
 after_yield = Callback()
 
+# Called as: before_yield_from(__name__, filename, name, lineno)
+before_yield_from = Callback()
+
+# Called as: after_yield_from(__name__, filename, name, lineno)
+after_yield_from = Callback()
+
 
 def iter_all_callbacks() -> Iterator[Callback]:
     for _key, val in globals().items():

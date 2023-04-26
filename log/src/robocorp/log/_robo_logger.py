@@ -254,6 +254,40 @@ class _RoboLogger:
             self._get_time_delta(),
         )
 
+    def yield_from_resume(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
+    ):
+        hide_from_logs = bool(self._skip_log_methods)
+
+        return self._robot_output_impl.yield_from_resume(
+            name,
+            libname,
+            source,
+            lineno,
+            self._get_time_delta(),
+            hide_from_logs,
+        )
+
+    def yield_from_suspend(
+        self,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
+    ):
+
+        return self._robot_output_impl.yield_from_suspend(
+            name,
+            libname,
+            source,
+            lineno,
+            self._get_time_delta(),
+        )
+
     @_log_error
     def after_assign(
         self,

@@ -1,3 +1,9 @@
+NEXT
+-----------------------------
+
+- Log: Support `yield from` statements in the auto-logging.
+- Log cli: Properly assign args to generator.
+
 0.0.12
 -----------------------------
 
