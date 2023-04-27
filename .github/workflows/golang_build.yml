@@ -34,6 +34,10 @@ jobs:
           path: ./build/
 
 
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          xcode-version: latest-stable
       - name: MacOS igning
         if: matrix.os == 'macos-latest'
         run: invoke sign
