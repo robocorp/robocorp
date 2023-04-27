@@ -56,23 +56,23 @@ def sign(ctx):
     assert cert_password
     try:
         print("create-keychain")
-        ctx.run(f"security create-keychain -p {cert_password} build.keychain")
+        ctx.run(f"xcrun security create-keychain -p {cert_password} build.keychain")
         print("default-keychain")
-        ctx.run("security default-keychain -s build.keychain")
+        ctx.run("xcrun security default-keychain -s build.keychain")
         print("unlock-keychain")
-        ctx.run(f"security unlock-keychain -p {cert_password} build.keychain")
+        ctx.run(f"xcrun security unlock-keychain -p {cert_password} build.keychain")
         print("cert.p12")
         ctx.run(f"echo {cert_data}| base64 --decode -o cert.p12")
         print("security import")
-        ctx.run(f"security import cert.p12 -A -P {cert_password}")
+        ctx.run(f"xcrun security import cert.p12 -A -P {cert_password}")
         print("security set-key-partition-list")
         ctx.run(
-            f"security set-key-partition-list -S apple-tool:,apple: -s -k {cert_password} build.keychain"
+            f"xcrun security set-key-partition-list -S apple-tool:,apple: -s -k {cert_password} build.keychain"
         )
         print("codesign")
         ctx.run(
             # TODO: change to build/macos64/robo
-            'codesign --entitlements ./signing/entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/robo'
+            'xcrun codesign --entitlements ./signing/entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/robo'
         )
         print("codesign")
         # ctx.run('codesign --entitlements entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/arm/rcc')
@@ -95,5 +95,5 @@ def notarize(ctx):
     # these are just confusing: --key path/to/AuthKey_7UD13000.p8 --key-id 7UD13000, unclear if we need them if we're using the "raw" apple account params
 
     ctx.run(
-        f"notarytool submit build/robo --password {signing_password} --apple_id {apple_id} --wait"
+        f"xcrun notarytool submit build/robo --password {signing_password} --apple_id {apple_id} --wait"
     )
