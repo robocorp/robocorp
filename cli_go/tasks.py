@@ -100,3 +100,5 @@ def notarize(ctx):
     )
     ctx.run("mkdir dist")
     ctx.run("unzip robo.zip -d dist")
+    ctx.run("ls dist/")
+    ctx.run("ls dist/build")
