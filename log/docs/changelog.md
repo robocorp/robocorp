@@ -1,4 +1,4 @@
-NEXT
+0.0.13
 -----------------------------
 
 - Log: Support `yield from` statements in the auto-logging.
