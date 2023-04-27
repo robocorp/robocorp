@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
 
     runs-on: ${{ matrix.os }}
     defaults:
@@ -46,10 +47,11 @@ jobs:
             MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
       - name: MacOS Notarizing
         if: matrix.os == 'macos-latest'
+        # TODO: pass secrets as arguments
         run: invoke notarize
         env:
-            APPLEID: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
-            APPLEIDPASS: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
+            MACOS_APP_ID_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
+            MACOS_APP_ID_PASS_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'macos-latest'
