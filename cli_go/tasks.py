@@ -91,14 +91,12 @@ def notarize(ctx):
     signing_password = os.environ.get("MACOS_APP_ID_PASS_FOR_SIGNING")
     assert signing_password
 
-    # removed args that we didn't previously use, but that notarytool man page included: --issuer 6bc36aee-c5c8-11ec-9d64-0242ac120001
-    # these are just confusing: --key path/to/AuthKey_7UD13000.p8 --key-id 7UD13000, unclear if we need them if we're using the "raw" apple account params
-
-    # TODO: add --team-id
+    # removed args that we didn't previously use, but that notarytool man page included: --issuer <uuid>
+    # these are just confusing: --key path/to/AuthKey_7UD13000.p8 --key-id 7UD13000, it seems we don't need them if we're using the "raw" apple account params
 
     ctx.run("zip robo.zip build/robo")
     ctx.run(
-        f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --wait"
+        f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --team-id 2H9N5J72C7 --wait"
     )
     ctx.run("mkdir dist")
     ctx.run("unzip robo.zip -d dist")
