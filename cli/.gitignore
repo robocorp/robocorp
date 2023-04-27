@@ -1,6 +1,6 @@
-# PyInstaller
+*.exe
+*.zip
+*.test
+*.out
 build/
-dist/
-
-# Vendored binaries
-resources/bin/
+.DS_Store
