@@ -2,9 +2,11 @@ package process
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 
 	"github.com/robocorp/robo/cli/paths"
@@ -24,15 +26,19 @@ type Output struct {
 	Stderr string
 }
 
+func (o Output) AsError() error {
+	return errors.New(o.Stderr)
+}
+
 func New(name string, args ...string) *Process {
-	return &Process{name, args, nil, nil, nil, nil}
+	return &Process{name: name, args: args}
 }
 
 func (proc *Process) String() string {
 	return fmt.Sprintf("Process[name='%v',args=%v]", proc.name, proc.args)
 }
 
-func (proc *Process) Run() (output *Output, err error) {
+func (proc *Process) Run() (*Output, error) {
 	var env []string
 	if proc.Env != nil {
 		if pathvar, ok := proc.Env["PATH"]; ok {
@@ -52,7 +58,7 @@ func (proc *Process) Run() (output *Output, err error) {
 	proc.cmd = exec.Command(proc.name, proc.args...)
 	proc.cmd.Env = env
 
-	var stdout, stderr string
+	var stdout, stderr []string
 	var wg sync.WaitGroup
 
 	stdoutPipe, err := proc.cmd.StdoutPipe()
@@ -73,7 +79,7 @@ func (proc *Process) Run() (output *Output, err error) {
 			if proc.StdoutListener != nil {
 				proc.StdoutListener(line)
 			}
-			stdout += line + "\n"
+			stdout = append(stdout, line)
 		}
 		wg.Done()
 	}()
@@ -86,7 +92,7 @@ func (proc *Process) Run() (output *Output, err error) {
 			if proc.StderrListener != nil {
 				proc.StderrListener(line)
 			}
-			stderr += line + "\n"
+			stderr = append(stderr, line)
 		}
 		wg.Done()
 	}()
@@ -94,5 +100,10 @@ func (proc *Process) Run() (output *Output, err error) {
 	err = proc.cmd.Run()
 	wg.Wait()
 
-	return &Output{stdout, stderr}, err
+	output := &Output{
+		Stdout: strings.Join(stdout, "\n"),
+		Stderr: strings.Join(stderr, "\n"),
+	}
+
+	return output, err
 }

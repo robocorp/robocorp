@@ -13,6 +13,8 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run a project task",
 	Run: func(cmd *cobra.Command, args []string) {
-		run.RunTask("")
+		if err := run.RunTask(""); err != nil {
+			fatalError(err)
+		}
 	},
 }

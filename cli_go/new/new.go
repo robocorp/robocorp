@@ -3,7 +3,6 @@ package new
 import (
 	"path"
 
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,6 +13,7 @@ import (
 	"github.com/robocorp/robo/cli/paths"
 	"github.com/robocorp/robo/cli/rcc"
 	"github.com/robocorp/robo/cli/ui"
+	"github.com/robocorp/robo/cli/ui/choice"
 	"github.com/robocorp/robo/cli/ui/progress"
 )
 
@@ -34,7 +34,7 @@ type model struct {
 	name      string
 	error     error
 
-	templateInput   list.Model
+	templateInput   choice.Model
 	nameInput       textinput.Model
 	installProgress progress.Model
 }
@@ -45,16 +45,15 @@ func NewProgram() *tea.Program {
 
 func initialModel() model {
 	templates := include.Templates()
-	items := make([]list.Item, len(templates))
+	items := make([]choice.Option, len(templates))
 	for i, t := range templates {
-		items[i] = listItem{t.Name, t.Description}
+		items[i] = choice.Option{
+			Title:       t.Name,
+			Description: t.Description,
+		}
 	}
 
-	templateInput := list.New(items, list.NewDefaultDelegate(), 0, 0)
-	templateInput.Title = "Select template"
-	templateInput.SetShowStatusBar(false)
-	templateInput.SetFilteringEnabled(false)
-	templateInput.SetShowHelp(false)
+	templateInput := choice.New("Select template", items)
 
 	nameInput := textinput.New()
 	installProgress := progress.New()
@@ -149,26 +148,19 @@ func (m model) View() string {
 }
 
 func (m model) updateStateTemplate(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		if msg.Type == tea.KeyEnter {
-			if i, ok := m.templateInput.SelectedItem().(listItem); ok {
-				m.template = m.findTemplateByName(i.Title())
-				m.currentState = StateName
-				cmd := m.nameInput.Focus()
-				return m, tea.Batch(cmd, textinput.Blink)
-			}
-		}
-	case tea.WindowSizeMsg:
-		m.templateInput.SetSize(msg.Width, msg.Height)
-		if h := listRenderHeight(len(m.templates)); h < msg.Height {
-			m.templateInput.SetHeight(h)
-		}
-		return m, nil
-	}
-
 	var cmd tea.Cmd
 	m.templateInput, cmd = m.templateInput.Update(msg)
+
+	if o := m.templateInput.SelectedOption(); o != nil {
+		m.template = m.findTemplateByName(o.Title)
+		m.currentState = StateName
+		return m, tea.Batch(
+			cmd,
+			m.nameInput.Focus(),
+			textinput.Blink,
+		)
+	}
+
 	return m, cmd
 }
 
