@@ -1,0 +1,16 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def method():
+    """
+    just docstring
+    """
+    try:
+        @robo_lifecycle_hooks.before_method('METHOD', __name__, __file__, 'method', 6, {})
+        a = 1
+        @robo_lifecycle_hooks.after_assign(__name__, __file__, 'method', 6, 'a', a)
+    except:
+        import sys as @py_sys
+        @robo_lifecycle_hooks.method_except('METHOD', __name__, __file__, 'method', 6, @py_sys.exc_info())
+        raise
+    finally:
+        @robo_lifecycle_hooks.after_method('METHOD', __name__, __file__, 'method', 6)

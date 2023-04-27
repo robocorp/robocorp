@@ -2,8 +2,13 @@ NEXT
 -----------------------------
 
 - Log: Support `yield from` statements in the auto-logging.
+- Log: Fixes in support for `yield`.
+    - Current yield limitation: When yield is inside another expression it won't 
+      show the yielded value (i.e.: `x = call() and yield another()` won't show the `another()` value) 
+      as doing so could change the order of calls.
 - Log cli: Properly assign args to generator.
-- Public API change: `critical`/`warn`/`info` methods now accept multiple arguments and all are concatenated and converted to `str`.
+- Public API change: `critical`/`warn`/`info` methods now accept multiple arguments and all are
+  concatenated and converted to `str`.
     - Old api: `robocorp.log.info(messsage: str, html: bool=False)`
     - New api: `robocorp.log.info(*message)`
 - New API to embed html into the page:

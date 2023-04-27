@@ -31,3 +31,28 @@ def yield_from():
 def main_yield_from():
     for v in yield_from():
         val = v
+
+
+def yield_augassign():
+    v = 0
+    v += yield "aug1"
+    v += yield " aug2"
+    v += yield " aug3"
+
+    assert v == 3
+    return " finish"
+
+
+def main_yield_augassign():
+    s = ""
+
+    iter_in = yield_augassign()
+    s += next(iter_in)
+    s += iter_in.send(1)
+    s += iter_in.send(1)
+    try:
+        s += iter_in.send(1)
+    except StopIteration as e:
+        s += e.value
+
+    assert s == "aug1 aug2 aug3 finish"

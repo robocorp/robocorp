@@ -1,34 +1,16 @@
 import ast
-from typing import Any, Union, List, Optional, Tuple, Dict, Callable, Sequence, Iterator
-import typing
+from typing import Any, Union, List, Optional, Tuple, Dict, Callable
 from . import _ast_utils
 from ._config import BaseConfig, FilterKind
 from .protocols import LogElementType
+from ._ast_utils import ASTRewriter
+from robocorp.log._ast_utils import NodeFactory
 
 DEBUG = False
 
 
 def is_rewrite_disabled(docstring: str) -> bool:
     return "NO_LOG" in docstring
-
-
-class _RewriteCtx:
-    def __init__(self):
-        self._memo = {}
-
-    def save_func_to_before_method_call(
-        self, function: ast.FunctionDef, call: ast.Call
-    ):
-        self._memo.setdefault(function, []).append(call)
-
-    def save_func_to_except_method_call(self, function, call):
-        self._memo.setdefault(function, []).append(call)
-
-    def save_func_to_after_method_call(self, function, call):
-        self._memo.setdefault(function, []).append(call)
-
-    def iter_func_calls_from_func(self, func: ast.FunctionDef) -> Iterator[ast.Call]:
-        yield from iter(self._memo[func])
 
 
 def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
@@ -80,8 +62,7 @@ def _rewrite_return(function, class_name, node: ast.Return) -> Optional[list]:
 
     result: List[ast.stmt] = []
 
-    call = factory.Call()
-    call.func = factory.NameLoadRewriteCallback("method_return")
+    call = factory.Call(factory.NameLoadRewriteCallback("method_return"))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
     call.args.append(factory.Str(f"{class_name}{function.name}"))
@@ -105,111 +86,13 @@ def _rewrite_return(function, class_name, node: ast.Return) -> Optional[list]:
     return result
 
 
-def _rewrite_assign(function, class_name, node: ast.Assign) -> Optional[list]:
-    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
-
-    result: List[ast.stmt] = []
-
-    if isinstance(node.value, ast.Yield):
-        result.extend(_make_before_yield_exprs(factory, function, class_name, node))
-    elif isinstance(node.value, ast.YieldFrom):
-        result.extend(
-            _make_before_yield_from_exprs(factory, function, class_name, node)
-        )
-
-    result.append(node)
-
-    if isinstance(node.value, ast.Yield):
-        result.append(_make_after_yield_expr(factory, function, class_name))
-    elif isinstance(node.value, ast.YieldFrom):
-        result.append(_make_after_yield_from_expr(factory, function, class_name))
-
-    for target in node.targets:
-        if isinstance(target, ast.Name):
-            call = _make_func_with_args(
-                factory,
-                "after_assign",
-                factory.NameLoad("__name__"),
-                factory.NameLoad("__file__"),
-                factory.Str(f"{class_name}{function.name}"),
-                factory.LineConstant(),
-                factory.Str(target.id),
-                factory.NameLoad(target.id),
-            )
-
-            result.append(factory.Expr(call))
-
-    return result
-
-
 def _make_func_with_args(factory, func_name, *args):
-    call = factory.Call()
-    call.func = factory.NameLoadRewriteCallback(func_name)
+    call = factory.Call(factory.NameLoadRewriteCallback(func_name))
     call.args.extend(args)
     return call
 
 
-class INodeWithValueExpr(typing.Protocol):
-    value: ast.expr
-
-
-def _make_before_yield_exprs(
-    factory, function, class_name, node_with_yield_val: INodeWithValueExpr
-) -> Sequence[ast.Expr]:
-    assert isinstance(node_with_yield_val.value, ast.Yield)
-    yield_expr: ast.Yield = node_with_yield_val.value
-
-    result = []
-    if yield_expr.value is not None:
-        assign = factory.Assign()
-        store_name = factory.NameTempStore()
-        assign.targets = [store_name]
-        assign.value = yield_expr.value
-
-        yield_expr.value = factory.NameLoad(store_name.id)
-
-        value_yielded = factory.NameLoad(store_name.id)
-        result.append(assign)
-    else:
-        value_yielded = factory.NoneConstant()
-
-    result.append(
-        factory.Expr(
-            _make_func_with_args(
-                factory,
-                "before_yield",
-                factory.NameLoad("__name__"),
-                factory.NameLoad("__file__"),
-                factory.Str(f"{class_name}{function.name}"),
-                factory.LineConstant(),
-                value_yielded,
-            )
-        )
-    )
-    return result
-
-
-def _make_before_yield_from_exprs(
-    factory, function, class_name, node_with_yield_val: INodeWithValueExpr
-) -> Sequence[ast.Expr]:
-    assert isinstance(node_with_yield_val.value, ast.YieldFrom)
-    result = [
-        factory.Expr(
-            _make_func_with_args(
-                factory,
-                "before_yield_from",
-                factory.NameLoad("__name__"),
-                factory.NameLoad("__file__"),
-                factory.Str(f"{class_name}{function.name}"),
-                factory.LineConstant(),
-            )
-        )
-    ]
-
-    return result
-
-
-def _make_after_yield_expr(factory, function, class_name):
+def _make_after_yield_expr(factory, function, class_name) -> ast.Expr:
     return factory.Expr(
         _make_func_with_args(
             factory,
@@ -222,7 +105,20 @@ def _make_after_yield_expr(factory, function, class_name):
     )
 
 
-def _make_after_yield_from_expr(factory, function, class_name):
+def _make_before_yield_from_exprs(factory, function, class_name) -> ast.Expr:
+    return factory.Expr(
+        _make_func_with_args(
+            factory,
+            "before_yield_from",
+            factory.NameLoad("__name__"),
+            factory.NameLoad("__file__"),
+            factory.Str(f"{class_name}{function.name}"),
+            factory.LineConstant(),
+        )
+    )
+
+
+def _make_after_yield_from_expr(factory, function, class_name) -> ast.Expr:
     return factory.Expr(
         _make_func_with_args(
             factory,
@@ -235,31 +131,11 @@ def _make_after_yield_from_expr(factory, function, class_name):
     )
 
 
-def _rewrite_yield(function, class_name, node: ast.Expr) -> Optional[list]:
-    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
-
-    result: List[ast.stmt] = []
-    result.extend(_make_before_yield_exprs(factory, function, class_name, node))
-    result.append(node)
-    result.append(_make_after_yield_expr(factory, function, class_name))
-    return result
-
-
-def _rewrite_yield_from(function, class_name, node: ast.Expr) -> Optional[list]:
-    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
-
-    result: List[ast.stmt] = []
-    result.extend(_make_before_yield_from_exprs(factory, function, class_name, node))
-    result.append(node)
-    result.append(_make_after_yield_from_expr(factory, function, class_name))
-    return result
-
-
 _EMPTY_LIST: list = []
 
 
 def _create_before_method_ast(
-    rewrite_ctx: _RewriteCtx, factory, class_name, function, filter_kind
+    rewrite_ctx: ASTRewriter, factory, class_name, function, filter_kind
 ) -> list:
     # Target code:
     # def method(a, b):
@@ -269,8 +145,7 @@ def _create_before_method_ast(
     if filter_kind == FilterKind.log_on_project_call:
         # In this case we need to create a local variable signaling whether
         # the caller is in the project (as if it's not we won't log the calls).
-        call = factory.Call()
-        call.func = factory.NameLoadRobo("_caller_in_project_roots")
+        call = factory.Call(factory.NameLoadRobo("_caller_in_project_roots"))
 
         assign = factory.Assign()
         caller_in_proj_name = factory.NameStore("@caller_in_proj")
@@ -278,8 +153,7 @@ def _create_before_method_ast(
         assign.value = call
         stmts.append(assign)
 
-    call = factory.Call()
-    call.func = factory.NameLoadRewriteCallback("before_method")
+    call = factory.Call(factory.NameLoadRewriteCallback("before_method"))
     log_method_type: LogElementType = "METHOD"
     call.args.append(factory.Str(log_method_type))
     call.args.append(factory.NameLoad("__name__"))
@@ -317,7 +191,7 @@ def _create_before_method_ast(
 
 
 def _create_except_handler_ast(
-    rewrite_ctx: _RewriteCtx,
+    rewrite_ctx: ASTRewriter,
     factory,
     class_name: str,
     function: ast.FunctionDef,
@@ -359,13 +233,11 @@ def _create_except_handler_ast(
     else:
         add_to_body = except_handler.body
 
-    exc_info_attr = factory.Attribute(factory.NameLoad("@py_sys"), "exc_info")
-    call_exc_info = factory.Call()
-    call_exc_info.func = exc_info_attr
+    call_exc_info = factory.Call(
+        factory.Attribute(factory.NameLoad("@py_sys"), "exc_info")
+    )
 
-    method_except = factory.NameLoadRewriteCallback("method_except")
-    call_method_except = factory.Call()
-    call_method_except.func = method_except
+    call_method_except = factory.Call(factory.NameLoadRewriteCallback("method_except"))
     log_method_type: LogElementType = "METHOD"
     call_method_except.args.append(factory.Str(log_method_type))
     call_method_except.args.append(factory.NameLoad("__name__"))
@@ -383,10 +255,9 @@ def _create_except_handler_ast(
 
 
 def _create_after_method_ast(
-    rewrite_ctx: _RewriteCtx, factory, class_name, function, filter_kind
+    rewrite_ctx: ASTRewriter, factory: NodeFactory, class_name, function, filter_kind
 ) -> ast.Expr:
-    call = factory.Call()
-    call.func = factory.NameLoadRewriteCallback("after_method")
+    call = factory.Call(factory.NameLoadRewriteCallback("after_method"))
     log_method_type: LogElementType = "METHOD"
     call.args.append(factory.Str(log_method_type))
     call.args.append(factory.NameLoad("__name__"))
@@ -412,7 +283,7 @@ def _accept_function_rewrite(function: ast.FunctionDef):
 
 
 def _rewrite_funcdef(
-    rewrite_ctx: _RewriteCtx, stack, function: ast.FunctionDef, filter_kind
+    rewrite_ctx: ASTRewriter, stack, function: ast.FunctionDef, filter_kind
 ) -> None:
     parent: Any
     # Only rewrite functions which actually have some content.
@@ -535,21 +406,16 @@ def rewrite_ast_add_callbacks(
     imports = _make_import_aliases_ast(lineno, filter_kind)
     mod.body[pos:pos] = imports
 
-    it: Any = _ast_utils.iter_and_replace_nodes(mod)
-    node: Any
+    rewrite_ctx = ASTRewriter(mod)
 
-    rewrite_ctx = _RewriteCtx()
-    while True:
-        try:
-            stack, node = next(it)
-        except StopIteration:
-            break
+    node: ast.AST
 
+    for stack, node in rewrite_ctx.iter_and_replace_nodes():
         handler = _dispatch.get(node.__class__)
         if handler:
             result = handler(rewrite_ctx, config, module_path, stack, filter_kind, node)
             if result is not None:
-                it.send(result)
+                rewrite_ctx.cursor.current = result
 
     if DEBUG:
         print("\n============ New AST (with hooks in place) ==============\n")
@@ -558,7 +424,7 @@ def rewrite_ast_add_callbacks(
 
 
 def _handle_funcdef(
-    rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node
+    rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node
 ):
     try:
         function: ast.FunctionDef = node
@@ -573,7 +439,7 @@ def _handle_funcdef(
 
 
 def _handle_return(
-    rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node
+    rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node
 ):
     func_and_class_name = _get_function_and_class_name(stack)
     if not func_and_class_name:
@@ -592,7 +458,7 @@ def _handle_return(
 
 
 def _handle_assign(
-    rewrite_ctx: _RewriteCtx, config: BaseConfig, module_path, stack, filter_kind, node
+    rewrite_ctx: ASTRewriter, config: BaseConfig, module_path, stack, filter_kind, node
 ):
     if filter_kind != FilterKind.full_log or not config.get_rewrite_assigns():
         return None
@@ -606,7 +472,21 @@ def _handle_assign(
         return
 
     try:
-        return _rewrite_assign(function, class_name, node)
+        factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                call = _make_func_with_args(
+                    factory,
+                    "after_assign",
+                    factory.NameLoad("__name__"),
+                    factory.NameLoad("__file__"),
+                    factory.Str(f"{class_name}{function.name}"),
+                    factory.LineConstant(),
+                    factory.Str(target.id),
+                    factory.NameLoad(target.id),
+                )
+
+                rewrite_ctx.stmts_cursor.after_append(factory.Expr(call))
     except Exception:
         raise RuntimeError(
             f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"
@@ -614,7 +494,7 @@ def _handle_assign(
 
 
 def _update_calls_from_func_to_generator(
-    rewrite_ctx: _RewriteCtx, function, filter_kind: FilterKind
+    rewrite_ctx: ASTRewriter, function, filter_kind: FilterKind
 ):
     before_call: ast.Call
     for before_call in rewrite_ctx.iter_func_calls_from_func(function):
@@ -627,44 +507,109 @@ def _update_calls_from_func_to_generator(
         before_call_method_type.s = log_method_type
 
 
-def _handle_expr(
-    rewrite_ctx: _RewriteCtx, config, module_path, stack, filter_kind, node: ast.Expr
+def _handle_yield(
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path,
+    stack,
+    filter_kind,
+    node: Union[ast.Yield, ast.YieldFrom],
 ):
-    if isinstance(node.value, (ast.Yield, ast.YieldFrom)):
-        func_and_class_name = _get_function_and_class_name(stack)
-        if not func_and_class_name:
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+    if not _accept_function_rewrite(function):
+        return None
+
+    try:
+        _update_calls_from_func_to_generator(rewrite_ctx, function, filter_kind)
+
+        if filter_kind != FilterKind.full_log:
             return None
 
-        function, class_name = func_and_class_name
-        if not _accept_function_rewrite(function):
-            return
+        # Wrapping of before/after for yield statements.
+        factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+        stmts_cursor = rewrite_ctx.stmts_cursor
+        yield_cursor = rewrite_ctx.cursor
 
-        try:
-            _update_calls_from_func_to_generator(rewrite_ctx, function, filter_kind)
+        if isinstance(node, ast.Yield):
+            value_yielded: ast.AST
+            if isinstance(yield_cursor.parent, ast.stmt):
+                # We can only rewrite in the simple case where we have something
+                # as:
+                # yield 2
+                #
+                # or
+                #
+                # a = yield call()
+                #
+                # Because we can't risk rewriting something as:
+                #
+                # a = call1() and (yield call2())
+                #
+                # as it'd change the order of the calls
+                #
+                # If the assumption above is correct than we can do something as:
+                #
+                # @tmp = call()
+                # before_yield(..., @tmp)
+                # yield @tmp
+                #
+                # and properly report the yield value.
 
-            if filter_kind != FilterKind.full_log:
-                return None
+                if node.value is not None:
+                    assign = factory.Assign()
+                    store_name = factory.NameTempStore()
+                    assign.targets = [store_name]
+                    assign.value = node.value
 
-            if isinstance(node.value, ast.Yield):
-                return _rewrite_yield(function, class_name, node)
+                    node.value = factory.NameLoad(store_name.id)
+
+                    value_yielded = factory.NameLoad(store_name.id)
+                    stmts_cursor.before_append(assign)
+                else:
+                    value_yielded = factory.NoneConstant()
             else:
-                return _rewrite_yield_from(function, class_name, node)
-        except Exception:
-            raise RuntimeError(
-                f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"
+                value_yielded = factory.NoneConstant()
+
+            stmts_cursor.before_append(
+                factory.Expr(
+                    _make_func_with_args(
+                        factory,
+                        "before_yield",
+                        factory.NameLoad("__name__"),
+                        factory.NameLoad("__file__"),
+                        factory.Str(f"{class_name}{function.name}"),
+                        factory.LineConstant(),
+                        value_yielded,
+                    )
+                )
             )
+
+            stmts_cursor.after_prepend(
+                _make_after_yield_expr(factory, function, class_name)
+            )
+        else:
+            stmts_cursor.before_append(
+                _make_before_yield_from_exprs(factory, function, class_name)
+            )
+            stmts_cursor.after_prepend(
+                _make_after_yield_from_expr(factory, function, class_name)
+            )
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"
+        )
 
 
 _dispatch: Dict[
     type,
-    Callable[[_RewriteCtx, BaseConfig, str, list, FilterKind, Any], Optional[list]],
+    Callable[[ASTRewriter, BaseConfig, str, list, FilterKind, Any], Optional[list]],
 ] = {}
 _dispatch[ast.Return] = _handle_return
 _dispatch[ast.Assign] = _handle_assign
 _dispatch[ast.FunctionDef] = _handle_funcdef
-
-# We can't deal with the Yield directly because it's a field of the Expr statement
-# and we can't rewrite a field (so, we have to go to the stmt level to be able to
-# rewrite it and then check if it's some expr we want to deal with -- and we also
-# need to check whether a yield appears in an assign).
-_dispatch[ast.Expr] = _handle_expr
+_dispatch[ast.Yield] = _handle_yield
+_dispatch[ast.YieldFrom] = _handle_yield

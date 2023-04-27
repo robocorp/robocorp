@@ -1,0 +1,14 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def method():
+    """
+    just docstring
+    """
+
+def _ignore_this():
+    a = 10
+    return a
+
+def _ignore_this_too():
+    a = 10
+    yield a

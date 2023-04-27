@@ -1,0 +1,16 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+import robocorp.log as @robolog
+
+def method():
+    try:
+        @caller_in_proj = @robolog._caller_in_project_roots()
+        @caller_in_proj and @robo_lifecycle_hooks.before_method('UNTRACKED_GENERATOR', __name__, __file__, 'method', 3, {})
+        yield from foo()
+        a = (yield from bar())
+    except:
+        if @caller_in_proj:
+            import sys as @py_sys
+            @robo_lifecycle_hooks.method_except('UNTRACKED_GENERATOR', __name__, __file__, 'method', 4, @py_sys.exc_info())
+        raise
+    finally:
+        @caller_in_proj and @robo_lifecycle_hooks.after_method('UNTRACKED_GENERATOR', __name__, __file__, 'method', 4)

@@ -4,15 +4,16 @@ import itertools
 import sys
 from typing import (
     Iterator,
-    Optional,
     List,
     Tuple,
     Generic,
     TypeVar,
+    Generator,
+    Union,
+    Optional,
 )
-import typing
-
 import ast as ast_module
+from ast import AST
 
 
 class _NodesProviderVisitor(ast_module.NodeVisitor):
@@ -92,29 +93,12 @@ class _PrinterVisitor(ast_module.NodeVisitor):
             self._level -= 1
 
 
-if sys.version_info[:2] < (3, 8):
-
-    class Protocol(object):
-        pass
-
-else:
-    from typing import Protocol
-
-
-class INode(Protocol):
-    type: str
-    lineno: int
-    end_lineno: int
-    col_offset: int
-    end_col_offset: int
-
-
 T = TypeVar("T")
 Y = TypeVar("Y", covariant=True)
 
 
 class NodeInfo(Generic[Y]):
-    stack: Tuple[INode, ...]
+    stack: Tuple[AST, ...]
     node: Y
 
     __slots__ = ["stack", "node"]
@@ -136,73 +120,157 @@ def print_ast(node, stream=None):
     errors_visitor.visit(node)
 
 
-if typing.TYPE_CHECKING:
-    from typing import runtime_checkable, Protocol
+class _RewriteCursor:
+    # These can be set in the instance to change the current node or
+    # something around it.
+    _before: Optional[List[AST]] = None
+    _after: Optional[List[AST]] = None
 
-    @runtime_checkable
-    class _AST_CLASS(INode, Protocol):
-        pass
+    current: Optional[Union[AST, List[AST]]] = None
 
-else:
-    # We know that the AST we're dealing with is the INode.
-    # We can't use runtime_checkable on Python 3.7 though.
-    _AST_CLASS = ast_module.AST
+    def __init__(self, parent, node):
+        # The parent node.
+        self.parent = parent
+
+        # This is the current node in the cursor.
+        self.node = node
+
+    @property
+    def after(self):
+        return self._after
+
+    @property
+    def before(self):
+        return self._before
+
+    def before_append(self, node: AST):
+        if self._before is None:
+            self._before = [node]
+        else:
+            self._before.append(node)
+
+    def after_append(self, node: AST):
+        if self._after is None:
+            self._after = [node]
+        else:
+            self._after.append(node)
+
+    def after_prepend(self, node: AST):
+        if self._after is None:
+            self._after = [node]
+        else:
+            self._after.insert(0, node)
 
 
-def iter_and_replace_nodes(
-    node, internal_stack: Optional[List[INode]] = None, recursive=True
-) -> Iterator[Tuple[List[INode], INode]]:
-    """
-    :note: the yielded stack is actually always the same (mutable) list, so,
-    clients that want to return it somewhere else should create a copy.
-    """
-    stack: List[INode]
-    if internal_stack is None:
-        stack = []
-        if node.__class__.__name__ != "File":
-            stack.append(node)
-    else:
-        stack = internal_stack
+class ASTRewriter:
+    def __init__(self, ast: AST):
+        self._memo: dict = {}
+        self._ast = ast
+        self._stack: List[AST] = []
+        self._cursor_stack: List[_RewriteCursor] = []
 
-    if recursive:
+    def save_func_to_before_method_call(
+        self, function: ast.FunctionDef, call: ast.Call
+    ):
+        self._memo.setdefault(function, []).append(call)
+
+    def save_func_to_except_method_call(self, function, call):
+        self._memo.setdefault(function, []).append(call)
+
+    def save_func_to_after_method_call(self, function, call):
+        self._memo.setdefault(function, []).append(call)
+
+    def iter_func_calls_from_func(self, func: ast.FunctionDef) -> Iterator[ast.Call]:
+        yield from iter(self._memo[func])
+
+    def iter_and_replace_nodes(
+        self,
+    ) -> Iterator[Tuple[List[AST], AST]]:
+        yield from self._iter_and_replace_nodes(self._ast)
+
+    def _iter_and_replace_nodes(self, node) -> Iterator[Tuple[List[AST], AST]]:
+        """
+        :note: the yielded stack is actually always the same (mutable) list, so,
+        clients that want to return it somewhere else should create a copy.
+        """
+        stack: List[AST] = self._stack
+
         for field, value in ast_module.iter_fields(node):
             if isinstance(value, list):
-                new_value = []
+                new_value: List[AST] = []
                 changed = False
-                for item in value:
-                    if isinstance(item, _AST_CLASS):
-                        new = yield stack, item
 
-                        if new is not None:
+                for item in value:
+                    if isinstance(item, AST):
+                        self._cursor_stack.append(_RewriteCursor(node, item))
+
+                        yield stack, item
+
+                        stack.append(item)
+                        yield from self._iter_and_replace_nodes(item)
+                        stack.pop()
+
+                        last_cursor = self._cursor_stack.pop(-1)
+                        if last_cursor.before is not None:
+                            if isinstance(last_cursor.before, list):
+                                new_value.extend(last_cursor.before)
+                            else:
+                                assert isinstance(last_cursor.before, AST)
+                                new_value.append(last_cursor.before)
                             changed = True
-                            new_value.extend(new)
+
+                        if last_cursor.current is not None:
+                            if isinstance(last_cursor.current, list):
+                                new_value.extend(last_cursor.current)
+                            else:
+                                assert isinstance(last_cursor.current, AST)
+                                new_value.append(last_cursor.current)
+                            changed = True
                         else:
                             new_value.append(item)
 
-                        stack.append(item)
-                        yield from iter_and_replace_nodes(item, stack, recursive=True)
-                        stack.pop()
+                        if last_cursor.after is not None:
+                            if isinstance(last_cursor.after, list):
+                                new_value.extend(last_cursor.after)
+                            else:
+                                assert isinstance(last_cursor.after, AST)
+                                new_value.append(last_cursor.after)
+                            changed = True
 
                 if changed:
                     setattr(node, field, new_value)
 
-            elif isinstance(value, _AST_CLASS):
+            elif isinstance(value, AST):
+                self._cursor_stack.append(_RewriteCursor(node, value))
+
                 yield stack, value
                 stack.append(value)
-
-                yield from iter_and_replace_nodes(value, stack, recursive=True)
-
+                yield from self._iter_and_replace_nodes(value)
                 stack.pop()
-    else:
-        # Not recursive
-        for _field, value in ast_module.iter_fields(node):
-            if isinstance(value, list):
-                for item in value:
-                    if isinstance(item, _AST_CLASS):
-                        yield stack, item
 
-            elif isinstance(value, _AST_CLASS):
-                yield stack, value
+                last_cursor = self._cursor_stack.pop(-1)
+                if last_cursor.before is not None or last_cursor.after is not None:
+                    stack_repr = "\n".join(str(x) for x in self._stack)
+                    raise RuntimeError(
+                        f"Cannot rewrite before/after in attribute, just in list.\nField: '{field}'\nStack:\n{stack_repr}"
+                    )
+
+                if last_cursor.current is not None:
+                    assert isinstance(last_cursor.current, ast.AST)
+                    setattr(node, field, last_cursor.current)
+
+    @property
+    def cursor(self) -> _RewriteCursor:
+        return self._cursor_stack[-1]
+
+    @property
+    def stmts_cursor(self) -> _RewriteCursor:
+        for cursor in reversed(self._cursor_stack):
+            if isinstance(cursor.node, ast.stmt):
+                return cursor
+
+        stack_repr = "\n".join(str(x.node) for x in self._cursor_stack)
+        raise RuntimeError(f"Did not find stmts cursor.\nStack:\n{stack_repr}")
 
 
 def copy_line_and_col(from_node, to_node):
@@ -221,8 +289,17 @@ class NodeFactory:
         node.col_offset = self.col_offset
         return node
 
-    def Call(self) -> ast.Call:
+    def Call(self, func: ast.expr) -> ast.Call:
+        """
+        Args:
+            func: The function call expression.
+
+        Example:
+            factory.Call(factory.NameLoad("some_name"))
+        """
         call = ast.Call(keywords=[], args=[])
+        if func is not None:
+            call.func = func
         return self._set_line_col(call)
 
     def Assign(self) -> ast.Assign:
