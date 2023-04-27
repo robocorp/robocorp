@@ -1,0 +1,49 @@
+name: Go package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cli_go
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.15'
+
+      - name: setup invoke
+        run: pipx install invoke
+
+
+      - name: Build
+        run: invoke build
+
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: robo-artifacts
+          path: ./build/
+
+
+      - name: Signing
+        run: invoke sign
+        env:
+            MACOS_SIGNING_CERT: ${{ secrets.MACOS_SIGNING_CERT }}
+            MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
+      - name: Notarizing
+        run: invoke notarize
+        env:
+            APPLEID: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
+            APPLEIDPASS: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: robo-signed
+          path: ./build/
+
