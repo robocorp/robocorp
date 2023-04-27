@@ -48,7 +48,7 @@ func HolotreeVariables(
 
 	var vars variables
 	if err := json.Unmarshal([]byte(output.Stdout), &vars); err != nil {
-		logger.Errorf("Malformed output: %v", err)
+		return nil, err
 	}
 
 	result := make(map[string]string, 0)

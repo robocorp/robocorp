@@ -18,8 +18,8 @@ func CopyFile(src, dst string, mode fs.FileMode) error {
 	}
 
 	parent := path.Dir(dst)
-	if _, err := os.Stat(parent); os.IsNotExist(err) {
-		os.MkdirAll(parent, mode)
+	if err := os.MkdirAll(parent, mode); err != nil {
+		return err
 	}
 
 	if err := os.WriteFile(dst, data, mode); err != nil {
@@ -35,15 +35,18 @@ func CopyDir(src, dst string, mode fs.FileMode) error {
 		return err
 	}
 
-	if _, err := os.Stat(dst); os.IsNotExist(err) {
-		os.MkdirAll(dst, mode)
+	if err := os.MkdirAll(dst, mode); err != nil {
+		return err
 	}
 
 	for _, entry := range entries {
 		entrySrc := path.Join(src, entry.Name())
 
 		if entry.IsDir() {
-			CopyDir(entrySrc, path.Join(dst, entry.Name()), mode)
+			dir := path.Join(dst, entry.Name())
+			if err := CopyDir(entrySrc, dir, mode); err != nil {
+				return err
+			}
 			continue
 		}
 

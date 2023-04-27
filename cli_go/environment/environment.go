@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/log"
 	"github.com/robocorp/robo/cli/config/conda"
 	"github.com/robocorp/robo/cli/config/pyproject"
 	"github.com/robocorp/robo/cli/environment/cache"
@@ -40,9 +39,7 @@ func EnsureFromConfig(
 	condaYaml := conda.NewFromConfig(cfg)
 
 	digest := calculateDigest(projectRoot, *condaYaml)
-	cachedEnv, ok := cache.GetEntry(digest)
-	if ok {
-		log.Debug("Found cached environment", "digest", digest)
+	if cachedEnv, ok := cache.GetEntry(digest); ok {
 		return mergeEnvironment(cachedEnv), nil
 	}
 
@@ -70,7 +67,6 @@ func createEnvironment(
 	digest := calculateDigest(projectRoot, *condaYaml)
 	space := fmt.Sprintf("robo-%v", digest)
 
-	log.Debug("Creating environment", "digest", digest, "space", space)
 	vars, err := rcc.HolotreeVariables(condaPath, space, onProgress)
 	if err != nil {
 		return nil, err
@@ -78,7 +74,7 @@ func createEnvironment(
 
 	err = cache.AddEntry(digest, vars)
 	if err != nil {
-		log.Debug(fmt.Sprintf("Failed to add cache entry: %v", err))
+		return nil, err
 	}
 
 	return vars, nil
@@ -105,7 +101,7 @@ func mergeEnvironment(holotree map[string]string) Environment {
 func calculateDigest(projectPath string, condaYaml conda.CondaYaml) string {
 	condaContent, err := json.Marshal(condaYaml)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	hash := md5.New()

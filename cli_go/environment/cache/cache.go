@@ -5,7 +5,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/charmbracelet/log"
 	"github.com/robocorp/robo/cli/paths"
 )
 
@@ -46,7 +45,6 @@ func loadCache() Cache {
 	var cache Cache
 	err = json.Unmarshal(data, &cache)
 	if err != nil {
-		log.Warn("Malformed environment cache", "err", err)
 		return make(Cache)
 	}
 

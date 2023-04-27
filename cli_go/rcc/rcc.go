@@ -4,7 +4,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/charmbracelet/log"
 	"github.com/robocorp/robo/cli/include"
 	"github.com/robocorp/robo/cli/paths"
 )
@@ -12,7 +11,6 @@ import (
 var (
 	Controller = "robo-cli"
 	Executable = path.Join(paths.BinPath(), "rcc")
-	logger     = log.NewWithOptions(os.Stderr, log.Options{Prefix: "rcc"})
 )
 
 func Ensure() {
@@ -21,7 +19,6 @@ func Ensure() {
 		return
 	}
 
-	logger.Info("Copying executable", "path", Executable)
 	if err := include.CopyFile("bin/rcc", Executable, 0o755); err != nil {
 		panic(err)
 	}

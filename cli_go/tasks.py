@@ -2,6 +2,7 @@ import urllib.request
 import os
 import platform
 import stat
+import sys
 from pathlib import Path
 
 from invoke import task
@@ -9,6 +10,8 @@ from invoke import task
 CURDIR = Path(__file__).parent
 BUILD = CURDIR / "build"
 
+RCC_EXE = "rcc.exe" if platform.system() == "Windows" else "rcc"
+RCC_PATH = CURDIR / "include" / "bin" / RCC_EXE
 RCC_VERSION = "11.28.0"
 RCC_URL = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
@@ -31,6 +34,10 @@ def pretty(ctx):
 @task
 def build(ctx):
     """Build robo binary"""
+    if not RCC_PATH.is_file():
+        print("rcc executable missing, run 'invoke include'")
+        sys.exit(1)
+
     BUILD.mkdir(parents=True, exist_ok=True)
     run(ctx, "go", "build", "-o", BUILD / "robo", CURDIR)
 
@@ -38,14 +45,11 @@ def build(ctx):
 @task
 def include(ctx):
     """Download static assets to include/ directory"""
-    filename = "rcc.exe" if platform.system() == "Windows" else "rcc"
-    path = CURDIR / "include" / "bin" / filename
+    print(f"Downloading '{RCC_URL}' to '{RCC_PATH}'")
+    urllib.request.urlretrieve(RCC_URL, RCC_PATH)
 
-    print(f"Downloading '{RCC_URL}' to '{path}'")
-    urllib.request.urlretrieve(RCC_URL, path)
-
-    st = os.stat(path)
-    os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    st = os.stat(RCC_PATH)
+    os.chmod(RCC_PATH, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
 @task

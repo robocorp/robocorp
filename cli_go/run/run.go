@@ -32,7 +32,10 @@ func RunTask(name string) error {
 		}
 	}
 
-	clearOutput(*cfg)
+	if err := clearOutput(*cfg); err != nil {
+		return err
+	}
+
 	fmt.Println("\nRunning task: " + bold(name))
 	return core.RunTask(*env, name)
 }
@@ -47,7 +50,7 @@ func clearOutput(cfg pyproject.Robo) error {
 	if err := os.RemoveAll(output); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(output, 0o666); err != nil {
+	if err := os.MkdirAll(output, 0o755); err != nil {
 		return err
 	}
 
