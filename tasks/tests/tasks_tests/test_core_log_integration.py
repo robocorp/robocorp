@@ -1,4 +1,5 @@
 from tasks_tests.fixtures import robo_run
+from pathlib import Path
 
 
 def test_core_log_integration_error_in_import(datadir):
@@ -75,3 +76,25 @@ def test_core_log_integration_config_log(datadir):
         import webbrowser
 
         webbrowser.open(log_target.as_uri())
+
+
+def test_core_log_integration_empty_pyproject(datadir) -> None:
+    pyproject: Path = datadir / "pyproject.toml"
+    pyproject.write_text("")
+    from robocorp.log import verify_log_messages_from_log_html
+
+    result = robo_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    assert not decoded.strip()
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "Robocorp Log (html)" in decoded
+
+    log_target = datadir / "output" / "log.html"
+    assert log_target.exists()
+
+    verify_log_messages_from_log_html(
+        log_target,
+        [{"message_type": "SE", "name": "check_difflib_log"}],
+        [{"message_type": "SE", "name": "ndiff"}],
+    )

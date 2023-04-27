@@ -1,3 +1,8 @@
+0.1.6
+-----------------------------
+
+- Fixed case where the log would not be properly setup if `[tool.robocorp.log`] was not in `pyproject.toml`.
+
 0.1.5
 -----------------------------
 

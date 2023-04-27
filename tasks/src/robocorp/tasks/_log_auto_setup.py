@@ -7,8 +7,6 @@ from robocorp import log
 
 
 def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
-    filters: List[log.Filter] = []
-
     while True:
         pyproject = path / "pyproject.toml"
         try:
@@ -39,33 +37,46 @@ def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
     except Exception:
         raise RuntimeError(f"Could not interpret the contents of {pyproject} as toml.")
 
-    # Filter(name="RPA", kind=FilterKind.log_on_project_call),
-    # Filter("selenium", FilterKind.log_on_project_call),
-    # Filter("SeleniumLibrary", FilterKind.log_on_project_call),
+    filters: List[log.Filter] = []
+    if isinstance(obj, dict):
+        # Filter(name="RPA", kind=FilterKind.log_on_project_call),
+        # Filter("selenium", FilterKind.log_on_project_call),
+        # Filter("SeleniumLibrary", FilterKind.log_on_project_call),
 
-    read_parts: List[str] = []
-    for part in "tool.robocorp.log".split("."):
-        read_parts.append(part)
+        read_parts: List[str] = []
+        for part in "tool.robocorp.log".split("."):
+            read_parts.append(part)
 
-        obj = obj.get(part)
-        if not obj:
-            break
+            obj = obj.get(part)
+            if not obj:
+                break
 
-        elif not isinstance(obj, dict):
-            context.show_error(
-                f"Expected {'.'.join(read_parts)} to be a dict in {pyproject}."
-            )
-            break
-
-    log_filter_rules: list = []
-    obj = obj.get("log_filter_rules")
-    if obj:
-        if isinstance(obj, list):
-            log_filter_rules = obj
+            elif not isinstance(obj, dict):
+                context.show_error(
+                    f"Expected {'.'.join(read_parts)} to be a dict in {pyproject}."
+                )
+                break
         else:
-            context.show_error(
-                f"Expected {'.'.join(read_parts)} to be a list in {pyproject}."
-            )
+            if isinstance(obj, dict):
+                filters = _load_filters(obj, context, pyproject)
+
+    return log.ConfigFilesFiltering(filters=filters)
+
+
+def _load_filters(obj: dict, context, pyproject) -> List[log.Filter]:
+    filters: List[log.Filter] = []
+    log_filter_rules: list = []
+    list_obj = obj.get("log_filter_rules")
+    if not list_obj:
+        return filters
+
+    if isinstance(list_obj, list):
+        log_filter_rules = list_obj
+    else:
+        context.show_error(
+            f"Expected 'tool.robocorp.log.log_filter_rules' to be a list in {pyproject}."
+        )
+        return filters
 
     # If we got here we have the 'log_filter_rules', which should be a list of
     # dicts in a structure such as: {name = "difflib", kind = "log_on_project_call"}
@@ -76,38 +87,37 @@ def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
             kind = rule.get("kind")
             if not name:
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have a 'name' in {pyproject}."
+                    f"Expected rule: {rule} from 'tool.robocorp.log.log_filter_rules' to have a 'name' in {pyproject}."
                 )
                 continue
 
             if not kind:
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have a 'kind' in {pyproject}."
+                    f"Expected rule: {rule} from 'tool.robocorp.log.log_filter_rules' to have a 'kind' in {pyproject}."
                 )
                 continue
 
             if not isinstance(name, str):
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have 'name' as a str in {pyproject}."
+                    f"Expected rule: {rule} from 'tool.robocorp.log.log_filter_rules' to have 'name' as a str in {pyproject}."
                 )
                 continue
 
             if not isinstance(kind, str):
                 context.show_error(
-                    f"Expected a rule from 'tool.robocorp.log.log_filter_rules' to have 'kind' as a str in {pyproject}."
+                    f"Expected rule: {rule} from 'tool.robocorp.log.log_filter_rules' to have 'kind' as a str in {pyproject}."
                 )
                 continue
 
             f: Optional[log.FilterKind] = getattr(log.FilterKind, kind, None)
             if f is None:
                 context.show_error(
-                    f"Rule from 'tool.robocorp.log.log_filter_rules' has invalid 'kind': >>{kind}<< in {pyproject}."
+                    f"Rule from 'tool.robocorp.log.log_filter_rules' ({rule}) has invalid 'kind': >>{kind}<< in {pyproject}."
                 )
                 continue
 
             filters.append(log.Filter(name, f))
-
-    return log.ConfigFilesFiltering(filters=filters)
+    return filters
 
 
 def _log_before_task_run(task: ITask):
