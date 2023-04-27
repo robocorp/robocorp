@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
-	//"github.com/spf13/viper"
 )
 
 var rootCmd = &cobra.Command{
@@ -18,6 +16,6 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		log.Fatal(err)
+		fatalError(err)
 	}
 }

@@ -3,6 +3,7 @@ package rcc
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/robocorp/robo/cli/process"
 )
 
@@ -59,10 +60,17 @@ func HolotreeVariables(
 }
 
 // rcc robot wrap
-func RobotWrap() error {
+func RobotWrap(path string) error {
 	Ensure()
 
-	proc := process.New(Executable, "robot", "wrap")
+	proc := process.New(
+		Executable,
+		"robot",
+		"wrap",
+		"--zipfile",
+		path,
+	)
+
 	if _, err := proc.Run(); err != nil {
 		return fmt.Errorf("Failed to package project: %v", err)
 	}

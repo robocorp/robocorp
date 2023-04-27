@@ -1,8 +1,10 @@
 package pyproject
 
 import (
-	toml "github.com/pelletier/go-toml/v2"
+	"errors"
 	"os"
+
+	toml "github.com/pelletier/go-toml/v2"
 )
 
 type Root struct {
@@ -34,5 +36,10 @@ func LoadPath(path string) (*Robo, error) {
 		return nil, err
 	}
 
-	return root.Tool.Robo, nil
+	cfg := root.Tool.Robo
+	if cfg == nil {
+		return nil, errors.New("Missing 'tool.robo' section in pyproject.toml")
+	}
+
+	return cfg, nil
 }

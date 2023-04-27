@@ -2,10 +2,11 @@ package cache
 
 import (
 	"encoding/json"
-	"github.com/charmbracelet/log"
-	"github.com/robocorp/robo/cli/paths"
 	"os"
 	"path"
+
+	"github.com/charmbracelet/log"
+	"github.com/robocorp/robo/cli/paths"
 )
 
 type Cache map[string]map[string]string

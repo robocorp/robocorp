@@ -2,8 +2,9 @@ package core
 
 import (
 	"encoding/json"
+
 	"github.com/charmbracelet/log"
-	"github.com/robocorp/robo/cli/env"
+	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/process"
 )
 
@@ -14,7 +15,7 @@ type Task struct {
 	Line int
 }
 
-func ListTasks(env env.Environment) []Task {
+func ListTasks(env environment.Environment) []Task {
 	env.Variables["RC_LOG_OUTPUT_STDOUT"] = "1"
 
 	proc := process.New("python", "-m", "robo", "list", "tasks.py")
@@ -34,7 +35,7 @@ func ListTasks(env env.Environment) []Task {
 	return tasks
 }
 
-func RunTask(env env.Environment, name string) {
+func RunTask(env environment.Environment, name string) {
 	env.Variables["RC_LOG_OUTPUT_STDOUT"] = "1"
 
 	proc := process.New("python", "-m", "robo", "run", "tasks.py", "-t", name)

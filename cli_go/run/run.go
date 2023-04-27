@@ -4,7 +4,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/robocorp/robo/cli/config/pyproject"
 	"github.com/robocorp/robo/cli/core"
-	"github.com/robocorp/robo/cli/env"
+	"github.com/robocorp/robo/cli/environment"
 )
 
 func RunTask(name string) {
@@ -13,7 +13,7 @@ func RunTask(name string) {
 		log.Fatalf("Failed to load pyproject.toml: %v", err)
 	}
 
-	env, err := env.EnsureFromConfig(*robo, nil)
+	env, err := environment.EnsureFromConfig(*robo, nil)
 	if err != nil {
 		log.Fatalf("Failed to create environment: %v", err)
 	}

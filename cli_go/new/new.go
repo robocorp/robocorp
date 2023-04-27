@@ -1,7 +1,6 @@
 package new
 
 import (
-	"fmt"
 	"path"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -10,13 +9,13 @@ import (
 	"github.com/charmbracelet/lipgloss"
 
 	"github.com/robocorp/robo/cli/config/pyproject"
-	"github.com/robocorp/robo/cli/env"
+	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/include"
+	"github.com/robocorp/robo/cli/paths"
 	"github.com/robocorp/robo/cli/rcc"
+	"github.com/robocorp/robo/cli/ui"
 	"github.com/robocorp/robo/cli/ui/progress"
 )
-
-type ErrorMsg error
 
 type State int
 
@@ -40,7 +39,7 @@ type model struct {
 	installProgress progress.Model
 }
 
-func New() *tea.Program {
+func NewProgram() *tea.Program {
 	return tea.NewProgram(initialModel())
 }
 
@@ -80,7 +79,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.Type == tea.KeyCtrlC {
 			return m, tea.Quit
 		}
-	case ErrorMsg:
+	case ui.ErrorMsg:
 		m.error = msg
 		return m, tea.Quit
 	}
@@ -102,6 +101,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	sections := make([]string, 0)
 
+	// TODO: Move to model/update?
+	dirName := paths.SanitizePath(m.nameInput.Value())
+
 	switch m.currentState {
 	case StateTemplate:
 		sections = append(
@@ -114,28 +116,31 @@ func (m model) View() string {
 			section("Selected template:", m.template.Name),
 			"Project name:",
 			m.nameInput.View(),
-			styles.Faint.Render("\nPress ctrl-c to abort"),
+			faintText("Directory name:", dirName),
+			faintText("\nPress ctrl-c to abort"),
 		)
 	case StateInstall:
 		sections = append(
 			sections,
 			section("Selected template:", m.template.Name),
 			section("Project name:", m.name),
+			section("Directory name:", dirName),
 			m.installProgress.View(),
-			styles.Faint.Render("\nPress ctrl-c to abort"),
+			faintText("\nPress ctrl-c to abort"),
 		)
 	case StateDone:
 		sections = append(
 			sections,
 			section("Selected template:", m.template.Name),
 			section("Project name:", m.name),
+			section("Directory name:", dirName),
 			m.installProgress.ViewAs(1.0),
 			"\nCreated project ✨\n",
 		)
 	}
 
 	if m.error != nil {
-		sections = append(sections, fmt.Sprintf("Error: %v", m.error))
+		sections = append(sections, errorBox(m.error))
 	}
 
 	return margin.Render(
@@ -207,17 +212,16 @@ func (m model) installProject() tea.Cmd {
 	}
 
 	return func() tea.Msg {
-		// TODO: Sanitize dir
-		dir := m.name
+		dir := paths.SanitizePath(m.name)
 		if err := m.template.Copy(dir); err != nil {
-			return ErrorMsg(err)
+			return ui.ErrorMsg(err)
 		}
 		robo, err := pyproject.LoadPath(path.Join(dir, "pyproject.toml"))
 		if err != nil {
-			return ErrorMsg(err)
+			return ui.ErrorMsg(err)
 		}
-		if _, err := env.EnsureFromConfig(*robo, onProgress); err != nil {
-			return ErrorMsg(err)
+		if _, err := environment.EnsureFromConfig(*robo, onProgress); err != nil {
+			return ui.ErrorMsg(err)
 		}
 		return nil
 	}

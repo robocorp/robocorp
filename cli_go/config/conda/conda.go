@@ -2,10 +2,11 @@ package conda
 
 import (
 	"fmt"
-	"github.com/robocorp/robo/cli/config/pyproject"
-	yaml "gopkg.in/yaml.v2"
 	"os"
 	"sort"
+
+	"github.com/robocorp/robo/cli/config/pyproject"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (

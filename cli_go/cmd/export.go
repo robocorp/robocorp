@@ -1,9 +1,14 @@
 package cmd
 
 import (
-	"github.com/charmbracelet/log"
+	"fmt"
+
 	"github.com/robocorp/robo/cli/export"
 	"github.com/spf13/cobra"
+)
+
+const (
+	robotZip = "robot.zip"
 )
 
 func init() {
@@ -12,10 +17,12 @@ func init() {
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
-	Short: "Create `rcc` compatible configuration files",
+	Short: "Export project as .zip file",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := export.ExportConfigs(); err != nil {
-			log.Fatal(err)
+		if err := export.ExportProject(robotZip, false); err != nil {
+			fatalError(err)
 		}
+
+		fmt.Printf("Created export: %v\n", robotZip)
 	},
 }

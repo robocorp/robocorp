@@ -33,9 +33,8 @@ func DefaultStyles() (s Styles) {
 	s.Faint = lipgloss.NewStyle().Faint(true)
 	s.Bold = lipgloss.NewStyle().Bold(true)
 	s.ErrorBox = lipgloss.NewStyle().
-		Bold(true).
-		Padding(1).
-		Margin(1).
+		Padding(0, 1).
+		Margin(1, 0).
 		Border(lipgloss.RoundedBorder()).
 		BorderForeground(ColorBrightRed)
 

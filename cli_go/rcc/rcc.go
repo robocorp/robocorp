@@ -1,11 +1,12 @@
 package rcc
 
 import (
+	"os"
+	"path"
+
 	"github.com/charmbracelet/log"
 	"github.com/robocorp/robo/cli/include"
 	"github.com/robocorp/robo/cli/paths"
-	"os"
-	"path"
 )
 
 var (

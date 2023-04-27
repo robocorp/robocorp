@@ -1,38 +1,54 @@
 package exec
 
 import (
+	"errors"
 	"fmt"
-	"github.com/charmbracelet/log"
-	"github.com/robocorp/robo/cli/config/pyproject"
-	"github.com/robocorp/robo/cli/env"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/robocorp/robo/cli/config/pyproject"
+	"github.com/robocorp/robo/cli/environment"
+	"github.com/robocorp/robo/cli/paths"
+	"github.com/robocorp/robo/cli/ui"
 )
 
-func Exec(args []string) {
+var (
+	bold = ui.DefaultStyles().Bold.Render
+)
+
+func Exec(args []string) error {
 	if len(args) == 0 {
-		log.Fatal("No arguments given!")
+		return errors.New("No arguments given!")
 	}
 
-	robo, err := pyproject.LoadPath("pyproject.toml")
+	cfg, err := pyproject.LoadPath("pyproject.toml")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	env, err := env.EnsureFromConfig(*robo, nil)
+	env, err := environment.EnsureWithProgress(*cfg)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	log.Info(fmt.Sprintf("Running command: %v", strings.Join(args, " ")))
-	cmd := exec.Command(args[0], args[1:]...)
+	fmt.Println("\nRunning command: " + bold(strings.Join(args, " ")))
+
+	// TODO: Move as part of Environment struct
+	var exe string
+	if pathvar, ok := env.Variables["PATH"]; ok {
+		if f, err := paths.FindExecutable(args[0], pathvar); err == nil {
+			exe = f
+		}
+	} else {
+		exe = args[0]
+	}
+
+	cmd := exec.Command(exe, args[1:]...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Env = env.ToSlice()
 
-	if err := cmd.Run(); err != nil {
-		log.Fatal(err)
-	}
+	return cmd.Run()
 }

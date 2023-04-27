@@ -26,8 +26,10 @@ func (e ProgressEvent) Percent() float64 {
 
 type ProgressDone struct{}
 
-func DoneCmd() tea.Msg {
-	return ProgressDone{}
+func makeDone() tea.Cmd {
+	return func() tea.Msg {
+		return ProgressDone{}
+	}
 }
 
 type Model struct {
@@ -93,7 +95,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		percent := msg.Percent()
 		cmd := m.progressBar.SetPercent(percent)
 		if percent == 1.0 {
-			return m, tea.Batch(cmd, DoneCmd)
+			return m, tea.Batch(cmd, makeDone())
 		} else {
 			return m, tea.Batch(cmd, m.PollEvents())
 		}

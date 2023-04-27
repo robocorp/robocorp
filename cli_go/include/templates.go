@@ -1,8 +1,9 @@
 package include
 
 import (
-	yaml "gopkg.in/yaml.v2"
 	"path"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 type TemplatesYaml struct {

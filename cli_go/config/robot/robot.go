@@ -1,9 +1,10 @@
 package robot
 
 import (
+	"os"
+
 	"github.com/robocorp/robo/cli/config/pyproject"
 	yaml "gopkg.in/yaml.v2"
-	"os"
 )
 
 type RobotYaml struct {

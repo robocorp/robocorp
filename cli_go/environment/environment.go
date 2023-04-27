@@ -1,4 +1,4 @@
-package env
+package environment
 
 import (
 	"crypto/md5"
@@ -10,7 +10,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/robocorp/robo/cli/config/conda"
 	"github.com/robocorp/robo/cli/config/pyproject"
-	"github.com/robocorp/robo/cli/env/cache"
+	"github.com/robocorp/robo/cli/environment/cache"
 	"github.com/robocorp/robo/cli/paths"
 	"github.com/robocorp/robo/cli/rcc"
 )

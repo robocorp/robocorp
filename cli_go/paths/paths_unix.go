@@ -4,7 +4,6 @@
 package paths
 
 import (
-	"github.com/charmbracelet/log"
 	"os"
 	"path"
 	"strings"
@@ -13,7 +12,7 @@ import (
 func RoboHome() string {
 	userHome, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	return path.Join(userHome, ".robocorp", "robo")
