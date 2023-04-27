@@ -2,6 +2,7 @@
 -----------------------------
 
 - Fixed case where the log would not be properly setup if `[tool.robocorp.log`] was not in `pyproject.toml`.
+- Upgraded `robocorp-log` dependency to `0.0.13`. 
 
 0.1.5
 -----------------------------

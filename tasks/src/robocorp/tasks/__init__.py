@@ -30,5 +30,5 @@ automatically logged is not imported prior the the `cli.main` call.
 
 from ._decorators import task
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 version_info = [int(x) for x in __version__.split(".")]
