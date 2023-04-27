@@ -96,6 +96,9 @@ def notarize(ctx):
 
     # TODO: add --team-id
 
+    ctx.run("zip robo.zip build/robo")
     ctx.run(
-        f"xcrun notarytool submit build/robo --apple-id {apple_id} --password {signing_password} --wait"
+        f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --wait"
     )
+    ctx.run("mkdir dist")
+    ctx.run("unzip robo.zip -d dist")

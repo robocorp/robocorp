@@ -58,5 +58,5 @@ jobs:
         if: matrix.os == 'macos-latest'
         with:
           name: robo-signed
-          path: ./build/
+          path: ./dist/
 
