@@ -62,23 +62,38 @@ jobs:
             MACOS_APP_ID_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
             MACOS_APP_ID_PASS_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
 
-      - name: Move binaries
-        run: |
-          mv build/windows64/robo dist/windows64/robo
-          mv build/linux64/robo dist/linux64/robo
-
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'macos-latest'
         with:
           name: robo-signed
           path: cli/dist/build/robo
-      - name: Upload binaries to release
+
+      - name: Upload macOS binary
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: dist/*
-          asset_name: mything
+          file: robo-$tag-macos64
+          asset_name: dist/build/macos64/robo
           tag: ${{ github.ref }}
           overwrite: true
-          body: "Binaries available as release assets."
+
+      - name: Upload windows binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: build/windows64/robo
+          asset_name: robo-$tag-windows64
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload ubuntu binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: build/ubuntu64/robo
+          asset_name: robo-$tag-ubuntu64
+          tag: ${{ github.ref }}
+          overwrite: true
