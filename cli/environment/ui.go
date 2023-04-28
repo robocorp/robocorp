@@ -28,6 +28,10 @@ type model struct {
 }
 
 func EnsureWithProgress(cfg pyproject.Robo) (*Environment, error) {
+	if env, ok := TryCache(cfg); ok {
+		return &env, nil
+	}
+
 	initialModel := model{
 		Cfg:      cfg,
 		progress: progress.New(),
@@ -57,7 +61,7 @@ func (m model) Init() tea.Cmd {
 	}
 
 	ensureCmd := func() tea.Msg {
-		env, err := EnsureFromConfig(m.Cfg, onProgress)
+		env, err := Create(m.Cfg, onProgress)
 		if err != nil {
 			return ui.ErrorMsg(err)
 		}

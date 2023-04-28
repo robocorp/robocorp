@@ -73,8 +73,13 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// TODO: Propagate window size message to all child components, always
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		var cmd1, cmd2, cmd3 tea.Cmd
+		m.templateInput, cmd1 = m.templateInput.Update(msg)
+		m.nameInput, cmd2 = m.nameInput.Update(msg)
+		m.installProgress, cmd3 = m.installProgress.Update(msg)
+		return m, tea.Batch(cmd1, cmd2, cmd3)
 	case tea.KeyMsg:
 		if msg.Type == tea.KeyCtrlC {
 			return m, tea.Quit
@@ -213,7 +218,15 @@ func (m model) installProject() tea.Cmd {
 		if err != nil {
 			return ui.ErrorMsg(err)
 		}
-		if _, err := environment.EnsureFromConfig(*cfg, onProgress); err != nil {
+		if _, ok := environment.TryCache(*cfg); ok {
+			ch <- progress.ProgressEvent{
+				Current: 1,
+				Total:   1,
+				Message: "Found cached environment",
+			}
+			return nil
+		}
+		if _, err := environment.Create(*cfg, onProgress); err != nil {
 			return ui.ErrorMsg(err)
 		}
 		return nil

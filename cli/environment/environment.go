@@ -26,58 +26,42 @@ func (e Environment) ToSlice() []string {
 	return env
 }
 
-func EnsureFromConfig(
+func TryCache(cfg pyproject.Robo) (Environment, bool) {
+	condaYaml := conda.NewFromConfig(cfg)
+	digest := calculateDigest(cfg.GetPath(), *condaYaml)
+
+	if env, ok := cache.GetEntry(digest); ok {
+		return mergeEnvironment(env), true
+	} else {
+		return Environment{}, false
+	}
+}
+
+func Create(
 	cfg pyproject.Robo,
 	onProgress func(*rcc.Progress),
 ) (Environment, error) {
-	// TODO: Get root from somewhere else
-	projectRoot, err := os.Getwd()
+	condaPath := paths.CreateTempFile(cfg.GetPath(), ".conda-*.yaml")
+	defer os.Remove(condaPath)
+
+	condaYaml := conda.NewFromConfig(cfg)
+	if err := condaYaml.SaveAs(condaPath); err != nil {
+		return Environment{}, err
+	}
+
+	digest := calculateDigest(cfg.GetPath(), *condaYaml)
+	space := fmt.Sprintf("robo-%v", digest)
+
+	env, err := rcc.HolotreeVariables(condaPath, space, onProgress)
 	if err != nil {
 		return Environment{}, err
 	}
 
-	condaYaml := conda.NewFromConfig(cfg)
-
-	digest := calculateDigest(projectRoot, *condaYaml)
-	if cachedEnv, ok := cache.GetEntry(digest); ok {
-		return mergeEnvironment(cachedEnv), nil
-	}
-
-	env, err := createEnvironment(projectRoot, condaYaml, onProgress)
-	if err != nil {
+	if err := cache.AddEntry(digest, env); err != nil {
 		return Environment{}, err
 	}
 
 	return mergeEnvironment(env), nil
-}
-
-func createEnvironment(
-	projectRoot string,
-	condaYaml *conda.CondaYaml,
-	onProgress func(*rcc.Progress),
-) (map[string]string, error) {
-	condaPath := paths.CreateTempFile(projectRoot, ".conda-*.yaml")
-	defer os.Remove(condaPath)
-
-	err := condaYaml.SaveAs(condaPath)
-	if err != nil {
-		return nil, err
-	}
-
-	digest := calculateDigest(projectRoot, *condaYaml)
-	space := fmt.Sprintf("robo-%v", digest)
-
-	vars, err := rcc.HolotreeVariables(condaPath, space, onProgress)
-	if err != nil {
-		return nil, err
-	}
-
-	err = cache.AddEntry(digest, vars)
-	if err != nil {
-		return nil, err
-	}
-
-	return vars, nil
 }
 
 func mergeEnvironment(holotree map[string]string) Environment {

@@ -3,6 +3,7 @@ package pyproject
 import (
 	"errors"
 	"os"
+	"path"
 
 	toml "github.com/pelletier/go-toml/v2"
 )
@@ -16,6 +17,7 @@ type Tool struct {
 }
 
 type Robo struct {
+	path            string
 	Name            string            `toml:"name"`
 	Description     string            `toml:"description"`
 	Python          string            `toml:"python"`
@@ -24,8 +26,8 @@ type Robo struct {
 	DevDependencies map[string]string `toml:"dev-dependencies"`
 }
 
-func LoadPath(path string) (*Robo, error) {
-	data, err := os.ReadFile(path)
+func LoadPath(name string) (*Robo, error) {
+	data, err := os.ReadFile(name)
 	if err != nil {
 		return nil, err
 	}
@@ -41,5 +43,10 @@ func LoadPath(path string) (*Robo, error) {
 		return nil, errors.New("Missing 'tool.robo' section in pyproject.toml")
 	}
 
+	cfg.path = path.Dir(name)
 	return cfg, nil
+}
+
+func (r Robo) GetPath() string {
+	return r.path
 }

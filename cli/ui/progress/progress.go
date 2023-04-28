@@ -21,6 +21,10 @@ type ProgressEvent struct {
 }
 
 func (e ProgressEvent) Percent() float64 {
+	if e.Total == 0 {
+		return 0
+	}
+
 	return float64(e.Current) / float64(e.Total)
 }
 
