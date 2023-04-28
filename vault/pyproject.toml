@@ -1,26 +1,27 @@
 [tool.poetry]
-name = "robocorp-excel"
-version = "0.2.0"
-description = "Robocorp Excel automation library"
+name = "robocorp-vault"
+version = "0.1.0"
+description = "Robocorp Control Room API integration library"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
 	"Kerkko P. <kerkko@robocorp.com>",
-    "Antero V. <antero@robocorp.com>",
+	"Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
 packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pillow = "^9.1.1"
-xlrd = "^2.0.1"
-xlwt = "^1.3.0"
-xlutils = "^2.0.0"
-openpyxl = "^3.0.9"
+cryptography = "^39.0.1"
 
 [tool.poetry.group.dev.dependencies]
-libs-devdeps = {path = ".."}
+black = "^23.1.0"
+ruff = "^0.0.255"
+mypy = "^1.1.1"
+pytest = "^7.2.2"
+pytest-xdist = "^3.2.1"
+pytest-regressions = "1.0.6"
 
 [build-system]
 requires = ["poetry-core"]
