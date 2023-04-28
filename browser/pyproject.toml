@@ -1,22 +1,27 @@
 [tool.poetry]
-name = "robocorp-vault"
-version = "0.1.0"
-description = "Robocorp Control Room API integration library"
+name = "robocorp-browser"
+version = "0.2.0"
+description = "Robocorp browser automation library"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
 	"Kerkko P. <kerkko@robocorp.com>",
-    "Antero V. <antero@robocorp.com>",
+	"Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
 packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-cryptography = "^39.0.1"
+playwright = "^1.32.1"
 
 [tool.poetry.group.dev.dependencies]
-libs-devdeps = {path = ".."}
+black = "^23.1.0"
+ruff = "^0.0.255"
+mypy = "^1.1.1"
+pytest = "^7.2.2"
+pytest-xdist = "^3.2.1"
+pytest-regressions = "1.0.6"
 
 [build-system]
 requires = ["poetry-core"]

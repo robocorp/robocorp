@@ -1,0 +1,3 @@
+def method():
+    some_name()
+    a = 10

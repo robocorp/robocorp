@@ -74,6 +74,10 @@ export class TreeBuilder {
     // The current element which should have children added to (== stack.at(-1))
     parent: IContentAdded;
 
+    // Usually the current element, but can also be set to an item that's not added
+    // to the stack (such as yield elements).
+    argsTarget: IContentAdded;
+
     // The current parent and message.
     messageNode: IMessageNode = { "parent": undefined, message: undefined };
 
@@ -303,9 +307,9 @@ export class TreeBuilder {
                 );
                 this.stack.push(this.parent);
                 break;
-            case "SE":
-            case "YR":
-                // start element
+            case "SE": // start element
+            case "YR": // yield resume
+            case "YFR": // yield from resume
                 const raiseStack = msgType != "SE" || msg.decoded["type"] != "UNTRACKED_GENERATOR";
                 if (!raiseStack) {
                     const item = addTreeContent(
@@ -321,6 +325,7 @@ export class TreeBuilder {
                         this.id.toString()
                     );
                     this.addGeneratorCSSClass(item);
+                    this.argsTarget = item;
                 } else {
                     this.messageNode = { "parent": this.messageNode, "message": msg };
                     let name = msg.decoded["name"];
@@ -343,6 +348,7 @@ export class TreeBuilder {
                         this.addResumedCSSClass(this.parent);
                     }
 
+                    this.argsTarget = this.parent;
                     this.stack.push(this.parent);
                 }
 
@@ -383,13 +389,14 @@ export class TreeBuilder {
 
                 break;
             case "EE": // end element
-            case "YS": // end element
+            case "YS": // yield suspend
+            case "YFS": // yield from suspend
                 const popStack = msgType != "EE" || msg.decoded["type"] != "UNTRACKED_GENERATOR";
                 if (!popStack) {
                     // The generator finished, but we don't even have its name... maybe we should have
                     // a different message for this case?
                 } else {
-                    if (msgType == "YS") {
+                    if (msgType == "YS" || msgType == "YFS") {
                         const yieldedItem = addTreeContent(
                             this.opts,
                             this.parent,
@@ -404,6 +411,7 @@ export class TreeBuilder {
                         );
                         this.addYieldedCSSClass(yieldedItem);
                         addValueToTreeContent(yieldedItem, msg.decoded["value"]);
+                        msg.decoded["status"] = "PASS";
                     }
 
                     this.messageNode = this.messageNode.parent;
@@ -430,8 +438,12 @@ export class TreeBuilder {
                 break;
             case "EA":
                 // Element arguments
-                item = this.stack.at(-1);
-                addArgumentsToTreeContent(item, msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
+                addArgumentsToTreeContent(
+                    this.argsTarget,
+                    msg.decoded["name"],
+                    msg.decoded["type"],
+                    msg.decoded["value"]
+                );
                 break;
             case "L":
             case "LH":
