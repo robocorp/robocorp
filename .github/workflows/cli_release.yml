@@ -74,8 +74,8 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: robo-$tag-macos64
-          asset_name: dist/build/macos64/robo
+          file: cli/dist/build/macos64/robo
+          asset_name: robo-$tag-macos64
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -84,7 +84,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: build/windows64/robo
+          file: cli/build/windows64/robo
           asset_name: robo-$tag-windows64
           tag: ${{ github.ref }}
           overwrite: true
@@ -94,7 +94,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: build/ubuntu64/robo
+          file: cli/build/ubuntu64/robo
           asset_name: robo-$tag-ubuntu64
           tag: ${{ github.ref }}
           overwrite: true
