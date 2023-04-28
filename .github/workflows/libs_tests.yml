@@ -5,18 +5,22 @@ on:
     branches:
       - "master"
     paths:
-      - "libs/**"
+      - "browser/**"
+      - "excel/**"
+      - "workitems/**"
       - ".github/workflows/tests_libs.yml"
   pull_request:
     branches:
       - "master"
     paths:
-      - "libs/**/"
+      - "browser/**"
+      - "excel/**"
+      - "workitems/**"
       - ".github/workflows/tests_libs.yml"
 
 defaults:
   run:
-    working-directory: './libs'
+    working-directory: './'
 
 
 jobs:
