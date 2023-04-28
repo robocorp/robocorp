@@ -1,0 +1,99 @@
+name: Create CLI Github release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub release
+        uses: Roang-zero1/github-create-release-action@v3
+        with:
+          version_regex: ^v[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-binaries:
+    defaults:
+      run:
+        working-directory: ./cli
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+          cache-dependency-path: cli/go.sum
+
+      - name: setup invoke
+        run: pipx install invoke
+
+
+      - name: Build
+        run: invoke build-all-platforms
+
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: robo-artifacts
+          path: ./build/
+
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          xcode-version: latest-stable
+
+      - name: MacOS igning
+        if: matrix.os == 'macos-latest'
+        run: invoke sign-macos
+        env:
+            MACOS_SIGNING_CERT: ${{ secrets.MACOS_SIGNING_CERT }}
+            MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
+      - name: MacOS Notarizing
+        if: matrix.os == 'macos-latest'
+        # TODO: pass secrets as arguments
+        run: invoke notarize-macos
+        env:
+            MACOS_APP_ID_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
+            MACOS_APP_ID_PASS_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
+
+      - uses: actions/upload-artifact@v3
+        if: matrix.os == 'macos-latest'
+        with:
+          name: robo-signed
+          path: cli/dist/build/robo
+
+      - name: Upload macOS binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: robo-$tag-macos64
+          asset_name: dist/build/macos64/robo
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload windows binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: build/windows64/robo
+          asset_name: robo-$tag-windows64
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload ubuntu binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file_glob: true
+          file: build/ubuntu64/robo
+          asset_name: robo-$tag-ubuntu64
+          tag: ${{ github.ref }}
+          overwrite: true

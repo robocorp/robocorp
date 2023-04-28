@@ -8,69 +8,117 @@ from pathlib import Path
 from invoke import task
 
 CURDIR = Path(__file__).parent
-SRC = CURDIR / "src"
+BUILD = CURDIR / "build"
 
+RCC_EXE = "rcc.exe" if platform.system() == "Windows" else "rcc"
+RCC_PATH = CURDIR / "include" / "bin" / RCC_EXE
+RCC_VERSION = "11.28.0"
 RCC_URL = {
-    "Windows": "https://downloads.robocorp.com/rcc/releases/v11.28.0/windows64/rcc.exe",
-    "Darwin": "https://downloads.robocorp.com/rcc/releases/v11.28.0/macos64/rcc",
-    "Linux": "https://downloads.robocorp.com/rcc/releases/v11.28.0/linux64/rcc",
+    "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
+    "Darwin": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/macos64/rcc",
+    "Linux": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/linux64/rcc",
 }[platform.system()]
 
 
-def poetry(ctx, *parts):
+def run(ctx, *parts):
     args = " ".join(str(part) for part in parts)
-    ctx.run(f"poetry {args}", pty=sys.platform != "win32", echo=True)
-
-
-@task
-def install(ctx):
-    poetry(ctx, "install")
-
-    # Download RCC
-    filename = "rcc.exe" if platform.system() == "Windows" else "rcc"
-    path = CURDIR / "resources" / "bin" / filename
-    path.parent.mkdir(parents=True, exist_ok=True)
-
-    print(f"Downloading '{RCC_URL}' to '{path}'")
-    urllib.request.urlretrieve(RCC_URL, path)
-
-    st = os.stat(path)
-    os.chmod(path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-
-
-@task
-def lint(ctx):
-    """Run static analysis and formatting checks"""
-    poetry(ctx, f"run ruff {SRC}")
-    poetry(ctx, f"run black --check {SRC}")
-    poetry(ctx, f"run isort --check {SRC}")
-
-
-@task
-def typecheck(ctx):
-    poetry(ctx, f"run mypy {SRC}")
-
-
-@task
-def test(ctx):
-    """Run unittests"""
-    poetry(ctx, "run pytest")
-
-
-@task(lint, typecheck, test)
-def check_all(ctx):
-    """Run all checks"""
-    pass
+    ctx.run(args, pty=platform.system() != "Windows", echo=True)
 
 
 @task
 def pretty(ctx):
-    """Automatically format code"""
-    poetry(ctx, f"run black {SRC} {CURDIR / 'tests'}")
-    poetry(ctx, f"run isort {SRC} {CURDIR / 'tests'}")
+    """Auto-format code"""
+    run(ctx, "gofmt", "-s", "-w", CURDIR)
 
 
 @task
 def build(ctx):
-    """Build executable"""
-    poetry(ctx, f"run pyinstaller {CURDIR / 'pyinstaller.spec'}")
+    """Build robo binary"""
+    if not RCC_PATH.is_file():
+        print("rcc executable missing, run 'invoke include'")
+        sys.exit(1)
+
+    BUILD.mkdir(parents=True, exist_ok=True)
+    run(ctx, "go", "build", "-o", BUILD / "robo", CURDIR)
+
+
+@task
+def include(ctx):
+    """Download static assets to include/ directory"""
+    print(f"Downloading '{RCC_URL}' to '{RCC_PATH}'")
+    urllib.request.urlretrieve(RCC_URL, RCC_PATH)
+
+    st = os.stat(RCC_PATH)
+    os.chmod(RCC_PATH, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+
+@task
+def build_all_platforms(ctx):
+    """Build for all platforms"""
+    for arch, go_os, target_dir in [
+        ("amd64", "windows", "windows64"),
+        ("amd64", "linux", "linux64"),
+        ("amd64", "darwin", "macos64"),
+    ]:
+        os.environ["GOOS"] = go_os
+        os.environ["GOARCH"] = arch
+
+        # RCC uses -ldsflags, '-s' flags for building, are they relevant for us?
+        # sh "go build -ldflags '-s' -o build/linux64/ ./cmd/..."
+        # RCC makes a shasum, should we also do that?
+        # sh "sha256sum build/linux64/* || true"
+        os.makedirs(BUILD / target_dir, exist_ok=True)
+        run(ctx, "go", "build", "-o", BUILD / target_dir / "robo", CURDIR)
+
+
+@task
+def sign_macos(ctx):
+    cert_data = os.environ.get("MACOS_SIGNING_CERT")
+    assert cert_data
+    cert_password = os.environ.get("MACOS_SIGNING_CERT_PASSWORD")
+    assert cert_password
+    try:
+        print("create-keychain")
+        ctx.run(f"xcrun security create-keychain -p {cert_password} build.keychain")
+        print("default-keychain")
+        ctx.run("xcrun security default-keychain -s build.keychain")
+        print("unlock-keychain")
+        ctx.run(f"xcrun security unlock-keychain -p {cert_password} build.keychain")
+        print("cert.p12")
+        ctx.run(f"echo {cert_data}| base64 --decode -o cert.p12")
+        print("security import")
+        ctx.run(f"xcrun security import cert.p12 -A -P {cert_password}")
+        print("security set-key-partition-list")
+        ctx.run(
+            f"xcrun security set-key-partition-list -S apple-tool:,apple: -s -k {cert_password} build.keychain"
+        )
+        print("codesign")
+        ctx.run(
+            # TODO: change to build/macos64/robo
+            'xcrun codesign --entitlements ./signing/entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/robo'
+        )
+        print("codesign")
+        # ctx.run('codesign --entitlements entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/arm/rcc')
+    finally:
+        Path("cert.p12").unlink()
+
+
+@task
+def notarize_macos(ctx):
+    # apple_id = os.environ.get("MACOS_APP_ID_FOR_SIGNING")
+    # assert apple_id
+    # signing_password = os.environ.get("MACOS_APP_ID_PASS_FOR_SIGNING")
+    # assert signing_password
+
+    # removed args that we didn't previously use, but that notarytool man page included: --issuer <uuid>
+    # these are just confusing: --key path/to/AuthKey_7UD13000.p8 --key-id 7UD13000, it seems we don't need them if we're using the "raw" apple account params
+
+    ctx.run("zip robo.zip build/macos64/robo")
+    # TODO: can we do a sort of bundling so that the data is inside the binary, to reduce latency when it's opened first time
+    # ctx.run(
+    #     f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --team-id 2H9N5J72C7 --wait"
+    # )
+    ctx.run("mkdir -p dist")
+    ctx.run("unzip robo.zip -d dist")
+    ctx.run("ls dist/")
+    ctx.run("ls dist/build")
