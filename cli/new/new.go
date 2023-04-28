@@ -73,6 +73,7 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// TODO: Propagate window size message to all child components, always
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.Type == tea.KeyCtrlC {
@@ -208,11 +209,11 @@ func (m model) installProject() tea.Cmd {
 		if err := m.template.Copy(dir); err != nil {
 			return ui.ErrorMsg(err)
 		}
-		robo, err := pyproject.LoadPath(path.Join(dir, "pyproject.toml"))
+		cfg, err := pyproject.LoadPath(path.Join(dir, "pyproject.toml"))
 		if err != nil {
 			return ui.ErrorMsg(err)
 		}
-		if _, err := environment.EnsureFromConfig(*robo, onProgress); err != nil {
+		if _, err := environment.EnsureFromConfig(*cfg, onProgress); err != nil {
 			return ui.ErrorMsg(err)
 		}
 		return nil
