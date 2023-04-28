@@ -1,0 +1,30 @@
+[
+    {
+        "payload": {
+            "workspace": "Example workspace",
+            "user_id": "Example user id",
+            "rawEmail": "Return-Path: <cosmin@robocorp.com>\r\nReceived: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])\r\n by inbound-smtp.eu-west-1.amazonaws.com with SMTP id urao452ul731vhl71eqhlb7i8ahhu12b7r3leq81\r\n for process.Robocorp.E-mailtrigge.1gwo6is9pml@mail.eu1.robocloud.eu;\r\n Thu, 05 May 2022 13:59:06 +0000 (UTC)\r\nX-SES-Spam-Verdict: PASS\r\nX-SES-Virus-Verdict: PASS\r\nReceived-SPF: pass (spfCheck: domain of robocorp.com designates 209.85.166.49 as permitted sender) client-ip=209.85.166.49; envelope-from=cosmin@robocorp.com; helo=mail-io1-f49.google.com;\r\nAuthentication-Results: amazonses.com;\r\n spf=pass (spfCheck: domain of robocorp.com designates 209.85.166.49 as permitted sender) client-ip=209.85.166.49; envelope-from=cosmin@robocorp.com; helo=mail-io1-f49.google.com;\r\n dkim=pass header.i=@robocorp.com;\r\n dmarc=pass header.from=robocorp.com;\r\nX-SES-RECEIPT: AEFBQUFBQUFBQUFHcHhGZTZvMFhXMStJSmZkYkZBWERvekUvTWNlUWFxclFYSTJXckhrMklPRllHRWZlaHpCb1ZTcWluWWU2QzBlVXRjUnF3emVENFFWZFkwM1FZdHozMk50bklKbDZmUnp2OW9hWjlKdlFUTXBEMFY1d2hzVm9HTWNzY0JTZm9WUDVFZ0l3QllhSEh5anlvMEI0R3dHSFlYcVBUcXNlbnhBemV6TURMVWluNXpPdXpQV0M0czhtVFdGbmVXRGFHek8yTzRReHk3YmthRmxVK1ZVSnFkMEhrL1dySjQrYW1FUVB4cDhOdmNEQ1VRV21kbU8xdllQME9RUUg1dEtHZXhrNzU3WTZuRWFyQTFTMi9peUh0Zml1U0xRZnNaUGVkWC8zRTY0WUFlM0JPSlE9PQ==\r\nX-SES-DKIM-SIGNATURE: a=rsa-sha256; q=dns/txt; b=tYqovJPwxnM4JHDpNMtVM0yjQMgInFzszPe7NJ7cCHLgKbRx0Z20PFNAXIfUvhwfTjgRL2GJUUlCECZtRtSrab2PuYn2XYm3JfxPGCF22CkGd5bPwgZ69y+NVtiBw+f4OFu9Ize00ObXyUbNKnenGczdajo1DsOWEfhISo0nTng=; c=relaxed/simple; s=ihchhvubuqgjsxyuhssfvqohv7z3u4hn; d=amazonses.com; t=1651759147; v=1; bh=iG1leQ9cTR8AAHIvLaVSgJlnEN37qS1mDpMyscb1mOo=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;\r\nReceived: by mail-io1-f49.google.com with SMTP id h85so4778428iof.12\r\n        for <process.Robocorp.E-mailtrigge.1gwo6is9pml@mail.eu1.robocloud.eu>; Thu, 05 May 2022 06:59:06 -0700 (PDT)\r\nDKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=robocorp.com; s=google;\r\n        h=mime-version:from:date:message-id:subject:to;\r\n        bh=ZqGq75+fMfkZvoRv1go2iphIvQW576dtxho7HJg/GS0=;\r\n        b=fqCTRzyAzcOrnZq3oI03+BntKQoPM7dVmtLmV0uABWMTfzJBWsYboF9BWoA9d7gJOF\r\n         Wjz0JzfNnJ+bbCkFY3+V7J2pxUgRuFSAXOG9H0nG9yG4OgXXb+UIO/75xnMiOOnse7NT\r\n         ChK2fkWde80Vrcjw8SzibCReA9sXzicBSvQ4xlTWmFttphHMxJSBnxgi1347V4N+FqzN\r\n         sNHcoQpg0G6kw5eAq8Fq/uY7FeH0enIt9CZ6G9RCwIhH7f/xp26RQsHIINF+GDzMq5CR\r\n         Q7dCW8k+I38R8huAL/UrqLT+isvK1GKxau5XSkSaJcZt4zqzDTe5mJR8+e0dWgYroBJp\r\n         WcbA==\r\nX-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20210112;\r\n        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;\r\n        bh=ZqGq75+fMfkZvoRv1go2iphIvQW576dtxho7HJg/GS0=;\r\n        b=jQjLVo5VBv5OSetOF7Dwxt5UTYwcDpmjf79wZZbNqdvy2DWifqozBKZYxUXBO9Zbsf\r\n         Fzsj7G5gVAqithfIDerD2cH+c6aSYaBk53dZlG00l+ruFkrGElE75NTozq4GQrItcr9z\r\n         StHg1UGtj4ht6i4H1gtL43iDBO7hKEt5DlXIDCcZ5EPMEZ+dImTzL5AI+PD01gkX0/rX\r\n         X6eNSyECBwJ31HyOGQShEY7NiesmIpPjCc4MV93lMbriqzFGYA315/Et5OWi6JLc0Caa\r\n         S3u4/DYhI4QN5bGTO/XukuvQ4Z+kUKFyagKAByUWkTpBdQjp76cRJn7Wn4P5Prh3QWvy\r\n         ZH7A==\r\nX-Gm-Message-State: AOAM531lm65hruZtAfrH281OIOXgS6wb/VwzKO8fOs++gRtKQG+BVS8x\r\n\tAFrm3LOkxwlIOqeUO+b++QdwyNgM5adHD/Qkd6iqEazmepLgv/Gw\r\nX-Google-Smtp-Source: ABdhPJypDK8u8Nf9HS9IkBeTclqzMNyGp/LN0kwUUfBVvkCuDunm27tah8nf0aguLLoaFrjBfDvkGgzXmp/qAHTYIDY=\r\nX-Received: by 2002:a6b:ed06:0:b0:649:d35f:852c with SMTP id\r\n n6-20020a6bed06000000b00649d35f852cmr10432317iog.186.1651759144643; Thu, 05\r\n May 2022 06:59:04 -0700 (PDT)\r\nMIME-Version: 1.0\r\nFrom: =?UTF-8?Q?Cosmin_Poiean=C4=83?= <cosmin@robocorp.com>\r\nDate: Thu, 5 May 2022 16:58:53 +0300\r\nMessage-ID: <CAJen4hi7iG=F4tPaYfhrd=TyARDY4MWewguvDWMz42E7wh-YXg@mail.gmail.com>\r\nSubject: Raw trigger & attachment\r\nTo: process.Robocorp.E-mailtrigge.1gwo6is9pml@mail.eu1.robocloud.eu\r\nContent-Type: multipart/mixed; boundary=\"0000000000001294a805de4425a7\"\r\n\r\n--0000000000001294a805de4425a7\r\nContent-Type: multipart/alternative; boundary=\"0000000000001294a605de4425a5\"\r\n\r\n--0000000000001294a605de4425a5\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\n{\r\n    \"message\": \"from email\"\r\n}\r\n\r\n--0000000000001294a605de4425a5\r\nContent-Type: text/html; charset=\"UTF-8\"\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n<div dir=3D\"ltr\">{<br>=C2=A0 =C2=A0 &quot;message&quot;: &quot;from email&q=\r\nuot;<br>}<br></div>\r\n\r\n--0000000000001294a605de4425a5--\r\n--0000000000001294a805de4425a7\r\nContent-Type: text/plain; charset=\"US-ASCII\"; name=\"test.txt\"\r\nContent-Disposition: attachment; filename=\"test.txt\"\r\nContent-Transfer-Encoding: base64\r\nContent-ID: <f_l2t2qht30>\r\nX-Attachment-Id: f_l2t2qht30\r\n\r\nTXkgQ29vbCBBdHRhY2htZW50Cg==\r\n--0000000000001294a805de4425a7--\r\n"
+        }
+    },
+    {
+        "payload": {
+            "workspace": "Another example workspace",
+            "user_id": "Another example user id"
+        },
+        "files": {
+            "__mail.html": "__mail.html"
+        }
+    },
+    {
+        "payload": {
+            "workspace": "3",
+            "user_id": "3"
+        }
+    },
+    {
+        "payload": {
+            "workspace": "4",
+            "user_id": "4"
+        }
+    }
+]
