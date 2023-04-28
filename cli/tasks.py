@@ -53,7 +53,26 @@ def include(ctx):
 
 
 @task
-def sign(ctx):
+def build_all_platforms(ctx):
+    """Build for all platforms"""
+    for arch, go_os, target_dir in [
+        ("amd64", "windows", "windows64"),
+        ("amd64", "linux", "linux64"),
+        ("amd64", "darwin", "macos64"),
+    ]:
+        os.environ["GOOS"] = go_os
+        os.environ["GOARCH"] = arch
+
+        # RCC uses -ldsflags, '-s' flags for building, are they relevant for us?
+        # sh "go build -ldflags '-s' -o build/linux64/ ./cmd/..."
+        # RCC makes a shasum, should we also do that?
+        # sh "sha256sum build/linux64/* || true"
+        os.makedirs(BUILD / target_dir, exist_ok=True)
+        run(ctx, "go", "build", "-o", BUILD / target_dir / "robo", CURDIR)
+
+
+@task
+def sign_macos(ctx):
     cert_data = os.environ.get("MACOS_SIGNING_CERT")
     assert cert_data
     cert_password = os.environ.get("MACOS_SIGNING_CERT_PASSWORD")
@@ -76,7 +95,7 @@ def sign(ctx):
         print("codesign")
         ctx.run(
             # TODO: change to build/macos64/robo
-            'xcrun codesign --entitlements ./signing/entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/robo'
+            'xcrun codesign --entitlements ./signing/entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/robo'
         )
         print("codesign")
         # ctx.run('codesign --entitlements entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/arm/rcc')
@@ -85,7 +104,7 @@ def sign(ctx):
 
 
 @task
-def notarize(ctx):
+def notarize_macos(ctx):
     # ctx.run(
     #     'xcrun altool --notarize-app --username "AC_USERNAME" --password "@keychain:AC_PASSWORD" --asc-provider <ProviderShortname> --file macos64/rcc'
     # )
@@ -98,7 +117,8 @@ def notarize(ctx):
     # removed args that we didn't previously use, but that notarytool man page included: --issuer <uuid>
     # these are just confusing: --key path/to/AuthKey_7UD13000.p8 --key-id 7UD13000, it seems we don't need them if we're using the "raw" apple account params
 
-    ctx.run("zip robo.zip build/robo")
+    ctx.run("zip robo.zip build/macos64/robo")
+    # TODO: can we do a sort of bundling so that the data is inside the binary, to reduce latency when it's opened first time
     ctx.run(
         f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --team-id 2H9N5J72C7 --wait"
     )
