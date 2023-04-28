@@ -1,13 +1,22 @@
+# macOS
 .DS_Store
 
+# Python generated files
 __pycache__/
 *.py[cod]
 *.whl
 
+# Python tooling caches
 .ruff_cahce/
 .pytest_cache/
 .mypy_cache/
 .coverage
 .idea/
+
+# Eclipse / PyDev
+.project
+.pydevproject
+.settings
+
+# Project generated files
 dist/
-.DS_Store
