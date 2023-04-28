@@ -3,7 +3,7 @@ name: Create CLI Github release
 on:
   push:
     tags:
-      - "cli-v[0-9]+.[0-9]+.[0-9]+"
+      - "cli-[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   release:
