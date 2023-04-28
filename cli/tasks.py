@@ -105,24 +105,20 @@ def sign_macos(ctx):
 
 @task
 def notarize_macos(ctx):
-    # ctx.run(
-    #     'xcrun altool --notarize-app --username "AC_USERNAME" --password "@keychain:AC_PASSWORD" --asc-provider <ProviderShortname> --file macos64/rcc'
-    # )
-
-    apple_id = os.environ.get("MACOS_APP_ID_FOR_SIGNING")
-    assert apple_id
-    signing_password = os.environ.get("MACOS_APP_ID_PASS_FOR_SIGNING")
-    assert signing_password
+    # apple_id = os.environ.get("MACOS_APP_ID_FOR_SIGNING")
+    # assert apple_id
+    # signing_password = os.environ.get("MACOS_APP_ID_PASS_FOR_SIGNING")
+    # assert signing_password
 
     # removed args that we didn't previously use, but that notarytool man page included: --issuer <uuid>
     # these are just confusing: --key path/to/AuthKey_7UD13000.p8 --key-id 7UD13000, it seems we don't need them if we're using the "raw" apple account params
 
     ctx.run("zip robo.zip build/macos64/robo")
     # TODO: can we do a sort of bundling so that the data is inside the binary, to reduce latency when it's opened first time
-    ctx.run(
-        f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --team-id 2H9N5J72C7 --wait"
-    )
-    ctx.run("mkdir dist")
+    # ctx.run(
+    #     f"xcrun notarytool submit robo.zip --apple-id {apple_id} --password {signing_password} --team-id 2H9N5J72C7 --wait"
+    # )
+    ctx.run("mkdir -p dist")
     ctx.run("unzip robo.zip -d dist")
     ctx.run("ls dist/")
     ctx.run("ls dist/build")
