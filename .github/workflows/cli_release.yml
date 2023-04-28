@@ -13,7 +13,7 @@ jobs:
         uses: Roang-zero1/github-create-release-action@v3
         with:
           version_regex: cli-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
-          release_title: Robo CLI ${{ github.ref }}
+          release_title: Robo CLI ${{ github.ref_name }}
           # TODO: once we have a changelog, add the URL
           release_text: Binaries available as assets.
         env:
@@ -82,7 +82,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: cli/dist/build/macos64/robo
-          asset_name: robo-$tag-macos64
+          asset_name: robo-macos64
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -92,7 +92,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
           file: cli/build/windows64/robo
-          asset_name: robo-$tag-windows64
+          asset_name: robo-windows64.exe
           tag: ${{ github.ref }}
           overwrite: true
 
@@ -101,7 +101,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: cli/build/ubuntu64/robo
-          asset_name: robo-$tag-ubuntu64
+          file: cli/build/linux64/robo
+          asset_name: robo-ubuntu64
           tag: ${{ github.ref }}
           overwrite: true
