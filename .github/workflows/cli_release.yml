@@ -48,7 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: robo-artifacts
-          path: ./build/
+          path: cli/build/**/robo
 
 
       - uses: maxim-lobanov/setup-xcode@v1
@@ -73,8 +73,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'macos-latest'
         with:
-          name: robo-signed
-          path: cli/dist/build/robo
+          name: robo-signed-macos
+          path: cli/dist/build/macos64/robo
 
       - name: Upload macOS binary
         uses: svenstaro/upload-release-action@v2
