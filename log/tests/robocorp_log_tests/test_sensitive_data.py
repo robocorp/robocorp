@@ -42,7 +42,44 @@ def test_sensitive_data():
     ]
 
 
-def test_func_or_dec():
+def test_sensitive_data_in_traceback():
+    from imp import reload
+    from robocorp_log_tests._resources import check_sensitive_data
+    from io import StringIO
+    from robocorp.log import verify_log_messages_from_stream
+
+    s = StringIO()
+
+    def write(msg):
+        s.write(msg)
+
+    with robolog.setup_auto_logging():
+        check_sensitive_data = reload(check_sensitive_data)
+
+        with robolog.add_in_memory_log_output(write):
+            try:
+                check_sensitive_data.run_with_exc()
+            except:
+                robolog.exception()
+
+    assert "my_pass" not in s.getvalue()
+
+    s.seek(0)
+
+    verify_log_messages_from_stream(
+        s,
+        [
+            {
+                "message_type": "TBV",
+                "name": "password",
+                "type": "str",
+                "value": "<redacted>",
+            }
+        ],
+    )
+
+
+def test_func_or_dec_suppress_handler():
     outer_var = []
 
     @contextmanager

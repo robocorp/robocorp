@@ -1,3 +1,9 @@
+NEXT
+-----------------------------
+
+- When an exception is logged, local variablas are properly redacted for sensitive information.
+
+
 0.0.14
 -----------------------------
 

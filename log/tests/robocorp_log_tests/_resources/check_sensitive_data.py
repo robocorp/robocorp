@@ -60,3 +60,12 @@ def run():
     dont_log_this_method2()
     dont_log_this_method3()
     dont_log_this_method4()
+
+
+def another_func_with_exc():
+    password = "my_pass"
+    raise RuntimeError("some exc in another_func_with_exc.")
+
+
+def run_with_exc():
+    another_func_with_exc()

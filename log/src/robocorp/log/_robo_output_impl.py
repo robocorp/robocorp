@@ -581,6 +581,10 @@ class _RoboOutputImpl:
                         continue
 
                     obj_type, obj_repr = get_obj_type_and_repr(val)
+
+                    hide_strings_re = self._hide_strings_re
+                    if hide_strings_re:
+                        obj_repr = hide_strings_re.sub("<redacted>", obj_repr)
                     self._write_with_separator(
                         "TBV ",
                         [
