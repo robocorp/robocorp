@@ -1,7 +1,7 @@
 # robocorp-log
 
-`robocorp-log` is a library which provides comprehensible logging for python 
-with a focus on RPA, where detailed information on what happened and why a
+`robocorp-log` is a library which provides comprehensible logging for python with 
+a focus on python automation, where detailed information on what happened and why a
 failure occurs is of vital importance.
 
 > Note: The current version is still alpha and it's expected that its
@@ -67,6 +67,9 @@ just an implementation detail).
 
 2. The logging needs to be fully setup prior to importing any module that should 
 be automatically logged.
+
+3. `async` and `await` are not currently well supported (although it's already in
+the plans).
 
 
 ## Dealing with sensitive data in the logs

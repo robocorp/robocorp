@@ -19,10 +19,11 @@ The usage for the API is:
 
 ```python
 
-pwd = request_password()
-
 from robocorp import log
-log.hide_from_output(pwd)
+
+with log.suppress_variables():
+    pwd = request_password()
+    log.hide_from_output(pwd)
 ```
 
 By calling the `hide_from_output` method, any further occurrence of the `password` contents will be
@@ -30,7 +31,9 @@ automatically changed to `<redacted>`.
 
 Note that some arguments and variable assigns for some names are automatically redacted.
 
--- by default `password` and `passwd`, but others may be customized through the `robocorp.log.add_sensitive_variable_name` and `add_sensitive_variable_name_pattern`
+-- by default `password` and `passwd`, but others may be customized through the 
+`robocorp.log.add_sensitive_variable_name` and `add_sensitive_variable_name_pattern`
+functions.
 
 In the example below, the contents of the `${user password}` variable will be automatically added to
 the list of strings to be hidden from the output.
@@ -55,9 +58,10 @@ This can be done with the `robocorp.log.suppress_variables` API (which is usable
 Example using API:
 
 ```python
+from robocorp import log
 
 def handle_sensitive_info()
-    with suppress_variables():
+    with log.suppress_variables():
         ...
 
 ```
@@ -73,9 +77,10 @@ albeit you may still call `critical / info / warn` to explicitly log something i
 Example using API:
 
 ```python
+from robocorp import log
 
 def handle_sensitive_info()
-    with suppress():
+    with log.suppress():
         ...
 
 ```

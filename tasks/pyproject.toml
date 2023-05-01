@@ -17,7 +17,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-log = "0.0.13"
+robocorp-log = "0.0.14"
 
 [tool.mypy]
 mypy_path = "src:tests"
