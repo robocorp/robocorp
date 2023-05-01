@@ -215,10 +215,12 @@ class _RoboOutputImpl:
 
         # Base memory for all streams (rotated or not)
         self._base_memo: Dict[str, str] = {}
+        self._base_loc_memo: Dict[Tuple[str, str, str, int], str] = {}
 
         # Memory just for the current stream (if a name is not
         # here it has to be added because the output was rotated).
         self._current_memo: Dict[str, str] = {}
+        self._current_loc_memo: Dict[Tuple[str, str, str, int], str] = {}
 
         self._config = config
         self._id = config.uuid
@@ -391,6 +393,36 @@ class _RoboOutputImpl:
         self._current_memo[s] = new_id
         return new_id
 
+    def _obtain_loc_id(
+        self, name: str, libname: str, source: str, lineno: int, docstring: str = ""
+    ) -> str:
+        key = (name, libname, source, lineno)
+        curr_id = self._current_loc_memo.get(key)
+        oid = self._obtain_id
+
+        if curr_id is not None:
+            if self._stack_handler.recording_writes:
+                self._stack_handler.record_msg(
+                    f"P {curr_id}:{oid(name)}|{oid(libname)}|{oid(source)}|{oid(docstring)}|{lineno}\n"
+                )
+            return curr_id
+
+        curr_id = self._base_loc_memo.get(key)
+        if curr_id is not None:
+            self._do_write(
+                f"P {curr_id}:{oid(name)}|{oid(libname)}|{oid(source)}|{oid(docstring)}|{lineno}\n"
+            )
+            self._current_loc_memo[key] = curr_id
+            return curr_id
+
+        new_id = self._gen_id()
+        self._do_write(
+            f"P {new_id}:{oid(name)}|{oid(libname)}|{oid(source)}|{oid(docstring)}|{lineno}\n"
+        )
+        self._base_loc_memo[key] = new_id
+        self._current_loc_memo[key] = new_id
+        return new_id
+
     def _number(self, v):
         return str(v)
 
@@ -422,18 +454,16 @@ class _RoboOutputImpl:
         libname: str,
         source: str,
         line: int,
+        doc: str,
         time_delta: float,
     ):
-        oid = self._obtain_id
+        loc_id = self._obtain_loc_id
         task_id = f"{libname}.{name}"
         with self._stack_handler.push_record("task", task_id, "ST", "RT"):
             self._write_with_separator(
                 "ST ",
                 [
-                    oid(name),
-                    oid(libname),
-                    oid(source),
-                    self._number(line),
+                    loc_id(name, libname, source, line, doc),
                     self._number(time_delta),
                 ],
             )
@@ -582,6 +612,7 @@ class _RoboOutputImpl:
         from ._null import NULL
 
         oid = self._obtain_id
+        loc_id = self._obtain_loc_id
         element_id = f"{libname}.{name}"
 
         ctx: Any = NULL
@@ -600,12 +631,8 @@ class _RoboOutputImpl:
             self._write_with_separator(
                 "SE ",
                 [
-                    oid(name),
-                    oid(libname),
+                    loc_id(name, libname, source, lineno, doc),
                     oid(element_type),
-                    oid(doc),
-                    oid(source),
-                    self._number(lineno),
                     self._number(start_time_delta),
                 ],
             )
@@ -684,10 +711,7 @@ class _RoboOutputImpl:
         self._write_with_separator(
             "YS ",
             [
-                oid(name),
-                oid(libname),
-                oid(source),
-                self._number(lineno),
+                self._obtain_loc_id(name, libname, source, lineno),
                 oid(yielded_value_type),
                 oid(yielded_value_repr),
                 self._number(time_delta),
@@ -707,7 +731,6 @@ class _RoboOutputImpl:
         Note that a yield resume is semantically very close to a start element
         but it doesn't have any arguments.
         """
-        oid = self._obtain_id
         element_id = f"{libname}.{name}"
         with self._stack_handler.push_record(
             "element", element_id, "YR", "RYR", hide_from_logs
@@ -719,10 +742,7 @@ class _RoboOutputImpl:
             self._write_with_separator(
                 "YR ",
                 [
-                    oid(name),
-                    oid(libname),
-                    oid(source),
-                    self._number(lineno),
+                    self._obtain_loc_id(name, libname, source, lineno),
                     self._number(time_delta),
                 ],
             )
@@ -748,15 +768,10 @@ class _RoboOutputImpl:
             # (and if it was logged, the stop should be also logged).
             return
 
-        oid = self._obtain_id
-
         self._write_with_separator(
             "YFS ",
             [
-                oid(name),
-                oid(libname),
-                oid(source),
-                self._number(lineno),
+                self._obtain_loc_id(name, libname, source, lineno),
                 self._number(time_delta),
             ],
         )
@@ -774,7 +789,6 @@ class _RoboOutputImpl:
         Note that a yield resume is semantically very close to a start element
         but it doesn't have any arguments.
         """
-        oid = self._obtain_id
         element_id = f"{libname}.{name}"
         with self._stack_handler.push_record(
             "element", element_id, "YR", "RYR", hide_from_logs
@@ -786,17 +800,16 @@ class _RoboOutputImpl:
             self._write_with_separator(
                 "YFR ",
                 [
-                    oid(name),
-                    oid(libname),
-                    oid(source),
-                    self._number(lineno),
+                    self._obtain_loc_id(name, libname, source, lineno),
                     self._number(time_delta),
                 ],
             )
 
     def after_assign(
         self,
-        filename: str,
+        name: str,
+        libname: str,
+        source: str,
         lineno: int,
         assign_name: str,
         assign_type: str,
@@ -812,8 +825,7 @@ class _RoboOutputImpl:
         self._write_with_separator(
             "AS ",
             [
-                oid(filename),
-                self._number(lineno),
+                self._obtain_loc_id(name, libname, source, lineno),
                 oid(assign_name),
                 oid(assign_type),
                 oid(assign_repr),
@@ -821,7 +833,17 @@ class _RoboOutputImpl:
             ],
         )
 
-    def log_message(self, level, message, html, source, lineno, time_delta):
+    def log_message(
+        self,
+        level: str,
+        message: str,
+        html: bool,
+        name,
+        libname,
+        source,
+        lineno,
+        time_delta,
+    ) -> None:
         oid = self._obtain_id
 
         msg_type = "L "
@@ -846,7 +868,7 @@ class _RoboOutputImpl:
                 # WARN = W
                 level[0].upper(),
                 oid(message),
-                oid(source),
+                self._obtain_loc_id(name, libname, source, lineno),
                 self._number(lineno),
                 self._number(time_delta),
             ],

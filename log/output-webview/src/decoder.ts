@@ -37,6 +37,19 @@ function decode_memo(decoder, message) {
     return null;
 }
 
+function decode_path_location(decoder, message) {
+    const [memo_id, memo_references] = splitInChar(message, ":");
+    const [name_id, libname_id, source_id, doc_id, lineno] = memo_references.split("|", 5);
+
+    decoder.location_memo[memo_id] = [
+        decoder.memo[name_id],
+        decoder.memo[libname_id],
+        decoder.memo[source_id],
+        decoder.memo[doc_id],
+        parseInt(lineno),
+    ];
+}
+
 function _decodeOid(decoder, oid) {
     const ret = decoder.memo[oid];
     if (ret === undefined) {
@@ -74,6 +87,10 @@ function _decode(message_definiton) {
             nameToDecode.set(s, _decodeFloat);
         } else if (decode === "str") {
             nameToDecode.set(s, _decodeStr);
+        } else if (decode === "loc_id") {
+            nameToDecode.set(s, "loc_id");
+        } else if (decode === "loc_and_doc_id") {
+            nameToDecode.set(s, "loc_and_doc_id");
         } else {
             throw new Error("Unexpected: " + decode);
         }
@@ -85,7 +102,23 @@ function _decode(message_definiton) {
         for (let index = 0; index < splitted.length; index++) {
             const s = splitted[index];
             const name = names[index];
-            ret[name] = nameToDecode.get(name)(decoder, s);
+            const decFunc = nameToDecode.get(name);
+            if (decFunc === "loc_id") {
+                const info = decoder.location_memo[s];
+                ret["name"] = info[0];
+                ret["libname"] = info[1];
+                ret["source"] = info[2];
+                ret["lineno"] = info[4];
+            } else if (decFunc === "loc_and_doc_id") {
+                const info = decoder.location_memo[s];
+                ret["name"] = info[0];
+                ret["libname"] = info[1];
+                ret["source"] = info[2];
+                ret["doc"] = info[3];
+                ret["lineno"] = info[4];
+            } else {
+                ret[name] = decFunc(decoder, s);
+            }
         }
         // console.log("decoded", ret);
         return ret;
@@ -101,16 +134,17 @@ const _MESSAGE_TYPE_INFO = {
     "I": simple_decode,
     "T": decode_time,
     "M": decode_memo,
+    "P": decode_path_location,
     "SR": _decode("name:oid, time_delta_in_seconds:float"),
     "ER": _decode("status:oid, time_delta_in_seconds:float"),
-    "ST": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "ST": _decode("loc:loc_id, time_delta_in_seconds:float"),
     "ET": _decode("status:oid, message:oid, time_delta_in_seconds:float"),
-    "SE": _decode("name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "SE": _decode("loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float"),
     "EE": _decode("type:oid, status:oid, time_delta_in_seconds:float"),
     "EA": _decode("name:oid, type:oid, value:oid"),
-    "AS": _decode("source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"),
-    "L": _decode("level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
-    "LH": _decode("level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "AS": _decode("loc:loc_id, target:oid, type:oid, value:oid, time_delta_in_seconds:float"),
+    "L": _decode("level:str, message:oid, loc:loc_id, time_delta_in_seconds:float"),
+    "LH": _decode("level:str, message:oid, loc:loc_id, time_delta_in_seconds:float"),
     "TG": _decode("tag:oid"),
     "S": _decode("start_time_delta:float"),
     "STB": _decode("message:oid, time_delta_in_seconds:float"),
@@ -118,10 +152,10 @@ const _MESSAGE_TYPE_INFO = {
     "TBE": _decode("source:oid, lineno:int, method:oid, line_content:oid"),
     "TBV": _decode("name:oid, type:oid, value:oid"),
     "ETB": _decode("time_delta_in_seconds:float"),
-    "YS": _decode("name:oid, libname:oid, source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float"),
-    "YR": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
-    "YFS": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
-    "YFR": _decode("name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float"),
+    "YS": _decode("loc:loc_id, type:oid, value:oid, time_delta_in_seconds:float"),
+    "YR": _decode("loc:loc_id, time_delta_in_seconds:float"),
+    "YFS": _decode("loc:loc_id, time_delta_in_seconds:float"),
+    "YFR": _decode("loc:loc_id, time_delta_in_seconds:float"),
 };
 
 _MESSAGE_TYPE_INFO["RR"] = _MESSAGE_TYPE_INFO["SR"];
@@ -131,9 +165,11 @@ _MESSAGE_TYPE_INFO["RYR"] = _MESSAGE_TYPE_INFO["YR"];
 
 export class Decoder {
     memo;
+    location_memo;
 
     constructor() {
         this.memo = {};
+        this.location_memo = {};
     }
 
     decode_message_type(message_type, message) {

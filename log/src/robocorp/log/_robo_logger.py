@@ -1,7 +1,7 @@
 from io import StringIO
 import functools
 from pathlib import Path
-from typing import Optional, Union, Sequence, Tuple
+from typing import Optional, Union, Sequence, Tuple, Any
 import datetime
 from .protocols import OptExcInfo, LogHTMLStyle, Status, LogElementType
 import sys
@@ -9,23 +9,19 @@ import sys
 
 def _log_error(func):
     @functools.wraps(func)
-    def new_func(self, *args, **kwargs):
+    def new_func(self, *args, **kwargs) -> Any:
         import traceback
 
         try:
             return func(self, *args, **kwargs)
-        except Exception as e:
-            s = StringIO()
-            traceback.print_exc(file=s)
+        except Exception:
             traceback.print_exc()
-            self._robot_output_impl.log_message(
-                Status.ERROR,
-                f"_RoboLogger internal error: {e}\n{s.getvalue()}",
-                False,
-                __file__,
-                sys._getframe().f_lineno,
-                self._robot_output_impl.get_time_delta(),
-            )
+            traceback.print_stack(limit=5)
+
+            from robocorp.log._robo_output_impl import _RoboOutputImpl
+
+            robot_output_impl: _RoboOutputImpl = self._robot_output_impl
+            robot_output_impl.log_method_except(sys.exc_info(), True)
 
     return new_func
 
@@ -141,12 +137,13 @@ class _RoboLogger:
         return self._robot_output_impl.end_run(name, status, self._get_time_delta())
 
     @_log_error
-    def start_task(self, name: str, libname: str, source: str, lineno: int):
+    def start_task(self, name: str, libname: str, source: str, lineno: int, doc: str):
         return self._robot_output_impl.start_task(
             name,
             libname,
             source,
             lineno,
+            doc,
             self._get_time_delta(),
         )
 
@@ -290,6 +287,8 @@ class _RoboLogger:
     @_log_error
     def after_assign(
         self,
+        name: str,
+        libname: str,
         filename: str,
         lineno: int,
         assign_name: str,
@@ -300,6 +299,8 @@ class _RoboLogger:
             return
 
         return self._robot_output_impl.after_assign(
+            name,
+            libname,
             filename,
             lineno,
             assign_name,
@@ -322,10 +323,17 @@ class _RoboLogger:
 
     @_log_error
     def log_message(
-        self, level: str, message: str, html: bool, source: str, lineno: int
+        self,
+        level: str,
+        message: str,
+        html: bool,
+        name: str,
+        libname: str,
+        source: str,
+        lineno: int,
     ):
         return self._robot_output_impl.log_message(
-            level, message, html, source, lineno, self._get_time_delta()
+            level, message, html, name, libname, source, lineno, self._get_time_delta()
         )
 
     @_log_error

@@ -243,7 +243,7 @@ class _AutoLogging:
 
         for robo_logger in _get_logger_instances():
             robo_logger.after_assign(
-                filename, lineno, assign_name, assign_type, assign_repr
+                name, mod_name, filename, lineno, assign_name, assign_type, assign_repr
             )
 
     def call_method_return(self, *args, **kwargs):

@@ -50,12 +50,18 @@ ConfigFilesFiltering = _config.ConfigFilesFiltering
 
 def _log(level, message: Sequence[Any], html: bool = False) -> None:
     back_frame = sys._getframe(2)
-    source = back_frame.f_code.co_filename
+    f_code = back_frame.f_code
+    source = f_code.co_filename
+    name = f_code.co_name
     lineno = back_frame.f_lineno
+    libname = str(back_frame.f_globals.get("__package__", ""))
+
+    name, libname, source, lineno
 
     m = " ".join(str(x) for x in message)
+    robo_logger: _RoboLogger
     for robo_logger in _get_logger_instances():
-        robo_logger.log_message(level, m, html, source, lineno)
+        robo_logger.log_message(level, m, html, name, libname, source, lineno)
 
 
 def critical(*message: Any) -> None:
@@ -373,7 +379,9 @@ def end_run(name: str, status: str) -> None:
         robo_logger.end_run(name, status)
 
 
-def start_task(name: str, libname: str, source: str, lineno: int) -> None:
+def start_task(
+    name: str, libname: str, source: str, lineno: int, doc: str = ""
+) -> None:
     """
     Starts a task (adds the related event to the log).
 
@@ -382,11 +390,12 @@ def start_task(name: str, libname: str, source: str, lineno: int) -> None:
         libname: The library (module name) where the task is defined.
         source: The source of the task.
         lineno: The line number of the task in the given source.
+        doc: The documentation for the task.
 
     Note: robocorp-tasks calls this method automatically.
     """
     for robo_logger in _get_logger_instances():
-        robo_logger.start_task(name, libname, source, lineno)
+        robo_logger.start_task(name, libname, source, lineno, doc)
 
 
 def end_task(name: str, libname: str, status: str, message: str) -> None:

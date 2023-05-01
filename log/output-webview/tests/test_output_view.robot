@@ -50,9 +50,8 @@ Test Scenario 4 screenshot
     Open Output View For Tests
     Setup Scenario    ${CURDIR}/_resources/case4.robolog
     Check Image
-    Check Tree Items Text    Scenario Generator.Screenshot test
-    ...    Take Screenshot path = output/test_screenshot.png, embed \= True
-    ...    Saved screenshot as 'output\\test_screenshot.png'
+    Check Tree Items Text    task_mod.Simple Task
+    ...    screenshot embed = True
     ...    ${EMPTY}
 
 

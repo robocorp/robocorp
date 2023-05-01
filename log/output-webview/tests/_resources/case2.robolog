@@ -1,18 +1,19 @@
-V 1
-T 2022-11-16T15:35:07.554
+V 0.0.2
+T 2023-04-30T13:35:49.798+00:00
+ID 1|eb887eee-e75b-11ed-bdec-202b20a029af
 I "sys.platform=win32"
-I "python=3.8.1 (default, Jan  8 2020, 15:55:49) [MSC v.1916 64 bit (AMD64)]"
-I "robot=5.0rc1"
-M b:"Robot1"
-M c:"s1"
-M d:"C:/Users/fabio/AppData/Local/Temp/pytest-of-fabio/pytest-1151/test_robot_out_stream0/test_robot_stream/robot1.robot"
-SR b|0.055
-M e:"Simple Task"
-M f:"s1-t1"
-ST e|b|d|16|0.056
-M m:"PASS"
-M h:""
-RR b|c|d|0.055
-RT e|f|16|0.056
-ET m|h|0.095
-ER Y|0.096
+I "python=3.9.16 (main, Mar  8 2023, 10:39:24) [MSC v.1916 64 bit (AMD64)]"
+M a:"Robot1"
+SR a|0.016
+M c:"Simple Task"
+M d:"Robot1"
+M e:"X:\\robocorpws\\draft-python-framework\\log\\tests\\robocorp_log_tests\\test_view_integrated.py"
+M f:""
+P b:c|d|e|f|0
+ST b|0.016
+M g:"PASS"
+M h:"Ok"
+RR a|0.016
+RT b|0.016
+ET g|h|0.017
+ER g|0.017

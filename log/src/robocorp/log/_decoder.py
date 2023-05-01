@@ -1,12 +1,19 @@
 import datetime
 import json
-from typing import Optional, List, Callable, Any, Dict, Iterator
+from typing import Optional, List, Callable, Any, Dict, Iterator, Tuple
 from .protocols import IReadLines
+
+# Whenever the decoding changes we should bump up this version.
+DOC_VERSION = "0.0.2"
+
+# name, libname, source, docstring, lineno
+Location = Tuple[str, str, str, str, int]
 
 
 class Decoder:
     def __init__(self) -> None:
         self.memo: Dict[str, str] = {}
+        self.location_memo: Dict[str, Location] = {}
 
     def decode_message_type(self, message_type: str, message: str) -> Optional[dict]:
         handler = _MESSAGE_TYPE_INFO[message_type]
@@ -14,7 +21,7 @@ class Decoder:
         try:
             r = handler(self, message)
             if not r:
-                if message_type == "M":
+                if message_type in ("M", "P"):
                     return None
                 raise RuntimeError(
                     f"No return when decoding: {message_type} - {message}"
@@ -68,16 +75,39 @@ def _decode(message_definition: str) -> Callable[[Decoder, str], Any]:
         elif decode == "str":
             name_to_decode[s] = _decode_str
 
+        elif decode == "loc_id":
+            name_to_decode[s] = "loc_id"
+
+        elif decode == "loc_and_doc_id":
+            name_to_decode[s] = "loc_and_doc_id"
+
         else:
             raise RuntimeError(f"Unexpected: {decode}")
 
     def dec_impl(decoder: Decoder, message: str):
         splitted = message.split("|", len(names) - 1)
-        ret = {}
+        ret: Dict[str, Any] = {}
         for i, s in enumerate(splitted):
             name = names[i]
             try:
-                ret[name] = name_to_decode[name](decoder, s)
+                dec_func = name_to_decode[name]
+                if dec_func == "loc_id":
+                    info = decoder.location_memo[s]
+                    ret["name"] = info[0]
+                    ret["libname"] = info[1]
+                    ret["source"] = info[2]
+                    ret["lineno"] = info[4]
+
+                elif dec_func == "loc_and_doc_id":
+                    info = decoder.location_memo[s]
+                    ret["name"] = info[0]
+                    ret["libname"] = info[1]
+                    ret["source"] = info[2]
+                    ret["doc"] = info[3]
+                    ret["lineno"] = info[4]
+
+                else:
+                    ret[name] = dec_func(decoder, s)
             except:
                 ret[name] = None
         return ret
@@ -95,6 +125,10 @@ def decode_time(decoder: Decoder, time: str):
 
 
 def decode_memo(decoder: Decoder, message: str) -> None:
+    """
+    Args:
+        message: something as 'a:"Start Suite"'
+    """
     memo_id: str
     memo_value: str
 
@@ -106,8 +140,22 @@ def decode_memo(decoder: Decoder, message: str) -> None:
     decoder.memo[memo_id] = memo_value
 
 
-# Whenever the decoding changes we should bump up this version.
-DOC_VERSION = "0.0.1"
+def decode_path_location(decoder: Decoder, message: str) -> None:
+    """
+    Args:
+        message: something as 'a:b|c|d|e|33'
+    """
+    memo_id, memo_references = message.split(":", 1)
+    name_id, libname_id, source_id, doc_id, lineno = memo_references.split("|", 4)
+
+    decoder.location_memo[memo_id] = (
+        decoder.memo[name_id],
+        decoder.memo[libname_id],
+        decoder.memo[source_id],
+        decoder.memo[doc_id],
+        int(lineno),
+    )
+
 
 MESSAGE_TYPE_YIELD_RESUME = "YR"
 MESSAGE_TYPE_YIELD_SUSPEND = "YS"
@@ -123,16 +171,14 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     "ID": _decode("part:int, id:str"),
     # Time.
     "T": decode_time,
-    # Memorize some word to be used as oid.
+    # Memorize some word (to be used as oid).
     "M": decode_memo,
+    # Memorize a path location (name/libname/source/lineno) to be referenced as loc_id.
+    "P": decode_path_location,
     # Log (raw text)
-    "L": _decode(
-        "level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"
-    ),
+    "L": _decode("level:str, message:oid, loc:loc_id, time_delta_in_seconds:float"),
     # Log (html)
-    "LH": _decode(
-        "level:str, message:oid, source:oid, lineno:int, time_delta_in_seconds:float"
-    ),
+    "LH": _decode("level:str, message:oid, loc:loc_id, time_delta_in_seconds:float"),
     # Start Run
     "SR": _decode(
         "name:oid, time_delta_in_seconds:float",
@@ -141,35 +187,35 @@ _MESSAGE_TYPE_INFO: Dict[str, Callable[[Decoder, str], Any]] = {
     "ER": _decode("status:oid, time_delta_in_seconds:float"),
     # Start Task
     "ST": _decode(
-        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+        "loc:loc_id, time_delta_in_seconds:float",
     ),
     # End Task
     "ET": _decode("status:oid, message:oid, time_delta_in_seconds:float"),
     # Start Element (some element we're tracking such as method, for, while, etc).
     "SE": _decode(
-        "name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+        "loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float",
     ),
     # Yield Resume (coming back to a suspended frame).
     MESSAGE_TYPE_YIELD_RESUME: _decode(
-        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+        "loc:loc_id, time_delta_in_seconds:float",
     ),
     # Yield From Resume (coming back to a suspended frame).
     MESSAGE_TYPE_YIELD_FROM_RESUME: _decode(
-        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+        "loc:loc_id, time_delta_in_seconds:float",
     ),
     # End Element
     "EE": _decode("type:oid, status:oid, time_delta_in_seconds:float"),
     # Yield Suspend (pausing a frame)
     MESSAGE_TYPE_YIELD_SUSPEND: _decode(
-        "name:oid, libname:oid, source:oid, lineno:int, type:oid, value:oid, time_delta_in_seconds:float",
+        "loc:loc_id, type:oid, value:oid, time_delta_in_seconds:float",
     ),
     # Yield From Suspend (pausing a frame)
     MESSAGE_TYPE_YIELD_FROM_SUSPEND: _decode(
-        "name:oid, libname:oid, source:oid, lineno:int, time_delta_in_seconds:float",
+        "loc:loc_id, time_delta_in_seconds:float",
     ),
     # Assign
     "AS": _decode(
-        "source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float"
+        "loc:loc_id, target:oid, type:oid, value:oid, time_delta_in_seconds:float"
     ),
     # Element/method argument (name and value of the argument).
     "EA": _decode("name:oid, type:oid, value:oid"),
