@@ -26,3 +26,16 @@ SE x|e|0.012
             "time_delta_in_seconds": 0.012,
         }
     ]
+
+
+def test_decoder_info():
+    from robocorp.log._decoder import iter_decoded_log_format
+    from io import StringIO
+
+    s = StringIO(
+        """
+I "my-name"
+"""
+    )
+    msgs = list(iter_decoded_log_format(s))
+    assert msgs == [{"message_type": "I", "info": "my-name"}]

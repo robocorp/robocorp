@@ -48,173 +48,146 @@ Such files are splitted in the following files (the idea is that it can be split
 The file should be always written and flushed at each log entry and it should be consistent even if the process crashes in the meanwhile (meaning that all entries written are valid up to the point of the crash).
 
 
-## "Basic log" spec
+## Log spec (parser generated from the spec below)
 
-To keep the format compact, strings will be referenced by an id in the output and the output message types will be predetermined and referenced in the same way.
 
-Times are referenced by the delta from the start.
-
-Also, each message should use a single line in the log output where the prefix is the message type and the arguments is either a message with ids/numbers separated by `|` or json-encoded strings.
-
-Note that each output log file (even if splitted after the main one) should be readable in a completely independent way, so, the starting scope should be replicated as well as the needed names to memorize.
-
-Basic message types are:
-
-### V: Version(name)
-
-    Identifies the version of the log being used
+    # Each message should use a single line in the log output where the prefix
+    # is the message type and the arguments is either a message with ids/numbers
+    # separated by `|` or json-encoded strings.
+    #
+    # Note that each output log file (even if splitted after the main one) should be
+    # readable in a completely independent way, so, the starting scope should be
+    # replicated as well as the needed names to memorize.
+    #
+    # To keep the format compact, some strings and locations are referenced through ids. 
+    # 
+    # In the spec `oid` are used to reference a message memorized with `M` and 
+    # `loc_id` or `loc_and_doc_id` a message memorized with `P`.
+    #
+    # There's an initial time and other time references are time-deltas from this time.
+    #
+    # The spec for the messages is below:
+    #
     
-    Example:
+    # Version of the log output
+    # Example: `V 0.0.1` - Identifies version 1 of the log
+    V: version:str
     
-    `V 0.0.1`             - Identifies version 1 of the log
-
-### ID: Identifier and part for this run.
-
-    Provides a unique id for the run (which should be the same even if the
-    file is split among multiple files) as well as the identification of
-    which is the current part.
+    # Some information message
+    # Example: `I "python=3.7"`
     
-    Example:
+    # The log has an id that may be split into multiple parts.
+    # `ID: 1|36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2`     1st part with identifier 36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2.
+    # `ID: 2|36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2`     2nd part with identifier 36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2.
+    ID: part:int, id:str
     
-    `ID: 1|36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2`     1st part with identifier 36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2.
-    `ID: 2|36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2`     2nd part with identifier 36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2.
-
-### I: Info(info_as_json_string)
-
-    Example:
+    # Initial time (all others are based on a delta from this date).
+    # Example: `T 2022-10-03T11:30:54.927`
+    T: time:dateisoformat
     
-    `I "python=3.7"`
-    `I "RF=5.7.0"`
-
-### M: Memorize name(id ':' json_string)
-
-    Example:
-
-    `M a:"Start Suite"`    - Identifies the String 'Start Suite' as 'a' in the logs 
-    `M b:"End Suite"`      - Identifies the String 'End Suite' as 'b' in the logs
-
-### T: Initial time(isoformat)
-
-    Example:
+    # Memorize some word (to be used as oid).
+    # i.e.: when the message is something as 'M a:"Start"', we memorize "Start" with key: "a"
+    # Example: `M a:"Start"`
+    M: memorize
     
-    `T 2022-10-03T11:30:54.927`
-
-### SR: Start Run
-
-    Spec: `name:oid, time_delta_in_seconds:float`
+    # Memorize a path location (name/libname/source/lineno/docstring) to be referenced as loc_id or loc_and_doc_id.
+    # Note: loc_id and loc_and_doc_id use the same info but one unpacks the docstring and the other doesn't
+    # Example: `P a|b|c|d|e` (where those are references to strings memoized with `M`).
+    P: memorize_path
     
-    Note: references to oid mean a reference to a previously memorized name.
+    # Log (raw text)
+    # level_enum is:
+    # - ERROR = `E`
+    # - FAIL = `F`
+    # - INFO = `I`
+    # - WARN = `W`
+    #
+    # Example:
+    #
+    # `L E|a|b|0.123`
+    L: level:str, message:oid, loc:loc_id, time_delta_in_seconds:float
     
-    Note: the time may be given as -1 (if unknown -- later it may be provided
-    through an "S" message to specify the start time which may be useful
-    when converting to xml where the status only appears later on in the file
-    along with the status and not at the suite definition).
+    # Log (html) -- same thing as Log but the message must be interpreted as HTML.
+    # So, something as <img alt="screenshot" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAEgCAIAAACl65ZFAAEAAElEQVR4nOz9d7R..."/>
+    # would be interpreted as an image in the final HTML. 
+    LH=L
     
-    Example (were a is a reference to a previously memorized name):
+    # Start Run
+    SR: name:oid, time_delta_in_seconds:float
     
-    `SR a|0.333`
-
-## RR: Replay Start Run
-
-    Same as "SR" but used just to replay the content to specify the context
-    when the log starts being written in a new file.
-
-### ER: End Run
-
-    Spec: `status:oid, time_delta_in_seconds:float`
+    # End Run
+    ER: status:oid, time_delta_in_seconds:float
     
-    Note: the status (PASS, FAIL, SKIP) is a previously memorized name.
+    # Start Task
+    ST: loc:loc_id, time_delta_in_seconds:float
     
-    Example:
+    # End Task
+    ET: status:oid, message:oid, time_delta_in_seconds:float
     
-    `ER a|0.222`
-
-### ST: Start Task
-
-    Spec: `name:oid, suite_id:oid, lineno:int, time_delta_in_seconds:float`
+    # Start Element 
+    # Should be sent when some element we're tracking such as method, for, while, etc. starts.
+    # The 'type' can be:
+    #
+    # METHOD
+    #
+    # GENERATOR
+    #
+    # UNTRACKED_GENERATOR (untracked generator is a generator in a library, where we
+    # just track the start/end and not what happens inside it).
+    SE: loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float
     
-    Note: the source (filename) is available through the parent suite_source.
+    # Yield Resume (coming back to a suspended frame).
+    # Should be sent when a given frame is resumed from a yield.
+    YR: loc:loc_id, time_delta_in_seconds:float
     
-    Example:
+    # Yield From Resume (coming back to a suspended frame).
+    # Should be sent when a given frame is resumed from a yield from.
+    YFR: loc:loc_id, time_delta_in_seconds:float
     
-    `ST a|b|22|0.332`
-
-## RT: Replay Start Task
-
-    Same as "ST" but used just to replay the content to specify the context
-    when the log starts being written in a new file.
-
-
-### ET: End Task
-
-    Spec: `status:oid, message:oid, time_delta_in_seconds:float`
+    # End Element
+    # When the element ends, provide its status ("PASS", "ERROR") and the time at which it finished.
+    EE: type:oid, status:oid, time_delta_in_seconds:float
     
-    Example:
+    # Yield Suspend (pausing a frame)
+    # Should be sent when a given frame is suspended in a yield.
+    YS: loc:loc_id, type:oid, value:oid, time_delta_in_seconds:float
     
-    `ET a|b|0.332`
-
-### SE: Start Element
-
-    Spec: `name:oid, libname:oid, type:oid, doc:oid, source:oid, lineno:int, time_delta_in_seconds:float`
+    # Yield From Suspend (pausing a frame)
+    # Should be sent when a given frame is suspended in a yield from.
+    YFS: loc:loc_id, time_delta_in_seconds:float
     
-    Example:
+    # Assign
+    # Assign some content (type, value) to a variable (target) in the given location (loc). 
+    AS: loc:loc_id, target:oid, type:oid, value:oid, time_delta_in_seconds:float
     
-    `SE a|b|c|d|e|22|0.444`
-
-## RE: Replay Element
-
-    Same as "SE" but used just to replay the content to specify the context
-    when the log starts being written in a new file.
-
-### EA: Element argument
-
-    Spec: `name:oid, type:oid, value:oid`
+    # Element/method argument (name and value of the argument).
+    # Adds some argument (name) to the current element (with the given type and value).
+    EA: name:oid, type:oid, value:oid
     
-    Example:
+    # Set some time for the current scope (usually not needed as the time
+    # is usually given in the element itself).
+    S: start_time_delta:float
     
-    `EA f|g|h`
-
-### AS: Assign some content to a variable.
-
-    Spec: `source:oid, lineno:int, target:oid, type:oid, value:oid, time_delta_in_seconds:float`
+    # --------------------------------------------------------------- Tracebacks
+    # Start traceback with the exception error message.
+    # Note: it should be possible to start a traceback inside another traceback
+    # for cases where the exception has an exception cause.
     
-### EE: End Element
-
-    Spec: `type:oid, status:oid, time_delta_in_seconds:float`
+    # Start Traceback
+    STB: message:oid, time_delta_in_seconds:float
     
-    Example:
+    # Traceback Entry
+    TBE: source:oid, lineno:int, method:oid, line_content:oid
     
-    `EE a|0.333`
-
-### L: Provide a log message
-
-    Spec: `level:level_enum, message:oid, time_delta_in_seconds:float`
+    # Traceback variable
+    TBV: name:oid, type:oid, value:oid
     
-    level_enum is:
-    - ERROR = `E`
-    - FAIL = `F`
-    - INFO = `I`
-    - WARN = `W`
+    # End Traceback
+    ETB: time_delta_in_seconds:float
     
-    Example:
-    
-    `L E|a|0.123`
-
-### LH: Provide an html log message
-
-    Same as "L" but interned message is expected to be an html which can be
-    embedded in the final log.html.
-    
-    i.e.: the message can be something as:
-    
-    <img alt="screenshot" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAEgCAIAAACl65ZFAAEAAElEQVR4nOz9d7R..."/>
-    
-    In which case the img would be embedded as an image in the final log.html.
-
-### S: Specify the start time (of the containing run/task/element)
-
-    Spec: `start_time_delta:float`
-    
-    Example:
-    
-    `S 2.456`
+    # These messages have the same format (just the message type is different).
+    RR=SR
+    RT=ST
+    RE=SE
+    RTB=STB
+    RYR=YR

@@ -26,22 +26,11 @@ class UIRegenerateFixture:
     # must also be manually called afterwards.
     FORCE_REGEN: List[typing.Union[str, int]] = []
 
-    # Must be set to false when merging to master.
     OPEN_IN_BROWSER = False
 
+    PRINT_MESSAGES = False
+
     LOG_HTML_STYLE: LogHTMLStyle = "standalone"
-
-    if False:
-        OPEN_IN_BROWSER = True
-
-        # LOG_HTML_STYLE = "vscode"
-        LOG_HTML_STYLE = "standalone"
-
-        FORCE_REGEN.append("dev")
-        if LOG_HTML_STYLE == "vscode":
-            FORCE_REGEN.append(1)
-        else:
-            FORCE_REGEN.append(2)
 
     def regenerate(self) -> None:
         if not self.FORCE_REGEN:
@@ -68,12 +57,56 @@ class UIRegenerateFixture:
 
 @pytest.fixture
 def ui_regenerate():
-    # Uncomment to get new contents to be added to `samples.ts / getSampleContents()`.
-    # from robocorp.log import _robo_output_impl
-    #
-    # _robo_output_impl.WRITE_CONTENTS_TO_STDERR = True
+    DEFAULT = False
+
+    # Flags to be changed (keep to False in repository).
+
+    # Set to True to get new contents to be added to `samples.ts / getSampleContents()`.
+    PRINT_SAMPLE_CONTENTS = DEFAULT
+
+    # Set to True to regenerate the html.
+    REGEN = DEFAULT
+
+    # Set to True open test result in browser
+    OPEN_IN_BROWSER = DEFAULT
+
+    # Set to True to print messages found.
+    PRINT_MESSAGES = DEFAULT
+
+    # --- Implementation
+    if PRINT_SAMPLE_CONTENTS:
+        from robocorp.log import _robo_output_impl
+
+        _robo_output_impl.WRITE_CONTENTS_TO_STDERR = True
 
     uiregenerate_fixture = UIRegenerateFixture()
+
+    if OPEN_IN_BROWSER:
+        uiregenerate_fixture.OPEN_IN_BROWSER = True
+
+    if REGEN:
+        # LOG_HTML_STYLE = "vscode"
+        uiregenerate_fixture.LOG_HTML_STYLE = "standalone"
+
+        uiregenerate_fixture.FORCE_REGEN.append("dev")
+        if uiregenerate_fixture.LOG_HTML_STYLE == "vscode":
+            uiregenerate_fixture.FORCE_REGEN.append(1)
+        else:
+            uiregenerate_fixture.FORCE_REGEN.append(2)
+
+    uiregenerate_fixture.PRINT_MESSAGES = PRINT_MESSAGES
+
+    matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
+    if matrix_name:
+        if (
+            DEFAULT
+            or PRINT_SAMPLE_CONTENTS
+            or REGEN
+            or OPEN_IN_BROWSER
+            or PRINT_MESSAGES
+        ):
+            raise AssertionError("Expected all flags to be False in the CI.")
+
     uiregenerate_fixture.regenerate()
     return uiregenerate_fixture
 

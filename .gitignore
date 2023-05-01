@@ -7,16 +7,22 @@ __pycache__/
 *.whl
 
 # Python tooling caches
-.ruff_cahce/
+.ruff_cache/
 .pytest_cache/
 .mypy_cache/
 .coverage
 .idea/
 
 # Eclipse / PyDev
-.project
-.pydevproject
-.settings
+# Please keep these as they contain instructions for Eclipse/PyDev to 
+# automatically recognize the project structure as well as settings for
+# code-formatting, mypy, test running, etc. 
+# .project
+# .pydevproject
+# .settings
+#
+# This one can be ignored.
+.settings/org.eclipse.core.resources.prefs
 
 # Project generated files
 dist/

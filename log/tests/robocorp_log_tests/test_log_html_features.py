@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 HTML_MESSAGE = '<p>Image is: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="></p>'
 
@@ -91,6 +92,13 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
 
         assert log_target.exists()
 
+        d: datetime.datetime = datetime.datetime.fromisoformat(
+            "2022-10-31T07:45:57.116+00:00"
+        )
+        # The internal time is in utc, so, we need to decode it to the current timezone.
+        d = d.astimezone()
+        timezone_end = d.isoformat(timespec="milliseconds")[-6:]
+
         msgs = verify_log_messages_from_log_html(
             log_target,
             [
@@ -127,8 +135,8 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
                 },
                 {
                     "message_type": "T",
-                    # i.e.: check for the utc timezone (+00:00) in the time.
-                    "__check__": lambda msg: msg["initial_time"].endswith("+00:00"),
+                    # i.e.: check for the utc timezone (+00:00) in the time (actually, converted to local timezone)..
+                    "__check__": lambda msg: msg["time"].endswith(timezone_end),
                 },
                 {
                     "message_type": "SE",
@@ -140,10 +148,11 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
             [],
         )
 
-        if ui_regenerate.OPEN_IN_BROWSER:
+        if ui_regenerate.PRINT_MESSAGES:
             for m in msgs:
                 print(m)
 
+        if ui_regenerate.OPEN_IN_BROWSER:
             import webbrowser
 
             webbrowser.open(log_target.as_uri())

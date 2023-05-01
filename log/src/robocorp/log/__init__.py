@@ -431,7 +431,7 @@ def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
         Example of messages provided:
 
         {'message_type': 'V', 'version': '1'}
-        {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
+        {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
         {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
         ...
@@ -456,7 +456,7 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         Example of messages provided:
 
         {'message_type': 'V', 'version': '1'}
-        {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
+        {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
         {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
         ...
@@ -521,7 +521,7 @@ def verify_log_messages_from_messages_iterator(
         messages_iterator,
         [
             {'message_type': 'V', 'version': '1'}
-            {'message_type': 'T', 'initial_time': '2022-10-31T07:45:57.116'}
+            {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
         ]
 
     Note: if one of the key entries is `__check__` the value will be considered
@@ -535,7 +535,7 @@ def verify_log_messages_from_messages_iterator(
             {
                 "message_type": "T",
                 # i.e.: check for the utc timezone (+00:00) in the time.
-                "__check__": lambda msg: msg["initial_time"].endswith("+00:00"),
+                "__check__": lambda msg: msg["time"].endswith("+00:00"),
             },
         ]
     """

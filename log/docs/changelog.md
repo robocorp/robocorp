@@ -1,3 +1,8 @@
+NEXT
+-----------------------------
+
+- Format improvement: the location (name,libname,filename,lineno,docstring) is embedded/referenced in a single message.
+
 0.0.13
 -----------------------------
 

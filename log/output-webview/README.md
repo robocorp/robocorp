@@ -15,14 +15,20 @@ source code will automatically update the page).
 ## Change contents shown in the view.
 
 Note: to add new contents to the sample, head over to `log_tests.fixtures.ui_regenerate`
-and uncomment the code:
+and change `PRINT_SAMPLE_CONTENTS` and `REGEN` to `True`:
+
 
 ```
-    # from robocorp.log import _robo_output_impl
-    # _robo_output_impl.WRITE_CONTENTS_TO_STDERR = True
+    PRINT_SAMPLE_CONTENTS = True
+    REGEN = True
 ```
 
-and then run the test `log_tests.test_log_html_features.test_log_html_features`.
+and then run the test `tests/robocorp_log_tests/test_log_html_features.py::test_log_html_features`
+(it can be run with the command below, considering you're in the `/log` folder):
+
+```
+poetry run python -m pytest tests/robocorp_log_tests/test_log_html_features.py::test_log_html_features
+```
 
 Then, head over to `samples.ts` and paste the contents sent to the stderr 
 into `getSampleContents` (something starting with `let chunks = [` 

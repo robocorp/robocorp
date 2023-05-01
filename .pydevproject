@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pydev_project>
+        
+    <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python interpreter</pydev_property>
+        
+    <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+        
+    <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
+        <path>/${PROJECT_DIR_NAME}/tasks/src</path>
+        <path>/${PROJECT_DIR_NAME}/tasks/tests</path>
+        <path>/${PROJECT_DIR_NAME}/log/src</path>
+        <path>/${PROJECT_DIR_NAME}/log/tests</path>
+        <path>/${PROJECT_DIR_NAME}/examples/rpa-challenge</path>
+        <path>/${PROJECT_DIR_NAME}/examples/rpa-challenge-rcc</path>
+        <path>/${PROJECT_DIR_NAME}/vault/src</path>
+        <path>/${PROJECT_DIR_NAME}/http/src</path>
+        <path>/${PROJECT_DIR_NAME}/excel/src</path>
+        <path>/${PROJECT_DIR_NAME}/excel/tests</path>
+        <path>/${PROJECT_DIR_NAME}/browser/src</path>
+        <path>/${PROJECT_DIR_NAME}/browser/tests</path>
+    </pydev_pathproperty>
+    
+</pydev_project>
