@@ -1,6 +1,5 @@
 import ast
 from typing import Any, Union, List, Optional, Tuple, Dict, Callable
-from . import _ast_utils
 from ._config import BaseConfig, FilterKind
 from .protocols import LogElementType
 from ._ast_utils import ASTRewriter
@@ -54,11 +53,13 @@ def _get_function_and_class_name(stack) -> Optional[Tuple[Any, str]]:
     return function, class_name
 
 
-def _rewrite_return(function, class_name, node: ast.Return) -> Optional[list]:
+def _rewrite_return(
+    rewrite_ctx: ASTRewriter, function, class_name, node: ast.Return
+) -> Optional[list]:
     if function.name.startswith("_"):
         return None
 
-    factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+    factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
 
     result: List[ast.stmt] = []
 
@@ -318,7 +319,7 @@ def _rewrite_funcdef(
         function.body = function_body_prefix
         return
 
-    factory = _ast_utils.NodeFactory(
+    factory = rewrite_ctx.NodeFactory(
         function_body[0].lineno, function_body[0].col_offset
     )
 
@@ -332,7 +333,7 @@ def _rewrite_funcdef(
     try_finally = factory.Try()
     try_finally.body = function_body
 
-    factory = _ast_utils.NodeFactory(
+    factory = rewrite_ctx.NodeFactory(
         function_body[-1].lineno, function_body[-1].col_offset
     )
 
@@ -450,7 +451,7 @@ def _handle_return(
         return
 
     try:
-        return _rewrite_return(function, class_name, node)
+        return _rewrite_return(rewrite_ctx, function, class_name, node)
     except Exception:
         raise RuntimeError(
             f"Error when rewriting function return: {function.name} line: {node.lineno} at: {module_path}"
@@ -472,7 +473,7 @@ def _handle_assign(
         return
 
     try:
-        factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+        factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
         for target in node.targets:
             if isinstance(target, ast.Name):
                 call = _make_func_with_args(
@@ -530,7 +531,7 @@ def _handle_yield(
             return None
 
         # Wrapping of before/after for yield statements.
-        factory = _ast_utils.NodeFactory(node.lineno, node.col_offset)
+        factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
         stmts_cursor = rewrite_ctx.stmts_cursor
         yield_cursor = rewrite_ctx.cursor
 
@@ -551,13 +552,14 @@ def _handle_yield(
                 #
                 # as it'd change the order of the calls
                 #
-                # If the assumption above is correct than we can do something as:
+                # If the assumption above is correct then we can do something as:
                 #
                 # @tmp = call()
                 # before_yield(..., @tmp)
                 # yield @tmp
                 #
-                # and properly report the yield value.
+                # and properly report the yield value, otherwise we need to do
+                # further analysis to know whether it's ok to rewrite it.
 
                 if node.value is not None:
                     assign = factory.Assign()
@@ -571,26 +573,87 @@ def _handle_yield(
                     stmts_cursor.before_append(assign)
                 else:
                     value_yielded = factory.NoneConstant()
-            else:
-                value_yielded = factory.NoneConstant()
 
-            stmts_cursor.before_append(
-                factory.Expr(
-                    _make_func_with_args(
-                        factory,
-                        "before_yield",
-                        factory.NameLoad("__name__"),
-                        factory.NameLoad("__file__"),
-                        factory.Str(f"{class_name}{function.name}"),
-                        factory.LineConstant(),
-                        value_yielded,
+                stmts_cursor.before_append(
+                    factory.Expr(
+                        _make_func_with_args(
+                            factory,
+                            "before_yield",
+                            factory.NameLoad("__name__"),
+                            factory.NameLoad("__file__"),
+                            factory.Str(f"{class_name}{function.name}"),
+                            factory.LineConstant(),
+                            value_yielded,
+                        )
                     )
                 )
-            )
 
-            stmts_cursor.after_prepend(
-                _make_after_yield_expr(factory, function, class_name)
-            )
+                stmts_cursor.after_prepend(
+                    _make_after_yield_expr(factory, function, class_name)
+                )
+            else:
+                # This is a case which is more complex. We do it in a way
+                # where we create a function and then yield from that function.
+                #
+                # Something as:
+                #
+                # yield f()
+                #
+                # becomes:
+                #
+                # def @tmp_0():
+                #     @tmp_1 = f()
+                #     before(...)
+                #     @tmp_2 = yield from @tmp_1
+                #     after(...)
+                #     return @tmp_2
+                #
+                # yield from @tmp_0()
+                #
+                temp_funcdef = factory.FunctionDefTemp()
+
+                if node.value is not None:
+                    store_name = factory.NameTempStore()
+                    assign = factory.Assign(targets=[store_name], value=node.value)
+
+                    value_yielded = factory.NameLoad(store_name.id)
+                    temp_funcdef.body.append(assign)
+                else:
+                    value_yielded = factory.NoneConstant()
+
+                temp_funcdef.body.append(
+                    factory.Expr(
+                        _make_func_with_args(
+                            factory,
+                            "before_yield",
+                            factory.NameLoad("__name__"),
+                            factory.NameLoad("__file__"),
+                            factory.Str(f"{class_name}{function.name}"),
+                            factory.LineConstant(),
+                            value_yielded,
+                        )
+                    )
+                )
+
+                store_name = factory.NameTempStore()
+                assign = factory.Assign(
+                    targets=[store_name], value=factory.Yield(value_yielded)
+                )
+
+                temp_funcdef.body.append(assign)
+                temp_funcdef.body.append(
+                    _make_after_yield_expr(factory, function, class_name)
+                )
+                temp_funcdef.body.append(
+                    factory.Return(factory.NameLoad(store_name.id))
+                )
+
+                stmts_cursor.before_append(temp_funcdef)
+
+                yield_cursor.current = factory.YieldFrom(
+                    factory.Call(factory.NameLoad(temp_funcdef.name))
+                )
+
         else:
             stmts_cursor.before_append(
                 _make_before_yield_from_exprs(factory, function, class_name)

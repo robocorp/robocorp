@@ -1,0 +1,30 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def foo():
+    try:
+        @robo_lifecycle_hooks.before_method('GENERATOR', __name__, __file__, 'foo', 3, {})
+
+        def @tmp_0():
+            @tmp_1 = call()
+            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 3, @tmp_1)
+            @tmp_2 = (yield @tmp_1)
+            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 3)
+            return @tmp_2
+
+        def @tmp_3():
+            @tmp_4 = 33
+            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 3, @tmp_4)
+            @tmp_5 = (yield @tmp_4)
+            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 3)
+            return @tmp_5
+        for a in [(b := (yield from @tmp_0())), (c := (yield from @tmp_3()))]:
+            pass
+        @tmp_6 = [b, c]
+        @robo_lifecycle_hooks.method_return(__name__, __file__, 'foo', 5, @tmp_6)
+        return @tmp_6
+    except:
+        import sys as @py_sys
+        @robo_lifecycle_hooks.method_except('GENERATOR', __name__, __file__, 'foo', 5, @py_sys.exc_info())
+        raise
+    finally:
+        @robo_lifecycle_hooks.after_method('GENERATOR', __name__, __file__, 'foo', 5)

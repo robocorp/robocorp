@@ -133,7 +133,11 @@ class _RewriteCursor:
         self.parent = parent
 
         # This is the current node in the cursor.
-        self.node = node
+        self._node = node
+
+    @property
+    def node(self):  # read-only (to change, change 'current')
+        return self._node
 
     @property
     def after(self):
@@ -161,6 +165,12 @@ class _RewriteCursor:
         else:
             self._after.insert(0, node)
 
+    def __eq__(self, o):
+        if isinstance(o, _RewriteCursor):
+            return self.node == o.node
+
+        return False
+
 
 class ASTRewriter:
     def __init__(self, ast: AST):
@@ -168,6 +178,7 @@ class ASTRewriter:
         self._ast = ast
         self._stack: List[AST] = []
         self._cursor_stack: List[_RewriteCursor] = []
+        self._next_var_id: "partial[int]" = partial(next, itertools.count())
 
     def save_func_to_before_method_call(
         self, function: ast.FunctionDef, call: ast.Call
@@ -272,6 +283,9 @@ class ASTRewriter:
         stack_repr = "\n".join(str(x.node) for x in self._cursor_stack)
         raise RuntimeError(f"Did not find stmts cursor.\nStack:\n{stack_repr}")
 
+    def NodeFactory(self, lineno: int, col_offset: int) -> "NodeFactory":
+        return NodeFactory(lineno, col_offset, self._next_var_id)
+
 
 def copy_line_and_col(from_node, to_node):
     to_node.lineno = from_node.lineno
@@ -279,10 +293,14 @@ def copy_line_and_col(from_node, to_node):
 
 
 class NodeFactory:
-    def __init__(self, lineno, col_offset):
+    def __init__(
+        self, lineno: int, col_offset: int, next_var_id: Optional["partial[int]"] = None
+    ):
         self.lineno = lineno
         self.col_offset = col_offset
-        self.next_var_id = partial(next, itertools.count())
+        if next_var_id is None:
+            next_var_id = partial(next, itertools.count())
+        self.next_var_id = next_var_id
 
     def _set_line_col(self, node):
         node.lineno = self.lineno
@@ -302,12 +320,33 @@ class NodeFactory:
             call.func = func
         return self._set_line_col(call)
 
-    def Assign(self) -> ast.Assign:
-        assign = ast.Assign()
+    def FunctionDefTemp(self) -> ast.FunctionDef:
+        name = f"@tmp_{self.next_var_id()}"
+        args = self._set_line_col(
+            ast.arguments(
+                posonlyargs=[], args=[], kwonlyargs=[], defaults=[], kw_defaults=[]
+            )
+        )
+        function_def = ast.FunctionDef(name, body=[], decorator_list=[], args=args)
+        return self._set_line_col(function_def)
+
+    def YieldFrom(self, value=None) -> ast.YieldFrom:
+        yield_from = ast.YieldFrom(value=value)
+        return self._set_line_col(yield_from)
+
+    def Yield(self, value=None) -> ast.Yield:
+        yield_from = ast.Yield(value=value)
+        return self._set_line_col(yield_from)
+
+    def Assign(self, targets=[], value=None) -> ast.Assign:
+        assign = ast.Assign(targets=targets, value=value)
         return self._set_line_col(assign)
 
     def NameLoad(self, name: str) -> ast.Name:
         return self._set_line_col(ast.Name(name, ast.Load()))
+
+    def Return(self, value: ast.expr) -> ast.Return:
+        return self._set_line_col(ast.Return(value))
 
     def NameTempStore(self) -> ast.Name:
         name = f"@tmp_{self.next_var_id()}"

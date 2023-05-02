@@ -2,6 +2,7 @@ NEXT
 -----------------------------
 
 - When an exception is logged, local variablas are properly redacted for sensitive information.
+- Support multiple yields appearing as expressions in one statement. 
 
 
 0.0.14

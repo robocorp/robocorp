@@ -23,6 +23,7 @@ if in_project_roots:
     s = StringIO()
     _ast_utils.print_ast(node, stream=s)
     assert "Name" in s.getvalue()
+    # ast_module.dump(node, include_attributes=False, indent=True)
 
 
 def test_ast_rewriter_change_current_node(str_regression) -> None:
@@ -316,3 +317,56 @@ def method():
         assert unparsed.count("before_method('UNTRACKED_GENERATOR'") == 1
         assert unparsed.count("method_except('UNTRACKED_GENERATOR'") == 1
         assert unparsed.count("after_method('UNTRACKED_GENERATOR'") == 1
+
+
+def test_rewrite_yield_multiple(tmpdir, str_regression):
+    from robocorp.log._config import FilterKind
+    from robocorp.log._rewrite_importhook import _rewrite
+    from robocorp.log._lifecycle_hooks import before_yield
+    from robocorp.log._lifecycle_hooks import after_yield
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    for a in [b := (yield call()), c := (yield 33)]:
+        pass
+    return [b, c]
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    if hasattr(ast, "unparse"):  # 3.9 onwards
+        unparsed = ast.unparse(mod)
+        str_regression.check(unparsed)
+
+    def call():
+        return 1
+
+    found = []
+
+    def before(*args):
+        found.append("before")
+
+    def after(*args):
+        found.append("after")
+
+    with before_yield.register(before), after_yield.register(after):
+        namespace = {"call": call}
+        namespace["__file__"] = "<string>"
+        exec(co, namespace)
+        foo = namespace["foo"]()
+        assert next(foo) == 1
+        assert foo.send("step_a") == 33
+        with pytest.raises(StopIteration) as e:
+            foo.send("step_b")
+
+        assert e.value.value == ["step_a", "step_b"]
+
+    # We cannot stack 2 before nor 2 after, it must be always interleaved.
+    assert found == ["before", "after", "before", "after"]
