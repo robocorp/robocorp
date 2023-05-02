@@ -13,9 +13,9 @@ jobs:
         uses: Roang-zero1/github-create-release-action@v3
         with:
           version_regex: cli-[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+
-          release_title: Robo CLI ${{ github.ref_name }}
+          release_title: ${{ github.ref_name }}
           # TODO: once we have a changelog, add the URL
-          release_text: Binaries available as assets.
+          release_text: Binaries available as assets. Run `<executable_name> help` for usage instructions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
