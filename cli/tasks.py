@@ -48,7 +48,7 @@ def include(ctx, target_os=None):
     if target_os:
         rcc_url = RCC_URLS[target_os]
         rcc_exe = "rcc.exe" if target_os == "Windows" else "rcc"
-        rcc_path = CURDIR / "include" / "bin" / RCC_EXE
+        rcc_path = CURDIR / "include" / "bin" / rcc_exe
     else:
         # Default is to use current platforms settings
         rcc_url = RCC_URLS[platform.system()]
@@ -60,6 +60,8 @@ def include(ctx, target_os=None):
     st = os.stat(rcc_path)
     os.chmod(rcc_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
+    return rcc_path
+
 
 @task
 def build_all_platforms(ctx):
@@ -69,7 +71,7 @@ def build_all_platforms(ctx):
         ("amd64", "Linux", "linux64", "robo"),
         ("amd64", "Darwin", "macos64", "robo"),
     ]:
-        include(ctx, target_os=go_os)
+        rcc_path = include(ctx, target_os=go_os)
         os.environ["GOOS"] = go_os.lower()
         os.environ["GOARCH"] = arch
 
@@ -80,8 +82,8 @@ def build_all_platforms(ctx):
         os.makedirs(BUILD / target_dir, exist_ok=True)
         run(ctx, "go", "build", "-o", BUILD / target_dir / executable_name, CURDIR)
 
-    # Without this we may leave the local developer environment with wrong included binary
-    include(ctx)
+        # Remove the rcc executable, so it's not included for next platform in the loop
+        rcc_path.unlink()
 
 
 @task
