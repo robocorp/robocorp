@@ -13,11 +13,11 @@ BUILD = CURDIR / "build"
 RCC_EXE = "rcc.exe" if platform.system() == "Windows" else "rcc"
 RCC_PATH = CURDIR / "include" / "bin" / RCC_EXE
 RCC_VERSION = "11.28.0"
-RCC_URL = {
+RCC_URLS = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
     "Darwin": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/macos64/rcc",
     "Linux": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/linux64/rcc",
-}[platform.system()]
+}
 
 
 def run(ctx, *parts):
@@ -43,24 +43,39 @@ def build(ctx):
 
 
 @task
-def include(ctx):
+def include(ctx, target_os=None):
     """Download static assets to include/ directory"""
-    print(f"Downloading '{RCC_URL}' to '{RCC_PATH}'")
-    urllib.request.urlretrieve(RCC_URL, RCC_PATH)
+    if target_os:
+        rcc_url = RCC_URLS[target_os]
+        rcc_exe = "rcc.exe" if target_os == "Windows" else "rcc"
+        rcc_path = CURDIR / "include" / "bin" / RCC_EXE
+    else:
+        # Default is to use current platforms settings
+        rcc_url = RCC_URLS[platform.system()]
+        rcc_exe = RCC_EXE
+        rcc_path = RCC_PATH
 
-    st = os.stat(RCC_PATH)
-    os.chmod(RCC_PATH, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+    print(f"Downloading '{rcc_url}' to '{rcc_path}'")
+    urllib.request.urlretrieve(rcc_url, rcc_path)
+    st = os.stat(rcc_path)
+    os.chmod(rcc_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
 
 @task
 def build_all_platforms(ctx):
     """Build for all platforms"""
-    for arch, go_os, target_dir in [
-        ("amd64", "windows", "windows64"),
-        ("amd64", "linux", "linux64"),
-        ("amd64", "darwin", "macos64"),
+
+    if not RCC_PATH.is_file():
+        print("rcc executable missing, run 'invoke include'")
+        sys.exit(1)
+
+    for arch, go_os, target_dir, executable_name in [
+        ("amd64", "Windows", "windows64", "robo.exe"),
+        ("amd64", "Linux", "linux64", "robo"),
+        ("amd64", "Darwin", "macos64", "robo"),
     ]:
-        os.environ["GOOS"] = go_os
+        include(ctx, target_os=go_os)
+        os.environ["GOOS"] = go_os.lower()
         os.environ["GOARCH"] = arch
 
         # RCC uses -ldsflags, '-s' flags for building, are they relevant for us?
@@ -68,7 +83,10 @@ def build_all_platforms(ctx):
         # RCC makes a shasum, should we also do that?
         # sh "sha256sum build/linux64/* || true"
         os.makedirs(BUILD / target_dir, exist_ok=True)
-        run(ctx, "go", "build", "-o", BUILD / target_dir / "robo", CURDIR)
+        run(ctx, "go", "build", "-o", BUILD / target_dir / executable_name, CURDIR)
+
+    # Without this we may leave the local developer environment with wrong included binary
+    include(ctx)
 
 
 @task
