@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+var (
+	RccInclude = "bin/rcc"
+	RccBin = path.Join(BinPath(), "rcc")
+)
+
 func RoboHome() string {
 	userHome, err := os.UserHomeDir()
 	if err != nil {

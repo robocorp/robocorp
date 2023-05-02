@@ -11,6 +11,9 @@ import (
 
 var (
 	ExeSuffix = []string{".com", ".exe", ".bat", ".cmd"}
+
+	RccInclude = "bin/rcc.exe"
+	RccBin = path.Join(BinPath(), "rcc.exe")
 )
 
 func RoboHome() string {

@@ -2,7 +2,6 @@ package rcc
 
 import (
 	"os"
-	"path"
 
 	"github.com/robocorp/robo/cli/include"
 	"github.com/robocorp/robo/cli/paths"
@@ -10,16 +9,15 @@ import (
 
 var (
 	Controller = "robo-cli"
-	Executable = path.Join(paths.BinPath(), "rcc")
 )
 
 func Ensure() {
 	// TODO: Fix this
-	if _, err := os.Stat(Executable); err == nil {
+	if _, err := os.Stat(paths.RccBin); err == nil {
 		return
 	}
 
-	if err := include.CopyFile("bin/rcc", Executable, 0o755); err != nil {
+	if err := include.CopyFile(paths.RccInclude, paths.RccBin, 0o755); err != nil {
 		panic(err)
 	}
 }

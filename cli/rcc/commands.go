@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/robocorp/robo/cli/paths"
 	"github.com/robocorp/robo/cli/process"
 )
 
@@ -21,7 +22,7 @@ func HolotreeVariables(
 	Ensure()
 
 	proc := process.New(
-		Executable,
+		paths.RccBin,
 		"holotree",
 		"variables",
 		"--json",
@@ -64,7 +65,7 @@ func RobotWrap(path string) error {
 	Ensure()
 
 	proc := process.New(
-		Executable,
+		paths.RccBin,
 		"robot",
 		"wrap",
 		"--zipfile",
