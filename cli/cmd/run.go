@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"github.com/robocorp/robo/cli/run"
+	"github.com/robocorp/robo/cli/fatal"
+	"github.com/robocorp/robo/cli/operations/run"
 	"github.com/spf13/cobra"
 )
 
@@ -10,11 +11,17 @@ func init() {
 }
 
 var runCmd = &cobra.Command{
-	Use:   "run",
+	Use:   "run [task to run]",
 	Short: "Run a project task",
+	Args:  cobra.MatchAll(cobra.MaximumNArgs(1), cobra.OnlyValidArgs),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := run.RunTask(""); err != nil {
-			fatalError(err)
+		task := ""
+		if len(args) > 0 {
+			task = args[0]
+		}
+
+		if err := run.RunTask(task); err != nil {
+			fatal.FatalError(err)
 		}
 	},
 }

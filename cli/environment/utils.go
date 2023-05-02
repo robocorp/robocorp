@@ -5,16 +5,16 @@ import (
 	"strings"
 )
 
-func getEnvironment() map[string]string {
+func environ() map[string]string {
 	env := make(map[string]string)
 	for _, item := range os.Environ() {
-		key, val := splitKeyValue(item)
+		key, val := splitVar(item)
 		env[key] = val
 	}
 	return env
 }
 
-func splitKeyValue(item string) (key, value string) {
+func splitVar(item string) (key, value string) {
 	x := strings.SplitN(item, "=", 2)
 	switch len(x) {
 	case 0:

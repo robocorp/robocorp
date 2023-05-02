@@ -28,10 +28,10 @@ func (e Environment) ToSlice() []string {
 
 func TryCache(cfg pyproject.Robo) (Environment, bool) {
 	condaYaml := conda.NewFromConfig(cfg)
-	digest := calculateDigest(cfg.GetPath(), *condaYaml)
+	digest := digest(cfg.GetPath(), *condaYaml)
 
-	if env, ok := cache.GetEntry(digest); ok {
-		return mergeEnvironment(env), true
+	if env, ok := cache.Get(digest); ok {
+		return Environment{merge(env)}, true
 	} else {
 		return Environment{}, false
 	}
@@ -49,40 +49,37 @@ func Create(
 		return Environment{}, err
 	}
 
-	digest := calculateDigest(cfg.GetPath(), *condaYaml)
-	space := fmt.Sprintf("robo-%v", digest)
+	key := digest(cfg.GetPath(), *condaYaml)
+	space := fmt.Sprintf("robo-%v", key)
 
 	env, err := rcc.HolotreeVariables(condaPath, space, onProgress)
 	if err != nil {
 		return Environment{}, err
 	}
 
-	if err := cache.AddEntry(digest, env); err != nil {
+	if err := cache.Add(key, env); err != nil {
 		return Environment{}, err
 	}
 
-	return mergeEnvironment(env), nil
+	return Environment{merge(env)}, nil
 }
 
-func mergeEnvironment(holotree map[string]string) Environment {
-	// Propagate user environment
-	env := getEnvironment()
+func merge(holotree map[string]string) map[string]string {
+	env := environ()
 
-	// Ignore Python-specific overrides
 	delete(env, "PYTHONPATH")
 	delete(env, "PYTHONHOME")
 	delete(env, "PYTHONSTARTUP")
 	delete(env, "PYTHONEXECUTABLE")
 
-	// Merge with rcc environment
 	for k, v := range holotree {
 		env[k] = v
 	}
 
-	return Environment{Variables: env}
+	return env
 }
 
-func calculateDigest(projectPath string, condaYaml conda.CondaYaml) string {
+func digest(projectPath string, condaYaml conda.CondaYaml) string {
 	condaContent, err := json.Marshal(condaYaml)
 	if err != nil {
 		panic(err)
@@ -92,6 +89,6 @@ func calculateDigest(projectPath string, condaYaml conda.CondaYaml) string {
 	hash.Write([]byte(projectPath))
 	hash.Write(condaContent)
 
-	digest := hex.EncodeToString(hash.Sum(nil))
-	return digest[:16]
+	checksum := hex.EncodeToString(hash.Sum(nil))
+	return checksum[:16]
 }

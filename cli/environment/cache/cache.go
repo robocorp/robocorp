@@ -11,21 +11,21 @@ import (
 type Cache map[string]map[string]string
 
 var (
-	cachePath string
+	filename string
 )
 
 func init() {
-	cachePath = path.Join(paths.RoboHome(), ".envcache.json")
+	filename = path.Join(paths.RoboHome(), ".envcache.json")
 }
 
-func GetEntry(key string) (map[string]string, bool) {
-	cache := loadCache()
+func Get(key string) (map[string]string, bool) {
+	cache := load()
 	values, ok := cache[key]
 	return values, ok
 }
 
-func AddEntry(key string, values map[string]string) error {
-	cache := loadCache()
+func Add(key string, values map[string]string) error {
+	cache := load()
 	cache[key] = values
 
 	data, err := json.Marshal(cache)
@@ -33,11 +33,11 @@ func AddEntry(key string, values map[string]string) error {
 		return err
 	}
 
-	return os.WriteFile(cachePath, data, 0o644)
+	return os.WriteFile(filename, data, 0o644)
 }
 
-func loadCache() Cache {
-	data, err := os.ReadFile(cachePath)
+func load() Cache {
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return make(Cache)
 	}

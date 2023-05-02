@@ -11,7 +11,7 @@ import (
 
 var (
 	RccInclude = "bin/rcc"
-	RccBin = path.Join(BinPath(), "rcc")
+	RccBin     = path.Join(BinPath(), "rcc")
 )
 
 func RoboHome() string {

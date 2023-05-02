@@ -19,7 +19,9 @@ func HolotreeVariables(
 	space string,
 	onProgress func(*Progress),
 ) (map[string]string, error) {
-	Ensure()
+	if err := Ensure(); err != nil {
+		return nil, err
+	}
 
 	proc := process.New(
 		paths.RccBin,
@@ -62,7 +64,9 @@ func HolotreeVariables(
 
 // rcc robot wrap
 func RobotWrap(path string) error {
-	Ensure()
+	if err := Ensure(); err != nil {
+		return err
+	}
 
 	proc := process.New(
 		paths.RccBin,

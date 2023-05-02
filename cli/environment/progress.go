@@ -2,6 +2,7 @@ package environment
 
 import (
 	"errors"
+	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -17,21 +18,30 @@ var (
 	margin    = lipgloss.NewStyle().Padding(1, 0).Render
 )
 
-type EnvironmentMsg = *Environment
+type EnvironmentMsg = Environment
 
 type model struct {
 	Cfg   pyproject.Robo
-	Env   *Environment
+	Env   Environment
 	Error error
 
+	isReady  bool
 	progress progress.Model
 }
 
-func EnsureWithProgress(cfg pyproject.Robo) (*Environment, error) {
+func EnsureWithProgress(cfg pyproject.Robo) (Environment, error) {
 	if env, ok := TryCache(cfg); ok {
-		return &env, nil
+		return env, nil
 	}
 
+	if ui.Interactive {
+		return createPretty(cfg)
+	} else {
+		return createFallback(cfg)
+	}
+}
+
+func createPretty(cfg pyproject.Robo) (Environment, error) {
 	initialModel := model{
 		Cfg:      cfg,
 		progress: progress.New(),
@@ -39,15 +49,24 @@ func EnsureWithProgress(cfg pyproject.Robo) (*Environment, error) {
 
 	m, err := tea.NewProgram(initialModel).Run()
 	if err != nil {
-		return nil, err
+		return Environment{}, err
 	}
 
 	result := m.(model)
 	if result.Error != nil {
-		return nil, result.Error
+		return Environment{}, result.Error
 	}
 
 	return result.Env, nil
+}
+
+func createFallback(cfg pyproject.Robo) (Environment, error) {
+	onProgress := func(p *rcc.Progress) {
+		fmt.Println(faintText(p.String()))
+	}
+
+	fmt.Println("Building environment")
+	return Create(cfg, onProgress)
 }
 
 func (m model) Init() tea.Cmd {
@@ -65,7 +84,7 @@ func (m model) Init() tea.Cmd {
 		if err != nil {
 			return ui.ErrorMsg(err)
 		}
-		return EnvironmentMsg(&env)
+		return EnvironmentMsg(env)
 	}
 
 	return tea.Batch(
@@ -86,6 +105,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	case EnvironmentMsg:
 		m.Env = msg
+		m.isReady = true
 		return m, tea.Quit
 	}
 
@@ -99,7 +119,7 @@ func (m model) View() string {
 		"Building environment",
 	}
 
-	if m.Env != nil {
+	if m.isReady {
 		sections = append(sections,
 			m.progress.ViewAs(1.0),
 		)

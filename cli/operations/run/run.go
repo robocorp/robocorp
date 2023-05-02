@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/robocorp/robo/cli/config/pyproject"
-	"github.com/robocorp/robo/cli/core"
 	"github.com/robocorp/robo/cli/environment"
+	"github.com/robocorp/robo/cli/tasks"
 	"github.com/robocorp/robo/cli/ui"
 )
 
@@ -26,7 +26,7 @@ func RunTask(name string) error {
 	}
 
 	if name == "" {
-		name, err = selectTask(*env)
+		name, err = selectTask(env)
 		if err != nil {
 			return err
 		}
@@ -37,7 +37,7 @@ func RunTask(name string) error {
 	}
 
 	fmt.Println("\nRunning task: " + bold(name))
-	return core.RunTask(*env, name)
+	return tasks.RunTask(env, name)
 }
 
 func clearOutput(cfg pyproject.Robo) error {

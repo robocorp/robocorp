@@ -1,7 +1,12 @@
 package cmd
 
 import (
+	"github.com/robocorp/robo/cli/fatal"
 	"github.com/spf13/cobra"
+)
+
+var (
+	Verbose = false
 )
 
 var rootCmd = &cobra.Command{
@@ -10,9 +15,14 @@ var rootCmd = &cobra.Command{
 	Short:   "All-in-one Python automation framework",
 }
 
+func init() {
+	rootCmd.PersistentFlags().
+		BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+}
+
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fatalError(err)
+		fatal.FatalError(err)
 	}
 }

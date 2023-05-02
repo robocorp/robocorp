@@ -1,4 +1,4 @@
-package core
+package tasks
 
 import (
 	"encoding/json"

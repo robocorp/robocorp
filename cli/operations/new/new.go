@@ -32,6 +32,7 @@ type model struct {
 	templates []include.Template
 	template  *include.Template
 	name      string
+	dirName   string
 	error     error
 
 	templateInput   choice.Model
@@ -106,9 +107,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	sections := make([]string, 0)
 
-	// TODO: Move to model/update?
-	dirName := paths.SanitizePath(m.nameInput.Value())
-
 	switch m.currentState {
 	case StateTemplate:
 		sections = append(
@@ -116,6 +114,7 @@ func (m model) View() string {
 			m.templateInput.View(),
 		)
 	case StateName:
+		dirName := paths.SanitizePath(m.nameInput.Value())
 		sections = append(
 			sections,
 			section("Selected template:", m.template.Name),
@@ -129,7 +128,7 @@ func (m model) View() string {
 			sections,
 			section("Selected template:", m.template.Name),
 			section("Project name:", m.name),
-			section("Directory name:", dirName),
+			section("Directory name:", m.dirName),
 			m.installProgress.View(),
 			faintText("\nPress ctrl-c to abort"),
 		)
@@ -138,7 +137,7 @@ func (m model) View() string {
 			sections,
 			section("Selected template:", m.template.Name),
 			section("Project name:", m.name),
-			section("Directory name:", dirName),
+			section("Directory name:", m.dirName),
 			m.installProgress.ViewAs(1.0),
 			"\nCreated project ✨\n",
 		)
@@ -176,6 +175,7 @@ func (m model) updateStateName(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.Type == tea.KeyEnter {
 			if value := m.nameInput.Value(); len(value) > 0 {
 				m.name = value
+				m.dirName = paths.SanitizePath(value)
 				m.currentState = StateInstall
 				return m, m.installProject()
 			}
@@ -210,11 +210,10 @@ func (m model) installProject() tea.Cmd {
 	}
 
 	return func() tea.Msg {
-		dir := paths.SanitizePath(m.name)
-		if err := m.template.Copy(dir); err != nil {
+		if err := m.template.Copy(m.dirName); err != nil {
 			return ui.ErrorMsg(err)
 		}
-		cfg, err := pyproject.LoadPath(path.Join(dir, "pyproject.toml"))
+		cfg, err := pyproject.LoadPath(path.Join(m.dirName, "pyproject.toml"))
 		if err != nil {
 			return ui.ErrorMsg(err)
 		}

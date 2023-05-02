@@ -11,13 +11,11 @@ var (
 	Controller = "robo-cli"
 )
 
-func Ensure() {
+func Ensure() error {
 	// TODO: Fix this
 	if _, err := os.Stat(paths.RccBin); err == nil {
-		return
+		return nil
 	}
 
-	if err := include.CopyFile(paths.RccInclude, paths.RccBin, 0o755); err != nil {
-		panic(err)
-	}
+	return include.CopyFile(paths.RccInclude, paths.RccBin, 0o755)
 }

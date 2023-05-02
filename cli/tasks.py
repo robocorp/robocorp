@@ -1,6 +1,7 @@
 import urllib.request
 import os
 import platform
+import shutil
 import stat
 import sys
 from pathlib import Path
@@ -25,10 +26,26 @@ def run(ctx, *parts):
     ctx.run(args, pty=platform.system() != "Windows", echo=True)
 
 
+def optional(ctx, *parts):
+    if shutil.which(parts[0]):
+        run(ctx, *parts)
+    else:
+        print(f"Executable '{parts[0]}' not found, skipping")
+
+
+@task
+def lint(ctx):
+    """Run static analysis"""
+    run(ctx, "go", "vet", CURDIR)
+    optional(ctx, "golangci-lint", "run", CURDIR)
+
+
 @task
 def pretty(ctx):
     """Auto-format code"""
     run(ctx, "gofmt", "-s", "-w", CURDIR)
+    optional(ctx, "golines", "-m", 88, "-w", CURDIR)
+    optional(ctx, "goimports", "-w", CURDIR)
 
 
 @task
@@ -110,7 +127,7 @@ def sign_macos(ctx):
         print("codesign")
         ctx.run(
             # TODO: change to build/macos64/robo
-            'xcrun codesign --entitlements ./signing/entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/robo'
+            'xcrun codesign --entitlements entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/robo'
         )
         print("codesign")
         # ctx.run('codesign --entitlements entitlements.mac.plist --deep -o runtime -s "Robocorp Technologies, Inc." --timestamp build/macos64/arm/rcc')

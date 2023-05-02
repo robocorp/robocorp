@@ -3,7 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/robocorp/robo/cli/export"
+	"github.com/robocorp/robo/cli/fatal"
+	"github.com/robocorp/robo/cli/operations/export"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,7 @@ var exportCmd = &cobra.Command{
 	Short: "Export project as .zip file",
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := export.ExportProject(robotZip, false); err != nil {
-			fatalError(err)
+			fatal.FatalError(err)
 		}
 
 		fmt.Printf("Created export: %v\n", robotZip)
