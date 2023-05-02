@@ -64,11 +64,6 @@ def include(ctx, target_os=None):
 @task
 def build_all_platforms(ctx):
     """Build for all platforms"""
-
-    if not RCC_PATH.is_file():
-        print("rcc executable missing, run 'invoke include'")
-        sys.exit(1)
-
     for arch, go_os, target_dir, executable_name in [
         ("amd64", "Windows", "windows64", "robo.exe"),
         ("amd64", "Linux", "linux64", "robo"),
