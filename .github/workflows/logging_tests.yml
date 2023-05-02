@@ -48,6 +48,15 @@ jobs:
     - name: Install poetry
       run: pipx install poetry
       
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
+        cache-dependency-path: cli/go.sum
+        
+    - name: setup invoke
+      run: pipx install invoke
+    
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
@@ -83,6 +92,18 @@ jobs:
     - uses: actions/upload-artifact@v3
       if: always() && contains(matrix.name, '-outviewintegrationtests')
       with:
-        name: robotlog.${{ matrix.name }}.html
+        name: robot_framework_log.${{ matrix.name }}.html
         path: log/output-webview/tests/output/log.html
+        
+    - uses: actions/upload-artifact@v3
+      if: always() && contains(matrix.name, '-outviewintegrationtests')
+      with:
+        name: robo_log.${{ matrix.name }}.html
+        path: log/output-webview/tests_robo/output/log.html
+
+    - uses: actions/upload-artifact@v3
+      if: always() && contains(matrix.name, '-outviewintegrationtests')
+      with:
+        name: screenshot.${{ matrix.name }}.png
+        path: log/output-webview/tests_robo/output/screenshot.png
 

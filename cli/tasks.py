@@ -56,7 +56,8 @@ def build(ctx):
         sys.exit(1)
 
     BUILD.mkdir(parents=True, exist_ok=True)
-    run(ctx, "go", "build", "-o", BUILD / "robo", CURDIR)
+    postfix = '.exe' if sys.platform == 'win32' else ''
+    run(ctx, "go", "build", "-o", BUILD / f"robo{postfix}", CURDIR)
 
 
 @task

@@ -8,6 +8,7 @@ import os
 import pytest
 import sys
 import typing
+import subprocess
 
 
 class _SetupInfo:
@@ -35,8 +36,6 @@ class UIRegenerateFixture:
     def regenerate(self) -> None:
         if not self.FORCE_REGEN:
             return
-
-        import subprocess
 
         cwd = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -190,8 +189,6 @@ def log_setup(tmpdir):
 
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
-    import subprocess
-
     dirname = tmpdir_factory.mktemp("rcc_dir")
     location = os.path.join(str(dirname), "rcc")
     if sys.platform == "win32":
@@ -205,7 +202,7 @@ def rcc_loc(tmpdir_factory):
 
 
 @pytest.fixture(scope="session")
-def path_for_tests_robot() -> Path:
+def path_for_output_view_tests() -> Path:
     f = Path(__file__).parent
     robotframework_output_stream_root = f / ".." / ".."
     contents = os.listdir(robotframework_output_stream_root)
@@ -215,6 +212,11 @@ def path_for_tests_robot() -> Path:
     ret = ret / "tests"
     assert ret.exists()
     return ret
+
+
+@pytest.fixture(scope="session")
+def path_for_output_view_tests_robo(path_for_output_view_tests) -> Path:
+    return (path_for_output_view_tests / ".." / "tests_robo").absolute()
 
 
 def _download_rcc(location: str, force: bool = False) -> None:
@@ -270,7 +272,7 @@ def _download_rcc(location: str, force: bool = False) -> None:
             try:
                 with open(location, "wb") as stream:
                     stream.write(data)
-                os.chmod(location, 0x744)
+                os.chmod(location, 0x755)
             except Exception:
                 sys.stderr.write(
                     f"Error writing to: {location}.\nParent dir exists: {os.path.exists(os.path.dirname(location))}\n"
@@ -369,3 +371,59 @@ class StrRegression:
 @pytest.fixture
 def str_regression(datadir, original_datadir, request):
     return StrRegression(datadir, original_datadir, request)
+
+
+@pytest.fixture(scope="session")
+def run_integration_tests_flag():
+    matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
+    if matrix_name:
+        # On ci run just if 'outviewintegrationtests' is in the matrix name.
+        return "outviewintegrationtests" in matrix_name
+
+    # Run locally
+    return True
+
+
+@pytest.fixture(scope="session")
+def robo_loc(tmpdir_factory, run_integration_tests_flag):
+    if not run_integration_tests_flag:
+        return
+
+    dirname = tmpdir_factory.mktemp("robo_dir")
+    location = os.path.join(str(dirname), "robo")
+
+    if sys.platform == "win32":
+        location += ".exe"
+
+    _build_and_copy_robo(location, force=False)
+    assert os.path.exists(location), f"robo not found at: {location}."
+
+    return Path(location)
+
+
+def _build_and_copy_robo(location: str, force: bool = False) -> None:
+    """
+    Downloads robo to the given location. Note that we don't overwrite it if it
+    already exists (unless force == True).
+
+    :param location:
+        The location to store the robo executable in the filesystem.
+    :param force:
+        Whether we should overwrite an existing installation.
+    """
+
+    if not os.path.exists(location) or force:
+        repo_root = Path(__file__).absolute().parent.parent.parent.parent
+        cli_dir = repo_root / "cli"
+        assert cli_dir.exists()
+
+        subprocess.check_call(["inv", "include"], cwd=cli_dir)
+        subprocess.check_call(["inv", "build"], cwd=cli_dir)
+
+        name = "robo"
+        if sys.platform == "win32":
+            name = "robo.exe"
+        robo_at = cli_dir / "build" / name
+        assert robo_at.exists()
+        Path(location).write_bytes(robo_at.read_bytes())
+        os.chmod(location, 0x755)
