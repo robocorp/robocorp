@@ -5,6 +5,7 @@ on:
     tags:
       - "cli-[0-9]+.[0-9]+.[0-9]+"
 
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -19,37 +20,56 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  upload-binaries:
-    needs: release
+  build-all-and-upload-ubuntu:
+    needs:
+      - release
     defaults:
       run:
         working-directory: ./cli
-    strategy:
-      matrix:
-        # TODO: add windows signing
-        os: [macos-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.20'
           cache-dependency-path: cli/go.sum
 
-      - name: setup invoke
-        run: pipx install invoke
-
-
       - name: Build
         run: invoke build-all-platforms
-
 
       - uses: actions/upload-artifact@v3
         with:
           name: robo-artifacts
-          path: cli/build/**/robo
+          path: cli/build/
 
+      - name: Upload ubuntu binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: cli/build/linux64/robo
+          asset_name: robo-$tag-ubuntu64
+          tag: ${{ github.ref }}
+          overwrite: true
+
+
+  sign-macos:
+    needs:
+      - release
+      - build
+    defaults:
+      run:
+        working-directory: ./cli
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+            name: robo-artifacts
+            path: cli/build
+
+      - name: setup invoke
+        run: pipx install invoke
 
       - uses: maxim-lobanov/setup-xcode@v1
         if: matrix.os == 'macos-latest'
@@ -57,13 +77,11 @@ jobs:
           xcode-version: latest-stable
 
       - name: MacOS igning
-        if: matrix.os == 'macos-latest'
         run: invoke sign-macos
         env:
             MACOS_SIGNING_CERT: ${{ secrets.MACOS_SIGNING_CERT }}
             MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
       - name: MacOS Notarizing
-        if: matrix.os == 'macos-latest'
         # TODO: pass secrets as arguments
         run: invoke notarize-macos
         env:
@@ -71,7 +89,6 @@ jobs:
             MACOS_APP_ID_PASS_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
 
       - uses: actions/upload-artifact@v3
-        if: matrix.os == 'macos-latest'
         with:
           name: robo-signed-macos
           path: cli/dist/build/macos64/robo
@@ -85,6 +102,40 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
+
+  sign-windows:
+    needs:
+      - release
+      - build
+    defaults:
+      run:
+        working-directory: ./cli
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+            name: robo-artifacts
+            path: cli/build
+      - name: Setup AzureSignTool
+        shell: powershell
+        run: |
+          dotnet tool install --global AzureSignTool --version 3.0.0
+      - name: Windows signing
+        env:
+          VAULT_URL: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_URL}}
+          CLIENT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_ID}}
+          TENANT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_TENANT_ID}}
+          CLIENT_SECRET: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_SECRET}}
+          CERTIFICATE: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CERTIFICATE}}
+        run: azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\windows64\robo.exe
+            # ARM signing for future
+            # azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\windows64\arm\robo.exe
+        shell: powershell
+      - uses: actions/upload-artifact@v3
+        with:
+            name: robo-signed
+            path: .\build
+
       - name: Upload windows binary
         uses: svenstaro/upload-release-action@v2
         with:
@@ -94,11 +145,4 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-      - name: Upload ubuntu binary
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: cli/build/linux64/robo
-          asset_name: robo-$tag-ubuntu64
-          tag: ${{ github.ref }}
-          overwrite: true
+
