@@ -42,7 +42,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: robo-artifacts
+          name: robo-unsigned-artifacts
           path: cli/build/
 
       - name: Upload ubuntu binary
@@ -68,7 +68,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-            name: robo-artifacts
+            name: robo-unsigned-artifacts
             path: cli/build
 
       - name: setup invoke
@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-            name: robo-artifacts
+            name: robo-unsigned-artifacts
             path: cli/build
       - name: Setup AzureSignTool
         shell: powershell
@@ -134,10 +134,11 @@ jobs:
             # ARM signing for future
             # azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\windows64\arm\robo.exe
         shell: powershell
+
       - uses: actions/upload-artifact@v3
         with:
             name: robo-signed
-            path: .\build
+            path: cli/build/windows64/robo.exe
 
       - name: Upload windows binary
         uses: svenstaro/upload-release-action@v2
