@@ -39,9 +39,9 @@ func RunTask(env environment.Environment, name string) error {
 
 	proc := process.New("python", "-m", "robocorp.tasks", "run", "tasks.py", "-t", name)
 	proc.Env = env.Variables
-	// proc.StdoutListener = func(line string) {
-	// 	parseEvent(line)
-	// }
+	proc.StdoutListener = func(line string) {
+		parseEvent(line)
+	}
 
 	if output, err := proc.Run(); err != nil {
 		return errors.New(output.Stderr)

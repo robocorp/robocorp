@@ -144,7 +144,7 @@ func (m model) View() string {
 	}
 
 	if m.error != nil {
-		sections = append(sections, errorBox(m.error))
+		sections = append(sections, errorTitle("Error"), m.error.Error())
 	}
 
 	return margin.Render(

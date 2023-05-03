@@ -24,20 +24,15 @@ var (
 )
 
 type Styles struct {
-	Faint    lipgloss.Style
-	Bold     lipgloss.Style
-	ErrorBox lipgloss.Style
+	Faint      lipgloss.Style
+	Bold       lipgloss.Style
+	ErrorTitle lipgloss.Style
 }
 
 func DefaultStyles() (s Styles) {
 	s.Faint = lipgloss.NewStyle().Faint(true)
 	s.Bold = lipgloss.NewStyle().Bold(true)
-	s.ErrorBox = lipgloss.NewStyle().
-		Width(80).
-		Padding(0, 1).
-		Margin(1, 0).
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(ColorBrightRed)
+	s.ErrorTitle = lipgloss.NewStyle().Padding(0, 1).Background(ColorRed).Bold(true)
 
 	return
 }
