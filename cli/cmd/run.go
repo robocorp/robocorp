@@ -6,10 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	rootCmd.AddCommand(runCmd)
-}
-
 var runCmd = &cobra.Command{
 	Use:   "run [task to run]",
 	Short: "Run a project task",
@@ -20,8 +16,12 @@ var runCmd = &cobra.Command{
 			task = args[0]
 		}
 
-		if err := run.RunTask(task); err != nil {
+		if err := run.RunTask(directory, task); err != nil {
 			fatal.FatalError(err)
 		}
 	},
+}
+
+func init() {
+	rootCmd.AddCommand(runCmd)
 }

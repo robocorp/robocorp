@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/robocorp/robo/cli/config"
 	"github.com/robocorp/robo/cli/config/conda"
-	"github.com/robocorp/robo/cli/config/pyproject"
 	"github.com/robocorp/robo/cli/environment/cache"
 	"github.com/robocorp/robo/cli/paths"
 	"github.com/robocorp/robo/cli/rcc"
@@ -16,6 +16,16 @@ import (
 
 type Environment struct {
 	Variables map[string]string
+}
+
+func (e Environment) FindExecutable(name string) string {
+	if pathvar, ok := e.Variables["PATH"]; ok {
+		if f, err := paths.FindExecutable(name, pathvar); err == nil {
+			return f
+		}
+	}
+
+	return name
 }
 
 func (e Environment) ToSlice() []string {
@@ -26,9 +36,9 @@ func (e Environment) ToSlice() []string {
 	return env
 }
 
-func TryCache(cfg pyproject.Robo) (Environment, bool) {
+func TryCache(cfg config.Config) (Environment, bool) {
 	condaYaml := conda.NewFromConfig(cfg)
-	digest := digest(cfg.GetPath(), *condaYaml)
+	digest := digest(cfg.Dir, condaYaml)
 
 	if env, ok := cache.Get(digest); ok {
 		return Environment{merge(env)}, true
@@ -38,18 +48,18 @@ func TryCache(cfg pyproject.Robo) (Environment, bool) {
 }
 
 func Create(
-	cfg pyproject.Robo,
+	cfg config.Config,
 	onProgress func(*rcc.Progress),
 ) (Environment, error) {
-	condaPath := paths.CreateTempFile(cfg.GetPath(), ".conda-*.yaml")
+	condaPath := paths.CreateTempFile(cfg.Dir, ".conda-*.yaml")
 	defer os.Remove(condaPath)
 
 	condaYaml := conda.NewFromConfig(cfg)
-	if err := condaYaml.SaveAs(condaPath); err != nil {
+	if err := condaYaml.SaveAs(condaPath, true); err != nil {
 		return Environment{}, err
 	}
 
-	key := digest(cfg.GetPath(), *condaYaml)
+	key := digest(cfg.Dir, condaYaml)
 	space := fmt.Sprintf("robo-%v", key)
 
 	env, err := rcc.HolotreeVariables(condaPath, space, onProgress)

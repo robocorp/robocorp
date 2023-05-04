@@ -6,6 +6,7 @@ import (
 
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/process"
+	"github.com/robocorp/robo/cli/tasks/output"
 )
 
 type Task struct {
@@ -15,11 +16,14 @@ type Task struct {
 	Line int
 }
 
-func ListTasks(env environment.Environment) ([]Task, error) {
+func List(env environment.Environment) ([]Task, error) {
 	env.Variables["RC_LOG_OUTPUT_STDOUT"] = "1"
 
-	proc := process.New("python", "-m", "robocorp.tasks", "list", "tasks.py")
-	proc.Env = env.Variables
+	cmd := ListCommand()
+	exe := env.FindExecutable(cmd[0])
+
+	proc := process.New(exe, cmd[1:]...)
+	proc.Env = env.ToSlice()
 
 	output, err := proc.Run()
 	if err != nil {
@@ -34,18 +38,31 @@ func ListTasks(env environment.Environment) ([]Task, error) {
 	return tasks, nil
 }
 
-func RunTask(env environment.Environment, name string) error {
+func Run(env environment.Environment, name string) error {
 	env.Variables["RC_LOG_OUTPUT_STDOUT"] = "1"
 
-	proc := process.New("python", "-m", "robocorp.tasks", "run", "tasks.py", "-t", name)
-	proc.Env = env.Variables
+	cmd := RunCommand(name)
+	exe := env.FindExecutable(cmd[0])
+
+	proc := process.New(exe, cmd[1:]...)
+	proc.Env = env.ToSlice()
+
+	events := output.New()
 	proc.StdoutListener = func(line string) {
-		parseEvent(line)
+		events.Parse(line)
 	}
 
-	if output, err := proc.Run(); err != nil {
-		return errors.New(output.Stderr)
+	if _, err := proc.Run(); err != nil {
+		return err
 	}
 
 	return nil
+}
+
+func ListCommand() []string {
+	return []string{"python", "-m", "robocorp.tasks", "list", "tasks.py"}
+}
+
+func RunCommand(name string) []string {
+	return []string{"python", "-m", "robocorp.tasks", "run", "tasks.py", "-t", name}
 }

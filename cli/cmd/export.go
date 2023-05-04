@@ -1,29 +1,30 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/robocorp/robo/cli/fatal"
 	"github.com/robocorp/robo/cli/operations/export"
 	"github.com/spf13/cobra"
 )
 
-const (
-	robotZip = "robot.zip"
+var (
+	forceFlag bool
+	robotZip  string
 )
-
-func init() {
-	rootCmd.AddCommand(exportCmd)
-}
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "Export project as .zip file",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := export.ExportProject(robotZip, false); err != nil {
+		if err := export.ExportProject(directory, robotZip, forceFlag); err != nil {
 			fatal.FatalError(err)
 		}
-
-		fmt.Printf("Created export: %v\n", robotZip)
 	},
+}
+
+func init() {
+	exportCmd.Flags().
+		BoolVarP(&forceFlag, "force", "f", false, "overwrite existing configuration files")
+	exportCmd.Flags().
+		StringVarP(&robotZip, "output", "o", "robot.zip", "path to output file")
+	rootCmd.AddCommand(exportCmd)
 }

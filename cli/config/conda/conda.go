@@ -1,17 +1,14 @@
 package conda
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"sort"
 
-	"github.com/robocorp/robo/cli/config/pyproject"
-	yaml "gopkg.in/yaml.v2"
-)
-
-const (
-	defaultPythonVersion = "3.9.13"
-	defaultPipVersion    = "22.1.2"
+	"github.com/robocorp/robo/cli/config"
+	"github.com/robocorp/robo/cli/paths"
+	yaml "gopkg.in/yaml.v3"
 )
 
 type CondaYaml struct {
@@ -22,13 +19,13 @@ type CondaYaml struct {
 	PostInstall  []string      `yaml:"rccPostInstall,omitempty"`
 }
 
-func NewFromConfig(cfg pyproject.Robo) *CondaYaml {
+func NewFromConfig(cfg config.Config) CondaYaml {
 	pipDependencies := generatePipDependencies(cfg)
-	return &CondaYaml{
-		Channels: getDefaultChannels(),
+	return CondaYaml{
+		Channels: cfg.Channels,
 		Dependencies: []interface{}{
-			fmt.Sprintf("python=%v", getPythonVersion(cfg)),
-			fmt.Sprintf("pip=%v", defaultPipVersion),
+			fmt.Sprintf("python=%v", cfg.PythonVersion),
+			fmt.Sprintf("pip=%v", cfg.PipVersion),
 			map[string][]string{
 				"pip": pipDependencies,
 			},
@@ -36,8 +33,37 @@ func NewFromConfig(cfg pyproject.Robo) *CondaYaml {
 	}
 }
 
-func (it *CondaYaml) SaveAs(path string) error {
-	content, err := yaml.Marshal(it)
+func (it CondaYaml) Encode() ([]byte, error) {
+	var b bytes.Buffer
+	e := yaml.NewEncoder(&b)
+	e.SetIndent(2)
+
+	if err := e.Encode(it); err != nil {
+		return nil, err
+	}
+
+	return b.Bytes(), nil
+}
+
+func (it CondaYaml) Pretty() string {
+	if content, err := it.Encode(); err == nil {
+		return string(content)
+	} else {
+		return fmt.Sprintf("%v", it)
+	}
+}
+
+func (it *CondaYaml) SaveAs(path string, force bool) error {
+	exists, err := paths.Exists(path)
+	if err != nil {
+		return err
+	}
+
+	if exists && !force {
+		return fmt.Errorf("File already exists: %v", path)
+	}
+
+	content, err := it.Encode()
 	if err != nil {
 		return err
 	}
@@ -45,23 +71,11 @@ func (it *CondaYaml) SaveAs(path string) error {
 	return os.WriteFile(path, content, 0o666)
 }
 
-func generatePipDependencies(cfg pyproject.Robo) []string {
+func generatePipDependencies(cfg config.Config) []string {
 	rows := make([]string, 0)
 	for key, element := range cfg.Dependencies {
 		rows = append(rows, fmt.Sprintf("%v==%v", key, element))
 	}
 	sort.Strings(rows)
 	return rows
-}
-
-func getPythonVersion(cfg pyproject.Robo) string {
-	if cfg.Python != "" {
-		return cfg.Python
-	} else {
-		return "3.9.13"
-	}
-}
-
-func getDefaultChannels() []string {
-	return []string{"conda-forge"}
 }

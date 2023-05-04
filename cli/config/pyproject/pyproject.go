@@ -1,14 +1,13 @@
 package pyproject
 
 import (
-	"errors"
+	"fmt"
 	"os"
-	"path"
 
 	toml "github.com/pelletier/go-toml/v2"
 )
 
-type Root struct {
+type PyprojectToml struct {
 	Tool *Tool `toml:"tool"`
 }
 
@@ -17,7 +16,6 @@ type Tool struct {
 }
 
 type Robo struct {
-	path            string
 	Name            string            `toml:"name"`
 	Description     string            `toml:"description"`
 	Python          string            `toml:"python"`
@@ -26,27 +24,17 @@ type Robo struct {
 	DevDependencies map[string]string `toml:"dev-dependencies"`
 }
 
-func LoadPath(name string) (*Robo, error) {
+func LoadPath(name string) (PyprojectToml, error) {
 	data, err := os.ReadFile(name)
 	if err != nil {
-		return nil, err
+		return PyprojectToml{}, fmt.Errorf("Failed to read pyproject.toml: %v", err)
 	}
 
-	var root Root
-	err = toml.Unmarshal(data, &root)
+	var config PyprojectToml
+	err = toml.Unmarshal(data, &config)
 	if err != nil {
-		return nil, err
+		return PyprojectToml{}, fmt.Errorf("Malformed pyproject.toml: %v", err)
 	}
 
-	cfg := root.Tool.Robo
-	if cfg == nil {
-		return nil, errors.New("Missing 'tool.robo' section in pyproject.toml")
-	}
-
-	cfg.path = path.Dir(name)
-	return cfg, nil
-}
-
-func (r Robo) GetPath() string {
-	return r.path
+	return config, nil
 }

@@ -7,7 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/robocorp/robo/cli/config/pyproject"
+	"github.com/robocorp/robo/cli/config"
 	"github.com/robocorp/robo/cli/rcc"
 	"github.com/robocorp/robo/cli/ui"
 	"github.com/robocorp/robo/cli/ui/progress"
@@ -15,13 +15,13 @@ import (
 
 var (
 	faintText = ui.DefaultStyles().Faint.Render
-	margin    = lipgloss.NewStyle().Padding(1, 0).Render
+	padding   = lipgloss.NewStyle().Padding(1, 0).Render
 )
 
 type EnvironmentMsg = Environment
 
 type model struct {
-	Cfg   pyproject.Robo
+	Cfg   config.Config
 	Env   Environment
 	Error error
 
@@ -29,7 +29,7 @@ type model struct {
 	progress progress.Model
 }
 
-func EnsureWithProgress(cfg pyproject.Robo) (Environment, error) {
+func EnsureWithProgress(cfg config.Config) (Environment, error) {
 	if env, ok := TryCache(cfg); ok {
 		return env, nil
 	}
@@ -41,7 +41,7 @@ func EnsureWithProgress(cfg pyproject.Robo) (Environment, error) {
 	}
 }
 
-func createPretty(cfg pyproject.Robo) (Environment, error) {
+func createPretty(cfg config.Config) (Environment, error) {
 	initialModel := model{
 		Cfg:      cfg,
 		progress: progress.New(),
@@ -60,7 +60,7 @@ func createPretty(cfg pyproject.Robo) (Environment, error) {
 	return result.Env, nil
 }
 
-func createFallback(cfg pyproject.Robo) (Environment, error) {
+func createFallback(cfg config.Config) (Environment, error) {
 	onProgress := func(p *rcc.Progress) {
 		fmt.Println(faintText(p.String()))
 	}
@@ -134,5 +134,5 @@ func (m model) View() string {
 		)
 	}
 
-	return margin(lipgloss.JoinVertical(lipgloss.Left, sections...))
+	return padding(lipgloss.JoinVertical(lipgloss.Left, sections...))
 }

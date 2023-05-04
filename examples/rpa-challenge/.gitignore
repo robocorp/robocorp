@@ -19,7 +19,4 @@ output/
 venv/
 temp/
 
-conda.yaml
-robot.yaml
-
 challenge.xlsx

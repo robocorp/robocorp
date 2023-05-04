@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/robocorp/robo/cli/fatal"
 	"github.com/spf13/cobra"
 )
 
 var (
-	Verbose = false
+	verboseFlag bool
+	directory   string
 )
 
 var rootCmd = &cobra.Command{
@@ -17,12 +20,25 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().
-		BoolVarP(&Verbose, "verbose", "v", false, "verbose output")
+		BoolVarP(&verboseFlag, "verbose", "v", false, "verbose output")
+	rootCmd.PersistentFlags().
+		StringVar(&directory, "directory", "", "working directory for commands (defaults to current)")
 }
 
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
+	setDirectoryDefault()
+
+	if err := rootCmd.Execute(); err != nil {
 		fatal.FatalError(err)
+	}
+}
+
+func setDirectoryDefault() {
+	if directory == "" {
+		var err error
+		directory, err = os.Getwd()
+		if err != nil {
+			fatal.FatalError(err)
+		}
 	}
 }

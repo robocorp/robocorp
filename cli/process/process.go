@@ -4,12 +4,9 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 	"sync"
-
-	"github.com/robocorp/robo/cli/paths"
 )
 
 type Process struct {
@@ -18,7 +15,7 @@ type Process struct {
 	cmd            *exec.Cmd
 	StdoutListener func(string)
 	StderrListener func(string)
-	Env            map[string]string
+	Env            []string
 }
 
 type Output struct {
@@ -39,24 +36,11 @@ func (proc *Process) String() string {
 }
 
 func (proc *Process) Run() (*Output, error) {
-	var env []string
-	if proc.Env != nil {
-		if pathvar, ok := proc.Env["PATH"]; ok {
-			if f, err := paths.FindExecutable(proc.name, pathvar); err == nil {
-				proc.name = f
-			}
-		}
-
-		env = make([]string, 0)
-		for k, v := range proc.Env {
-			env = append(env, fmt.Sprintf("%v=%v", k, v))
-		}
-	} else {
-		env = os.Environ()
-	}
-
 	proc.cmd = exec.Command(proc.name, proc.args...)
-	proc.cmd.Env = env
+
+	if proc.Env != nil {
+		proc.cmd.Env = proc.Env
+	}
 
 	var stdout, stderr []string
 	var wg sync.WaitGroup

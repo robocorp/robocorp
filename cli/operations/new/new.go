@@ -1,13 +1,14 @@
 package new
 
 import (
+	"fmt"
 	"path"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/robocorp/robo/cli/config/pyproject"
+	"github.com/robocorp/robo/cli/config"
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/include"
 	"github.com/robocorp/robo/cli/paths"
@@ -29,6 +30,7 @@ const (
 type model struct {
 	currentState State
 
+	root      string
 	templates []include.Template
 	template  *include.Template
 	name      string
@@ -40,11 +42,12 @@ type model struct {
 	installProgress progress.Model
 }
 
-func NewProgram() *tea.Program {
-	return tea.NewProgram(initialModel())
+func NewProgram(dir string) *tea.Program {
+	m := initialModel(dir)
+	return tea.NewProgram(m)
 }
 
-func initialModel() model {
+func initialModel(dir string) model {
 	templates := include.Templates()
 	items := make([]choice.Option, len(templates))
 	for i, t := range templates {
@@ -55,11 +58,11 @@ func initialModel() model {
 	}
 
 	templateInput := choice.New("Select template", items)
-
 	nameInput := textinput.New()
 	installProgress := progress.New()
 
 	m := model{
+		root:            dir,
 		templates:       templates,
 		templateInput:   templateInput,
 		nameInput:       nameInput,
@@ -114,7 +117,7 @@ func (m model) View() string {
 			m.templateInput.View(),
 		)
 	case StateName:
-		dirName := paths.SanitizePath(m.nameInput.Value())
+		dirName := paths.Sanitize(m.nameInput.Value())
 		sections = append(
 			sections,
 			section("Selected template:", m.template.Name),
@@ -175,7 +178,7 @@ func (m model) updateStateName(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.Type == tea.KeyEnter {
 			if value := m.nameInput.Value(); len(value) > 0 {
 				m.name = value
-				m.dirName = paths.SanitizePath(value)
+				m.dirName = paths.Sanitize(value)
 				m.currentState = StateInstall
 				return m, m.installProject()
 			}
@@ -209,15 +212,22 @@ func (m model) installProject() tea.Cmd {
 		}
 	}
 
-	return func() tea.Msg {
-		if err := m.template.Copy(m.dirName); err != nil {
+	return func() (msg tea.Msg) {
+		defer func() {
+			if r := recover(); r != nil {
+				msg = ui.ErrorMsg(fmt.Errorf("%v", r))
+			}
+		}()
+
+		dir := path.Join(m.root, m.dirName)
+		if err := m.template.Copy(dir); err != nil {
 			return ui.ErrorMsg(err)
 		}
-		cfg, err := pyproject.LoadPath(path.Join(m.dirName, "pyproject.toml"))
+		cfg, err := config.FromPath(dir)
 		if err != nil {
 			return ui.ErrorMsg(err)
 		}
-		if _, ok := environment.TryCache(*cfg); ok {
+		if _, ok := environment.TryCache(cfg); ok {
 			ch <- progress.ProgressEvent{
 				Current: 1,
 				Total:   1,
@@ -225,7 +235,7 @@ func (m model) installProject() tea.Cmd {
 			}
 			return nil
 		}
-		if _, err := environment.Create(*cfg, onProgress); err != nil {
+		if _, err := environment.Create(cfg, onProgress); err != nil {
 			return ui.ErrorMsg(err)
 		}
 		return nil

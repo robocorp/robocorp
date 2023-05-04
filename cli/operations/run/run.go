@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/robocorp/robo/cli/config/pyproject"
+	"github.com/robocorp/robo/cli/config"
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/tasks"
 	"github.com/robocorp/robo/cli/ui"
@@ -14,43 +14,38 @@ var (
 	bold = ui.DefaultStyles().Bold.Render
 )
 
-func RunTask(name string) error {
-	cfg, err := pyproject.LoadPath("pyproject.toml")
+func RunTask(dir, name string) error {
+	cfg, err := config.FromPath(dir)
 	if err != nil {
 		return err
 	}
 
-	env, err := environment.EnsureWithProgress(*cfg)
+	env, err := environment.EnsureWithProgress(cfg)
 	if err != nil {
 		return err
 	}
 
 	if name == "" {
+		fmt.Println("Parsing tasks")
 		name, err = selectTask(env)
 		if err != nil {
 			return err
 		}
 	}
 
-	if err := clearOutput(*cfg); err != nil {
+	if err := clearOutput(cfg); err != nil {
 		return err
 	}
 
 	fmt.Println("\nRunning task: " + bold(name))
-	return tasks.RunTask(env, name)
+	return tasks.Run(env, name)
 }
 
-func clearOutput(cfg pyproject.Robo) error {
-	// TODO: Move default to sane place
-	output := cfg.Output
-	if output == "" {
-		output = "output"
-	}
-
-	if err := os.RemoveAll(output); err != nil {
+func clearOutput(cfg config.Config) error {
+	if err := os.RemoveAll(cfg.OutputDir); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(output, 0o755); err != nil {
+	if err := os.MkdirAll(cfg.OutputDir, 0o755); err != nil {
 		return err
 	}
 

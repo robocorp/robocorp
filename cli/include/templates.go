@@ -3,7 +3,7 @@ package include
 import (
 	"path"
 
-	yaml "gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v3"
 )
 
 type TemplatesYaml struct {
