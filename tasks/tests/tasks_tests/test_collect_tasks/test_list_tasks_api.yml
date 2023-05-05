@@ -1,10 +1,10 @@
 - docs: "\n    main method docstring\n    "
   file: tasks.py
-  line: 8
+  line: 10
   name: main
 - docs: ''
   file: tasks.py
-  line: 20
+  line: 22
   name: main_errors
 - docs: ''
   file: sub_task.py

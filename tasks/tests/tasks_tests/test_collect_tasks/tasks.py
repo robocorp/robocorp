@@ -1,5 +1,7 @@
 from robocorp.tasks import task
 
+print("some message while collecting.")
+
 
 def some_method():
     print("In some method")
