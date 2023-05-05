@@ -5,7 +5,7 @@ python = "3.9.13"
 
 [tool.robo.dependencies]
 # We always want to run with the latest version
-robocorp-tasks="0.1.6"
+robocorp-tasks="0.1.7"
 robocorp-browser="0.2.0"
 
 [tool.robo.dev-dependencies]

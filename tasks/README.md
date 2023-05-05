@@ -1,21 +1,22 @@
 # robocorp-tasks
 
-`robocorp-tasks` is a Python framework to simplify RPA development in Python.
+`robocorp-tasks` is a Python framework designed to simplify the development 
+of Python automations.
 
 > Note: The current version is still alpha but its public API is already meant
 > to be stable and new releases should keep backward compatibility.
 
 ## Why
 
-While Python is widely used in the RPA world, many solutions end up being ad-hoc, 
-making it difficult to navigate different projects or achieve comprehensible 
-logging out of the box.
+While Python is widely used in the automation world, many solutions end up being 
+ad-hoc, making it difficult to navigate different projects and keep up with the
+features required for analysing the results of such automations afterwards.
 
 ## How
 
-`robocorp-tasks` provides a runner for RPA tasks that offers logging 
-out of the box by leveraging `robocorp-log`, as well as the necessary 
-lifecycle management for running such tasks.
+`robocorp-tasks` provides a runner for running tasks that offers logging 
+out of the box for Python code (showing method calls, arguments, assigns, etc)
+by leveraging `robocorp-log`, and managing the lifecycle for running such tasks.
  
 ### Installation
 

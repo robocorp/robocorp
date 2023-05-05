@@ -381,14 +381,14 @@ files = [
 
 [[package]]
 name = "robocorp-log"
-version = "0.0.14"
+version = "0.0.15"
 description = "Automatic trace logging for Python"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_log-0.0.14-py3-none-any.whl", hash = "sha256:1779d84795a6f4989299d2dd072747c35f13e1c9c959ee056eb322c624c437be"},
-    {file = "robocorp_log-0.0.14.tar.gz", hash = "sha256:360520994b2292bb1a4942b35309029a4bee38d0bb433d8db8930d2baf7f00ce"},
+    {file = "robocorp_log-0.0.15-py3-none-any.whl", hash = "sha256:4db0a63ac94c1e7ea45d165f5900f467284dda4f2b5e4638b36786608074a78b"},
+    {file = "robocorp_log-0.0.15.tar.gz", hash = "sha256:ed949ebcaefbbfbaf0829bd6656d9a0768bc630f159fd75cf6b5f142a0a83148"},
 ]
 
 [package.dependencies]
@@ -475,4 +475,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "2fb8ce7432da712a6b3ff1a6ecb8fae3a589b415ce28ee7fb946a7c860d05cdf"
+content-hash = "cc71f9178198056454993dbc1380470848b5983dcd8961dd0deabea61adf4fec"

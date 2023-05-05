@@ -4,16 +4,16 @@ Steps to do a new release
 
 - Open a shell at the proper place (something as `X:/robocorpws/robo/tasks`)
 
-- Update version (`python -m dev set-version 0.1.6`).
+- Update version (`python -m dev set-version 0.1.7`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-tasks`).
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
 - Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
-  - `mu acp robocorp-tasks release 0.1.6`
+  - `mu acp robocorp-tasks release 0.1.7`
 
-- Create a tag (`git tag robocorp-tasks-0.1.6`) and push it.
+- Create a tag (`git tag robocorp-tasks-0.1.7`) and push it.
 
 - Rebase with master (`git checkout master&git rebase release-robocorp-tasks`).
 
@@ -21,7 +21,7 @@ Steps to do a new release
 
 Hi @channel,
 
-I'm happy to announce the release of `Robocorp Tasks 0.1.6`.
+I'm happy to announce the release of `Robocorp Tasks 0.1.7`.
 
 *## Changes*
 
