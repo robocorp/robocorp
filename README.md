@@ -84,6 +84,6 @@ Download files easily, or make custom HTTP requests.
 
 ## Documentation
 
-To see how to use the libraries, refer to [API documentation](docs/content/README.md) hosted in the repository.
+To see how to use the libraries, refer to [API documentation](docs/README.md) hosted in the repository.
 
 For in-depth tutorials and troubleshooting guides, refer to [Robocorp Docs](https://robocorp.com/docs).

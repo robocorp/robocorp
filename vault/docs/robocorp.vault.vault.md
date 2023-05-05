@@ -1,8 +1,8 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-# <kbd>module</kbd> `vault`
+# <kbd>module</kbd> `robocorp.vault.vault`
 
 
 
@@ -11,7 +11,7 @@
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L28"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L28"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `RobocorpVaultError`
 Raised when there's problem with reading from Robocorp Vault. 
@@ -22,7 +22,7 @@ Raised when there's problem with reading from Robocorp Vault.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L32"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L32"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Secret`
 Container for a secret with name, description, and multiple key-value pairs. 
@@ -37,7 +37,7 @@ Immutable and avoids logging internal values when possible.
  - <b>`description`</b>:  Human-friendly description for secret 
  - <b>`values`</b>:       Dictionary of key-value pairs stored in secret 
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L44"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L44"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -70,7 +70,7 @@ __init__(name, description, values)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L57"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L57"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `update`
 
@@ -85,7 +85,7 @@ update(kvpairs)
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L81"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L81"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `BaseSecretManager`
 Abstract class for secrets management. 
@@ -97,7 +97,7 @@ Should be used as a base-class for any adapter implementation.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L88"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L88"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_secret`
 
@@ -109,7 +109,7 @@ Return ``Secret`` object with given name.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L92"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L92"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_secret`
 
@@ -122,7 +122,7 @@ Set a secret with a new value.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L97"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L97"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `FileSecrets`
 Adapter for secrets stored in a database file. 
@@ -143,7 +143,7 @@ OR
 
  name1:  key1: value1  key2: value2  name2:  key1: value1 
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L136"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L136"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -160,7 +160,7 @@ __init__(secret_file='secrets.json')
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L179"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L179"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_secret`
 
@@ -188,7 +188,7 @@ Get secret defined with given name from file.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L155"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L155"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `load`
 
@@ -200,7 +200,7 @@ Load secrets file.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L169"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L169"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `save`
 
@@ -212,7 +212,7 @@ Save the secrets content to disk.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L197"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L197"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_secret`
 
@@ -238,7 +238,7 @@ Set the secret value in the local Vault with the given ``Secret`` object.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L212"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L212"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `RobocorpVault`
 Adapter for secrets stored in Robocorp Vault. 
@@ -252,7 +252,7 @@ The following environment variables should exist:
 
 If the robot run is started from the Robocorp Control Room these environment variables will be configured automatically. 
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L228"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L228"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -281,7 +281,7 @@ Default request parameters.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L281"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L281"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `create_public_key_url`
 
@@ -293,7 +293,7 @@ Create a URL for encryption public key.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L275"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L275"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `create_secret_url`
 
@@ -305,7 +305,7 @@ Create a URL for a specific secret.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L393"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L393"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_publickey`
 
@@ -317,7 +317,7 @@ Get the public key for AES encryption with the existing token.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L292"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L292"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_secret`
 
@@ -345,7 +345,7 @@ Get secret defined with given name from Robocorp Vault.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L353"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L353"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_secret`
 
@@ -369,7 +369,7 @@ Set the secret value in the Vault.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L458"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L458"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Vault`
 `Vault` is a library for interacting with secrets stored in the ``Robocorp Control Room Vault``. 
@@ -418,7 +418,7 @@ OR
 
  def modifying_secrets():  secret = VAULT.get_secret("swaglabs")  secret["username"] = "nobody"  VAULT.set_secret(secret) 
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L523"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L523"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -451,7 +451,7 @@ All other library arguments are passed to the adapter.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L564"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L564"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `get_secret`
 
@@ -475,7 +475,7 @@ Read a secret from the configured source, e.g. Robocorp Vault.
 
 ---
 
-<a href="https://github.com/robocorp/draft-python-framework/blob/master/libs\robocorp\src\robo\libs\robocorp\vault.py#L576"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../../vault/src/robocorp/vault/vault.py#L576"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `set_secret`
 
