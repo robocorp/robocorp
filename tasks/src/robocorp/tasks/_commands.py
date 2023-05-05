@@ -33,6 +33,7 @@ def list_tasks(
     from robocorp.tasks._collect_tasks import collect_tasks
     from robocorp.tasks._task import Context
     from robocorp.tasks._protocols import ITask
+    from contextlib import redirect_stdout
 
     p = Path(path)
     context = Context()
@@ -40,19 +41,21 @@ def list_tasks(
         context.show_error(f"Path: {path} does not exist")
         return 1
 
-    task: ITask
-    tasks_found = []
-    for task in collect_tasks(p):
-        tasks_found.append(
-            {
-                "name": task.name,
-                "line": task.lineno,
-                "file": task.filename,
-                "docs": getattr(task.method, "__doc__") or "",
-            }
-        )
+    original_stdout = sys.stdout
+    with redirect_stdout(sys.stderr):
+        task: ITask
+        tasks_found = []
+        for task in collect_tasks(p):
+            tasks_found.append(
+                {
+                    "name": task.name,
+                    "line": task.lineno,
+                    "file": task.filename,
+                    "docs": getattr(task.method, "__doc__") or "",
+                }
+            )
 
-    sys.stdout.write(json.dumps(tasks_found))
+        original_stdout.write(json.dumps(tasks_found))
     return 0
 
 
