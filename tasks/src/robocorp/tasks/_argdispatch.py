@@ -79,6 +79,29 @@ class _ArgDispatcher:
             default="1MB",
         )
 
+        run_parser.add_argument(
+            "--console-colors",
+            help="""Define how the console messages shown should be color encoded.
+
+"auto" (default) will color either using the windows API or the ansi color codes.
+"plain" will disable console coloring.
+"ansi" will force the console coloring to use ansi color codes.
+""",
+            dest="console_colors",
+            type=str,
+            choices=["auto", "plain", "ansi"],
+            default="auto",
+        )
+
+        run_parser.add_argument(
+            "--log-output-to-stdout",
+            help="Can be used so that log messages are also sent to the 'stdout' (if not specified the RC_LOG_OUTPUT_STDOUT is also queried).",
+            dest="log_output_to_stdout",
+            type=str,
+            choices=["no", "json"],
+            default="",
+        )
+
         # List tasks
         list_parser = subparsers.add_parser(
             "list",
@@ -86,7 +109,7 @@ class _ArgDispatcher:
         )
         list_parser.add_argument(
             dest="path",
-            help="The directory or file from where the tasks should be listed.",
+            help="The directory or file from where the tasks should be listed (default is the current directory).",
             nargs="?",
             default=".",
         )

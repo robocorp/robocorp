@@ -1,13 +1,12 @@
 [tool.robo]
 name = "RPA Challenge"
-description = "A simple example robot that solves the RPA Challenge"
+description = "Tests the browser output using playwright."
 python = "3.9.13"
 
 [tool.robo.dependencies]
+# We always want to run with the latest version
 robocorp-tasks="0.1.6"
 robocorp-browser="0.2.0"
-robocorp-excel="0.2.0"
-robocorp-http="0.2.0"
 
 [tool.robo.dev-dependencies]
 ruff="0.0.260"

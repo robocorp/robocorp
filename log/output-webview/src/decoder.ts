@@ -201,6 +201,29 @@ P: memorize_path
 # 'L E|a|b|0.123'
 L: level:str, message:oid, loc:loc_id, time_delta_in_seconds:float
 
+# A message which is intended to be sent to to the console
+# This can be either a message being sent by the user to stdout/stderr
+# (if those are being redirected) or some message from the framework
+# intended to be shown in the console.
+#
+# Expected "kind" values:
+#
+# User messages:
+# "stdout": Some user message which was being sent to the stdout.
+# "stderr": Some user message which was being sent to the stderr.
+#
+# Messages from the framework:
+# "regular": Some regular message.
+# "important": Some message which deserves a bit more attention.
+# "task_name": The task name is being written.
+# "error": Some error message.
+# "traceback": Some traceback message.
+#
+# Example:
+#
+# 'C a|b|0.123'
+C: kind:oid, message:oid, time_delta_in_seconds:float
+
 # Log (html) -- same thing as Log but the message must be interpreted as HTML.
 # So, something as <img alt="screenshot" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAEgCAIAAACl65ZFAAEAAElEQVR4nOz9d7R..."/>
 # would be interpreted as an image in the final HTML. 
@@ -216,6 +239,9 @@ ER: status:oid, time_delta_in_seconds:float
 ST: loc:loc_id, time_delta_in_seconds:float
 
 # End Task
+# status may be:
+# "PASS": Everything went well.
+# "ERROR": There was some detected error while running the task.
 ET: status:oid, message:oid, time_delta_in_seconds:float
 
 # Start Element 

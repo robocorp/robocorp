@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import pytest
 from typing import Union
+import subprocess
 
 
 def run_in_rcc(rcc_loc: str, cwd: Union[str, Path]):
@@ -16,18 +17,16 @@ def run_in_rcc(rcc_loc: str, cwd: Union[str, Path]):
     subprocess.check_call([rcc_loc] + "task run".split(), cwd=cwd, env=env)
 
 
-def run_in_robo(robo_loc: str, cwd: Union[str, Path]):
-    import subprocess
-
+def run_in_robo(robo_loc: str, cwd: Union[str, Path]) -> subprocess.CompletedProcess:
     completed_process = subprocess.run(
         [robo_loc, "run"], cwd=cwd, stdout=subprocess.PIPE
     )
-    stdout = completed_process.stdout.decode("utf-8")
+
     if completed_process.returncode != 0:
         raise AssertionError(
-            f"Expected command to be run successfully. Result: {completed_process.returncode}.\n{completed_process}\nStdout:\n{stdout}\n"
+            f"Expected command to be run successfully. Result: {completed_process.returncode}.\n{completed_process}\nStdout:\n{completed_process.stdout.decode('utf-8')}\n"
         )
-    assert "Running task: solve_challenge" in stdout
+    return completed_process
 
 
 def gen_case1(path_for_output_view_tests: Path, tmpdir: Path):
@@ -109,4 +108,6 @@ def test_output_view_integrated_robo(
 
     tasks_py = path_for_output_view_tests_robo / "tasks.py"
     assert tasks_py.exists()
-    run_in_robo(robo_loc, path_for_output_view_tests_robo)
+    completed_process = run_in_robo(robo_loc, path_for_output_view_tests_robo)
+    stdout = completed_process.stdout.decode("utf-8")
+    assert "Running task: check_output_webview" in stdout

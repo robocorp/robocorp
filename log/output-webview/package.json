@@ -8,6 +8,7 @@
         "build-prod-v2": "webpack --env production --env v2",
         "build-dev": "webpack --env development",
         "build-test": "webpack --env test",
+        "build-test-v2": "webpack --env test --env v2",
         "watch-build-dev": "webpack --watch --env development",
         "watch-build-dev-v2": "webpack --watch --env development --env v2",
         "watch-build-test": "webpack --watch --env test",

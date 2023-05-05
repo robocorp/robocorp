@@ -2,7 +2,11 @@ NEXT
 -----------------------------
 
 - When an exception is logged, local variablas are properly redacted for sensitive information.
-- Support multiple yields appearing as expressions in one statement. 
+- Support multiple yields appearing as expressions in one statement.
+- Provide output in the console showing that a task is being run and the result of the run.
+- Redirecting messages written to the console to log messages.
+    The `--console-colors` arguments can be set to `auto` (where it'll decide the best approach to print with colors), `plain` to disable the colors or `ansi` to force colors to be printed with ansi chars.
+- It's possible to setup the messages redirection by using either command line arguments (`--log-output-to-stdout=json`) or the `RC_LOG_OUTPUT_STDOUT=json` environment variable.
 
 
 0.0.14

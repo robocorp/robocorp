@@ -1,0 +1,6 @@
+
+Collecting tasks from: simple.py
+========================== Running: '\x1b'[96mcheck_difflib_log'\x1b'[0m ==========================
+  aaaa  bbb- ccc+ eee  ddd
+'\x1b'[96mcheck_difflib_log'\x1b'[0m status: PASS
+================================================================================

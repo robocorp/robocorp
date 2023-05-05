@@ -28,9 +28,9 @@ def test_collect_tasks_integrated_error(tmpdir):
         ["run", "dir_not_there", "-t=main"], returncode=1, cwd=str(tmpdir)
     )
 
-    decoded = result.stderr.decode("utf-8", "replace")
+    decoded = result.stdout.decode("utf-8", "replace")
     if "dir_not_there does not exist" not in decoded:
-        raise AssertionError(f"Unexpected stderr: {decoded}")
+        raise AssertionError(f"Unexpected stdout: {decoded}")
 
 
 def test_collect_tasks_integrated(datadir):

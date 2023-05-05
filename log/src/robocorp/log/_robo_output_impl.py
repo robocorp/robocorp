@@ -313,8 +313,8 @@ class _RoboOutputImpl:
     def _write_on_start_or_after_rotate(self):
         from ._decoder import DOC_VERSION
 
-        if self._current_file is not None:
-            print("Robocorp Log output:", self._current_file.absolute())
+        # if self._current_file is not None:
+        #     print("Robocorp Log output:", self._current_file.absolute())
 
         self._write_with_separator("V ", (DOC_VERSION,))
         self._write_with_separator(
@@ -874,6 +874,25 @@ class _RoboOutputImpl:
                 oid(message),
                 self._obtain_loc_id(name, libname, source, lineno),
                 self._number(lineno),
+                self._number(time_delta),
+            ],
+        )
+
+    def console_message(
+        self,
+        message: str,
+        kind: str,
+        time_delta: float,
+    ) -> None:
+        hide_strings_re = self._hide_strings_re
+        if hide_strings_re:
+            message = hide_strings_re.sub("&lt;redacted&gt;", message)
+
+        self._write_with_separator(
+            "C ",
+            [
+                self._obtain_id(kind),
+                self._obtain_id(message),
                 self._number(time_delta),
             ],
         )

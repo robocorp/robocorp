@@ -1,5 +1,6 @@
 from tasks_tests.fixtures import robo_run
 from pathlib import Path
+import pytest
 
 
 def test_core_log_integration_error_in_import(datadir):
@@ -98,3 +99,51 @@ def test_core_log_integration_empty_pyproject(datadir) -> None:
         [{"message_type": "SE", "name": "check_difflib_log"}],
         [{"message_type": "SE", "name": "ndiff"}],
     )
+
+
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "plain",
+        "ansi",
+    ],
+)
+def test_core_log_integration_console_messages(datadir, str_regression, mode) -> None:
+    pyproject: Path = datadir / "pyproject.toml"
+    pyproject.write_text("")
+    from robocorp.log import verify_log_messages_from_log_html
+
+    result = robo_run(
+        ["run", f"--console-colors={mode}", "simple.py"], returncode=0, cwd=str(datadir)
+    )
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    assert not decoded.strip()
+    decoded = result.stdout.decode("utf-8", "replace")
+    header_end = "=" * 80
+    header_end_i = decoded.rfind(header_end)
+    assert header_end_i > 0
+    decoded = decoded[: header_end_i + len(header_end)]
+
+    str_regression.check(decoded)
+
+    log_target = datadir / "output" / "log.html"
+    assert log_target.exists()
+
+    msgs = verify_log_messages_from_log_html(
+        log_target,
+        [
+            {
+                "message_type": "C",
+                "message": "\nCollecting tasks from: simple.py\n",
+                "kind": "regular",
+            },
+            {
+                "message_type": "C",
+                "kind": "stdout",
+                "message": "  aaaa  bbb- ccc+ eee  ddd",
+            },
+        ],
+    )
+    # for m in msgs:
+    #     print(m)

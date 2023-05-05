@@ -292,11 +292,11 @@ class StrRegression:
         self.original_datadir = original_datadir
         self.force_regen = False
 
-    def check(self, expected: Path, basename=None, fullpath=None):
+    def check(self, obtained: str, basename=None, fullpath=None):
         """
         Checks the given str against a previously recorded version, or generate a new file.
 
-        :param str expected: The path with contents expected
+        :param str obtained: The contents obtained
 
         :param str basename: basename of the file to test/record. If not given the name
             of the test is used.
@@ -312,19 +312,25 @@ class StrRegression:
 
         __tracebackhide__ = True
 
-        def dump(filename):
-            with filename.open("w", encoding="utf-8") as f:
-                f.write(expected)
+        def dump(f):
+            # Change the binary chars for its repr.
+            new_obtained = "".join(
+                (x if (x.isprintable() or x in ("\r", "\n")) else repr(x))
+                for x in obtained
+            )
+            f.write_bytes(
+                "\n".join(new_obtained.splitlines(keepends=False)).encode("utf-8")
+            )
 
         def check_fn(obtained_path, expected_path):
             from itertools import zip_longest
             from io import StringIO
 
-            obtained = obtained_path.read_text()
-            expected = expected_path.read_text()
+            obtained = obtained_path.read_bytes().decode("utf-8", "replace")
+            expected = expected_path.read_bytes().decode("utf-8", "replace")
 
-            lines1 = obtained.strip().splitlines()
-            lines2 = expected.strip().splitlines()
+            lines1 = obtained.strip().splitlines(keepends=False)
+            lines2 = expected.strip().splitlines(keepends=False)
             if lines1 != lines2:
                 max_line_length = max(
                     len(line) for line in lines1 + lines2 + ["=== Obtained ==="]

@@ -2,12 +2,11 @@ import os
 import sys
 
 import pytest
+from pathlib import Path
 
 
 @pytest.fixture(scope="session")
 def examples_dir():
-    from pathlib import Path
-
     examples = Path(__file__).parent.parent.parent.parent / "examples"
 
     assert examples.exists()
@@ -123,3 +122,102 @@ def _download_rcc(location: str, force: bool = False) -> None:
                     f"Error writing to: {location}.\nParent dir exists: {os.path.exists(os.path.dirname(location))}\n"
                 )
                 raise
+
+
+class StrRegression:
+    def __init__(self, datadir, original_datadir, request):
+        """
+        :type datadir: Path
+        :type original_datadir: Path
+        :type request: FixtureRequest
+        """
+        self.request = request
+        self.datadir = datadir
+        self.original_datadir = original_datadir
+        self.force_regen = False
+
+    def check(self, obtained: str, basename=None, fullpath=None):
+        """
+        Checks the given str against a previously recorded version, or generate a new file.
+
+        :param str obtained: The contents obtained
+
+        :param str basename: basename of the file to test/record. If not given the name
+            of the test is used.
+            Use either `basename` or `fullpath`.
+
+        :param str fullpath: complete path to use as a reference file. This option
+            will ignore ``datadir`` fixture when reading *expected* files but will still use it to
+            write *obtained* files. Useful if a reference file is located in the session data dir for example.
+
+        ``basename`` and ``fullpath`` are exclusive.
+        """
+        from pytest_regressions.common import perform_regression_check  # type: ignore
+
+        __tracebackhide__ = True
+
+        def dump(f):
+            # Change the binary chars for its repr.
+            new_obtained = "".join(
+                (x if (x.isprintable() or x in ("\r", "\n")) else repr(x))
+                for x in obtained
+            )
+            f.write_bytes(
+                "\n".join(new_obtained.splitlines(keepends=False)).encode("utf-8")
+            )
+
+        def check_fn(obtained_path, expected_path):
+            from itertools import zip_longest
+            from io import StringIO
+
+            obtained = obtained_path.read_bytes().decode("utf-8", "replace")
+            expected = expected_path.read_bytes().decode("utf-8", "replace")
+
+            lines1 = obtained.strip().splitlines(keepends=False)
+            lines2 = expected.strip().splitlines(keepends=False)
+            if lines1 != lines2:
+                max_line_length = max(
+                    len(line) for line in lines1 + lines2 + ["=== Obtained ==="]
+                )
+                stream = StringIO()
+
+                status = "   "
+                print(
+                    status
+                    + "{:<{width}}\t{:<{width}}".format(
+                        "=== Obtained ===", "=== Expected ===", width=max_line_length
+                    ),
+                    file=stream,
+                )
+                for line1, line2 in zip_longest(lines1, lines2, fillvalue=""):
+                    if line1 != line2:
+                        status = "!! "
+                    else:
+                        status = "   "
+                    print(
+                        status
+                        + "{:<{width}}\t{:<{width}}".format(
+                            line1, line2, width=max_line_length
+                        ),
+                        file=stream,
+                    )
+                raise AssertionError(
+                    f"Strings don't match. Obtained:\n\n{obtained}\n\nComparison:\n{stream.getvalue()}"
+                )
+
+        perform_regression_check(
+            datadir=self.datadir,
+            original_datadir=self.original_datadir,
+            request=self.request,
+            check_fn=check_fn,
+            dump_fn=dump,
+            extension=".txt",
+            basename=basename,
+            fullpath=fullpath,
+            force_regen=self.force_regen,
+        )
+
+
+@pytest.fixture
+def str_regression(datadir, original_datadir, request):
+    return StrRegression(datadir, original_datadir, request)

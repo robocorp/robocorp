@@ -1,6 +1,7 @@
 from pathlib import Path
-from typing import TypeVar
+from typing import TypeVar, Optional
 import typing
+from robocorp.log.protocols import OptExcInfo
 
 
 T = TypeVar("T")
@@ -40,6 +41,7 @@ class ITask(typing.Protocol):
 
     status: str
     message: str
+    exc_info: Optional[OptExcInfo]
 
     @property
     def name(self) -> str:

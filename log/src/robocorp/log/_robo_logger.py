@@ -1,9 +1,8 @@
-from io import StringIO
 import functools
 from pathlib import Path
 from typing import Optional, Union, Sequence, Tuple, Any
 import datetime
-from .protocols import OptExcInfo, LogHTMLStyle, Status, LogElementType
+from .protocols import OptExcInfo, LogHTMLStyle, LogElementType
 import sys
 
 
@@ -343,6 +342,16 @@ class _RoboLogger:
         unhandled: bool,
     ):
         return self._robot_output_impl.log_method_except(exc_info, unhandled)
+
+    @_log_error
+    def console_message(
+        self,
+        message: str,
+        kind: str,
+    ):
+        return self._robot_output_impl.console_message(
+            message, kind, self._get_time_delta()
+        )
 
     @_log_error
     def close(self):

@@ -64,6 +64,8 @@ def run(
     task_name: str,
     max_log_files: int = 5,
     max_log_file_size: str = "1MB",
+    console_colors: str = "auto",
+    log_output_to_stdout: str = "",
 ) -> int:
     """
     Runs a task.
@@ -75,6 +77,14 @@ def run(
         max_log_files: The maximum number of log files to be created (if more would
             be needed the oldest one is deleted).
         max_log_file_size: The maximum size for the created log files.
+        console_colors:
+            "auto": uses the default console
+            "plain": disables colors
+            "ansi": forces ansi color mode
+        log_output_to_stdout:
+            "": query the RC_LOG_OUTPUT_STDOUT value.
+            "no": don't provide log output to the stdout.
+            "json": provide json output to the stdout.
 
     Returns:
         0 if everything went well.
@@ -90,7 +100,11 @@ def run(
         setup_cli_auto_logging,
         read_filters_from_pyproject_toml,
     )
-    from ._log_output_setup import setup_log_output, setup_stdout_logging
+    from ._log_output_setup import setup_log_output
+    from robocorp.log import redirect
+    from robocorp.log import console
+
+    console.set_mode(console_colors)
 
     # Don't show internal machinery on tracebacks:
     # setting __tracebackhide__ will make it so that robocorp-log
@@ -111,11 +125,11 @@ def run(
         # Note: we can't customize what's a "project" file or a "library" file, right now
         # the customizations are all based on module names.
         config
-    ), setup_stdout_logging(), setup_log_output(
+    ), redirect.setup_stdout_logging(log_output_to_stdout), setup_log_output(
         output_dir=Path(output_dir),
         max_files=max_log_files,
         max_file_size=max_log_file_size,
-    ):
+    ), context.register_lifecycle_prints():
         run_status = "PASS"
         setup_message = ""
 
@@ -165,6 +179,7 @@ def run(
                     run_status = task.status = Status.ERROR
                     returncode = 1
                     task.message = str(e)
+                    task.exc_info = sys.exc_info()
                 finally:
                     after_task_run(task)
 

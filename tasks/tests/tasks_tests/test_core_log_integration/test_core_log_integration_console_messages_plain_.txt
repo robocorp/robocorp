@@ -1,0 +1,6 @@
+
+Collecting tasks from: simple.py
+========================== Running: check_difflib_log ==========================
+  aaaa  bbb- ccc+ eee  ddd
+check_difflib_log status: PASS
+================================================================================

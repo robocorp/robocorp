@@ -177,6 +177,10 @@ MESSAGE_TYPE_YIELD_SUSPEND = "YS"
 MESSAGE_TYPE_YIELD_FROM_RESUME = "YFR"
 MESSAGE_TYPE_YIELD_FROM_SUSPEND = "YFS"
 
+# Note: the spec appears in 3 places (and needs to be manually updated accordingly).
+# _decoder.py (this file)
+# decoder.ts
+# format.md
 
 SPEC = """ 
 # Each message should use a single line in the log output where the prefix
@@ -210,8 +214,8 @@ I: info:json.loads
 # 'ID: 2|36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2'     2nd part with identifier 36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2.
 ID: part:int, id:str
 
-# Initial time (all others are based on a delta from this date).
-# Example: 'T 2022-10-03T11:30:54.927'
+# Initial time in UTC (all others are based on a delta from this date).
+# Example: 'T 2022-10-03T11:30:54.927+00:00'
 T: time:dateisoformat
 
 # Memorize some word (to be used as oid).
@@ -236,6 +240,29 @@ P: memorize_path
 # 'L E|a|b|0.123'
 L: level:str, message:oid, loc:loc_id, time_delta_in_seconds:float
 
+# A message which is intended to be sent to to the console
+# This can be either a message being sent by the user to stdout/stderr
+# (if those are being redirected) or some message from the framework
+# intended to be shown in the console.
+#
+# Expected "kind" values:
+#
+# User messages:
+# "stdout": Some user message which was being sent to the stdout.
+# "stderr": Some user message which was being sent to the stderr.
+#
+# Messages from the framework:
+# "regular": Some regular message.
+# "important": Some message which deserves a bit more attention.
+# "task_name": The task name is being written.
+# "error": Some error message.
+# "traceback": Some traceback message.
+#
+# Example:
+#
+# 'C a|b|0.123'
+C: kind:oid, message:oid, time_delta_in_seconds:float
+
 # Log (html) -- same thing as Log but the message must be interpreted as HTML.
 # So, something as <img alt="screenshot" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABAAAAAEgCAIAAACl65ZFAAEAAElEQVR4nOz9d7R..."/>
 # would be interpreted as an image in the final HTML. 
@@ -251,6 +278,9 @@ ER: status:oid, time_delta_in_seconds:float
 ST: loc:loc_id, time_delta_in_seconds:float
 
 # End Task
+# status may be:
+# "PASS": Everything went well.
+# "ERROR": There was some detected error while running the task.
 ET: status:oid, message:oid, time_delta_in_seconds:float
 
 # Start Element 
