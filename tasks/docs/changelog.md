@@ -1,3 +1,11 @@
+NEXT
+-----------------------------
+
+- New argument: `--no-status-rc`:
+    When set, if running tasks has an error inside the task the return code of the process is 0 (
+    if unsed the return code if an error is thrown inside a task the return code is 1).
+
+
 0.1.7
 -----------------------------
 

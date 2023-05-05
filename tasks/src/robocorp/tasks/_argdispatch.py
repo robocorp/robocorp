@@ -102,6 +102,13 @@ class _ArgDispatcher:
             default="",
         )
 
+        run_parser.add_argument(
+            "--no-status-rc",
+            help="When set, if running tasks has an error inside the task the return code of the process is 0.",
+            dest="no_status_rc",
+            action="store_true",
+        )
+
         # List tasks
         list_parser = subparsers.add_parser(
             "list",
