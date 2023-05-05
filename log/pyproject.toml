@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-log"
-version = "0.0.14"
+version = "0.0.15"
 description = "Automatic trace logging for Python"
 authors = [
     "Fabio Zadrozny <fabio@robocorp.com>",
