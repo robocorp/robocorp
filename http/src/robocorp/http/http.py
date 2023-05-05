@@ -2,12 +2,14 @@ from pathlib import Path
 import requests
 from urllib.parse import urlparse
 
-from typing import Any, Optional
-from robocorp.http._types import PathType
+from typing import Any, Optional, Union
+
+
+PathLike = Union[str, Path]
 
 
 def _create_or_overwrite_target_file(
-    path: PathType,
+    path: PathLike,
     response: Any,
     overwrite: bool,
 ) -> Path:
@@ -25,7 +27,7 @@ def _create_or_overwrite_target_file(
 
 def download(
     url: str,
-    target_file: Optional[PathType] = None,
+    target_file: Optional[PathLike] = None,
     overwrite: bool = False,
     stream=True,
 ) -> Path:
