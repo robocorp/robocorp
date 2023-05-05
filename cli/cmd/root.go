@@ -8,12 +8,13 @@ import (
 )
 
 var (
+	version     string = "unknown"
 	verboseFlag bool
 	directory   string
 )
 
 var rootCmd = &cobra.Command{
-	Version: "v0.0.1",
+	Version: version,
 	Use:     "robo",
 	Short:   "All-in-one Python automation framework",
 }

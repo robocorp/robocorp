@@ -55,9 +55,21 @@ def build(ctx):
         print("rcc executable missing, run 'invoke include'")
         sys.exit(1)
 
+    with open(CURDIR / "VERSION") as fd:
+        version = fd.read().strip()
+
     BUILD.mkdir(parents=True, exist_ok=True)
-    postfix = '.exe' if sys.platform == 'win32' else ''
-    run(ctx, "go", "build", "-o", BUILD / f"robo{postfix}", CURDIR)
+    exe = "robo.exe" if platform.system() == "Windows" else "robo"
+    run(
+        ctx,
+        "go",
+        "build",
+        "-ldflags",
+        f'"-X github.com/robocorp/robo/cli/cmd.version={version}"',
+        "-o",
+        BUILD / exe,
+        CURDIR,
+    )
 
 
 @task
