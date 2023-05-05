@@ -480,10 +480,21 @@ export class TreeBuilder {
                 if (tb) {
                     if (tb.stack.length > 0) {
                         const tbEntry = tb.stack[0];
+                        const split: string[] = tb.exceptionMsg.split(":", 2);
+                        let excType: string;
+                        let excMsg: string;
+                        if (split.length > 1) {
+                            excType = split[0];
+                            excMsg = split[1];
+                        } else {
+                            excType = "Error";
+                            excMsg = split[0];
+                        }
+
                         item = addTreeContent(
                             this.opts,
                             this.parent,
-                            tb.exceptionMsg,
+                            excType,
                             "",
                             msg,
                             false,
@@ -492,6 +503,7 @@ export class TreeBuilder {
                             this.messageNode,
                             this.id.toString()
                         );
+                        addValueToTreeContent(item, excMsg);
                         this.addExceptionCssClass(item);
                     }
                 }
