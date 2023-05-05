@@ -66,6 +66,7 @@ def run(
     max_log_file_size: str = "1MB",
     console_colors: str = "auto",
     log_output_to_stdout: str = "",
+    no_status_rc: bool = False,
 ) -> int:
     """
     Runs a task.
@@ -85,6 +86,9 @@ def run(
             "": query the RC_LOG_OUTPUT_STDOUT value.
             "no": don't provide log output to the stdout.
             "json": provide json output to the stdout.
+        no_status_rc:
+            Set to True so that if running tasks has an error inside the task
+            the return code of the process is 0.
 
     Returns:
         0 if everything went well.
@@ -177,7 +181,8 @@ def run(
                     run_status = task.status = Status.PASS
                 except Exception as e:
                     run_status = task.status = Status.ERROR
-                    returncode = 1
+                    if not no_status_rc:
+                        returncode = 1
                     task.message = str(e)
                     task.exc_info = sys.exc_info()
                 finally:

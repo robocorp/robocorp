@@ -147,3 +147,31 @@ def test_core_log_integration_console_messages(datadir, str_regression, mode) ->
     )
     # for m in msgs:
     #     print(m)
+
+
+@pytest.mark.parametrize("no_error_rc", [True, False])
+def test_no_status_rc(datadir, no_error_rc) -> None:
+    pyproject: Path = datadir / "pyproject.toml"
+    pyproject.write_text("")
+    from robocorp.log import verify_log_messages_from_log_html
+
+    result = robo_run(
+        ["run"]
+        + (["--no-status-rc"] if no_error_rc else [])
+        + ["--console-color=plain", "expected_error_in_task.py"],
+        returncode=0 if no_error_rc else 1,
+        cwd=str(datadir),
+    )
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    assert not decoded.strip()
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "Robocorp Log (html)" in decoded
+
+    log_target = datadir / "output" / "log.html"
+    assert log_target.exists()
+
+    verify_log_messages_from_log_html(
+        log_target,
+        [{"message_type": "ER", "status": "ERROR"}],
+    )
