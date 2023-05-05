@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import TypeVar, Optional
+from typing import TypeVar, Optional, Any, Callable
 import typing
 from robocorp.log.protocols import OptExcInfo
 
@@ -67,8 +67,24 @@ class ICallback(typing.Protocol):
         pass
 
 
+class IAutoUnregisterContextManager(typing.Protocol):
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+
 class IOnTaskFuncFoundCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
+        pass
+
+    def register(
+        self, callback: Callable[[ITask], Any]
+    ) -> IAutoUnregisterContextManager:
+        pass
+
+    def unregister(self, callback: Callable[[ITask], Any]) -> None:
         pass
 
 
@@ -76,12 +92,36 @@ class IBeforeCollectTasksCallback(ICallback, typing.Protocol):
     def __call__(self, path: Path, task_name: str):
         pass
 
+    def register(
+        self, callback: Callable[[Path, str], Any]
+    ) -> IAutoUnregisterContextManager:
+        pass
+
+    def unregister(self, callback: Callable[[Path, str], Any]) -> None:
+        pass
+
 
 class IBeforeTaskRunCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
         pass
 
+    def register(
+        self, callback: Callable[[ITask], Any]
+    ) -> IAutoUnregisterContextManager:
+        pass
+
+    def unregister(self, callback: Callable[[ITask], Any]) -> None:
+        pass
+
 
 class IAfterTaskRunCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
+        pass
+
+    def register(
+        self, callback: Callable[[ITask], Any]
+    ) -> IAutoUnregisterContextManager:
+        pass
+
+    def unregister(self, callback: Callable[[ITask], Any]) -> None:
         pass
