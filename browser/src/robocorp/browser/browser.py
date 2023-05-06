@@ -98,17 +98,3 @@ def open_url(url: str, headless=True) -> Page:
     page = browser.new_page()
     page.goto(url)
     return page
-
-
-# TODO: don't let playwright print directly into stdout, it's breaking console behaviour
-
-# Close All Browsers
-
-
-#  Click Button    Start
-
-
-# Input Text    alias:First Name    ${person}[First Name]
-
-
-# Capture Element Screenshot    alias:Congratulations

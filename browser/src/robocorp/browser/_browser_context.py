@@ -41,7 +41,7 @@ after_all_tasks_run: Any = None
 after_task_run: Any = None
 
 
-def session_cache(func):
+def _session_cache(func):
     cache = []
 
     @functools.wraps(func)
@@ -62,7 +62,7 @@ def session_cache(func):
     return new_func
 
 
-def task_cache(func):
+def _task_cache(func):
     cache = []
 
     @functools.wraps(func)
@@ -83,10 +83,10 @@ def task_cache(func):
     return new_func
 
 
-class _Foobar:
+class _PlayWrightBrowserContext:
     def __init__(
         self,
-        browser_name,
+        browser_engine,
         headless: Optional[bool] = None,
         slowmo: int = 0,
         tracing: str = "off",
@@ -95,12 +95,13 @@ class _Foobar:
     ):
         """
         Args:
-            browser_name:
+            browser_engine:
                 help="Browser engine which should be used",
                 choices=["chromium", "firefox", "webkit"],
 
             headless:
                 Run headless or not.
+
             slowmo:
                 Run interactions in slow motion.
 
@@ -119,7 +120,7 @@ class _Foobar:
                 choices=["on", "off", "only-on-failure"],
                 help="Whether to automatically capture a screenshot after each task.",
         """
-        self.browser_name = browser_name
+        self.browser_engine = browser_engine
 
         if headless is None:
             headless = _is_debugger_attached()
@@ -131,7 +132,7 @@ class _Foobar:
         self.screenshot = screenshot
 
     @property
-    @session_cache
+    @_session_cache
     def browser_context_args(
         self,
     ) -> Dict:
@@ -153,7 +154,7 @@ class _Foobar:
         return context_args
 
     @property
-    @session_cache
+    @_session_cache
     def playwright(self) -> Playwright:
         pw = sync_playwright().start()
 
@@ -166,20 +167,20 @@ class _Foobar:
         return pw
 
     @property
-    @session_cache
-    def browser_type(self) -> BrowserType:
+    @_session_cache
+    def _browser_type(self) -> BrowserType:
         playwright = self.playwright
 
-        return getattr(playwright, self.browser_name)
+        return getattr(playwright, self.browser_engine)
 
     @property
-    @session_cache
+    @_session_cache
     def _launch_browser(self) -> Callable[..., Browser]:
         browser_type_launch_args: Dict = {
             "headless": self.headless,
             "slow_mo": self.slowmo,
         }
-        browser_type: BrowserType = self.browser_type()
+        browser_type: BrowserType = self._browser_type()
 
         def launch(**kwargs: Dict) -> Browser:
             launch_options = {**browser_type_launch_args, **kwargs}
@@ -189,7 +190,7 @@ class _Foobar:
         return launch
 
     @property
-    @session_cache
+    @_session_cache
     def browser(
         self,
     ) -> Browser:
@@ -204,7 +205,7 @@ class _Foobar:
         return browser
 
     @property
-    @task_cache
+    @_task_cache
     def context(self) -> BrowserContext:
         browser: Browser = self.browser
         browser_context_args: Dict = self.browser_context_args
@@ -282,7 +283,7 @@ class _Foobar:
                     # Silent catch empty videos.
                     pass
 
-    @task_cache
+    @_task_cache
     def page(self) -> Page:
         context: BrowserContext = self.context
         page = context.new_page()
