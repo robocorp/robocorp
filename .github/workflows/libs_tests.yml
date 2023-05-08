@@ -5,18 +5,22 @@ on:
     branches:
       - "master"
     paths:
-      - "libs/**"
+      - "browser/**"
+      - "excel/**"
+      - "workitems/**"
       - ".github/workflows/tests_libs.yml"
   pull_request:
     branches:
       - "master"
     paths:
-      - "libs/**/"
+      - "browser/**"
+      - "excel/**"
+      - "workitems/**"
       - ".github/workflows/tests_libs.yml"
 
 defaults:
   run:
-    working-directory: './libs'
+    working-directory: './'
 
 
 jobs:
@@ -67,9 +71,27 @@ jobs:
         python-version: ${{ matrix.python }}
         cache: 'poetry'
 
-    - name: Install project
-      run: poetry install
-    - name: Run tests
+    - name: Install browser and run tests
+      run: |
+        poetry install
+        poetry run pytest
+      working-directory: './browser'
       env:
         PYTHONPATH: .
-      run: poetry run pytest
+
+    - name: Install excel and run tests
+      run: |
+        poetry install
+        poetry run pytest
+      working-directory: './excel'
+      env:
+        PYTHONPATH: .
+
+    - name: Install workitems and run tests
+      run: |
+        poetry install
+        poetry run pytest
+      working-directory: './workitems'
+      env:
+        PYTHONPATH: .
+        RPA_DEBUG_API: True
