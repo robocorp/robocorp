@@ -481,7 +481,7 @@ testing = ["filelock"]
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -721,4 +721,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "fb13276a11e63bef71fb87b5630c40e7aea0d98502eb6f5bc64018ca416228f0"
+content-hash = "56f791257658a9d3bccd63a6b037d4dfafcfe8968f32f5abf1e9922bb46ab8cb"

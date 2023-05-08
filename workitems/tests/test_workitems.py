@@ -15,6 +15,11 @@ except ImportError:
 import pytest
 from requests import HTTPError
 from robocorp.workitems import inputs as _inputs
+from robocorp.workitems._workitems._adapter import (
+    BaseAdapter,
+    FileAdapter,
+    RobocorpAdapter,
+)
 from robocorp.workitems._workitems._utils import (
     DEBUG_ON,
     RequestsHTTPError,
@@ -22,11 +27,8 @@ from robocorp.workitems._workitems._utils import (
 )
 from robocorp.workitems._workitems._workitems import (
     ENCODING,
-    BaseAdapter,
     EmptyQueue,
     Error,
-    FileAdapter,
-    RobocorpAdapter,
     State,
 )
 from robocorp.workitems._workitems._workitems import _WorkItemsLibrary as WorkItems

@@ -21,22 +21,13 @@ class _WorkItemsInputs:
         wi = _WorkItemsSingleton.instance()
         return wi.current
 
-    @staticmethod
-    def create_output(
-        variables: Optional[dict] = None,
-        files: Optional[Union[str, List[str]]] = None,
-        save: bool = False,
-    ):
-        wi = _WorkItemsSingleton.instance()
-        return wi.create_output_work_item(variables, files, save, wi.current)
-
 
 class _WorkItemsOutputs:
     @staticmethod
     def create(
         variables: Optional[dict] = None,
         files: Optional[Union[str, List[str]]] = None,
-        save: bool = False,
+        save: bool = True,
     ) -> WorkItem:
         wi = _WorkItemsSingleton.instance()
         return wi.create_output_work_item(variables, files, save)

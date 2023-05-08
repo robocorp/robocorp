@@ -73,8 +73,12 @@ func (it *CondaYaml) SaveAs(path string, force bool) error {
 
 func generatePipDependencies(cfg config.Config) []string {
 	rows := make([]string, 0)
-	for key, element := range cfg.Dependencies {
-		rows = append(rows, fmt.Sprintf("%v==%v", key, element))
+	for k, v := range cfg.Dependencies {
+		if v == "*" {
+			rows = append(rows, k)
+		} else {
+			rows = append(rows, fmt.Sprintf("%v==%v", k, v))
+		}
 	}
 	sort.Strings(rows)
 	return rows

@@ -2,7 +2,6 @@ package process
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -23,8 +22,17 @@ type Output struct {
 	Stderr string
 }
 
-func (o Output) AsError() error {
-	return errors.New(o.Stderr)
+type ProcessError struct {
+	Err    error
+	Output *Output
+}
+
+func (p ProcessError) Error() string {
+	if p.Output != nil {
+		return p.Output.Stderr
+	} else {
+		return p.Err.Error()
+	}
 }
 
 func New(name string, args ...string) *Process {
@@ -89,5 +97,9 @@ func (proc *Process) Run() (*Output, error) {
 		Stderr: strings.Join(stderr, "\n"),
 	}
 
-	return output, err
+	if err != nil {
+		return nil, ProcessError{Err: err, Output: output}
+	} else {
+		return output, nil
+	}
 }

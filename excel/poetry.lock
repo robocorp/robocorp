@@ -614,7 +614,7 @@ test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.
 name = "typing-extensions"
 version = "4.5.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -674,4 +674,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "7ac6cb73d4f0df6c8c648ca66f15f409801aa79548c699da69cb02ad828de818"
+content-hash = "5164f3f44764f0d93d385fe44bfdc8110f4778a9072c43b80c83e1951cf5703c"

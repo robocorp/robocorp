@@ -13,7 +13,7 @@ BUILD = CURDIR / "build"
 
 RCC_EXE = "rcc.exe" if platform.system() == "Windows" else "rcc"
 RCC_PATH = CURDIR / "include" / "bin" / RCC_EXE
-RCC_VERSION = "11.28.0"
+RCC_VERSION = "14.6.0"
 RCC_URLS = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
     "Darwin": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/macos64/rcc",

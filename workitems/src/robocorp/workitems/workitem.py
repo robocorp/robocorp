@@ -2,29 +2,16 @@ import copy
 import fnmatch
 import logging
 import os
-from enum import Enum
 from pathlib import Path
 from shutil import copy2
 from typing import Dict, List, Optional, Union
 
 from robocorp.workitems._workitems._adapter import BaseAdapter
+from robocorp.workitems._workitems._types import Error, State
 from robocorp.workitems._workitems._utils import JSONType, is_json_equal, truncate
 
 
-class State(Enum):
-    """Work item state. (set when released)"""
-
-    DONE = "COMPLETED"
-    FAILED = "FAILED"
-
-
-class Error(Enum):
-    """Failed work item error type."""
-
-    BUSINESS = "BUSINESS"  # wrong/missing data, shouldn't be retried
-    APPLICATION = "APPLICATION"  # logic issue/timeout, can be retried
-
-
+# TODO: Split into input and output items
 class WorkItem:
     """Base class for input and output work items.
 
@@ -61,6 +48,15 @@ class WorkItem:
         payload = truncate(str(self.payload), 64)
         files = len(self.files)
         return f"WorkItem(id={self.id}, payload={payload}, files={files}, state={self.state})"
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is not None:
+            self.fail(message=str(exc_value))
+        else:
+            self.done()
 
     @property
     def is_dirty(self):
@@ -207,12 +203,23 @@ class WorkItem:
 
         return name
 
+    def create_output(
+        self,
+        variables: Optional[dict] = None,
+        files: Optional[Union[str, List[str]]] = None,
+        save: bool = True,
+    ):
+        # TODO: Implement
+        raise NotImplementedError
+
     def _ensure_releasable(self):
+        # TODO: Move these checks elsewhere
         if self.state is not None:
             raise RuntimeError("Input work item already released")
-
-        assert self.parent_id is None, "Cannot set state on output item"
-        assert self.id is not None, "Cannot set state on input item with null ID"
+        if self.parent_id is None:
+            raise RuntimeError("Cannot set state on output item")
+        if self.id is not None:
+            raise RuntimeError("Cannot set state on input item with null ID")
 
     def done(self):
         """Mark item status as DONE."""
@@ -225,28 +232,23 @@ class WorkItem:
 
     def fail(
         self,
-        exception_type: Optional[Union[Error, str]] = None,
+        exception_type: Union[Error, str] = Error.APPLICATION,
         code: Optional[str] = None,
         message: Optional[str] = None,
     ):
         self._ensure_releasable()
-
         state = State.FAILED
 
-        if exception_type:
-            exception_type: Error = (
-                exception_type
-                if isinstance(exception_type, Error)
-                else Error(exception_type.upper())
-            )
-            exception = {
-                "type": exception_type.value,
-                "code": code,
-                "message": message,
-            }
-        elif code or message:
-            exc_types = ", ".join(list(Error.__members__))
-            raise RuntimeError(f"Must specify failure type from: {exc_types}")
+        type_ = (
+            exception_type
+            if isinstance(exception_type, Error)
+            else Error(exception_type.upper())
+        )
+        exception = {
+            "type": type_.value,
+            "code": code,
+            "message": message,
+        }
 
         self.adapter.release_input(self.id, state, exception=exception)
         self.state = state

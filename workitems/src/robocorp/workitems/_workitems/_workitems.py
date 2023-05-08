@@ -14,7 +14,6 @@ from robocorp.workitems._workitems._adapter import (
     UNDEFINED,
     BaseAdapter,
     EmptyQueue,
-    FileAdapter,
     RobocorpAdapter,
 )
 from robocorp.workitems._workitems._utils import (

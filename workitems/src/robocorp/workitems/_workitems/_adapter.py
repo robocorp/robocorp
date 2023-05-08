@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from robocorp.workitems._workitems._types import State
 from robocorp.workitems._workitems._utils import (
     JSONType,
     Requests,
@@ -14,7 +15,6 @@ from robocorp.workitems._workitems._utils import (
     resolve_path,
     url_join,
 )
-from robocorp.workitems.workitem import State
 
 UNDEFINED = object()  # Undefined default value
 ENCODING = "utf-8"

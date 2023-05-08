@@ -148,6 +148,45 @@ def set_dot_value(source: Dict, key: str, *, value: Any):
     source[keys[-1]] = value
 
 
+def _needs_retry(exc: BaseException) -> bool:
+    # Don't retry on some specific error codes or messages.
+
+    # https://www.restapitutorial.com/httpstatuscodes.html
+    # 400 - payload is bad and needs to be changed
+    # 401 - missing auth bearer token
+    # 403 - auth is in place, but not allowed (insufficient privileges)
+    # 409 - payload not good for the affected resource
+    no_retry_codes = [400, 401, 403, 409]
+    no_retry_messages = []
+
+    if isinstance(exc, RequestsHTTPError):
+        if exc.status_code in no_retry_codes or exc.status_message in no_retry_messages:
+            return False
+
+        if exc.status_code == 429:
+            # We hit the rate limiter, so sleep extra.
+            seconds = random.uniform(1, 3)
+            log_more("Rate limit hit, sleeping: %fs", seconds, func=logging.warning)
+            time.sleep(seconds)
+
+    return True
+
+
+def _before_sleep_log():
+    logger = logging.root
+    logger_log = logger.log
+
+    def extensive_log(level, msg, *args, **kwargs):
+        logger_log(level, msg, *args, **kwargs)
+        if DEBUG_ON:
+            logging.debug(str(msg) % args)
+
+    # Monkeypatch inner logging function so it produces an exhaustive log when
+    # used under the before-sleep logging utility in `tenacity`.
+    logger.log = extensive_log
+    return before_sleep_log(logger, logging.DEBUG, exc_info=True)
+
+
 class RequestsHTTPError(HTTPError):
     """Custom `requests` HTTP error with status code and message."""
 
@@ -207,48 +246,6 @@ class Requests:
             raise RequestsHTTPError(
                 str(fields), status_code=err_status_code, status_message=status_message
             ) from exc
-
-    @staticmethod
-    def _needs_retry(exc: BaseException) -> bool:
-        # Don't retry on some specific error codes or messages.
-
-        # https://www.restapitutorial.com/httpstatuscodes.html
-        # 400 - payload is bad and needs to be changed
-        # 401 - missing auth bearer token
-        # 403 - auth is in place, but not allowed (insufficient privileges)
-        # 409 - payload not good for the affected resource
-        no_retry_codes = [400, 401, 403, 409]
-        no_retry_messages = []
-
-        if isinstance(exc, RequestsHTTPError):
-            if (
-                exc.status_code in no_retry_codes
-                or exc.status_message in no_retry_messages
-            ):
-                return False
-
-            if exc.status_code == 429:
-                # We hit the rate limiter, so sleep extra.
-                seconds = random.uniform(1, 3)
-                log_more("Rate limit hit, sleeping: %fs", seconds, func=logging.warning)
-                time.sleep(seconds)
-
-        return True
-
-    @staticmethod
-    def _before_sleep_log():
-        logger = logging.root
-        logger_log = logger.log
-
-        def extensive_log(level, msg, *args, **kwargs):
-            logger_log(level, msg, *args, **kwargs)
-            if DEBUG_ON:
-                logging.debug(str(msg) % args)
-
-        # Monkeypatch inner logging function so it produces an exhaustive log when
-        # used under the before-sleep logging utility in `tenacity`.
-        logger.log = extensive_log
-        return before_sleep_log(logger, logging.DEBUG, exc_info=True)
 
     @retry(
         # Retry until either succeed or trying for the fifth time and still failing.
