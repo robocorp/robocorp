@@ -4,6 +4,7 @@ from invoke import task
 
 CURDIR = Path(__file__).parent
 SRC = CURDIR / "src"
+DIST = CURDIR / "dist"
 
 
 def poetry(ctx, *parts):
@@ -48,6 +49,16 @@ def test(ctx):
 def build(ctx):
     """Build distributable .tar.gz and .wheel files"""
     poetry(ctx, "build")
+
+
+@task
+def publish(ctx):
+    """Publish package to PyPI"""
+    for file in DIST.glob("*"):
+        print(f"Removing: {file}")
+        file.unlink()
+
+    poetry(ctx, "publish", "--build")
 
 
 @task
