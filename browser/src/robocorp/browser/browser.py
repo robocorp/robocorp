@@ -1,8 +1,9 @@
-from pathlib import Path
 import platform
+from pathlib import Path
 from typing import Literal
 
-from playwright.sync_api import Browser, Page, sync_playwright as _sync_playwright
+from playwright.sync_api import Browser, Page
+from playwright.sync_api import sync_playwright as _sync_playwright
 
 
 def _registry_path(browser: Literal["chrome", "firefox"]) -> str:

@@ -1,9 +1,8 @@
 from pathlib import Path
-import requests
+from typing import Any, Optional, Union
 from urllib.parse import urlparse
 
-from typing import Any, Optional, Union
-
+import requests
 
 PathLike = Union[str, Path]
 

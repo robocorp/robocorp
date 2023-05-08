@@ -1,7 +1,7 @@
-from typing import Any, Callable, Generator, List, Optional, Union
+from typing import List, Optional, Union
 
 from robocorp.workitems._workitems._workitems import _WorkItemsSingleton
-from robocorp.workitems.workitem import Error, State, WorkItem
+from robocorp.workitems.workitem import WorkItem
 
 
 class _WorkItemsInputs:

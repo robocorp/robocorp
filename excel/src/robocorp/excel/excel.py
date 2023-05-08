@@ -1,7 +1,6 @@
 from typing import Literal, Optional
 
 from robocorp.excel._types import PathType
-
 from robocorp.excel._workbooks import XlsWorkbook, XlsxWorkbook, _load_workbook
 from robocorp.excel.workbook import Workbook
 

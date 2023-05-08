@@ -5,15 +5,13 @@ from contextlib import contextmanager
 from io import BytesIO
 from typing import Any, List, Optional, Union
 
-
 import openpyxl
 import xlrd
 import xlwt
-
-from xlutils.copy import copy as xlutils_copy
-from openpyxl.worksheet.cell_range import CellRange
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
+from openpyxl.worksheet.cell_range import CellRange
+from xlutils.copy import copy as xlutils_copy
 
 from robocorp.excel._types import PathType
 from robocorp.excel.tables import Table

@@ -48,7 +48,7 @@ def required_env(name: str, default: Any = UNDEFINED) -> str:
     return val
 
 
-def import_by_name(name: str, caller: str = None) -> Any:
+def import_by_name(name: str, caller: Optional[str] = None) -> Any:
     """Import module (or attribute) by name.
 
     Args:
@@ -208,7 +208,7 @@ class Requests:
                 str(fields), status_code=err_status_code, status_message=status_message
             ) from exc
 
-    # pylint: disable=no-self-argument
+    @staticmethod
     def _needs_retry(exc: BaseException) -> bool:
         # Don't retry on some specific error codes or messages.
 
@@ -235,7 +235,7 @@ class Requests:
 
         return True
 
-    # pylint: disable=no-self-argument,no-method-argument
+    @staticmethod
     def _before_sleep_log():
         logger = logging.root
         logger_log = logger.log

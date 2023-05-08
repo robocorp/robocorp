@@ -6,9 +6,10 @@ import os
 from glob import glob
 from pathlib import Path
 from threading import Event
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Type, Union
 
 import yaml
+
 from robocorp.workitems._workitems._adapter import (
     UNDEFINED,
     BaseAdapter,
@@ -503,7 +504,7 @@ class _WorkItemsLibrary:
         variables: Optional[dict] = None,
         files: Optional[Union[str, List[str]]] = None,
         save: bool = False,
-        parent: WorkItem = None,
+        parent: Optional[WorkItem] = None,
     ) -> WorkItem:
         """Create a new output work item with optional variables and files.
 
@@ -1071,7 +1072,7 @@ class _WorkItemsLibrary:
     def iter_input_work_item(
         self,
         items_limit: int = 0,
-    ) -> WorkItem:
+    ) -> Generator[WorkItem, None, None]:
         self._raise_under_iteration("iterate input work items")
 
         try:

@@ -1,9 +1,9 @@
-from PIL import Image
-
 from typing import TYPE_CHECKING, Any, List, Optional, Union
-from typing_extensions import deprecated
-from robocorp.excel._types import PathType
 
+from PIL import Image
+from typing_extensions import deprecated
+
+from robocorp.excel._types import PathType
 from robocorp.excel.tables import Table, Tables
 
 if TYPE_CHECKING:

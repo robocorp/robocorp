@@ -7,6 +7,7 @@ from pathlib import Path
 from shutil import copy2
 from typing import Dict, List, Optional, Union
 
+from robocorp.workitems._workitems._adapter import BaseAdapter
 from robocorp.workitems._workitems._utils import JSONType, is_json_equal, truncate
 
 
@@ -34,7 +35,12 @@ class WorkItem:
 
     """
 
-    def __init__(self, adapter, item_id=None, parent_id=None):
+    def __init__(
+        self,
+        adapter: BaseAdapter,
+        item_id: Optional[str] = None,
+        parent_id: Optional[str] = None,
+    ):
         #: Adapter for loading/saving content
         self.adapter = adapter
         #: This item's and/or parent's ID

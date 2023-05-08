@@ -26,6 +26,19 @@ def lint(ctx):
 
 
 @task
+def typecheck(ctx):
+    """Type check code"""
+    poetry(ctx, f"run mypy {SRC}")
+
+
+@task
+def pretty(ctx):
+    """Auto-format code and sort imports"""
+    poetry(ctx, f"run black {SRC}")
+    poetry(ctx, f"run isort {SRC}")
+
+
+@task
 def test(ctx):
     """Run unittests"""
     poetry(ctx, f"run pytest")
