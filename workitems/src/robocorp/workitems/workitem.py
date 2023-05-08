@@ -216,9 +216,9 @@ class WorkItem:
         # TODO: Move these checks elsewhere
         if self.state is not None:
             raise RuntimeError("Input work item already released")
-        if self.parent_id is None:
+        if self.parent_id is not None:
             raise RuntimeError("Cannot set state on output item")
-        if self.id is not None:
+        if self.id is None:
             raise RuntimeError("Cannot set state on input item with null ID")
 
     def done(self):

@@ -6,9 +6,6 @@ from robocorp.workitems import Error, inputs, outputs
 
 @task
 def producer():
-    os.environ["RPA_WORKITEMS_ADAPTER"] = "robocorp.workitems.FileAdapter"
-    os.environ["RPA_INPUT_WORKITEM_PATH"] = "devdata/work-items-in/test-input-for-producer/work-items.json"
-
     with inputs.reserve() as item:
         path = item.get_file("orders.xlsx")
         groups = (
