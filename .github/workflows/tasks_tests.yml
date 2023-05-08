@@ -1,4 +1,4 @@
-name: tasks Tests
+name: Tasks Tests
 
 on:
   push:

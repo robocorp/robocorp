@@ -1,4 +1,4 @@
-name: Library tests
+name: Browser Tests
 
 on:
   push:
@@ -6,22 +6,17 @@ on:
       - "master"
     paths:
       - "browser/**"
-      - "excel/**"
-      - "workitems/**"
-      - ".github/workflows/tests_libs.yml"
+      - ".github/workflows/browser_tests.yml"
   pull_request:
     branches:
       - "master"
     paths:
       - "browser/**"
-      - "excel/**"
-      - "workitems/**"
-      - ".github/workflows/tests_libs.yml"
+      - ".github/workflows/browser_tests.yml"
 
 defaults:
   run:
-    working-directory: './'
-
+    working-directory: './browser'
 
 jobs:
   build:
@@ -45,7 +40,7 @@ jobs:
     - name: Checkout repository and submodules
       uses: actions/checkout@v3
 
-    - name: Set up chrome and firefox on windows
+    - name: Set up chrome and firefox on Windows
       if: matrix.os == 'windows-latest'
       run: |
         choco install firefox
@@ -62,36 +57,20 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: which chrome
 
-    - name: Install poetry
-      run: pipx install poetry
-
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
-        cache: 'poetry'
-
-    - name: Install browser and run tests
+    - name: Install poetry/invoke
       run: |
-        poetry install
-        poetry run pytest
-      working-directory: './browser'
-      env:
-        PYTHONPATH: .
+        pipx install poetry
+        pipx install invoke
 
-    - name: Install excel and run tests
-      run: |
-        poetry install
-        poetry run pytest
-      working-directory: './excel'
-      env:
-        PYTHONPATH: .
-
-    - name: Install workitems and run tests
-      run: |
-        poetry install
-        poetry run pytest
-      working-directory: './workitems'
-      env:
-        PYTHONPATH: .
-        RPA_DEBUG_API: True
+    - name: Install dependencies
+      run: invoke install
+    - name: Run Lint
+      run: invoke lint
+    - name: Run Typecheck
+      run: invoke typecheck
+    - name: Run Unittests
+      run: invoke test
