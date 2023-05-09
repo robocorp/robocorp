@@ -5,14 +5,6 @@ import pytest
 from pathlib import Path
 
 
-@pytest.fixture(scope="session")
-def examples_dir():
-    examples = Path(__file__).parent.parent.parent.parent / "examples"
-
-    assert examples.exists()
-    return examples
-
-
 def robo_run(cmdline, returncode, cwd=None, additional_env=None):
     import subprocess
 

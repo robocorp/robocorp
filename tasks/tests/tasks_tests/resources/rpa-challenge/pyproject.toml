@@ -23,9 +23,9 @@
 #     the caller was a file considered a project file.
 #
 #     Example:
-#        {name = "RPA", kind = "log_on_project_call"}
+#        {name = "robocorp", kind = "log_on_project_call"}
 #
-#        would track methods for RPA as well as RPA.Excel, etc. when
+#        would track methods for robocorp as well as robocorp.excel, etc. when
 #        such a method is called directly from a file considered part
 #        of the project.
 #        
@@ -41,7 +41,5 @@
 #     In this case all methods of the given module will not be tracked.
 #     (default for all files considered library files).
 log_filter_rules = [
-    {name = "RPA", kind = "log_on_project_call"},
-    {name = "selenium", kind = "log_on_project_call"},
-    {name = "SeleniumLibrary", kind = "log_on_project_call"},
+    {name = "robocorp", kind = "log_on_project_call"},
 ]

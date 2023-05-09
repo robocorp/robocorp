@@ -98,6 +98,8 @@ def environ(overrides: dict[str, str]):
 
 @task
 def clean(ctx):
+    TIMESTAMP.unlink(missing_ok=True)
+
     if BUILD.exists():
         print("Removing build artifacts:", BUILD)
         shutil.rmtree(BUILD)

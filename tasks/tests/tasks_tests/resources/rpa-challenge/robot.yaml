@@ -1,6 +1,6 @@
 tasks:
-  Challenge Python:
-    shell: python -m robocorp.tasks run tasks.py -t complete_rpa_challenge
+  solve_challenge:
+    shell: python -m robocorp.tasks run tasks.py -t solve_challenge
 
 condaConfigFile: conda.yaml
 artifactsDir: output
