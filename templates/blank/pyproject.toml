@@ -1,0 +1,7 @@
+[tool.robo]
+name = "Empty project"
+description = "An empty automation project"
+python = "3.9.13"
+
+[tool.robo.dependencies]
+robocorp-tasks="0.1.6"
