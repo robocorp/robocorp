@@ -423,7 +423,7 @@ def _build_and_copy_robo(location: str, force: bool = False) -> None:
         cli_dir = repo_root / "cli"
         assert cli_dir.exists()
 
-        subprocess.check_call(["inv", "include"], cwd=cli_dir)
+        subprocess.check_call(["inv", "prepare"], cwd=cli_dir)
         subprocess.check_call(["inv", "build"], cwd=cli_dir)
 
         name = "robo"

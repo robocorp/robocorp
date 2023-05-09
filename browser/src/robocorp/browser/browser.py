@@ -1,8 +1,10 @@
-from pathlib import Path
+# TODO: don't let playwright print directly into stdout, it's breaking console behaviour
 import platform
+from pathlib import Path
 from typing import Literal
 
-from playwright.sync_api import Browser, Page, sync_playwright as _sync_playwright
+from playwright.sync_api import Browser, Page
+from playwright.sync_api import sync_playwright as _sync_playwright
 
 
 def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
@@ -39,13 +41,14 @@ EXECUTABLE_PATHS = {
 def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
     browser = browser.lower()
     system = platform.system()
+
     if system == "Windows":
         return _registry_path(browser)
 
-    system = platform.system()
     assert browser in EXECUTABLE_PATHS
     executable_path = EXECUTABLE_PATHS[browser][system]
     assert Path(executable_path).exists()
+
     return str(executable_path)
 
 
@@ -54,17 +57,17 @@ def open_browser(
     headless=True
     # TODO: support more args
 ) -> Browser:
-    """Launches a Playwright browser instance.
+    """Launch a Playwright browser instance.
 
     Args:
-        browser: Specifies which browser to use. Supported browsers are: ``chrome`` and ``firefox``.
+        browser: Specifies which browser to use.
+            Supported browsers are: ``chrome`` and ``firefox``.
         headless: If set to False a GUI is provided, otherwise it is hidden.
 
     Returns:
         Browser: A Browser instance.
 
     """
-
     playwright = _sync_playwright().start()
 
     assert playwright
@@ -81,7 +84,7 @@ def open_browser(
 
 
 def open_url(url: str, headless=True) -> Page:
-    """Launches a Playwright browser instance and opens the given URL.
+    """Launch a Playwright browser instance and opens the given URL.
 
     Note:
         Uses the ``chrome`` browser.
@@ -98,17 +101,3 @@ def open_url(url: str, headless=True) -> Page:
     page = browser.new_page()
     page.goto(url)
     return page
-
-
-# TODO: don't let playwright print directly into stdout, it's breaking console behaviour
-
-# Close All Browsers
-
-
-#  Click Button    Start
-
-
-# Input Text    alias:First Name    ${person}[First Name]
-
-
-# Capture Element Screenshot    alias:Congratulations

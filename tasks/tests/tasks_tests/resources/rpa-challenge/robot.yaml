@@ -1,0 +1,15 @@
+tasks:
+  solve_challenge:
+    shell: python -m robocorp.tasks run tasks.py -t solve_challenge
+
+condaConfigFile: conda.yaml
+artifactsDir: output
+ignoreFiles:
+  - .gitignore
+PATH:
+  - .
+PYTHONPATH:
+  - .
+  # We want the 'robocorp.tasks' and 'robocorp.log' to be there too.
+  - ../../../../src
+  - ../../../../../log/src

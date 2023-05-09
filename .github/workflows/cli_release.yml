@@ -1,10 +1,9 @@
-name: Create CLI Github release
+name: CLI Release
 
 on:
   push:
     tags:
       - "cli-[0-9]+.[0-9]+.[0-9]+"
-
 
 jobs:
   release:
@@ -38,7 +37,7 @@ jobs:
         run: pipx install invoke
 
       - name: Build
-        run: invoke build-all-platforms
+        run: invoke crossbuild
 
       - uses: actions/upload-artifact@v3
         with:
@@ -54,7 +53,6 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-
   sign-macos:
     needs:
       - release
@@ -63,6 +61,7 @@ jobs:
       run:
         working-directory: ./cli
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -80,13 +79,13 @@ jobs:
           xcode-version: latest-stable
 
       - name: MacOS igning
-        run: invoke sign-macos
+        run: invoke macos-sign
         env:
             MACOS_SIGNING_CERT: ${{ secrets.MACOS_SIGNING_CERT }}
             MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
       - name: MacOS Notarizing
         # TODO: pass secrets as arguments
-        run: invoke notarize-macos
+        run: invoke macos-notarize
         env:
             MACOS_APP_ID_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
             MACOS_APP_ID_PASS_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
@@ -105,7 +104,6 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-
   sign-windows:
     needs:
       - release
@@ -114,6 +112,7 @@ jobs:
       run:
         working-directory: ./cli
     runs-on: windows-latest
+
     steps:
       - uses: actions/download-artifact@v3
         with:
@@ -148,5 +147,3 @@ jobs:
           asset_name: robo-$tag-windows64.exe
           tag: ${{ github.ref }}
           overwrite: true
-
-

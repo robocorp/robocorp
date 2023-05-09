@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import traceback
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Tuple
 
 import requests
@@ -17,12 +17,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from robocorp.vault._utils import (
-    import_by_name,
-    required_env,
-    resolve_path,
-    url_join,
-)
+from robocorp.vault._utils import (import_by_name, required_env, resolve_path,
+                                   url_join)
 
 
 class RobocorpVaultError(RuntimeError):

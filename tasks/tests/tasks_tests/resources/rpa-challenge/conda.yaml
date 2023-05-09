@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9.13
+  - pip=22.1.2
+  - pip:
+      - robocorp-browser==0.2.0
+      - robocorp-excel==0.2.0
+      - robocorp-http==0.2.0
+      - tomli>=2.0.1,<3

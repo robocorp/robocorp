@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-http"
-version = "0.2.0"
+version = "0.3.0"
 description = "Robocorp HTTP automation library"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
@@ -22,6 +22,9 @@ mypy = "^1.1.1"
 pytest = "^7.2.2"
 pytest-xdist = "^3.2.1"
 pytest-regressions = "1.0.6"
+lazydocs = "^0.4.8"
+pydocstyle = "^6.3.0"
+isort = "^5.12.0"
 
 [build-system]
 requires = ["poetry-core"]

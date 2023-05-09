@@ -1,0 +1,45 @@
+[tool.robocorp.log]
+# It's possible to customize what's logged or not through log filter rules.
+#
+# Note: by default all files which are in the python "Lib" or "site-packages"
+# are considered "library" files and all files which are
+# not "library" files are considered "project" files (so, the
+# logging by default will show entries for any method that is in the project
+# and no logging for methods which are "libraries").
+#
+# It's possible to customize this behaviour by adding log filter rules.
+#
+# A log filter rule consists of the module name and the kind of the rule to
+# be applied to such module.
+#
+# i.e.: a rule such as {name = "difflib", kind = "log_on_project_call"} would add
+# logging to the difflib and a rule such as {name = "my.sub.module", kind = "exclude"}
+# would exclude logging from the given user module.
+#
+# Log filter rule kinds are:
+#
+# "log_on_project_call": 
+#     In this case methods of the given module will be tracked, only if 
+#     the caller was a file considered a project file.
+#
+#     Example:
+#        {name = "robocorp", kind = "log_on_project_call"}
+#
+#        would track methods for robocorp as well as robocorp.excel, etc. when
+#        such a method is called directly from a file considered part
+#        of the project.
+#        
+#        note: if a library is "repackaged" (meaning that some of its
+#        methods are imports from other modules, the filtering must
+#        be applied to the actual location and not to the alias).
+#
+# "full_log"
+#     In this case all methods of the given module will be tracked.
+#     (default for all files considered project files).
+#
+# "exclude"
+#     In this case all methods of the given module will not be tracked.
+#     (default for all files considered library files).
+log_filter_rules = [
+    {name = "robocorp", kind = "log_on_project_call"},
+]

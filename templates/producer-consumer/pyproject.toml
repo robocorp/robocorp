@@ -1,0 +1,9 @@
+[tool.robo]
+name = "producer-consumer"
+description = "A minimal example of a producer-consumer pattern"
+python = "3.9.13"
+
+[tool.robo.dependencies]
+robocorp-tasks="0.1.7"
+robocorp-excel="0.3.0"
+robocorp-workitems="0.3.0"

@@ -1,9 +1,7 @@
 import importlib
 import os
 from pathlib import Path
-
 from typing import Any
-
 
 # Sentinel value for undefined argument
 UNDEFINED = object()

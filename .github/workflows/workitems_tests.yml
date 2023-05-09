@@ -1,0 +1,59 @@
+name: Work Items Tests
+
+on:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "workitems/**"
+      - ".github/workflows/workitems_tests.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "workitems/**"
+      - ".github/workflows/workitems_tests.yml"
+
+defaults:
+  run:
+    working-directory: './workitems'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "ubuntu-py310"
+            python: "3.10"
+            os: ubuntu-latest
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+          - name: "macos-py310"
+            os: macos-latest
+            python: "3.10"
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install poetry/invoke
+      run: |
+        pipx install poetry
+        pipx install invoke
+
+    - name: Install dependencies
+      run: invoke install
+    - name: Run Lint
+      run: invoke lint
+    - name: Run Typecheck
+      run: invoke typecheck
+    - name: Run Unittests
+      run: invoke test

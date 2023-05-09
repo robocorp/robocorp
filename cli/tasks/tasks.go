@@ -2,7 +2,6 @@ package tasks
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/process"
@@ -27,7 +26,7 @@ func List(env environment.Environment) ([]Task, error) {
 
 	output, err := proc.Run()
 	if err != nil {
-		return nil, errors.New(output.Stderr)
+		return nil, err
 	}
 
 	var tasks []Task

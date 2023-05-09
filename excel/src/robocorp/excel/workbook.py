@@ -3,8 +3,8 @@ from io import BytesIO
 from typing import Any, List, Optional, Union
 
 from robocorp.excel._types import PathType
-from robocorp.excel.worksheet import Worksheet
 from robocorp.excel._workbooks import XlsWorkbook, XlsxWorkbook
+from robocorp.excel.worksheet import Worksheet
 
 
 class Workbook:
