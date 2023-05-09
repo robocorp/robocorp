@@ -1,4 +1,4 @@
-name: Logging Tests
+name: Log Tests
 
 on:
   push:

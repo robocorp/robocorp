@@ -1,9 +1,7 @@
-name: Logging Release
+name: Log Release
 
 on:
   push:
-#     branches:
-#       - "release-robocorp-log"
     tags:
       - "robocorp-log-*"
 

@@ -1,4 +1,4 @@
-name: Logging Lint
+name: Log Lint
 
 on:
   push:
