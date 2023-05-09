@@ -37,7 +37,7 @@ jobs:
         run: pipx install invoke
 
       - name: Build
-        run: invoke build-all-platforms
+        run: invoke crossbuild
 
       - uses: actions/upload-artifact@v3
         with:
@@ -79,13 +79,13 @@ jobs:
           xcode-version: latest-stable
 
       - name: MacOS igning
-        run: invoke sign-macos
+        run: invoke macos-sign
         env:
             MACOS_SIGNING_CERT: ${{ secrets.MACOS_SIGNING_CERT }}
             MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
       - name: MacOS Notarizing
         # TODO: pass secrets as arguments
-        run: invoke notarize-macos
+        run: invoke macos-notarize
         env:
             MACOS_APP_ID_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
             MACOS_APP_ID_PASS_FOR_SIGNING: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
