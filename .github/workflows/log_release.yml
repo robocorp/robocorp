@@ -38,10 +38,10 @@ jobs:
       run: poetry install
 
     - name: Embed output view in index.py
-      run: poetry run python -m dev build-output-view
+      run: poetry run invoke build-output-view
         
     - name: Check tag version
-      run: poetry run python -m dev check-tag-version
+      run: poetry run invoke check-tag-version
       
     - name: Build with poetry
       run: poetry build

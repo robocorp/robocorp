@@ -72,7 +72,7 @@ jobs:
       run: poetry install
       
     - name: Embed output view in index.py
-      run: poetry run python -m dev build-output-view
+      run: poetry run inv build-output-view
       
     - name: Build output view
       if: contains(matrix.name, '-outviewintegrationtests')

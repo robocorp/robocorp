@@ -4,7 +4,7 @@ Steps to do a new release
 
 - Open a shell at the proper place (something as `X:/robocorpws/robo/tasks`)
 
-- Update version (`python -m dev set-version 0.2.0`).
+- Update version (`inv set-version 0.2.0`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-tasks`).
 

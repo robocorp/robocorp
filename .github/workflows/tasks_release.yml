@@ -33,7 +33,7 @@ jobs:
       run: poetry install
 
     - name: Check tag version
-      run: poetry run python -m dev check-tag-version
+      run: poetry run invoke check-tag-version
       
     - name: Build with poetry
       run: poetry build

@@ -23,7 +23,7 @@ class _SetupInfo:
 
 class UIRegenerateFixture:
     # Must be set to False when merging to master and
-    # python -m dev build-output-view
+    # inv build-output-view
     # must also be manually called afterwards.
     FORCE_REGEN: List[typing.Union[str, int]] = []
 

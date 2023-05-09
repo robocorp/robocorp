@@ -19,6 +19,20 @@ classifiers = [
 python = "^3.9"
 robocorp-log = "0.1.0"
 # robocorp-log = {path = "../log/", develop = true}
+robocorp-devutils = {path = "../devutils/", develop = true}
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+ruff = "^0.0.255"
+mypy = "^1.1.1"
+pytest = "^7.2.2"
+pytest-xdist = "^3.2.1"
+pytest-regressions = "1.0.6"
+pydocstyle = "^6.3.0"
+isort = "^5.12.0"
+types-invoke = "^2.0"
+invoke = "^2.0"
+lazydocs = { git = "https://github.com/robocorp/lazydocs.git" }
 
 [tool.mypy]
 mypy_path = "src:tests"
@@ -38,15 +52,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "module_that_does_not_exist"
 ignore_missing_imports = true
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-ruff = "^0.0.255"
-mypy = "^1.1.1"
-pytest = "^7.2.2"
-pytest-xdist = "^3.2.1"
-pytest-regressions = "1.0.6"
-fire = "^0.5.0"
 
 [build-system]
 requires = ["poetry-core"]

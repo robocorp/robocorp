@@ -67,8 +67,7 @@ jobs:
         python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
         python -c "from robocorp import log;print(log.__file__)"
         cd ../log
-        pip install fire
-        python -m dev build-output-view
+        poetry run inv build-output-view
 
     - name: Test (dev)
       if: contains(matrix.name, '-logindev')

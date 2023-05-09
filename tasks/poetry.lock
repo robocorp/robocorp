@@ -108,21 +108,6 @@ files = [
 testing = ["pre-commit"]
 
 [[package]]
-name = "fire"
-version = "0.5.0"
-description = "A library for automatically generating command line interfaces."
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "fire-0.5.0.tar.gz", hash = "sha256:a6b0d49e98c8963910021f92bba66f65ab440da2982b78eb1bbf95a0a34aacc6"},
-]
-
-[package.dependencies]
-six = "*"
-termcolor = "*"
-
-[[package]]
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
@@ -133,6 +118,58 @@ files = [
     {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
     {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
 ]
+
+[[package]]
+name = "invoke"
+version = "2.1.1"
+description = "Pythonic task execution"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "invoke-2.1.1-py3-none-any.whl", hash = "sha256:e86a53046eca453d3e609e7017f65db5f66b947d4d337b60658859eb8c8a80e3"},
+    {file = "invoke-2.1.1.tar.gz", hash = "sha256:7dcf054c4626b89713da650635c29e9dfeb8a1dd0a14edc60bd3e16f751292ff"},
+]
+
+[[package]]
+name = "isort"
+version = "5.12.0"
+description = "A Python utility / library to sort Python imports."
+category = "dev"
+optional = false
+python-versions = ">=3.8.0"
+files = [
+    {file = "isort-5.12.0-py3-none-any.whl", hash = "sha256:f84c2818376e66cf843d497486ea8fed8700b340f308f076c6fb1229dff318b6"},
+    {file = "isort-5.12.0.tar.gz", hash = "sha256:8bef7dde241278824a6d83f44a544709b065191b95b6e50894bdc722fcba0504"},
+]
+
+[package.extras]
+colors = ["colorama (>=0.4.3)"]
+pipfile-deprecated-finder = ["pip-shims (>=0.5.2)", "pipreqs", "requirementslib"]
+plugins = ["setuptools"]
+requirements-deprecated-finder = ["pip-api", "pipreqs"]
+
+[[package]]
+name = "lazydocs"
+version = "0.5.0"
+description = "Generate markdown API documentation for Google-style Python docstring."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = []
+develop = false
+
+[package.dependencies]
+typer = "*"
+
+[package.extras]
+dev = ["black", "flake8", "isort", "mypy", "pydocstyle", "pytest", "pytest-cov", "pytest-mock", "setuptools", "twine", "wheel"]
+
+[package.source]
+type = "git"
+url = "https://github.com/robocorp/lazydocs.git"
+reference = "HEAD"
+resolved_reference = "4bee0319714858089576bbd4091e53c785fedd72"
 
 [[package]]
 name = "mypy"
@@ -248,6 +285,24 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
+
+[[package]]
+name = "pydocstyle"
+version = "6.3.0"
+description = "Python docstring style checker"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pydocstyle-6.3.0-py3-none-any.whl", hash = "sha256:118762d452a49d6b05e194ef344a55822987a462831ade91ec5c06fd2169d019"},
+    {file = "pydocstyle-6.3.0.tar.gz", hash = "sha256:7ce43f0c0ac87b07494eb9c0b462c0b73e6ff276807f204d6b53edc72b7e44e1"},
+]
+
+[package.dependencies]
+snowballstemmer = ">=2.2.0"
+
+[package.extras]
+toml = ["tomli (>=1.2.3)"]
 
 [[package]]
 name = "pytest"
@@ -380,6 +435,20 @@ files = [
 ]
 
 [[package]]
+name = "robocorp-devutils"
+version = "0.0.1"
+description = "Utilities for development in monorepo."
+category = "main"
+optional = false
+python-versions = "^3.9"
+files = []
+develop = true
+
+[package.source]
+type = "directory"
+url = "../devutils"
+
+[[package]]
 name = "robocorp-log"
 version = "0.1.0"
 description = "Automatic trace logging for Python"
@@ -434,19 +503,16 @@ files = [
 ]
 
 [[package]]
-name = "termcolor"
-version = "2.3.0"
-description = "ANSI color formatting for output in terminal"
+name = "snowballstemmer"
+version = "2.2.0"
+description = "This package provides 29 stemmers for 28 languages generated from Snowball algorithms."
 category = "dev"
 optional = false
-python-versions = ">=3.7"
+python-versions = "*"
 files = [
-    {file = "termcolor-2.3.0-py3-none-any.whl", hash = "sha256:3afb05607b89aed0ffe25202399ee0867ad4d3cb4180d98aaf8eefa6a5f7d475"},
-    {file = "termcolor-2.3.0.tar.gz", hash = "sha256:b5b08f68937f138fe92f6c089b99f1e2da0ae56c52b78bf7075fd95420fd9a5a"},
+    {file = "snowballstemmer-2.2.0-py2.py3-none-any.whl", hash = "sha256:c8e1716e83cc398ae16824e5572ae04e0d9fc2c6b985fb0f900f5f0c96ecba1a"},
+    {file = "snowballstemmer-2.2.0.tar.gz", hash = "sha256:09b16deb8547d3412ad7b590689584cd0fe25ec8db3be37788be3810cbf19cb1"},
 ]
-
-[package.extras]
-tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "tomli"
@@ -458,6 +524,40 @@ python-versions = ">=3.7"
 files = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
+name = "typer"
+version = "0.9.0"
+description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "typer-0.9.0-py3-none-any.whl", hash = "sha256:5d96d986a21493606a358cae4461bd8cdf83cbf33a5aa950ae629ca3b51467ee"},
+    {file = "typer-0.9.0.tar.gz", hash = "sha256:50922fd79aea2f4751a8e0408ff10d2662bd0c8bbfa84755a699f3bada2978b2"},
+]
+
+[package.dependencies]
+click = ">=7.1.1,<9.0.0"
+typing-extensions = ">=3.7.4.3"
+
+[package.extras]
+all = ["colorama (>=0.4.3,<0.5.0)", "rich (>=10.11.0,<14.0.0)", "shellingham (>=1.3.0,<2.0.0)"]
+dev = ["autoflake (>=1.3.1,<2.0.0)", "flake8 (>=3.8.3,<4.0.0)", "pre-commit (>=2.17.0,<3.0.0)"]
+doc = ["cairosvg (>=2.5.2,<3.0.0)", "mdx-include (>=1.4.1,<2.0.0)", "mkdocs (>=1.1.2,<2.0.0)", "mkdocs-material (>=8.1.4,<9.0.0)", "pillow (>=9.3.0,<10.0.0)"]
+test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.0.0)", "mypy (==0.910)", "pytest (>=4.4.0,<8.0.0)", "pytest-cov (>=2.10.0,<5.0.0)", "pytest-sugar (>=0.9.4,<0.10.0)", "pytest-xdist (>=1.32.0,<4.0.0)", "rich (>=10.11.0,<14.0.0)", "shellingham (>=1.3.0,<2.0.0)"]
+
+[[package]]
+name = "types-invoke"
+version = "2.0.0.6"
+description = "Typing stubs for invoke"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-invoke-2.0.0.6.tar.gz", hash = "sha256:b3bd3a7e18548b98f6a2833a635a5ee56cd32f32d8046ec3786de8043ece2b6e"},
+    {file = "types_invoke-2.0.0.6-py3-none-any.whl", hash = "sha256:7b2c2994162a453b4a7386530da3be1a03f171c0826ab4aabf75f2034a914e12"},
 ]
 
 [[package]]
@@ -475,4 +575,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "9a19e86cd90ddd8fee95c697167f0cad5deef4dc692629641491aca4c950bcad"
+content-hash = "2273f0acf3717b36710c9beb7b9b32baf80c3e45418990aa2a841fbbdae304c3"

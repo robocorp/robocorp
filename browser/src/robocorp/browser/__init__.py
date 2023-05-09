@@ -1,18 +1,11 @@
-from typing import Optional, Literal
-from playwright.sync_api import (
-    Browser,
-    BrowserContext,
-    BrowserType,
-    Error,
-    Page,
-    Playwright,
-)
+from typing import Literal, Optional
+
+from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
 
 def configure(**kwargs) -> None:
     """
-    This method may be called before any other method to configure the context
-    for the browser.
+    May be called before any other method to configure the browser settings.
 
     Calling this method is optional (if not called a default configuration will
     be used -- note that calling this method after the browser is already
@@ -47,6 +40,8 @@ def configure(**kwargs) -> None:
 
 def page() -> Page:
     """
+    Provides a managed instance of the browser page to interact with.
+
     Returns:
         The browser page to interact with.
 
@@ -65,6 +60,8 @@ def page() -> Page:
 
 def browser() -> Browser:
     """
+    Provides a managed instance of the browser to interact with.
+
     Returns:
         The browser which should be interacted with.
 
@@ -84,6 +81,8 @@ def browser() -> Browser:
 
 def playwright() -> Playwright:
     """
+    Provides a managed instance of playwright to interact with.
+
     Returns:
         The playwright instance to interact with.
 
@@ -103,6 +102,8 @@ def playwright() -> Playwright:
 
 def context() -> BrowserContext:
     """
+    Provides a managed instance of the browser context to interact with.
+
     Returns:
         The browser context instance to interact with.
 
@@ -155,8 +156,7 @@ def open_url(
     headless: Optional[bool] = None,
 ) -> Page:
     """
-    Changes the url of the current page. If no current browser/page is
-    opened those are created.
+    Changes the url of the current page (creating a page if needed).
 
     Args:
         url: Navigates to the provided URL.
@@ -204,6 +204,7 @@ def screenshot(
         The bytes from the screenshot.
     """
     import base64
+
     from robocorp import log
 
     if page is None:

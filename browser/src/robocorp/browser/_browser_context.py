@@ -1,8 +1,7 @@
-import sys
 import platform
-
-from typing import Callable, Dict, Optional, List, Iterator, Literal
+import sys
 from pathlib import Path
+from typing import Callable, Dict, Iterator, List, Literal, Optional
 
 from playwright.sync_api import (
     Browser,
@@ -13,7 +12,6 @@ from playwright.sync_api import (
     Playwright,
     sync_playwright,
 )
-
 from robocorp.tasks import session_cache, task_cache
 
 
@@ -204,7 +202,8 @@ def _browser_launcher() -> Callable[..., Browser]:
 @session_cache
 def browser(**kwargs) -> Iterator[Browser]:
     """
-    The kwargs are passed as additional launch options to the BrowserType.launch(**kwargs).
+    The kwargs are passed as additional launch options to the
+    BrowserType.launch(**kwargs).
     """
     # Note: one per session (must be tear-down).
     launcher = _browser_launcher()
