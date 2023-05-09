@@ -185,10 +185,10 @@ jobs:
           mv build/linux64 s3-drop/
           mv build/windows64 s3-drop/
           ls -l s3-drop/
-          echo "rccVersion=${ver}" >> $GITHUB_ENV
+          echo "roboVersion=${ver}" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
-          name: rcc-artifacts-for-s3-${{ env.rccVersion }}
+          name: robo-artifacts-for-s3-${{ env.roboVersion }}
           path: cli/s3-drop
       # TODO: upload to s3
       - name: Configure AWS credentials
