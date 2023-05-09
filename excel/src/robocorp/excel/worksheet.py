@@ -146,18 +146,6 @@ class Worksheet:
             self.set_cell_format(row, column, fmt)
         return self
 
-    @deprecated("Use set_cell_value instead")
-    def set_value(
-        self,
-        row: int,
-        column: Union[str, int],
-        value: Any,
-        fmt: Optional[Union[str, float]] = None,
-    ):
-        # files.set_worksheet_value()
-        # This was actually just an alias for set cell value
-        return self.set_cell_value(row, column, value, fmt)
-
     def set_cell_values(self):
         # files.set_cell_values()
         pass

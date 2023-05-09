@@ -1,35 +1,33 @@
-import os
 from robocorp.excel import open_workbook
 from robocorp.tasks import task
-from robocorp.workitems import Error, inputs, outputs
+from robocorp.workitems import ExceptionType, inputs, outputs
 
 
 @task
 def producer():
+    """Split Excel rows into multiple work items"""
     with inputs.reserve() as item:
         path = item.get_file("orders.xlsx")
-        groups = (
-            open_workbook(path)
-            .worksheet(0)
-            .as_table(header=True)
-            .group_by_column("Name")
-        )
+        orders = open_workbook(path).worksheet("Sheet1").as_table()
 
-        for customer in groups:
-            name = customer.get_cell(0, "Name")
-            address = customer.get_cell(0, "Zip")
-            orders = customer.get_column("Item", as_list=True)
-            outputs.create({"Name": name, "Zip": address, "Items": orders})
+        for row in orders:
+            payload = {
+                "Name": row["Name"],
+                "Zip": row["Zip"],
+                "Item": row["Item"],
+            }
+            outputs.create(payload)
 
 
 @task
 def consumer():
+    """Process all input work items"""
     for item in inputs.iterate():
         try:
             name = item.payload["Name"]
             address = item.payload["Zip"]
-            items = item.payload["Items"]
-            print(f"Name: {name}, Address: {address}, Items: {items}")
+            item = item.payload["Item"]
+            print(f"Processing order: {name}, {address}, {item}")
             item.done()
         except KeyError as err:
-            item.fail(Error.APPLICATION, "INVALID_PAYLOAD", str(err))
+            item.fail(ExceptionType.APPLICATION, "MISSING_VALUE", str(err))
