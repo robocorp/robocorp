@@ -155,6 +155,8 @@ jobs:
   deploy-s3:
     needs:
       - release
+      - sign-macos
+      - sign-windows
     defaults:
       run:
         working-directory: ./cli
