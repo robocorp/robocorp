@@ -1,4 +1,4 @@
-NEXT
+0.2.0
 -----------------------------
 
 - New argument: `--no-status-rc`:

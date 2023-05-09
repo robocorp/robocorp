@@ -13,7 +13,7 @@ packages = [{include = "robocorp", from="src"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 playwright = "^1.32.1"
-robocorp-tasks = "^0.1.7"
+robocorp-tasks = "^0.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
