@@ -5,6 +5,13 @@ import pytest
 from pathlib import Path
 
 
+@pytest.fixture(scope="session")
+def resources_dir():
+    resources = Path(__file__).parent / "resources"
+    assert resources.exists()
+    return resources
+
+
 def robo_run(cmdline, returncode, cwd=None, additional_env=None):
     import subprocess
 

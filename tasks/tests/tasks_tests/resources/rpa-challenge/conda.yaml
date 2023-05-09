@@ -7,4 +7,4 @@ dependencies:
       - robocorp-browser==0.2.0
       - robocorp-excel==0.2.0
       - robocorp-http==0.2.0
-      - robocorp-tasks==0.1.6
+      - tomli>=2.0.1,<3

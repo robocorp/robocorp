@@ -15,7 +15,7 @@ def run_in_rcc(rcc_loc: Path, cwd: Path):
     subprocess.check_call([str(rcc_loc)] + "task run --trace".split(), cwd=cwd, env=env)
 
 
-def test_rpa_challenge_works(rcc_loc: Path):
+def test_rpa_challenge_works(rcc_loc: Path, resources_dir: Path):
     from robocorp.log import verify_log_messages_from_log_html
 
     matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
@@ -23,7 +23,7 @@ def test_rpa_challenge_works(rcc_loc: Path):
         if "logindev" not in matrix_name:
             pytest.skip(f"Disabled for matrix name: {matrix_name}")
 
-    rpa_challenge_dir = Path() / "resources" / "rpa-challenge"
+    rpa_challenge_dir = resources_dir / "rpa-challenge"
     assert rpa_challenge_dir.exists()
     output_dir = rpa_challenge_dir / "output"
     log_html = output_dir / "log.html"
