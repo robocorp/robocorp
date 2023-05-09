@@ -1,3 +1,9 @@
+0.1.0
+-----------------------------
+
+- `log.html`: Exception message is now in the details (so it can be expanded).
+
+
 0.0.15
 -----------------------------
 

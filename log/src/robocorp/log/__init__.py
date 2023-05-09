@@ -34,7 +34,7 @@ from ._suppress_helper import SuppressHelper as _SuppressHelper
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
 
-__version__ = "0.0.15"
+__version__ = "0.1.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 from . import _config
