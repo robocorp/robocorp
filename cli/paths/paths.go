@@ -12,7 +12,7 @@ var (
 	tempFiles = make([]string, 0)
 
 	invalidRunePattern = regexp.MustCompile(`[^\w\d-_ ]+`)
-	whitespacePattern  = regexp.MustCompile(`\s+`)
+	whitespacePattern  = regexp.MustCompile(`[\s_]+`)
 	dashPattern        = regexp.MustCompile(`-+`)
 )
 

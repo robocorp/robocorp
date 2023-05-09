@@ -130,6 +130,12 @@ def pretty(ctx):
 
 
 @task
+def test(ctx):
+    """Run unittests"""
+    run(ctx, "go", "test", "-coverpkg=./...", "./...")
+
+
+@task
 def prepare(ctx):
     """Download/copy static assets"""
     download_rcc()
