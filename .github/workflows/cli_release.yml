@@ -41,6 +41,11 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: robo-linux
+          path: cli/build/linux64/robo
+
+      - uses: actions/upload-artifact@v3
+        with:
           name: robo-unsigned-artifacts
           path: cli/build/
 
@@ -136,7 +141,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-            name: robo-signed
+            name: robo-signed-windows
             path: cli/build/windows64/robo.exe
 
       - name: Upload windows binary
@@ -147,3 +152,47 @@ jobs:
           asset_name: robo-$tag-windows64.exe
           tag: ${{ github.ref }}
           overwrite: true
+  deploy-s3:
+    needs:
+      - release
+    defaults:
+      run:
+        working-directory: ./cli
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+            name: robo-signed-windows
+            path: cli/build/windows64/robo
+      - uses: actions/download-artifact@v3
+        with:
+            name: robo-signed-macos
+            path: cli/build/macos64/robo
+      - uses: actions/download-artifact@v3
+        with:
+            name: robo-linux
+            path: cli/build/linux64/robo
+      - run: |
+          ls -l build/
+          mkdir s3-drop
+          cp VERSION s3-drop/version.txt
+          mv cli/build/macos64 s3-drop/
+          mv cli/build/linux64 s3-drop/
+          mv cli/build/windows64 s3-drop/
+          ls -l dist/
+          echo "rccVersion=${ver}" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v3
+        with:
+          name: rcc-artifacts-for-s3-${{ env.rccVersion }}
+          path: ./s3-drop
+      # TODO: upload to s3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CICD_DROPBOX }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CICD_DROPBOX }}
+            aws-region: eu-west-1
+      - name: Copy files to the deploy drop-box with the AWS CLI
+        run: |
+            aws s3 sync ./s3-drop s3://robo-build-drop-box
+
