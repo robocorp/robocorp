@@ -175,13 +175,13 @@ jobs:
             name: robo-linux
             path: cli/build/linux64/robo
       - run: |
-          ls -l build/
+          ls -l cli/build
           mkdir s3-drop
-          cp VERSION s3-drop/version.txt
+          cp cli/VERSION s3-drop/version.txt
           mv cli/build/macos64 s3-drop/
           mv cli/build/linux64 s3-drop/
           mv cli/build/windows64 s3-drop/
-          ls -l dist/
+          ls -l s3-drop/
           echo "rccVersion=${ver}" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
