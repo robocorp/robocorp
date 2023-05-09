@@ -166,15 +166,15 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
             name: robo-signed-windows
-            path: cli/build/windows64/robo
+            path: cli/build/windows64/
       - uses: actions/download-artifact@v3
         with:
             name: robo-signed-macos
-            path: cli/build/macos64/robo
+            path: cli/build/macos64/
       - uses: actions/download-artifact@v3
         with:
             name: robo-linux
-            path: cli/build/linux64/robo
+            path: cli/build/linux64/
       - run: |
           ls -l
           pwd
@@ -199,5 +199,5 @@ jobs:
             aws-region: eu-west-1
       - name: Copy files to the deploy drop-box with the AWS CLI
         run: |
-            aws s3 sync ./s3-drop s3://robo-build-drop-box
+            aws s3 sync cli/s3-drop s3://robo-build-drop-box
 
