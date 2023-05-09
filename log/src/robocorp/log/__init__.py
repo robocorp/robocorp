@@ -24,6 +24,7 @@ from typing import (
     Callable,
     Protocol,
     IO,
+    ContextManager,
 )
 from ._logger_instances import _get_logger_instances
 from .protocols import OptExcInfo, LogHTMLStyle, Status, IReadLines
@@ -334,13 +335,19 @@ def suppress_variables():
     return suppress(variables=True, methods=False)
 
 
-class _AnyCall(Protocol):
+class _AnyCallOrCtxManager(Protocol):
     def __call__(self, *args, **kwargs) -> Any:
         pass
 
+    def __enter__(self) -> Any:
+        """Return `self` upon entering the runtime context."""
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        """Raise any exception triggered within the runtime context."""
+
 
 @overload
-def suppress(*, variables: bool = True, methods: bool = True) -> _AnyCall:
+def suppress(*, variables: bool = True, methods: bool = True) -> _AnyCallOrCtxManager:
     """
     Arguments when used as a decorator or context manager with parameters.
 
@@ -349,7 +356,7 @@ def suppress(*, variables: bool = True, methods: bool = True) -> _AnyCall:
 
 
 @overload
-def suppress(func: Callable[[], Any]) -> _AnyCall:
+def suppress(func: Callable[[], Any]) -> _AnyCallOrCtxManager:
     """
     Arguments when used as a decorator without any arguments (where it just
     receives a function).
@@ -712,6 +719,32 @@ def verify_log_messages_from_decoded_str(
     return verify_log_messages_from_messages_iterator(
         iter(log_messages), expected, not_expected
     )
+
+
+def _print_msgs_pretty(decoded_msgs: Union[Iterator[dict], Sequence[dict]]) -> None:
+    """
+    Helper function to print the messages.
+
+    Args:
+        decoded_msgs: The messages (already decoded) which should be printed.
+    """
+    level = 0
+    indent = ""
+
+    for m in decoded_msgs:
+        msg_type = m["message_type"]
+        if msg_type in ("EE", "ET", "ER"):
+            level -= 1
+            assert level >= 0
+            indent = "    " * level
+
+        m = m.copy()
+        del m["message_type"]
+        print(f"{indent}{msg_type}: {m}")
+
+        if msg_type in ("SE", "ST", "SR"):
+            level += 1
+            indent = "    " * level
 
 
 def verify_log_messages_from_log_html(

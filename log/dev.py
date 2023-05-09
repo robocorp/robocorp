@@ -75,7 +75,7 @@ class Dev(object):
         update_version(
             version, os.path.join(".", "src", "robocorp", "log", "__init__.py")
         )
-        logging_dir = Path(".").absolute()
+        logging_dir = Path(__file__).absolute().parent
         tasks_poetry = logging_dir.parent / "tasks" / "pyproject.toml"
         update_version(version, tasks_poetry, _fix_contents_version_in_poetry)
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Iterator, List, Callable, Dict
+from typing import Iterator, List, Callable, Dict, Sequence
 from types import ModuleType
 import sys
 from robocorp.tasks._protocols import ITask
@@ -92,20 +92,22 @@ def import_path(
     return mod
 
 
-def collect_tasks(path: Path, task_name: str = "") -> Iterator[ITask]:
+def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]:
     """
     Note: collecting tasks is not thread-safe.
     """
     from robocorp.tasks import _hooks
     from robocorp.tasks._task import Task
 
-    _hooks.before_collect_tasks(path, task_name)
+    task_names_as_set = set(task_names)
+
+    _hooks.before_collect_tasks(path, task_names_as_set)
 
     def accept_task(task: ITask):
-        if not task_name:
+        if not task_names:
             return True
 
-        return task.name == task_name
+        return task.name in task_names
 
     methods_marked_as_tasks_found: List[Callable] = []
 

@@ -56,7 +56,7 @@ class _ArgDispatcher:
             "--task",
             dest="task_name",
             help="The name of the task that should be run.",
-            default="",
+            action="append",
         )
         run_parser.add_argument(
             "-o",

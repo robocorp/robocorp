@@ -120,12 +120,7 @@ def test_core_log_integration_console_messages(datadir, str_regression, mode) ->
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip()
     decoded = result.stdout.decode("utf-8", "replace")
-    header_end = "=" * 80
-    header_end_i = decoded.rfind(header_end)
-    assert header_end_i > 0
-    decoded = decoded[: header_end_i + len(header_end)]
-
-    str_regression.check(decoded)
+    str_regression.check_until_header(decoded)
 
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()

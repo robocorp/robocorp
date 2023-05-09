@@ -1,12 +1,12 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Tuple
 
 from ._protocols import ITask
 from robocorp import log
 
 
-def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
+def read_pyproject_toml(context, path: Path) -> Optional[Tuple[Path, dict]]:
     while True:
         pyproject = path / "pyproject.toml"
         try:
@@ -18,7 +18,7 @@ def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
         parent = path.parent
         if parent == path or not parent:
             # Couldn't find pyproject.toml
-            return log.ConfigFilesFiltering()
+            return None
         path = parent
 
     try:
@@ -26,17 +26,26 @@ def read_filters_from_pyproject_toml(context, path: Path) -> log.BaseConfig:
     except Exception:
         raise OSError(f"Could not read the contents of: {pyproject}.")
 
-    obj: Any
+    pyproject_toml: Any = None
     try:
         try:
             import tomllib  # type: ignore
         except ImportError:
             import tomli as tomllib  # type: ignore
 
-        obj = tomllib.loads(toml_contents)
+        pyproject_toml = tomllib.loads(toml_contents)
     except Exception:
         raise RuntimeError(f"Could not interpret the contents of {pyproject} as toml.")
+    return pyproject, pyproject_toml
 
+
+def read_filters_from_pyproject_toml(
+    context, pyproject: Path, pyproject_toml_contents: dict
+) -> log.BaseConfig:
+    if not pyproject_toml_contents:
+        log.ConfigFilesFiltering()
+
+    obj: Any = pyproject_toml_contents
     filters: List[log.Filter] = []
     if isinstance(obj, dict):
         # Filter(name="RPA", kind=FilterKind.log_on_project_call),

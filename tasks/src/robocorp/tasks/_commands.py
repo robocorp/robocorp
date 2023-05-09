@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Tuple
+from typing import Union, Sequence, List
 
 import json
 import os
@@ -64,7 +64,7 @@ def list_tasks(
 def run(
     output_dir: str,
     path: str,
-    task_name: str,
+    task_name: Union[Sequence[str], str, None],
     max_log_files: int = 5,
     max_log_file_size: str = "1MB",
     console_colors: str = "auto",
@@ -77,7 +77,7 @@ def run(
     Args:
         output_dir: The directory where output should be put.
         path: The path (file or directory where the tasks should be collected from.
-        task_name: The name of the task to run.
+        task_name: The name(s) of the task to run.
         max_log_files: The maximum number of log files to be created (if more would
             be needed the oldest one is deleted).
         max_log_file_size: The maximum size for the created log files.
@@ -98,18 +98,26 @@ def run(
         1 if there was some error running the task.
     """
     from ._collect_tasks import collect_tasks
-    from ._hooks import before_task_run, after_task_run
+    from ._hooks import (
+        before_task_run,
+        after_task_run,
+        before_all_tasks_run,
+        after_all_tasks_run,
+    )
     from ._protocols import ITask
     from ._task import Context
     from ._protocols import Status
     from ._exceptions import RobocorpTasksCollectError
     from ._log_auto_setup import (
         setup_cli_auto_logging,
+        read_pyproject_toml,
         read_filters_from_pyproject_toml,
     )
     from ._log_output_setup import setup_log_output
+    from ._config import RunConfig, set_config
     from robocorp.log import redirect
     from robocorp.log import console
+    from ._task import set_current_task
 
     console.set_mode(console_colors)
 
@@ -126,9 +134,39 @@ def run(
 
     from robocorp import log
 
-    config = read_filters_from_pyproject_toml(context, p)
+    task_names: Sequence[str]
+    if not task_name:
+        task_names = []
+    elif isinstance(task_name, str):
+        task_names = [task_name]
+    else:
+        task_names = task_name
 
-    with setup_cli_auto_logging(
+    config: log.BaseConfig
+    pyproject_path_and_contents = read_pyproject_toml(context, p)
+    pyproject_toml_contents: dict
+    if not pyproject_path_and_contents:
+        config = log.ConfigFilesFiltering()
+        pyproject_toml_contents = {}
+    else:
+        pyproject, pyproject_toml_contents = pyproject_path_and_contents
+        config = read_filters_from_pyproject_toml(
+            context, pyproject, pyproject_toml_contents
+        )
+
+    run_config = RunConfig(
+        Path(output_dir),
+        p,
+        task_names,
+        max_log_files,
+        max_log_file_size,
+        console_colors,
+        log_output_to_stdout,
+        no_status_rc,
+        pyproject_toml_contents,
+    )
+
+    with set_config(run_config), setup_cli_auto_logging(
         # Note: we can't customize what's a "project" file or a "library" file, right now
         # the customizations are all based on module names.
         config
@@ -140,7 +178,10 @@ def run(
         run_status = "PASS"
         setup_message = ""
 
-        run_name = f"{os.path.basename(path)} - {task_name}"
+        run_name = os.path.basename(p)
+        if task_name:
+            run_name += f" - {task_name}"
+
         log.start_run(run_name)
 
         try:
@@ -151,15 +192,11 @@ def run(
                 else:
                     context.show(f"\nCollecting task {task_name} from: {path}")
 
-                tasks: Tuple[ITask, ...] = tuple(collect_tasks(p, task_name))
+                tasks: List[ITask] = list(collect_tasks(p, task_names))
 
                 if not tasks:
                     raise RobocorpTasksCollectError(
                         f"Did not find any tasks in: {path}"
-                    )
-                if len(tasks) > 1:
-                    raise RobocorpTasksCollectError(
-                        f"Expected only 1 task to be run. Found: {', '.join(t.name for t in tasks)}"
                     )
             except Exception as e:
                 run_status = "ERROR"
@@ -177,19 +214,30 @@ def run(
 
             returncode = 0
 
-            for task in tasks:
-                before_task_run(task)
+            before_all_tasks_run(tasks)
+
+            try:
+                for task in tasks:
+                    set_current_task(task)
+                    before_task_run(task)
+                    try:
+                        task.run()
+                        run_status = task.status = Status.PASS
+                    except Exception as e:
+                        run_status = task.status = Status.ERROR
+                        if not no_status_rc:
+                            returncode = 1
+                        task.message = str(e)
+                        task.exc_info = sys.exc_info()
+                    finally:
+                        after_task_run(task)
+                        set_current_task(None)
+            finally:
+                log.start_task("Teardown tasks", "teardown", "", 0)
                 try:
-                    task.run()
-                    run_status = task.status = Status.PASS
-                except Exception as e:
-                    run_status = task.status = Status.ERROR
-                    if not no_status_rc:
-                        returncode = 1
-                    task.message = str(e)
-                    task.exc_info = sys.exc_info()
+                    after_all_tasks_run(tasks)
                 finally:
-                    after_task_run(task)
+                    log.end_task("Teardown tasks", "teardown", Status.PASS, "")
 
             return returncode
         finally:

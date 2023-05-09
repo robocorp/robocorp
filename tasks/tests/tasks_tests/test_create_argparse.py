@@ -27,7 +27,7 @@ def test_argparse():
     assert parsed.command == "run"
     assert parsed.path == "target_dir"
     assert parsed.output_dir == "./out"
-    assert parsed.task_name == "task-name"
+    assert parsed.task_name == ["task-name"]
 
     parsed = parser.parse_args(
         ["run", "target_dir", "--max-log-files=5", "--max-log-file-size=2MB"]

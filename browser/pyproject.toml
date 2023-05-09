@@ -3,10 +3,9 @@ name = "robocorp-browser"
 version = "0.3.0"
 description = "Robocorp browser automation library"
 authors = [
-	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
 	"Kerkko P. <kerkko@robocorp.com>",
-	"Antero V. <antero@robocorp.com>",
+	"Ossi R. <ossi@robocorp.com>",
 ]
 readme = "README.md"
 packages = [{include = "robocorp", from="src"}]
@@ -14,6 +13,7 @@ packages = [{include = "robocorp", from="src"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 playwright = "^1.32.1"
+robocorp-tasks = "^0.1.7"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"

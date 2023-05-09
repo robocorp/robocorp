@@ -5,7 +5,11 @@ NEXT
     When set, if running tasks has an error inside the task the return code of the process is 0 (
     if unsed the return code if an error is thrown inside a task the return code is 1).
 - When collecting tasks redirect sys.stdout to sys.stderr so that only the expected json is outputed.
-
+- Allow running multiple tasks.
+- New decorator: `session_cache` allows a value to be cached until the task run session finishes.
+- New decorator: `task_cache` allows a value to be cached until the current task run finishes.
+- New API: `get_output_dir` provides the configured output directory.
+- New API: `get_current_task` provides the task being currently run.
 
 0.1.7
 -----------------------------

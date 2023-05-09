@@ -3,7 +3,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-class _OnExitContextManager:
+class OnExitContextManager:
     def __init__(self, on_exit):
         self.on_exit = on_exit
 
@@ -21,21 +21,29 @@ class Callback(object):
     same time in multiple threads.
     """
 
-    def __init__(self):
+    def __init__(self, reversed=False):
         self.raise_exceptions = False
+        self._reversed = reversed
         self._callbacks = ()
 
     def register(self, callback):
         self._callbacks = self._callbacks + (callback,)
 
         # Enable using as a context manager to automatically call the unregister.
-        return _OnExitContextManager(lambda: self.unregister(callback))
+        return OnExitContextManager(lambda: self.unregister(callback))
 
     def unregister(self, callback):
         self._callbacks = tuple(x for x in self._callbacks if x != callback)
 
+    def __len__(self):
+        return len(self._callbacks)
+
     def __call__(self, *args, **kwargs):
-        for c in self._callbacks:
+        if self._reversed:
+            iter_in = reversed(self._callbacks)
+        else:
+            iter_in = self._callbacks
+        for c in iter_in:
             try:
                 c(*args, **kwargs)
             except:

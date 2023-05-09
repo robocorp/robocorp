@@ -27,10 +27,31 @@ class Task:
     def run(self):
         self.method()
 
+    @property
+    def failed(self):
+        return self.status in (Status.ERROR, Status.FAIL)
+
     def __typecheckself__(self) -> None:
         from robocorp.tasks._protocols import check_implements
 
         _: ITask = check_implements(self)
+
+    def __str__(self):
+        return f"Task({self.name}, status: {self.status})"
+
+    __repr__ = __str__
+
+
+class _TaskContext:
+    _current_task: Optional[ITask] = None
+
+
+def set_current_task(task: Optional[ITask]):
+    _TaskContext._current_task = task
+
+
+def get_current_task() -> Optional[ITask]:
+    return _TaskContext._current_task
 
 
 class Context:

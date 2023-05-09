@@ -46,6 +46,15 @@ def _fix_contents_version(contents, version):
     return contents
 
 
+def _fix_contents_version_in_poetry(contents, version):
+    import re
+
+    contents = re.sub(
+        r"(robocorp-tasks\s*=\s*)\"\^?\d+\.\d+\.\d+", r'\1"^%s' % (version,), contents
+    )
+    return contents
+
+
 class Dev(object):
     def set_version(self, version):
         """
@@ -66,6 +75,9 @@ class Dev(object):
         update_version(
             version, os.path.join(".", "src", "robocorp", "tasks", "__init__.py")
         )
+        tasks_dir = Path(__file__).absolute().parent
+        browser_poetry = tasks_dir.parent / "browser" / "pyproject.toml"
+        update_version(version, browser_poetry, _fix_contents_version_in_poetry)
 
     def get_tag(self):
         import subprocess
