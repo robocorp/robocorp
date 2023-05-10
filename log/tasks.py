@@ -61,7 +61,8 @@ def _fix_contents_version_in_poetry(contents, version):
     return contents
 
 
-def set_version(version):
+@task
+def set_version(ctx, version):
     """
     Sets a new version for robocorp-log in all the needed files.
     """
