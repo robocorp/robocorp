@@ -301,8 +301,7 @@ _suppress_helper = _SuppressHelper(_suppress_contextmanager)
 
 def suppress_methods():
     """
-    Can be used as a context manager or decorator so that methods are no
-    longer logged.
+    Can be used as a context manager or decorator so that methods are not logged.
 
     i.e.:
         @suppress_methods
@@ -319,8 +318,7 @@ def suppress_methods():
 
 def suppress_variables():
     """
-    Can be used as a context manager or decorator so that variables are no
-    longer logged.
+    Can be used as a context manager or decorator so that variables are not logged.
 
     i.e.:
         @suppress_variables
@@ -358,8 +356,8 @@ def suppress(*, variables: bool = True, methods: bool = True) -> _AnyCallOrCtxMa
 @overload
 def suppress(func: Callable[[], Any]) -> _AnyCallOrCtxManager:
     """
-    Arguments when used as a decorator without any arguments (where it just
-    receives a function).
+    Arguments when used as a decorator without any arguments
+    -- just receives it as a function.
     """
 
 
@@ -412,6 +410,8 @@ _sensitive_names = _SensitiveVariableNames(("password", "passwd"))
 
 def is_sensitive_variable_name(variable_name: str) -> bool:
     """
+    Returns true if the given variable name should be considered sensitive.
+
     Args:
         variable_name: The variable name to be checked.
 
@@ -424,8 +424,10 @@ def is_sensitive_variable_name(variable_name: str) -> bool:
 
 def add_sensitive_variable_name(variable_name: str) -> None:
     """
-    Marks a given variable name as sensitive (in which case any variable
-    containing the given `variable_name` will be redacted).
+    Marks a given variable name as sensitive
+
+    (in this case any variable containing the given `variable_name` will be
+    redacted).
 
     Note that this will add a patterns where any variable containing the given
     variable name even as a substring will be considered sensitive.
@@ -438,8 +440,9 @@ def add_sensitive_variable_name(variable_name: str) -> None:
 
 def add_sensitive_variable_name_pattern(variable_name_pattern: str) -> None:
     """
-    Adds a given pattern to consider a variable name as sensitive. Any variable
-    name matching the given pattern will have its value redacted.
+    Adds a given pattern to consider a variable name as sensitive.
+
+    Any variable name matching the given pattern will have its value redacted.
 
     Args:
         variable_name_pattern: The variable name pattern to be considered
@@ -538,6 +541,8 @@ def end_task(name: str, libname: str, status: str, message: str) -> None:
 
 def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
     """
+    Iterates stream contents and decodes those as dicts.
+
     Args:
         stream: The stream which should be iterated in (anything with a
             `readlines()` method which should provide the messages encoded
@@ -565,8 +570,7 @@ def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
 
 def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
     """
-    This function will read the data saved in the log html and provide an
-    iterator which will provide the decoded messages which were encoded into it.
+    Reads the data saved in the log html and provides decoded messages (dicts).
 
     Returns:
         An iterator which will decode the messages and provides a dictionary for
@@ -626,8 +630,9 @@ def verify_log_messages_from_messages_iterator(
     not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
-    A helper for checking that the expected messages are found (or not found) in
-    the given messages iterator.
+    Helper for checking that the expected messages are found in the given messages iterator.
+
+    Can also check if a message is not found.
 
     Args:
         messages_iterator: An iterator over the messages found.
@@ -702,6 +707,8 @@ def verify_log_messages_from_decoded_str(
     not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
+    Verifies whether the given messages are available or not in the decoded messages.
+
     Args:
         s: A string with the messages already decoded (where messages are
         separated by lines and each message is a json string to be decoded).
@@ -753,6 +760,8 @@ def verify_log_messages_from_log_html(
     not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> List[dict]:
     """
+    Verifies whether the given messages are available or not in the decoded messages.
+
     Args:
         log_html: The path to the log_html where messages were embedded.
         expected: The messages expected.
@@ -771,6 +780,8 @@ def verify_log_messages_from_stream(
     not_expected: Sequence[dict] = _DEFAULT_NOT_EXPECTED,
 ) -> Sequence[dict]:
     """
+    Verifies whether the given messages are available or not in the decoded messages.
+
     Args:
         stream: A stream from where the encoded messages are expected to be read
             from.
@@ -827,9 +838,10 @@ def add_log_output(
     log_html_style: LogHTMLStyle = "standalone",
 ):
     """
-    Adds a log output which will write the contents to the given output
-    directory. Optionally it's possible to collect all the output when the run
-    is finished and put it into a log.html file.
+    Adds a log output which will write the contents to the given output directory.
+
+    Optionally it's possible to collect all the output when the run is finished
+    and put it into a log.html file.
 
     Args:
         output_dir: The output directory where the log contents should be saved.
@@ -866,8 +878,10 @@ def add_log_output(
 
 def close_log_outputs():
     """
-    This method must be called to close loggers (note that some loggers such as
-    the one which outputs html needs to bo closed to actually write the output).
+    This method must be called to close loggers.
+
+    Note that some loggers such as the one which outputs html needs to bo closed
+    to actually write the output.
     """
     while _get_logger_instances():
         logger = next(iter(_get_logger_instances()))
@@ -875,9 +889,9 @@ def close_log_outputs():
         logger.close()
 
 
-def add_in_memory_log_output(write):
+def add_in_memory_log_output(write: Callable[[str], Any]):
     """
-    Adds a log output which is in-memory.
+    Adds a log output which is in-memory (receives a callable).
 
     Args:
         write: A callable which will be called as `write(msg)` whenever

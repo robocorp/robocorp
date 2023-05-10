@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\log\robocorp\log\console#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\console.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.log.console`
 
@@ -20,7 +20,7 @@
 
 ---
 
-<a href="..\..\log\robocorp\log\console\set_color#L213"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\console.py#L213"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_color`
 
@@ -40,7 +40,7 @@ with set_color(COLOR_BLACK):  ...
 
 ---
 
-<a href="..\..\log\robocorp\log\console\set_mode#L227"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\console.py#L227"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_mode`
 

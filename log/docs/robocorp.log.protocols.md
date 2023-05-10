@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\log\robocorp\log\protocols#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\protocols.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.log.protocols`
 
@@ -11,7 +11,7 @@
 
 ---
 
-<a href="..\..\log\robocorp\log\protocols\IReadLines#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\protocols.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `IReadLines`
 
@@ -23,7 +23,7 @@
 
 ---
 
-<a href="..\..\log\robocorp\log\protocols\readlines#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\protocols.py#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `readlines`
 
@@ -38,7 +38,7 @@ readlines() → List[str]
 
 ---
 
-<a href="..\..\log\robocorp\log\protocols\Status#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\protocols.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `Status`
 

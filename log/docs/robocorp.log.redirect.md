@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\log\robocorp\log\redirect#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\redirect.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.log.redirect`
 

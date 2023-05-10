@@ -10,7 +10,7 @@
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L12"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L6"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `configure`
 
@@ -37,7 +37,7 @@ screenshot:  default="only-on-failure",  choices=["on", "off", "only-on-failure"
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L47"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L41"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `page`
 
@@ -61,7 +61,7 @@ Provides a managed instance of the browser page to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L67"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L61"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `browser`
 
@@ -85,7 +85,7 @@ Provides a managed instance of the browser to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L88"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `playwright`
 
@@ -109,7 +109,7 @@ Provides a managed instance of playwright to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L109"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L103"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `context`
 
@@ -133,7 +133,7 @@ Provides a managed instance of the browser context to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L130"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L124"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `open_browser`
 
@@ -170,7 +170,7 @@ Note that if the browser was already previously launched the previous instance w
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L159"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L153"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `open_url`
 
@@ -209,7 +209,7 @@ Changes the url of the current page (creating a page if needed).
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L192"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\browser\src\robocorp\browser\__init__.py#L186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `screenshot`
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\tasks\robocorp\tasks#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.tasks`
 Robocorp tasks helps in creating entry points for your automation project. 
@@ -41,7 +41,7 @@ Note: Using the `cli.main(args)` is possible to run tasks programmatically, but 
 
 ---
 
-<a href="..\..\tasks\robocorp\tasks\task#L42"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\__init__.py#L42"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `task`
 
@@ -74,7 +74,7 @@ python -m robocorp.tasks run tasks.py -t enter_user
 
 ---
 
-<a href="..\..\tasks\robocorp\tasks\session_cache#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\__init__.py#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `session_cache`
 
@@ -97,7 +97,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 ---
 
-<a href="..\..\tasks\robocorp\tasks\task_cache#L94"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\__init__.py#L94"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `task_cache`
 
@@ -120,7 +120,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 ---
 
-<a href="..\..\tasks\robocorp\tasks\get_output_dir#L115"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\__init__.py#L115"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_output_dir`
 
@@ -133,7 +133,7 @@ Provide the output directory being used for the run or None if there's no output
 
 ---
 
-<a href="..\..\tasks\robocorp\tasks\get_current_task#L127"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\__init__.py#L127"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_current_task`
 

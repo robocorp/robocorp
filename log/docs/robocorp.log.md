@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\log\robocorp\log#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.log`
 
@@ -14,7 +14,7 @@
 
 ---
 
-<a href="..\..\log\robocorp\log\critical#L69"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L69"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `critical`
 
@@ -45,7 +45,7 @@ Adds a new logging message with a critical (error) level.
 
 ---
 
-<a href="..\..\log\robocorp\log\warn#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `warn`
 
@@ -76,7 +76,7 @@ Adds a new logging message with a warn level.
 
 ---
 
-<a href="..\..\log\robocorp\log\info#L109"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L109"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `info`
 
@@ -109,7 +109,7 @@ Adds a new logging message with an info level.
 
 ---
 
-<a href="..\..\log\robocorp\log\exception#L131"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L131"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `exception`
 
@@ -129,7 +129,7 @@ Adds to the logging the exceptions that's currently raised.
 
 ---
 
-<a href="..\..\log\robocorp\log\html#L147"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L147"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `html`
 
@@ -154,7 +154,7 @@ html(
 
 ---
 
-<a href="..\..\log\robocorp\log\console_message#L197"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L197"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `console_message`
 
@@ -162,7 +162,7 @@ html(
 console_message(
     message: str,
     kind: str,
-    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x00000179D51D9AB0>,
+    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x000001C1930CE6B0>,
     flush: Optional[bool] = None
 ) → None
 ```
@@ -194,7 +194,7 @@ Messages from the framework:
 
 ---
 
-<a href="..\..\log\robocorp\log\suppress_methods#L302"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L302"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `suppress_methods`
 
@@ -202,7 +202,7 @@ Messages from the framework:
 suppress_methods()
 ```
 
-Can be used as a context manager or decorator so that methods are no longer logged. 
+Can be used as a context manager or decorator so that methods are not logged. 
 
 i.e.:  @suppress_methods  def method():  ... 
 
@@ -213,7 +213,7 @@ i.e.:  @suppress_methods  def method():  ...
 
 ---
 
-<a href="..\..\log\robocorp\log\suppress_variables#L320"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L319"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `suppress_variables`
 
@@ -221,7 +221,7 @@ i.e.:  @suppress_methods  def method():  ...
 suppress_variables()
 ```
 
-Can be used as a context manager or decorator so that variables are no longer logged. 
+Can be used as a context manager or decorator so that variables are not logged. 
 
 i.e.:  @suppress_variables  def method():  ... 
 
@@ -232,7 +232,7 @@ i.e.:  @suppress_variables  def method():  ...
 
 ---
 
-<a href="..\..\log\robocorp\log\suppress#L366"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L364"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `suppress`
 
@@ -276,13 +276,15 @@ with log.suppress(methods=False):  ....
 
 ---
 
-<a href="..\..\log\robocorp\log\is_sensitive_variable_name#L413"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L411"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `is_sensitive_variable_name`
 
 ```python
 is_sensitive_variable_name(variable_name: str) → bool
 ```
+
+Returns true if the given variable name should be considered sensitive. 
 
 
 
@@ -298,7 +300,7 @@ is_sensitive_variable_name(variable_name: str) → bool
 
 ---
 
-<a href="..\..\log\robocorp\log\add_sensitive_variable_name#L425"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L425"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_sensitive_variable_name`
 
@@ -306,7 +308,9 @@ is_sensitive_variable_name(variable_name: str) → bool
 add_sensitive_variable_name(variable_name: str) → None
 ```
 
-Marks a given variable name as sensitive (in which case any variable containing the given `variable_name` will be redacted). 
+Marks a given variable name as sensitive 
+
+(in this case any variable containing the given `variable_name` will be redacted). 
 
 Note that this will add a patterns where any variable containing the given variable name even as a substring will be considered sensitive. 
 
@@ -319,7 +323,7 @@ Note that this will add a patterns where any variable containing the given varia
 
 ---
 
-<a href="..\..\log\robocorp\log\add_sensitive_variable_name_pattern#L439"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L441"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_sensitive_variable_name_pattern`
 
@@ -327,7 +331,9 @@ Note that this will add a patterns where any variable containing the given varia
 add_sensitive_variable_name_pattern(variable_name_pattern: str) → None
 ```
 
-Adds a given pattern to consider a variable name as sensitive. Any variable name matching the given pattern will have its value redacted. 
+Adds a given pattern to consider a variable name as sensitive. 
+
+Any variable name matching the given pattern will have its value redacted. 
 
 
 
@@ -338,7 +344,7 @@ Adds a given pattern to consider a variable name as sensitive. Any variable name
 
 ---
 
-<a href="..\..\log\robocorp\log\hide_from_output#L451"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L454"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `hide_from_output`
 
@@ -363,7 +369,7 @@ Will be automatically hidden and it's also possible to add new names to be autom
 
 ---
 
-<a href="..\..\log\robocorp\log\start_run#L474"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L477"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `start_run`
 
@@ -384,7 +390,7 @@ Note: robocorp-tasks calls this method automatically.
 
 ---
 
-<a href="..\..\log\robocorp\log\end_run#L487"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L490"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `end_run`
 
@@ -406,7 +412,7 @@ Note: robocorp-tasks calls this method automatically.
 
 ---
 
-<a href="..\..\log\robocorp\log\start_task#L501"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L504"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `start_task`
 
@@ -437,7 +443,7 @@ Note: robocorp-tasks calls this method automatically.
 
 ---
 
-<a href="..\..\log\robocorp\log\end_task#L520"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L523"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `end_task`
 
@@ -461,13 +467,15 @@ Note: robocorp-tasks calls this method automatically.
 
 ---
 
-<a href="..\..\log\robocorp\log\iter_decoded_log_format_from_stream#L539"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L542"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `iter_decoded_log_format_from_stream`
 
 ```python
 iter_decoded_log_format_from_stream(stream: IReadLines) → Iterator[dict]
 ```
+
+Iterates stream contents and decodes those as dicts. 
 
 
 
@@ -494,7 +502,7 @@ Example of messages provided:
 
 ---
 
-<a href="..\..\log\robocorp\log\iter_decoded_log_format_from_log_html#L566"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L571"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `iter_decoded_log_format_from_log_html`
 
@@ -502,7 +510,7 @@ Example of messages provided:
 iter_decoded_log_format_from_log_html(log_html: Path) → Iterator[dict]
 ```
 
-This function will read the data saved in the log html and provide an iterator which will provide the decoded messages which were encoded into it. 
+Reads the data saved in the log html and provides decoded messages (dicts). 
 
 
 
@@ -523,7 +531,7 @@ This function will read the data saved in the log html and provide an iterator w
 
 ---
 
-<a href="..\..\log\robocorp\log\verify_log_messages_from_messages_iterator#L623"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L627"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_messages_iterator`
 
@@ -535,7 +543,9 @@ verify_log_messages_from_messages_iterator(
 ) → List[dict]
 ```
 
-A helper for checking that the expected messages are found (or not found) in the given messages iterator. 
+Helper for checking that the expected messages are found in the given messages iterator. 
+
+Can also check if a message is not found. 
 
 
 
@@ -560,7 +570,7 @@ Note: if one of the key entries is `__check__` the value will be considered a ca
 
 ---
 
-<a href="..\..\log\robocorp\log\verify_log_messages_from_decoded_str#L699"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L704"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_decoded_str`
 
@@ -571,6 +581,8 @@ verify_log_messages_from_decoded_str(
     not_expected: Sequence[dict] = ({'message_type': 'L', 'level': 'E'},)
 ) → List[dict]
 ```
+
+Verifies whether the given messages are available or not in the decoded messages. 
 
 
 
@@ -585,7 +597,7 @@ See: `verify_log_messages_from_messages_iterator` for more details on the matchi
 
 ---
 
-<a href="..\..\log\robocorp\log\verify_log_messages_from_log_html#L750"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L757"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_log_html`
 
@@ -596,6 +608,8 @@ verify_log_messages_from_log_html(
     not_expected: Sequence[dict] = ({'message_type': 'L', 'level': 'E'},)
 ) → List[dict]
 ```
+
+Verifies whether the given messages are available or not in the decoded messages. 
 
 
 
@@ -610,7 +624,7 @@ See: `verify_log_messages_from_messages_iterator` for more details on the matchi
 
 ---
 
-<a href="..\..\log\robocorp\log\verify_log_messages_from_stream#L768"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L777"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_stream`
 
@@ -621,6 +635,8 @@ verify_log_messages_from_stream(
     not_expected: Sequence[dict] = ({'message_type': 'L', 'level': 'E'},)
 ) → Sequence[dict]
 ```
+
+Verifies whether the given messages are available or not in the decoded messages. 
 
 
 
@@ -635,7 +651,7 @@ See: `verify_log_messages_from_messages_iterator` for more details on the matchi
 
 ---
 
-<a href="..\..\log\robocorp\log\setup_auto_logging#L791"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L802"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `setup_auto_logging`
 
@@ -660,7 +676,7 @@ Returns a context manager which will stop applying the auto-logging to new loade
 
 ---
 
-<a href="..\..\log\robocorp\log\add_log_output#L822"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L833"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_log_output`
 
@@ -674,7 +690,9 @@ add_log_output(
 )
 ```
 
-Adds a log output which will write the contents to the given output directory. Optionally it's possible to collect all the output when the run is finished and put it into a log.html file. 
+Adds a log output which will write the contents to the given output directory. 
+
+Optionally it's possible to collect all the output when the run is finished and put it into a log.html file. 
 
 
 
@@ -695,7 +713,7 @@ Adds a log output which will write the contents to the given output directory. O
 
 ---
 
-<a href="..\..\log\robocorp\log\close_log_outputs#L867"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L879"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `close_log_outputs`
 
@@ -703,20 +721,22 @@ Adds a log output which will write the contents to the given output directory. O
 close_log_outputs()
 ```
 
-This method must be called to close loggers (note that some loggers such as the one which outputs html needs to bo closed to actually write the output). 
+This method must be called to close loggers. 
+
+Note that some loggers such as the one which outputs html needs to bo closed to actually write the output. 
 
 
 ---
 
-<a href="..\..\log\robocorp\log\add_in_memory_log_output#L878"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L892"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_in_memory_log_output`
 
 ```python
-add_in_memory_log_output(write)
+add_in_memory_log_output(write: Callable[[str], Any])
 ```
 
-Adds a log output which is in-memory. 
+Adds a log output which is in-memory (receives a callable). 
 
 
 
@@ -732,7 +752,7 @@ Adds a log output which is in-memory.
 
 ---
 
-<a href="..\..\log\robocorp\log\ConsoleMessageKind#L166"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\__init__.py#L166"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `ConsoleMessageKind`
 
