@@ -17,6 +17,13 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 
+[tool.poetry.dependencies]
+python = "^3.9"
+tomli = { version = "^2.0.1", python = "<3.11" }
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+
 [tool.mypy]
 mypy_path = "src:tests"
 
@@ -32,26 +39,6 @@ ignore_missing_imports = true
 module = "pytest_timeout.*"
 ignore_missing_imports = true
 
-[tool.poetry.dependencies]
-python = "^3.9"
-tomli = { version = "^2.0.1", python = "<3.11" }
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.1.0"
-ruff = "^0.0.255"
-mypy = "^1.1.1"
-pytest = "^7.2.2"
-pytest-xdist = "^3.2.1"
-pytest-regressions = "1.0.6"
-pydocstyle = "^6.3.0"
-isort = "^5.12.0"
-types-invoke = "^2.0"
-invoke = "^2.0"
-lazydocs = { git = "https://github.com/robocorp/lazydocs.git" }
-robocorp-devutils = {path = "../devutils/", develop = true}
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-

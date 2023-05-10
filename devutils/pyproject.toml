@@ -13,8 +13,6 @@ packages = [{include = "devutils", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-
-[tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 ruff = "^0.0.255"
 mypy = "^1.1.1"

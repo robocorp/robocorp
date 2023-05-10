@@ -710,6 +710,19 @@ python-versions = "^3.9"
 files = []
 develop = true
 
+[package.dependencies]
+black = "^23.1.0"
+invoke = "^2.0"
+isort = "^5.12.0"
+lazydocs = {git = "https://github.com/robocorp/lazydocs.git"}
+mypy = "^1.1.1"
+pydocstyle = "^6.3.0"
+pytest = "^7.2.2"
+pytest-regressions = "1.0.6"
+pytest-xdist = "^3.2.1"
+ruff = "^0.0.255"
+types-invoke = "^2.0"
+
 [package.source]
 type = "directory"
 url = "../devutils"
@@ -844,4 +857,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "18109c74f5e5a4c8db5b43a66fe01efd577e88968819985c03a9b3606e201c3c"
+content-hash = "4911f337476c910ccb07e98a1e3e8407e658e8ee3056d1f48f45f38a28c4d8be"
