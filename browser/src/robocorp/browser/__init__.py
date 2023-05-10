@@ -2,6 +2,9 @@ from typing import Literal, Optional
 
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
+__version__ = "0.4.0"
+version_info = [int(x) for x in __version__.split(".")]
+
 
 def configure(**kwargs) -> None:
     """

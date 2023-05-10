@@ -4,6 +4,8 @@ Steps to do a new release
 
 - Open a shell at the proper place (something as `X:/robocorpws/robo/tasks`)
 
+- Create a new branch (`git checkout -b release-tasks-branch`)
+
 - Update version (`inv set-version 0.2.1`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-tasks`).
@@ -13,9 +15,9 @@ Steps to do a new release
 - Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
   - `mu acp robocorp-tasks release 0.2.1`
 
-- Create a tag (`git tag robocorp-tasks-0.2.1`) and push it.
+- Create a tag and push it (`git tag robocorp-tasks-0.2.1&&git push origin robocorp-tasks-0.2.1`).
 
-- Rebase with master (`git checkout master&git rebase release-robocorp-tasks`).
+- Rebase with master (`git checkout master&git rebase -`).
 
 - Send release msg. i.e.:
 

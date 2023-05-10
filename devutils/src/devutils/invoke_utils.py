@@ -2,7 +2,7 @@ from invoke import task
 import sys
 from pathlib import Path
 from contextlib import contextmanager
-from typing import Iterator
+from typing import Iterator, List
 
 
 class RoundtripPyProject:
@@ -46,7 +46,45 @@ def collect_deps_pyprojects(root_pyproject: Path, found=None) -> Iterator[Path]:
                 yield from collect_deps_pyprojects(dep_pyproject, found)
 
 
-def build_common_tasks(root, package_name):
+def get_tag(tag_prefix: str) -> str:
+    """
+    Args:
+        tag_prefix: The tag prefix to match (i.e.: "robocorp-tasks")
+    """
+    import subprocess
+
+    # i.e.: Gets the last tagged version
+    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}*".split()
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    stdout, stderr = popen.communicate()
+
+    # Something as: b'robocorp-tasks-0.0.1'
+    return stdout.decode("utf-8").strip()
+
+
+def get_all_tags(tag_prefix: str) -> List[str]:
+    import subprocess
+
+    cmd = "git tag".split()
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    stdout, stderr = popen.communicate()
+
+    found = stdout.decode("utf-8").strip()
+    return [x for x in found.splitlines() if x.startswith(tag_prefix)]
+
+
+def build_common_tasks(root: Path, package_name: str):
+    """
+    Args:
+        root: The path to the package root (i.e.: /tasks in the repo)
+        package_name: The name of the python package (i.e.: robocorp.tasks)
+    """
+
+    # The tag for releases should be `robocorp-tasks-{version}`
+    # i.e.: robocorp-tasks-0.1.1
+    # Here we just want the prefix.
+    tag_prefix = package_name.replace(".", "-")
+
     DIST = root / "dist"
 
     def poetry(ctx, *parts):
@@ -144,5 +182,89 @@ def build_common_tasks(root, package_name):
             "--remove-package-prefix",
             package_name,
         )
+
+    @task
+    def check_tag_version(ctx):
+        """
+        Checks if the current tag matches the latest version (exits with 1 if it
+        does not match and with 0 if it does match).
+        """
+        import importlib
+
+        mod = importlib.import_module(package_name)
+
+        tag = get_tag(tag_prefix)
+        version = tag[tag.rfind("-") + 1 :]
+
+        if mod.__version__ == version:
+            sys.stderr.write(f"Version matches ({version}) (exit(0))\n")
+            sys.exit(0)
+        else:
+            sys.stderr.write(
+                f"Version does not match ({tag_prefix}: {mod.__version__} != repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
+            )
+            sys.exit(1)
+
+    @task
+    def set_version_in_deps(ctx, version):
+        """
+        Sets a new version of this project in the project dependencies.
+        """
+        root_pyproject = root / "pyproject.toml"
+        assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
+
+        all_pyprojects = list(collect_deps_pyprojects(root_pyproject))
+        all_pyprojects.append(root_pyproject)
+
+    @task
+    def set_version(ctx, version):
+        """
+        Sets a new version for the project in all the needed files.
+        """
+        import os.path
+
+        def _fix_contents_version(contents, version):
+            import re
+
+            contents = re.sub(
+                r"(version\s*=\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
+            )
+            contents = re.sub(
+                r"(__version__\s*=\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
+            )
+            contents = re.sub(
+                r"(\"version\"\s*:\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
+            )
+
+            return contents
+
+        def _fix_robocorp_tasks_contents_version_in_poetry(contents, version):
+            import re
+
+            contents = re.sub(
+                r"(robocorp-tasks\s*=\s*)\"\^?\d+\.\d+\.\d+",
+                r'\1"^%s' % (version,),
+                contents,
+            )
+            return contents
+
+        def update_version(version, filepath, fix_func=_fix_contents_version):
+            with open(filepath, "r") as stream:
+                contents = stream.read()
+
+            new_contents = fix_func(contents, version)
+            if contents != new_contents:
+                print("Changed: ", filepath)
+                with open(filepath, "w") as stream:
+                    stream.write(new_contents)
+
+        # Update version in current project pyproject.toml
+        update_version(version, "pyproject.toml")
+
+        # Update version in current project __init__.py
+        parts = [".", "src"]
+        parts.extend(package_name.split("."))
+        parts.append("__init__.py")
+        update_version(version, os.path.join(*parts))
 
     return locals()

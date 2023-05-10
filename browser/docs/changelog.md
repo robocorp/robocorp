@@ -10,3 +10,4 @@
     - `context()`: gets the current browser context (creates if needed)
     - `screenshot()`: takes a screenshot and puts contents in the log
 - Now requires `robocorp-tasks` and `robocorp-log`.
+- The version is now available in `robocorp.browser.__version__`.
