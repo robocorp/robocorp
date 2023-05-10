@@ -1,6 +1,8 @@
-NEXT
+0.2.1
 -----------------------------
+
 - Added py.typed marker file.
+- Documentation updates
 
 
 0.2.0

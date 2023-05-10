@@ -1,4 +1,4 @@
-NEXT
+0.4.0
 -----------------------------
 
 - New APIs to handle managed instances through the following APIs:
