@@ -4,7 +4,7 @@ from time import sleep
 
 from robocorp.tasks import task
 from robocorp.http import download
-from robocorp.browser import open_url
+from robocorp.browser import open_url, screenshot
 from robocorp.excel import open_workbook
 
 
@@ -21,7 +21,6 @@ def fill_and_submit_form(page, person):
     page.fill('//input[@ng-reflect-name="labelEmail"]', person["Email"])
     page.fill('//input[@ng-reflect-name="labelPhone"]', str(person["Phone Number"]))
     page.click("input:text('Submit')")
-    sleep(0.5)
 
 
 @task
@@ -37,5 +36,4 @@ def solve_challenge():
         fill_and_submit_form(page, person)
 
     element = page.query_selector("css=div.congratulations")
-    element.screenshot(path=Path("output", "screenshot.png"))
-    sleep(2)
+    screenshot(element)

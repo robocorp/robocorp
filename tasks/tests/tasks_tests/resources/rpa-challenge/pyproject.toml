@@ -41,5 +41,8 @@
 #     In this case all methods of the given module will not be tracked.
 #     (default for all files considered library files).
 log_filter_rules = [
-    {name = "robocorp", kind = "log_on_project_call"},
+    {name = "robocorp.browser", kind = "log_on_project_call"},
+    {name = "robocorp.http", kind = "log_on_project_call"},
+    {name = "robocorp.excel", kind = "log_on_project_call"},
+    {name = "playwright", kind = "log_on_project_call"},
 ]
