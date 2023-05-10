@@ -78,5 +78,14 @@ jobs:
       run: invoke lint
     - name: Run Typecheck
       run: invoke typecheck
+
+    # Because we've installed the logging in dev mode we need to build the view too.      
+    - name: Print robocorp-log info and build the output view.
+      run: |
+        poetry run python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
+        poetry run python -c "from robocorp import log;print(log.__file__)"
+        cd ../log
+        poetry run inv build-output-view
+
     - name: Run Unittests
       run: invoke test

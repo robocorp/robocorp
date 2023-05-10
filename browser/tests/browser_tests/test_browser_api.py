@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 
@@ -56,7 +57,24 @@ def test_screenshot_on_failure(datadir):
     from robocorp.log import verify_log_messages_from_log_html
 
     result = robo_run(["run"], returncode=1, cwd=datadir)
-    assert "RuntimeError: Some error..." in result.stdout.decode("utf-8", "replace")
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "RuntimeError: Some error..." in decoded
     log_html = datadir / "output" / "log.html"
-    assert log_html.exists()
+    if not log_html.exists():
+        msg = f"\n{log_html} does not exist.\n"
+
+        if not datadir.exists():
+            msg += f"\n{datadir} does not exists.\n"
+        else:
+            msg += f"\n{datadir} exists.\nContents: {os.listdir(datadir)}\n"
+
+            output_dir = datadir / "output"
+            if not output_dir.exists():
+                msg += f"\n{output_dir} does not exists.\n"
+            else:
+                msg += f"\n{output_dir} exists.\nContents: {os.listdir(output_dir)}\n"
+
+        msg += f"\nStdout:\n{decoded}"
+
+        raise AssertionError(msg)
     verify_log_messages_from_log_html(log_html, [{"message_type": "LH"}])

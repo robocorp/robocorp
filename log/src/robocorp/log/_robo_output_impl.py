@@ -917,7 +917,7 @@ class _RoboOutputImpl:
                 from robocorp.log import _index_v2 as index
             else:
                 raise ValueError(
-                    "Unexpected log html style: {self._config.log_html_style}"
+                    f"Unexpected log html style: {self._config.log_html_style}"
                 )
 
             has_separate_bundle_js = "bundle.js" in index.FILE_CONTENTS
