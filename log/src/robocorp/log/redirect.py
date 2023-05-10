@@ -3,7 +3,7 @@ import json
 import os
 import sys
 import traceback
-from typing import Iterator, IO, AnyStr, Iterable
+from typing import Iterator, IO, Any, AnyStr, Iterable
 from threading import RLock
 from robocorp.log import console_message
 

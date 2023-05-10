@@ -13,6 +13,6 @@ Steps to do a new release
 - Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
   - `mu acp robocorp-browser release 0.4.0`
 
-- Create a tag and push it (`git tag robocorp-browser-0.4.0&&git push origin robocorp-browser-0.4.0`).
-
 - Rebase with master (`git checkout master&git rebase -`).
+
+- Create a tag and push it (`git tag robocorp-browser-0.4.0&&git push origin robocorp-browser-0.4.0`).
