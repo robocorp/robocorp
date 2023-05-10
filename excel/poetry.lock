@@ -542,6 +542,20 @@ files = [
 ]
 
 [[package]]
+name = "robocorp-devutils"
+version = "0.0.1"
+description = "Utilities for development in monorepo."
+category = "dev"
+optional = false
+python-versions = "^3.9"
+files = []
+develop = true
+
+[package.source]
+type = "directory"
+url = "../devutils"
+
+[[package]]
 name = "ruff"
 version = "0.0.255"
 description = "An extremely fast Python linter, written in Rust."
@@ -702,4 +716,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "3abc3a88b725e813f3edd2afd9ec2e82f456b76eed3e1208ed6715225e671f74"
+content-hash = "bc1c95a32c35a0f0d382c73a009feb53df96a6f88a1ac3328ed74d77075eb39f"

@@ -35,7 +35,6 @@ ignore_missing_imports = true
 [tool.poetry.dependencies]
 python = "^3.9"
 tomli = { version = "^2.0.1", python = "<3.11" }
-robocorp-devutils = {path = "../devutils/", develop = true}
 
 
 [tool.poetry.group.dev.dependencies]
@@ -50,6 +49,7 @@ isort = "^5.12.0"
 types-invoke = "^2.0"
 invoke = "^2.0"
 lazydocs = { git = "https://github.com/robocorp/lazydocs.git" }
+robocorp-devutils = {path = "../devutils/", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

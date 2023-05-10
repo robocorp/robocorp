@@ -44,10 +44,16 @@ def update_pyproject_dev_deps(ctx) -> None:
 
     for project_dir in iter_project_dirs():
         pyproject = project_dir / "pyproject.toml"
-        additional = ""
+        additional = """robocorp-devutils = {path = "../devutils/", develop = true}
+"""
+
+        if project_dir.name == "devutils":
+            additional = ""
+
         if project_dir.name == "workitems":
             additional = """types-requests = "^2.30.0.0"
 types-pyyaml = "^6.0.12.9"
+robocorp-devutils = {path = "../devutils/", develop = true}
 """
         new_content = """[tool.poetry.group.dev.dependencies]
 black = "^23.1.0"

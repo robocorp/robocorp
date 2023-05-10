@@ -566,6 +566,20 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "robocorp-devutils"
+version = "0.0.1"
+description = "Utilities for development in monorepo."
+category = "dev"
+optional = false
+python-versions = "^3.9"
+files = []
+develop = true
+
+[package.source]
+type = "directory"
+url = "../devutils"
+
+[[package]]
 name = "ruff"
 version = "0.0.255"
 description = "An extremely fast Python linter, written in Rust."
@@ -749,4 +763,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "181d7f6ccc2bd2e08834858e59806522e8fe5d1b6d1df728f17e2841b347fc6a"
+content-hash = "eabff0909020666bdd3296ef43da528405f714a709e48597fc9a17a2b58285c3"

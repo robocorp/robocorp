@@ -438,7 +438,7 @@ files = [
 name = "robocorp-devutils"
 version = "0.0.1"
 description = "Utilities for development in monorepo."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "^3.9"
 files = []
@@ -575,4 +575,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "2273f0acf3717b36710c9beb7b9b32baf80c3e45418990aa2a841fbbdae304c3"
+content-hash = "640950ce88e404b45ee425835cfce26ec84b74f5bc0a79c37da05ff512a1851f"

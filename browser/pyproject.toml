@@ -14,7 +14,6 @@ packages = [{include = "robocorp", from="src"}]
 python = "^3.9"
 playwright = "^1.32.1"
 robocorp-tasks = "^0.2.0"
-robocorp-devutils = {path = "../devutils/", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
@@ -28,6 +27,7 @@ isort = "^5.12.0"
 types-invoke = "^2.0"
 invoke = "^2.0"
 lazydocs = { git = "https://github.com/robocorp/lazydocs.git" }
+robocorp-devutils = {path = "../devutils/", develop = true}
 
 [build-system]
 requires = ["poetry-core"]
