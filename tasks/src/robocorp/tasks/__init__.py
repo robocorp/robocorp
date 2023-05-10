@@ -5,11 +5,12 @@ To use:
 Mark entry points with:
 
 ```
+from robocorp.tasks import task
+
 @task
 def my_method():
     ...
 ```
-
 
 Running options:
 
