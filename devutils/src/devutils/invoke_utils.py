@@ -1,8 +1,9 @@
-from invoke import task
 import sys
-from pathlib import Path
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Iterator, List
+
+from invoke import run, task
 
 
 class RoundtripPyProject:
@@ -87,12 +88,18 @@ def build_common_tasks(root: Path, package_name: str):
 
     DIST = root / "dist"
 
-    def poetry(ctx, *parts):
+    def run(ctx, *cmd, **options):
         import os
 
+        options.setdefault("pty", sys.platform != "win32")
+        options.setdefault("echo", True)
+
         os.chdir(root)
-        args = " ".join(str(part) for part in parts)
-        ctx.run(f"poetry {args}", pty=sys.platform != "win32", echo=True)
+        args = " ".join(str(c) for c in cmd)
+        return ctx.run(args, **options)
+
+    def poetry(ctx, *cmd):
+        return run(ctx, "poetry", *cmd)
 
     @task
     def install(ctx):
@@ -144,7 +151,12 @@ def build_common_tasks(root: Path, package_name: str):
         """Type check code"""
         poetry(
             ctx,
-            f"run mypy --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases src tests",
+            "run mypy",
+            "--follow-imports=silent",
+            "--show-column-numbers",
+            "--namespace-packages",
+            "--explicit-package-bases",
+            "src tests",
         )
 
     @task
@@ -164,15 +176,6 @@ def build_common_tasks(root: Path, package_name: str):
         poetry(ctx, "build")
 
     @task
-    def publish(ctx):
-        """Publish package to PyPI"""
-        for file in DIST.glob("*"):
-            print(f"Removing: {file}")
-            file.unlink()
-
-        poetry(ctx, "publish", "--build")
-
-    @task
     def docs(ctx):
         """Build API documentation"""
         poetry(
@@ -181,6 +184,43 @@ def build_common_tasks(root: Path, package_name: str):
             "--overview-file README.md",
             "--remove-package-prefix",
             package_name,
+        )
+
+    @task
+    def make_release(ctx):
+        """Create a release tag"""
+        import importlib
+
+        import semver
+
+        result = run(ctx, "git rev-parse --abbrev-ref HEAD", hide=True)
+        branch = result.stdout.strip()
+        if branch != "master":
+            sys.stderr.write(f"Not on master branch: {branch}\n")
+            sys.exit(1)
+
+        current_version = importlib.import_module(package_name).__version__
+
+        previous_tag = get_tag(tag_prefix)
+        previous_version = previous_tag.split("-")[-1]
+
+        if not previous_version:
+            print(f"No previous release for {package_name}")
+        elif semver.compare(current_version, previous_version) <= 0:
+            sys.stderr.write(
+                f"Current version older than previous: {current_version} <= {previous_version}\n"
+            )
+            sys.exit(1)
+
+        current_tag = f"{tag_prefix}-{current_version}"
+        run(
+            ctx,
+            "git tag",
+            "-a",
+            current_tag,
+            "-m",
+            f'"Release {current_version} for {package_name}"',
+            echo=True,
         )
 
     @task
@@ -207,9 +247,7 @@ def build_common_tasks(root: Path, package_name: str):
 
     @task
     def set_version_in_deps(ctx, version):
-        """
-        Sets a new version of this project in the project dependencies.
-        """
+        """Sets a new version of this project in the project dependencies"""
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
 
@@ -218,53 +256,35 @@ def build_common_tasks(root: Path, package_name: str):
 
     @task
     def set_version(ctx, version):
-        """
-        Sets a new version for the project in all the needed files.
-        """
-        import os.path
+        """Sets a new version for the project in all the needed files"""
+        import re
+        from pathlib import Path
 
-        def _fix_contents_version(contents, version):
-            import re
+        version_patterns = (
+            re.compile(r"(version\s*=\s*)\"\d+\.\d+\.\d+"),
+            re.compile(r"(__version__\s*=\s*)\"\d+\.\d+\.\d+"),
+            re.compile(r"(\"version\"\s*:\s*)\"\d+\.\d+\.\d+"),
+        )
 
-            contents = re.sub(
-                r"(version\s*=\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
-            )
-            contents = re.sub(
-                r"(__version__\s*=\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
-            )
-            contents = re.sub(
-                r"(\"version\"\s*:\s*)\"\d+\.\d+\.\d+", r'\1"%s' % (version,), contents
-            )
-
-            return contents
-
-        def _fix_robocorp_tasks_contents_version_in_poetry(contents, version):
-            import re
-
-            contents = re.sub(
-                r"(robocorp-tasks\s*=\s*)\"\^?\d+\.\d+\.\d+",
-                r'\1"^%s' % (version,),
-                contents,
-            )
-            return contents
-
-        def update_version(version, filepath, fix_func=_fix_contents_version):
+        def update_version(version, filepath):
             with open(filepath, "r") as stream:
-                contents = stream.read()
+                before = stream.read()
 
-            new_contents = fix_func(contents, version)
-            if contents != new_contents:
+            after = before
+            for pattern in version_patterns:
+                after = re.sub(pattern, r'\1"%s' % (version,), after)
+
+            if before != after:
                 print("Changed: ", filepath)
                 with open(filepath, "w") as stream:
-                    stream.write(new_contents)
+                    stream.write(after)
 
         # Update version in current project pyproject.toml
         update_version(version, "pyproject.toml")
 
         # Update version in current project __init__.py
-        parts = [".", "src"]
-        parts.extend(package_name.split("."))
-        parts.append("__init__.py")
-        update_version(version, os.path.join(*parts))
+        package_path = package_name.split(".")
+        init_file = Path(root, "src", *package_path, "__init__.py")
+        update_version(version, init_file)
 
     return locals()

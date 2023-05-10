@@ -26,3 +26,6 @@ __pycache__/
 
 # Project generated files
 dist/
+
+# Removed old files
+/examples/

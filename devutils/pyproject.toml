@@ -24,6 +24,8 @@ isort = "^5.12.0"
 types-invoke = "^2.0"
 invoke = "^2.0"
 lazydocs = { git = "https://github.com/robocorp/lazydocs.git" }
+tomlkit = "^0.11.8"
+semver = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core"]
