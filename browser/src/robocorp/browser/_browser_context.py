@@ -153,7 +153,7 @@ def browser_type_launch_args() -> Dict:
     launch_options = {}
     headless = _browser_config().headless
     if headless is None:
-        launch_options["headless"] = _is_debugger_attached()
+        launch_options["headless"] = not _is_debugger_attached()
     else:
         launch_options["headless"] = headless
 

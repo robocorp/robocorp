@@ -14,7 +14,7 @@ def iter_project_dirs():
 
 
 @task
-def update_poetry_lock(ctx: invoke.Context) -> None:
+def poetry_lock(ctx: invoke.Context) -> None:
     """Runs 'poetry lock' on all projects with a pyproject.toml."""
     for project_dir in iter_project_dirs():
         # Note: can't use threads to speed it up. poetry (or pip) just fail...

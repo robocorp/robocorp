@@ -58,19 +58,25 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: which chrome
 
+    - name: Install poetry
+      run: |
+        pipx install poetry
+        
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
-    - name: Install poetry
-      run: |
-        pipx install poetry
-
-    - name: Install dependencies
-      run: poetry install
+        cache: 'poetry'
+        
+    - name: Install invoke/tomlkit
+      run: pip install invoke tomlkit
+      
+    - name: Install dependencies (in dev mode).
+      run: python -m invoke devinstall
+      
     - name: Run Lint
-      run: poetry run invoke lint
+      run: invoke lint
     - name: Run Typecheck
-      run: poetry run invoke typecheck
+      run: invoke typecheck
     - name: Run Unittests
-      run: poetry run invoke test
+      run: invoke test

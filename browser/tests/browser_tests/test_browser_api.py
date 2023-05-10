@@ -15,7 +15,7 @@ def _check_page_query(page_prefix):
 
 
 def test_browser_api(datadir) -> None:
-    from robocorp.browser import page, context, open_url
+    from robocorp.browser import context, open_url, page
 
     initial_page = page()
     page1_html: Path = datadir / "page1.html"

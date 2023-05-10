@@ -1,6 +1,8 @@
-from robocorp.tasks import task
-from robocorp.browser import open_url
 from pathlib import Path
+
+from robocorp.tasks import task
+
+from robocorp.browser import open_url
 
 
 @task

@@ -26,12 +26,12 @@ jobs:
       fail-fast: false
       matrix:
         name: [
-          "ubuntu-py39-logindev",
+          "ubuntu-py39-devmode",
           "windows-py310",
         ]
 
         include:
-          - name: "ubuntu-py39-logindev"
+          - name: "ubuntu-py39-devmode"
             python: "3.9"
             os: ubuntu-latest
             PATH_SEPARATOR: ":"
@@ -45,40 +45,40 @@ jobs:
     - name: Checkout repository and submodules
       uses: actions/checkout@v3
       
-    # Use poetry
     - name: Install poetry
-      run: pipx install poetry
-
+      run: |
+        pipx install poetry
+        
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
         cache: 'poetry'
+        
+    - name: Install invoke/tomlkit
+      run: pip install invoke tomlkit
 
-    - name: Install project
+    - name: Install project (dev)
+      if: contains(matrix.name, '-devmode')
+      run: python -m invoke devinstall
+      
+    - name: Install project (not dev)
+      if: contains(matrix.name, '-devmode') == false
       run: poetry install
       
-    # Uncomment setup below to use the dev version of robocorp-log.    
     - name: Print robocorp-log info and build the output view.
-      if: contains(matrix.name, '-logindev')
-      env:
-        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../log/src
+      if: contains(matrix.name, '-devmode')
       run: |
-        python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
-        python -c "from robocorp import log;print(log.__file__)"
+        poetry run python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
+        poetry run python -c "from robocorp import log;print(log.__file__)"
         cd ../log
         poetry run inv build-output-view
 
-    - name: Test (dev)
-      if: contains(matrix.name, '-logindev')
+    # Note: the env for dev mode or not is already setup at this point.
+    - name: Test
       env:
-        PYTHONPATH: ./src${{ matrix.PATH_SEPARATOR }}../log/src
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
-      run: poetry run pytest -rfE -vv tests/tasks_tests
+      run: |
+        poetry run pytest -rfE -vv tests/tasks_tests
 
-    - name: Test (log from pypi)
-      env:
-        GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
-      if: contains(matrix.name, '-logindev') == false
-      run: poetry run pytest -rfE -vv tests/tasks_tests
 

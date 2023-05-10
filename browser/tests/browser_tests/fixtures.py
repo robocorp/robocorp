@@ -49,7 +49,8 @@ class StrRegression:
 
     def check(self, obtained: str, basename=None, fullpath=None):
         """
-        Checks the given str against a previously recorded version, or generate a new file.
+        Checks the given str against a previously recorded version, or generate
+        a new file.
 
         :param str obtained: The contents obtained
 
@@ -58,8 +59,9 @@ class StrRegression:
             Use either `basename` or `fullpath`.
 
         :param str fullpath: complete path to use as a reference file. This option
-            will ignore ``datadir`` fixture when reading *expected* files but will still use it to
-            write *obtained* files. Useful if a reference file is located in the session data dir for example.
+            will ignore ``datadir`` fixture when reading *expected* files but
+            will still use it to write *obtained* files. Useful if a reference
+            file is located in the session data dir for example.
 
         ``basename`` and ``fullpath`` are exclusive.
         """
@@ -78,8 +80,8 @@ class StrRegression:
             )
 
         def check_fn(obtained_path, expected_path):
-            from itertools import zip_longest
             from io import StringIO
+            from itertools import zip_longest
 
             obtained = obtained_path.read_bytes().decode("utf-8", "replace")
             expected = expected_path.read_bytes().decode("utf-8", "replace")
@@ -113,7 +115,8 @@ class StrRegression:
                         file=stream,
                     )
                 raise AssertionError(
-                    f"Strings don't match. Obtained:\n\n{obtained}\n\nComparison:\n{stream.getvalue()}"
+                    f"Strings don't match. "
+                    f"Obtained:\n\n{obtained}\n\nComparison:\n{stream.getvalue()}"
                 )
 
         perform_regression_check(
