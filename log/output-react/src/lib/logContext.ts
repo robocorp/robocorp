@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, createContext, useContext } from 'react';
+import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
 import { Entry, ViewSettings } from './types';
 
 export const defaultLogState = {
@@ -15,6 +15,7 @@ export const defaultLogState = {
     },
   },
   setViewSettings: () => null,
+  lastUpdatedIndex: { current: 0 },
 };
 
 type LogContext = {
@@ -25,6 +26,7 @@ type LogContext = {
   setActiveIndex: (index: null | number) => void;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
+  lastUpdatedIndex: MutableRefObject<number>;
 };
 
 export const LogContext = createContext<LogContext>(defaultLogState);

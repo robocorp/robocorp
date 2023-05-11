@@ -8,5 +8,21 @@
   <body>
     <div id="root" />
     <script type="module" src="/src/index.tsx"></script>
+    <script>
+      var vscode = () => null;
+
+      setInterval(() => {
+        vscode([
+          {
+            type: 'Suite',
+            source: 'challenge.py',
+            duration: 100,
+            lineNo: 1,
+            date: new Date(),
+            name: 'fill_and_submit_the_form',
+          },
+        ]);
+      }, [1000]);
+    </script>
   </body>
 </html>

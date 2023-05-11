@@ -3,12 +3,29 @@ import { Entry, Type } from './types';
 const searchFn = (haystack: string, needle: string) =>
   haystack.toLowerCase().includes(needle.trim().toLowerCase());
 
+export const addEntries = (currentEntries: Entry[], newEntries: Partial<Entry>[]) => {
+  // TODO: Actual transformation from the log event to Entry has to be done
+  const transformedEntries = newEntries.map(
+    (entry, index) =>
+      ({
+        ...entry,
+        id: `${currentEntries.length + index}`,
+      } as Entry),
+  );
+
+  return currentEntries.concat(transformedEntries);
+};
+
 // TODO: Update search logic
 export const filterEntries = (data: Entry[], filter: string, expandedItems: string[]): Entry[] => {
   return data.filter((entry) => {
     if (entry.id.indexOf('-') > 0 && filter.length === 0) {
       const parentId = entry.id.split('-').slice(0, -1).join('-');
       return expandedItems.includes(parentId);
+    }
+
+    if (filter.length === 0) {
+      return true;
     }
 
     if (entry.type === Type.suite) {
