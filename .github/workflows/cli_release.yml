@@ -209,10 +209,15 @@ jobs:
       needs:
           # Only update index when deploy passes
           - deploy-s3
+      defaults:
+        run:
+          working-directory: ./cli
       steps:
           - uses: actions/checkout@v3
           - name: Generate the new index files
-            run: python3 cli/index.py
+            run: |
+              mkdir -p build/
+              python3 index.py
           - name: Configure AWS credentials for index.html update
             uses: aws-actions/configure-aws-credentials@v1-node16
             with:

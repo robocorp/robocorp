@@ -2,6 +2,9 @@
 
 ## NEXT (not yet released)
 
+## 0.2.10 (date: 11.05.2023)
+- Fix bug in index generation python script
+
 ## 0.2.9 (date: 11.05.2023)
 - Implement index for existing releases
 
