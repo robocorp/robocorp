@@ -8,7 +8,7 @@ export const defaultLogState = {
   activeIndex: null,
   setActiveIndex: () => null,
   viewSettings: {
-    theme: 'light',
+    theme: 'light' as const,
     columns: {
       duration: true,
       location: true,
