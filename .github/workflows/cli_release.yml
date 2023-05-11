@@ -185,6 +185,7 @@ jobs:
           mv build/linux64 s3-drop/
           mv build/windows64 s3-drop/
           ls -l s3-drop/
+          ver=`cat s3-drop/version.txt`
           echo "roboVersion=${ver}" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         with:
