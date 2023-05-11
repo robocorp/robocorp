@@ -41,6 +41,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@robocorp"
           
       - name: Install prettier
         run: |
@@ -57,6 +59,9 @@ jobs:
           npm run test:lint
           npm run test:prettier
           npm run test:types
+        env:
+          CI: true
+          NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         
       - name: Black check
         run: |
