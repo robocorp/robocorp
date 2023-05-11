@@ -2,6 +2,8 @@ name: Log Lint
 
 on:
   push:
+    branches:
+      - "master"
     paths:
       - "log/**"
       - ".github/workflows/log_lint.yml"
@@ -11,7 +13,7 @@ on:
     paths:
       - "log/**"
       - ".github/workflows/log_lint.yml"
-      
+
 defaults:
   run:
     working-directory: './log'
@@ -27,35 +29,35 @@ jobs:
 
       - name: Install poetry
         run: pipx install poetry
-        
+
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
           cache: 'poetry'
-          
+
       - name: Install project
         run: poetry install
-          
+
       - name: Setup node 16.x
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-          
+
       - name: Install prettier
         run: |
           npm install -g prettier@2.4.1
-          
+
       - name: TS Format (yarn prettier --write **/*.ts to format files locally)
         working-directory: ./log/output-webview/
         run: prettier --check **/*.ts
-        
+
       - name: Black check
         run: |
           poetry run black --check src tests --exclude="_index\.py|_index_v2\.py"
-          
+
       - name: mypy robocorp-log
         run: |
           poetry run mypy --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases src tests
-          
-          
+
+
