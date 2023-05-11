@@ -49,6 +49,14 @@ jobs:
       - name: TS Format (yarn prettier --write **/*.ts to format files locally)
         working-directory: ./log/output-webview/
         run: prettier --check **/*.ts
+
+      - name: Test React log
+        working-directory: ./log/output-react/
+        run: |
+          npm ci
+          npm run test:lint
+          npm run test:prettier
+          npm run test:types
         
       - name: Black check
         run: |
