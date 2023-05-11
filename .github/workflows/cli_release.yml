@@ -200,5 +200,5 @@ jobs:
             aws-region: eu-west-1
       - name: Copy files to the deploy drop-box with the AWS CLI
         run: |
-            aws s3 sync cli/s3-drop s3://robo-build-drop-box
+            aws s3 sync s3-drop s3://robo-build-drop-box
 
