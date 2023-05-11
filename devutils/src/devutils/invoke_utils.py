@@ -208,7 +208,7 @@ def build_common_tasks(root: Path, package_name: str):
             print(f"No previous release for {package_name}")
         elif semver.compare(current_version, previous_version) <= 0:
             sys.stderr.write(
-                f"Current version older than previous: {current_version} <= {previous_version}\n"
+                f"Current version older/same than previous: {current_version} <= {previous_version}\n"
             )
             sys.exit(1)
 
@@ -222,6 +222,8 @@ def build_common_tasks(root: Path, package_name: str):
             f'"Release {current_version} for {package_name}"',
             echo=True,
         )
+
+        print(f"Trigger the release with: git push origin {current_tag}")
 
     @task
     def check_tag_version(ctx):
