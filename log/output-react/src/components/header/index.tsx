@@ -34,6 +34,13 @@ export const Header: FC<Props> = ({ filter, setFilter }) => {
     }));
   }, []);
 
+  const onToggleTheme = useCallback(() => {
+    setViewSettings((curr) => ({
+      ...curr,
+      theme: curr.theme === 'dark' ? 'light' : 'dark',
+    }));
+  }, []);
+
   return (
     <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary">
       <BaseHeader size="medium">
@@ -48,6 +55,13 @@ export const Header: FC<Props> = ({ filter, setFilter }) => {
             }
             leaveMenuOpenOnItemSelect
           >
+            <Menu.Title>Theme</Menu.Title>
+            <Menu.Checkbox checked={viewSettings.theme === 'dark'} onClick={onToggleTheme}>
+              Dark
+            </Menu.Checkbox>
+            <Menu.Checkbox checked={viewSettings.theme === 'light'} onClick={onToggleTheme}>
+              Light
+            </Menu.Checkbox>
             <Menu.Title>Columns</Menu.Title>
             <Menu.Checkbox checked={viewSettings.columns.location} onClick={onToggleLocation}>
               Location

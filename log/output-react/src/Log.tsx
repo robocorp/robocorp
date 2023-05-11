@@ -44,7 +44,7 @@ export const Log = () => {
   );
 
   return (
-    <ThemeProvider name="light">
+    <ThemeProvider name={viewSettings.theme}>
       <Main>
         <LogContext.Provider value={logContextValue}>
           <Header filter={filter} setFilter={setFilter} />
