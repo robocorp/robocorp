@@ -52,6 +52,14 @@ jobs:
         working-directory: ./log/output-webview/
         run: prettier --check **/*.ts
 
+      - name: Test React log
+        working-directory: ./log/output-react/
+        run: |
+          npm ci
+          npm run test:lint
+          npm run test:prettier
+          npm run test:types
+        
       - name: Black check
         run: |
           poetry run black --check src tests --exclude="_index\.py|_index_v2\.py"

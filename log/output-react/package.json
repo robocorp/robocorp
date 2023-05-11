@@ -1,0 +1,43 @@
+{
+  "name": "log-ui",
+  "description": "",
+  "version": "0.1.0",
+  "copyright": "Copyright 2021 Robocorp Technologies, Inc.",
+  "license": "SEE LICENSE IN LICENSE",
+  "main": "index.js",
+  "author": {
+    "name": "Robocorp Technologies",
+    "email": "info@robocorp.com",
+    "url": "https://robocorp.com"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test:lint": "eslint './src/**/*.{ts,tsx}' --max-warnings 0",
+    "test:types": "tsc --noEmit",
+    "test:prettier": "prettier --check ./src/**/*.{ts,tsx}"
+  },
+  "dependencies": {
+    "@robocorp/components": "1.0.1-RC3",
+    "@robocorp/icons": "^1.0.0",
+    "@robocorp/theme": "^1.0.0",
+    "date-fns": "^2.30.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-window": "^1.8.9"
+  },
+  "devDependencies": {
+    "@robocorp/eslint-config-frontend": "^1.0.0",
+    "@robocorp/prettier-config-robocorp": "^1.1.1",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.1",
+    "@types/react-window": "^1.8.5",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.39.0",
+    "prettier": "^2.8.8",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.4",
+    "vite-plugin-singlefile": "^0.13.5"
+  },
+  "prettier": "@robocorp/prettier-config-robocorp"
+}
