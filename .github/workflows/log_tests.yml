@@ -4,13 +4,13 @@ on:
   push:
     paths:
       - "log/**"
-      - ".github/workflows/logging_tests.yml"
+      - ".github/workflows/log_tests.yml"
   pull_request:
     branches:
       - "master"
     paths:
       - "log/**"
-      - ".github/workflows/logging_tests.yml"
+      - ".github/workflows/log_tests.yml"
       
 defaults:
   run:

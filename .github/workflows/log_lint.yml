@@ -4,13 +4,13 @@ on:
   push:
     paths:
       - "log/**"
-      - ".github/workflows/logging_lint.yml"
+      - ".github/workflows/log_lint.yml"
   pull_request:
     branches:
       - "master"
     paths:
       - "log/**"
-      - ".github/workflows/logging_lint.yml"
+      - ".github/workflows/log_lint.yml"
       
 defaults:
   run:
