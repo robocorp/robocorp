@@ -15,13 +15,13 @@ const Container = styled(Box)`
 `;
 
 export const Body: FC<Props> = () => {
-  const { entries } = useLogContext();
+  const { entries, lastUpdatedIndex } = useLogContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VariableSizeList>(null);
   const { height } = useSize(containerRef);
 
   const itemCount = useMemo(() => {
-    listRef.current?.resetAfterIndex(0);
+    listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
     return entries.length;
   }, [entries]);
 
