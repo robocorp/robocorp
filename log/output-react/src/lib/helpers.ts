@@ -3,19 +3,6 @@ import { Entry, Type } from './types';
 const searchFn = (haystack: string, needle: string) =>
   haystack.toLowerCase().includes(needle.trim().toLowerCase());
 
-export const addEntries = (currentEntries: Entry[], newEntries: Partial<Entry>[]) => {
-  // TODO: Actual transformation from the log event to Entry has to be done
-  const transformedEntries = newEntries.map(
-    (entry, index) =>
-      ({
-        ...entry,
-        id: `${currentEntries.length + index}`,
-      } as Entry),
-  );
-
-  return currentEntries.concat(transformedEntries);
-};
-
 // TODO: Update search logic
 export const filterEntries = (data: Entry[], filter: string, expandedItems: string[]): Entry[] => {
   return data.filter((entry) => {
@@ -42,12 +29,21 @@ export const filterEntries = (data: Entry[], filter: string, expandedItems: stri
 
 // TODO: Update location format
 export const formatLocation = (entry: Entry) => {
-  return `${entry.source}:${entry.lineNo}`;
+  return `${entry.source}:${entry.lineno}`;
 };
 
 // TODO: Update duration format
-export const formatDuration = (duration: number) => {
-  return `${duration}s`;
+export const formatDuration = (entry: Entry) => {
+  const asObj = <any>entry;
+  const start: number | undefined = asObj.startDeltaInSeconds;
+  if (start !== undefined && start >= 0) {
+    const end: number | undefined = asObj.endDeltaInSeconds;
+    if (end !== undefined && end >= 0) {
+      const duration = end - start;
+      return `${duration}s`;
+    }
+  }
+  return '';
 };
 
 // TODO: Update item heights to cover all special cases

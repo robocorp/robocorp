@@ -13,9 +13,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test:lint": "eslint './src/**/*.{ts,tsx}' --max-warnings 0",
+    "test:lint": "eslint --ext .tsx,.ts --max-warnings 0 .",
     "test:types": "tsc --noEmit",
-    "test:prettier": "prettier --check ./src/**/*.{ts,tsx}"
+    "test:prettier": "prettier --check ./src/**/*.{ts,tsx}",
+    "prettier": "prettier --write ./src/**/*.{ts,tsx}",
+    "fixlint": "eslint --fix --ext .tsx,.ts .",
+    "test": "jest"
   },
   "dependencies": {
     "@robocorp/components": "1.0.1-RC3",
@@ -29,12 +32,16 @@
   "devDependencies": {
     "@robocorp/eslint-config-frontend": "^1.0.0",
     "@robocorp/prettier-config-robocorp": "^1.1.1",
+    "@types/jest": "^29.5.1",
+    "@types/node": "^20.1.2",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.1",
     "@types/react-window": "^1.8.5",
     "@vitejs/plugin-react": "^4.0.0",
     "eslint": "^8.39.0",
+    "jest": "^29.5.0",
     "prettier": "^2.8.8",
+    "ts-jest": "^29.1.0",
     "typescript": "^5.0.4",
     "vite": "^4.3.4",
     "vite-plugin-singlefile": "^0.13.5"

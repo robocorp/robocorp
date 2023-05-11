@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 
 import { Header, Details, Table } from '~/components';
-import { LogContext, dummyData, filterEntries, defaultLogState, addEntries } from '~/lib';
+import { LogContext, dummyData, filterEntries, defaultLogState } from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
 
 const Main = styled.main`
@@ -27,7 +27,7 @@ export const Log = () => {
     window.vscode = (newEntries) => {
       setEntries((current) => {
         lastUpdatedIndex.current = current.length;
-        return addEntries(current, newEntries);
+        return current.concat(newEntries);
       });
     };
   }, []);

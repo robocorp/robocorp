@@ -41,7 +41,7 @@ export const Row: FC<Props> = ({ index, ...rest }) => {
           </Tooltip>
         </Cell>
       )}
-      {viewSettings.columns.duration && <Cell>{formatDuration(entry.duration)}</Cell>}
+      {viewSettings.columns.duration && <Cell>{formatDuration(entry)}</Cell>}
     </Container>
   );
 };

@@ -25,9 +25,8 @@ export enum Type {
 export interface EntryBase {
   id: string;
   source: string;
-  lineNo: number;
-  date: Date;
-  duration: number;
+  lineno: number;
+  type: Type;
 }
 
 export interface EntrySuite extends EntryBase {
@@ -40,6 +39,8 @@ export interface EntryTask extends EntryBase {
   type: Type.task;
   name: string;
   value: string;
+  startDeltaInSeconds: number | -1 | undefined;
+  endDeltaInSeconds: number | -1 | undefined;
 }
 
 export interface EntryVariable extends EntryBase {
