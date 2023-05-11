@@ -201,4 +201,25 @@ jobs:
       - name: Copy files to the deploy drop-box with the AWS CLI
         run: |
             aws s3 sync s3-drop s3://robo-build-drop-box
-
+  update-index:
+      # Way to disable the final deploy steps
+      # if: ${{ false }}
+      timeout-minutes: 10
+      runs-on: ubuntu-20.04
+      needs:
+          # Only update index when deploy passes
+          - deploy-s3
+      steps:
+          - uses: actions/checkout@v3
+          - name: Generate the new index files
+            run: python3 cli/index.py
+          - name: Configure AWS credentials for index.html update
+            uses: aws-actions/configure-aws-credentials@v1-node16
+            with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
+                aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
+                aws-region: eu-west-1
+          - name: Copy files to the deploy drop-box with the AWS CLI
+            run: |
+                aws s3 cp ./build/index.html s3://downloads.robocorp.com/robo/releases/index.html --cache-control max-age=120 --content-type "text/html"
+                aws s3 cp ./build/index.json s3://downloads.robocorp.com/robo/releases/index.json --cache-control max-age=120 --content-type "application/json"
