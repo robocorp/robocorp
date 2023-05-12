@@ -9,6 +9,8 @@ type Props = {
 
 const getTitle = (entry: Entry): ReactNode => {
   switch (entry.type) {
+    case Type.task:
+    // fallthrough
     case Type.suite:
       return entry.name;
     case Type.variable:

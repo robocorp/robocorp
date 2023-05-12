@@ -5,20 +5,32 @@ import {
   IconInformation,
   IconWarningTriangle,
 } from '@robocorp/icons/iconic';
-import { IconStatusError } from '@robocorp/icons';
+import {
+  IconEmptyCircle,
+  IconStatusCompleted,
+  IconStatusError,
+  IconStatusIdle,
+} from '@robocorp/icons';
 import { Badge, Box } from '@robocorp/components';
 
-import { Entry, Status, Type } from '~/lib/types';
+import { Entry, StatusLevel, Type } from '~/lib/types';
 
 type Props = {
   entry: Entry;
 };
 
-const getLogIcon = (status: Status): ReactNode => {
+const getLogIcon = (status: StatusLevel): ReactNode => {
   switch (status) {
-    case Status.warn:
+    case StatusLevel.error:
+      return <IconStatusError color="background.error" />;
+    case StatusLevel.warn:
       return <IconWarningTriangle color="background.notification" />;
-    case Status.info:
+    case StatusLevel.info:
+      return <IconStatusIdle color="background.accent" />;
+    case StatusLevel.success:
+      return <IconStatusCompleted color="background.success" />;
+    case StatusLevel.unset:
+      return <IconEmptyCircle color="background.notification" />;
     default:
       return <IconInformation color="blue60" />;
   }
@@ -31,6 +43,8 @@ const getIcon = (entry: Entry): ReactNode => {
     case Type.variable:
       return <IconBox color="magenta60" />;
     case Type.log:
+      return getLogIcon(entry.status);
+    case Type.task:
       return getLogIcon(entry.status);
     case Type.error:
       return (

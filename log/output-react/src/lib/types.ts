@@ -6,12 +6,12 @@ export type ViewSettings = {
   theme: 'dark' | 'light';
 };
 
-export enum Status {
-  error = 'Error',
-  fail = 'Fail',
-  info = 'Info',
-  warn = 'Warn',
-  success = 'Success',
+export enum StatusLevel {
+  error = 3,
+  warn = 2,
+  info = 1,
+  success = 0,
+  unset = -1,
 }
 
 export enum Type {
@@ -27,6 +27,7 @@ export interface EntryBase {
   source: string;
   lineno: number;
   type: Type;
+  entriesIndex: number;
 }
 
 export interface EntrySuite extends EntryBase {
@@ -38,7 +39,8 @@ export interface EntrySuite extends EntryBase {
 export interface EntryTask extends EntryBase {
   type: Type.task;
   name: string;
-  value: string;
+  libname: string;
+  status: StatusLevel;
   startDeltaInSeconds: number | -1 | undefined;
   endDeltaInSeconds: number | -1 | undefined;
 }
@@ -51,7 +53,7 @@ export interface EntryVariable extends EntryBase {
 
 export interface EntryLog extends EntryBase {
   type: Type.log;
-  status: Status;
+  status: StatusLevel;
   message: string;
   image?: string;
 }

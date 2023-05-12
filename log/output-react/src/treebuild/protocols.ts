@@ -18,7 +18,7 @@ export interface IOpts {
   runId: string | undefined;
   state: IState | undefined;
   onClickReference: Function | undefined;
-  allRunIdsToLabel: object;
+  allRunIdsToLabel: object | undefined;
 
   // Contains the initial file contents.
   initialContents: string | undefined;

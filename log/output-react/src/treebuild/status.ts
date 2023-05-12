@@ -1,16 +1,19 @@
-export function getIntLevelFromStatus(status: string): number {
+import { StatusLevel } from '~/lib/types';
+
+export function getIntLevelFromStatus(status: string): StatusLevel {
   switch (status) {
     case 'FAIL':
     case 'ERROR':
-      return 2;
+      return StatusLevel.error;
     case 'WARN':
-      return 1;
+      return StatusLevel.warn;
     case 'NOT RUN':
     case 'NOT_RUN':
-      return -1;
+      return StatusLevel.unset;
     case 'PASS':
-      return 0;
+      return StatusLevel.success;
     default:
-      return 0;
+      console.log(`Unexpected status: ${status}`);
+      return StatusLevel.unset;
   }
 }

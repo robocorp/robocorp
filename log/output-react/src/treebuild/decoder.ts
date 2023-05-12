@@ -28,7 +28,7 @@ function decode_memo(decoder: Decoder, message: string) {
       memo_value = JSON.parse(memo_value);
     } catch (error) {
       console.log(`Error parsing json: ${memo_value}`);
-      console.log(error);
+      console.log(JSON.stringify(error));
       return null;
     }
     decoder.memo[memo_id] = memo_value;

@@ -15,13 +15,16 @@ const Container = styled(Box)`
 `;
 
 export const Body: FC<Props> = () => {
-  const { entries, lastUpdatedIndex } = useLogContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VariableSizeList>(null);
   const { height } = useSize(containerRef);
+  const { entries, lastUpdatedIndex } = useLogContext();
 
   const itemCount = useMemo(() => {
-    listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
+    // Commented out due to:
+    // Cannot update during an existing state transition (such as within `render`). Render methods should be a pure function of props and state.
+    // TODO: Check side-effect of doing this with rihards.
+    // listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
     return entries.length;
   }, [entries]);
 

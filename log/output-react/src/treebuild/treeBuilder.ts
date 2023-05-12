@@ -1,4 +1,4 @@
-import { Type, EntryBase, EntryTask } from '../lib/types';
+import { Type, EntryBase, EntryTask, Entry, StatusLevel } from '../lib/types';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
 import { getOpts } from './options';
 import { IOpts, PythonTraceback } from './protocols';
@@ -65,17 +65,17 @@ class TBHandler {
 }
 
 class FlattenedTree {
-  public entries: EntryBase[] = [];
+  public entries: Entry[] = [];
 
-  public stack: EntryBase[] = [];
+  public stack: Entry[] = [];
 
-  private parentId = 'root';
+  private parentId = '';
 
   private seqId = 0;
 
   newScopeId(): string {
     this.seqId += 1;
-    const newId = `${this.parentId}-${this.seqId}`;
+    const newId = this.parentId === undefined ? 'root' : `${this.parentId}-${this.seqId}`;
     this.parentId = newId;
     return newId;
   }
@@ -84,12 +84,14 @@ class FlattenedTree {
     const entry: EntryTask = {
       id: this.newScopeId(),
       type: Type.task,
-      name: `${msg.decoded.libname}.${msg.decoded.name}`,
-      value: '',
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
       source: msg.decoded.source,
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
     };
     this.stack.push(entry);
     this.entries.push(entry);
@@ -102,17 +104,21 @@ class FlattenedTree {
         console.log(
           `Unable to find task start when receiving end task message: ${JSON.stringify(msg)}.`,
         );
+        return;
       }
       entry = this.stack.pop();
       if (entry?.type === Type.task) {
         break;
       }
     }
-    const taskScopeEntry: EntryTask = <EntryTask>entry;
-
+    // Note: create a copy and assign it in the entries array (we don't want to mutate the
+    // entry that's being used in react).
+    const taskScopeEntry: EntryTask = <EntryTask>Object.assign({}, entry);
     const { status } = msg.decoded;
-    const iLevel = getIntLevelFromStatus(status);
+    taskScopeEntry.status = getIntLevelFromStatus(status);
     taskScopeEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
+
+    this.entries[taskScopeEntry.entriesIndex] = taskScopeEntry;
   }
 }
 
@@ -216,6 +222,12 @@ export class TreeBuilder {
         await this.addOneMessage(msg);
       }
     }
+
+    // TODO: properly compute from where we should update (we have to
+    // check what was the first item which was updated as we could be
+    // changing previous entries when the element is being closed).
+    const updateFromIndex = 0;
+    window.setAllEntries(this.flattened.entries, updateFromIndex);
   }
 
   private async addOneMessage(msg: IMessage): Promise<void> {

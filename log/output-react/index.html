@@ -1,28 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Log</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <div id="root" />
-    <script type="module" src="/src/index.tsx"></script>
-    <script>
-      var vscode = () => null;
 
-      setInterval(() => {
-        vscode([
-          {
-            type: 'Suite',
-            source: 'challenge.py',
-            duration: 100,
-            lineno: 1,
-            date: new Date(),
-            name: 'fill_and_submit_the_form',
-          },
-        ]);
-      }, [1000]);
-    </script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <title>Log</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+  <div id="root" />
+  <script type="module" src="/src/index.tsx"></script>
+  <script>
+    window.onload = function () {
+      try {
+        const vscode = acquireVsCodeApi();
+        window.setVSCodeAPI(vscode);
+      } catch (err) {
+        // That's ok (not running in VSCode).
+        window.setContents({
+          "initialContents": window.getSampleContents(),
+        });
+      }
+
+
+      // entry = {
+      //   id: 'root',
+      //   type: 'Task',
+      //   name: `Entry name`,
+      //   value: 'Entry value',
+      //   source: 'source.py',
+      //   lineno: 20,
+      //   endDeltaInSeconds: -1,
+      //   startDeltaInSeconds: -1,
+      //   entriesIndex: 0,
+      // };
+
+      // entries = [
+      // ];
+
+      // setInterval(() => {
+      //   entries.push(entry);
+      //   setAllEntries(entries);
+      // }, [1000]);
+    };
+  </script>
+</body>
+
+
 </html>

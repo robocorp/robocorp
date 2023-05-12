@@ -50,6 +50,7 @@ export interface IEventMessage {
   type: 'event';
   seq: number;
   event: string;
+  data?: any;
 }
 
 export interface ISetContentsRequest {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 
 import { Header, Details, Table } from '~/components';
-import { LogContext, dummyData, filterEntries, defaultLogState } from '~/lib';
+import { LogContext, filterEntries, defaultLogState } from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
 
 const Main = styled.main`
@@ -17,20 +17,28 @@ export const Log = () => {
   const [expandedEntries, setExpandedEntries] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
-  const [entries, setEntries] = useState<Entry[]>(dummyData());
+  const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
   const lastUpdatedIndex = useRef<number>(0);
 
   /**
    * Listen to VS Code callback and add new entries
    */
   useEffect(() => {
-    window.vscode = (newEntries) => {
+    window.addEntries = (newEntries: Entry[]) => {
       setEntries((current) => {
         lastUpdatedIndex.current = current.length;
         return current.concat(newEntries);
       });
     };
   }, []);
+
+  window.setAllEntries = (newEntries: Entry[], updatedFromIndex: number = 0) => {
+    // console.log('SET ALL ENTRIES!', JSON.stringify(newEntries));
+    setEntries(() => {
+      lastUpdatedIndex.current = updatedFromIndex;
+      return [...newEntries];
+    });
+  };
 
   /**
    * Filter entries by current filter and expanded entries
