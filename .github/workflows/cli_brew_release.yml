@@ -28,17 +28,6 @@ jobs:
           git config user.name Kerkko Pelttari
           git config user.email kerkko@robocorp.com
 
-      - uses: actions/setup-node@v3
-        with:
-            node-version:  '16.x'
-            registry-url: https://npm.pkg.github.com/
-            scope: '@robocorp'
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7' # Not needed with a .ruby-version file
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-
       - name: download latest rcc
         run: |
           mkdir -p cli/dist/macos64/
@@ -47,5 +36,3 @@ jobs:
 
       - name: package cask
         run: cd cli && invoke macos-push-brew dist/macos64/robo ${{github.event.inputs.name}}
-        continue-on-error: true
-
