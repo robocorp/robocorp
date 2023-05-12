@@ -1,8 +1,10 @@
 package include
 
 import (
+	"fmt"
 	"path"
 
+	"github.com/robocorp/robo/cli/paths"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -34,5 +36,13 @@ func (t Template) FilterValue() string { return t.Name }
 
 func (t *Template) Copy(dst string) error {
 	src := path.Join("templates", t.DirName)
+	exists, err := paths.Exists(dst)
+	if exists {
+		return fmt.Errorf("Path already exists: %v", dst)
+	}
+	if err != nil {
+		return err
+	}
+
 	return CopyDir(src, dst, 0o755)
 }

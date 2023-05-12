@@ -176,9 +176,10 @@ func (m model) updateStateName(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.Type == tea.KeyEnter {
-			if value := m.nameInput.Value(); len(value) > 0 {
+			value := m.nameInput.Value()
+			if dirName := paths.Sanitize(value); len(dirName) > 0 {
 				m.name = value
-				m.dirName = paths.Sanitize(value)
+				m.dirName = dirName
 				m.currentState = StateInstall
 				return m, m.installProject()
 			}

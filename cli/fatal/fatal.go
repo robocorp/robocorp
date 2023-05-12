@@ -16,7 +16,7 @@ type FatalExit struct {
 }
 
 func FatalErrorf(format string, a ...any) {
-	msg := "\n" + errorTitle("Error") + "\n\n" + fmt.Sprintf(format, a...)
+	msg := "\n\n" + errorTitle("Error") + "\n\n" + fmt.Sprintf(format, a...)
 	panic(FatalExit{Code: 1, Message: msg})
 }
 
