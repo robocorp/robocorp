@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/robocorp/robo/cli/fatal"
 	"github.com/robocorp/robo/cli/operations/run"
 	"github.com/spf13/cobra"
@@ -16,8 +18,13 @@ var runCmd = &cobra.Command{
 			task = args[0]
 		}
 
-		if err := run.RunTask(directory, task); err != nil {
+		result, err := run.RunTask(directory, task)
+		if err != nil {
 			fatal.FatalError(err)
+		}
+
+		if !result.Status {
+			os.Exit(1)
 		}
 	},
 }

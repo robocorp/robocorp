@@ -142,7 +142,10 @@ func (m model) View() string {
 			section("Project name:", m.name),
 			section("Directory name:", m.dirName),
 			m.installProgress.ViewAs(1.0),
-			"\nCreated project ✨\n",
+			"",
+			"Created project ✨",
+			faintText("To run the project ")+"cd "+m.dirName+faintText(" and then ")+"robo run",
+			"",
 		)
 	}
 

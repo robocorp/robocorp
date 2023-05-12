@@ -2,6 +2,7 @@ package output
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type EventType string
@@ -13,6 +14,7 @@ const (
 	EventTypeInitialTime                 = "InitialTime"
 	EventTypeLog                         = "Log"
 	EventTypeLogHtml                     = "LogHtml"
+	EventTypeConsole                     = "Console"
 	EventTypeStartRun                    = "StartRun"
 	EventTypeEndRun                      = "EndRun"
 	EventTypeStartTask                   = "StartTask"
@@ -45,21 +47,22 @@ func New() Events {
 	}
 }
 
-func (e *Events) Parse(line string) {
+func (e *Events) Parse(line string) (*Event, error) {
 	var event Event
 	if err := json.Unmarshal([]byte(line), &event.Fields); err != nil {
-		return
+		return nil, err
 	}
 
 	eventType, ok := event.Fields["message_type"].(string)
 	if !ok {
-		return
+		return nil, fmt.Errorf("Invalid message_type field")
 	}
 
 	event.Type = TypeFromString(eventType)
 	delete(event.Fields, "message_type")
 
 	e.events = append(e.events, event)
+	return &event, nil
 }
 
 func TypeFromString(value string) EventType {
@@ -76,6 +79,8 @@ func TypeFromString(value string) EventType {
 		return EventTypeLog
 	case "LH":
 		return EventTypeLogHtml
+	case "C":
+		return EventTypeConsole
 	case "SR":
 		return EventTypeStartRun
 	case "ER":

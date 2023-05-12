@@ -14,30 +14,31 @@ var (
 	bold = ui.DefaultStyles().Bold.Render
 )
 
-func RunTask(dir, name string) error {
+func RunTask(dir, name string) (tasks.Result, error) {
 	cfg, err := config.FromPath(dir)
 	if err != nil {
-		return err
+		return tasks.Result{}, err
 	}
 
 	env, err := environment.EnsureWithProgress(cfg)
 	if err != nil {
-		return err
+		return tasks.Result{}, err
 	}
 
+	fmt.Println("")
 	if name == "" {
 		fmt.Println("Parsing tasks")
 		name, err = selectTask(env)
 		if err != nil {
-			return err
+			return tasks.Result{}, err
 		}
 	}
 
 	if err := clearOutput(cfg); err != nil {
-		return err
+		return tasks.Result{}, err
 	}
 
-	fmt.Println("\nRunning task: " + bold(name))
+	fmt.Println("Running task: " + bold(name))
 	return tasks.Run(env, name)
 }
 
