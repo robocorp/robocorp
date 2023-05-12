@@ -5,7 +5,7 @@ on:
       name:
         description: 'Version to upload'
         required: true
-        default: 'vx.x.x'
+        default: 'x.x.x'
 jobs:
   robo:
     name: robo
@@ -42,7 +42,7 @@ jobs:
       - name: download latest rcc
         run: |
           mkdir -p cli/dist/macos64/
-          version_number=[${{github.event.inputs.name}}]
+          version_number=${{github.event.inputs.name}}
           curl "https://downloads.robocorp.com/robo/releases/${version_number}/macos64/robo" -o cli/dist/macos64/robo
 
       - name: package cask
