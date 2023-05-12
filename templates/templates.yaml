@@ -5,5 +5,5 @@ templates:
   - name: Browser
     desc: Browser automation template
     dirName: browser
-  - name: Producer-Consumer
-    desc: Template for Producer-Consumer pattern in Control Room
+#  - name: Producer-Consumer
+#    desc: Template for Producer-Consumer pattern in Control Room
