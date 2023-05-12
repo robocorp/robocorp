@@ -1,6 +1,6 @@
 # robo command line tool
 
-## CLI
+## Functionality
 
 The `robo` CLI is used to manage and run your projects during development, and it bundles your project for deployment.
 

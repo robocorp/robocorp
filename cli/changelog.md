@@ -1,6 +1,7 @@
 # robo cli change log
 
 ## NEXT (not yet released)
+- Add to brew
 - Fix changelog link on downloads index page
 
 ## 0.2.10 (date: 11.05.2023)

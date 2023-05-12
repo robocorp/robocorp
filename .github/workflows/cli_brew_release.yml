@@ -1,0 +1,51 @@
+name: Update Latest RCC (brew and latest)
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Version to upload'
+        required: true
+        default: 'vx.x.x'
+jobs:
+  rcc:
+    name: rcc
+    runs-on: ubuntu-latest
+    steps:
+      - name: main checkout
+        uses: actions/checkout@v3
+      - name: setup invoke
+        run: pipx install invoke
+      - name: homebrew cask checkout
+        uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.CASK_REPO_KEY }}
+          repository: robocorp/homebrew-tools
+          path: ./cli/cask
+
+      - name: configure homebrew cask git
+        run: |
+          cd ./cli/cask
+          git config user.name Kerkko Pelttari
+          git config user.email kerkko@robocorp.com
+
+      - uses: actions/setup-node@v3
+        with:
+            node-version:  '16.x'
+            registry-url: https://npm.pkg.github.com/
+            scope: '@robocorp'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+      - name: download latest rcc
+        run: |
+          mkdir -p cli/dist/macos64/
+          version_number=[${{github.event.inputs.name}}]
+          curl "https://downloads.robocorp.com/robo/releases/${version_number}/macos64/robo" -o cli/dist/macos64/robo
+
+      - name: package cask
+        run: cd cli && invoke macos-push-brew cli/dist/macos64/robo [${{github.event.inputs.name}}]
+        continue-on-error: true
+
