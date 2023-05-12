@@ -57,7 +57,7 @@ def hello():
 
 The above minimum example defines a task, which can then be executed with `robo run`.
 
-Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials, and refer to the [API documentation](docs/README.md) to learn how to use the different libraries. If you have further questions or want to help, join our (Forum)[https://forum.robocorp.com/].
+Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials, and refer to the [API documentation](docs/README.md) to learn how to use the different libraries. If you have further questions or want to help, join our [Forum](https://forum.robocorp.com/).
 
 ## CLI
 
