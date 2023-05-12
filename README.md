@@ -6,7 +6,7 @@
 
 # Robo is an all-in-one Python automation framework
 
-## Create, develop, run, and deploy your automation code with Robo - and operate it all with Control Room
+## Create, develop, run, and deploy your automation code with Robo - and operate it all with [Control Room](https://robocorp.com/products/control-room)
 
 Supports Windows, MacOS, and Linux
 
@@ -33,6 +33,31 @@ Robo is both a CLI for managing your Python projects, and a set of libraries for
 - **Troubleshoot easily.** Robo automatically traces your automation task, and create an easy-to-read report of what happened. You can quickly see if something went wrong - and how to fix it.
 
 Robo is designed to function as a single tool that helps you more easily get things done. It is entirely compatible with the PyPI and Conda ecosystems, but also brings in a set of libraries designed from the ground up to be focused on automation.
+
+## Getting started
+
+To install Robo, visit our [downloads site](https://downloads.robocorp.com/robo/releases/index.html) to get the latest version.
+
+After downloading, you can create a new project with:
+```bash
+robo new
+```
+
+It will interactively prompt for project name and type, after which it'll create a new environment for the project. This might take a few minutes for the first time, but results are cached and will be quick on later iterations.
+
+Looking at the created `tasks.py`, the runnable portions of the project are defined with a `@task` decorator. It tells `robo` that the function implements one specific automation task, which can then later be scheduled to run in [Control Room](https://robocorp.com/products/control-room).
+
+```python
+from robocorp.tasks import task
+
+@task
+def hello():
+    print("Hello World!")
+```
+
+The above minimum example defines a task, which can then be executed with `robo run`.
+
+Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials, and refer to the [API documentation](docs/README.md) to learn how to use the different libraries. If you have further questions or want to help, join our (Forum)[https://forum.robocorp.com/].
 
 ## CLI
 
@@ -81,9 +106,3 @@ Automate actions in a browser, powered by [Playwright](https://playwright.dev/).
 #### `robocorp.http`
 
 Download files easily, or make custom HTTP requests.
-
-## Documentation
-
-To see how to use the libraries, refer to [API documentation](docs/README.md) hosted in the repository.
-
-For in-depth tutorials and troubleshooting guides, refer to [Robocorp Docs](https://robocorp.com/docs).
