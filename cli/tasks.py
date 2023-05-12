@@ -225,7 +225,10 @@ end
 
 @task
 def macos_push_brew(ctx, filename: str, version: str):
-    """Create artifact for brew cask """
+    """Create artifact for brew cask and push it.
+
+    Requires a local clone of the robocorp/homebrew-tools to be under path `cask`."""
+    assert Path("cask").is_dir()
 
     import hashlib
     with open(filename,"rb") as f:
@@ -240,7 +243,6 @@ def macos_push_brew(ctx, filename: str, version: str):
     with open("cask/Casks/robo.rb", "w") as f:
         f.write(ruby_cask_file)
 
-
-    ctx.run("cd cask && git add -u")
+    ctx.run("cd cask && git add Casks/robo.rb")
     ctx.run(f'cd cask && git commit -m "robo updated to {version}"')
     ctx.run("cd cask && git push")
