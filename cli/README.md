@@ -20,6 +20,45 @@ Easily run an arbitrary command within the isolated environment, such as shell c
 
 Package your project as a Control Room compatible bundle, ready for deployment.
 
+## Installing RCC from command line
+
+### Windows
+
+1. Open the command prompt
+1. Download: `curl -o robo.exe https://downloads.robocorp.com/robo/releases/latest/windows64/robo.exe`
+1. [Add to system path](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/): Open Start -> `Edit the system environment variables`
+1. Test: `robo`
+
+### macOS
+
+Coming soon
+#### Brew cask from Robocorp tap
+
+1. Install: `brew install robocorp/tools/robo`
+1. Test: `robo`
+
+Upgrading: `brew upgrade robo`
+
+#### Raw download
+
+1. Open the terminal
+1. Download: `curl -o robo https://downloads.robocorp.com/robo/releases/latest/macos64/robo`
+1. Make the downloaded file executable: `chmod a+x robo`
+1. Add to path: `sudo mv robo /usr/local/bin/`
+1. Test: `robo`
+
+### Linux
+
+1. Open the terminal
+1. Download: `curl -o robo https://downloads.robocorp.com/robo/releases/latest/linux64/robo`
+1. Make the downloaded file executable: `chmod a+x robo`
+1. Add to path: `sudo mv robo /usr/local/bin/`
+1. Test: `robo`
+
+### [Direct downloads for signed executables provided by Robocorp](https://downloads.robocorp.com/robo/releases/index.html)
+
+Follow above link to download site. Both tested and bleeding edge versions are available from same location.
+
 
 # development instructions
 
@@ -31,3 +70,11 @@ Package your project as a Control Room compatible bundle, ready for deployment.
 4. Tag the commit matching the pattern `cli-<version>` (e.g. `cli-0.1.0`)
 5. Push the commit and tag to GitHub
 6. Wait for CI to build the new release and upload the artifacts.
+
+## Marking a release as "stable" / latest
+
+1. Run the AWS codebuild for Robo
+
+## Updating the stable version in Homebrew
+
+1. Run the "Update Robo in Homebrew" github action in https://github.com/robocorp/packaging/actions, pass in the desired version.
