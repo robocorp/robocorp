@@ -242,5 +242,5 @@ def macos_push_brew(ctx, filename: str, version: str):
 
 
     ctx.run("cd cask && git add -u")
-    ctx.run(f"cd cask && git commit -m robo updated to {version}")
+    ctx.run(f'cd cask && git commit -m "robo updated to {version}"')
     ctx.run("cd cask && git push")

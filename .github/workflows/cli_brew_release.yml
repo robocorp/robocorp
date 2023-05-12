@@ -46,6 +46,6 @@ jobs:
           curl "https://downloads.robocorp.com/robo/releases/${version_number}/macos64/robo" -o cli/dist/macos64/robo
 
       - name: package cask
-        run: cd cli && invoke macos-push-brew dist/macos64/robo [${{github.event.inputs.name}}]
+        run: cd cli && invoke macos-push-brew dist/macos64/robo ${{github.event.inputs.name}}
         continue-on-error: true
 
