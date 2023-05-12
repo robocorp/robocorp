@@ -1,4 +1,4 @@
-name: Update Latest RCC (brew and latest)
+name: Update Robo in Homebrew
 on:
   workflow_dispatch:
     inputs:
@@ -7,8 +7,8 @@ on:
         required: true
         default: 'vx.x.x'
 jobs:
-  rcc:
-    name: rcc
+  robo:
+    name: robo
     runs-on: ubuntu-latest
     steps:
       - name: main checkout
