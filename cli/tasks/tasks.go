@@ -60,7 +60,10 @@ func Run(env environment.Environment, name string) (Result, error) {
 
 	events := output.New()
 	proc.StdoutListener = func(line string) {
-		event, _ := events.Parse(line)
+		event, err := events.Parse(line)
+		if err != nil {
+			return
+		}
 		if res, end := handleEvent(event); end {
 			result = res
 		}
