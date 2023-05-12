@@ -1,6 +1,6 @@
 # robo command line tool
 
-## Functionality
+## Command
 
 The `robo` CLI is used to manage and run your projects during development, and it bundles your project for deployment.
 
@@ -20,7 +20,7 @@ Easily run an arbitrary command within the isolated environment, such as shell c
 
 Package your project as a Control Room compatible bundle, ready for deployment.
 
-## Installing RCC from command line
+## Installing robo from the command line
 
 ### Windows
 
@@ -59,10 +59,9 @@ Upgrading: `brew upgrade robo`
 
 Follow above link to download site. Both tested and bleeding edge versions are available from same location.
 
+## Development instructions
 
-# development instructions
-
-## Releasing
+### Releasing
 
 1. Update the version in `cli/VERSION`
 2. Add the new version and a short description of changes to `cli/CHANGELOG.md`
@@ -71,10 +70,10 @@ Follow above link to download site. Both tested and bleeding edge versions are a
 5. Push the commit and tag to GitHub
 6. Wait for CI to build the new release and upload the artifacts.
 
-## Marking a release as "stable" / latest
+### Marking a release as "stable" / latest
 
 1. Run the AWS codebuild for Robo
 
-## Updating the stable version in Homebrew
+### Updating the stable version in Homebrew
 
 1. Run the "Update Robo in Homebrew" github action in https://github.com/robocorp/packaging/actions, pass in the desired version.
