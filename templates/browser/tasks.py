@@ -1,6 +1,3 @@
-from pathlib import Path
-from time import sleep
-
 from robocorp import browser, excel, http
 from robocorp.tasks import task
 
@@ -8,18 +5,29 @@ from robocorp.tasks import task
 @task
 def solve_challenge():
     """Solve the RPA challenge"""
-    page = browser.open_url("http://rpachallenge.com/", headless=False)
+
+    browser.configure(
+        # slowmo=100,  # Can be used to activate slow-motion (in millis)
+        browser_engine="chrome",  # Can be chrome or firefox
+        screenshot="only-on-failure",
+        headless=False,
+    )
+    page = browser.open_url("http://rpachallenge.com/")
 
     http.download("http://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
-    rows = excel.open_workbook("challenge.xlsx").worksheet("Sheet1").as_table(header=True)
+    rows = (
+        excel.open_workbook("challenge.xlsx").worksheet("Sheet1").as_table(header=True)
+    )
 
     page.click("button:text('Start')")
     for row in rows:
         fill_and_submit_form(row)
 
     element = page.locator("css=div.congratulations")
-    element.screenshot(path=Path("output", "screenshot.png"))
-    sleep(2)
+
+    # Can be used to add a screenshot to the logs. If not given any element
+    # would take a screenshot of the full page.
+    browser.screenshot(element)
 
 
 def fill_and_submit_form(row):
@@ -32,4 +40,3 @@ def fill_and_submit_form(row):
     page.fill('//input[@ng-reflect-name="labelEmail"]', row["Email"])
     page.fill('//input[@ng-reflect-name="labelPhone"]', str(row["Phone Number"]))
     page.click("input:text('Submit')")
-    sleep(0.5)
