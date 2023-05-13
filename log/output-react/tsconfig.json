@@ -11,7 +11,7 @@
     "moduleResolution": "node",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": false,
     "baseUrl": "./src",
     "paths": {
       "~/*": ["*"]

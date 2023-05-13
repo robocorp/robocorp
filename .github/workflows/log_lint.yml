@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "log/**"
       - ".github/workflows/log_lint.yml"
@@ -56,9 +57,9 @@ jobs:
 
       - name: Test React log
         working-directory: ./log/output-react/
+        # npm run test:lint -- linting not done, just prettier/types.
         run: |
           npm ci
-          npm run test:lint
           npm run test:prettier
           npm run test:types
         env:

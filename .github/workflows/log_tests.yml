@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "log/**"
       - ".github/workflows/log_tests.yml"
@@ -69,6 +70,8 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
+        registry-url: "https://npm.pkg.github.com"
+        scope: "@robocorp"
 
     - name: Install project
       run: poetry install
@@ -83,6 +86,17 @@ jobs:
         yarn install
         yarn build-test
         yarn build-test-v2
+
+    - name: Build output view (react)
+      if: contains(matrix.name, '-outviewintegrationtests')
+      working-directory: ./log/output-react
+      run: |
+        npm ci
+        npm run build:tests
+        npm run test
+      env:
+        CI: true
+        NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     - name: Test
       working-directory: ./log/tests
@@ -110,3 +124,8 @@ jobs:
         name: screenshot.${{ matrix.name }}.png
         path: log/output-webview/tests_robo/output/screenshot.png
 
+    - uses: actions/upload-artifact@v3
+      if: always() && contains(matrix.name, '-outviewintegrationtests')
+      with:
+        name: robo_log_react.${{ matrix.name }}.html
+        path: log/output-react/tests_robo/output/log.html

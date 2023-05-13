@@ -6,8 +6,6 @@ import subprocess
 
 
 def run_in_rcc(rcc_loc: str, cwd: Union[str, Path]):
-    import subprocess
-
     env = os.environ.copy()
     env.pop("PYTHONPATH", "")
     env.pop("PYTHONHOME", "")
@@ -18,8 +16,14 @@ def run_in_rcc(rcc_loc: str, cwd: Union[str, Path]):
 
 
 def run_in_robo(robo_loc: str, cwd: Union[str, Path]) -> subprocess.CompletedProcess:
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", "")
+    env.pop("PYTHONHOME", "")
+    env.pop("VIRTUAL_ENV", "")
+    env["PYTHONIOENCODING"] = "utf-8"
+
     completed_process = subprocess.run(
-        [robo_loc, "run"], cwd=cwd, stdout=subprocess.PIPE
+        [robo_loc, "run"], cwd=cwd, stdout=subprocess.PIPE, env=env
     )
 
     if completed_process.returncode != 0:
@@ -111,3 +115,18 @@ def test_output_view_integrated_robo(
     completed_process = run_in_robo(robo_loc, path_for_output_view_tests_robo)
     stdout = completed_process.stdout.decode("utf-8")
     assert "Running task: check_output_webview" in stdout
+
+
+def test_output_view_integrated_robo_react(
+    robo_loc: str,
+    path_for_output_view_react_tests_robo: Path,
+    run_integration_tests_flag,
+):
+    if not run_integration_tests_flag:
+        pytest.skip(f"Disabled (not running integration tests).")
+
+    tasks_py = path_for_output_view_react_tests_robo / "tasks.py"
+    assert tasks_py.exists()
+    completed_process = run_in_robo(robo_loc, path_for_output_view_react_tests_robo)
+    stdout = completed_process.stdout.decode("utf-8")
+    assert "Running task: check_output_webview_react" in stdout

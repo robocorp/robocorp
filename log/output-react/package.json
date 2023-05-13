@@ -12,7 +12,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --minify=esbuild --outDir=./dist_v3",
+    "build:tests": "vite build -m=debug --minify=false --outDir=./dist-test_v3",
     "test:lint": "eslint --ext .tsx,.ts --max-warnings 0 .",
     "test:types": "tsc --noEmit",
     "test:prettier": "prettier --check ./src/**/*.{ts,tsx}",

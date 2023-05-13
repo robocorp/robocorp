@@ -1,4 +1,5 @@
 import { Type, EntryBase, EntryTask, Entry, StatusLevel } from '../lib/types';
+import { setAllEntriesWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
 import { getOpts } from './options';
 import { IOpts, PythonTraceback } from './protocols';
@@ -74,8 +75,9 @@ class FlattenedTree {
   private seqId = 0;
 
   newScopeId(): string {
+    const newId =
+      this.parentId.length === 0 ? `root${this.seqId}` : `${this.parentId}-${this.seqId}`;
     this.seqId += 1;
-    const newId = this.parentId === undefined ? 'root' : `${this.parentId}-${this.seqId}`;
     this.parentId = newId;
     return newId;
   }
@@ -113,7 +115,7 @@ class FlattenedTree {
     }
     // Note: create a copy and assign it in the entries array (we don't want to mutate the
     // entry that's being used in react).
-    const taskScopeEntry: EntryTask = <EntryTask>Object.assign({}, entry);
+    const taskScopeEntry: EntryTask = <EntryTask>{ ...entry };
     const { status } = msg.decoded;
     taskScopeEntry.status = getIntLevelFromStatus(status);
     taskScopeEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
@@ -227,7 +229,7 @@ export class TreeBuilder {
     // check what was the first item which was updated as we could be
     // changing previous entries when the element is being closed).
     const updateFromIndex = 0;
-    window.setAllEntries(this.flattened.entries, updateFromIndex);
+    setAllEntriesWhenPossible(this.flattened.entries, updateFromIndex);
   }
 
   private async addOneMessage(msg: IMessage): Promise<void> {

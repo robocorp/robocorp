@@ -1,4 +1,4 @@
-import { StatusLevel } from '~/lib/types';
+import { StatusLevel } from '../lib/types';
 
 export function getIntLevelFromStatus(status: string): StatusLevel {
   switch (status) {

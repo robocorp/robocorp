@@ -1,5 +1,5 @@
 [tool.robo]
-name = "RPA Challenge"
+name = "Test React output"
 description = "Tests the browser output using playwright."
 python = "3.9.13"
 

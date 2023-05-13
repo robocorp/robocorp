@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
-
 import { Header, Details, Table } from '~/components';
 import { LogContext, filterEntries, defaultLogState } from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
+import { reactCallSetAllEntriesCallback } from './treebuild/effectCallbacks';
 
 const Main = styled.main`
   display: grid;
@@ -21,24 +21,16 @@ export const Log = () => {
   const lastUpdatedIndex = useRef<number>(0);
 
   /**
-   * Listen to VS Code callback and add new entries
+   * Register callback which should be used to set entries.
    */
   useEffect(() => {
-    window.addEntries = (newEntries: Entry[]) => {
-      setEntries((current) => {
-        lastUpdatedIndex.current = current.length;
-        return current.concat(newEntries);
+    reactCallSetAllEntriesCallback((newEntries: Entry[], updatedFromIndex = 0) => {
+      setEntries(() => {
+        lastUpdatedIndex.current = updatedFromIndex;
+        return [...newEntries];
       });
-    };
-  }, []);
-
-  window.setAllEntries = (newEntries: Entry[], updatedFromIndex: number = 0) => {
-    // console.log('SET ALL ENTRIES!', JSON.stringify(newEntries));
-    setEntries(() => {
-      lastUpdatedIndex.current = updatedFromIndex;
-      return [...newEntries];
     });
-  };
+  }, []);
 
   /**
    * Filter entries by current filter and expanded entries

@@ -19,7 +19,7 @@ export const Step: FC<Props> = ({ entry }) => {
   const depth = entry.id.split('-').length - 1;
 
   return (
-    <Container depth={depth}>
+    <Container depth={depth} id={entry.id}>
       <Toggle entry={entry} />
       <Icon entry={entry} />
       <Title entry={entry} />

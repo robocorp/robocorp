@@ -42,7 +42,7 @@ export const Header: FC<Props> = ({ filter, setFilter }) => {
   }, []);
 
   return (
-    <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary">
+    <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary" id="base-header">
       <BaseHeader size="medium">
         <BaseHeader.Title title="Python RPA Challenge">
           <Badge variant="danger" label="Failed" size="small" />

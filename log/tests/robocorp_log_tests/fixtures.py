@@ -219,6 +219,18 @@ def path_for_output_view_tests_robo(path_for_output_view_tests) -> Path:
     return (path_for_output_view_tests / ".." / "tests_robo").absolute()
 
 
+@pytest.fixture(scope="session")
+def path_for_output_view_react_tests_robo() -> Path:
+    f = Path(__file__).parent
+    robotframework_output_stream_root = f / ".." / ".."
+    contents = os.listdir(robotframework_output_stream_root)
+    assert "output-react" in contents
+    ret = robotframework_output_stream_root / "output-react"
+    assert ret.exists()
+
+    return (ret / "tests_robo").absolute()
+
+
 def _download_rcc(location: str, force: bool = False) -> None:
     """
     Downloads rcc to the given location. Note that we don't overwrite it if it

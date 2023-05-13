@@ -11,7 +11,7 @@
   <div id="root" />
   <script type="module" src="/src/index.tsx"></script>
   <script>
-    window.onload = function () {
+    window.addEventListener('load', function () {
       try {
         const vscode = acquireVsCodeApi();
         window.setVSCodeAPI(vscode);
@@ -21,28 +21,7 @@
           "initialContents": window.getSampleContents(),
         });
       }
-
-
-      // entry = {
-      //   id: 'root',
-      //   type: 'Task',
-      //   name: `Entry name`,
-      //   value: 'Entry value',
-      //   source: 'source.py',
-      //   lineno: 20,
-      //   endDeltaInSeconds: -1,
-      //   startDeltaInSeconds: -1,
-      //   entriesIndex: 0,
-      // };
-
-      // entries = [
-      // ];
-
-      // setInterval(() => {
-      //   entries.push(entry);
-      //   setAllEntries(entries);
-      // }, [1000]);
-    };
+    })
   </script>
 </body>
 

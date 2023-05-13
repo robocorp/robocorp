@@ -8,7 +8,7 @@
 // new contents to be embedded.
 
 export function getSampleContents() {
-  let s = JSON.stringify(`V 0.0.2
+  const s = JSON.stringify(`V 0.0.2
   T 2023-04-30T13:35:49.798+00:00
   ID 1|eb887eee-e75b-11ed-bdec-202b20a029af
   I "sys.platform=win32"

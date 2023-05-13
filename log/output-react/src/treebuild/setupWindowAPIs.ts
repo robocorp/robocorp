@@ -1,3 +1,4 @@
+import { setAllEntriesWhenPossible } from './effectCallbacks';
 import { getOpts } from './options';
 import { saveTreeState } from './persistTree';
 import { getSampleContents } from './sample';
@@ -22,12 +23,12 @@ async function rebuildTreeAndStatusesFromOpts(): Promise<void> {
 }
 
 function onClickReference(message: any) {
-  let ev: IEventMessage = {
+  const ev: IEventMessage = {
     type: 'event',
     seq: nextMessageSeq(),
     event: 'onClickReference',
   };
-  ev['data'] = message;
+  ev.data = message;
   sendEventToClient(ev);
 }
 
@@ -77,24 +78,39 @@ export function updateLabel(msg: IUpdateLabelRequest): void {
 }
 
 function onChangedRun(selectedRun: any) {
-  let ev: IEventMessage = {
+  const ev: IEventMessage = {
     type: 'event',
     seq: nextMessageSeq(),
     event: 'onSetCurrentRunId',
   };
-  ev['data'] = { runId: selectedRun };
+  ev.data = { runId: selectedRun };
   sendEventToClient(ev);
+}
+
+export function setupScenario(scenario: string) {
+  console.log('Setup Scenario');
+
+  const msg: ISetContentsRequest = {
+    type: 'request',
+    command: 'setContents',
+    initialContents: scenario,
+    runId: undefined,
+    allRunIdsToLabel: undefined,
+  };
+  setContents(msg);
 }
 
 /**
  * Function sets up the globals in requestToHandler and window.
  */
 export function setupGlobals() {
-  requestToHandler['setContents'] = setContents;
-  requestToHandler['appendContents'] = appendContents;
-  requestToHandler['updateLabel'] = updateLabel;
+  requestToHandler.setContents = setContents;
+  requestToHandler.appendContents = appendContents;
+  requestToHandler.updateLabel = updateLabel;
 
   window.onChangedRun = onChangedRun;
   window.setContents = setContents;
   window.getSampleContents = getSampleContents;
+  window.setupScenario = setupScenario;
+  window.setAllEntriesWhenPossible = setAllEntriesWhenPossible;
 }

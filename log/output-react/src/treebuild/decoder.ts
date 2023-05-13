@@ -1,5 +1,6 @@
 import parseISO from 'date-fns/parseISO';
-var parseDate = parseISO;
+
+let parseDate = parseISO;
 if (parseDate === undefined) {
   // Note (fabioz): when running npm test the import is returning an undefined,
   // yet a require works (why? no idea...)
