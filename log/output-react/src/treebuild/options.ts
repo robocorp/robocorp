@@ -1,16 +1,18 @@
 import { IOpts } from './protocols';
 import { getState } from './vscodeComm';
 
-const _opts: IOpts = {
-  initialContents: undefined,
-  runId: undefined,
-  state: undefined,
-  onClickReference: undefined,
-  appendedContents: [],
-  allRunIdsToLabel: {},
-  showTime: true,
-  showExpand: true,
-};
+export function createOpts(): IOpts {
+  return {
+    initialContents: undefined,
+    runId: undefined,
+    state: undefined,
+    onClickReference: undefined,
+    appendedContents: [],
+    allRunIdsToLabel: {},
+  };
+}
+
+const _opts: IOpts = createOpts();
 
 export function getOpts(): IOpts {
   if (_opts.state === undefined) {

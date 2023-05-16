@@ -14,7 +14,7 @@ const Main = styled.main`
 
 export const Log = () => {
   const [filter, setFilter] = useState('');
-  const [expandedEntries, setExpandedEntries] = useState<string[]>([]);
+  const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
@@ -26,9 +26,27 @@ export const Log = () => {
   useEffect(() => {
     reactCallSetAllEntriesCallback((newEntries: Entry[], updatedFromIndex = 0) => {
       setEntries(() => {
+        // console.log('Set entries to: ' + JSON.stringify(newEntries));
         lastUpdatedIndex.current = updatedFromIndex;
         return [...newEntries];
       });
+    });
+  }, []);
+
+  /**
+   * Single entry expansion toggle callacbk
+   */
+  const toggleEntry = useCallback((id: string) => {
+    lastUpdatedIndex.current = 0;
+    setExpandedEntries((curr) => {
+      const cp = new Set<string>(curr);
+
+      if (curr.has(id)) {
+        cp.delete(id);
+      } else {
+        cp.add(id);
+      }
+      return cp;
     });
   }, []);
 
@@ -38,18 +56,6 @@ export const Log = () => {
   const filteredEntries = useMemo(() => {
     return filterEntries(entries, filter, expandedEntries);
   }, [entries, expandedEntries, filter]);
-
-  /**
-   * Single entry expansion toggle callacbk
-   */
-  const toggleEntry = useCallback((id: string) => {
-    lastUpdatedIndex.current = 0;
-    setExpandedEntries((curr) =>
-      curr.indexOf(id) > -1
-        ? curr.filter((value) => value !== id && value.indexOf(`${id}-`) !== 0)
-        : [...curr, id],
-    );
-  }, []);
 
   const logContextValue = useMemo(
     () => ({
@@ -62,7 +68,7 @@ export const Log = () => {
       setViewSettings,
       lastUpdatedIndex,
     }),
-    [activeIndex, filteredEntries, viewSettings],
+    [activeIndex, expandedEntries, filteredEntries, viewSettings],
   );
 
   return (

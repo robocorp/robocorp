@@ -9,11 +9,6 @@ type Props = {
 
 const getTitle = (entry: Entry) => {
   switch (entry.type) {
-    case Type.suite:
-      return {
-        title: entry.name,
-        description: 'Suite',
-      };
     case Type.variable:
       return {
         title: entry.name,
@@ -26,8 +21,8 @@ const getTitle = (entry: Entry) => {
       };
     default:
       return {
-        title: '',
-        description: '',
+        title: 'TODO: Provide title for ' + entry.type,
+        description: 'TODO: Provide description for ' + entry.type,
       };
   }
 };

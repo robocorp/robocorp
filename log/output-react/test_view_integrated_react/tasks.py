@@ -3,6 +3,7 @@ from robocorp.browser import open_url
 from pathlib import Path
 import json
 from typing import Sequence
+import sys
 
 
 def open_output_view_for_tests():
@@ -12,7 +13,7 @@ def open_output_view_for_tests():
             f'File "{filepath}" does not exist (distribution does not seem to be built with "nmp run build:test").'
         )
 
-    page = open_url(filepath.as_uri(), headless=True)
+    page = open_url(filepath.as_uri(), headless="pydevd" not in sys.modules)
     return page
 
 
@@ -59,7 +60,13 @@ def check_labels(page, expected_labels: Sequence[str]):
 
 
 def setup_scenario(page, case_name: str) -> None:
-    case_path: Path = Path(__file__).absolute().parent / "_resources" / case_name
+    case_path: Path = (
+        Path(__file__).absolute().parent.parent.parent
+        / "tests"
+        / "robocorp_log_tests"
+        / "test_view_integrated_react"
+        / (case_name + ".txt")
+    )
     contents = case_path.read_text()
     contents_as_json = json.dumps(contents)
     page.evaluate(
@@ -81,36 +88,25 @@ def check_text_from_tree_items(page, expected: Sequence[str]):
     compare_strlist(found, expected)
 
 
-def check_case1(page) -> None:
-    setup_scenario(page, "case1.robolog")
-    check_labels(page, ["Run Passed", "PASS"])
-    check_text_from_tree_items(page, ["Robot1.Simple Task"])
-
-
 @task
-def check_output_webview_react():
+def case_task_and_element():
     """
     Checks whether the output view works as expected for us.
+
+    Note: the test scenario is actually at:
+
+    /log/tests/robocorp_log_tests/test_view_integrated_react
     """
     page = open_output_view_for_tests()
     page.wait_for_selector("#base-header")  # Check that the page header was loaded
-    root0_div = page.locator("#root0")
-    assert root0_div.text_content() == "Simple Task"
-    # page.pause()  # Run this to enter in record mode.
-    # check_case1(page)
 
-    # print("here")
+    setup_scenario(page, "case_task_and_element")
 
-    # page.locator('el_input[name="vBoUw"]').click()
-    # page.locator('[id="\\36 IRTq"]').click()
-    # page.locator('el_input[name="ZsRnT"]').click()
+    root_text_content = page.locator("#root0 > .entryName").text_content()
+    assert root_text_content == "Simple Task"
 
-    # download("http://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
-    # people = read_people_from_excel()
-    #
-    # page.click("button:text('Start')")
-    # for person in people:
-    #     fill_and_submit_form(page, person)
-    #
-    # element = page.query_selector("css=div.congratulations")
-    # element.screenshot(path=Path("output", "screenshot.png"))
+    toggle_expand = page.locator("#root0 > .toggleExpand")
+    toggle_expand.click()
+
+    root_text_content = page.locator("#root0-1 > .entryName").text_content()
+    assert root_text_content == "some_method"

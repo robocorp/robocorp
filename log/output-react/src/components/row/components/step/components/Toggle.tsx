@@ -27,7 +27,7 @@ const Button = styled.button`
 export const Toggle: FC<Props> = ({ entry }) => {
   const { expandedEntries, toggleEntry } = useLogContext();
 
-  const expanded = expandedEntries.indexOf(entry.id) > -1;
+  const expanded = expandedEntries.has(entry.id);
 
   const onToggle = useCallback(
     (e: MouseEvent) => {
@@ -37,12 +37,15 @@ export const Toggle: FC<Props> = ({ entry }) => {
     [entry.id],
   );
 
-  if (entry.type !== Type.suite) {
-    return <Box width="$24" height="100%" flexShrink={0} />;
-  }
+  // TODO: The toggle should only appear when an element has children (but that's not possible
+  // to do just based on the type).
+  //
+  // if (entry.type !== Type.suite) {
+  //   return <Box width="$24" height="100%" flexShrink={0} />;
+  // }
 
   return (
-    <Button onClick={onToggle} aria-label="Toggle item">
+    <Button onClick={onToggle} aria-label="Toggle item" className="toggleExpand">
       {expanded ? (
         <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M10.594 3.959A.75.75 0 0 0 10 2.75H1.5a.75.75 0 0 0-.593 1.209l4.25 5.5a.75.75 0 0 0 1.186 0l4.25-5.5Z" />

@@ -13,9 +13,8 @@ const getContentComponent = (type: Type) => {
   switch (type) {
     case Type.variable:
       return Variable;
-    case Type.suite:
-      return Suite;
     case Type.log:
+      return Log;
     default:
       return Log;
   }

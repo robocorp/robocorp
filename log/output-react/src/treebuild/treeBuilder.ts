@@ -1,4 +1,4 @@
-import { Type, EntryBase, EntryTask, Entry, StatusLevel } from '../lib/types';
+import { Type, EntryBase, EntryTask, Entry, StatusLevel, EntryMethod } from '../lib/types';
 import { setAllEntriesWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
 import { getOpts } from './options';
@@ -82,7 +82,31 @@ class FlattenedTree {
     return newId;
   }
 
+  pushMethodScope(msg: IMessage) {
+    // console.log('pushMethodScope');
+    let name = msg.decoded['name'];
+    if (msg.message_type == 'YR') {
+      name += ' (resumed)';
+    }
+
+    const entry: EntryMethod = {
+      id: this.newScopeId(),
+      type: Type.method,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+    };
+    this.stack.push(entry);
+    this.entries.push(entry);
+  }
+
   pushTaskScope(msg: IMessage) {
+    // console.log('pushTaskScope');
     const entry: EntryTask = {
       id: this.newScopeId(),
       type: Type.task,
@@ -97,6 +121,32 @@ class FlattenedTree {
     };
     this.stack.push(entry);
     this.entries.push(entry);
+  }
+
+  popMethodScope(msg: IMessage) {
+    let entry: EntryBase | undefined;
+    while (true) {
+      if (this.stack.length === 0) {
+        console.log(
+          `Unable to find element start when receiving end element message: ${JSON.stringify(
+            msg,
+          )}.`,
+        );
+        return;
+      }
+      entry = this.stack.pop();
+      if (entry?.type === Type.method) {
+        break;
+      }
+    }
+    // Note: create a copy and assign it in the entries array (we don't want to mutate the
+    // entry that's being used in react).
+    const methodScopeEntry: EntryMethod = <EntryMethod>{ ...entry };
+    const { status } = msg.decoded;
+    methodScopeEntry.status = getIntLevelFromStatus(status);
+    methodScopeEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
+
+    this.entries[methodScopeEntry.entriesIndex] = methodScopeEntry;
   }
 
   popTaskScope(msg: IMessage) {
@@ -155,8 +205,8 @@ export class TreeBuilder {
 
   flattened: FlattenedTree = new FlattenedTree();
 
-  constructor() {
-    this.opts = getOpts();
+  constructor(opts: IOpts) {
+    this.opts = opts;
     this.runId = this.opts.runId;
     this.lease = obtainNewLease();
     this.resetState();
@@ -213,10 +263,9 @@ export class TreeBuilder {
       return;
     }
 
-    const opts = getOpts();
-    while (this.appendedMessagesIndex + 1 < opts.appendedContents.length) {
+    while (this.appendedMessagesIndex + 1 < this.opts.appendedContents.length) {
       this.appendedMessagesIndex += 1;
-      const processMsg = opts.appendedContents[this.appendedMessagesIndex];
+      const processMsg = this.opts.appendedContents[this.appendedMessagesIndex];
       for (const msg of iter_decoded_log_format(processMsg, this.decoder)) {
         if (!this.isCurrentTreeBuilder()) {
           return;
@@ -320,6 +369,8 @@ export class TreeBuilder {
         this.flattened.pushTaskScope(msg);
         break;
       case 'SE': // start element
+        this.flattened.pushMethodScope(msg);
+        break;
       case 'YR': // yield resume
       case 'YFR': // yield from resume
         // const raiseStack = msgType != 'SE' || msg.decoded['type'] != 'UNTRACKED_GENERATOR';
@@ -390,6 +441,8 @@ export class TreeBuilder {
         this.flattened.popTaskScope(msg);
         break;
       case 'EE': // end element
+        this.flattened.popMethodScope(msg);
+        break;
       case 'YS': // yield suspend
       case 'YFS': // yield from suspend
         // const popStack = msgType != 'EE' || msg.decoded['type'] != 'UNTRACKED_GENERATOR';

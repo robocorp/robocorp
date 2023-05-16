@@ -3,7 +3,7 @@ import { Entry, ViewSettings } from './types';
 
 export const defaultLogState = {
   entries: [],
-  expandedEntries: [],
+  expandedEntries: new Set<string>(),
   toggleEntry: () => null,
   activeIndex: null,
   setActiveIndex: () => null,
@@ -20,7 +20,7 @@ export const defaultLogState = {
 
 type LogContext = {
   entries: Entry[];
-  expandedEntries: string[];
+  expandedEntries: Set<string>;
   toggleEntry: (id: string) => void;
   activeIndex: null | number;
   setActiveIndex: (index: null | number) => void;

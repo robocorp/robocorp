@@ -1,4 +1,4 @@
-import { FC, HTMLProps, useCallback, useMemo, useRef } from 'react';
+import { FC, HTMLProps, useCallback, useEffect, useMemo, useRef } from 'react';
 import { VariableSizeList } from 'react-window';
 import { Box, useSize } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
@@ -20,11 +20,11 @@ export const Body: FC<Props> = () => {
   const { height } = useSize(containerRef);
   const { entries, lastUpdatedIndex } = useLogContext();
 
+  useEffect(() => {
+    listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
+  });
+
   const itemCount = useMemo(() => {
-    // Commented out due to:
-    // Cannot update during an existing state transition (such as within `render`). Render methods should be a pure function of props and state.
-    // TODO: Check side-effect of doing this with rihards.
-    // listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
     return entries.length;
   }, [entries]);
 

@@ -11,20 +11,19 @@ const getTitle = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.task:
     // fallthrough
-    case Type.suite:
-      return entry.name;
+    case Type.method:
     case Type.variable:
-      return `Variable: ${entry.name}`;
+      return entry.name;
     case Type.log:
       return entry.message;
     default:
-      return '';
+      return 'TODO: provide getTitle';
   }
 };
 
 export const Title: FC<Props> = ({ entry }) => {
   return (
-    <Box minWidth={0}>
+    <Box minWidth={0} className="entryName">
       <Typography mr="$24" lineHeight="$32" variant="body.small" fontWeight="medium" truncate={1}>
         {getTitle(entry)}
       </Typography>

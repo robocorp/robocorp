@@ -28,9 +28,6 @@ export interface IOpts {
   // and then add new messages line by line as it's
   // being tracked afterwards).
   appendedContents: string[];
-
-  showTime: boolean;
-  showExpand: boolean;
 }
 
 export interface ITracebackEntry {

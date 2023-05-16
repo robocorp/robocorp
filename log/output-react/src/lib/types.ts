@@ -15,8 +15,10 @@ export enum StatusLevel {
 }
 
 export enum Type {
-  suite = 'Suite',
   task = 'Task',
+  method = 'Method',
+
+  // Not used for now...
   variable = 'Variable',
   log = 'Log',
   error = 'Error',
@@ -30,14 +32,17 @@ export interface EntryBase {
   entriesIndex: number;
 }
 
-export interface EntrySuite extends EntryBase {
-  type: Type.suite;
-  date: Date;
-  name: string;
-}
-
 export interface EntryTask extends EntryBase {
   type: Type.task;
+  name: string;
+  libname: string;
+  status: StatusLevel;
+  startDeltaInSeconds: number | -1 | undefined;
+  endDeltaInSeconds: number | -1 | undefined;
+}
+
+export interface EntryMethod extends EntryBase {
+  type: Type.method;
   name: string;
   libname: string;
   status: StatusLevel;
@@ -58,9 +63,4 @@ export interface EntryLog extends EntryBase {
   image?: string;
 }
 
-export interface EntryError extends EntryBase {
-  type: Type.error;
-  message: string;
-}
-
-export type Entry = EntrySuite | EntryTask | EntryVariable | EntryLog | EntryError;
+export type Entry = EntryTask | EntryMethod | EntryVariable | EntryLog;

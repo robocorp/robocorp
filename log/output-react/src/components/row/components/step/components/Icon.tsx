@@ -13,7 +13,7 @@ import {
 } from '@robocorp/icons';
 import { Badge, Box } from '@robocorp/components';
 
-import { Entry, StatusLevel, Type } from '~/lib/types';
+import { Entry, EntryMethod, EntryTask, StatusLevel, Type } from '~/lib/types';
 
 type Props = {
   entry: Entry;
@@ -38,24 +38,24 @@ const getLogIcon = (status: StatusLevel): ReactNode => {
 
 const getIcon = (entry: Entry): ReactNode => {
   switch (entry.type) {
-    case Type.suite:
-      return <IconCloseCircle color="red60" />;
+    case Type.task:
+    case Type.method:
+      const e: EntryTask | EntryMethod = entry as EntryTask | EntryMethod;
+      return getLogIcon(e.status);
     case Type.variable:
       return <IconBox color="magenta60" />;
     case Type.log:
       return getLogIcon(entry.status);
-    case Type.task:
-      return getLogIcon(entry.status);
-    case Type.error:
-      return (
-        <Badge
-          icon={IconStatusError}
-          variant="danger"
-          iconColor="background.error"
-          label="Execution Error"
-          size="small"
-        />
-      );
+    // case Type.error:
+    //   return (
+    //     <Badge
+    //       icon={IconStatusError}
+    //       variant="danger"
+    //       iconColor="background.error"
+    //       label="Execution Error"
+    //       size="small"
+    //     />
+    //   );
     default:
       return <IconInformation color="blue60" />;
   }

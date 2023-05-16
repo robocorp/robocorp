@@ -228,7 +228,7 @@ def path_for_output_view_react_tests_robo() -> Path:
     ret = robotframework_output_stream_root / "output-react"
     assert ret.exists()
 
-    return (ret / "tests_robo").absolute()
+    return (ret / "test_view_integrated_react").absolute()
 
 
 def _download_rcc(location: str, force: bool = False) -> None:

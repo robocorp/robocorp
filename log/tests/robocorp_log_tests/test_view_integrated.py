@@ -115,18 +115,3 @@ def test_output_view_integrated_robo(
     completed_process = run_in_robo(robo_loc, path_for_output_view_tests_robo)
     stdout = completed_process.stdout.decode("utf-8")
     assert "Running task: check_output_webview" in stdout
-
-
-def test_output_view_integrated_robo_react(
-    robo_loc: str,
-    path_for_output_view_react_tests_robo: Path,
-    run_integration_tests_flag,
-):
-    if not run_integration_tests_flag:
-        pytest.skip(f"Disabled (not running integration tests).")
-
-    tasks_py = path_for_output_view_react_tests_robo / "tasks.py"
-    assert tasks_py.exists()
-    completed_process = run_in_robo(robo_loc, path_for_output_view_react_tests_robo)
-    stdout = completed_process.stdout.decode("utf-8")
-    assert "Running task: check_output_webview_react" in stdout

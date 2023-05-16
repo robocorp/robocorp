@@ -17,7 +17,7 @@ import {
 let treeBuilder: TreeBuilder | undefined;
 
 async function rebuildTreeAndStatusesFromOpts(): Promise<void> {
-  treeBuilder = new TreeBuilder();
+  treeBuilder = new TreeBuilder(getOpts());
   treeBuilder.clearAndInitializeTree();
   await treeBuilder.addInitialContents();
 }
@@ -50,14 +50,6 @@ export function setContents(msg: ISetContentsRequest): void {
   // TODO: Implement this.
   // rebuildRunSelection(opts.allRunIdsToLabel, opts.runId);
   rebuildTreeAndStatusesFromOpts();
-}
-
-export function setShowTime(showTime: boolean): void {
-  getOpts().showTime = showTime;
-}
-
-export function setShowExpand(showExpand: boolean): void {
-  getOpts().showExpand = showExpand;
 }
 
 export function appendContents(msg: IAppendContentsRequest): void {

@@ -22,10 +22,8 @@ const getValue = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.variable:
       return entry.value;
-    case Type.error:
-      return entry.message;
     default:
-      return '';
+      return 'TODO: provide getValue for: ' + entry.type;
   }
 };
 
