@@ -61,7 +61,11 @@ export const filterExpandedEntries = (
 // TODO: Update location format
 export const formatLocation = (entry: Entry) => {
   if (entry.source) {
-    return `${pathBasename(entry.source)}:${entry.lineno}`;
+    if (entry.lineno > 0) {
+      return `${pathBasenameNoExt(entry.source)}:${entry.lineno}`;
+    } else {
+      return `${pathBasenameNoExt(entry.source)}`;
+    }
   }
   return '';
 };
@@ -74,7 +78,7 @@ export const formatDuration = (entry: Entry) => {
     const end: number | undefined = asObj.endDeltaInSeconds;
     if (end !== undefined && end >= 0) {
       const duration = end - start;
-      return `${duration}s`;
+      return `${duration.toFixed(2)}s`;
     }
   }
   return '';
@@ -90,11 +94,15 @@ export const getLogEntryHeight = (entry: Entry): number => {
   return 32;
 };
 
-export function pathBasename(source: string): string {
+export function pathBasenameNoExt(source: string): string {
   let basename = source;
   let index = Math.max(source.lastIndexOf('/'), source.lastIndexOf('\\'));
   if (index > 0) {
     basename = source.substring(index + 1);
+  }
+  index = basename.lastIndexOf('.');
+  if (index > 0) {
+    basename = basename.substring(0, index);
   }
   return basename;
 }

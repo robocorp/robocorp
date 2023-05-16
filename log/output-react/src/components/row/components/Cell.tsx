@@ -4,6 +4,8 @@ import { styled } from '@robocorp/theme';
 
 type Props = {
   children?: ReactNode;
+  minWidth: number;
+  cellClass: string;
 };
 
 const Content = styled(Typography)`
@@ -11,12 +13,17 @@ const Content = styled(Typography)`
   line-height: ${({ theme }) => theme.space.$32};
 `;
 
-export const Cell: FC<Props> = ({ children }) => {
+const StyledBox = styled(Box)`
+  flex: 0 0 6rem;
+  text-align: center;
+`;
+
+export const Cell: FC<Props> = ({ children, minWidth, cellClass }) => {
   return (
-    <Box flex="0 0 6rem" minWidth={0}>
+    <StyledBox minWidth={minWidth} className={cellClass}>
       <Content px="$8" variant="body.small" truncate={1}>
         {children}
       </Content>
-    </Box>
+    </StyledBox>
   );
 };

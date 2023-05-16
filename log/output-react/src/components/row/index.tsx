@@ -35,13 +35,17 @@ export const Row: FC<Props> = ({ index, ...rest }) => {
     <Container role="button" onClick={onToggle} onKeyPress={onToggle} {...rest} tabIndex={0}>
       <Step entry={entry} />
       {viewSettings.columns.location && (
-        <Cell>
+        <Cell minWidth={180} cellClass="colLocation">
           <Tooltip text={formatLocation(entry)}>
             <span>{formatLocation(entry)}</span>
           </Tooltip>
         </Cell>
       )}
-      {viewSettings.columns.duration && <Cell>{formatDuration(entry)}</Cell>}
+      {viewSettings.columns.duration && (
+        <Cell minWidth={0} cellClass="colDuration">
+          {formatDuration(entry)}
+        </Cell>
+      )}
     </Container>
   );
 };

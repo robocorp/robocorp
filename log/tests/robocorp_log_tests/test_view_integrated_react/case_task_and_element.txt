@@ -7,13 +7,13 @@ M a:"Robot1"
 SR a|0.001
 M c:"Simple Task"
 M d:"task_mod"
-M e:"X:\\robocorpws\\draft-python-framework\\log\\tests\\robocorp_log_tests\\test_view_integrated_react.py"
+M e:"X:/robocorpws/draft-python-framework/log/tests/robocorp_log_tests/test_view_integrated_react.py"
 M f:""
 P b:c|d|e|f|0
 ST b|0.001
 M h:"some_method"
 M i:"robocorp_log_tests._resources.check"
-M j:"X:\\robocorpws\\draft-python-framework\\log\\tests\\robocorp_log_tests\\_resources\\check.py"
+M j:"X:/robocorpws/draft-python-framework/log/tests/robocorp_log_tests/_resources/check.py"
 P g:h|i|j|f|12
 M k:"METHOD"
 SE g|k|0.001

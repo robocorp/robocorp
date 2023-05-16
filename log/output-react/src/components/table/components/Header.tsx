@@ -8,9 +8,9 @@ type Props = {
 };
 
 const Container = styled.div`
-  padding: 0 calc(${({ theme }) => theme.space.$24} + var(--scrollbar-width)) 0
+  padding: 0 calc(${({ theme }) => theme.space.$12} + var(--scrollbar-width)) 0
     ${({ theme }) => theme.space.$24};
-  height: ${({ theme }) => theme.sizes.$56};
+  height: ${({ theme }) => theme.sizes.$48};
   display: flex;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle.color};

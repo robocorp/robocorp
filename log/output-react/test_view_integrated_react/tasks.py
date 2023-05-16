@@ -129,3 +129,11 @@ def case_task_and_element():
     # Check that the last method is a leaf and doesn't have the expand button.
     assert page.query_selector("#root0-1-2 > .toggleExpand") is None
     assert page.query_selector("#root0-1-2 > .noExpand") is not None
+
+    # ~ is sibling (columns are as siblings and not inside the item).
+    col_location_text = page.locator("#root0-1-2 ~ .colLocation").text_content()
+    assert col_location_text == "check:7"
+
+    # ~ is sibling (columns are as siblings and not inside the item).
+    col_duration_text = page.locator("#root0-1-2 ~ .colDuration").text_content()
+    assert col_duration_text == "0.00s"
