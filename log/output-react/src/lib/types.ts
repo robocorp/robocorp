@@ -41,6 +41,12 @@ export interface EntryTask extends EntryBase {
   endDeltaInSeconds: number | -1 | undefined;
 }
 
+export interface Argument {
+  name: string;
+  type: string;
+  value: string;
+}
+
 export interface EntryMethod extends EntryBase {
   type: Type.method;
   name: string;
@@ -48,6 +54,7 @@ export interface EntryMethod extends EntryBase {
   status: StatusLevel;
   startDeltaInSeconds: number | -1 | undefined;
   endDeltaInSeconds: number | -1 | undefined;
+  arguments: Argument[] | undefined;
 }
 
 export interface EntryVariable extends EntryBase {

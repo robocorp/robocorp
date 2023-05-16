@@ -52,7 +52,10 @@ export const filterEntries = (
 
 // TODO: Update location format
 export const formatLocation = (entry: Entry) => {
-  return `${entry.source}:${entry.lineno}`;
+  if (entry.source) {
+    return `${pathBasename(entry.source)}:${entry.lineno}`;
+  }
+  return '';
 };
 
 // TODO: Update duration format
@@ -78,3 +81,12 @@ export const getLogEntryHeight = (entry: Entry): number => {
 
   return 32;
 };
+
+export function pathBasename(source: string): string {
+  let basename = source;
+  let index = Math.max(source.lastIndexOf('/'), source.lastIndexOf('\\'));
+  if (index > 0) {
+    basename = source.substring(index + 1);
+  }
+  return basename;
+}

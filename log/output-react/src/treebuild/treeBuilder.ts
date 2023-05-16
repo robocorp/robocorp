@@ -1,4 +1,12 @@
-import { Type, EntryBase, EntryTask, Entry, StatusLevel, EntryMethod } from '../lib/types';
+import {
+  Type,
+  EntryBase,
+  EntryTask,
+  Entry,
+  StatusLevel,
+  EntryMethod,
+  Argument,
+} from '../lib/types';
 import { setAllEntriesWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
 import { getOpts } from './options';
@@ -70,6 +78,8 @@ class FlattenedTree {
 
   public stack: Entry[] = [];
 
+  private argsTarget: EntryMethod | undefined;
+
   private parentId = '';
 
   private seqId = 0;
@@ -100,9 +110,38 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entriesIndex: this.entries.length,
+      arguments: undefined,
     };
     this.stack.push(entry);
     this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  addArguments(msg: IMessage) {
+    if (this.argsTarget !== undefined) {
+      const targetCp: EntryMethod = <EntryMethod>{ ...this.argsTarget };
+      const arg: Argument = {
+        name: msg.decoded.name,
+        type: msg.decoded.type,
+        value: msg.decoded.value,
+      };
+      if (!targetCp.arguments || targetCp.arguments.length === 0) {
+        targetCp.arguments = [arg];
+      } else {
+        targetCp.arguments = [...targetCp.arguments, arg];
+      }
+
+      // Update the references to the new object to avoid mutability.
+      this.entries[targetCp.entriesIndex] = targetCp;
+      this.argsTarget = targetCp;
+      for (let index = this.stack.length - 1; index >= 0; index--) {
+        const element = this.stack[index];
+        if (element.entriesIndex === targetCp.entriesIndex) {
+          this.stack[index] = targetCp;
+          break;
+        }
+      }
+    }
   }
 
   pushTaskScope(msg: IMessage) {
@@ -492,12 +531,7 @@ export class TreeBuilder {
         break;
       case 'EA':
         // Element arguments
-        // addArgumentsToTreeContent(
-        //   this.argsTarget,
-        //   msg.decoded['name'],
-        //   msg.decoded['type'],
-        //   msg.decoded['value'],
-        // );
+        this.flattened.addArguments(msg);
         break;
       case 'L':
       case 'LH':

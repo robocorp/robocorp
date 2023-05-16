@@ -20,6 +20,18 @@ const Container = styled(Box)`
 
 const getValue = (entry: Entry): ReactNode => {
   switch (entry.type) {
+    case Type.method:
+      const args = entry.arguments;
+      if (args !== undefined && args.length > 0) {
+        let rep = [];
+        for (const arg of args) {
+          rep.push(`${arg.name}=${arg.value}`);
+        }
+        return rep.join(', ');
+      }
+      return '';
+    case Type.task:
+      return '';
     case Type.variable:
       return entry.value;
     default:
@@ -29,7 +41,7 @@ const getValue = (entry: Entry): ReactNode => {
 
 export const Value: FC<Props> = ({ entry }) => {
   return (
-    <Container flex="1">
+    <Container flex="1" className="entryValue">
       <Typography
         mr="$8"
         mt={6}

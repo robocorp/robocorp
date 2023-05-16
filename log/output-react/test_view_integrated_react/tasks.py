@@ -102,11 +102,26 @@ def case_task_and_element():
 
     setup_scenario(page, "case_task_and_element")
 
+    # Check for "Simple Task"
     root_text_content = page.locator("#root0 > .entryName").text_content()
     assert root_text_content == "Simple Task"
 
-    toggle_expand = page.locator("#root0 > .toggleExpand")
-    toggle_expand.click()
+    # Expand "Simple Task"
+    page.locator("#root0 > .toggleExpand").click()
 
-    root_text_content = page.locator("#root0-1 > .entryName").text_content()
-    assert root_text_content == "some_method"
+    # Check "some_method"
+    some_method_text = page.locator("#root0-1 > .entryName").text_content()
+    assert some_method_text == "some_method"
+
+    # Expand "some_method"
+    page.locator("#root0-1 > .toggleExpand").click()
+
+    # Check "call_another_method"
+    call_another_text = page.locator("#root0-1-2 > .entryName").text_content()
+    assert call_another_text == "call_another_method"
+
+    call_another_text = page.locator("#root0-1-2 > .entryValue").text_content()
+    assert (
+        call_another_text
+        == "param0=1, param1='arg', args=(['a', 'b'],), kwargs={'c': 3}"
+    )
