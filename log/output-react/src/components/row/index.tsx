@@ -24,8 +24,8 @@ const Container = styled.div`
 `;
 
 export const Row: FC<Props> = ({ index, ...rest }) => {
-  const { entries, setActiveIndex, viewSettings } = useLogContext();
-  const entry = entries[index];
+  const { filteredEntries, setActiveIndex, viewSettings } = useLogContext();
+  const entry = filteredEntries.entries[index];
 
   const onToggle = useCallback(() => {
     setActiveIndex(index);

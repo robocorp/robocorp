@@ -5,8 +5,8 @@ import { useLogContext } from '~/lib';
 import { Content, Title } from './components';
 
 export const Details = () => {
-  const { entries, activeIndex, setActiveIndex } = useLogContext();
-  const entry = typeof activeIndex === 'number' && entries[activeIndex];
+  const { filteredEntries, activeIndex, setActiveIndex } = useLogContext();
+  const entry = typeof activeIndex === 'number' && filteredEntries.entries[activeIndex];
 
   const onClose = useCallback(() => {
     setActiveIndex(null);

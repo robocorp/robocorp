@@ -1,3 +1,4 @@
+import { FilteredEntries } from './logContext';
 import { Entry, Type } from './types';
 
 const searchFn = (haystack: string, needle: string) =>
@@ -7,13 +8,14 @@ function entryLevel(entry: Entry) {
   return entry.id.split('-').length - 1;
 }
 
-// TODO: Update search logic
-export const filterEntries = (
+export const filterExpandedEntries = (
   data: Entry[],
-  filter: string,
   expandedItems: Set<string>,
-): Entry[] => {
+): FilteredEntries => {
   // console.log('All: ', JSON.stringify(data));
+
+  const entriesWithChildren: Set<string> = new Set();
+
   const ret: Entry[] = [];
 
   // We have to remove all non-expanded objects with
@@ -28,6 +30,12 @@ export const filterEntries = (
 
   for (const entry of data) {
     const level = entryLevel(entry);
+    const i = entry.id.lastIndexOf('-');
+    if (i > 0) {
+      const parentId = entry.id.substring(0, i);
+      entriesWithChildren.add(parentId);
+    }
+
     if (hideChildren) {
       if (level > hideChildrenOnLevel) {
         // A child of the current entry we're hiding must be hidden.
@@ -47,7 +55,7 @@ export const filterEntries = (
     }
   }
   // console.log('Filtered: ', JSON.stringify(ret));
-  return ret;
+  return { entries: ret, entriesWithChildren };
 };
 
 // TODO: Update location format

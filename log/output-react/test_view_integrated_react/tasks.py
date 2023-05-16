@@ -125,3 +125,7 @@ def case_task_and_element():
         call_another_text
         == "param0=1, param1='arg', args=(['a', 'b'],), kwargs={'c': 3}"
     )
+
+    # Check that the last method is a leaf and doesn't have the expand button.
+    assert page.query_selector("#root0-1-2 > .toggleExpand") is None
+    assert page.query_selector("#root0-1-2 > .noExpand") is not None

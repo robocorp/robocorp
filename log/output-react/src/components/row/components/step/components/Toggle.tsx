@@ -25,7 +25,7 @@ const Button = styled.button`
 `;
 
 export const Toggle: FC<Props> = ({ entry }) => {
-  const { expandedEntries, toggleEntry } = useLogContext();
+  const { filteredEntries, expandedEntries, toggleEntry } = useLogContext();
 
   const expanded = expandedEntries.has(entry.id);
 
@@ -37,12 +37,10 @@ export const Toggle: FC<Props> = ({ entry }) => {
     [entry.id],
   );
 
-  // TODO: The toggle should only appear when an element has children (but that's not possible
-  // to do just based on the type).
-  //
-  // if (entry.type !== Type.suite) {
-  //   return <Box width="$24" height="100%" flexShrink={0} />;
-  // }
+  // Add the expand/collapse if we have a parent or no icon if it cannot be expanded.
+  if (!filteredEntries.entriesWithChildren.has(entry.id)) {
+    return <Box className="noExpand" width="$24" height="100%" flexShrink={0} />;
+  }
 
   return (
     <Button onClick={onToggle} aria-label="Toggle item" className="toggleExpand">

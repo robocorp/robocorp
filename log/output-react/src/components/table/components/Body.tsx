@@ -18,22 +18,22 @@ export const Body: FC<Props> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VariableSizeList>(null);
   const { height } = useSize(containerRef);
-  const { entries, lastUpdatedIndex } = useLogContext();
+  const { filteredEntries, lastUpdatedIndex } = useLogContext();
 
   useEffect(() => {
     listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
   });
 
   const itemCount = useMemo(() => {
-    return entries.length;
-  }, [entries]);
+    return filteredEntries.entries.length;
+  }, [filteredEntries]);
 
   const itemSize = useCallback(
     (itemIndex: number) => {
-      const size = getLogEntryHeight(entries[itemIndex]);
+      const size = getLogEntryHeight(filteredEntries.entries[itemIndex]);
       return size;
     },
-    [entries],
+    [filteredEntries],
   );
 
   return (

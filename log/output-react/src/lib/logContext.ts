@@ -1,9 +1,28 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
 import { Entry, ViewSettings } from './types';
 
-export const defaultLogState = {
-  entries: [],
+export interface FilteredEntries {
+  entries: Entry[];
+  entriesWithChildren: Set<string>;
+}
+
+export type LogContextType = {
+  expandedEntries: Set<string>;
+  filteredEntries: FilteredEntries;
+  toggleEntry: (id: string) => void;
+  activeIndex: null | number;
+  setActiveIndex: (index: null | number) => void;
+  viewSettings: ViewSettings;
+  setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
+  lastUpdatedIndex: MutableRefObject<number>;
+};
+
+export const defaultLogState: LogContextType = {
   expandedEntries: new Set<string>(),
+  filteredEntries: {
+    entries: [],
+    entriesWithChildren: new Set<string>(),
+  },
   toggleEntry: () => null,
   activeIndex: null,
   setActiveIndex: () => null,
@@ -18,18 +37,7 @@ export const defaultLogState = {
   lastUpdatedIndex: { current: 0 },
 };
 
-type LogContext = {
-  entries: Entry[];
-  expandedEntries: Set<string>;
-  toggleEntry: (id: string) => void;
-  activeIndex: null | number;
-  setActiveIndex: (index: null | number) => void;
-  viewSettings: ViewSettings;
-  setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
-  lastUpdatedIndex: MutableRefObject<number>;
-};
-
-export const LogContext = createContext<LogContext>(defaultLogState);
+export const LogContext = createContext<LogContextType>(defaultLogState);
 
 export const useLogContext = () => {
   return useContext(LogContext);

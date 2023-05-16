@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 import { Header, Details, Table } from '~/components';
-import { LogContext, filterEntries, defaultLogState } from '~/lib';
+import { LogContext, filterExpandedEntries, defaultLogState, LogContextType } from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
 import { reactCallSetAllEntriesCallback } from './treebuild/effectCallbacks';
 
@@ -33,9 +33,7 @@ export const Log = () => {
     });
   }, []);
 
-  /**
-   * Single entry expansion toggle callacbk
-   */
+  // Toggle the expanded state.
   const toggleEntry = useCallback((id: string) => {
     lastUpdatedIndex.current = 0;
     setExpandedEntries((curr) => {
@@ -50,24 +48,24 @@ export const Log = () => {
     });
   }, []);
 
-  /**
-   * Filter entries by current filter and expanded entries
-   */
+  // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
-    return filterEntries(entries, filter, expandedEntries);
+    return filterExpandedEntries(entries, expandedEntries);
   }, [entries, expandedEntries, filter]);
 
+  const ctx: LogContextType = {
+    expandedEntries,
+    filteredEntries,
+    toggleEntry,
+    activeIndex,
+    setActiveIndex,
+    viewSettings,
+    setViewSettings,
+    lastUpdatedIndex,
+  };
+
   const logContextValue = useMemo(
-    () => ({
-      entries: filteredEntries,
-      activeIndex,
-      setActiveIndex,
-      expandedEntries,
-      toggleEntry,
-      viewSettings,
-      setViewSettings,
-      lastUpdatedIndex,
-    }),
+    () => ctx,
     [activeIndex, expandedEntries, filteredEntries, viewSettings],
   );
 
