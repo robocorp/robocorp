@@ -1,3 +1,3 @@
 export * from './Log';
-export * from './Suite';
 export * from './Variable';
+export * from './Method';

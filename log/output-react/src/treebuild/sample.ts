@@ -9,22 +9,49 @@
 
 export function getSampleContents() {
   const s = JSON.stringify(`V 0.0.2
-  T 2023-04-30T13:35:49.798+00:00
-  ID 1|eb887eee-e75b-11ed-bdec-202b20a029af
+  T 2023-05-15T14:30:37.751+00:00
+  ID 1|0f808d43-f32d-11ed-a9e3-202b20a029af
   I "sys.platform=win32"
   I "python=3.9.16 (main, Mar  8 2023, 10:39:24) [MSC v.1916 64 bit (AMD64)]"
   M a:"Robot1"
-  SR a|0.016
+  SR a|0.001
   M c:"Simple Task"
-  M d:"Robot1"
-  M e:"X:/robocorpws/robo/log/tests/robocorp_log_tests/test_view_integrated.py"
+  M d:"task_mod"
+  M e:"X:/robocorpws/draft-python-framework/log/tests/robocorp_log_tests/test_view_integrated_react.py"
   M f:""
   P b:c|d|e|f|0
-  ST b|0.016
-  M g:"PASS"
-  M h:"Ok"
-  ET g|h|0.017
-  ER g|0.017
+  ST b|0.001
+  M h:"some_method"
+  M i:"robocorp_log_tests._resources.check"
+  M j:"X:/robocorpws/draft-python-framework/log/tests/robocorp_log_tests/_resources/check.py"
+  P g:h|i|j|f|12
+  M k:"METHOD"
+  SE g|k|0.001
+  M m:"call_another_method"
+  P l:m|i|j|f|7
+  SE l|k|0.001
+  M n:"param0"
+  M o:"int"
+  M p:"1"
+  EA n|o|p
+  M q:"param1"
+  M r:"str"
+  M s:"'arg'"
+  EA q|r|s
+  M t:"args"
+  M u:"tuple"
+  M v:"(['a', 'b'],)"
+  EA t|u|v
+  M w:"kwargs"
+  M x:"dict"
+  M y:"{'c': 3}"
+  EA w|x|y
+  M z:"PASS"
+  EE k|z|0.001
+  EE k|z|0.001
+  M A:"Ok"
+  ET z|A|0.001
+  ER z|0.001
   `);
   return JSON.parse(s);
 }

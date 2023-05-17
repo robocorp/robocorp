@@ -1,5 +1,5 @@
 import { FilteredEntries } from './logContext';
-import { Entry, Type } from './types';
+import { Entry, EntryMethod, Type } from './types';
 
 const searchFn = (haystack: string, needle: string) =>
   haystack.toLowerCase().includes(needle.trim().toLowerCase());
@@ -92,6 +92,18 @@ export function formatTimeInSeconds(seconds: number) {
 
 function padZero(n: number) {
   return n.toFixed(0).padStart(2, '0');
+}
+
+export function formatArguments(entry: EntryMethod): string {
+  const args = entry.arguments;
+  if (args !== undefined && args.length > 0) {
+    let rep = [];
+    for (const arg of args) {
+      rep.push(`${arg.name}=${arg.value}`);
+    }
+    return rep.join(', ');
+  }
+  return '';
 }
 
 export const formatDuration = (entry: Entry) => {

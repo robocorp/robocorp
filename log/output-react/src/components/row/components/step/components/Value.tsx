@@ -3,6 +3,7 @@ import { Box, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
 import { Entry, Type } from '~/lib/types';
+import { formatArguments } from '~/lib/helpers';
 
 type Props = {
   entry: Entry;
@@ -21,15 +22,7 @@ const Container = styled(Box)`
 const getValue = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.method:
-      const args = entry.arguments;
-      if (args !== undefined && args.length > 0) {
-        let rep = [];
-        for (const arg of args) {
-          rep.push(`${arg.name}=${arg.value}`);
-        }
-        return rep.join(', ');
-      }
-      return '';
+      return formatArguments(entry);
     case Type.task:
       return '';
     case Type.variable:

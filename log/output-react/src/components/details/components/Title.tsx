@@ -1,7 +1,7 @@
 import { Drawer } from '@robocorp/components';
 import { FC } from 'react';
 
-import { Entry, Type } from '~/lib/types';
+import { Entry, EntryMethod, Type } from '~/lib/types';
 
 type Props = {
   entry: Entry;
@@ -9,16 +9,13 @@ type Props = {
 
 const getTitle = (entry: Entry) => {
   switch (entry.type) {
-    case Type.variable:
+    case Type.method:
+      const methodEntry = entry as EntryMethod;
       return {
         title: entry.name,
-        description: 'Variable',
+        description: `Module: ${entry.libname}`,
       };
-    case Type.log:
-      return {
-        title: 'Log entry',
-        description: entry.status,
-      };
+
     default:
       return {
         title: 'TODO: Provide title for ' + entry.type,
