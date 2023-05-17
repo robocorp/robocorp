@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "tasks/**"
       - ".github/workflows/tasks_lint.yml"

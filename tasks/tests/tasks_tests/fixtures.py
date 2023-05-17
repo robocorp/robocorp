@@ -3,7 +3,7 @@ import sys
 
 import pytest
 from pathlib import Path
-from typing import List, Any
+from typing import Any, Sequence
 from contextlib import nullcontext
 
 
@@ -63,7 +63,7 @@ def rcc_loc(tmpdir_factory):
     return Path(location)
 
 
-def run_in_rcc(rcc_loc: Path, cwd: Path, args: List[str], expect_error=False):
+def run_in_rcc(rcc_loc: Path, cwd: Path, args: Sequence[str] = (), expect_error=False):
     import subprocess
     from subprocess import CalledProcessError
 
@@ -81,7 +81,7 @@ def run_in_rcc(rcc_loc: Path, cwd: Path, args: List[str], expect_error=False):
 
     with ctx:
         subprocess.check_call(
-            [str(rcc_loc)] + "task run --trace".split() + args, cwd=cwd, env=env
+            [str(rcc_loc), "task", "run", "--trace"] + list(args), cwd=cwd, env=env
         )
 
 

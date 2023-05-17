@@ -137,11 +137,14 @@ def run(
     task_names: Sequence[str]
     if not task_name:
         task_names = []
+        task_or_tasks = "tasks"
     elif isinstance(task_name, str):
         task_names = [task_name]
+        task_or_tasks = "task"
     else:
         task_names = task_name
         task_name = ", ".join(str(x) for x in task_names)
+        task_or_tasks = "task" if len(task_names) == 1 else "tasks"
 
     config: log.BaseConfig
     pyproject_path_and_contents = read_pyproject_toml(context, p)
@@ -191,7 +194,9 @@ def run(
                 if not task_name:
                     context.show(f"\nCollecting tasks from: {path}")
                 else:
-                    context.show(f"\nCollecting task {task_name} from: {path}")
+                    context.show(
+                        f"\nCollecting {task_or_tasks} {task_name} from: {path}"
+                    )
 
                 tasks: List[ITask] = list(collect_tasks(p, task_names))
 

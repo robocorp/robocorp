@@ -1,5 +1,5 @@
 
-Collecting task ['task1', 'task2'] from: .
+Collecting tasks task1, task2 from: .
 ================================ Running: task1 ================================
 task1 status: PASS
 ================================================================================
