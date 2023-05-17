@@ -1,6 +1,6 @@
 import { TreeBuilder } from '../treebuild/treeBuilder';
 import { createOpts, getOpts } from '../treebuild/options';
-import { EntryMethod, EntryTask, Type } from '../lib/types';
+import { EntryBase, EntryMethod, EntryTask, Type } from '../lib/types';
 
 const CREATE_RUN_AND_TEST = `
 V 0.0.2
@@ -16,6 +16,13 @@ M e:"/path/to/file.py"
 M f:""
 P b:c|d|e|f|0
 ST b|0.016
+`;
+
+const START_TEST = `
+ST b|0.016
+`;
+const END_TEST = `
+ET g|h|0.017
 `;
 
 const FINISH_RUN_AND_TEST = `
@@ -69,16 +76,50 @@ test('TreeBuilder can read method.', async () => {
   expect(treeBuilder.flattened.entries.length).toBe(2);
   expect(treeBuilder.flattened.stack.length).toBe(2);
 
-  opts.appendedContents.push(END_ELEMENT + FINISH_RUN_AND_TEST);
+  opts.appendedContents.push(END_ELEMENT);
   await treeBuilder.onAppendedContents();
   expect(treeBuilder.flattened.entries.length).toBe(2);
+  expect(treeBuilder.flattened.stack.length).toBe(1);
+
+  opts.appendedContents.push(START_ELEMENT + END_ELEMENT);
+  await treeBuilder.onAppendedContents();
+  expect(treeBuilder.flattened.entries.length).toBe(3);
+  expect(treeBuilder.flattened.stack.length).toBe(1);
+
+  opts.appendedContents.push(END_TEST);
+  await treeBuilder.onAppendedContents();
+  expect(treeBuilder.flattened.entries.length).toBe(3);
   expect(treeBuilder.flattened.stack.length).toBe(0);
 
   const entryTask: EntryTask = <EntryTask>treeBuilder.flattened.entries[0];
   expect(entryTask.type === Type.task);
   expect(entryTask.name === 'Simple Task');
+  expect(entryTask.id === 'root0');
 
-  const entryElement: EntryMethod = <EntryMethod>treeBuilder.flattened.entries[1];
+  let entryElement: EntryMethod = <EntryMethod>treeBuilder.flattened.entries[1];
   expect(entryElement.type === Type.method);
   expect(entryElement.name === 'screenshot');
+  expect(entryTask.id === 'root0-0');
+
+  entryElement = <EntryMethod>treeBuilder.flattened.entries[2];
+  expect(entryElement.type === Type.method);
+  expect(entryElement.name === 'screenshot');
+  expect(entryTask.id === 'root0-1');
+
+  opts.appendedContents.push(START_TEST);
+  opts.appendedContents.push(START_ELEMENT);
+  opts.appendedContents.push(END_ELEMENT);
+  opts.appendedContents.push(FINISH_RUN_AND_TEST);
+  await treeBuilder.onAppendedContents();
+
+  let entry = <EntryBase>treeBuilder.flattened.entries[3];
+  expect(entry.type === Type.task);
+  expect(entry.id === 'root1');
+
+  entry = <EntryBase>treeBuilder.flattened.entries[4];
+  expect(entry.type === Type.method);
+  expect(entry.id === 'root1-0');
+
+  expect(treeBuilder.flattened.entries.length).toBe(5);
+  expect(treeBuilder.flattened.stack.length).toBe(0);
 });

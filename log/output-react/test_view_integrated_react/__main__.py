@@ -10,6 +10,9 @@ if __name__ == "__main__":
     from robocorp.tasks import cli
 
     target = Path(__file__).absolute().parent / "tasks.py"
-    cases = ["case_task_and_element"]
+    cases = [
+        "case_failure",
+        "case_task_and_element",
+    ]
 
     cli.main(["run", str(target)] + [f"-t={c}" for c in cases], exit=True)

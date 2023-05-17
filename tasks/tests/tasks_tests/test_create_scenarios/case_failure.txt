@@ -1,0 +1,93 @@
+V 0.0.2
+T 2023-05-17T17:15:31.821+00:00
+ID 1|6da62757-f4d6-11ed-a64c-202b20a029af
+I "sys.platform=win32"
+I "python=3.9.13 | packaged by conda-forge | (main, May 27 2022, 16:51:29) [MSC v.1929 64 bit (AMD64)]"
+M a:"tasks.py - case_failure"
+SR a|0.002
+M c:"Collect tasks"
+M d:"setup"
+M e:""
+P b:c|d|e|e|0
+ST b|0.002
+M f:"regular"
+M g:"\nCollecting task case_failure from: tasks.py\n"
+C f|g|0.002
+M h:"PASS"
+ET h|e|0.01
+M j:"case_failure"
+M k:"tasks"
+M l:"D:/x/robocorpws/robo/tasks/tests/tasks_tests/resources/gen-scenarios/tasks.py"
+M m:"A case which has a known failure"
+P i:j|k|l|m|13
+ST i|0.01
+M n:"============================ "
+C f|n|0.011
+M o:"Running: "
+C f|o|0.011
+M p:"task_name"
+C p|j|0.011
+M q:" =============================\n"
+C f|q|0.011
+P r:j|k|l|e|16
+M s:"METHOD"
+SE r|s|0.011
+M u:"call_method"
+P t:u|k|l|e|9
+SE t|s|0.011
+M v:"msg"
+M w:"str"
+M x:"'Error message'"
+EA v|w|x
+M y:"some_assign"
+AS t|y|w|x|0.011
+M z:"RuntimeError: Error message"
+STB z|0.011
+M A:"D:/x/robocorpws/robo/tasks/src/robocorp/tasks/_task.py"
+M B:"run"
+M C:"self.method()"
+TBE A|28|B|C
+M D:"self"
+M E:"Task"
+M F:"Task(case_failure, status: NOT_RUN)"
+TBV D|E|F
+M G:"call_method(\"Error message\")"
+TBE l|16|j|G
+M H:"raise RuntimeError(some_assign)"
+TBE l|10|u|H
+TBV v|w|x
+TBV y|w|x
+ETB 0.012
+M I:"ERROR"
+EE s|I|0.012
+EE s|I|0.012
+C p|j|0.012
+M J:" status: "
+C f|J|0.012
+M K:"error"
+M L:"ERROR\n"
+C K|L|0.012
+M M:"\nError message\n"
+C K|M|0.012
+M N:"==================== "
+C f|N|0.012
+M O:"Full Traceback (running "
+C f|O|0.012
+C p|j|0.012
+M P:")"
+C f|P|0.012
+M Q:" =====================\n"
+C f|Q|0.012
+M R:"traceback"
+M S:"Traceback (most recent call last):\n  File \"D:/x/robocorpws/robo/tasks/src/robocorp/tasks/_commands.py\", line 225, in run\n    task.run()\n  File \"D:/x/robocorpws/robo/tasks/src/robocorp/tasks/_task.py\", line 28, in run\n    self.method()\n  File \"D:/x/robocorpws/robo/tasks/tests/tasks_tests/resources/gen-scenarios/tasks.py\", line 16, in case_failure\n    call_method(\"Error message\")\n  File \"D:/x/robocorpws/robo/tasks/tests/tasks_tests/resources/gen-scenarios/tasks.py\", line 10, in call_method\n    raise RuntimeError(some_assign)\nRuntimeError: Error message\n\n"
+C R|S|0.012
+M T:"================================================================================\n"
+C f|T|0.013
+M U:"Error message"
+ET I|U|0.013
+M W:"Teardown tasks"
+M X:"teardown"
+P V:W|X|e|e|0
+ST V|0.013
+ET h|e|0.013
+ER I|0.013

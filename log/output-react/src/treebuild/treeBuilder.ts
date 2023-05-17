@@ -9,10 +9,9 @@ import {
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
-import { getOpts } from './options';
 import { IOpts, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
-import { RunInfo, RunInfoStatus } from '~/lib';
+import { Counter, RunInfo, RunInfoStatus, logError } from '../lib';
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -78,18 +77,23 @@ class FlattenedTree {
   public entries: Entry[] = [];
 
   public stack: Entry[] = [];
+  public stackCounter: Counter[] = [new Counter()];
 
   private argsTarget: EntryMethod | undefined;
 
   private parentId = '';
 
-  private seqId = 0;
-
   newScopeId(): string {
+    let counter = this.stackCounter.at(-1);
+    if (counter === undefined) {
+      throw new Error('Error stack counter must always have at least 1 entry.');
+    }
     const newId =
-      this.parentId.length === 0 ? `root${this.seqId}` : `${this.parentId}-${this.seqId}`;
-    this.seqId += 1;
+      this.parentId.length === 0 ? `root${counter.next()}` : `${this.parentId}-${counter.next()}`;
     this.parentId = newId;
+
+    this.stackCounter.push(new Counter());
+
     return newId;
   }
 
@@ -163,24 +167,44 @@ class FlattenedTree {
     this.entries.push(entry);
   }
 
-  popMethodScope(msg: IMessage) {
+  popScope(msg: IMessage, type: Type): EntryBase | undefined {
     let entry: EntryBase | undefined;
     while (true) {
       if (this.stack.length === 0) {
         console.log(
-          `Unable to find element start when receiving end element message: ${JSON.stringify(
-            msg,
-          )}.`,
+          `Unable to find scope start when receiving end message: ${JSON.stringify(msg)}.`,
         );
         return;
       }
       entry = this.stack.pop();
-      if (entry?.type === Type.method) {
+      if (this.stackCounter.length > 1) {
+        // i.e.: the root entry must be always there (even if messages become wrong and we have
+        // more endings than starts).
+        this.stackCounter.pop();
+      }
+      if (entry?.type === type) {
+        if (this.stack.length > 0) {
+          const last = this.stack.at(-1);
+          if (last === undefined) {
+            throw new Error('Stack is not empty yet accessing last item returned undefined.');
+          }
+          this.parentId = last.id;
+        } else {
+          this.parentId = '';
+        }
         break;
       }
     }
+    return entry;
+  }
+
+  popMethodScope(msg: IMessage) {
     // Note: create a copy and assign it in the entries array (we don't want to mutate the
     // entry that's being used in react).
+    const entry: EntryBase | undefined = this.popScope(msg, Type.method);
+    if (entry === undefined) {
+      return;
+    }
     const methodScopeEntry: EntryMethod = <EntryMethod>{ ...entry };
     const { status } = msg.decoded;
     methodScopeEntry.status = getIntLevelFromStatus(status);
@@ -190,19 +214,11 @@ class FlattenedTree {
   }
 
   popTaskScope(msg: IMessage) {
-    let entry: EntryBase | undefined;
-    while (true) {
-      if (this.stack.length === 0) {
-        console.log(
-          `Unable to find task start when receiving end task message: ${JSON.stringify(msg)}.`,
-        );
-        return;
-      }
-      entry = this.stack.pop();
-      if (entry?.type === Type.task) {
-        break;
-      }
+    const entry: EntryBase | undefined = this.popScope(msg, Type.task);
+    if (entry === undefined) {
+      return;
     }
+
     // Note: create a copy and assign it in the entries array (we don't want to mutate the
     // entry that's being used in react).
     const taskScopeEntry: EntryTask = <EntryTask>{ ...entry };
@@ -367,6 +383,7 @@ export class TreeBuilder {
       console.log(
         `Error: handling message: ${JSON.stringify(msg)}: ${err} - ${JSON.stringify(err)}`,
       );
+      logError(err);
     }
   }
 

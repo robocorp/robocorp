@@ -141,6 +141,7 @@ def run(
         task_names = [task_name]
     else:
         task_names = task_name
+        task_name = ", ".join(str(x) for x in task_names)
 
     config: log.BaseConfig
     pyproject_path_and_contents = read_pyproject_toml(context, p)

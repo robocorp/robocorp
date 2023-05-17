@@ -3,6 +3,8 @@ import sys
 
 import pytest
 from pathlib import Path
+from typing import List, Any
+from contextlib import nullcontext
 
 
 @pytest.fixture(scope="session")
@@ -46,7 +48,6 @@ def robo_run(cmdline, returncode, cwd=None, additional_env=None):
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
     import subprocess
-    from pathlib import Path
 
     dirname = tmpdir_factory.mktemp("rcc_dir")
     location = os.path.join(str(dirname), "rcc")
@@ -60,6 +61,28 @@ def rcc_loc(tmpdir_factory):
     # Disable tracking for tests
     subprocess.check_call([location] + "configure identity --do-not-track".split())
     return Path(location)
+
+
+def run_in_rcc(rcc_loc: Path, cwd: Path, args: List[str], expect_error=False):
+    import subprocess
+    from subprocess import CalledProcessError
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", "")
+    env.pop("PYTHONHOME", "")
+    env.pop("VIRTUAL_ENV", "")
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUNBUFFERED"] = "1"
+
+    if expect_error:
+        ctx: Any = pytest.raises(CalledProcessError)
+    else:
+        ctx = nullcontext()
+
+    with ctx:
+        subprocess.check_call(
+            [str(rcc_loc)] + "task run --trace".split() + args, cwd=cwd, env=env
+        )
 
 
 def _download_rcc(location: str, force: bool = False) -> None:

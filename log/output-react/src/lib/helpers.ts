@@ -141,3 +141,28 @@ export function pathBasenameNoExt(source: string): string {
   }
   return basename;
 }
+
+export function logError(err: any | Error | undefined) {
+  if (err !== undefined) {
+    let indent = '    ';
+    if (err.message) {
+      console.log(indent + err.message);
+    }
+    if (err.stack) {
+      let stack: string = '' + err.stack;
+      console.log(stack.replace(/^/gm, indent));
+    }
+  }
+}
+
+export class Counter {
+  private count: number;
+
+  constructor() {
+    this.count = 0;
+  }
+
+  public next(): number {
+    return this.count++;
+  }
+}

@@ -61,10 +61,11 @@ def check_labels(page, expected_labels: Sequence[str]):
 
 def setup_scenario(page, case_name: str) -> None:
     case_path: Path = (
-        Path(__file__).absolute().parent.parent.parent
+        Path(__file__).absolute().parent.parent.parent.parent
+        / "tasks"
         / "tests"
-        / "robocorp_log_tests"
-        / "test_view_integrated_react"
+        / "tasks_tests"
+        / "test_create_scenarios"
         / (case_name + ".txt")
     )
     contents = case_path.read_text()
@@ -89,6 +90,27 @@ def check_text_from_tree_items(page, expected: Sequence[str]):
 
 
 @task
+def case_failure():
+    """
+    Checks whether the output view works as expected for us.
+
+    Note: the test scenario is actually at:
+
+    /log/tests/robocorp_log_tests/test_view_integrated_react
+    """
+    page = open_output_view_for_tests()
+    page.wait_for_selector("#base-header")  # Check that the page header was loaded
+
+    setup_scenario(page, "case_failure")
+
+    root_text_content = page.query_selector("#root0 > .entryName").text_content()
+    assert root_text_content == "Collect tasks"
+
+    root_text_content = page.query_selector("#root1 > .entryName").text_content()
+    assert root_text_content == "case_failure"
+
+
+@task
 def case_task_and_element():
     """
     Checks whether the output view works as expected for us.
@@ -110,32 +132,32 @@ def case_task_and_element():
     page.locator("#root0 > .toggleExpand").click()
 
     # Check "some_method"
-    some_method_text = page.locator("#root0-1 > .entryName").text_content()
+    some_method_text = page.locator("#root0-0 > .entryName").text_content()
     assert some_method_text == "some_method"
 
     # Expand "some_method"
-    page.locator("#root0-1 > .toggleExpand").click()
+    page.locator("#root0-0 > .toggleExpand").click()
 
     # Check "call_another_method"
-    call_another_text = page.locator("#root0-1-2 > .entryName").text_content()
+    call_another_text = page.locator("#root0-0-0 > .entryName").text_content()
     assert call_another_text == "call_another_method"
 
-    call_another_text = page.locator("#root0-1-2 > .entryValue").text_content()
+    call_another_text = page.locator("#root0-0-0 > .entryValue").text_content()
     assert (
         call_another_text
         == "param0=1, param1='arg', args=(['a', 'b'],), kwargs={'c': 3}"
     )
 
     # Check that the last method is a leaf and doesn't have the expand button.
-    assert page.query_selector("#root0-1-2 > .toggleExpand") is None
-    assert page.query_selector("#root0-1-2 > .noExpand") is not None
+    assert page.query_selector("#root0-0-0 > .toggleExpand") is None
+    assert page.query_selector("#root0-0-0 > .noExpand") is not None
 
     # ~ is sibling (columns are as siblings and not inside the item).
-    col_location_text = page.locator("#root0-1-2 ~ .colLocation").text_content()
+    col_location_text = page.locator("#root0-0-0 ~ .colLocation").text_content()
     assert col_location_text == "check:7"
 
     # ~ is sibling (columns are as siblings and not inside the item).
-    col_duration_text = page.locator("#root0-1-2 ~ .colDuration").text_content()
+    col_duration_text = page.locator("#root0-0-0 ~ .colDuration").text_content()
     assert col_duration_text == "0.0 s"
 
     # Check that the header (run info) is properly set.

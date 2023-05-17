@@ -1,4 +1,5 @@
 import parseISO from 'date-fns/parseISO';
+import { logError } from '../lib/helpers';
 
 let parseDate = parseISO;
 if (parseDate === undefined) {
@@ -399,7 +400,7 @@ export function* iter_decoded_log_format(stream: string, decoder: Decoder) {
         }
       } catch (err) {
         console.log(`Unable to decode message: ${line}`);
-        console.log(err);
+        logError(err);
       }
     }
   }

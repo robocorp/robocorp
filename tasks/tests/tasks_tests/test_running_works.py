@@ -1,18 +1,7 @@
 import os
 from pathlib import Path
 import pytest
-
-
-def run_in_rcc(rcc_loc: Path, cwd: Path):
-    import subprocess
-
-    env = os.environ.copy()
-    env.pop("PYTHONPATH", "")
-    env.pop("PYTHONHOME", "")
-    env.pop("VIRTUAL_ENV", "")
-    env["PYTHONIOENCODING"] = "utf-8"
-    env["PYTHONUNBUFFERED"] = "1"
-    subprocess.check_call([str(rcc_loc)] + "task run --trace".split(), cwd=cwd, env=env)
+from tasks_tests.fixtures import run_in_rcc
 
 
 def test_rpa_challenge_works(rcc_loc: Path, resources_dir: Path):
