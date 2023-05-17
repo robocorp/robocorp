@@ -7,11 +7,12 @@ import {
   EntryMethod,
   Argument,
 } from '../lib/types';
-import { setAllEntriesWhenPossible } from './effectCallbacks';
+import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
 import { getOpts } from './options';
 import { IOpts, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
+import { RunInfo, RunInfoStatus } from '~/lib';
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -251,6 +252,35 @@ export class TreeBuilder {
     this.resetState();
   }
 
+  private runInfo: RunInfo = {
+    description: 'Waiting for run to start ...',
+    time: '',
+    status: 'UNSET',
+    finishTimeDeltaInSeconds: undefined,
+  };
+
+  private runInfoChanged: boolean = false;
+
+  updateRunInfoName(name: string) {
+    this.runInfo.description = name;
+    this.runInfoChanged = true;
+  }
+
+  updateRunInfoTime(time: string) {
+    this.runInfo.time = time;
+    this.runInfoChanged = true;
+  }
+
+  updateRunInfoStatus(status: RunInfoStatus) {
+    this.runInfo.status = status;
+    this.runInfoChanged = true;
+  }
+
+  updateRunInfoFinishTime(timeDeltaInSeconds: number) {
+    this.runInfo.finishTimeDeltaInSeconds = timeDeltaInSeconds;
+    this.runInfoChanged = true;
+  }
+
   resetState() {
     this.seenSuiteTaskOrElement = false;
   }
@@ -318,6 +348,10 @@ export class TreeBuilder {
     // changing previous entries when the element is being closed).
     const updateFromIndex = 0;
     setAllEntriesWhenPossible(this.flattened.entries, updateFromIndex);
+    if (this.runInfoChanged) {
+      this.runInfoChanged = false;
+      setRunInfoWhenPossible(this.runInfo);
+    }
   }
 
   private async addOneMessage(msg: IMessage): Promise<void> {
@@ -379,11 +413,7 @@ export class TreeBuilder {
     switch (msgType) {
       case 'SR':
         // start run
-        // TODO: Set suite header
-        // for (const el of document.querySelectorAll('.suiteHeader')) {
-        //   el.textContent = msg.decoded['name'];
-        // }
-
+        this.updateRunInfoName(msg.decoded['name']);
         break;
 
       case 'AS':
@@ -456,18 +486,12 @@ export class TreeBuilder {
 
         break;
       case 'ER': // end run
-        // this.messageNode = this.messageNode.parent;
-        // {
-        //   const div = divById('suiteResult');
-        //   div.style.display = 'block';
-        //   if (this.suiteErrored) {
-        //     div.classList.add('ERROR');
-        //     div.textContent = 'Run Failed';
-        //   } else {
-        //     div.classList.add('PASS');
-        //     div.textContent = 'Run Passed';
-        //   }
-
+        if (this.suiteErrored) {
+          this.updateRunInfoStatus('ERROR');
+        } else {
+          this.updateRunInfoStatus('PASS');
+        }
+        this.updateRunInfoFinishTime(msg.decoded['time_delta_in_seconds']);
         //   const timeDiv = divById('suiteRunStart');
         //   if (timeDiv) {
         //     timeDiv.textContent += ` - Finished in: ${msg.decoded['time_delta_in_seconds'].toFixed(
@@ -597,10 +621,7 @@ export class TreeBuilder {
         }
         break;
       case 'T':
-        // const div = divById('suiteRunStart');
-        // if (div) {
-        //   div.textContent = msg.decoded['time'];
-        // }
+        this.updateRunInfoTime(msg.decoded);
         break;
     }
   }

@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 import { Header, Details, Table } from '~/components';
-import { LogContext, filterExpandedEntries, defaultLogState, LogContextType } from '~/lib';
+import { LogContext, filterExpandedEntries, defaultLogState, LogContextType, RunInfo } from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
-import { reactCallSetAllEntriesCallback } from './treebuild/effectCallbacks';
+import {
+  reactCallSetAllEntriesCallback,
+  reactCallSetRunInfoCallback,
+} from './treebuild/effectCallbacks';
 
 const Main = styled.main`
   display: grid;
@@ -16,6 +19,12 @@ export const Log = () => {
   const [filter, setFilter] = useState('');
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [runInfo, setRunInfo] = useState<RunInfo>({
+    description: 'Waiting for run to start ...',
+    time: '',
+    status: 'UNSET',
+    finishTimeDeltaInSeconds: undefined,
+  });
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
   const lastUpdatedIndex = useRef<number>(0);
@@ -29,6 +38,12 @@ export const Log = () => {
         // console.log('Set entries to: ' + JSON.stringify(newEntries));
         lastUpdatedIndex.current = updatedFromIndex;
         return [...newEntries];
+      });
+    });
+
+    reactCallSetRunInfoCallback((runInfo: RunInfo) => {
+      setRunInfo(() => {
+        return runInfo;
       });
     });
   }, []);
@@ -61,6 +76,7 @@ export const Log = () => {
     setActiveIndex,
     viewSettings,
     setViewSettings,
+    runInfo,
     lastUpdatedIndex,
   };
 
@@ -73,7 +89,7 @@ export const Log = () => {
     <ThemeProvider name={viewSettings.theme}>
       <Main>
         <LogContext.Provider value={logContextValue}>
-          <Header filter={filter} setFilter={setFilter} />
+          <Header filter={filter} setFilter={setFilter} runInfo={runInfo} />
           <Table />
           <Details />
         </LogContext.Provider>

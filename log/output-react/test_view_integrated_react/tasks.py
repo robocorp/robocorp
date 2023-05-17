@@ -136,4 +136,15 @@ def case_task_and_element():
 
     # ~ is sibling (columns are as siblings and not inside the item).
     col_duration_text = page.locator("#root0-1-2 ~ .colDuration").text_content()
-    assert col_duration_text == "0.00s"
+    assert col_duration_text == "0.0 s"
+
+    # Check that the header (run info) is properly set.
+    run_badge_text = (
+        page.query_selector("#base-header").query_selector(".badge").text_content()
+    )
+    assert run_badge_text == "Run Passed"
+
+    header_text = (
+        page.query_selector("#base-header").query_selector("h1").text_content()
+    )
+    assert header_text == "Robot1"

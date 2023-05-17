@@ -1,15 +1,24 @@
 import { ChangeEvent, FC, useCallback } from 'react';
-import { Badge, Box, Button, Header as BaseHeader, Input, Menu } from '@robocorp/components';
+import {
+  Badge,
+  Box,
+  Button,
+  Header as BaseHeader,
+  Input,
+  Menu,
+  BadgeVariant,
+} from '@robocorp/components';
 import { IconCloseSmall } from '@robocorp/icons';
 import { IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
-import { useLogContext } from '~/lib';
+import { RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
 
 type Props = {
   filter: string;
   setFilter: (filter: string) => void;
+  runInfo: RunInfo;
 };
 
-export const Header: FC<Props> = ({ filter, setFilter }) => {
+export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
   const { viewSettings, setViewSettings } = useLogContext();
 
   const onFilterChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -41,13 +50,38 @@ export const Header: FC<Props> = ({ filter, setFilter }) => {
     }));
   }, []);
 
+  let variant: BadgeVariant = 'magenta';
+  let label: string = 'TODO: set label for: ' + runInfo.status;
+  switch (runInfo.status) {
+    case 'ERROR':
+      label = 'Run Failed';
+      variant = 'danger';
+      break;
+    case 'PASS':
+      label = 'Run Passed';
+      variant = 'success';
+      break;
+    case 'UNSET':
+      label = 'Unfinished ...';
+      variant = 'magenta';
+      break;
+  }
+  const time: string = runInfo.time;
+  const timeDelta: number | undefined = runInfo.finishTimeDeltaInSeconds;
+  let timeDescription = '';
+  if (time && time.length > 0) {
+    timeDescription = time;
+    if (timeDelta !== undefined) {
+      timeDescription += ' — took: ' + formatTimeInSeconds(timeDelta);
+    }
+  }
   return (
     <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary" id="base-header">
       <BaseHeader size="medium">
-        <BaseHeader.Title title="Python RPA Challenge">
-          <Badge variant="danger" label="Failed" size="small" />
+        <BaseHeader.Title title={runInfo.description}>
+          <Badge variant={variant} label={label} size="small" />
         </BaseHeader.Title>
-        <BaseHeader.Description>27 Mar 2023 at 12:44 (UTC+2) — 13 seconds</BaseHeader.Description>
+        <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
         <BaseHeader.Actions>
           <Menu
             trigger={

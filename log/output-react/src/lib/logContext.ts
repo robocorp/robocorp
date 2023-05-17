@@ -6,6 +6,14 @@ export interface FilteredEntries {
   entriesWithChildren: Set<string>;
 }
 
+export type RunInfoStatus = 'ERROR' | 'PASS' | 'UNSET';
+export interface RunInfo {
+  description: string;
+  time: string;
+  status: RunInfoStatus;
+  finishTimeDeltaInSeconds: number | undefined;
+}
+
 export type LogContextType = {
   expandedEntries: Set<string>;
   filteredEntries: FilteredEntries;
@@ -14,6 +22,7 @@ export type LogContextType = {
   setActiveIndex: (index: null | number) => void;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
+  runInfo: RunInfo;
   lastUpdatedIndex: MutableRefObject<number>;
 };
 
@@ -34,6 +43,12 @@ export const defaultLogState: LogContextType = {
     },
   },
   setViewSettings: () => null,
+  runInfo: {
+    description: 'Wating for run to start ...',
+    time: '',
+    status: 'UNSET',
+    finishTimeDeltaInSeconds: undefined,
+  },
   lastUpdatedIndex: { current: 0 },
 };
 

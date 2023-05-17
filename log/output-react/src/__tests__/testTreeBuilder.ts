@@ -66,9 +66,7 @@ test('TreeBuilder can read method.', async () => {
 
   opts.initialContents = CREATE_RUN_AND_TEST + START_ELEMENT;
   await treeBuilder.addInitialContents();
-  console.log(JSON.stringify(treeBuilder.flattened.entries));
   expect(treeBuilder.flattened.entries.length).toBe(2);
-  console.log(JSON.stringify(treeBuilder.flattened.stack));
   expect(treeBuilder.flattened.stack.length).toBe(2);
 
   opts.appendedContents.push(END_ELEMENT + FINISH_RUN_AND_TEST);

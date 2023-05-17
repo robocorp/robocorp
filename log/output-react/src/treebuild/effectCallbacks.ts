@@ -1,3 +1,4 @@
+import { RunInfo } from '~/lib';
 import { Entry } from '~/lib/types';
 
 let callsToSetAllEntries: { newEntries: Entry[]; updatedFromIndex: number } | undefined;
@@ -26,5 +27,24 @@ export function setAllEntriesWhenPossible(newEntries: Entry[], updatedFromIndex 
       updatedFromIndex = Math.min(updatedFromIndex, callsToSetAllEntries.updatedFromIndex);
     }
     callsToSetAllEntries = { newEntries, updatedFromIndex };
+  }
+}
+
+let callsToSetRunInfo: { runInfo: RunInfo } | undefined;
+let reactSetRunInfoCallback: any;
+
+export function reactCallSetRunInfoCallback(setRunInfoCallback: any) {
+  reactSetRunInfoCallback = setRunInfoCallback;
+  if (callsToSetRunInfo !== undefined) {
+    setRunInfoCallback(callsToSetRunInfo.runInfo);
+    callsToSetRunInfo = undefined;
+  }
+}
+
+export function setRunInfoWhenPossible(runInfo: RunInfo) {
+  if (reactSetRunInfoCallback !== undefined) {
+    reactSetRunInfoCallback(runInfo);
+  } else {
+    callsToSetRunInfo = { runInfo };
   }
 }

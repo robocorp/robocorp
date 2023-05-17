@@ -70,7 +70,30 @@ export const formatLocation = (entry: Entry) => {
   return '';
 };
 
-// TODO: Update duration format
+export function formatTimeInSeconds(seconds: number) {
+  if (seconds < 60) {
+    return seconds.toFixed(1) + ' s';
+  }
+
+  var hours = Math.floor(seconds / 3600);
+  var minutes = Math.floor((seconds % 3600) / 60);
+  var remainingSeconds = seconds % 60;
+
+  var formattedTime = '';
+  if (hours > 0) {
+    formattedTime += hours + ':';
+    formattedTime += padZero(minutes) + ' hours';
+  } else {
+    formattedTime += padZero(minutes) + ':' + padZero(remainingSeconds) + ' min';
+  }
+
+  return formattedTime;
+}
+
+function padZero(n: number) {
+  return n.toFixed(0).padStart(2, '0');
+}
+
 export const formatDuration = (entry: Entry) => {
   const asObj = <any>entry;
   const start: number | undefined = asObj.startDeltaInSeconds;
@@ -78,7 +101,7 @@ export const formatDuration = (entry: Entry) => {
     const end: number | undefined = asObj.endDeltaInSeconds;
     if (end !== undefined && end >= 0) {
       const duration = end - start;
-      return `${duration.toFixed(2)}s`;
+      return formatTimeInSeconds(duration);
     }
   }
   return '';
