@@ -1,5 +1,5 @@
 import { FilteredEntries } from './logContext';
-import { Entry, EntryMethod, Type } from './types';
+import { Entry, EntryException, EntryMethod, Type } from './types';
 
 const searchFn = (haystack: string, needle: string) =>
   haystack.toLowerCase().includes(needle.trim().toLowerCase());
@@ -119,12 +119,12 @@ export const formatDuration = (entry: Entry) => {
   return '';
 };
 
-// TODO: Update item heights to cover all special cases
 export const getLogEntryHeight = (entry: Entry): number => {
-  // if (entry.type === Type.error) {
-  //   // Error entry height is dependent of the message line count
-  //   return 32 + Math.min((entry.message.split(/\r\n|\r|\n/).length - 1) * 16, 32);
-  // }
+  if (entry.type === Type.exception) {
+    const excEntry = entry as EntryException;
+    // Error entry height is dependent of the message line count
+    return 32 + Math.min((excEntry.excMsg.split(/\r\n|\r|\n/).length - 1) * 16, 32);
+  }
 
   return 32;
 };

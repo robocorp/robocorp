@@ -1,7 +1,14 @@
-import { Drawer } from '@robocorp/components';
+import { Box, Drawer } from '@robocorp/components';
+import { styled } from '@robocorp/theme';
 import { FC } from 'react';
 
-import { Entry, EntryMethod, Type } from '~/lib/types';
+import { Entry, EntryException, EntryMethod, Type } from '../../../lib/types';
+
+const PreBox = styled(Box)`
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: inline;
+`;
 
 type Props = {
   entry: Entry;
@@ -14,6 +21,12 @@ const getTitle = (entry: Entry) => {
       return {
         title: methodEntry.name,
         description: `Module: ${methodEntry.libname}`,
+      };
+    case Type.exception:
+      const excEntry = entry as EntryException;
+      return {
+        title: excEntry.excType,
+        description: <PreBox>{excEntry.excMsg.trim()}</PreBox>,
       };
 
     default:

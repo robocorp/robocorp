@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { Drawer } from '@robocorp/components';
+import { Box, Drawer } from '@robocorp/components';
 
 import { Entry, Type } from '~/lib/types';
-import { ErrorComponent } from './components/ErrorComponent';
+import { ExceptionComponent } from './components/ExceptionComponent';
 import { Method } from './components/Method';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
@@ -13,8 +13,8 @@ const getContentComponent = (type: Type) => {
   switch (type) {
     case Type.method:
       return Method;
-    case Type.error:
-      return ErrorComponent;
+    case Type.exception:
+      return ExceptionComponent;
     default:
       return Todo;
   }
@@ -24,8 +24,8 @@ export const Content: FC<{ entry: Entry }> = ({ entry }) => {
   const Component = getContentComponent(entry.type);
 
   return (
-    <Drawer.Content>
+    <Box p="$32" borderColor="border.inversed" borderRadius="$16" margin="$8">
       <Component entry={entry} />
-    </Drawer.Content>
+    </Box>
   );
 };

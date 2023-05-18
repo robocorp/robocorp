@@ -24,7 +24,6 @@ export enum Type {
   // Not used for now...
   variable = 'Variable',
   log = 'Log',
-  error = 'Error',
 }
 
 export interface EntryBase {
