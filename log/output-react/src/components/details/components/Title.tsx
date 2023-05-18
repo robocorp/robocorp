@@ -2,7 +2,14 @@ import { Box, Drawer } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 import { FC } from 'react';
 
-import { Entry, EntryException, EntryMethod, Type } from '../../../lib/types';
+import {
+  Entry,
+  EntryException,
+  EntryMethod,
+  EntryTask,
+  EntryVariable,
+  Type,
+} from '../../../lib/types';
 
 const PreBox = styled(Box)`
   white-space: pre-wrap;
@@ -19,14 +26,26 @@ const getTitle = (entry: Entry) => {
     case Type.method:
       const methodEntry = entry as EntryMethod;
       return {
-        title: methodEntry.name,
+        title: `Method: ${methodEntry.name}`,
         description: `Module: ${methodEntry.libname}`,
       };
     case Type.exception:
       const excEntry = entry as EntryException;
       return {
-        title: excEntry.excType,
+        title: `Exception: ${excEntry.excType}`,
         description: <PreBox>{excEntry.excMsg.trim()}</PreBox>,
+      };
+    case Type.variable:
+      const excVar = entry as EntryVariable;
+      return {
+        title: `Variable: ${excVar.name}`,
+        description: <PreBox>Type: {excVar.varType.trim()}</PreBox>,
+      };
+    case Type.task:
+      const excTask = entry as EntryTask;
+      return {
+        title: `Task: ${excTask.name}`,
+        description: <PreBox>(task entry point)</PreBox>,
       };
 
     default:

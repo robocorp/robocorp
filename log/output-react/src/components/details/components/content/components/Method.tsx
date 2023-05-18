@@ -3,6 +3,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 
 import { Entry, EntryMethod } from '~/lib/types';
+import { Bold, LocationContent } from './Common';
 
 const Content = styled(Box)`
   position: relative;
@@ -20,11 +21,6 @@ const ArgumentName = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$8};
 `;
 
-const Bold = styled(Box)`
-  font-weight: bolder;
-  display: inline;
-`;
-
 const ArgumentType = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$8};
   display: inline;
@@ -32,11 +28,6 @@ const ArgumentType = styled(Box)`
 
 const ArgumentValue = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$12};
-`;
-
-const LocationContent = styled(Box)`
-  margin-left: ${({ theme }) => theme.space.$12};
-  margin-bottom: ${({ theme }) => theme.space.$8};
 `;
 
 export const Method: FC<{ entry: Entry }> = (props) => {

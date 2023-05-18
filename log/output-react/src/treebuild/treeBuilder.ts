@@ -7,6 +7,7 @@ import {
   EntryMethod,
   Argument,
   EntryException,
+  EntryVariable,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
@@ -107,9 +108,9 @@ class FlattenedTree {
     }
     const newId =
       this.parentId.length === 0 ? `root${counter.next()}` : `${this.parentId}-${counter.next()}`;
-    this.parentId = newId;
 
     if (addToStack) {
+      this.parentId = newId;
       this.stackCounter.push(new Counter());
     }
 
@@ -135,7 +136,7 @@ class FlattenedTree {
       lineno: tbEntry.lineno,
       tb: tb,
       excType: excType,
-      excMsg: excMsg,
+      excMsg: excMsg.trim(),
       entriesIndex: this.entries.length,
     };
     this.entries.push(entry);
@@ -193,6 +194,21 @@ class FlattenedTree {
     }
   }
 
+  pushAssign(msg: IMessage) {
+    const entry: EntryVariable = {
+      id: this.newScopeId(false),
+      type: Type.variable,
+      source: msg.decoded['source'],
+      lineno: msg.decoded['lineno'],
+      name: msg.decoded['target'],
+      value: msg.decoded['value'],
+      varType: msg.decoded['type'],
+      entriesIndex: this.entries.length,
+    };
+    this.entries.push(entry);
+    // Tooltip:
+    // `Assign to name: ${msg.decoded['target']}\nAn object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
+  }
   pushTaskScope(msg: IMessage) {
     // console.log('pushTaskScope');
     const entry: EntryTask = {
@@ -488,20 +504,7 @@ export class TreeBuilder {
 
       case 'AS':
         // assign
-        // item = addTreeContent(
-        //   this.opts,
-        //   this.parent,
-        //   `${msg.decoded['target']} = `,
-        //   `Assign to name: ${msg.decoded['target']}\nAn object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
-        //   msg,
-        //   false,
-        //   msg.decoded['source'],
-        //   msg.decoded['lineno'],
-        //   this.messageNode,
-        //   this.id.toString(),
-        // );
-        // addValueToTreeContent(item, msg.decoded['value']);
-        // this.addAssignCssClass(item);
+        this.flattened.pushAssign(msg);
         break;
       case 'ST':
         // start task

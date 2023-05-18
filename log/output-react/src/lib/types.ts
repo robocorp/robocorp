@@ -69,6 +69,7 @@ export interface EntryVariable extends EntryBase {
   type: Type.variable;
   name: string;
   value: string;
+  varType: string;
 }
 
 export interface EntryLog extends EntryBase {

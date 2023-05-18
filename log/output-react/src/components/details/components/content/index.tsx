@@ -4,6 +4,8 @@ import { Box, Drawer } from '@robocorp/components';
 import { Entry, Type } from '~/lib/types';
 import { ExceptionComponent } from './components/ExceptionComponent';
 import { Method } from './components/Method';
+import { VariableComponent } from './components/VariableComponent';
+import { TaskComponent } from './components/TaskComponent';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
   return <>Todo: support {props.entry.type}</>;
@@ -15,6 +17,10 @@ const getContentComponent = (type: Type) => {
       return Method;
     case Type.exception:
       return ExceptionComponent;
+    case Type.variable:
+      return VariableComponent;
+    case Type.task:
+      return TaskComponent;
     default:
       return Todo;
   }

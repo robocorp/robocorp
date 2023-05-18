@@ -5,6 +5,7 @@ import { Counter } from '~/lib';
 import styled from 'styled-components';
 
 import { Entry, EntryException } from '~/lib/types';
+import { Bold } from './Common';
 
 const LocationContent = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$12};
@@ -21,11 +22,6 @@ const LineContents = styled(Box)`
 const LineVar = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$32};
   margin-bottom: ${({ theme }) => theme.space.$8};
-`;
-
-const Bold = styled(Box)`
-  font-weight: bold;
-  display: inline;
 `;
 
 export const ExceptionComponent: FC<{ entry: Entry }> = (props) => {

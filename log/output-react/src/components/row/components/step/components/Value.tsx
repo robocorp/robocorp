@@ -2,7 +2,7 @@ import { FC, ReactNode } from 'react';
 import { Box, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
-import { Entry, EntryException, EntryMethod, Type } from '~/lib/types';
+import { Entry, EntryException, EntryMethod, EntryVariable, Type } from '~/lib/types';
 import { formatArguments } from '~/lib/helpers';
 
 type Props = {
@@ -27,6 +27,9 @@ const getValue = (entry: Entry): ReactNode => {
       return '';
     case Type.exception:
       return (entry as EntryException).excMsg;
+    case Type.variable:
+      const entryVariable = entry as EntryVariable;
+      return `${entryVariable.value} (${entryVariable.varType})`;
     default:
       return 'TODO: provide getValue for: ' + entry.type;
   }
