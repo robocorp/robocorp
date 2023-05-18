@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { Box, Typography } from '@robocorp/components';
 
-import { Entry, Type } from '~/lib/types';
+import { Entry, EntryMethod, EntryTask, EntryException, Type } from '~/lib/types';
 
 type Props = {
   entry: Entry;
@@ -10,12 +10,12 @@ type Props = {
 const getTitle = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.task:
-    // fallthrough
+      return (entry as EntryTask).name;
     case Type.method:
-    case Type.variable:
-      return entry.name;
-    case Type.log:
-      return entry.message;
+      return (entry as EntryMethod).name;
+    case Type.exception:
+      return ''; // the type is added in the icon.
+    // return (entry as EntryException).excType;
     default:
       return 'TODO: provide getTitle';
   }

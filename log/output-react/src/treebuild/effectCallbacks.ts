@@ -1,7 +1,9 @@
 import { RunInfo } from '~/lib';
 import { Entry } from '~/lib/types';
 
-let callsToSetAllEntries: { newEntries: Entry[]; updatedFromIndex: number } | undefined;
+let callsToSetAllEntries:
+  | { newEntries: Entry[]; newExpanded: string[]; updatedFromIndex: number }
+  | undefined;
 let reactSetAllEntriesCallback: any;
 
 /**
@@ -10,7 +12,11 @@ let reactSetAllEntriesCallback: any;
 export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
   reactSetAllEntriesCallback = setAllentriesCallback;
   if (callsToSetAllEntries !== undefined) {
-    setAllentriesCallback(callsToSetAllEntries.newEntries, callsToSetAllEntries.updatedFromIndex);
+    setAllentriesCallback(
+      callsToSetAllEntries.newEntries,
+      callsToSetAllEntries.newExpanded,
+      callsToSetAllEntries.updatedFromIndex,
+    );
     callsToSetAllEntries = undefined;
   }
 }
@@ -19,14 +25,19 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
  * Sets the entries. May be done right now if the react callback is already set or it may be
  * done at a later time (when the callback is actually set).
  */
-export function setAllEntriesWhenPossible(newEntries: Entry[], updatedFromIndex = 0) {
+export function setAllEntriesWhenPossible(
+  newEntries: Entry[], // all the entries which should be set
+  newExpanded: string[], // new entry ids to be expanded
+  updatedFromIndex = 0, // from which index onwards was there some change
+) {
   if (reactSetAllEntriesCallback !== undefined) {
-    reactSetAllEntriesCallback(newEntries, updatedFromIndex);
+    reactSetAllEntriesCallback(newEntries, newExpanded, updatedFromIndex);
   } else {
     if (callsToSetAllEntries !== undefined) {
       updatedFromIndex = Math.min(updatedFromIndex, callsToSetAllEntries.updatedFromIndex);
+      newExpanded = callsToSetAllEntries.newExpanded.concat(newExpanded);
     }
-    callsToSetAllEntries = { newEntries, updatedFromIndex };
+    callsToSetAllEntries = { newEntries, newExpanded, updatedFromIndex };
   }
 }
 

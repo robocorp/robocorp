@@ -2,7 +2,7 @@ import { FC, ReactNode } from 'react';
 import { Box, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
-import { Entry, Type } from '~/lib/types';
+import { Entry, EntryException, EntryMethod, Type } from '~/lib/types';
 import { formatArguments } from '~/lib/helpers';
 
 type Props = {
@@ -22,11 +22,11 @@ const Container = styled(Box)`
 const getValue = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.method:
-      return formatArguments(entry);
+      return formatArguments(entry as EntryMethod);
     case Type.task:
       return '';
-    case Type.variable:
-      return entry.value;
+    case Type.exception:
+      return (entry as EntryException).excMsg;
     default:
       return 'TODO: provide getValue for: ' + entry.type;
   }

@@ -109,6 +109,11 @@ def case_failure():
     root_text_content = page.query_selector("#root1 > .entryName").text_content()
     assert root_text_content == "case_failure"
 
+    # Expand "case_failure"
+    assert (
+        page.query_selector("#root1-0-0") is not None
+    ), "Expected exception to be expanded by default."
+
 
 @task
 def case_task_and_element():

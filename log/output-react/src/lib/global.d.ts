@@ -8,6 +8,10 @@ declare global {
     setContents: (msg: ISetContentsRequest) => void;
     getSampleContents: (t) => any;
 
-    setAllEntriesWhenPossible: (newEntries: Entry[], updatedFromIndex: number) => void;
+    setAllEntriesWhenPossible: (
+      newEntries: Entry[],
+      newExpanded: string[],
+      updatedFromIndex: number,
+    ) => void;
   }
 }

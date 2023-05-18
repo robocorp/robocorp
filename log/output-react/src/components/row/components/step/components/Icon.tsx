@@ -13,7 +13,7 @@ import {
 } from '@robocorp/icons';
 import { Badge, Box } from '@robocorp/components';
 
-import { Entry, EntryMethod, EntryTask, StatusLevel, Type } from '~/lib/types';
+import { Entry, EntryException, EntryMethod, EntryTask, StatusLevel, Type } from '~/lib/types';
 
 type Props = {
   entry: Entry;
@@ -44,18 +44,17 @@ const getIcon = (entry: Entry): ReactNode => {
       return getLogIcon(e.status);
     case Type.variable:
       return <IconBox color="magenta60" />;
-    case Type.log:
-      return getLogIcon(entry.status);
-    // case Type.error:
-    //   return (
-    //     <Badge
-    //       icon={IconStatusError}
-    //       variant="danger"
-    //       iconColor="background.error"
-    //       label="Execution Error"
-    //       size="small"
-    //     />
-    //   );
+    case Type.exception:
+      const exc: EntryException = entry as EntryException;
+      return (
+        <Badge
+          icon={IconStatusError}
+          variant="danger"
+          iconColor="background.error"
+          label={exc.excType}
+          size="small"
+        />
+      );
     default:
       return <IconInformation color="blue60" />;
   }

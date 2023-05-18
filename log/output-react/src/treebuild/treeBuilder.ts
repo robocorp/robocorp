@@ -6,10 +6,11 @@ import {
   StatusLevel,
   EntryMethod,
   Argument,
+  EntryException,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
-import { IOpts, PythonTraceback } from './protocols';
+import { IOpts, ITracebackEntry, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
 import { Counter, RunInfo, RunInfoStatus, logError } from '../lib';
 
@@ -43,7 +44,7 @@ class TBHandler {
       case 'TBE': // tb entry
         tb = this.stack.at(-1);
         if (tb === undefined) {
-          console.log('Unable to pop stack entry because the stack is empty.');
+          console.log('Unable add traceback entry because no traceback is in the stack.');
           return undefined;
         }
         tb.pushEntry(
@@ -55,10 +56,12 @@ class TBHandler {
         return undefined;
 
       case 'TBV': // variable
-        // We no longer push variabes into the stack because we're not using them
-        // right now (as we record assigns as they happen in a scope).
-        // tb = this.stack.at(-1);
-        // tb.pushVar(msg.decoded["name"], msg.decoded["type"], msg.decoded["value"]);
+        tb = this.stack.at(-1);
+        if (tb === undefined) {
+          console.log('Unable add traceback variable because no traceback is in the stack.');
+          return undefined;
+        }
+        tb.pushVar(msg.decoded['name'], msg.decoded['type'], msg.decoded['value']);
         return undefined;
 
       case 'ETB': // tb end
@@ -74,16 +77,30 @@ class TBHandler {
 }
 
 class FlattenedTree {
+  // All entries we're viewing.
+  // Note: when an entry is changed a copy should be done and the entry
+  // in this object should be replace.
   public entries: Entry[] = [];
 
+  // New entry ids which should be automatically expanded.
+  public newExpanded: string[] = [];
+
+  // A stack to help us manage the parent entry for new entries.
+  // Note: when an entry is changed a copy should be done and the entry
+  // in this object should be replace.
   public stack: Entry[] = [];
+
+  // A stack helper just to provide ids for entries.
   public stackCounter: Counter[] = [new Counter()];
 
+  // The target for the arguments being set (may not be the stack top as some
+  // entries which have arguments may not create a new scope).
   private argsTarget: EntryMethod | undefined;
 
+  // The current parentId.
   private parentId = '';
 
-  newScopeId(): string {
+  newScopeId(addToStack = true): string {
     let counter = this.stackCounter.at(-1);
     if (counter === undefined) {
       throw new Error('Error stack counter must always have at least 1 entry.');
@@ -92,9 +109,36 @@ class FlattenedTree {
       this.parentId.length === 0 ? `root${counter.next()}` : `${this.parentId}-${counter.next()}`;
     this.parentId = newId;
 
-    this.stackCounter.push(new Counter());
+    if (addToStack) {
+      this.stackCounter.push(new Counter());
+    }
 
     return newId;
+  }
+
+  pushException(tb: PythonTraceback) {
+    const tbEntry: ITracebackEntry = tb.stack[0];
+    const split: string[] = tb.exceptionMsg.split(':', 2);
+    let excType: string;
+    let excMsg: string;
+    if (split.length > 1) {
+      excType = split[0];
+      excMsg = split[1];
+    } else {
+      excType = 'Error';
+      excMsg = split[0];
+    }
+    const entry: EntryException = {
+      id: this.newScopeId(false),
+      type: Type.exception,
+      source: tbEntry.source,
+      lineno: tbEntry.lineno,
+      tb: tb,
+      excType: excType,
+      excMsg: excMsg,
+      entriesIndex: this.entries.length,
+    };
+    this.entries.push(entry);
   }
 
   pushMethodScope(msg: IMessage) {
@@ -198,6 +242,17 @@ class FlattenedTree {
     return entry;
   }
 
+  updateEntryStatus(entry: EntryTask | EntryMethod, msg: IMessage) {
+    const { status } = msg.decoded;
+    entry.status = getIntLevelFromStatus(status);
+    entry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
+
+    this.entries[entry.entriesIndex] = entry;
+    if (entry.status >= StatusLevel.error) {
+      this.newExpanded.push(entry.id);
+    }
+  }
+
   popMethodScope(msg: IMessage) {
     // Note: create a copy and assign it in the entries array (we don't want to mutate the
     // entry that's being used in react).
@@ -205,12 +260,9 @@ class FlattenedTree {
     if (entry === undefined) {
       return;
     }
-    const methodScopeEntry: EntryMethod = <EntryMethod>{ ...entry };
-    const { status } = msg.decoded;
-    methodScopeEntry.status = getIntLevelFromStatus(status);
-    methodScopeEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
 
-    this.entries[methodScopeEntry.entriesIndex] = methodScopeEntry;
+    const methodScopeEntry: EntryMethod = <EntryMethod>{ ...entry };
+    this.updateEntryStatus(methodScopeEntry, msg);
   }
 
   popTaskScope(msg: IMessage) {
@@ -222,11 +274,7 @@ class FlattenedTree {
     // Note: create a copy and assign it in the entries array (we don't want to mutate the
     // entry that's being used in react).
     const taskScopeEntry: EntryTask = <EntryTask>{ ...entry };
-    const { status } = msg.decoded;
-    taskScopeEntry.status = getIntLevelFromStatus(status);
-    taskScopeEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
-
-    this.entries[taskScopeEntry.entriesIndex] = taskScopeEntry;
+    this.updateEntryStatus(taskScopeEntry, msg);
   }
 }
 
@@ -363,7 +411,12 @@ export class TreeBuilder {
     // check what was the first item which was updated as we could be
     // changing previous entries when the element is being closed).
     const updateFromIndex = 0;
-    setAllEntriesWhenPossible(this.flattened.entries, updateFromIndex);
+    let newExpanded = this.flattened.newExpanded;
+    if (newExpanded.length > 0) {
+      // Don't add the same ones again.
+      this.flattened.newExpanded = [];
+    }
+    setAllEntriesWhenPossible(this.flattened.entries, newExpanded, updateFromIndex);
     if (this.runInfoChanged) {
       this.runInfoChanged = false;
       setRunInfoWhenPossible(this.runInfo);
@@ -608,32 +661,7 @@ export class TreeBuilder {
         const tb: PythonTraceback | undefined = this.tbHandler.handle(msg);
         if (tb) {
           if (tb.stack.length > 0) {
-            const tbEntry = tb.stack[0];
-            const split: string[] = tb.exceptionMsg.split(':', 2);
-            let excType: string;
-            let excMsg: string;
-            if (split.length > 1) {
-              excType = split[0];
-              excMsg = split[1];
-            } else {
-              excType = 'Error';
-              excMsg = split[0];
-            }
-
-            // item = addTreeContent(
-            //   this.opts,
-            //   this.parent,
-            //   excType,
-            //   '',
-            //   msg,
-            //   false,
-            //   tbEntry.source,
-            //   tbEntry.lineno,
-            //   this.messageNode,
-            //   this.id.toString(),
-            // );
-            // addValueToTreeContent(item, excMsg);
-            // this.addExceptionCssClass(item);
+            this.flattened.pushException(tb);
           }
         }
         break;

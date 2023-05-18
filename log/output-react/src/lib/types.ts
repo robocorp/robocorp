@@ -1,3 +1,5 @@
+import { PythonTraceback } from '~/treebuild/protocols';
+
 export type ViewSettings = {
   columns: {
     duration: boolean;
@@ -17,6 +19,7 @@ export enum StatusLevel {
 export enum Type {
   task = 'Task',
   method = 'Method',
+  exception = 'Exception',
 
   // Not used for now...
   variable = 'Variable',
@@ -57,6 +60,12 @@ export interface EntryMethod extends EntryBase {
   arguments: Argument[] | undefined;
 }
 
+export interface EntryException extends EntryBase {
+  tb: PythonTraceback;
+  excType: string;
+  excMsg: string;
+}
+
 export interface EntryVariable extends EntryBase {
   type: Type.variable;
   name: string;
@@ -70,4 +79,4 @@ export interface EntryLog extends EntryBase {
   image?: string;
 }
 
-export type Entry = EntryTask | EntryMethod | EntryVariable | EntryLog;
+export type Entry = EntryTask | EntryMethod | EntryVariable | EntryLog | EntryException;

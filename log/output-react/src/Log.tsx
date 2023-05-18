@@ -33,13 +33,27 @@ export const Log = () => {
    * Register callback which should be used to set entries.
    */
   useEffect(() => {
-    reactCallSetAllEntriesCallback((newEntries: Entry[], updatedFromIndex = 0) => {
-      setEntries(() => {
-        // console.log('Set entries to: ' + JSON.stringify(newEntries));
-        lastUpdatedIndex.current = updatedFromIndex;
-        return [...newEntries];
-      });
-    });
+    reactCallSetAllEntriesCallback(
+      (newEntries: Entry[], newExpanded: string[], updatedFromIndex = 0) => {
+        if (newExpanded.length > 0) {
+          setExpandedEntries((curr) => {
+            const set = new Set<string>(curr);
+            for (const s of newExpanded) {
+              set.add(s);
+            }
+            return set;
+          });
+        }
+
+        setEntries(() => {
+          // console.log('Set entries to: ' + JSON.stringify(newEntries));
+          lastUpdatedIndex.current = updatedFromIndex;
+          return [...newEntries];
+        });
+
+        return undefined;
+      },
+    );
 
     reactCallSetRunInfoCallback((runInfo: RunInfo) => {
       setRunInfo(() => {

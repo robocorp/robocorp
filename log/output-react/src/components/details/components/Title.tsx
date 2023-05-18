@@ -12,8 +12,8 @@ const getTitle = (entry: Entry) => {
     case Type.method:
       const methodEntry = entry as EntryMethod;
       return {
-        title: entry.name,
-        description: `Module: ${entry.libname}`,
+        title: methodEntry.name,
+        description: `Module: ${methodEntry.libname}`,
       };
 
     default:
