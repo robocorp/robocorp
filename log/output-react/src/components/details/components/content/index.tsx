@@ -2,27 +2,25 @@ import { FC } from 'react';
 import { Drawer } from '@robocorp/components';
 
 import { Entry, Type } from '~/lib/types';
+import { ErrorComponent } from './components/ErrorComponent';
+import { Method } from './components/Method';
 
-import { Log, Variable, Method } from './components';
-
-type Props = {
-  entry: Entry;
+export const Todo: FC<{ entry: Entry }> = (props) => {
+  return <>Todo: support {props.entry.type}</>;
 };
 
 const getContentComponent = (type: Type) => {
   switch (type) {
-    case Type.variable:
-      return Variable;
     case Type.method:
       return Method;
-    case Type.log:
-      return Log;
+    case Type.error:
+      return ErrorComponent;
     default:
-      return Log;
+      return Todo;
   }
 };
 
-export const Content: FC<Props> = ({ entry }) => {
+export const Content: FC<{ entry: Entry }> = ({ entry }) => {
   const Component = getContentComponent(entry.type);
 
   return (

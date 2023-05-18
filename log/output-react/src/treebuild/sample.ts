@@ -8,7 +8,7 @@
 // new contents to be embedded.
 
 export function getSampleContents() {
-  const s = JSON.stringify(`V 0.0.2
+  const raw = String.raw`V 0.0.2
   T 2023-05-15T14:30:37.751+00:00
   ID 1|0f808d43-f32d-11ed-a9e3-202b20a029af
   I "sys.platform=win32"
@@ -52,6 +52,7 @@ export function getSampleContents() {
   M A:"Ok"
   ET z|A|0.001
   ER z|0.001
-  `);
+  `;
+  const s = JSON.stringify(raw);
   return JSON.parse(s);
 }

@@ -4,10 +4,6 @@ import styled from 'styled-components';
 
 import { Entry, EntryMethod } from '~/lib/types';
 
-type Props = {
-  entry: Entry;
-};
-
 const Content = styled(Box)`
   position: relative;
 `;
@@ -43,7 +39,7 @@ const LocationContent = styled(Box)`
   margin-bottom: ${({ theme }) => theme.space.$8};
 `;
 
-export const Method: FC<Props> = (props) => {
+export const Method: FC<{ entry: Entry }> = (props) => {
   const entryMethod: EntryMethod = props.entry as EntryMethod;
   const argumentsList = [];
   let argumentsHeader = <></>;
