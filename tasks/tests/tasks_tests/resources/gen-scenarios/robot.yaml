@@ -1,6 +1,8 @@
 tasks:
   case_failure:
     shell: python -m robocorp.tasks run tasks.py -t case_failure
+  case_generators:
+    shell: python -m robocorp.tasks run tasks.py -t case_generators
 
 condaConfigFile: conda.yaml
 artifactsDir: output

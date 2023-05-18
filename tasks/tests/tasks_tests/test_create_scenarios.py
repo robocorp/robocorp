@@ -45,9 +45,23 @@ def case_failure(rcc_loc: str, resources_dir: Path) -> str:
     return robolog.read_bytes().decode("utf-8")
 
 
+def case_generators(rcc_loc: str, resources_dir: Path) -> str:
+    gen_scenarios_dir = resources_dir / "gen-scenarios"
+    assert gen_scenarios_dir.exists()
+    run_in_rcc(
+        Path(rcc_loc),
+        cwd=gen_scenarios_dir,
+        args=["-t", "case_generators"],
+    )
+    robolog = gen_scenarios_dir / "output" / "output.robolog"
+    assert robolog.exists()
+    return robolog.read_bytes().decode("utf-8")
+
+
 case_names = [
     "case_task_and_element",
     "case_failure",
+    "case_generators",
 ]
 
 

@@ -1,0 +1,92 @@
+V 0.0.2
+T 2023-05-18T19:20:26.489+00:00
+ID 1|0b3cb27e-f5b1-11ed-9e20-526b9a7d5711
+I "sys.platform=darwin"
+I "python=3.9.13 | packaged by conda-forge | (main, May 27 2022, 17:01:00) \n[Clang 13.0.1 ]"
+M a:"tasks.py - case_generators"
+SR a|0.001
+M c:"Collect tasks"
+M d:"setup"
+M e:""
+P b:c|d|e|e|0
+ST b|0.002
+M f:"regular"
+M g:"\nCollecting task case_generators from: tasks.py\n"
+C f|g|0.002
+M h:"PASS"
+ET h|e|0.01
+M j:"case_generators"
+M k:"tasks"
+M l:"/Users/fabioz/Desktop/robocorpws/robo/tasks/tests/tasks_tests/resources/gen-scenarios/tasks.py"
+M m:"A case which creates generators"
+P i:j|k|l|m|33
+ST i|0.01
+M n:"=========================== "
+C f|n|0.01
+M o:"Running: "
+C f|o|0.01
+M p:"task_name"
+C p|j|0.01
+M q:" ===========================\n"
+C f|q|0.01
+P r:j|k|l|e|36
+M s:"METHOD"
+SE r|s|0.01
+M u:"call_generators"
+P t:u|k|l|e|22
+M v:"GENERATOR"
+SE t|v|0.01
+YFS t|0.011
+P w:j|k|l|e|37
+M x:"found_var"
+M y:"int"
+M z:"0"
+AS w|x|y|z|0.011
+M A:"1"
+AS w|x|y|A|0.011
+YFR t|0.011
+P B:u|k|l|e|25
+M C:"str"
+M D:"'Generated: 0'"
+YS B|C|D|0.011
+AS w|x|C|D|0.011
+YR B|0.011
+M E:"'Generated: 1'"
+YS B|C|E|0.011
+AS w|x|C|E|0.011
+YR B|0.011
+EE v|h|0.011
+M G:"check_ctx_manager"
+P F:G|k|l|e|30
+SE F|v|0.011
+M H:"22"
+YS F|y|H|0.011
+YR F|0.011
+EE v|h|0.011
+M J:"call_generators_in_library"
+M K:"somelibrary"
+M L:"/Users/fabioz/Desktop/robocorpws/robo/tasks/tests/tasks_tests/resources/gen-scenarios/somelibrary.py"
+P I:J|K|L|e|2
+M M:"UNTRACKED_GENERATOR"
+SE I|M|0.011
+P N:j|k|l|e|43
+AS N|x|y|z|0.011
+AS N|x|y|A|0.011
+AS N|x|C|D|0.011
+AS N|x|C|E|0.011
+EE M|h|0.011
+EE s|h|0.011
+C p|j|0.011
+M O:" status: "
+C f|O|0.011
+M P:"PASS\n"
+C f|P|0.011
+M Q:"================================================================================\n"
+C f|Q|0.011
+ET h|e|0.011
+M S:"Teardown tasks"
+M T:"teardown"
+P R:S|T|e|e|0
+ST R|0.011
+ET h|e|0.011
+ER h|0.011
