@@ -14,26 +14,7 @@ from playwright.sync_api import (
 )
 from robocorp.tasks import session_cache, task_cache
 
-
-def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
-    if sys.platform == "win32":
-        import winreg
-
-        location = winreg.HKEY_LOCAL_MACHINE
-        browser_registry = (
-            rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{browser}.exe"
-        )
-        key = winreg.OpenKeyEx(location, browser_registry)
-        # empty string key gets the (Default) value
-        path = winreg.QueryValueEx(key, "")
-        if isinstance(path, tuple):
-            path = path[0]
-        assert path, f"Could not find {browser} path"
-        return str(path)
-    raise RuntimeError("Not implemented for this OS")
-
-
-EXECUTABLE_PATHS: Dict[str, Dict[str, str]] = {
+EXECUTABLE_PATHS = {
     "chrome": {
         "Linux": "/usr/bin/google-chrome",
         "Darwin": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -47,15 +28,37 @@ EXECUTABLE_PATHS: Dict[str, Dict[str, str]] = {
 
 
 def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
-    if sys.platform == "win32":
+    system = platform.system()
+
+    if system == "Windows":
         return _registry_path(browser)
 
-    system = platform.system()
-    assert browser in EXECUTABLE_PATHS
-    executable_path = EXECUTABLE_PATHS[browser][system]
-    if not Path(executable_path).exists():
-        raise AssertionError()
-    return executable_path
+    if browser not in EXECUTABLE_PATHS:
+        raise ValueError(f"Unsupported browser: {browser}")
+
+    path = EXECUTABLE_PATHS[browser][system]
+    if not Path(path).exists():
+        raise RuntimeError(f"Browser executable not found: {path}")
+
+    return path
+
+
+def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
+    if sys.platform != "win32":
+        raise NotImplementedError("Not implemented for non-Windows")
+
+    import winreg
+
+    parent = winreg.HKEY_LOCAL_MACHINE
+    key = rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{browser}.exe"
+
+    handle = winreg.OpenKeyEx(parent, key)
+    path, _ = winreg.QueryValueEx(handle, "")  # Empty string is (Default) value
+
+    if not path:
+        raise RuntimeError(f"Failed to read browser path: {browser}")
+
+    return str(path)
 
 
 class _BrowserConfig:
