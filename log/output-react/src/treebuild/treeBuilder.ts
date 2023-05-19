@@ -8,6 +8,13 @@ import {
   Argument,
   EntryException,
   EntryVariable,
+  EntryUntrackedGenerator,
+  EntryMethodBase,
+  EntryGenerator,
+  EntryResumeYield,
+  EntryResumeYieldFrom,
+  EntrySuspendYield,
+  EntrySuspendYieldFrom,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
@@ -96,7 +103,7 @@ class FlattenedTree {
 
   // The target for the arguments being set (may not be the stack top as some
   // entries which have arguments may not create a new scope).
-  private argsTarget: EntryMethod | undefined;
+  private argsTarget: EntryMethodBase | undefined;
 
   // The current parentId.
   private parentId = '';
@@ -142,16 +149,72 @@ class FlattenedTree {
     this.entries.push(entry);
   }
 
-  pushMethodScope(msg: IMessage) {
-    // console.log('pushMethodScope');
-    let name = msg.decoded['name'];
-    if (msg.message_type == 'YR') {
-      name += ' (resumed)';
-    }
+  pushUntrackedGeneratorScope(msg: IMessage) {
+    const entry: EntryUntrackedGenerator = {
+      id: this.newScopeId(false),
+      type: Type.untrackedGenerator,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
 
-    const entry: EntryMethod = {
+  pushYieldSuspend(msg: IMessage) {
+    // Tooltip
+    // `Suspending function with yield.\nYielding an object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
+    const isYieldFrom = msg.message_type == 'YFS';
+    const entry: EntrySuspendYield | EntrySuspendYieldFrom = {
+      id: this.newScopeId(false),
+      type: isYieldFrom ? Type.suspendYieldFrom : Type.suspendYield,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+      arguments: undefined,
+      varType: msg.decoded['type'], // Note: not really used for EntrySuspendYieldFrom.
+      value: msg.decoded['value'], // Note: not really used for EntrySuspendYieldFrom.
+    };
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  pushMethodScope(msg: IMessage) {
+    const isGenerator = msg.decoded['type'] === 'GENERATOR';
+    const entry: EntryMethod | EntryGenerator = {
       id: this.newScopeId(),
-      type: Type.method,
+      type: isGenerator ? Type.generator : Type.method,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+      arguments: undefined,
+    };
+    this.stack.push(entry);
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  pushResumeMethodScope(msg: IMessage) {
+    const isYieldFrom = msg.message_type == 'YFR';
+    const entry: EntryResumeYield | EntryResumeYieldFrom = {
+      id: this.newScopeId(),
+      type: isYieldFrom ? Type.resumeYieldFrom : Type.resumeYield,
       name: msg.decoded.name,
       libname: msg.decoded.libname,
       source: msg.decoded.source,
@@ -242,7 +305,10 @@ class FlattenedTree {
         // more endings than starts).
         this.stackCounter.pop();
       }
-      if (entry?.type === type) {
+      if (entry === undefined) {
+        continue;
+      }
+      if ((entry.type & type) != 0) {
         if (this.stack.length > 0) {
           const last = this.stack.at(-1);
           if (last === undefined) {
@@ -253,6 +319,12 @@ class FlattenedTree {
           this.parentId = '';
         }
         break;
+      } else {
+        console.log(
+          `Unable to find scope start when receiving end message: ${JSON.stringify(
+            msg,
+          )}. Entry popped: ${JSON.stringify(entry)}`,
+        );
       }
     }
     return entry;
@@ -272,11 +344,18 @@ class FlattenedTree {
   popMethodScope(msg: IMessage) {
     // Note: create a copy and assign it in the entries array (we don't want to mutate the
     // entry that's being used in react).
-    const entry: EntryBase | undefined = this.popScope(msg, Type.method);
+    const entry: EntryBase | undefined = this.popScope(
+      msg,
+      Type.method | Type.generator | Type.resumeYield | Type.resumeYieldFrom,
+    );
     if (entry === undefined) {
       return;
     }
 
+    if (msg.decoded.status === undefined) {
+      // No need to update if the status isn't set.
+      return;
+    }
     const methodScopeEntry: EntryMethod = <EntryMethod>{ ...entry };
     this.updateEntryStatus(methodScopeEntry, msg);
   }
@@ -511,52 +590,16 @@ export class TreeBuilder {
         this.flattened.pushTaskScope(msg);
         break;
       case 'SE': // start element
-        this.flattened.pushMethodScope(msg);
+        if (msg.decoded['type'] === 'UNTRACKED_GENERATOR') {
+          this.flattened.pushUntrackedGeneratorScope(msg);
+        } else {
+          this.flattened.pushMethodScope(msg);
+        }
+
         break;
       case 'YR': // yield resume
       case 'YFR': // yield from resume
-        // const raiseStack = msgType != 'SE' || msg.decoded['type'] != 'UNTRACKED_GENERATOR';
-        // if (!raiseStack) {
-        //   const item = addTreeContent(
-        //     this.opts,
-        //     this.parent,
-        //     `Create Generator: ${msg.decoded['name']}`,
-        //     '',
-        //     msg,
-        //     false,
-        //     msg.decoded['source'],
-        //     msg.decoded['lineno'],
-        //     this.messageNode,
-        //     this.id.toString(),
-        //   );
-        //   this.addGeneratorCSSClass(item);
-        //   this.argsTarget = item;
-        // } else {
-        //   this.messageNode = { parent: this.messageNode, message: msg };
-        //   let name = msg.decoded['name'];
-        //   if (msgType == 'YR') {
-        //     name += ' (resumed)';
-        //   }
-        //   this.parent = addTreeContent(
-        //     this.opts,
-        //     this.parent,
-        //     name,
-        //     msg.decoded['libname'],
-        //     msg,
-        //     false,
-        //     msg.decoded['source'],
-        //     msg.decoded['lineno'],
-        //     this.messageNode,
-        //     this.id.toString(),
-        //   );
-        //   if (msgType == 'YR') {
-        //     this.addResumedCSSClass(this.parent);
-        //   }
-
-        //   this.argsTarget = this.parent;
-        //   this.stack.push(this.parent);
-        // }
-
+        this.flattened.pushResumeMethodScope(msg);
         break;
       case 'ER': // end run
         if (this.suiteErrored) {
@@ -565,59 +608,24 @@ export class TreeBuilder {
           this.updateRunInfoStatus('PASS');
         }
         this.updateRunInfoFinishTime(msg.decoded['time_delta_in_seconds']);
-        //   const timeDiv = divById('suiteRunStart');
-        //   if (timeDiv) {
-        //     timeDiv.textContent += ` - Finished in: ${msg.decoded['time_delta_in_seconds'].toFixed(
-        //       2,
-        //     )}s.`;
-        //   }
-        // }
         break;
       case 'ET': // end task
         this.flattened.popTaskScope(msg);
         break;
       case 'EE': // end element
-        this.flattened.popMethodScope(msg);
+        if (msg.decoded['type'] === 'UNTRACKED_GENERATOR') {
+          // The generator finished, but we don't even have its name... maybe we should have
+          // a different message for this case?
+        } else {
+          const isGenerator = msg.decoded['type'] === 'GENERATOR';
+          this.flattened.popMethodScope(msg);
+        }
         break;
       case 'YS': // yield suspend
       case 'YFS': // yield from suspend
-        // const popStack = msgType != 'EE' || msg.decoded['type'] != 'UNTRACKED_GENERATOR';
-        // if (!popStack) {
-        //   // The generator finished, but we don't even have its name... maybe we should have
-        //   // a different message for this case?
-        // } else {
-        //   if (msgType == 'YS' || msgType == 'YFS') {
-        //     const yieldedItem = addTreeContent(
-        //       this.opts,
-        //       this.parent,
-        //       'Yielded',
-        //       `Suspending function with yield.\nYielding an object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
-        //       msg,
-        //       false,
-        //       msg.decoded['source'],
-        //       msg.decoded['lineno'],
-        //       this.messageNode,
-        //       this.id.toString(),
-        //     );
-        //     this.addYieldedCSSClass(yieldedItem);
-        //     addValueToTreeContent(yieldedItem, msg.decoded['value']);
-        //     msg.decoded['status'] = 'PASS';
-        //   }
-
-        //   this.messageNode = this.messageNode.parent;
-        //   let currK = this.parent;
-
-        //   this.stack.pop();
-        //   this.parent = this.stack.at(-1);
-        //   this.onEndUpdateMaxLevelFoundInHierarchyFromStatus(currK, this.parent, msg);
-        //   this.onEndSetStatusOrRemove(this.opts, currK, msg.decoded, this.parent, true);
-
-        //   isError = this.addDetailsCSSClasses(msg.decoded.status, currK);
-        //   if (isError) {
-        //     currK.details.open = true;
-        //   }
-        // }
-
+        const isYieldFrom = msg.message_type == 'YFS';
+        this.flattened.pushYieldSuspend(msg);
+        this.flattened.popMethodScope(msg);
         break;
       case 'S':
         // Update the start time from the current message.

@@ -1,5 +1,13 @@
 import { FilteredEntries } from './logContext';
-import { Entry, EntryException, EntryMethod, Type } from './types';
+import {
+  Entry,
+  EntryException,
+  EntryGenerator,
+  EntryMethod,
+  EntryMethodBase,
+  EntryUntrackedGenerator,
+  Type,
+} from './types';
 
 const searchFn = (haystack: string, needle: string) =>
   haystack.toLowerCase().includes(needle.trim().toLowerCase());
@@ -94,7 +102,9 @@ function padZero(n: number) {
   return n.toFixed(0).padStart(2, '0');
 }
 
-export function formatArguments(entry: EntryMethod): string {
+export function formatArguments(
+  entry: EntryMethodBase | EntryGenerator | EntryUntrackedGenerator,
+): string {
   const args = entry.arguments;
   if (args !== undefined && args.length > 0) {
     let rep = [];

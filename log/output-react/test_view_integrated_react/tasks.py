@@ -1,5 +1,5 @@
 from robocorp.tasks import task
-from robocorp.browser import open_url
+from robocorp.browser import open_url, page
 from pathlib import Path
 import json
 from typing import Sequence
@@ -77,18 +77,6 @@ def setup_scenario(page, case_name: str) -> None:
     )
 
 
-def check_text_from_tree_items(page, expected: Sequence[str]):
-    summary_names = [s.text_content() for s in page.query_selector_all(".summaryName")]
-    summary_inputs = [
-        s.text_content() for s in page.query_selector_all(".summaryInput")
-    ]
-    found = []
-    for name, el_input in zip(summary_names, summary_inputs):
-        found.append(f"{name} {el_input}".strip())
-
-    compare_strlist(found, expected)
-
-
 @task
 def case_failure():
     """
@@ -113,6 +101,74 @@ def case_failure():
     assert (
         page.query_selector("#root1-0-0") is not None
     ), "Expected exception to be expanded by default."
+
+
+def collect_full_tree_contents(parent_id=""):
+    found = {}
+    for i in range(1000):
+        if parent_id:
+            entry_id = f"{parent_id}-{i}"
+        else:
+            entry_id = f"#root{i}"
+        element = page().query_selector(f"{entry_id} > .entryName")
+        if element is None:
+            return found
+
+        found[entry_id] = element.text_content()
+
+        expand = page().query_selector(f"{entry_id} > .toggleExpand")
+        if expand:
+            expand.click()
+            found.update(collect_full_tree_contents(entry_id))
+
+    raise AssertionError("Not expecting that many elements...")
+
+
+@task
+def case_generators():
+    """
+    Checks whether the output view works as expected for us.
+
+    Note: the test scenario is actually at:
+
+    /log/tests/robocorp_log_tests/test_view_integrated_react
+    """
+    page = open_output_view_for_tests()
+    page.wait_for_selector("#base-header")  # Check that the page header was loaded
+
+    setup_scenario(page, "case_generators")
+
+    full_tree_contents = collect_full_tree_contents()
+
+    found = []
+    for name, value in full_tree_contents.items():
+        found.append(f"{name} {value}".strip())
+
+    expected = """
+#root0 Collect tasks
+#root1 case_generators
+#root1-0 case_generators
+#root1-0-0 call_generators (enter generator)
+#root1-0-0-0 call_generators (suspend generator)
+#root1-0-1 found_var
+#root1-0-2 found_var
+#root1-0-3 call_generators (resume generator)
+#root1-0-3-0 call_generators (suspend generator)
+#root1-0-4 found_var
+#root1-0-5 call_generators (resume generator)
+#root1-0-5-0 call_generators (suspend generator)
+#root1-0-6 found_var
+#root1-0-7 call_generators (resume generator)
+#root1-0-8 check_ctx_manager (enter generator)
+#root1-0-8-0 check_ctx_manager (suspend generator)
+#root1-0-9 check_ctx_manager (resume generator)
+#root1-0-10 call_generators_in_library (generator lifecycle untracked)
+#root1-0-11 found_var
+#root1-0-12 found_var
+"""
+    compare_strlist(
+        found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
+    )
 
 
 @task

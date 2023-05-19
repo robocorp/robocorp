@@ -14,6 +14,7 @@ export function getIntLevelFromStatus(status: string): StatusLevel {
       return StatusLevel.success;
     default:
       console.log(`Unexpected status: ${status}`);
+      console.trace();
       return StatusLevel.unset;
   }
 }

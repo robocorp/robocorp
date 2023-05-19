@@ -17,13 +17,19 @@ export enum StatusLevel {
 }
 
 export enum Type {
-  task = 'Task',
-  method = 'Method',
-  exception = 'Exception',
+  task = 1 << 0, // 1
+  variable = 1 << 1, // 2
+  method = 1 << 2, // 4
+  exception = 1 << 3, // 8
+  generator = 1 << 4, // 16
+  untrackedGenerator = 1 << 5, // 32
+  resumeYieldFrom = 1 << 6, // 64
+  resumeYield = 1 << 7, // 128
+  suspendYieldFrom = 1 << 8, // 256
+  suspendYield = 1 << 9, // 512
 
   // Not used for now...
-  variable = 'Variable',
-  log = 'Log',
+  log = 1 << 10, // 1024
 }
 
 export interface EntryBase {
@@ -49,14 +55,43 @@ export interface Argument {
   value: string;
 }
 
-export interface EntryMethod extends EntryBase {
-  type: Type.method;
+export interface EntryMethodBase extends EntryBase {
   name: string;
   libname: string;
   status: StatusLevel;
   startDeltaInSeconds: number | -1 | undefined;
   endDeltaInSeconds: number | -1 | undefined;
   arguments: Argument[] | undefined;
+}
+
+export interface EntryMethod extends EntryMethodBase {
+  type: Type.method;
+}
+
+export interface EntryGenerator extends EntryMethodBase {
+  type: Type.generator;
+}
+
+export interface EntryUntrackedGenerator extends EntryMethodBase {
+  type: Type.untrackedGenerator;
+}
+
+export interface EntryResumeYield extends EntryMethodBase {
+  type: Type.resumeYield;
+}
+
+export interface EntryResumeYieldFrom extends EntryMethodBase {
+  type: Type.resumeYieldFrom;
+}
+
+export interface EntrySuspendYield extends EntryMethodBase {
+  type: Type.suspendYield;
+  value: string; // the yielded value
+  varType: string;
+}
+
+export interface EntrySuspendYieldFrom extends EntryMethodBase {
+  type: Type.suspendYieldFrom;
 }
 
 export interface EntryException extends EntryBase {
@@ -79,4 +114,15 @@ export interface EntryLog extends EntryBase {
   image?: string;
 }
 
-export type Entry = EntryTask | EntryMethod | EntryVariable | EntryLog | EntryException;
+export type Entry =
+  | EntryTask
+  | EntryMethod
+  | EntryVariable
+  | EntryLog
+  | EntryException
+  | EntryGenerator
+  | EntryResumeYield
+  | EntryResumeYieldFrom
+  | EntrySuspendYield
+  | EntrySuspendYieldFrom
+  | EntryUntrackedGenerator;

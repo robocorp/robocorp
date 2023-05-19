@@ -2,7 +2,16 @@ import { FC, ReactNode } from 'react';
 import { Box, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
-import { Entry, EntryException, EntryMethod, EntryVariable, Type } from '~/lib/types';
+import {
+  Entry,
+  EntryException,
+  EntryGenerator,
+  EntryMethodBase,
+  EntrySuspendYield,
+  EntryUntrackedGenerator,
+  EntryVariable,
+  Type,
+} from '~/lib/types';
 import { formatArguments } from '~/lib/helpers';
 
 type Props = {
@@ -22,14 +31,23 @@ const Container = styled(Box)`
 const getValue = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.method:
-      return formatArguments(entry as EntryMethod);
+    case Type.generator:
+    case Type.untrackedGenerator:
+    case Type.resumeYield:
+    case Type.resumeYieldFrom:
+      return formatArguments(entry as EntryMethodBase | EntryGenerator | EntryUntrackedGenerator);
     case Type.task:
+      return '';
+    case Type.suspendYieldFrom:
       return '';
     case Type.exception:
       return (entry as EntryException).excMsg;
     case Type.variable:
       const entryVariable = entry as EntryVariable;
       return `${entryVariable.value} (${entryVariable.varType})`;
+    case Type.suspendYield:
+      const entrySuspendYield = entry as EntrySuspendYield;
+      return `Yielded: ${entrySuspendYield.value} (${entrySuspendYield.varType})`;
     default:
       return 'TODO: provide getValue for: ' + entry.type;
   }

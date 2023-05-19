@@ -4,6 +4,9 @@ tasks:
     
   case_failure:
     shell: python -m robocorp.tasks run tasks.py -t case_failure --console-colors=plain
+    
+  case_generators:
+    shell: python -m robocorp.tasks run tasks.py -t case_generators --console-colors=plain
 
 condaConfigFile: conda.yaml
 artifactsDir: output

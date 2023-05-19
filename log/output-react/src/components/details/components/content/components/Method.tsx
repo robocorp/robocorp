@@ -2,8 +2,9 @@ import { Box, Header, Typography } from '@robocorp/components';
 import { FC } from 'react';
 import styled from 'styled-components';
 
-import { Entry, EntryMethod } from '~/lib/types';
+import { Entry, EntryMethod, EntryMethodBase, EntrySuspendYield, Type } from '~/lib/types';
 import { Bold, LocationContent } from './Common';
+import { Counter } from '~/lib';
 
 const Content = styled(Box)`
   position: relative;
@@ -31,26 +32,38 @@ const ArgumentValue = styled(Box)`
 `;
 
 export const Method: FC<{ entry: Entry }> = (props) => {
-  const entryMethod: EntryMethod = props.entry as EntryMethod;
+  const entryMethod: EntryMethodBase = props.entry as EntryMethodBase;
   const argumentsList = [];
   let argumentsHeader = <></>;
+
+  let counter = new Counter();
   if (entryMethod.arguments && entryMethod.arguments.length > 0) {
     argumentsHeader = (
       <Header size="medium">
         <Header.Title title="Arguments" />
       </Header>
     );
-    let key = 0;
     for (const arg of entryMethod.arguments) {
       argumentsList.push(
-        <ArgumentContent key={key} className="argument">
+        <ArgumentContent key={counter.next()} className="argument">
           <ArgumentName className="argumentName">{`${arg.name}`}</ArgumentName>
           <ArgumentType>{`(type: ${arg.type})`}</ArgumentType>
           <ArgumentValue>{`${arg.value}`}</ArgumentValue>
         </ArgumentContent>,
       );
-      key += 1;
     }
+  }
+
+  if (entryMethod.type === Type.suspendYield) {
+    const entrySuspendYield = entryMethod as EntrySuspendYield;
+    argumentsList.push(
+      <Header key={counter.next()} size="medium">
+        <Header.Title title={`Yielded Value of type: ${entrySuspendYield.varType}`} />
+      </Header>,
+    );
+    argumentsList.push(
+      <LocationContent key={counter.next()}>{entrySuspendYield.value}</LocationContent>,
+    );
   }
 
   return (

@@ -39,6 +39,7 @@ def run_in_rcc(
 case_names = [
     "case_task_and_element",
     "case_failure",
+    "case_generators",
 ]
 
 

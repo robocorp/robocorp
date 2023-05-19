@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     target = Path(__file__).absolute().parent / "tasks.py"
     cases = [
+        "case_generators",
         "case_failure",
         "case_task_and_element",
     ]

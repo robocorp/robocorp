@@ -8,12 +8,18 @@ import { VariableComponent } from './components/VariableComponent';
 import { TaskComponent } from './components/TaskComponent';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
-  return <>Todo: support {props.entry.type}</>;
+  return <>Todo: provide details for {props.entry.type}</>;
 };
 
 const getContentComponent = (type: Type) => {
   switch (type) {
     case Type.method:
+    case Type.generator:
+    case Type.untrackedGenerator:
+    case Type.resumeYield:
+    case Type.resumeYieldFrom:
+    case Type.suspendYield:
+    case Type.suspendYieldFrom:
       return Method;
     case Type.exception:
       return ExceptionComponent;
