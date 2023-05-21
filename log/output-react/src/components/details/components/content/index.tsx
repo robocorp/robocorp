@@ -6,6 +6,7 @@ import { ExceptionComponent } from './components/ExceptionComponent';
 import { Method } from './components/Method';
 import { VariableComponent } from './components/VariableComponent';
 import { TaskComponent } from './components/TaskComponent';
+import { LogComponent } from './components/LogComponent';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
   return <>Todo: provide details for {props.entry.type}</>;
@@ -27,6 +28,8 @@ const getContentComponent = (type: Type) => {
       return VariableComponent;
     case Type.task:
       return TaskComponent;
+    case Type.log:
+      return LogComponent;
     default:
       return Todo;
   }

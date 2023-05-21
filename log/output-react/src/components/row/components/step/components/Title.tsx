@@ -38,6 +38,8 @@ const getTitle = (entry: Entry): ReactNode => {
       return `${(entry as EntrySuspendYieldFrom).name} (suspend generator)`;
     case Type.method:
       return (entry as EntryMethod).name;
+    case Type.log:
+      return ''; // the log type is added in the icon.
     case Type.variable:
       return (entry as EntryVariable).name;
     case Type.exception:
@@ -49,10 +51,15 @@ const getTitle = (entry: Entry): ReactNode => {
 };
 
 export const Title: FC<Props> = ({ entry }) => {
+  const title = getTitle(entry);
+  if (!title) {
+    return <></>;
+  }
+
   return (
     <Box minWidth={0} className="entryName">
       <Typography mr="$24" lineHeight="$32" variant="body.small" fontWeight="medium" truncate={1}>
-        {getTitle(entry)}
+        {title}
       </Typography>
     </Box>
   );

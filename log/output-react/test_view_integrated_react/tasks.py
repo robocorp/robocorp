@@ -111,10 +111,18 @@ def collect_full_tree_contents(parent_id=""):
         else:
             entry_id = f"#root{i}"
         element = page().query_selector(f"{entry_id} > .entryName")
-        if element is None:
-            return found
 
-        found[entry_id] = element.text_content()
+        if element is None:
+            element = page().query_selector(f"{entry_id} > .entryValue")
+
+        if element is not None:
+            text = element.text_content()
+            if not text.strip():
+                text = element.evaluate("(element) => element.tagName")
+            found[entry_id] = text
+
+        else:
+            return found
 
         expand = page().query_selector(f"{entry_id} > .toggleExpand")
         if expand:
@@ -165,6 +173,46 @@ def case_generators():
 #root1-0-10 call_generators_in_library (generator lifecycle untracked)
 #root1-0-11 found_var
 #root1-0-12 found_var
+"""
+    compare_strlist(
+        found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
+    )
+
+
+@task
+def case_log():
+    """
+    Checks whether the output view works as expected for us.
+
+    Note: the test scenario is actually at:
+
+    /log/tests/robocorp_log_tests/test_view_integrated_react
+    """
+    page = open_output_view_for_tests()
+    page.wait_for_selector("#base-header")  # Check that the page header was loaded
+
+    setup_scenario(page, "case_log")
+
+    full_tree_contents = collect_full_tree_contents()
+
+    found = []
+    for name, value in full_tree_contents.items():
+        found.append(f"{name} {value}".strip())
+
+    expected = """
+#root0 Collect tasks
+#root1 case_log
+#root1-0 case_log
+#root1-0-0 add_log_in_method
+#root1-0-0-0 Some info message
+#root1-0-0-1 Some warn message
+#root1-0-0-2 Some critical message
+#root1-0-1 add_html_log_in_method
+#root1-0-1-0 DIV
+#root1-0-1-1 DIV
+#root1-0-1-2 DIV
+#root1-0-2 print_in_another
+#root2 Teardown tasks
 """
     compare_strlist(
         found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]

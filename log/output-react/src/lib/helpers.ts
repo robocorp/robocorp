@@ -3,11 +3,12 @@ import {
   Entry,
   EntryException,
   EntryGenerator,
-  EntryMethod,
+  EntryLog,
   EntryMethodBase,
   EntryUntrackedGenerator,
   Type,
 } from './types';
+import * as DOMPurify from 'dompurify';
 
 const searchFn = (haystack: string, needle: string) =>
   haystack.toLowerCase().includes(needle.trim().toLowerCase());
@@ -129,11 +130,50 @@ export const formatDuration = (entry: Entry) => {
   return '';
 };
 
+export function sanitizeHTML(html: string): string {
+  let sanitize = DOMPurify.sanitize;
+  if (!sanitize) {
+    // It can be either in DOMPurify or DOMPurify.default.
+    const d = DOMPurify as any;
+    sanitize = d.default.sanitize;
+  }
+  const sanitizedHTML = sanitize(html);
+  return sanitizedHTML;
+}
+
+export function extractDataFromImg(html: string): string | undefined {
+  if (html.startsWith('<img ')) {
+    const srcIndex = html.indexOf('src');
+    if (srcIndex > 0) {
+      const re = new RegExp('.*src\\s*=\\s*"(.*)".*');
+      const result = re.exec(html);
+      if (result !== undefined) {
+        const dataSrc = result?.at(1);
+        if (dataSrc && dataSrc.startsWith('data:')) {
+          // Ok, we're dealing with an image.
+          return dataSrc;
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+export const IMG_HEIGHT_SMALL = 80;
+export const IMG_MARGIN_SMALL = '5px';
+export const HTML_HEIGHT_SMALL = 90;
+
 export const getLogEntryHeight = (entry: Entry): number => {
   if (entry.type === Type.exception) {
     const excEntry = entry as EntryException;
     // Error entry height is dependent of the message line count
     return 32 + Math.min((excEntry.excMsg.split(/\r\n|\r|\n/).length - 1) * 16, 32);
+  }
+  if (entry.type === Type.log) {
+    const logEntry = entry as EntryLog;
+    if (logEntry.isHtml) {
+      return HTML_HEIGHT_SMALL;
+    }
   }
 
   return 32;

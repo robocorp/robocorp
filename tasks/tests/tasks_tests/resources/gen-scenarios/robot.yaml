@@ -3,6 +3,8 @@ tasks:
     shell: python -m robocorp.tasks run tasks.py -t case_failure
   case_generators:
     shell: python -m robocorp.tasks run tasks.py -t case_generators
+  case_log:
+    shell: python -m robocorp.tasks run tasks.py -t case_log
 
 condaConfigFile: conda.yaml
 artifactsDir: output

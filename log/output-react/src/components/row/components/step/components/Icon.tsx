@@ -15,6 +15,7 @@ import { Badge, Box } from '@robocorp/components';
 import {
   Entry,
   EntryException,
+  EntryLog,
   EntryMethodBase,
   EntryResumeYield,
   EntryResumeYieldFrom,
@@ -84,7 +85,7 @@ const getSuspendYieldIcon = (): ReactNode => {
   return <IconPauseCircle color="magenta60" size="small" />;
 };
 
-const getIcon = (entry: Entry): ReactNode => {
+export const getIcon = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.task:
       const entryTask: EntryTask = entry as EntryTask;
@@ -103,6 +104,40 @@ const getIcon = (entry: Entry): ReactNode => {
       return getSuspendYieldIcon();
     case Type.variable:
       return <IconBox color="blue60" size="small" />;
+    case Type.log:
+      const log: EntryLog = entry as EntryLog;
+      switch (log.status) {
+        case StatusLevel.error:
+          return (
+            <Badge
+              icon={IconStatusError}
+              variant="danger"
+              iconColor="background.error"
+              label={'ERROR'}
+              size="small"
+            />
+          );
+        case StatusLevel.warn:
+          return (
+            <Badge
+              icon={IconWarningTriangle}
+              variant="warning"
+              label={'WARN'}
+              size="small"
+              iconColor="background.notification"
+            />
+          );
+        default:
+          return (
+            <Badge
+              icon={IconInformation}
+              label={'INFO'}
+              size="small"
+              iconColor="blue60"
+              variant="info"
+            />
+          );
+      }
     case Type.exception:
       const exc: EntryException = entry as EntryException;
       return (

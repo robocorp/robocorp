@@ -27,9 +27,20 @@ export enum Type {
   resumeYield = 1 << 7, // 128
   suspendYieldFrom = 1 << 8, // 256
   suspendYield = 1 << 9, // 512
-
-  // Not used for now...
   log = 1 << 10, // 1024
+
+  unhandled = 1 << 11, // 2048
+}
+
+export enum ConsoleMessageKind {
+  unset = 0,
+  regular = 1 << 1, // 1
+  stdout = 1 << 2, // 2
+  stderr = 1 << 3, // 4
+  important = 1 << 5, // 8
+  task_name = 1 << 6, // 16
+  error = 1 << 7, // 32
+  traceback = 1 << 8, // 64
 }
 
 export interface EntryBase {
@@ -110,8 +121,8 @@ export interface EntryVariable extends EntryBase {
 export interface EntryLog extends EntryBase {
   type: Type.log;
   status: StatusLevel;
+  isHtml: boolean;
   message: string;
-  image?: string;
 }
 
 export type Entry =

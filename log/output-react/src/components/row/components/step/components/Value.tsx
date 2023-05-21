@@ -6,13 +6,20 @@ import {
   Entry,
   EntryException,
   EntryGenerator,
+  EntryLog,
   EntryMethodBase,
   EntrySuspendYield,
   EntryUntrackedGenerator,
   EntryVariable,
   Type,
 } from '~/lib/types';
-import { formatArguments } from '~/lib/helpers';
+import {
+  IMG_HEIGHT_SMALL,
+  IMG_MARGIN_SMALL,
+  extractDataFromImg,
+  formatArguments,
+  sanitizeHTML,
+} from '~/lib/helpers';
 
 type Props = {
   entry: Entry;
@@ -42,6 +49,26 @@ const getValue = (entry: Entry): ReactNode => {
       return '';
     case Type.exception:
       return (entry as EntryException).excMsg;
+    case Type.log:
+      const entryLog = entry as EntryLog;
+      if (entryLog.isHtml) {
+        // Special handling for img.
+        const initialHTML = entryLog.message;
+        let handledHTML = initialHTML.trim();
+        const dataSrc = extractDataFromImg(handledHTML);
+        if (dataSrc !== undefined) {
+          // Ok, we're dealing with an image.
+          return (
+            <img src={dataSrc} height={IMG_HEIGHT_SMALL} style={{ margin: IMG_MARGIN_SMALL }} />
+          );
+        }
+
+        // Could not recognize as image. Handle as "random" html.
+        const sanitizedHTML = sanitizeHTML(handledHTML);
+        return <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>;
+      } else {
+        return entryLog.message;
+      }
     case Type.variable:
       const entryVariable = entry as EntryVariable;
       return `${entryVariable.value} (${entryVariable.varType})`;
@@ -54,20 +81,26 @@ const getValue = (entry: Entry): ReactNode => {
 };
 
 export const Value: FC<Props> = ({ entry }) => {
+  const value = getValue(entry);
+  const isString = typeof value === 'string';
   return (
     <Container flex="1" className="entryValue">
-      <Typography
-        mr="$8"
-        mt={6}
-        as="pre"
-        fontFamily="code"
-        variant="body.small"
-        color="content.subtle.light"
-        fontWeight="bold"
-        truncate={1}
-      >
-        {getValue(entry)}
-      </Typography>
+      {isString ? (
+        <Typography
+          mr="$8"
+          mt={6}
+          as="pre"
+          fontFamily="code"
+          variant="body.small"
+          color="content.subtle.light"
+          fontWeight="bold"
+          truncate={1}
+        >
+          {value}
+        </Typography>
+      ) : (
+        value
+      )}
     </Container>
   );
 };

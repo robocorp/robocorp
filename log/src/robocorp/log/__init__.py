@@ -72,7 +72,6 @@ def critical(*message: Any) -> None:
 
     Args:
         message: The message which should be logged.
-        html: If True the message passed should be rendered as HTML.
 
     Example:
         critical('Failed because', obj, 'is not', expected)
@@ -92,7 +91,6 @@ def warn(*message: Any) -> None:
 
     Args:
         message: The message which should be logged.
-        html: If True the message passed should be rendered as HTML.
 
     Example:
         warn('Did not expect', obj)
@@ -112,7 +110,6 @@ def info(*message: Any) -> None:
 
     Args:
         message: The message which should be logged.
-        html: If True the message passed should be rendered as HTML.
 
 
     Example:
@@ -134,7 +131,6 @@ def exception(*message: Any):
 
     Args:
         message: If given an additional error message to be shown.
-        html: If True the message passed should be rendered as HTML.
     """
     if message:
         _log(Status.ERROR, message)

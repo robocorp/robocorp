@@ -5,15 +5,14 @@ import { FC } from 'react';
 import {
   Entry,
   EntryException,
-  EntryGenerator,
-  EntryMethod,
+  EntryLog,
   EntryMethodBase,
-  EntryResumeYieldFrom,
   EntryTask,
-  EntryUntrackedGenerator,
   EntryVariable,
   Type,
 } from '../../../lib/types';
+import { extractDataFromImg, sanitizeHTML } from '~/lib/helpers';
+import { getIcon } from '~/components/row/components/step/components';
 
 const PreBox = styled(Box)`
   white-space: pre-wrap;
@@ -41,9 +40,9 @@ const getTitle = (entry: Entry) => {
         description: <PreBox>Type: {excVar.varType.trim()}</PreBox>,
       };
     case Type.task:
-      const excTask = entry as EntryTask;
+      const entryTask = entry as EntryTask;
       return {
-        title: `Task: ${excTask.name}`,
+        title: `Task: ${entryTask.name}`,
         description: <PreBox>(task entry point)</PreBox>,
       };
     case Type.method:
@@ -65,6 +64,13 @@ const getTitle = (entry: Entry) => {
         title: `${prefix}: ${methodEntry.name}`,
         description: `Module: ${methodEntry.libname}`,
       };
+    case Type.log:
+      const entryLog = entry as EntryLog;
+      const logTitle = getIcon(entry);
+      if (entryLog.isHtml) {
+        return { title: logTitle, description: 'Logged HTML message' };
+      }
+      return { title: logTitle, description: 'Logged message' };
     default:
       return {
         title: 'TODO: Provide title for ' + entry.type,
