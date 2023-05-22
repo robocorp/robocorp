@@ -20,7 +20,7 @@ type Props = {
   entry: Entry;
 };
 
-const getTitle = (entry: Entry): ReactNode => {
+export const getTitle = (entry: Entry): string => {
   switch (entry.type) {
     case Type.task:
       return (entry as EntryTask).name;

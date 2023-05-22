@@ -10,14 +10,11 @@ import {
 } from './types';
 import * as DOMPurify from 'dompurify';
 
-const searchFn = (haystack: string, needle: string) =>
-  haystack.toLowerCase().includes(needle.trim().toLowerCase());
-
-function entryLevel(entry: Entry) {
+export function entryDepth(entry: Entry) {
   return entry.id.split('-').length - 1;
 }
 
-export const filterExpandedEntries = (
+export const leaveOnlyExpandedEntries = (
   data: Entry[],
   expandedItems: Set<string>,
 ): FilteredEntries => {
@@ -35,10 +32,10 @@ export const filterExpandedEntries = (
   // before going to the next parent and then automatically marking
   // children as hidden if the parent is hidden.
   let hideChildren: boolean = false;
-  let hideChildrenOnLevel: number = 0;
+  let hideChildrenOnDepth: number = 0;
 
   for (const entry of data) {
-    const level = entryLevel(entry);
+    const depth = entryDepth(entry);
     const i = entry.id.lastIndexOf('-');
     if (i > 0) {
       const parentId = entry.id.substring(0, i);
@@ -46,7 +43,7 @@ export const filterExpandedEntries = (
     }
 
     if (hideChildren) {
-      if (level > hideChildrenOnLevel) {
+      if (depth > hideChildrenOnDepth) {
         // A child of the current entry we're hiding must be hidden.
         continue;
       }
@@ -60,14 +57,13 @@ export const filterExpandedEntries = (
       // until we get to the next sibling.
       // Note that the item itself is still shown, just children are hidden.
       hideChildren = true;
-      hideChildrenOnLevel = level;
+      hideChildrenOnDepth = depth;
     }
   }
   // console.log('Filtered: ', JSON.stringify(ret));
   return { entries: ret, entriesWithChildren };
 };
 
-// TODO: Update location format
 export const formatLocation = (entry: Entry) => {
   if (entry.source) {
     if (entry.lineno > 0) {

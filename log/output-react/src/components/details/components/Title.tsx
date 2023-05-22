@@ -11,8 +11,7 @@ import {
   EntryVariable,
   Type,
 } from '../../../lib/types';
-import { extractDataFromImg, sanitizeHTML } from '~/lib/helpers';
-import { getIcon } from '~/components/row/components/step/components';
+import { getIcon } from '../../../components/row/components/step/components';
 
 const PreBox = styled(Box)`
   white-space: pre-wrap;

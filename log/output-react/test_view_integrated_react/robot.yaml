@@ -7,6 +7,12 @@ tasks:
     
   case_generators:
     shell: python -m robocorp.tasks run tasks.py -t case_generators --console-colors=plain
+    
+  case_log:
+    shell: python -m robocorp.tasks run tasks.py -t case_log --console-colors=plain
+    
+  case_filter:
+    shell: python -m robocorp.tasks run tasks.py -t case_filter --console-colors=plain
 
 condaConfigFile: conda.yaml
 artifactsDir: output

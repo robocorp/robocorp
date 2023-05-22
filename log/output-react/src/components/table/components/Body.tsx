@@ -3,7 +3,7 @@ import { VariableSizeList } from 'react-window';
 import { Box, useSize } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
-import { Row } from '~/components/row';
+import { Row } from '../../../components/row';
 import { getLogEntryHeight, useLogContext } from '~/lib';
 
 type Props = HTMLProps<HTMLDivElement>;

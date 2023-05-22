@@ -103,9 +103,9 @@ def case_failure():
     ), "Expected exception to be expanded by default."
 
 
-def collect_full_tree_contents(parent_id=""):
+def collect_full_tree_contents(parent_id="", has_filter=False):
     found = {}
-    for i in range(1000):
+    for i in range(100):
         if parent_id:
             entry_id = f"{parent_id}-{i}"
         else:
@@ -122,14 +122,18 @@ def collect_full_tree_contents(parent_id=""):
             found[entry_id] = text
 
         else:
+            if has_filter:
+                continue
             return found
 
         expand = page().query_selector(f"{entry_id} > .toggleExpand")
         if expand:
             expand.click()
-            found.update(collect_full_tree_contents(entry_id))
+            found.update(collect_full_tree_contents(entry_id, has_filter))
 
-    raise AssertionError("Not expecting that many elements...")
+    if not has_filter:
+        raise AssertionError("Not expecting that many elements...")
+    return found
 
 
 @task
@@ -213,6 +217,42 @@ def case_log():
 #root1-0-1-2 DIV
 #root1-0-2 print_in_another
 #root2 Teardown tasks
+"""
+    compare_strlist(
+        found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
+    )
+
+
+@task
+def case_filter():
+    """
+    Checks whether the output view works as expected for us.
+
+    Note: the test scenario is actually at:
+
+    /log/tests/robocorp_log_tests/test_view_integrated_react
+    """
+    page = open_output_view_for_tests()
+    page.wait_for_selector("#base-header")  # Check that the page header was loaded
+
+    setup_scenario(page, "case_log")
+
+    locator = page.get_by_placeholder("Search logs")
+    locator.type("some")
+
+    full_tree_contents = collect_full_tree_contents(has_filter=True)
+
+    found = []
+    for name, value in full_tree_contents.items():
+        found.append(f"{name} {value}".strip())
+
+    expected = """
+#root1 case_log
+#root1-0 case_log
+#root1-0-0 add_log_in_method
+#root1-0-0-0 Some info message
+#root1-0-0-1 Some warn message
+#root1-0-0-2 Some critical message
 """
     compare_strlist(
         found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]

@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
-import { Header, Details, Table } from '~/components';
-import { LogContext, filterExpandedEntries, defaultLogState, LogContextType, RunInfo } from '~/lib';
+import { Header, Details, Table } from './components';
+import {
+  LogContext,
+  leaveOnlyExpandedEntries,
+  defaultLogState,
+  LogContextType,
+  RunInfo,
+} from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
 import {
   reactCallSetAllEntriesCallback,
   reactCallSetRunInfoCallback,
 } from './treebuild/effectCallbacks';
+import { leaveOnlyFilteredExpandedEntries } from './lib/filteringHelpers';
 
 const Main = styled.main`
   display: grid;
@@ -79,7 +86,10 @@ export const Log = () => {
 
   // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
-    return filterExpandedEntries(entries, expandedEntries);
+    if (filter !== undefined && filter.length > 0) {
+      return leaveOnlyFilteredExpandedEntries(entries, expandedEntries, filter);
+    }
+    return leaveOnlyExpandedEntries(entries, expandedEntries);
   }, [entries, expandedEntries, filter]);
 
   const ctx: LogContextType = {

@@ -35,7 +35,7 @@ const Container = styled(Box)`
   }
 `;
 
-const getValue = (entry: Entry): ReactNode => {
+export const getValue = (entry: Entry): ReactNode | string => {
   switch (entry.type) {
     case Type.method:
     case Type.generator:

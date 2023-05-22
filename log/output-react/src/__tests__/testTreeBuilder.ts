@@ -1,5 +1,5 @@
 import { TreeBuilder } from '../treebuild/treeBuilder';
-import { createOpts, getOpts } from '../treebuild/options';
+import { createOpts } from '../treebuild/options';
 import { EntryBase, EntryMethod, EntryTask, Type } from '../lib/types';
 
 const CREATE_RUN_AND_TEST = `

@@ -14,7 +14,8 @@ if __name__ == "__main__":
         # "case_generators",
         # "case_failure",
         # "case_task_and_element",
-        "case_log",
+        # "case_log",
+        "case_filter",
     ]
 
     cli.main(["run", str(target)] + [f"-t={c}" for c in cases], exit=True)
