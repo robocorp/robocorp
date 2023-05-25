@@ -1,3 +1,14 @@
+0.4.2
+-----------------------------
+
+- Updated dependency on `robocorp-tasks` to `0.3.0`.
+
+
+0.4.1
+-----------------------------
+
+- Added more information in thrown errors
+
 0.4.0
 -----------------------------
 

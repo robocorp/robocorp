@@ -2,7 +2,7 @@ from typing import Literal, Optional
 
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 
