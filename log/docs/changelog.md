@@ -1,3 +1,14 @@
+0.2.0
+-----------------------------
+
+- New features in `log.html`:
+    - Redesigned (now uses react and the tree can handle much more items).
+    - Filtering is now available.
+    - It's possible to click elements to see details.
+    - Full traceback with variables available.
+    
+
+
 0.1.1
 -----------------------------
 
