@@ -7,7 +7,7 @@ authors = [
 ]
 readme = "README.md"
 packages = [{include = "robocorp/log", from = "src"}]
-include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]]
+include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Topic :: Software Development :: Libraries :: Python Modules",
