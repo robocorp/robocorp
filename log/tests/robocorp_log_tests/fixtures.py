@@ -23,7 +23,7 @@ class _SetupInfo:
 
 class UIRegenerateFixture:
     # Must be set to False when merging to master and
-    # inv build-output-view
+    # inv build-output-view-react
     # must also be manually called afterwards.
     FORCE_REGEN: List[typing.Union[str, int]] = []
 
@@ -40,18 +40,9 @@ class UIRegenerateFixture:
         cwd = os.path.dirname(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         )
-        cmd = [sys.executable, "-m", "dev", "build-output-view"]
-        if "dev" in self.FORCE_REGEN:
-            cmd.append("--dev")
+        cmd = [sys.executable, "-m", "invoke", "build-output-view-react"]
 
-        versions: List[int] = []
-        for setting in self.FORCE_REGEN:
-            if isinstance(setting, int):
-                versions.append(setting)
-
-        if versions:
-            cmd.append(f"--version={','.join(str(x) for x in versions)}")
-            subprocess.check_call(cmd, cwd=cwd)
+        subprocess.check_call(cmd, cwd=cwd)
 
 
 @pytest.fixture
@@ -88,10 +79,6 @@ def ui_regenerate():
         uiregenerate_fixture.LOG_HTML_STYLE = "standalone"
 
         uiregenerate_fixture.FORCE_REGEN.append("dev")
-        if uiregenerate_fixture.LOG_HTML_STYLE == "vscode":
-            uiregenerate_fixture.FORCE_REGEN.append(1)
-        else:
-            uiregenerate_fixture.FORCE_REGEN.append(2)
 
     uiregenerate_fixture.PRINT_MESSAGES = PRINT_MESSAGES
 
@@ -199,24 +186,6 @@ def rcc_loc(tmpdir_factory):
     # Disable tracking for tests
     subprocess.check_call([location] + "configure identity --do-not-track".split())
     return location
-
-
-@pytest.fixture(scope="session")
-def path_for_output_view_tests() -> Path:
-    f = Path(__file__).parent
-    robotframework_output_stream_root = f / ".." / ".."
-    contents = os.listdir(robotframework_output_stream_root)
-    assert "output-webview" in contents
-    ret = robotframework_output_stream_root / "output-webview"
-    assert ret.exists()
-    ret = ret / "tests"
-    assert ret.exists()
-    return ret
-
-
-@pytest.fixture(scope="session")
-def path_for_output_view_tests_robo(path_for_output_view_tests) -> Path:
-    return (path_for_output_view_tests / ".." / "tests_robo").absolute()
 
 
 @pytest.fixture(scope="session")

@@ -68,6 +68,16 @@ jobs:
         python-version: ${{ matrix.python }}
         cache: 'poetry'
         
+    - name: Setup node 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        registry-url: "https://npm.pkg.github.com"
+        scope: "@robocorp"
+        
+    - name: Install project
+      run: poetry install
+      
     - name: Install invoke/tomlkit
       run: pip install invoke tomlkit
       
@@ -80,12 +90,21 @@ jobs:
       run: invoke typecheck
 
     # Because we've installed the logging in dev mode we need to build the view too.      
-    - name: Print robocorp-log info and build the output view.
+    - name: npm ci
+      working-directory: ./log/output-react/
       run: |
-        poetry run python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
-        poetry run python -c "from robocorp import log;print(log.__file__)"
-        cd ../log
-        poetry run inv build-output-view
+        npm ci
+      env:
+        CI: true
+        NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+      
+    - name: Build the output view.
+      working-directory: ./log
+      run: |
+        python -m invoke build-output-view-react
+      env:
+        CI: true
+        NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     - name: Run Unittests
       run: invoke test

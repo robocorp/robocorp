@@ -599,7 +599,7 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
             i = txt.find("let chunks = [")
             j = txt.find("];", i)
 
-    assert i > 0, "Could not find the chunks in the file."
+    assert i > 0, f"Could not find the chunks in the file ({log_html})."
     assert j > 0, "Could not find the end of the chunks in the file."
 
     sub = txt[i + len("let chunks = ") : j + 1]

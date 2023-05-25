@@ -10,7 +10,7 @@ def open_output_view_for_tests():
     filepath = Path(__file__).absolute().parent.parent / "dist-test_v3" / "index.html"
     if not filepath.exists():
         raise AssertionError(
-            f'File "{filepath}" does not exist (distribution does not seem to be built with "nmp run build:test").'
+            f'File "{filepath}" does not exist (distribution does not seem to be built with "npm run build:test").'
         )
 
     page = open_url(filepath.as_uri(), headless="pydevd" not in sys.modules)

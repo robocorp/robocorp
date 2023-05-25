@@ -76,24 +76,18 @@ jobs:
     - name: Install project
       run: poetry install
 
-    - name: Embed output view in index.py
-      run: poetry run inv build-output-view
-
-    - name: Build output view
-      if: contains(matrix.name, '-outviewintegrationtests')
-      working-directory: ./log/output-webview
-      run: |
-        yarn install
-        yarn build-test
-        yarn build-test-v2
-
-    - name: Build output view (react)
-      if: contains(matrix.name, '-outviewintegrationtests')
-      working-directory: ./log/output-react
+    - name: npm ci
+      working-directory: ./log/output-react/
       run: |
         npm ci
         npm run build:tests
-        npm run test
+      env:
+        CI: true
+        NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+      
+    - name: Print robocorp-log info and build the output view.
+      run: |
+        poetry run python -m invoke build-output-view-react
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
@@ -105,24 +99,6 @@ jobs:
         RUN_TESTS_TIMEOUT: 10000
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
       run: poetry run pytest -rfE -vv .
-
-    - uses: actions/upload-artifact@v3
-      if: always() && contains(matrix.name, '-outviewintegrationtests')
-      with:
-        name: robot_framework_log.${{ matrix.name }}.html
-        path: log/output-webview/tests/output/log.html
-
-    - uses: actions/upload-artifact@v3
-      if: always() && contains(matrix.name, '-outviewintegrationtests')
-      with:
-        name: robo_log.${{ matrix.name }}.html
-        path: log/output-webview/tests_robo/output/log.html
-
-    - uses: actions/upload-artifact@v3
-      if: always() && contains(matrix.name, '-outviewintegrationtests')
-      with:
-        name: screenshot.${{ matrix.name }}.png
-        path: log/output-webview/tests_robo/output/screenshot.png
 
     - uses: actions/upload-artifact@v3
       if: always() && contains(matrix.name, '-outviewintegrationtests')

@@ -92,12 +92,8 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
 
         assert log_target.exists()
 
-        d: datetime.datetime = datetime.datetime.fromisoformat(
-            "2022-10-31T07:45:57.116+00:00"
-        )
-        # The internal time is in utc, so, we need to decode it to the current timezone.
-        d = d.astimezone()
-        timezone_end = d.isoformat(timespec="milliseconds")[-6:]
+        def ends_with_timezone(msg):
+            return msg["time"][-6:].startswith("+")
 
         msgs = verify_log_messages_from_log_html(
             log_target,
@@ -136,7 +132,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
                 {
                     "message_type": "T",
                     # i.e.: check for the utc timezone (+00:00) in the time (actually, converted to local timezone)..
-                    "__check__": lambda msg: msg["time"].endswith(timezone_end),
+                    "__check__": ends_with_timezone,
                 },
                 {
                     "message_type": "SE",

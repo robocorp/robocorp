@@ -24,6 +24,8 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
+        registry-url: "https://npm.pkg.github.com"
+        scope: "@robocorp"
 
     - name: Install poetry
       run: pipx install poetry
@@ -36,9 +38,21 @@ jobs:
 
     - name: Install project
       run: poetry install
+      
+    - name: npm ci
+      working-directory: ./log/output-react/
+      run: |
+        npm ci
+      env:
+        CI: true
+        NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
-    - name: Embed output view in index.py
-      run: poetry run invoke build-output-view
+    - name: Print robocorp-log info and build the output view.
+      run: |
+        poetry run inv build-output-view-react
+      env:
+        CI: true
+        NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         
     - name: Check tag version
       run: poetry run invoke check-tag-version

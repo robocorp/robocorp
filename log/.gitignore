@@ -131,11 +131,12 @@ node_modules
 **/playwright-log.txt
 /tests/browser
 /tests/playwright-log.txt
-/output-webview/dist-test
-/output-webview/dist
+/output-react/dist-test_v3
+/output-react/dist_v3
 
-/output-webview/.vscode
+/output-react/.vscode
 /src/robocorp/log/index.py
 /src/robocorp/log/index_v2.py
 /src/robocorp/log/_index.py
 /src/robocorp/log/_index_v2.py
+/src/robocorp/log/_index_v3.py

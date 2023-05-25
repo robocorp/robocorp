@@ -911,14 +911,7 @@ class _RoboOutputImpl:
                 os.makedirs(dirname, exist_ok=True)
             print(f"Robocorp Log (html): {target}")
 
-            if self._config.log_html_style == 1:
-                from robocorp.log import _index as index
-            elif self._config.log_html_style == 2:
-                from robocorp.log import _index_v2 as index
-            else:
-                raise ValueError(
-                    f"Unexpected log html style: {self._config.log_html_style}"
-                )
+            from robocorp.log import _index_v3 as index
 
             has_separate_bundle_js = "bundle.js" in index.FILE_CONTENTS
 
@@ -956,26 +949,31 @@ class _RoboOutputImpl:
 
     def _write_index_updating_sample(self, target, contents):
         with open(target, "wb") as stream:
-            sample_contents_index = contents.index("getSampleContents")
-            assert sample_contents_index > 0
+            string_start = contents.index("String.raw`V 0.0.2")
+            string_end = contents.index("`", string_start + 18)
+            string_end = contents.index("}", string_end)
 
-            return_json_parse_index = contents.index(
-                "return JSON.parse", sample_contents_index
-            )
-            assert return_json_parse_index > 0
+            assert string_start > 0, f'Could not find "String.raw`V 0.0.2" in {target}.'
+            assert string_end > 0, f"Could not find the string end in {target}."
 
-            end_of_json_parse_index = contents.index(")}}", return_json_parse_index) + 1
-            assert end_of_json_parse_index > 0
-            self._write_updating_sample(
-                stream, contents, return_json_parse_index, end_of_json_parse_index
-            )
+            # Now, go a bit back in the string and find the `const XXX=` to also remove that.
+            i = string_start
+            found = []
+            while i > 0:
+                c = contents[i]
+                found.insert(0, c)
 
-    def _write_updating_sample(
-        self, stream, contents, return_json_parse_index, end_of_json_parse_index
-    ):
+                if "".join(found).startswith("const "):
+                    string_start = i
+                    break
+                i -= 1
+
+            self._write_updating_sample(stream, contents, string_start, string_end)
+
+    def _write_updating_sample(self, stream, contents, start_index, end_index):
         import base64
 
-        stream.write(contents[:return_json_parse_index].encode("utf-8"))
+        stream.write(contents[:start_index].encode("utf-8"))
 
         import zlib
 
@@ -1037,4 +1035,4 @@ return new TextDecoder().decode(mergedArray);
 """
         )
 
-        stream.write(contents[end_of_json_parse_index:].encode("utf-8"))
+        stream.write(contents[end_index:].encode("utf-8"))
