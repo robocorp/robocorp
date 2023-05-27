@@ -1,6 +1,13 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 
-from playwright.sync_api import Browser, BrowserContext, Page, Playwright
+from playwright.sync_api import (
+    Browser,
+    BrowserContext,
+    Page,
+    Playwright,
+    ElementHandle,
+    Locator,
+)
 
 __version__ = "0.4.2"
 version_info = [int(x) for x in __version__.split(".")]
@@ -125,8 +132,9 @@ def context() -> BrowserContext:
 
 
 def open_browser(
-    browser_engine: Literal["firefox", "chrome"] = "chrome",
+    browser_engine: Optional[Literal["chrome", "firefox"]] = None,
     headless: Optional[bool] = None,
+    **kwargs,
 ) -> Browser:
     """Shortcut to configure and launch a browser instance (using Playwright).
 
@@ -149,14 +157,20 @@ def open_browser(
     Returns:
         The browser instance.
     """
-    configure(browser_engine=browser_engine, headless=headless)
+    if browser_engine is not None:
+        kwargs["browser_engine"] = browser_engine
+    if headless is not None:
+        kwargs["headless"] = headless
+    if kwargs:
+        configure(**kwargs)
     return browser()
 
 
 def open_url(
     url: str,
-    browser_engine: Literal["firefox", "chrome"] = "chrome",
+    browser_engine: Optional[Literal["chrome", "firefox"]] = None,
     headless: Optional[bool] = None,
+    **kwargs,
 ) -> Page:
     """
     Changes the url of the current page (creating a page if needed).
@@ -171,6 +185,9 @@ def open_url(
             the browser UI will be kept hidden. If unset or set to None it'll
             show the browser UI only if a debugger is detected.
 
+        kwargs: Other keyword arguments to be passed to the
+            `configure` function (besides `browser` and `headless`).
+
     Note:
         The arguments related to browser initialization will only be used
         if this is the first call, on subsequent calls the same browser instance
@@ -180,28 +197,33 @@ def open_url(
         The page instance managed by the robocorp.tasks framework
         (it will be automatically closed when the task finishes).
     """
-    configure(browser_engine=browser_engine, headless=headless)
+    if browser_engine is not None:
+        kwargs["browser_engine"] = browser_engine
+    if headless is not None:
+        kwargs["headless"] = headless
+    if kwargs:
+        configure(**kwargs)
     p = page()
     p.goto(url)
     return p
 
 
 def screenshot(
-    page: Optional[Page] = None,
+    element: Optional[Union[Page, ElementHandle, Locator]] = None,
     timeout: int = 5000,
     image_type: Literal["png", "jpeg"] = "png",
     log_level: Literal["INFO", "WARN", "ERROR"] = "INFO",
 ) -> bytes:
     """
-    Takes a screenshot of the given page and saves it to the log. If no page
-    is provided the current page is saved.
+    Takes a screenshot of the given page/element/locator and saves it to the
+    log. If no element is provided the screenshot will target the current page.
 
-    Note: the page.screenshot can be used if the screenshot is not expected
+    Note: the element.screenshot can be used if the screenshot is not expected
     to be added to the log.
 
     Args:
-        page: The page which should have its screenshot taken. If not given
-        the managed page instance will be used.
+        element: The page/element/locator which should have its screenshot taken. If not
+        given the managed page instance will be used.
 
     Returns:
         The bytes from the screenshot.
@@ -210,15 +232,15 @@ def screenshot(
 
     from robocorp import log
 
-    if page is None:
+    if element is None:
         from . import _browser_context
 
-        page = _browser_context.page()
+        element = _browser_context.page()
 
     with log.suppress():
         # Suppress log because we don't want the bytes to appear at
         # the screenshot and then as the final html.
-        in_bytes = page.screenshot(timeout=timeout, type=image_type)
+        in_bytes = element.screenshot(timeout=timeout, type=image_type)
         in_base64 = base64.b64encode(in_bytes).decode("ascii")
 
     log.html(
