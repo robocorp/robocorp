@@ -3,10 +3,10 @@ from typing import Literal, Optional, Union
 from playwright.sync_api import (
     Browser,
     BrowserContext,
-    Page,
-    Playwright,
     ElementHandle,
     Locator,
+    Page,
+    Playwright,
 )
 
 __version__ = "0.4.2"
