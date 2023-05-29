@@ -131,78 +131,17 @@ def context() -> BrowserContext:
     return _browser_context.context()
 
 
-def open_browser(
-    browser_engine: Optional[Literal["chrome", "firefox"]] = None,
-    headless: Optional[bool] = None,
-    **kwargs,
-) -> Browser:
-    """Shortcut to configure and launch a browser instance (using Playwright).
-
-    Note that if the browser was already previously launched the previous
-    instance will be returned and any configuration passed will be ignored.
-
-    Args:
-        browser_engine: Specifies which browser to use. Supported browsers are:
-            ``chrome`` and ``firefox``.
-
-        headless: If set to False the browser UI will be shown. If set to True
-            the browser UI will be kept hidden. If unset or set to None it'll
-            show the browser UI only if a debugger is detected.
-
-    Note:
-        The arguments related to browser initialization will only be used
-        if this is the first call, on subsequent calls the same browser instance
-        will be used and the current page will open the given url.
-
-    Returns:
-        The browser instance.
-    """
-    if browser_engine is not None:
-        kwargs["browser_engine"] = browser_engine
-    if headless is not None:
-        kwargs["headless"] = headless
-    if kwargs:
-        configure(**kwargs)
-    return browser()
-
-
-def open_url(
-    url: str,
-    browser_engine: Optional[Literal["chrome", "firefox"]] = None,
-    headless: Optional[bool] = None,
-    **kwargs,
-) -> Page:
+def goto(url: str) -> Page:
     """
     Changes the url of the current page (creating a page if needed).
 
     Args:
         url: Navigates to the provided URL.
 
-        browser: Specifies which browser to use. Supported browsers are:
-            ``chrome`` and ``firefox``.
-
-        headless: If set to False the browser UI will be shown. If set to True
-            the browser UI will be kept hidden. If unset or set to None it'll
-            show the browser UI only if a debugger is detected.
-
-        kwargs: Other keyword arguments to be passed to the
-            `configure` function (besides `browser` and `headless`).
-
-    Note:
-        The arguments related to browser initialization will only be used
-        if this is the first call, on subsequent calls the same browser instance
-        will be used and the current page will open the given url.
-
     Returns:
         The page instance managed by the robocorp.tasks framework
         (it will be automatically closed when the task finishes).
     """
-    if browser_engine is not None:
-        kwargs["browser_engine"] = browser_engine
-    if headless is not None:
-        kwargs["headless"] = headless
-    if kwargs:
-        configure(**kwargs)
     p = page()
     p.goto(url)
     return p

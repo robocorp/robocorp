@@ -16,7 +16,7 @@ def _check_page_query(page_prefix):
 
 
 def test_browser_api(datadir) -> None:
-    from robocorp.browser import context, open_url, page
+    from robocorp.browser import context, goto, page
 
     initial_page = page()
     page1_html: Path = datadir / "page1.html"
@@ -34,7 +34,7 @@ def test_browser_api(datadir) -> None:
     # If the current page is closed another one is automatically provided.
     page().close()
 
-    another_page = open_url(page2_html.as_uri())
+    another_page = goto(page2_html.as_uri())
     assert another_page is not initial_page
     assert initial_page.is_closed()
 
@@ -43,12 +43,9 @@ def test_browser_api(datadir) -> None:
 
 
 def test_get_executable_path():
-    from robocorp.browser._browser_context import _get_executable_path
+    from robocorp.browser._browser_engines import get_executable_path
 
-    executable_path = _get_executable_path("chrome")
-    assert executable_path
-
-    executable_path = _get_executable_path("firefox")
+    executable_path = get_executable_path("chrome")
     assert executable_path
 
 

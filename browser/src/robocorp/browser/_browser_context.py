@@ -1,7 +1,5 @@
-import platform
 import sys
-from pathlib import Path
-from typing import Callable, Dict, Iterator, List, Literal, Optional
+from typing import Callable, Dict, Iterator, List, Optional, Union
 
 from playwright.sync_api import (
     Browser,
@@ -14,51 +12,7 @@ from playwright.sync_api import (
 )
 from robocorp.tasks import session_cache, task_cache
 
-EXECUTABLE_PATHS = {
-    "chrome": {
-        "Linux": "/usr/bin/google-chrome",
-        "Darwin": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-    },
-    "firefox": {
-        "Linux": "/usr/bin/firefox",
-        "Windows": "C:\\Program Files\\Mozilla Firefox\\firefox.exe",
-        "Darwin": "/Applications/Firefox.app/Contents/MacOS/firefox",
-    },
-}
-
-
-def _get_executable_path(browser: Literal["firefox", "chrome"]) -> str:
-    system = platform.system()
-
-    if system == "Windows":
-        return _registry_path(browser)
-
-    if browser not in EXECUTABLE_PATHS:
-        raise ValueError(f"Unsupported browser: {browser}")
-
-    path = EXECUTABLE_PATHS[browser][system]
-    if not Path(path).exists():
-        raise RuntimeError(f"Browser executable not found: {path}")
-
-    return path
-
-
-def _registry_path(browser: Literal["chrome", "firefox"]) -> str:
-    if sys.platform != "win32":
-        raise NotImplementedError("Not implemented for non-Windows")
-
-    import winreg
-
-    parent = winreg.HKEY_LOCAL_MACHINE
-    key = rf"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\{browser}.exe"
-
-    handle = winreg.OpenKeyEx(parent, key)
-    path, _ = winreg.QueryValueEx(handle, "")  # Empty string is (Default) value
-
-    if not path:
-        raise RuntimeError(f"Failed to read browser path: {browser}")
-
-    return str(path)
+from ._browser_engines import Engine, get_executable_path, to_engine
 
 
 class _BrowserConfig:
@@ -66,7 +20,7 @@ class _BrowserConfig:
 
     def __init__(
         self,
-        browser_engine: str = "chrome",
+        browser_engine: Engine = "chrome",
         headless: Optional[bool] = None,
         slowmo: int = 0,
         screenshot: str = "only-on-failure",
@@ -75,7 +29,7 @@ class _BrowserConfig:
         Args:
             browser_engine:
                 help="Browser engine which should be used",
-                choices=["chrome", "firefox"],
+                choices=["chrome"],
 
             headless:
                 Run headless or not.
@@ -94,13 +48,12 @@ class _BrowserConfig:
         self.screenshot = screenshot
 
     @property
-    def browser_engine(self) -> str:
+    def browser_engine(self) -> Engine:
         return self._browser_engine
 
     @browser_engine.setter
-    def browser_engine(self, value: str):
-        assert value in ["chrome", "firefox"]
-        self._browser_engine = value
+    def browser_engine(self, value: Union[Engine, str]):
+        self._browser_engine = to_engine(value)
 
     @property
     def headless(self) -> Optional[bool]:
@@ -194,7 +147,7 @@ def _browser_launcher() -> Callable[..., Browser]:
 
         if "executable_path" not in launch_options:
             engine = _browser_config().browser_engine
-            launch_options["executable_path"] = _get_executable_path(engine)
+            launch_options["executable_path"] = get_executable_path(engine)
 
         browser = browser_type.launch(**launch_options)
         return browser
