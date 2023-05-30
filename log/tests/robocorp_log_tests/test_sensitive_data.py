@@ -1,11 +1,14 @@
-from robocorp import log as robolog
 from contextlib import contextmanager
+
+from robocorp import log as robolog
 
 
 def test_sensitive_data():
     from imp import reload
-    from robocorp_log_tests._resources import check_sensitive_data
     from io import StringIO
+
+    from robocorp_log_tests._resources import check_sensitive_data
+
     from robocorp.log import iter_decoded_log_format_from_stream
 
     s = StringIO()
@@ -44,8 +47,10 @@ def test_sensitive_data():
 
 def test_sensitive_data_in_traceback():
     from imp import reload
-    from robocorp_log_tests._resources import check_sensitive_data
     from io import StringIO
+
+    from robocorp_log_tests._resources import check_sensitive_data
+
     from robocorp.log import verify_log_messages_from_stream
 
     s = StringIO()

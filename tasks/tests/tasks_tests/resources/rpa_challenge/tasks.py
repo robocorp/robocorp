@@ -2,10 +2,11 @@
 from pathlib import Path
 from time import sleep
 
-from robocorp.tasks import task
-from robocorp.http import download
 from robocorp.browser import open_url, screenshot
 from robocorp.excel import open_workbook
+from robocorp.http import download
+
+from robocorp.tasks import task
 
 
 def read_people_from_excel():

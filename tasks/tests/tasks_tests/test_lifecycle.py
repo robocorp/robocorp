@@ -1,7 +1,7 @@
 import itertools
 
-from robocorp.tasks._hooks import after_all_tasks_run
 from robocorp.tasks import session_cache
+from robocorp.tasks._hooks import after_all_tasks_run
 
 
 def test_session_cache_yield():
@@ -66,9 +66,9 @@ def test_session_cache_return():
 
 
 def test_integrated(datadir, str_regression):
-    from tasks_tests.fixtures import robo_run
+    from devutils.fixtures import robocorp_tasks_run
 
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run", "-t", "task1", "-t", "task2", "--console-colors=plain"],
         returncode=0,
         cwd=str(datadir),

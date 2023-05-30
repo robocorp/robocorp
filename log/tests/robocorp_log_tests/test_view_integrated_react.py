@@ -1,11 +1,12 @@
 import os
-from pathlib import Path
-import pytest
-from typing import Union, Optional
 import subprocess
+from pathlib import Path
+from typing import Optional, Union
+
+import pytest
 
 
-def run_in_rcc(
+def _run_in_rcc(
     rcc_loc: str,
     cwd: Union[str, Path],
     case_name: str,
@@ -66,7 +67,7 @@ def test_react_integrated(
 
     tasks_py = path_for_output_view_react_tests_robo / "tasks.py"
     assert tasks_py.exists()
-    completed_process = run_in_rcc(
+    completed_process = _run_in_rcc(
         rcc_loc,
         path_for_output_view_react_tests_robo,
         case_name,

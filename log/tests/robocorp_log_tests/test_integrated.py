@@ -2,12 +2,15 @@ from robocorp.log import verify_log_messages_from_log_html
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate):
-    from robocorp_log_tests._resources import check_iterators
     from imp import reload
-    from robocorp_log_tests.fixtures import basic_log_setup
-    from robocorp_log_tests.fixtures import ConfigForTest
-    from robocorp.log._decoder import MESSAGE_TYPE_YIELD_SUSPEND
-    from robocorp.log._decoder import MESSAGE_TYPE_YIELD_RESUME
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+
+    from robocorp.log._decoder import (
+        MESSAGE_TYPE_YIELD_RESUME,
+        MESSAGE_TYPE_YIELD_SUSPEND,
+    )
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
@@ -43,12 +46,15 @@ def test_log_with_yield_iterator(tmpdir, ui_regenerate):
 
 
 def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
-    from robocorp_log_tests._resources import check_iterators
     from imp import reload
-    from robocorp_log_tests.fixtures import basic_log_setup
-    from robocorp_log_tests.fixtures import ConfigForTest
-    from robocorp.log._decoder import MESSAGE_TYPE_YIELD_SUSPEND
-    from robocorp.log._decoder import MESSAGE_TYPE_YIELD_RESUME
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+
+    from robocorp.log._decoder import (
+        MESSAGE_TYPE_YIELD_RESUME,
+        MESSAGE_TYPE_YIELD_SUSPEND,
+    )
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
@@ -109,12 +115,15 @@ def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
 
 
 def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
-    from robocorp_log_tests._resources import check_iterators
     from imp import reload
-    from robocorp_log_tests.fixtures import basic_log_setup
-    from robocorp_log_tests.fixtures import ConfigForTest
-    from robocorp.log._decoder import MESSAGE_TYPE_YIELD_FROM_RESUME
-    from robocorp.log._decoder import MESSAGE_TYPE_YIELD_FROM_SUSPEND
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+
+    from robocorp.log._decoder import (
+        MESSAGE_TYPE_YIELD_FROM_RESUME,
+        MESSAGE_TYPE_YIELD_FROM_SUSPEND,
+    )
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:

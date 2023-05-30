@@ -1,9 +1,10 @@
-import functools
-from pathlib import Path
-from typing import Optional, Union, Sequence, Tuple, Any
 import datetime
-from .protocols import OptExcInfo, LogHTMLStyle, LogElementType
+import functools
 import sys
+from pathlib import Path
+from typing import Any, Optional, Sequence, Tuple, Union
+
+from .protocols import LogElementType, LogHTMLStyle, OptExcInfo
 
 
 def _log_error(func):
@@ -35,8 +36,8 @@ class _RoboLogger:
         log_html_style: LogHTMLStyle = "standalone",
         **kwargs,
     ):
-        from ._robo_output_impl import _RoboOutputImpl, _Config
         from ._convert_units import _convert_to_bytes
+        from ._robo_output_impl import _Config, _RoboOutputImpl
 
         # Note: expected to be used just when used in-memory (not part of the public API).
         config = _Config(kwargs.get("__uuid__"))

@@ -1,5 +1,6 @@
-from robocorp.tasks import task
 import difflib
+
+from robocorp.tasks import task
 
 
 @task

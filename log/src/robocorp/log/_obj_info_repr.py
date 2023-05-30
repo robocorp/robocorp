@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Any, Tuple
 
 
 def get_obj_type_and_repr(obj: Any) -> Tuple[str, str]:

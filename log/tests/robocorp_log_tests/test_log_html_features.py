@@ -8,22 +8,23 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
     This is a test which should generate an output for a log.html which
     showcases all the features available.
     """
-    from robocorp.log import (
-        Filter,
-        FilterKind,
-        verify_log_messages_from_log_html,
-        ConfigFilesFiltering,
+    from imp import reload
+    from pathlib import Path
+
+    from robocorp_log_tests._resources import (
+        check,
+        check_iterators,
+        check_sensitive_data,
+        check_traceback,
     )
 
     from robocorp import log
-    from robocorp_log_tests._resources import (
-        check,
-        check_sensitive_data,
-        check_traceback,
-        check_iterators,
+    from robocorp.log import (
+        ConfigFilesFiltering,
+        Filter,
+        FilterKind,
+        verify_log_messages_from_log_html,
     )
-    from imp import reload
-    from pathlib import Path
 
     __tracebackhide__ = 1
 

@@ -1,9 +1,11 @@
 import ast
-from typing import Any, Union, List, Optional, Tuple, Dict, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
+from robocorp.log._ast_utils import NodeFactory
+
+from ._ast_utils import ASTRewriter
 from ._config import BaseConfig, FilterKind
 from .protocols import LogElementType
-from ._ast_utils import ASTRewriter
-from robocorp.log._ast_utils import NodeFactory
 
 DEBUG = False
 

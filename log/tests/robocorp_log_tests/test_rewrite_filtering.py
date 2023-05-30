@@ -1,7 +1,8 @@
 def test_rewrite_filtering() -> None:
-    import threading
     import email
-    from robocorp.log import FilterKind, ConfigFilesFiltering, Filter
+    import threading
+
+    from robocorp.log import ConfigFilesFiltering, Filter, FilterKind
 
     # By default accept what's not in the library.
     files_filtering = ConfigFilesFiltering()

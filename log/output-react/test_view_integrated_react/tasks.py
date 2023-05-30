@@ -1,9 +1,10 @@
-from robocorp.tasks import task
-from robocorp.browser import open_url, page
-from pathlib import Path
 import json
-from typing import Sequence
 import sys
+from pathlib import Path
+from typing import Sequence
+
+from robocorp.browser import open_url, page
+from robocorp.tasks import task
 
 
 def open_output_view_for_tests():

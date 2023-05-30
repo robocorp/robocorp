@@ -1,10 +1,11 @@
-from contextlib import contextmanager, redirect_stdout, redirect_stderr
 import json
 import os
 import sys
 import traceback
-from typing import Iterator, IO, Any, AnyStr, Iterable
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from threading import RLock
+from typing import IO, Any, AnyStr, Iterable, Iterator
+
 from robocorp.log import console_message
 
 
@@ -158,8 +159,9 @@ def setup_stdout_logging(
             Whether messages sent to stdout and stderr should be
             redirected to console messages.
     """
-    from robocorp import log
     import threading
+
+    from robocorp import log
     from robocorp.log import console
 
     if not mode:

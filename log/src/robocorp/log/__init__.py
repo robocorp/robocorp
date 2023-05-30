@@ -1,35 +1,33 @@
-from contextlib import contextmanager, nullcontext
-from io import StringIO
-from pathlib import Path
-
 import datetime
-import json
 import functools
+import json
 import sys
 import threading
 import typing
 import weakref
-
+from contextlib import contextmanager, nullcontext
+from io import StringIO
+from pathlib import Path
 from typing import (
-    Optional,
+    IO,
     Any,
+    Callable,
+    ContextManager,
+    Dict,
+    Iterable,
     Iterator,
     List,
-    Sequence,
-    Dict,
-    Union,
-    Iterable,
     Literal,
-    overload,
-    Callable,
+    Optional,
     Protocol,
-    IO,
-    ContextManager,
+    Sequence,
+    Union,
+    overload,
 )
-from ._logger_instances import _get_logger_instances
-from .protocols import OptExcInfo, LogHTMLStyle, Status, IReadLines
-from ._suppress_helper import SuppressHelper as _SuppressHelper
 
+from ._logger_instances import _get_logger_instances
+from ._suppress_helper import SuppressHelper as _SuppressHelper
+from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
@@ -397,9 +395,7 @@ def suppress(*args, **kwargs):
     return _suppress_helper.handle(*args, **kwargs)
 
 
-from ._sensitive_variable_names import (
-    SensitiveVariableNames as _SensitiveVariableNames,
-)
+from ._sensitive_variable_names import SensitiveVariableNames as _SensitiveVariableNames
 
 _sensitive_names = _SensitiveVariableNames(("password", "passwd"))
 
@@ -583,8 +579,8 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         Note: the exact format of the messages provided is not stable across
         releases.
     """
-    import zlib
     import base64
+    import zlib
     from ast import literal_eval
 
     txt = log_html.read_text(encoding="utf-8")
@@ -854,8 +850,8 @@ def add_log_output(
         to the same directory there will be conflicts (in the future this should
         generate an error).
     """
-    from ._robo_logger import _RoboLogger  # @Reimport
     from ._auto_logging_setup import OnExitContextManager
+    from ._robo_logger import _RoboLogger  # @Reimport
 
     if not output_dir:
         raise RuntimeError("The output directory must be specified.")
@@ -897,8 +893,8 @@ def add_in_memory_log_output(write: Callable[[str], Any]):
         A context manager which can be used to automatically remove and
         close the related logger.
     """
-    from ._robo_logger import _RoboLogger  # @Reimport
     from ._auto_logging_setup import OnExitContextManager
+    from ._robo_logger import _RoboLogger  # @Reimport
 
     logger = _RoboLogger(__write__=write)
     _get_logger_instances()[logger] = 1

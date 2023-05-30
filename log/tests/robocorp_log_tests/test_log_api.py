@@ -5,11 +5,13 @@ import threading
 
 
 def test_log_api(tmpdir) -> None:
-    from robocorp import log
-    from robocorp_log_tests._resources import check
     from imp import reload
-    from robocorp.log import verify_log_messages_from_log_html
+
+    from robocorp_log_tests._resources import check
     from robocorp_log_tests.fixtures import basic_log_setup
+
+    from robocorp import log
+    from robocorp.log import verify_log_messages_from_log_html
 
     with basic_log_setup(tmpdir, max_file_size="30kb", max_files=1) as setup_info:
         check = reload(check)
@@ -46,10 +48,12 @@ def test_log_api(tmpdir) -> None:
 
 
 def test_log_api_without_with_statments(tmpdir) -> None:
-    from robocorp import log
-    from robocorp_log_tests._resources import check
     from imp import reload
     from pathlib import Path
+
+    from robocorp_log_tests._resources import check
+
+    from robocorp import log
     from robocorp.log import verify_log_messages_from_log_html
 
     log_target = Path(tmpdir.join("log.html"))

@@ -1,14 +1,15 @@
-from contextlib import contextmanager
-from pathlib import Path
-from robocorp.log import BaseConfig, FilterKind
-from robocorp.log.protocols import LogHTMLStyle
-from typing import Optional, List
-
 import os
-import pytest
+import subprocess
 import sys
 import typing
-import subprocess
+from contextlib import contextmanager
+from pathlib import Path
+from typing import List, Optional
+
+import pytest
+
+from robocorp.log import BaseConfig, FilterKind
+from robocorp.log.protocols import LogHTMLStyle
 
 
 class _SetupInfo:
@@ -159,8 +160,9 @@ def raise_exceptions():
 
 @pytest.fixture()
 def log_setup(tmpdir):
-    from robocorp import log
     import io
+
+    from robocorp import log
 
     log_target = Path(tmpdir.join("log.html"))
 

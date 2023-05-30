@@ -33,8 +33,8 @@ automatically logged is not imported prior the the `cli.main` call.
 """
 from pathlib import Path
 from typing import Optional
-from ._protocols import ITask
 
+from ._protocols import ITask
 
 __version__ = "0.3.0"
 version_info = [int(x) for x in __version__.split(".")]

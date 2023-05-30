@@ -25,6 +25,9 @@ robocorp-devutils = {path = "../devutils/", develop = true}
 [tool.mypy]
 mypy_path = "src:tests"
 
+[tool.isort]
+profile = "black"
+
 [[tool.mypy.overrides]]
 module = "setuptools.*"
 ignore_missing_imports = true

@@ -1,19 +1,10 @@
 import ast
-from functools import partial
+import ast as ast_module
 import itertools
 import sys
-from typing import (
-    Iterator,
-    List,
-    Tuple,
-    Generic,
-    TypeVar,
-    Generator,
-    Union,
-    Optional,
-)
-import ast as ast_module
 from ast import AST
+from functools import partial
+from typing import Generator, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
 
 
 class _NodesProviderVisitor(ast_module.NodeVisitor):

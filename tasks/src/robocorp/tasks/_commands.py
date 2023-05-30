@@ -1,10 +1,9 @@
-from pathlib import Path
-from typing import Union, Sequence, List
-
 import json
 import os
 import sys
 import traceback
+from pathlib import Path
+from typing import List, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
@@ -30,10 +29,11 @@ def list_tasks(
     Args:
         path: The path (file or directory) from where tasks should be collected.
     """
-    from robocorp.tasks._collect_tasks import collect_tasks
-    from robocorp.tasks._task import Context
-    from robocorp.tasks._protocols import ITask
     from contextlib import redirect_stdout
+
+    from robocorp.tasks._collect_tasks import collect_tasks
+    from robocorp.tasks._protocols import ITask
+    from robocorp.tasks._task import Context
 
     p = Path(path)
     context = Context()
@@ -97,27 +97,25 @@ def run(
         0 if everything went well.
         1 if there was some error running the task.
     """
+    from robocorp.log import console, redirect
+
     from ._collect_tasks import collect_tasks
+    from ._config import RunConfig, set_config
+    from ._exceptions import RobocorpTasksCollectError
     from ._hooks import (
-        before_task_run,
+        after_all_tasks_run,
         after_task_run,
         before_all_tasks_run,
-        after_all_tasks_run,
+        before_task_run,
     )
-    from ._protocols import ITask
-    from ._task import Context
-    from ._protocols import Status
-    from ._exceptions import RobocorpTasksCollectError
     from ._log_auto_setup import (
-        setup_cli_auto_logging,
         read_pyproject_toml,
-        read_filters_from_pyproject_toml,
+        read_robocorp_log_config,
+        setup_cli_auto_logging,
     )
     from ._log_output_setup import setup_log_output
-    from ._config import RunConfig, set_config
-    from robocorp.log import redirect
-    from robocorp.log import console
-    from ._task import set_current_task
+    from ._protocols import ITask, Status
+    from ._task import Context, set_current_task
 
     console.set_mode(console_colors)
 
@@ -154,9 +152,7 @@ def run(
         pyproject_toml_contents = {}
     else:
         pyproject, pyproject_toml_contents = pyproject_path_and_contents
-        config = read_filters_from_pyproject_toml(
-            context, pyproject, pyproject_toml_contents
-        )
+        config = read_robocorp_log_config(context, pyproject, pyproject_toml_contents)
 
     run_config = RunConfig(
         Path(output_dir),

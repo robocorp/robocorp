@@ -32,9 +32,9 @@ import struct
 import sys
 import types
 from pathlib import Path
-from typing import Callable, Dict, IO, Optional, Sequence, Tuple, Union
-from ._config import BaseConfig, FilterKind
+from typing import IO, Callable, Dict, Optional, Sequence, Tuple, Union
 
+from ._config import BaseConfig, FilterKind
 
 # caches rewritten pycs in pycache dirs
 # 0.0.1: Initial version

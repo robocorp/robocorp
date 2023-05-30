@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 from invoke import task
 
@@ -15,7 +15,6 @@ except ImportError:
 
 
 from devutils.invoke_utils import build_common_tasks
-
 
 globals().update(build_common_tasks(Path(__file__).absolute().parent, "robocorp.log"))
 

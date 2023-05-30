@@ -1,6 +1,7 @@
 def test_decoder_location():
-    from robocorp.log._decoder import iter_decoded_log_format
     from io import StringIO
+
+    from robocorp.log._decoder import iter_decoded_log_format
 
     s = StringIO(
         """
@@ -29,8 +30,9 @@ SE x|e|0.012
 
 
 def test_decoder_info():
-    from robocorp.log._decoder import iter_decoded_log_format
     from io import StringIO
+
+    from robocorp.log._decoder import iter_decoded_log_format
 
     s = StringIO(
         """

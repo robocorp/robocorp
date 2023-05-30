@@ -1,14 +1,15 @@
-from robocorp_log_tests.test_rewrite_hook import ConfigForTest
+import ast as ast_module
+from io import StringIO
 from pathlib import Path
 
-from io import StringIO
 import pytest
-import ast as ast_module
+from robocorp_log_tests.test_rewrite_hook import ConfigForTest
 
 
 def test_ast_utils() -> None:
-    from robocorp.log import _ast_utils
     import ast
+
+    from robocorp.log import _ast_utils
 
     node = ast.parse(
         """
@@ -28,8 +29,8 @@ if in_project_roots:
 
 def test_ast_rewriter_change_current_node(str_regression) -> None:
     import ast
-    from robocorp.log._ast_utils import ASTRewriter
-    from robocorp.log._ast_utils import NodeFactory
+
+    from robocorp.log._ast_utils import ASTRewriter, NodeFactory
 
     mod = ast.parse(
         """
@@ -50,8 +51,8 @@ def method():
 
 def test_ast_rewriter_change_current_node_and_before_after_fails() -> None:
     import ast
-    from robocorp.log._ast_utils import ASTRewriter
-    from robocorp.log._ast_utils import NodeFactory
+
+    from robocorp.log._ast_utils import ASTRewriter, NodeFactory
 
     mod = ast.parse(
         """
@@ -76,8 +77,8 @@ def method():
 
 def test_ast_rewriter_change_before_after_stmt(str_regression) -> None:
     import ast
-    from robocorp.log._ast_utils import ASTRewriter
-    from robocorp.log._ast_utils import NodeFactory
+
+    from robocorp.log._ast_utils import ASTRewriter, NodeFactory
 
     mod = ast.parse(
         """
@@ -321,9 +322,8 @@ def method():
 
 def test_rewrite_yield_multiple(tmpdir, str_regression):
     from robocorp.log._config import FilterKind
+    from robocorp.log._lifecycle_hooks import after_yield, before_yield
     from robocorp.log._rewrite_importhook import _rewrite
-    from robocorp.log._lifecycle_hooks import before_yield
-    from robocorp.log._lifecycle_hooks import after_yield
 
     config = ConfigForTest()
 

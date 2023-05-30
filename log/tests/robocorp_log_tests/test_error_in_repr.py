@@ -2,8 +2,9 @@ from robocorp.log import verify_log_messages_from_log_html
 
 
 def test_error_in_repr(tmpdir):
-    from robocorp_log_tests._resources import check_repr_error
     from imp import reload
+
+    from robocorp_log_tests._resources import check_repr_error
     from robocorp_log_tests.fixtures import basic_log_setup
 
     with basic_log_setup(tmpdir) as setup_info:

@@ -1,8 +1,7 @@
+import typing
 from pathlib import Path
 from types import TracebackType
-from typing import TypeVar, Optional, Any, Callable, Set, Sequence, Union
-import typing
-
+from typing import Any, Callable, Optional, Sequence, Set, TypeVar, Union
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]

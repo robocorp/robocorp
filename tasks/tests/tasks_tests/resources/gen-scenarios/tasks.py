@@ -1,11 +1,12 @@
 # type: ignore
+from contextlib import contextmanager
 from pathlib import Path
 from time import sleep
 
-from robocorp.tasks import task
-from robocorp import log
-from contextlib import contextmanager
 from somelibrary import call_generators_in_library
+
+from robocorp import log
+from robocorp.tasks import task
 
 
 def call_method(msg):

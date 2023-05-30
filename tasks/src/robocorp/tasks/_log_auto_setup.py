@@ -1,9 +1,10 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Optional, List, Any, Tuple
+from typing import Any, List, Optional, Tuple
+
+from robocorp import log
 
 from ._protocols import ITask
-from robocorp import log
 
 
 def read_pyproject_toml(context, path: Path) -> Optional[Tuple[Path, dict]]:
@@ -39,7 +40,7 @@ def read_pyproject_toml(context, path: Path) -> Optional[Tuple[Path, dict]]:
     return pyproject, pyproject_toml
 
 
-def read_filters_from_pyproject_toml(
+def read_robocorp_log_config(
     context, pyproject: Path, pyproject_toml_contents: dict
 ) -> log.BaseConfig:
     if not pyproject_toml_contents:
@@ -149,8 +150,7 @@ def setup_cli_auto_logging(config: Optional[log.BaseConfig]):
     # This needs to be called before importing code which needs to show in the log
     # (user or library).
 
-    from robocorp.tasks._hooks import before_task_run
-    from robocorp.tasks._hooks import after_task_run
+    from robocorp.tasks._hooks import after_task_run, before_task_run
 
     with log.setup_auto_logging(config):
         with before_task_run.register(_log_before_task_run), after_task_run.register(

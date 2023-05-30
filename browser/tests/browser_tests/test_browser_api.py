@@ -53,10 +53,10 @@ def test_get_executable_path():
 
 
 def test_screenshot_on_failure(datadir):
-    from browser_tests.fixtures import robo_run
+    from devutils.fixtures import robocorp_tasks_run
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(["run"], returncode=1, cwd=datadir)
+    result = robocorp_tasks_run(["run"], returncode=1, cwd=datadir)
     decoded = result.stdout.decode("utf-8", "replace")
     assert "RuntimeError: Some error..." in decoded
     log_html = datadir / "output" / "log.html"

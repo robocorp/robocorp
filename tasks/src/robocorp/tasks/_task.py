@@ -1,10 +1,12 @@
 import typing
-from types import ModuleType
-from robocorp.tasks._protocols import Status, ITask
 from contextlib import contextmanager
-from typing import Optional, Tuple, List
-from robocorp.log.protocols import OptExcInfo
+from types import ModuleType
+from typing import List, Optional, Tuple
+
 from robocorp.log import ConsoleMessageKind, console_message
+from robocorp.log.protocols import OptExcInfo
+
+from robocorp.tasks._protocols import ITask, Status
 
 
 class Task:
@@ -176,7 +178,7 @@ class Context:
 
     @contextmanager
     def register_lifecycle_prints(self):
-        from ._hooks import before_task_run, after_task_run
+        from ._hooks import after_task_run, before_task_run
 
         with before_task_run.register(self._before_task_run), after_task_run.register(
             self._after_task_run

@@ -1,10 +1,9 @@
-import os.path
-import sys
-
-import platform
 import logging
-from typing import Sequence, Optional, List, Dict
+import os.path
+import platform
+import sys
 import threading
+from typing import Dict, List, Optional, Sequence
 
 log = logging.getLogger(__name__)
 

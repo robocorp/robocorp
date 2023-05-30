@@ -1,9 +1,9 @@
 from contextlib import contextmanager
 
 import pytest
+from robocorp_log_tests.fixtures import ConfigForTest
 
 from robocorp.log._config import ConfigFilesFiltering
-from robocorp_log_tests.fixtures import ConfigForTest
 from robocorp.log.protocols import LogElementType
 
 
@@ -73,10 +73,12 @@ def _setup_test_callbacks():
 
 @pytest.mark.parametrize("config", [ConfigForTest(), ConfigFilesFiltering()])
 def test_rewrite_hook_basic(config):
-    from robocorp.log._rewrite_importhook import RewriteHook
     import sys
     from imp import reload
+
     from robocorp_log_tests._resources import check
+
+    from robocorp.log._rewrite_importhook import RewriteHook
 
     hook = RewriteHook(config)
     sys.meta_path.insert(0, hook)
@@ -111,10 +113,12 @@ def test_rewrite_hook_basic(config):
 
 
 def test_rewrite_hook_except():
-    from robocorp.log._rewrite_importhook import RewriteHook
     import sys
     from imp import reload
+
     from robocorp_log_tests._resources import check_traceback
+
+    from robocorp.log._rewrite_importhook import RewriteHook
 
     config = ConfigForTest()
 
@@ -147,13 +151,14 @@ def test_rewrite_hook_except():
 
 
 def test_rewrite_hook_log_on_project_call():
-    from robocorp.log._rewrite_importhook import RewriteHook
     import sys
     from imp import reload
-    from robocorp_log_tests._resources import check_lib_lib
-    from robocorp_log_tests._resources import check_lib_main
-    from robocorp import log as robolog
     from unittest import mock
+
+    from robocorp_log_tests._resources import check_lib_lib, check_lib_main
+
+    from robocorp import log as robolog
+    from robocorp.log._rewrite_importhook import RewriteHook
 
     config = ConfigForTest()
 

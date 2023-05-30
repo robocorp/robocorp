@@ -1,6 +1,7 @@
-from tasks_tests.fixtures import robo_run
 import json
 import os
+
+from devutils.fixtures import robocorp_tasks_run
 
 
 def test_colect_tasks(datadir):
@@ -24,7 +25,7 @@ def test_colect_tasks(datadir):
 
 
 def test_collect_tasks_integrated_error(tmpdir):
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run", "dir_not_there", "-t=main"], returncode=1, cwd=str(tmpdir)
     )
 
@@ -36,7 +37,9 @@ def test_collect_tasks_integrated_error(tmpdir):
 def test_collect_tasks_integrated(datadir):
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(["run", str(datadir), "-t", "main"], returncode=0, cwd=datadir)
+    result = robocorp_tasks_run(
+        ["run", str(datadir), "-t", "main"], returncode=0, cwd=datadir
+    )
 
     assert (
         not result.stderr
@@ -68,18 +71,18 @@ def test_list_tasks_api(datadir, tmpdir, data_regression):
         data_regression.check(loaded)
 
     # List with the dir as a target
-    result = robo_run(["list", str(datadir)], returncode=0, cwd=str(tmpdir))
+    result = robocorp_tasks_run(["list", str(datadir)], returncode=0, cwd=str(tmpdir))
     check(result)
 
     # List without the dir as a target (must have the same output).
-    result = robo_run(["list"], returncode=0, cwd=datadir)
+    result = robocorp_tasks_run(["list"], returncode=0, cwd=datadir)
     check(result)
 
 
 def test_provide_output_in_stdout(datadir, tmpdir):
     from robocorp.log import verify_log_messages_from_decoded_str
 
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run", "-t=main", str(datadir), "--output", str(tmpdir)],
         returncode=0,
         additional_env={"RC_LOG_OUTPUT_STDOUT": "1"},
@@ -100,7 +103,7 @@ def test_provide_output_in_stdout(datadir, tmpdir):
 def test_error_in_stdout(datadir, tmpdir):
     from robocorp.log import verify_log_messages_from_decoded_str
 
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run", "-t=main_errors", str(datadir), "--output", str(tmpdir)],
         returncode=1,
         additional_env={"RC_LOG_OUTPUT_STDOUT": "1"},

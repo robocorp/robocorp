@@ -1,6 +1,8 @@
 def test_errors(log_setup, tmpdir):
-    from robocorp_log_tests._resources import check_traceback
     from imp import reload
+
+    from robocorp_log_tests._resources import check_traceback
+
     from robocorp import log
     from robocorp.log import verify_log_messages_from_stream
     from robocorp.log.protocols import Status

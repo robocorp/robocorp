@@ -1,5 +1,5 @@
 import re
-from typing import Set, Sequence, Optional, Pattern, Dict
+from typing import Dict, Optional, Pattern, Sequence, Set
 
 
 class SensitiveVariableNames:

@@ -1,8 +1,10 @@
 def test_rotate_logs(tmpdir) -> None:
-    from robocorp import log as robolog
-    from robocorp_log_tests._resources import check
     from imp import reload
     from pathlib import Path
+
+    from robocorp_log_tests._resources import check
+
+    from robocorp import log as robolog
     from robocorp.log import iter_decoded_log_format_from_stream
 
     log_target = Path(tmpdir.join("log.html"))

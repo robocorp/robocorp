@@ -1,13 +1,12 @@
 from ._callback import Callback
 from ._protocols import (
-    IOnTaskFuncFoundCallback,
-    IBeforeCollectTasksCallback,
-    IBeforeTaskRunCallback,
+    IAfterAllTasksRunCallback,
     IAfterTaskRunCallback,
     IBeforeAllTasksRunCallback,
-    IAfterAllTasksRunCallback,
+    IBeforeCollectTasksCallback,
+    IBeforeTaskRunCallback,
+    IOnTaskFuncFoundCallback,
 )
-
 
 # Called as on_task_func_found(task: ITask)
 on_task_func_found: IOnTaskFuncFoundCallback = Callback()

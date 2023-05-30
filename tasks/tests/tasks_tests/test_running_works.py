@@ -1,10 +1,11 @@
 import os
 from pathlib import Path
+
 import pytest
-from tasks_tests.fixtures import run_in_rcc
 
 
 def test_rpa_challenge_works(rcc_loc: Path, resources_dir: Path):
+    from devutils.fixtures import run_in_rcc
     from robocorp.log import verify_log_messages_from_log_html
 
     matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")

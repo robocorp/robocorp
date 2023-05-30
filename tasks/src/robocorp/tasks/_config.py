@@ -1,5 +1,5 @@
-from typing import Optional, Sequence
 from pathlib import Path
+from typing import Optional, Sequence
 
 
 class RunConfig:

@@ -11,10 +11,9 @@ call.
 
 import sys
 
-from ._argdispatch import arg_dispatch as _arg_dispatch
-
 # Just importing is enough to register the commands
 from . import _commands  # @UnusedImport
+from ._argdispatch import arg_dispatch as _arg_dispatch
 
 
 def main(args=None, exit: bool = True) -> int:

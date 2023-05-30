@@ -1,5 +1,6 @@
-from robocorp.tasks import task, task_cache
 import itertools
+
+from robocorp.tasks import task, task_cache
 
 _counter = itertools.count()
 

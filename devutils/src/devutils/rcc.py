@@ -6,7 +6,7 @@ import sys
 import time
 from dataclasses import dataclass
 from subprocess import CalledProcessError, TimeoutExpired
-from typing import Any, Generic, List, Optional, TypedDict, TypeVar, Protocol
+from typing import Any, Generic, List, Optional, Protocol, TypedDict, TypeVar
 
 log = logging.getLogger(__name__)
 
@@ -161,8 +161,7 @@ class Rcc(object):
             If given sets the stderr redirection (by default it's subprocess.PIPE,
             but users could change it to something as subprocess.STDOUT).
         """
-        from subprocess import check_output
-        from subprocess import list2cmdline
+        from subprocess import check_output, list2cmdline
 
         if stderr is _SENTINEL:
             stderr = subprocess.PIPE

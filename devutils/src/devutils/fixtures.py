@@ -1,6 +1,9 @@
 import os.path
 import subprocess
 import sys
+from contextlib import nullcontext
+from pathlib import Path
+from typing import Any, Sequence
 
 import pytest
 
@@ -32,7 +35,7 @@ def rcc_loc(tmpdir_factory):
 
     # Disable tracking for tests
     subprocess.check_call([location] + "configure identity --do-not-track".split())
-    return location
+    return Path(location)
 
 
 @pytest.fixture
@@ -40,6 +43,27 @@ def rcc(rcc_loc, robocorp_home, ci_endpoint):
     from devutils.rcc import Rcc
 
     return Rcc(rcc_loc, robocorp_home, ci_endpoint)
+
+
+def run_in_rcc(rcc_loc: Path, cwd: Path, args: Sequence[str] = (), expect_error=False):
+    from subprocess import CalledProcessError
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", "")
+    env.pop("PYTHONHOME", "")
+    env.pop("VIRTUAL_ENV", "")
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUNBUFFERED"] = "1"
+
+    if expect_error:
+        ctx: Any = pytest.raises(CalledProcessError)
+    else:
+        ctx = nullcontext()
+
+    with ctx:
+        subprocess.check_call(
+            [str(rcc_loc), "task", "run", "--trace"] + list(args), cwd=cwd, env=env
+        )
 
 
 @pytest.fixture(scope="session")
@@ -130,7 +154,8 @@ class StrRegression:
 
     def check(self, obtained: str, basename=None, fullpath=None):
         """
-        Checks the given str against a previously recorded version, or generate a new file.
+        Checks the given str against a previously recorded version, or generate
+        a new file.
 
         :param str obtained: The contents obtained
 
@@ -139,12 +164,14 @@ class StrRegression:
             Use either `basename` or `fullpath`.
 
         :param str fullpath: complete path to use as a reference file. This option
-            will ignore ``datadir`` fixture when reading *expected* files but will still use it to
-            write *obtained* files. Useful if a reference file is located in the session data dir for example.
+            will ignore ``datadir`` fixture when reading *expected* files but
+            will still use it to write *obtained* files. Useful if a reference
+            file is located in the session data dir for example.
 
         ``basename`` and ``fullpath`` are exclusive.
         """
-        from pytest_regressions.common import perform_regression_check  # type: ignore
+        from pytest_regressions.common import \
+            perform_regression_check  # type: ignore
 
         __tracebackhide__ = True
 
@@ -159,8 +186,8 @@ class StrRegression:
             )
 
         def check_fn(obtained_path, expected_path):
-            from itertools import zip_longest
             from io import StringIO
+            from itertools import zip_longest
 
             obtained = obtained_path.read_bytes().decode("utf-8", "replace")
             expected = expected_path.read_bytes().decode("utf-8", "replace")
@@ -194,7 +221,8 @@ class StrRegression:
                         file=stream,
                     )
                 raise AssertionError(
-                    f"Strings don't match. Obtained:\n\n{obtained}\n\nComparison:\n{stream.getvalue()}"
+                    f"Strings don't match. "
+                    f"Obtained:\n\n{obtained}\n\nComparison:\n{stream.getvalue()}"
                 )
 
         perform_regression_check(
@@ -209,7 +237,44 @@ class StrRegression:
             force_regen=self.force_regen,
         )
 
+    def check_until_header(self, found: str):
+        header_end = "=" * 80
+        header_end_i = found.rfind(header_end)
+        assert header_end_i > 0
+        found = found[: header_end_i + len(header_end)]
+
+        self.check(found)
+
 
 @pytest.fixture
 def str_regression(datadir, original_datadir, request):
     return StrRegression(datadir, original_datadir, request)
+
+
+def robocorp_tasks_run(cmdline, returncode, cwd=None, additional_env=None):
+    cp = os.environ.copy()
+    cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
+    if additional_env:
+        cp.update(additional_env)
+    args = [sys.executable, "-m", "robocorp.tasks"] + cmdline
+    result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd)
+    if result.returncode != returncode:
+        env_str = "\n".join(str(x) for x in sorted(cp.items()))
+
+        raise AssertionError(
+            f"""Expected returncode: {returncode}. Found: {result.returncode}.
+=== stdout:
+{result.stdout.decode('utf-8')}
+
+=== stderr:
+{result.stderr.decode('utf-8')}
+
+=== Env:
+{env_str}
+
+=== Args:
+{args}
+
+"""
+        )
+    return result

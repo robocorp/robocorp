@@ -1,7 +1,8 @@
-from pathlib import Path
-from typing import Iterator, List, Callable, Dict, Sequence
-from types import ModuleType
 import sys
+from pathlib import Path
+from types import ModuleType
+from typing import Callable, Dict, Iterator, List, Sequence
+
 from robocorp.tasks._protocols import ITask
 
 

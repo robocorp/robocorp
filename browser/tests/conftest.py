@@ -1,3 +1,3 @@
 pytest_plugins = [
-    "browser_tests.fixtures",
+    "devutils.fixtures",
 ]

@@ -1,12 +1,13 @@
-from tasks_tests.fixtures import robo_run
 from pathlib import Path
+
 import pytest
+from devutils.fixtures import robocorp_tasks_run
 
 
 def test_core_log_integration_error_in_import(datadir):
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run", "main_with_error_in_import.py"], returncode=1, cwd=str(datadir)
     )
 
@@ -53,7 +54,7 @@ def test_core_log_integration_error_in_import(datadir):
 def test_core_log_integration_config_log(datadir):
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
+    result = robocorp_tasks_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
 
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip()
@@ -84,7 +85,7 @@ def test_core_log_integration_empty_pyproject(datadir) -> None:
     pyproject.write_text("")
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
+    result = robocorp_tasks_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
 
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip()
@@ -113,7 +114,7 @@ def test_core_log_integration_console_messages(datadir, str_regression, mode) ->
     pyproject.write_text("")
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run", f"--console-colors={mode}", "simple.py"], returncode=0, cwd=str(datadir)
     )
 
@@ -150,7 +151,7 @@ def test_no_status_rc(datadir, no_error_rc) -> None:
     pyproject.write_text("")
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robo_run(
+    result = robocorp_tasks_run(
         ["run"]
         + (["--no-status-rc"] if no_error_rc else [])
         + ["--console-color=plain", "expected_error_in_task.py"],

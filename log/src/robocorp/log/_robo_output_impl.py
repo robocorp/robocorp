@@ -1,10 +1,3 @@
-from pathlib import Path
-from contextlib import contextmanager
-from datetime import timezone
-from functools import partial
-from .protocols import OptExcInfo, LogElementType
-from typing import Dict, Iterator, List, Sequence, Set, Pattern, Tuple, Any
-from typing import Optional, Callable
 import datetime
 import itertools
 import json
@@ -14,6 +7,24 @@ import sys
 import time
 import traceback
 import weakref
+from contextlib import contextmanager
+from datetime import timezone
+from functools import partial
+from pathlib import Path
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Pattern,
+    Sequence,
+    Set,
+    Tuple,
+)
+
+from .protocols import LogElementType, OptExcInfo
 
 WRITE_CONTENTS_TO_STDERR: bool = False
 

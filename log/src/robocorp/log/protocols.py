@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import Union, Literal, Protocol, List
+from typing import List, Literal, Protocol, Union
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]

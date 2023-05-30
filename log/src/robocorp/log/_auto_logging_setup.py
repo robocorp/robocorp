@@ -1,13 +1,13 @@
+import sys
+import threading
+from typing import Any, List, Optional, Tuple
+
 from robocorp.log import critical, is_sensitive_variable_name
+
 from ._config import BaseConfig
 from ._logger_instances import _get_logger_instances
 from ._obj_info_repr import get_obj_type_and_repr
-from .protocols import OptExcInfo, Status
-import sys
-import threading
-from typing import Tuple, List, Any, Optional
-
-from .protocols import LogElementType
+from .protocols import LogElementType, OptExcInfo, Status
 
 
 class OnExitContextManager:
@@ -57,6 +57,7 @@ class _AutoLogging:
 
     def register(self) -> None:
         from robocorp.log import _lifecycle_hooks
+
         from ._rewrite_importhook import RewriteHook
 
         for name, callback in _lifecycle_hooks.iter_all_name_and_callback():

@@ -1,6 +1,7 @@
-from typing import Optional, Sequence, Dict
-from collections import namedtuple
 import enum
+from collections import namedtuple
+from typing import Dict, Optional, Sequence
+
 from robocorp import log
 
 _ROBO_LOG_MODULE_NAME = log.__name__

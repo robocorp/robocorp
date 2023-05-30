@@ -1,8 +1,7 @@
 # --- Private API
 import threading
-from typing import Dict
 import typing
-
+from typing import Dict
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
