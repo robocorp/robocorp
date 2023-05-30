@@ -41,55 +41,38 @@ jobs:
     - name: Checkout repository and submodules
       uses: actions/checkout@v3
 
-    - name: Set up chrome and firefox on Windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        choco install firefox
-        choco install googlechrome
-    - name: Set up chrome and firefox on macOS
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew install --cask google-chrome
-        brew install --cask firefox
-    - name: Set up chrome on linux
-      if: matrix.os == 'ubuntu-latest'
-      uses: browser-actions/setup-chrome@v1
-    - name: "Document chrome path on linux"
-      if: matrix.os == 'ubuntu-latest'
-      run: which chrome
-
     - name: Install poetry
       run: |
         pipx install poetry
-        
+
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
         cache: 'poetry'
-        
+
     - name: Setup node 16.x
       uses: actions/setup-node@v3
       with:
         node-version: 16.x
         registry-url: "https://npm.pkg.github.com"
         scope: "@robocorp"
-        
+
     - name: Install project
       run: poetry install
-      
+
     - name: Install invoke/tomlkit
       run: pip install invoke tomlkit
-      
-    - name: Install dependencies (in dev mode).
+
+    - name: Install dependencies (in dev mode)
       run: python -m invoke devinstall
-      
+
     - name: Run Lint
       run: invoke lint
     - name: Run Typecheck
       run: invoke typecheck
 
-    # Because we've installed the logging in dev mode we need to build the view too.      
+    # Because we've installed the logging in dev mode we need to build the view too
     - name: npm ci
       working-directory: ./log/output-react/
       run: |
@@ -97,8 +80,8 @@ jobs:
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-      
-    - name: Build the output view.
+
+    - name: Build the output view
       working-directory: ./log
       run: |
         python -m invoke build-output-view-react
