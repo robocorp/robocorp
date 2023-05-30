@@ -3,10 +3,8 @@ name = "robocorp-vault"
 version = "0.3.0"
 description = "Robocorp Control Room API integration library"
 authors = [
-	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
-	"Kerkko P. <kerkko@robocorp.com>",
-	"Antero V. <antero@robocorp.com>",
+	"Ossi R. <ossi@robocorp.com>",
 ]
 readme = "README.md"
 packages = [{include = "robocorp", from="src"}]
@@ -14,11 +12,22 @@ packages = [{include = "robocorp", from="src"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 cryptography = "^39.0.1"
-requests = "^2.30.0"
+requests = "^2.31"
+pyyaml = "^6.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
+mock = "^5.0"
+types-requests = "^2.31"
+types-mock = "^5.0"
+types-PyYAML = "^6.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+mypy_path = "src:tests"

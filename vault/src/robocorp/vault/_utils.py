@@ -1,7 +1,7 @@
 import importlib
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 # Sentinel value for undefined argument
 UNDEFINED = object()
@@ -22,7 +22,7 @@ def required_env(name: str, default: Any = UNDEFINED) -> str:
     return val
 
 
-def import_by_name(name: str, caller: str = None) -> Any:
+def import_by_name(name: str, caller: Optional[str] = None) -> Any:
     """Import module (or attribute) by name.
 
     Args:

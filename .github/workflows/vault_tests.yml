@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "vault/**"
       - ".github/workflows/vault_tests.yml"
@@ -47,13 +48,15 @@ jobs:
     - name: Install poetry/invoke
       run: |
         pipx install poetry
-        pipx install invoke
 
     - name: Install dependencies
-      run: invoke install
+      run: poetry install
     - name: Run Lint
-      run: invoke lint
+      run: poetry run python -m invoke lint
     - name: Run Typecheck
-      run: invoke typecheck
+      run: poetry run python -m invoke typecheck
     - name: Run Unittests
-      run: invoke test
+      run: poetry run python -m invoke test
+      env:
+        CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
+        CI_ENDPOINT: ${{ secrets.CI_ENDPOINT }}

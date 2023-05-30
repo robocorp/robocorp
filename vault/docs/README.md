@@ -4,20 +4,16 @@
 
 ## Modules
 
-- [`robocorp.vault.vault`](./robocorp.vault.vault.md#module-robocorpvaultvault)
+- [`robocorp.vault`](./robocorp.vault.md#module-robocorpvault): `robocorp.vault` is a library for interacting with secrets stored in the ``Robocorp Control Room Vault``.
 
 ## Classes
 
-- [`vault.BaseSecretManager`](./robocorp.vault.vault.md#class-basesecretmanager): Abstract class for secrets management.
-- [`vault.FileSecrets`](./robocorp.vault.vault.md#class-filesecrets): Adapter for secrets stored in a database file.
-- [`vault.RobocorpVault`](./robocorp.vault.vault.md#class-robocorpvault): Adapter for secrets stored in Robocorp Vault.
-- [`vault.RobocorpVaultError`](./robocorp.vault.vault.md#class-robocorpvaulterror): Raised when there's problem with reading from Robocorp Vault.
-- [`vault.Secret`](./robocorp.vault.vault.md#class-secret): Container for a secret with name, description, and multiple key-value pairs.
-- [`vault.Vault`](./robocorp.vault.vault.md#class-vault): `Vault` is a library for interacting with secrets stored in the ``Robocorp Control Room Vault``.
+- No classes
 
 ## Functions
 
-- No functions
+- [`vault.get_secret`](./robocorp.vault.md#function-get_secret): Get secret defined with given name.
+- [`vault.set_secret`](./robocorp.vault.md#function-set_secret): Overwrite an existing secret with new values.
 
 
 ---
