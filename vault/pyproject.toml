@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "robocorp-vault"
 version = "0.3.0"
-description = "Robocorp Control Room API integration library"
+description = "Robocorp Control Room Vault API integration library"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
 	"Ossi R. <ossi@robocorp.com>",

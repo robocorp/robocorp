@@ -29,12 +29,12 @@ File-based secrets can be set by defining two environment variables.
 Example content of local secrets file:
 
 ```json
-    {
-        "swaglabs": {
-            "username": "standard_user",
-            "password": "secret_sauce"
-        }
+{
+    "swaglabs": {
+        "username": "standard_user",
+        "password": "secret_sauce"
     }
+}
 ```
 
 
@@ -42,24 +42,24 @@ OR
 
 ```yaml
 
-    swaglabs:
-        username: standard_user
-        password: secret_sauce
+swaglabs:
+    username: standard_user
+    password: secret_sauce
 ```
 
 Example:
 
 ```python    
-    from robocorp import vault
+from robocorp import vault
 
-    def reading_secrets():
-        secrets_container = vault.get_secret('swaglabs')
-        print(f"My secrets: {secrets_container}")
-        
-    def modifying_secrets():
-        secret = vault.get_secret("swaglabs")
-        secret["username"] = "nobody"
-        vault.set_secret(secret)
+def reading_secrets():
+    secrets_container = vault.get_secret('swaglabs')
+    print(f"My secrets: {secrets_container}")
+    
+def modifying_secrets():
+    secret = vault.get_secret("swaglabs")
+    secret["username"] = "nobody"
+    vault.set_secret(secret)
 ```
 """  # noqa: E501
 

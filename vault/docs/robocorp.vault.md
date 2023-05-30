@@ -27,12 +27,12 @@ File-based secrets can be set by defining two environment variables.
 Example content of local secrets file: 
 
 ```json
-     {
-         "swaglabs": {
-             "username": "standard_user",
-             "password": "secret_sauce"
-         }
+{
+     "swaglabs": {
+         "username": "standard_user",
+         "password": "secret_sauce"
      }
+}
 ``` 
 
 
@@ -41,9 +41,9 @@ OR
 
 ```yaml
 
-     swaglabs:
-         username: standard_user
-         password: secret_sauce
+swaglabs:
+     username: standard_user
+     password: secret_sauce
 ``` 
 
 
@@ -52,22 +52,25 @@ OR
  
 
 ```python    
-     from robocorp import vault
+from robocorp import vault
 
-     def reading_secrets():
-         secrets_container = vault.get_secret('swaglabs')
-         print(f"My secrets: {secrets_container}")
-         
-     def modifying_secrets():
-         secret = vault.get_secret("swaglabs")
-         secret["username"] = "nobody"
-         vault.set_secret(secret)
+def reading_secrets():
+     secrets_container = vault.get_secret('swaglabs')
+     print(f"My secrets: {secrets_container}")
+     
+def modifying_secrets():
+     secret = vault.get_secret("swaglabs")
+     secret["username"] = "nobody"
+     vault.set_secret(secret)
 ``` 
 
+**Global Variables**
+---------------
+- **version_info**
 
 ---
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L79"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\vault\src\robocorp\vault\__init__.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_secret`
 
@@ -102,7 +105,7 @@ Get secret defined with given name.
 
 ---
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L114"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\vault\src\robocorp\vault\__init__.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_secret`
 
