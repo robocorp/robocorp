@@ -1,82 +1,69 @@
+import os
 import platform
-import shutil
+import subprocess
+import sys
+from enum import Enum
+from functools import lru_cache
 from pathlib import Path
-from typing import Literal, Optional, Union, cast
-
-Engine = Literal["chrome"]
 
 
-def to_engine(value: Union[str, Engine]) -> Engine:
-    if value not in ["chrome"]:
-        raise ValueError(f"Invalid browser engine: {value}")
-
-    return cast(Engine, value)
+class InstallError(RuntimeError):
+    """Error encountered during browser install"""
 
 
-def get_executable_path(browser: Engine) -> str:
-    system = platform.system()
+class BrowserEngine(str, Enum):
+    CHROMIUM = "chromium"
+    CHROME = "chrome"
+    CHROME_BETA = "chrome-beta"
+    MSEDGE = "msedge"
+    MSEDGE_BETA = "msedge-beta"
+    MSEDGE_DEV = "msedge-dev"
+    FIREFOX = "firefox"
+    WEBKIT = "webkit"
 
-    if system == "Darwin":
-        path = _get_executable_darwin(browser)
-    elif system == "Linux":
-        path = _get_executable_linux(browser)
-    elif system == "Windows":
-        path = _get_executable_windows(browser)
+
+# Map of BrowserEngine to Playwright driver & channel
+ENGINE_TO_ARGS = {
+    BrowserEngine.CHROMIUM: ("chromium", None),
+    BrowserEngine.CHROME: ("chromium", "chrome"),
+    BrowserEngine.CHROME_BETA: ("chromium", "chrome-beta"),
+    BrowserEngine.MSEDGE: ("chromium", "msedge"),
+    BrowserEngine.MSEDGE_BETA: ("chromium", "msedge-beta"),
+    BrowserEngine.MSEDGE_DEV: ("chromium", "msedge-dev"),
+    BrowserEngine.FIREFOX: ("firefox", None),
+    BrowserEngine.WEBKIT: ("webkit", None),
+}
+
+
+@lru_cache
+def browsers_path() -> Path:
+    if platform.system() == "Windows":
+        return Path.home() / "AppData" / "Local" / "robocorp" / "playwright"
     else:
-        raise ValueError(f"Unsupported platform: {system}")
-
-    if path is None:
-        raise RuntimeError(f"Browser executable not found: {browser}")
-
-    return path
+        return Path.home() / ".robocorp" / "playwright"
 
 
-def _get_executable_darwin(browser: Engine) -> Optional[str]:
-    if browser == "chrome":
-        options = [
-            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-            "/Applications/Chromium.app/Contents/MacOS/Chromium",
-        ]
-    else:
-        raise ValueError(f"Unsupported browser: {browser}")
+def install_browser(engine: BrowserEngine, force=False, interactive=False):
+    cmd = [sys.executable, "-m", "playwright", "install"]
+    if force:
+        cmd.append("--force")
 
-    for option in options:
-        if Path(option).exists():
-            return option
+    name = BrowserEngine(engine).value
+    cmd.append(name)
 
-    return None
+    env = dict(os.environ)
+    env["PLAYWRIGHT_BROWSERS_PATH"] = str(browsers_path())
 
+    result = subprocess.run(
+        cmd,
+        capture_output=not interactive,
+        start_new_session=not interactive,
+        text=True,
+        env=env,
+    )
 
-def _get_executable_linux(browser: Engine) -> Optional[str]:
-    if browser == "chrome":
-        options = [
-            "google-chrome",
-            "chromium-browser",
-            "chromium",
-        ]
-    else:
-        raise ValueError(f"Unsupported browser: {browser}")
-
-    for option in options:
-        if (path := shutil.which(option)) is not None:
-            return path
-
-    return None
-
-
-def _get_executable_windows(browser: Engine) -> Optional[str]:
-    if browser == "chrome":
-        options = [
-            "chrome",
-            "chrome.exe",
-            "chromium",
-            "chromium.exe",
-        ]
-    else:
-        raise ValueError(f"Unsupported browser: {browser}")
-
-    for option in options:
-        if (path := shutil.which(option)) is not None:
-            return path
-
-    return None
+    if result.returncode != 0:
+        if not interactive:
+            raise InstallError(f"Failed to install {name}:\n{result.stdout}")
+        else:
+            raise InstallError(f"Failed to install {name}")

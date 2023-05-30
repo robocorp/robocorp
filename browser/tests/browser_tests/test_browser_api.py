@@ -42,13 +42,6 @@ def test_browser_api(datadir) -> None:
     assert page() is another_page
 
 
-def test_get_executable_path():
-    from robocorp.browser._browser_engines import get_executable_path
-
-    executable_path = get_executable_path("chrome")
-    assert executable_path
-
-
 def test_screenshot_on_failure(datadir):
     from devutils.fixtures import robocorp_tasks_run
     from robocorp.log import verify_log_messages_from_log_html

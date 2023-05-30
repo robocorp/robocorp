@@ -1,3 +1,4 @@
+import os
 import sys
 from typing import Callable, Dict, Iterator, List, Optional, Union
 
@@ -12,15 +13,28 @@ from playwright.sync_api import (
 )
 from robocorp.tasks import session_cache, task_cache
 
-from ._browser_engines import Engine, get_executable_path, to_engine
+from ._browser_engines import (
+    ENGINE_TO_ARGS,
+    BrowserEngine,
+    browsers_path,
+    install_browser,
+)
 
 
 class _BrowserConfig:
-    __slots__ = "_browser_engine _headless _slowmo _screenshot __weakref__".split()
+    __slots__ = [
+        "_browser_engine",
+        "_install",
+        "_headless",
+        "_slowmo",
+        "_screenshot",
+        "__weakref__",
+    ]
 
     def __init__(
         self,
-        browser_engine: Engine = "chrome",
+        browser_engine: BrowserEngine = BrowserEngine.CHROMIUM,
+        install: Optional[bool] = None,
         headless: Optional[bool] = None,
         slowmo: int = 0,
         screenshot: str = "only-on-failure",
@@ -29,7 +43,11 @@ class _BrowserConfig:
         Args:
             browser_engine:
                 help="Browser engine which should be used",
-                choices=["chrome"],
+                choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"]
+
+            install:
+                Install browser or not. If not defined, download is only
+                attempted if the browser fails to launch.
 
             headless:
                 Run headless or not.
@@ -41,19 +59,29 @@ class _BrowserConfig:
                 default="only-on-failure",
                 choices=["on", "off", "only-on-failure"],
                 help="Whether to automatically capture a screenshot after each task.",
-        """
+        """  # noqa
         self.browser_engine = browser_engine
+        self.install = install
         self.headless = headless
         self.slowmo = slowmo
         self.screenshot = screenshot
 
     @property
-    def browser_engine(self) -> Engine:
+    def browser_engine(self) -> BrowserEngine:
         return self._browser_engine
 
     @browser_engine.setter
-    def browser_engine(self, value: Union[Engine, str]):
-        self._browser_engine = to_engine(value)
+    def browser_engine(self, value: Union[BrowserEngine, str]):
+        self._browser_engine = BrowserEngine(value)
+
+    @property
+    def install(self) -> Optional[bool]:
+        return self._install
+
+    @install.setter
+    def install(self, value: Optional[bool]):
+        assert value is None or isinstance(value, bool)
+        self._install = value
 
     @property
     def headless(self) -> Optional[bool]:
@@ -121,6 +149,9 @@ def browser_type_launch_args() -> Dict:
 
 @session_cache
 def playwright() -> Iterator[Playwright]:
+    # Make sure playwright searches from robocorp-specific path
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = str(browsers_path())
+
     pw = sync_playwright().start()
     yield pw
     # Need to stop when tasks finish running.
@@ -132,10 +163,9 @@ def _browser_type() -> BrowserType:
     pw = playwright()
 
     engine = _browser_config().browser_engine
-    if engine == "chrome":
-        engine = "chromium"
+    klass, _ = ENGINE_TO_ARGS[engine]
 
-    return getattr(pw, engine)
+    return getattr(pw, klass)
 
 
 @session_cache
@@ -145,9 +175,11 @@ def _browser_launcher() -> Callable[..., Browser]:
     def launch(**kwargs: Dict) -> Browser:
         launch_options = {**browser_type_launch_args(), **kwargs}
 
-        if "executable_path" not in launch_options:
+        if "channel" not in launch_options:
             engine = _browser_config().browser_engine
-            launch_options["executable_path"] = get_executable_path(engine)
+            _, channel = ENGINE_TO_ARGS[engine]
+            if channel is not None:
+                launch_options["channel"] = channel
 
         browser = browser_type.launch(**launch_options)
         return browser
@@ -162,8 +194,20 @@ def browser(**kwargs) -> Iterator[Browser]:
     BrowserType.launch(**kwargs).
     """
     # Note: one per session (must be tear-down).
+    config = _browser_config()
+    if config.install:
+        install_browser(config.browser_engine)
+
     launcher = _browser_launcher()
-    browser = launcher(**kwargs)
+    try:
+        browser = launcher(**kwargs)
+    except Error:
+        if config.install is None:
+            install_browser(config.browser_engine)
+            browser = launcher(**kwargs)
+        else:
+            raise
+
     yield browser
     browser.close()
 
