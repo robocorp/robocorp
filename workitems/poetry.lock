@@ -593,6 +593,36 @@ type = "directory"
 url = "../devutils"
 
 [[package]]
+name = "robocorp-log"
+version = "0.1.1"
+description = "Automatic trace logging for Python"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "robocorp_log-0.1.1-py3-none-any.whl", hash = "sha256:46a600c2466c3ec226eb038023099eeeb996c79f51e9b2fc91051569e8c6de3f"},
+    {file = "robocorp_log-0.1.1.tar.gz", hash = "sha256:66d3372ff8763169d55d228462915ce0d8e62a0e40678f559300e8669b665114"},
+]
+
+[package.dependencies]
+tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
+
+[[package]]
+name = "robocorp-tasks"
+version = "0.2.1"
+description = "The automation framework for Python"
+category = "main"
+optional = false
+python-versions = ">=3.9,<4.0"
+files = [
+    {file = "robocorp_tasks-0.2.1-py3-none-any.whl", hash = "sha256:862b2f1b71ca80cb18282a428404cdfb599ffadafe92f8b4969b090693feb020"},
+    {file = "robocorp_tasks-0.2.1.tar.gz", hash = "sha256:37e1a9c9d5070a8d05ff54731dbc321121f44a78b249dc8293f3be1d9e32f0ad"},
+]
+
+[package.dependencies]
+robocorp-log = "0.1.1"
+
+[[package]]
 name = "ruff"
 version = "0.0.255"
 description = "An extremely fast Python linter, written in Rust."
@@ -662,7 +692,7 @@ doc = ["reno", "sphinx", "tornado (>=4.5)"]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -776,4 +806,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "b9e7e9728f6c3c7810966638ffccde3ce627c6ab49da7a60ff579e8b733f373a"
+content-hash = "ca1e8e7a42dfd805a44f21c8fd222fc331714511623a6cb755ffeb32f99927f1"
