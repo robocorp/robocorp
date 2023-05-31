@@ -1,12 +1,12 @@
 from robocorp.excel import open_workbook
 from robocorp.tasks import task
-from robocorp.workitems import ExceptionType, inputs, outputs
+from robocorp import workitems
 
 
 @task
 def producer():
     """Split Excel rows into multiple work items"""
-    with inputs.reserve() as item:
+    for item in workitems.inputs:
         path = item.get_file("orders.xlsx")
         orders = open_workbook(path).worksheet("Sheet1").as_table()
 
@@ -16,13 +16,12 @@ def producer():
                 "Zip": row["Zip"],
                 "Item": row["Item"],
             }
-            outputs.create(payload)
+            workitems.outputs.create(payload)
 
 
-@task
 def consumer():
     """Process all input work items"""
-    for item in inputs.iterate():
+    for item in workitems.inputs:
         try:
             name = item.payload["Name"]
             address = item.payload["Zip"]
@@ -30,4 +29,4 @@ def consumer():
             print(f"Processing order: {name}, {address}, {item}")
             item.done()
         except KeyError as err:
-            item.fail(ExceptionType.APPLICATION, "MISSING_VALUE", str(err))
+            item.fail("APPLICATION", "MISSING_VALUE", str(err))
