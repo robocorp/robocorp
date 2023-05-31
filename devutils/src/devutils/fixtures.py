@@ -113,7 +113,7 @@ def _download_rcc(location: str, force: bool = False) -> None:
                 else:
                     relative_path = "/linux32/rcc"
 
-            RCC_VERSION = "v13.5.5"
+            RCC_VERSION = "v14.6.0"
             prefix = f"https://downloads.robocorp.com/rcc/releases/{RCC_VERSION}"
             url = prefix + relative_path
 
@@ -170,8 +170,7 @@ class StrRegression:
 
         ``basename`` and ``fullpath`` are exclusive.
         """
-        from pytest_regressions.common import \
-            perform_regression_check  # type: ignore
+        from pytest_regressions.common import perform_regression_check  # type: ignore
 
         __tracebackhide__ = True
 

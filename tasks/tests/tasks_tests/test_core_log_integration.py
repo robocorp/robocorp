@@ -12,9 +12,13 @@ def test_core_log_integration_error_in_import(datadir):
     )
 
     decoded = result.stderr.decode("utf-8", "replace")
-    assert (
-        "ModuleNotFoundError: No module named 'module_that_does_not_exist'" in decoded
-    )
+    if (
+        "ModuleNotFoundError: No module named 'module_that_does_not_exist'"
+        not in decoded
+    ):
+        raise AssertionError(
+            f"Expected: 'ModuleNotFoundError: No module named 'module_that_does_not_exist' to be in: {decoded}"
+        )
     decoded = result.stdout.decode("utf-8", "replace")
 
     log_target = datadir / "output" / "log.html"

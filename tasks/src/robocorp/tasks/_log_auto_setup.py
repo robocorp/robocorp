@@ -1,79 +1,38 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional
 
 from robocorp import log
+from robocorp.tasks._protocols import PyProjectInfo
 
-from ._protocols import ITask
-
-
-def read_pyproject_toml(context, path: Path) -> Optional[Tuple[Path, dict]]:
-    while True:
-        pyproject = path / "pyproject.toml"
-        try:
-            if pyproject.exists():
-                break
-        except OSError:
-            continue
-
-        parent = path.parent
-        if parent == path or not parent:
-            # Couldn't find pyproject.toml
-            return None
-        path = parent
-
-    try:
-        toml_contents = pyproject.read_text(encoding="utf-8")
-    except Exception:
-        raise OSError(f"Could not read the contents of: {pyproject}.")
-
-    pyproject_toml: Any = None
-    try:
-        try:
-            import tomllib  # type: ignore
-        except ImportError:
-            import tomli as tomllib  # type: ignore
-
-        pyproject_toml = tomllib.loads(toml_contents)
-    except Exception:
-        raise RuntimeError(f"Could not interpret the contents of {pyproject} as toml.")
-    return pyproject, pyproject_toml
+from ._protocols import IContextErrorReport, ITask
 
 
 def read_robocorp_log_config(
-    context, pyproject: Path, pyproject_toml_contents: dict
+    context: IContextErrorReport, pyproject: PyProjectInfo
 ) -> log.BaseConfig:
-    if not pyproject_toml_contents:
+    from ._toml_settings import read_section_from_toml
+
+    if not pyproject.toml_contents:
         log.ConfigFilesFiltering()
 
-    obj: Any = pyproject_toml_contents
+    obj: Any = pyproject.toml_contents
     filters: List[log.Filter] = []
     if isinstance(obj, dict):
         # Filter(name="RPA", kind=FilterKind.log_on_project_call),
         # Filter("selenium", FilterKind.log_on_project_call),
         # Filter("SeleniumLibrary", FilterKind.log_on_project_call),
+        obj = read_section_from_toml(pyproject, "tool.robocorp.log", context)
 
-        read_parts: List[str] = []
-        for part in "tool.robocorp.log".split("."):
-            read_parts.append(part)
-
-            obj = obj.get(part)
-            if not obj:
-                break
-
-            elif not isinstance(obj, dict):
-                context.show_error(
-                    f"Expected {'.'.join(read_parts)} to be a dict in {pyproject}."
-                )
-                break
-        else:
-            if isinstance(obj, dict):
-                filters = _load_filters(obj, context, pyproject)
+        if isinstance(obj, dict):
+            filters = _load_filters(obj, context, pyproject.pyproject)
 
     return log.ConfigFilesFiltering(filters=filters)
 
 
-def _load_filters(obj: dict, context, pyproject) -> List[log.Filter]:
+def _load_filters(
+    obj: dict, context: IContextErrorReport, pyproject: Path
+) -> List[log.Filter]:
     filters: List[log.Filter] = []
     log_filter_rules: list = []
     list_obj = obj.get("log_filter_rules")

@@ -99,6 +99,8 @@ def run(
     """
     from robocorp.log import console, redirect
 
+    from robocorp.tasks._toml_settings import read_pyproject_toml
+
     from ._collect_tasks import collect_tasks
     from ._config import RunConfig, set_config
     from ._exceptions import RobocorpTasksCollectError
@@ -108,11 +110,7 @@ def run(
         before_all_tasks_run,
         before_task_run,
     )
-    from ._log_auto_setup import (
-        read_pyproject_toml,
-        read_robocorp_log_config,
-        setup_cli_auto_logging,
-    )
+    from ._log_auto_setup import read_robocorp_log_config, setup_cli_auto_logging
     from ._log_output_setup import setup_log_output
     from ._protocols import ITask, Status
     from ._task import Context, set_current_task
@@ -145,14 +143,14 @@ def run(
         task_or_tasks = "task" if len(task_names) == 1 else "tasks"
 
     config: log.BaseConfig
-    pyproject_path_and_contents = read_pyproject_toml(context, p)
+    pyproject_path_and_contents = read_pyproject_toml(p)
     pyproject_toml_contents: dict
-    if not pyproject_path_and_contents:
+    if pyproject_path_and_contents is None:
         config = log.ConfigFilesFiltering()
         pyproject_toml_contents = {}
     else:
-        pyproject, pyproject_toml_contents = pyproject_path_and_contents
-        config = read_robocorp_log_config(context, pyproject, pyproject_toml_contents)
+        config = read_robocorp_log_config(context, pyproject_path_and_contents)
+        pyproject_toml_contents = pyproject_path_and_contents.toml_contents
 
     run_config = RunConfig(
         Path(output_dir),

@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Add the devutils even if the poetry env isn't setup (to do a 'inv devinstall').
 try:

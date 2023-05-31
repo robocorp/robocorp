@@ -1,4 +1,5 @@
 import typing
+from dataclasses import dataclass
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Callable, Optional, Sequence, Set, TypeVar, Union
@@ -37,6 +38,12 @@ class Status:
     WARN = "WARN"
 
 
+@dataclass
+class PyProjectInfo:
+    pyproject: Path
+    toml_contents: dict
+
+
 class ITask(typing.Protocol):
     module_name: str
     filename: str
@@ -63,6 +70,11 @@ class ITask(typing.Protocol):
         Returns true if the task failed.
         (in which case usually exc_info is not None).
         """
+
+
+class IContextErrorReport(typing.Protocol):
+    def show_error(self, message):
+        pass
 
 
 class ICallback(typing.Protocol):
