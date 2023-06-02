@@ -1,3 +1,13 @@
+0.4.0
+-----------------------------
+
+- Updated `robocorp-log` to `0.3.0`.
+- During task teardown a process snapshot is now included.
+- After all tasks are run, if the process doesn't exit in 40 seconds
+  (or the value specified in the `RC_DUMP_THREADS_AFTER_RUN_TIMEOUT`
+  environment variable), the stack of the running threads are printed 
+  to stderr. 
+
 0.3.0
 -----------------------------
 

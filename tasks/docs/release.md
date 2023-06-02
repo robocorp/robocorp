@@ -6,16 +6,16 @@ Steps to do a new release
 
 - Create a new branch (`git checkout -b release-tasks-branch`)
 
-- Update version (`inv set-version 0.3.0`).
+- Update version (`inv set-version 0.4.0`).
 
 - Update README.md to add notes on features/fixes (on `robocorp-tasks`).
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
 - Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
-  - `mu acp robocorp-tasks release 0.3.0`
+  - `mu acp robocorp-tasks release 0.4.0`
 
-- Create a tag and push it (`git tag robocorp-tasks-0.3.0&&git push origin robocorp-tasks-0.3.0`).
+- Create a tag and push it (`git tag robocorp-tasks-0.4.0&&git push origin robocorp-tasks-0.4.0`).
 
 - Rebase with master (`git checkout master&git rebase -`).
 
@@ -23,7 +23,7 @@ Steps to do a new release
 
 Hi @channel,
 
-I'm happy to announce the release of `Robocorp Tasks 0.3.0`.
+I'm happy to announce the release of `Robocorp Tasks 0.4.0`.
 
 *## Changes*
 
