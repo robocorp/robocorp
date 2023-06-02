@@ -28,8 +28,10 @@ export enum Type {
   suspendYieldFrom = 1 << 8, // 256
   suspendYield = 1 << 9, // 512
   log = 1 << 10, // 1024
+  threadDump = 1 << 11, // 2048
+  processSnapshot = 1 << 12, // 4096
 
-  unhandled = 1 << 11, // 2048
+  unhandled = 1 << 13,
 }
 
 export enum ConsoleMessageKind {
@@ -41,21 +43,31 @@ export enum ConsoleMessageKind {
   task_name = 1 << 6, // 16
   error = 1 << 7, // 32
   traceback = 1 << 8, // 64
+  processSnapshot = 1 << 9, // 128
 }
 
 export interface EntryBase {
   id: string;
-  source: string;
-  lineno: number;
   type: Type;
   entriesIndex: number;
 }
 
-export interface EntryTask extends EntryBase {
+export interface EntryWithLocationBase extends EntryBase {
+  source: string;
+  lineno: number;
+}
+
+export interface EntryTask extends EntryWithLocationBase {
   type: Type.task;
   name: string;
   libname: string;
   status: StatusLevel;
+  startDeltaInSeconds: number | -1 | undefined;
+  endDeltaInSeconds: number | -1 | undefined;
+}
+
+export interface EntryProcessSnapshot extends EntryBase {
+  type: Type.processSnapshot;
   startDeltaInSeconds: number | -1 | undefined;
   endDeltaInSeconds: number | -1 | undefined;
 }
@@ -66,7 +78,7 @@ export interface Argument {
   value: string;
 }
 
-export interface EntryMethodBase extends EntryBase {
+export interface EntryMethodBase extends EntryWithLocationBase {
   name: string;
   libname: string;
   status: StatusLevel;
@@ -105,20 +117,26 @@ export interface EntrySuspendYieldFrom extends EntryMethodBase {
   type: Type.suspendYieldFrom;
 }
 
-export interface EntryException extends EntryBase {
+export interface EntryException extends EntryWithLocationBase {
   tb: PythonTraceback;
   excType: string;
   excMsg: string;
 }
 
-export interface EntryVariable extends EntryBase {
+export interface EntryThreadDump extends EntryWithLocationBase {
+  tb: PythonTraceback;
+  threadName: string;
+  threadDetails: string;
+}
+
+export interface EntryVariable extends EntryWithLocationBase {
   type: Type.variable;
   name: string;
   value: string;
   varType: string;
 }
 
-export interface EntryLog extends EntryBase {
+export interface EntryLog extends EntryWithLocationBase {
   type: Type.log;
   status: StatusLevel;
   isHtml: boolean;
@@ -136,4 +154,6 @@ export type Entry =
   | EntryResumeYieldFrom
   | EntrySuspendYield
   | EntrySuspendYieldFrom
-  | EntryUntrackedGenerator;
+  | EntryUntrackedGenerator
+  | EntryThreadDump
+  | EntryProcessSnapshot;

@@ -28,6 +28,7 @@ from typing import (
 from ._logger_instances import _get_logger_instances
 from ._suppress_helper import SuppressHelper as _SuppressHelper
 from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
+import traceback
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
@@ -60,8 +61,9 @@ def _log(level, message: Sequence[Any], html: bool = False) -> None:
 
     m = " ".join(str(x) for x in message)
     robo_logger: _RoboLogger
-    for robo_logger in _get_logger_instances():
-        robo_logger.log_message(level, m, html, name, libname, source, lineno)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.log_message(level, m, html, name, libname, source, lineno)
 
 
 def critical(*message: Any) -> None:
@@ -134,8 +136,9 @@ def exception(*message: Any):
         _log(Status.ERROR, message)
 
     exc_info = sys.exc_info()
-    for robo_logger in _get_logger_instances():
-        robo_logger.log_method_except(exc_info, unhandled=True)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.log_method_except(exc_info, unhandled=True)
 
 
 def html(html: str, level: str = "INFO"):
@@ -155,6 +158,18 @@ def html(html: str, level: str = "INFO"):
 
     assert level in ("ERROR", "WARN", "INFO")
     _log(level, (html,), html=True)
+
+
+def process_snapshot() -> None:
+    """
+    Makes a process snapshot and adds it to the logs.
+
+    A process snapshot can include details on the python process and subprocesses
+    and should add a thread dump with the stack of all running threads.
+    """
+    with _get_logger_instances(only_from_main_thread=False) as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.process_snapshot()
 
 
 class ConsoleMessageKind:
@@ -231,8 +246,9 @@ def console_message(
 
     try:
         robo_logger: _RoboLogger
-        for robo_logger in _get_logger_instances():
-            robo_logger.console_message(message, kind)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.console_message(message, kind)
 
         if isinstance(stream, _SentinelUseStdout):
             stream = sys.stdout
@@ -273,21 +289,22 @@ def console_message(
 
 @contextmanager
 def _suppress_contextmanager(variables=True, methods=True):
-    instances = _get_logger_instances()
-    for robo_logger in instances:
-        if variables:
-            robo_logger.stop_logging_variables()
-        if methods:
-            robo_logger.stop_logging_methods()
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            if variables:
+                robo_logger.stop_logging_variables()
+            if methods:
+                robo_logger.stop_logging_methods()
 
     try:
         yield
     finally:
-        for robo_logger in instances:
-            if variables:
-                robo_logger.start_logging_variables()
-            if methods:
-                robo_logger.start_logging_methods()
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                if variables:
+                    robo_logger.start_logging_variables()
+                if methods:
+                    robo_logger.start_logging_methods()
 
 
 _suppress_helper = _SuppressHelper(_suppress_contextmanager)
@@ -459,8 +476,9 @@ def hide_from_output(string_to_hide: str) -> None:
     Args:
         string_to_hide: The string that should be hidden from the output.
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.hide_from_output(string_to_hide)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.hide_from_output(string_to_hide)
 
 
 # --- Logging methods usually called automatically from the framework.
@@ -475,8 +493,9 @@ def start_run(name: str) -> None:
 
     Note: robocorp-tasks calls this method automatically.
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.start_run(name)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.start_run(name)
 
 
 def end_run(name: str, status: str) -> None:
@@ -489,8 +508,9 @@ def end_run(name: str, status: str) -> None:
 
     Note: robocorp-tasks calls this method automatically.
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.end_run(name, status)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.end_run(name, status)
 
 
 def start_task(
@@ -508,8 +528,9 @@ def start_task(
 
     Note: robocorp-tasks calls this method automatically.
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.start_task(name, libname, source, lineno, doc)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.start_task(name, libname, source, lineno, doc)
 
 
 def end_task(name: str, libname: str, status: str, message: str) -> None:
@@ -524,8 +545,9 @@ def end_task(name: str, libname: str, status: str, message: str) -> None:
 
     Note: robocorp-tasks calls this method automatically.
     """
-    for robo_logger in _get_logger_instances():
-        robo_logger.end_task(name, libname, status, message)
+    with _get_logger_instances() as logger_instances:
+        for robo_logger in logger_instances:
+            robo_logger.end_task(name, libname, status, message)
 
 
 # ---- APIs to decode existing log files
@@ -859,11 +881,13 @@ def add_log_output(
     logger = _RoboLogger(
         output_dir, max_file_size, max_files, log_html, log_html_style=log_html_style
     )
-    _get_logger_instances()[logger] = 1
+    with _get_logger_instances() as logger_instances:
+        logger_instances[logger] = 1
 
     def _exit():
-        _get_logger_instances().pop(logger, None)
-        logger.close()
+        with _get_logger_instances() as logger_instances:
+            logger_instances.pop(logger, None)
+            logger.close()
 
     return OnExitContextManager(_exit)
 
@@ -875,10 +899,14 @@ def close_log_outputs():
     Note that some loggers such as the one which outputs html needs to bo closed
     to actually write the output.
     """
-    while _get_logger_instances():
-        logger = next(iter(_get_logger_instances()))
-        _get_logger_instances().pop(logger, None)
-        logger.close()
+    while True:
+        with _get_logger_instances() as logger_instances:
+            if logger_instances:
+                logger = next(iter(logger_instances))
+                logger_instances.pop(logger, None)
+                logger.close()
+            else:
+                break
 
 
 def add_in_memory_log_output(write: Callable[[str], Any]):
@@ -897,11 +925,14 @@ def add_in_memory_log_output(write: Callable[[str], Any]):
     from ._robo_logger import _RoboLogger  # @Reimport
 
     logger = _RoboLogger(__write__=write)
-    _get_logger_instances()[logger] = 1
+
+    with _get_logger_instances() as logger_instances:
+        logger_instances[logger] = 1
 
     def _exit():
-        _get_logger_instances().pop(logger, None)
-        logger.close()
+        with _get_logger_instances() as logger_instances:
+            logger_instances.pop(logger, None)
+            logger.close()
 
     return OnExitContextManager(_exit)
 

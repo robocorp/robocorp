@@ -14,6 +14,7 @@ import {
   EntryResumeYieldFrom,
   EntrySuspendYield,
   EntrySuspendYieldFrom,
+  EntryThreadDump,
 } from '~/lib/types';
 
 type Props = {
@@ -24,6 +25,10 @@ export const getTitle = (entry: Entry): string => {
   switch (entry.type) {
     case Type.task:
       return (entry as EntryTask).name;
+    case Type.processSnapshot:
+      return '';
+    case Type.threadDump:
+      return `Thread Stack: ${(entry as EntryThreadDump).threadName}`;
     case Type.generator:
       return `${(entry as EntryGenerator).name} (enter generator)`;
     case Type.untrackedGenerator:

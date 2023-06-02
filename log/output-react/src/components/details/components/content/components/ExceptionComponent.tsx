@@ -4,34 +4,50 @@ import { Counter } from '~/lib';
 
 import styled from 'styled-components';
 
-import { Entry, EntryException } from '~/lib/types';
+import { Entry, EntryException, EntryThreadDump } from '~/lib/types';
 import { Bold } from './Common';
+import { PythonTraceback } from '~/treebuild/protocols';
 
 const LocationContent = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$12};
   margin-bottom: ${({ theme }) => theme.space.$8};
   margin-top: ${({ theme }) => theme.space.$8};
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 const LineContents = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$20};
   margin-bottom: ${({ theme }) => theme.space.$8};
   font-weight: bold;
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 const LineVar = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$32};
   margin-bottom: ${({ theme }) => theme.space.$8};
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
+export const ThreadDumpComponent: FC<{ entry: Entry }> = (props) => {
+  return tracebackComponent(
+    (props.entry as EntryThreadDump).tb,
+    'Thread stack (most recent call last):',
+  );
+};
+
 export const ExceptionComponent: FC<{ entry: Entry }> = (props) => {
+  return tracebackComponent(
+    (props.entry as EntryException).tb,
+    'Traceback (most recent call last):',
+  );
+};
+
+function tracebackComponent(tb: PythonTraceback, title: string) {
   const counter = new Counter();
 
-  const entryException: EntryException = props.entry as EntryException;
-  const tb = entryException.tb;
   const contents = [];
 
-  contents.push(<Box key={counter.next()}>Traceback (most recent call last):</Box>);
+  contents.push(<Box key={counter.next()}>{title}</Box>);
   for (const tbe of tb.stack) {
     contents.push(
       <LocationContent key={counter.next()}>
@@ -64,4 +80,4 @@ export const ExceptionComponent: FC<{ entry: Entry }> = (props) => {
   contents.splice(-1);
 
   return <>{contents}</>;
-};
+}

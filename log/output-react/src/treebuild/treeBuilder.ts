@@ -17,9 +17,11 @@ import {
   EntrySuspendYieldFrom,
   EntryLog,
   ConsoleMessageKind,
+  EntryThreadDump,
+  EntryProcessSnapshot,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
-import { Decoder, iter_decoded_log_format, IMessage } from './decoder';
+import { Decoder, iter_decoded_log_format, IMessage, splitInChar } from './decoder';
 import { IOpts, ITracebackEntry, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
 import { Counter, RunInfo, RunInfoStatus, logError } from '../lib';
@@ -47,7 +49,8 @@ class TBHandler {
   handle(msg: IMessage): PythonTraceback | undefined {
     let tb: PythonTraceback | undefined;
     switch (msg.message_type) {
-      case 'STB': // start
+      case 'STB': // start traceback
+      case 'STD': // start thread dump
         this.stack.push(new PythonTraceback(msg.decoded.message));
         return undefined;
 
@@ -75,6 +78,7 @@ class TBHandler {
         return undefined;
 
       case 'ETB': // tb end
+      case 'ETD': // thread dump end
         tb = this.stack.pop();
         if (tb === undefined) {
           console.log('Unable to pop stack entry because the stack is empty.');
@@ -128,15 +132,15 @@ class FlattenedTree {
 
   pushException(tb: PythonTraceback) {
     const tbEntry: ITracebackEntry = tb.stack[0];
-    const split: string[] = tb.exceptionMsg.split(':', 2);
+    const split: string[] | undefined = splitInChar(tb.exceptionMsg, ':');
     let excType: string;
     let excMsg: string;
-    if (split.length > 1) {
+    if (split !== undefined) {
       excType = split[0];
       excMsg = split[1];
     } else {
       excType = 'Error';
-      excMsg = split[0];
+      excMsg = tb.exceptionMsg;
     }
     const entry: EntryException = {
       id: this.newScopeId(false),
@@ -146,6 +150,31 @@ class FlattenedTree {
       tb: tb,
       excType: excType,
       excMsg: excMsg.trim(),
+      entriesIndex: this.entries.length,
+    };
+    this.entries.push(entry);
+  }
+
+  pushThreadDump(tb: PythonTraceback) {
+    const tbEntry: ITracebackEntry = tb.stack[0];
+    const split: string[] | undefined = splitInChar(tb.exceptionMsg, '|');
+    let threadName: string;
+    let threadDetails: string;
+    if (split !== undefined) {
+      threadName = split[0];
+      threadDetails = split[1];
+    } else {
+      threadName = '<unknown thread name>';
+      threadDetails = tb.exceptionMsg;
+    }
+    const entry: EntryThreadDump = {
+      id: this.newScopeId(false),
+      type: Type.threadDump,
+      source: tbEntry.source,
+      lineno: tbEntry.lineno,
+      tb: tb,
+      threadName,
+      threadDetails: threadDetails.trim(),
       entriesIndex: this.entries.length,
     };
     this.entries.push(entry);
@@ -323,6 +352,7 @@ class FlattenedTree {
     // Tooltip:
     // `Assign to name: ${msg.decoded['target']}\nAn object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
   }
+
   pushTaskScope(msg: IMessage) {
     // console.log('pushTaskScope');
     const entry: EntryTask = {
@@ -334,6 +364,19 @@ class FlattenedTree {
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+    };
+    this.stack.push(entry);
+    this.entries.push(entry);
+  }
+
+  pushProcessSnapshotScope(msg: IMessage) {
+    // console.log('pushProcessSnapshotScope');
+    const entry: EntryProcessSnapshot = {
+      id: this.newScopeId(),
+      type: Type.processSnapshot,
+      endDeltaInSeconds: -1,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entriesIndex: this.entries.length,
     };
@@ -421,6 +464,19 @@ class FlattenedTree {
     // entry that's being used in react).
     const taskScopeEntry: EntryTask = <EntryTask>{ ...entry };
     this.updateEntryStatus(taskScopeEntry, msg);
+  }
+
+  popProcessSnapshotScope(msg: IMessage) {
+    const entry: EntryBase | undefined = this.popScope(msg, Type.processSnapshot);
+    if (entry === undefined) {
+      return;
+    }
+
+    // Note: create a copy and assign it in the entries array (we don't want to mutate the
+    // entry that's being used in react).
+    const processSnapshotEntry: EntryProcessSnapshot = <EntryProcessSnapshot>{ ...entry };
+    processSnapshotEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
+    this.entries[processSnapshotEntry.entriesIndex] = processSnapshotEntry;
   }
 }
 
@@ -623,6 +679,18 @@ export class TreeBuilder {
         }
         msgType = 'STB';
         break;
+      case 'RTD':
+        if (this.seenSuiteTaskOrElement) {
+          return;
+        }
+        msgType = 'STD';
+        break;
+      case 'RPS':
+        if (this.seenSuiteTaskOrElement) {
+          return;
+        }
+        msgType = 'SPS';
+        break;
     }
     this.id += 1;
 
@@ -639,6 +707,10 @@ export class TreeBuilder {
       case 'ST':
         // start task
         this.flattened.pushTaskScope(msg);
+        break;
+      case 'SPS':
+        // start process snapshot
+        this.flattened.pushProcessSnapshotScope(msg);
         break;
       case 'SE': // start element
         if (msg.decoded['type'] === 'UNTRACKED_GENERATOR') {
@@ -672,6 +744,10 @@ export class TreeBuilder {
           this.flattened.popMethodScope(msg);
         }
         break;
+      case 'EPS':
+        // end process snapshot
+        this.flattened.popProcessSnapshotScope(msg);
+        break;
       case 'YS': // yield suspend
       case 'YFS': // yield from suspend
         const isYieldFrom = msg.message_type == 'YFS';
@@ -693,14 +769,22 @@ export class TreeBuilder {
       case 'LH':
         this.flattened.pushLog(msg);
         break;
-      case 'STB': // start
+      case 'STB': // start traceback
+      case 'STD': // start thread dump
       case 'TBE': // tb entry
       case 'TBV': // variable
       case 'ETB': // tb end
+      case 'ETD': // thread dump end
         const tb: PythonTraceback | undefined = this.tbHandler.handle(msg);
         if (tb) {
           if (tb.stack.length > 0) {
-            this.flattened.pushException(tb);
+            if (msgType === 'ETB') {
+              // traceback means exception
+              this.flattened.pushException(tb);
+            } else if (msgType === 'ETD') {
+              // thread dump
+              this.flattened.pushThreadDump(tb);
+            }
           }
         }
         break;

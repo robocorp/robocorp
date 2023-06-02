@@ -25,6 +25,8 @@ from typing import (
 )
 
 from .protocols import LogElementType, OptExcInfo
+import threading
+from types import FrameType
 
 WRITE_CONTENTS_TO_STDERR: bool = False
 
@@ -39,6 +41,100 @@ def _gen_id(level: int = 1) -> Iterator[str]:
 
     # Recursively generate ids...
     yield from _gen_id(level + 1)
+
+
+def _pprint_secs(secs):
+    """Format seconds in a human readable form."""
+    now = time.time()
+    secs_ago = int(now - secs)
+    if secs_ago < 60 * 60 * 24:
+        fmt = "%H:%M:%S"
+    else:
+        fmt = "%Y-%m-%d %H:%M:%S"
+    return datetime.datetime.fromtimestamp(secs).strftime(fmt)
+
+
+# see: http://goo.gl/kTQMs
+SYMBOLS = {
+    "customary": ("B", "K", "M", "G", "T", "P", "E", "Z", "Y"),
+    "customary_ext": (
+        "byte",
+        "kilo",
+        "mega",
+        "giga",
+        "tera",
+        "peta",
+        "exa",
+        "zetta",
+        "iotta",
+    ),
+    "iec": ("Bi", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi"),
+    "iec_ext": ("byte", "kibi", "mebi", "gibi", "tebi", "pebi", "exbi", "zebi", "yobi"),
+}
+
+
+def bytes2human(n, format="%(value).1f %(symbol)s", symbols="customary"):
+    """
+    Bytes-to-human / human-to-bytes converter.
+    Based on: http://goo.gl/kTQMs
+    Working with Python 2.x and 3.x.
+
+    Author: Giampaolo Rodola' <g.rodola [AT] gmail [DOT] com>
+    License: MIT
+    """
+
+    """
+    Convert n bytes into a human readable string based on format.
+    symbols can be either "customary", "customary_ext", "iec" or "iec_ext",
+    see: http://goo.gl/kTQMs
+
+      >>> bytes2human(0)
+      '0.0 B'
+      >>> bytes2human(0.9)
+      '0.0 B'
+      >>> bytes2human(1)
+      '1.0 B'
+      >>> bytes2human(1.9)
+      '1.0 B'
+      >>> bytes2human(1024)
+      '1.0 K'
+      >>> bytes2human(1048576)
+      '1.0 M'
+      >>> bytes2human(1099511627776127398123789121)
+      '909.5 Y'
+
+      >>> bytes2human(9856, symbols="customary")
+      '9.6 K'
+      >>> bytes2human(9856, symbols="customary_ext")
+      '9.6 kilo'
+      >>> bytes2human(9856, symbols="iec")
+      '9.6 Ki'
+      >>> bytes2human(9856, symbols="iec_ext")
+      '9.6 kibi'
+
+      >>> bytes2human(10000, "%(value).1f %(symbol)s/sec")
+      '9.8 K/sec'
+
+      >>> # precision can be adjusted by playing with %f operator
+      >>> bytes2human(10000, format="%(value).5f %(symbol)s")
+      '9.76562 K'
+    """
+    n = int(n)
+    if n < 0:
+        raise ValueError("n < 0")
+    symbols = SYMBOLS[symbols]
+    prefix = {}
+    for i, s in enumerate(symbols[1:]):
+        prefix[s] = 1 << (i + 1) * 10
+    for symbol in reversed(symbols[1:]):
+        if n >= prefix[symbol]:
+            value = float(n) / prefix[symbol]
+            return format % locals()
+    return format % dict(symbol=symbols[0], value=n)
+
+
+def format_memory_info(memory_info):
+    return f"Total: {bytes2human(memory_info.total)}, Available: {bytes2human(memory_info.available)}, Used: {memory_info.percent} %"
 
 
 class _Config:
@@ -500,6 +596,127 @@ class _RoboOutputImpl:
         task_id = f"{libname}.{name}"
         self._stack_handler.pop("task", task_id)
 
+    def process_snapshot(self) -> None:
+        oid = self._obtain_id
+        entry_id = f"ps_{self._next_int()}"
+        entry_type = "process_snapshot"
+
+        with self._stack_handler.push_record(
+            entry_type,
+            entry_id,
+            "SPS",
+            "RPS",
+            hide_from_logs=False,
+        ):
+            self._write_with_separator(
+                f"SPS ",
+                [oid("Process snapshot"), self._number(self.get_time_delta())],
+            )
+
+        try:
+            try:
+                import psutil
+                from psutil import ZombieProcess
+                from psutil import NoSuchProcess
+                from psutil import AccessDenied
+            except ImportError:
+                pass
+            else:
+                curr_process = psutil.Process()
+
+                def log_info(message):
+                    self.log_message(
+                        "I", message, False, "", "", "", 0, self.get_time_delta()
+                    )
+
+                memory_info = "<unknown>"
+                try:
+                    memory_info = format_memory_info(psutil.virtual_memory())
+                    memory_info = format_memory_info(psutil.virtual_memory())
+                except:
+                    pass
+
+                log_info(
+                    f"""System information:
+Memory: {memory_info}
+CPUs: {os.cpu_count()}"""
+                )
+
+                for child_i, child in enumerate(
+                    itertools.chain(
+                        [curr_process], curr_process.children(recursive=True)
+                    )
+                ):
+                    name = "<unknown>"
+                    status = "<unknown>"
+                    create_time = "<unknown>"
+                    ppid = "<unknown>"
+                    cmdline = "<unknown>"
+                    rss = "<unknown>"
+                    vms = "<unknown>"
+
+                    try:
+                        with child.oneshot():
+                            try:
+                                name = child.name()
+                                status = child.status()
+                                try:
+                                    create_time = _pprint_secs(child.create_time())
+                                except:
+                                    pass
+                                ppid = str(child.ppid())
+                                cmdline = " ".join(child.cmdline())
+                                proc_memory_info = child.memory_info()
+                                rss = bytes2human(proc_memory_info.rss)
+                                vms = bytes2human(proc_memory_info.vms)
+                            except ZombieProcess:
+                                status = "zombie"
+                            except NoSuchProcess:
+                                status = "terminated"
+                            except AccessDenied:
+                                pass
+                            except Exception:
+                                pass
+                    except:
+                        pass
+
+                    message = f"""{"Subprocess" if child_i > 0 else "Current Process"}: {name} (pid: {child.pid}, status: {status})
+Command Line: {cmdline}
+Started: {create_time}
+Parent pid: {ppid}
+Resident Set Size: {rss}
+Virtual Memory Size: {vms}"""
+                    log_info(message)
+
+            self._dump_threads()
+        finally:
+            self._stack_handler.pop(entry_type, entry_id)
+            self._write_with_separator(f"EPS ", [self._number(self.get_time_delta())])
+
+    def _dump_threads(self) -> None:
+        for thread_id, frame in sys._current_frames().items():
+            try:
+                thread = threading._active[thread_id]  # type: ignore [attr-defined] # @UndefinedVariable
+                title = f"{thread.name}|Thread ID: {thread_id} ({'daemon' if thread.daemon else 'non daemon'})"
+            except KeyError:
+                title = f"{thread_id}|(not active)"
+
+            f: Optional[FrameType] = frame
+            stack: List[tuple] = []
+            while f is not None:
+                if "__tracebackhide__" in f.f_locals:
+                    break
+                stack.append((f, f.f_lineno))
+                f = f.f_back
+            stack = list(reversed(stack))
+
+            self._write_stack(
+                title,
+                stack,
+                entry_type="thread_dump",
+                start_message_types=("STD", "RTD", "ETD"),
+            )
+
     def log_method_except(
         self,
         exc_info: OptExcInfo,
@@ -523,8 +740,6 @@ class _RoboOutputImpl:
             was already previously logged (see the `unhandled` parameter for
             details on the use-cases where it may be skipped).
         """
-        from ._obj_info_repr import get_obj_type_and_repr
-
         tp, e, tb = exc_info
         if e is None or tb is None or tp is None:
             return False
@@ -554,63 +769,85 @@ class _RoboOutputImpl:
             stack.append((frame, tb_lineno))
             tb = tb.tb_next
 
+        self._write_stack(
+            f"{tp.__name__}: {e}",
+            stack,
+            entry_type="traceback",
+            start_message_types=("STB", "RTB", "ETB"),
+        )
+        return True
+
+    def _write_stack(
+        self,
+        title: str,
+        stack: List[tuple],
+        entry_type: str,
+        start_message_types: Tuple[str, str, str],
+    ):
+        start_message_type, restart_message_type, end_message_type = start_message_types
+
         # Write the stack now.
         import linecache
+        from ._obj_info_repr import get_obj_type_and_repr
 
         oid = self._obtain_id
         entry_id = f"tb_{self._next_int()}"
 
         with self._stack_handler.push_record(
-            "traceback", entry_id, "STB", "RTB", hide_from_logs=False
+            entry_type,
+            entry_id,
+            start_message_type,
+            restart_message_type,
+            hide_from_logs=False,
         ):
             self._write_with_separator(
-                "STB ",
-                [oid(f"{tp.__name__}: {e}"), self._number(self.get_time_delta())],
+                f"{start_message_type} ",
+                [oid(title), self._number(self.get_time_delta())],
             )
 
-            for frame, tb_lineno in stack:
-                code = frame.f_code
-                code_filename = code.co_filename
-                try:
-                    line_content = linecache.getline(code_filename, tb_lineno).strip()
-                except:
-                    line_content = ""  # Unable to get contents.
+        for frame, tb_lineno in stack:
+            code = frame.f_code
+            code_filename = code.co_filename
+            try:
+                line_content = linecache.getline(code_filename, tb_lineno).strip()
+            except:
+                line_content = ""  # Unable to get contents.
 
+            self._write_with_separator(
+                "TBE ",
+                [
+                    oid(code_filename),
+                    self._number(tb_lineno),
+                    oid(code.co_name),
+                    oid(line_content),
+                ],
+            )
+
+            for key, val in tuple(frame.f_locals.items()):
+                if key.startswith("@"):
+                    # Skip our own variables.
+                    continue
+
+                obj_type, obj_repr = get_obj_type_and_repr(val)
+
+                hide_strings_re = self._hide_strings_re
+                if hide_strings_re:
+                    obj_repr = hide_strings_re.sub("<redacted>", obj_repr)
                 self._write_with_separator(
-                    "TBE ",
+                    "TBV ",
                     [
-                        oid(code_filename),
-                        self._number(tb_lineno),
-                        oid(code.co_name),
-                        oid(line_content),
+                        oid(str(key)),
+                        oid(obj_type),
+                        oid(obj_repr),
                     ],
                 )
 
-                for key, val in tuple(frame.f_locals.items()):
-                    if key.startswith("@"):
-                        # Skip our own variables.
-                        continue
-
-                    obj_type, obj_repr = get_obj_type_and_repr(val)
-
-                    hide_strings_re = self._hide_strings_re
-                    if hide_strings_re:
-                        obj_repr = hide_strings_re.sub("<redacted>", obj_repr)
-                    self._write_with_separator(
-                        "TBV ",
-                        [
-                            oid(str(key)),
-                            oid(obj_type),
-                            oid(obj_repr),
-                        ],
-                    )
-
-        stack_entry = self._stack_handler.pop("traceback", entry_id)
+        stack_entry = self._stack_handler.pop(entry_type, entry_id)
         assert stack_entry
 
-        self._write_with_separator("ETB ", [self._number(self.get_time_delta())])
-
-        return True
+        self._write_with_separator(
+            f"{end_message_type} ", [self._number(self.get_time_delta())]
+        )
 
     def start_element(
         self,
@@ -652,20 +889,20 @@ class _RoboOutputImpl:
                 ],
             )
 
-            if args:
-                for name, arg_type, arg in args:
-                    hide_strings_re = self._hide_strings_re
-                    if hide_strings_re:
-                        arg = hide_strings_re.sub("<redacted>", arg)
+        if args:
+            for name, arg_type, arg in args:
+                hide_strings_re = self._hide_strings_re
+                if hide_strings_re:
+                    arg = hide_strings_re.sub("<redacted>", arg)
 
-                    self._write_with_separator(
-                        "EA ",
-                        [
-                            oid(name),
-                            oid(arg_type),
-                            oid(arg),
-                        ],
-                    )
+                self._write_with_separator(
+                    "EA ",
+                    [
+                        oid(name),
+                        oid(arg_type),
+                        oid(arg),
+                    ],
+                )
 
     def end_method(
         self,

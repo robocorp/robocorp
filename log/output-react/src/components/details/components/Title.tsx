@@ -7,7 +7,9 @@ import {
   EntryException,
   EntryLog,
   EntryMethodBase,
+  EntryProcessSnapshot,
   EntryTask,
+  EntryThreadDump,
   EntryVariable,
   Type,
 } from '../../../lib/types';
@@ -31,6 +33,17 @@ const getTitle = (entry: Entry) => {
       return {
         title: `Exception: ${excEntry.excType}`,
         description: <PreBox>{excEntry.excMsg.trim()}</PreBox>,
+      };
+    case Type.processSnapshot:
+      return {
+        title: `Process Snapshot`,
+        description: <PreBox>Current snapshot of the process</PreBox>,
+      };
+    case Type.threadDump:
+      const threadDumpEntry = entry as EntryThreadDump;
+      return {
+        title: `Thread: ${threadDumpEntry.threadName}`,
+        description: <PreBox></PreBox>,
       };
     case Type.variable:
       const excVar = entry as EntryVariable;

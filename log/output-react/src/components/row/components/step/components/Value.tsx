@@ -9,6 +9,7 @@ import {
   EntryLog,
   EntryMethodBase,
   EntrySuspendYield,
+  EntryThreadDump,
   EntryUntrackedGenerator,
   EntryVariable,
   Type,
@@ -47,8 +48,12 @@ export const getValue = (entry: Entry): ReactNode | string => {
       return '';
     case Type.suspendYieldFrom:
       return '';
+    case Type.processSnapshot:
+      return '';
     case Type.exception:
       return (entry as EntryException).excMsg;
+    case Type.threadDump:
+      return (entry as EntryThreadDump).threadDetails;
     case Type.log:
       const entryLog = entry as EntryLog;
       if (entryLog.isHtml) {

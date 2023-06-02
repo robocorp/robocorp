@@ -1,19 +1,40 @@
 # --- Private API
 import threading
 import typing
-from typing import Dict
+from typing import Dict, Iterator
+from contextlib import contextmanager
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
 
-__tlocal_log__ = threading.local()
+_instances_lock = threading.RLock()
+instances: Dict["_RoboLogger", int] = {}
+
+_main_thread_id = threading.get_ident()
 
 
 # We could use a set, but we're using a dict to keep the order.
-def _get_logger_instances() -> Dict["_RoboLogger", int]:
-    instances: Dict["_RoboLogger", int]
-    try:
-        instances = __tlocal_log__.instances
-    except AttributeError:
-        instances = __tlocal_log__.instances = {}
-    return instances
+@contextmanager
+def _get_logger_instances(
+    only_from_main_thread: bool = True,
+) -> Iterator[Dict["_RoboLogger", int]]:
+    """
+    Args:
+        only_from_main_thread:
+            If true the logger instances will only be provided if this is the
+            main thread.
+            If false the logger instances will be provided even if not currently
+            in the main thread.
+
+    Returns:
+        The logger instances registered so far. Note that a lock is held when
+        the instances are requested and it's only released when the context
+        exits.
+    """
+    if only_from_main_thread:
+        if _main_thread_id != threading.get_ident():
+            yield {}
+            return
+
+    with _instances_lock:
+        yield instances

@@ -2,7 +2,7 @@ import { Box, Header, Typography } from '@robocorp/components';
 import { FC } from 'react';
 import styled from 'styled-components';
 
-import { Entry, EntryMethod, EntryMethodBase, EntrySuspendYield, Type } from '~/lib/types';
+import { Entry, EntryMethodBase, EntrySuspendYield, Type } from '~/lib/types';
 import { Bold, LocationContent } from './Common';
 import { Counter } from '~/lib';
 
@@ -20,15 +20,18 @@ const ArgumentName = styled(Box)`
   font-weight: bolder;
   display: inline;
   margin-left: ${({ theme }) => theme.space.$8};
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 const ArgumentType = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$8};
   display: inline;
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 const ArgumentValue = styled(Box)`
   margin-left: ${({ theme }) => theme.space.$12};
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 export const Method: FC<{ entry: Entry }> = (props) => {

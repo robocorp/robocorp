@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="tasks\src\robocorp\tasks\cli.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\cli.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.tasks.cli`
 Main entry point for running tasks from robocorp-tasks. 
@@ -12,7 +12,7 @@ Note: when running tasks, clients using this approach MUST make sure that any co
 
 ---
 
-<a href="tasks\src\robocorp\tasks\cli.py#L20"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\tasks\src\robocorp\tasks\cli.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `main`
 

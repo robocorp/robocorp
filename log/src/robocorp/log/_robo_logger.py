@@ -345,6 +345,12 @@ class _RoboLogger:
         return self._robot_output_impl.log_method_except(exc_info, unhandled)
 
     @_log_error
+    def process_snapshot(
+        self,
+    ):
+        return self._robot_output_impl.process_snapshot()
+
+    @_log_error
     def console_message(
         self,
         message: str,

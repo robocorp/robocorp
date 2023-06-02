@@ -10,10 +10,10 @@ def test_rpa_challenge_works(rcc_loc: Path, resources_dir: Path):
 
     matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
     if matrix_name:
-        if "logindev" not in matrix_name:
+        if "devmode" not in matrix_name:
             pytest.skip(f"Disabled for matrix name: {matrix_name}")
 
-    rpa_challenge_dir = resources_dir / "rpa-challenge"
+    rpa_challenge_dir = resources_dir / "rpa_challenge"
     assert rpa_challenge_dir.exists()
     output_dir = rpa_challenge_dir / "output"
     log_html = output_dir / "log.html"

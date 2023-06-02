@@ -6,6 +6,7 @@ import {
   EntryLog,
   EntryMethodBase,
   EntryUntrackedGenerator,
+  EntryWithLocationBase,
   Type,
 } from './types';
 import * as DOMPurify from 'dompurify';
@@ -65,11 +66,14 @@ export const leaveOnlyExpandedEntries = (
 };
 
 export const formatLocation = (entry: Entry) => {
-  if (entry.source) {
-    if (entry.lineno > 0) {
-      return `${pathBasenameNoExt(entry.source)}:${entry.lineno}`;
-    } else {
-      return `${pathBasenameNoExt(entry.source)}`;
+  if (Object.hasOwn(entry, 'source')) {
+    const entryWithLocation = entry as EntryWithLocationBase;
+    if (entryWithLocation.source) {
+      if (entryWithLocation.lineno > 0) {
+        return `${pathBasenameNoExt(entryWithLocation.source)}:${entryWithLocation.lineno}`;
+      } else {
+        return `${pathBasenameNoExt(entryWithLocation.source)}`;
+      }
     }
   }
   return '';
@@ -170,6 +174,7 @@ export const getLogEntryHeight = (entry: Entry): number => {
     if (logEntry.isHtml) {
       return HTML_HEIGHT_SMALL;
     }
+    return 32 + Math.min((logEntry.message.split(/\r\n|\r|\n/).length - 1) * 16, 32);
   }
 
   return 32;

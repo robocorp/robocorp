@@ -25,10 +25,11 @@ def _get_obj_type_and_repr_and_hide_if_needed(key, val):
     obj_type, obj_repr = get_obj_type_and_repr(val)
 
     if is_sensitive_variable_name(key):
-        for robo_logger in _get_logger_instances():
-            robo_logger.hide_from_output(obj_repr)
-            if isinstance(val, str):
-                robo_logger.hide_from_output(val)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.hide_from_output(obj_repr)
+                if isinstance(val, str):
+                    robo_logger.hide_from_output(val)
     return obj_type, obj_repr
 
 
@@ -98,16 +99,17 @@ class _AutoLogging:
             obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
             args.append((f"{key}", obj_type, obj_repr))
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.start_element(
-                name,
-                mod_name,
-                filename,
-                lineno,
-                method_type,
-                "",
-                args,
-            )
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.start_element(
+                    name,
+                    mod_name,
+                    filename,
+                    lineno,
+                    method_type,
+                    "",
+                    args,
+                )
 
     def call_after_method(
         self,
@@ -136,8 +138,9 @@ class _AutoLogging:
                     return
             status = pop_stack_entry.status
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.end_method(method_type, name, mod_name, status)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.end_method(method_type, name, mod_name, status)
 
     def call_before_yield(
         self,
@@ -165,10 +168,16 @@ class _AutoLogging:
 
         yielded_value_type, yielded_value_repr = get_obj_type_and_repr(yielded_value)
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.yield_suspend(
-                name, mod_name, filename, lineno, yielded_value_type, yielded_value_repr
-            )
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.yield_suspend(
+                    name,
+                    mod_name,
+                    filename,
+                    lineno,
+                    yielded_value_type,
+                    yielded_value_repr,
+                )
 
     def call_after_yield(
         self,
@@ -182,8 +191,9 @@ class _AutoLogging:
 
         self.status_stack.append(_StackEntry(mod_name, name, "PASS"))
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.yield_resume(name, mod_name, filename, lineno)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.yield_resume(name, mod_name, filename, lineno)
 
     def call_before_yield_from(
         self,
@@ -208,8 +218,9 @@ class _AutoLogging:
                 )
                 return
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.yield_from_suspend(name, mod_name, filename, lineno)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.yield_from_suspend(name, mod_name, filename, lineno)
 
     def call_after_yield_from(
         self,
@@ -223,8 +234,9 @@ class _AutoLogging:
 
         self.status_stack.append(_StackEntry(mod_name, name, "PASS"))
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.yield_from_resume(name, mod_name, filename, lineno)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.yield_from_resume(name, mod_name, filename, lineno)
 
     def call_after_assign(
         self,
@@ -242,10 +254,17 @@ class _AutoLogging:
             assign_name, assign_value
         )
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.after_assign(
-                name, mod_name, filename, lineno, assign_name, assign_type, assign_repr
-            )
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.after_assign(
+                    name,
+                    mod_name,
+                    filename,
+                    lineno,
+                    assign_name,
+                    assign_type,
+                    assign_repr,
+                )
 
     def call_method_return(self, *args, **kwargs):
         pass
@@ -276,8 +295,9 @@ class _AutoLogging:
 
         self.status_stack[-1].status = Status.ERROR
 
-        for robo_logger in _get_logger_instances():
-            robo_logger.log_method_except(exc_info, unhandled=False)
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.log_method_except(exc_info, unhandled=False)
 
 
 def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):

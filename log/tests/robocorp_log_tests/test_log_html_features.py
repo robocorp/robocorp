@@ -82,6 +82,8 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
             else:
                 raise AssertionError("Expected RuntimeError.")
 
+            log.process_snapshot()
+
             log.end_task(
                 "my_task",
                 "modname",

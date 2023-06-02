@@ -52,6 +52,14 @@ class FilesFiltering(object):
         self._library_roots: List[str] = []
         self._cache_in_project_roots: Dict[str, bool] = {}
 
+        if project_roots is None:
+            # If the ROBOT_ROOT is available, use it to signal it's
+            # user code beneath that folder.
+            robot_root = os.environ.get("ROBOT_ROOT")
+            if robot_root:
+                if os.path.isdir(robot_root):
+                    project_roots = [robot_root]
+
         if project_roots is not None:
             self._set_project_roots(project_roots)
 
@@ -151,7 +159,7 @@ class FilesFiltering(object):
 
     def _set_project_roots(self, project_roots):
         self._project_roots = self._fix_roots(project_roots)
-        log.debug("IDE_PROJECT_ROOTS %s\n" % project_roots)
+        log.debug("ROBOT_ROOTS %s\n" % project_roots)
 
     def _get_project_roots(self):
         return self._project_roots

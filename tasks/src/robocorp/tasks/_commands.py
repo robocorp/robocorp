@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
+import threading
 
 
 # Note: the args must match the 'dest' on the configured argparser.
@@ -236,9 +237,70 @@ def run(
                 log.start_task("Teardown tasks", "teardown", "", 0)
                 try:
                     after_all_tasks_run(tasks)
+                    # Always do a process snapshot as the process is about to finish.
+                    log.process_snapshot()
                 finally:
                     log.end_task("Teardown tasks", "teardown", Status.PASS, "")
 
             return returncode
         finally:
             log.end_run(run_name, run_status)
+
+            # After the run is finished, start a timer which will print the
+            # current threads if the process doesn't exit after a given timeout.
+            from threading import Timer
+
+            var_name = "RC_DUMP_THREADS_AFTER_RUN_TIMEOUT"
+            try:
+                timeout = float(os.environ.get(var_name, "40"))
+            except:
+                sys.stderr.write(
+                    f"Invalid value for: {var_name} environment value. Cannot convert to float."
+                )
+                timeout = 40
+
+            def on_timeout():
+                _dump_threads(
+                    message=f"All tasks have run but the process still hasn't exited after {timeout} seconds. Showing threads found:"
+                )
+
+            t = Timer(timeout, on_timeout)
+            t.daemon = True
+            t.start()
+
+
+def _dump_threads(stream=None, message="Threads found"):
+    if stream is None:
+        stream = sys.stderr
+
+    thread_id_to_name = {}
+    try:
+        for t in threading.enumerate():
+            thread_id_to_name[t.ident] = "%s  (daemon: %s)" % (t.name, t.daemon)
+    except:
+        pass
+
+    stack_trace = [
+        "===============================================================================",
+        message,
+        "================================= Thread Dump =================================",
+    ]
+
+    for thread_id, stack in sys._current_frames().items():
+        stack_trace.append(
+            "\n-------------------------------------------------------------------------------"
+        )
+        stack_trace.append(" Thread %s" % thread_id_to_name.get(thread_id, thread_id))
+        stack_trace.append("")
+
+        if "self" in stack.f_locals:
+            sys.stderr.write(str(stack.f_locals["self"]) + "\n")
+
+        for filename, lineno, name, line in traceback.extract_stack(stack):
+            stack_trace.append(' File "%s", line %d, in %s' % (filename, lineno, name))
+            if line:
+                stack_trace.append("   %s" % (line.strip()))
+    stack_trace.append(
+        "\n=============================== END Thread Dump ==============================="
+    )
+    stream.write("\n".join(stack_trace))

@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Box, Drawer } from '@robocorp/components';
 
 import { Entry, Type } from '~/lib/types';
-import { ExceptionComponent } from './components/ExceptionComponent';
+import { ExceptionComponent, ThreadDumpComponent } from './components/ExceptionComponent';
 import { Method } from './components/Method';
 import { VariableComponent } from './components/VariableComponent';
 import { TaskComponent } from './components/TaskComponent';
@@ -10,6 +10,10 @@ import { LogComponent } from './components/LogComponent';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
   return <>Todo: provide details for {props.entry.type}</>;
+};
+
+export const Empty: FC<{ entry: Entry }> = (props) => {
+  return <></>;
 };
 
 const getContentComponent = (type: Type) => {
@@ -24,12 +28,16 @@ const getContentComponent = (type: Type) => {
       return Method;
     case Type.exception:
       return ExceptionComponent;
+    case Type.threadDump:
+      return ThreadDumpComponent;
     case Type.variable:
       return VariableComponent;
     case Type.task:
       return TaskComponent;
     case Type.log:
       return LogComponent;
+    case Type.processSnapshot:
+      return Empty;
     default:
       return Todo;
   }

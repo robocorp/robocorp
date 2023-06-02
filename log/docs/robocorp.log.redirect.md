@@ -10,7 +10,7 @@
 
 ---
 
-<a href="..\..\log\robocorp\log\redirect\setup_stdout_logging#L135"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\robocorp\log\redirect\setup_stdout_logging#L136"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `setup_stdout_logging`
 

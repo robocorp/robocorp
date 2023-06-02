@@ -2,13 +2,18 @@ import { FC, ReactNode } from 'react';
 import { IconBox, IconInformation, IconWarningTriangle } from '@robocorp/icons/iconic';
 import {
   IconAtSign,
+  IconCpu,
   IconEmptyCircle,
   IconFrame,
+  IconMenu,
+  IconNote,
   IconPauseCircle,
   IconPlayCircle,
   IconStatusCompleted,
   IconStatusError,
   IconStatusIdle,
+  IconStatusProcessing,
+  IconTable,
 } from '@robocorp/icons';
 import { Badge, Box } from '@robocorp/components';
 
@@ -149,6 +154,27 @@ export const getIcon = (entry: Entry): ReactNode => {
           size="small"
         />
       );
+    case Type.processSnapshot:
+      return (
+        <Badge
+          icon={IconCpu}
+          label={'Process Snapshot'}
+          iconColor="blue60"
+          variant="blue"
+          size="small"
+        />
+      );
+    case Type.threadDump:
+      return <IconTable size="small" color="blue60" />;
+    // return (
+    //   <Badge
+    //     icon={IconTable}
+    //     label={'Thread Stack'}
+    //     iconColor="blue60"
+    //     variant="blue"
+    //     size="small"
+    //   />
+    // );
     default:
       return <IconInformation color="blue60" />;
   }
