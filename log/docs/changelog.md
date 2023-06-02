@@ -1,3 +1,11 @@
+0.3.0
+-----------------------------
+
+- New API: `robocorp.log.process_snapshot()`:
+    Makes a process snapshot and adds it to the logs.
+    A process snapshot can include details on the python process and subprocesses
+    and should add a thread dump with the stack of all running threads.
+
 0.2.0
 -----------------------------
 
@@ -6,7 +14,6 @@
     - Filtering is now available.
     - It's possible to click elements to see details.
     - Full traceback with variables available.
-    
 
 
 0.1.1
