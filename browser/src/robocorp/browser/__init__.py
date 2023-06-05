@@ -9,7 +9,7 @@ from playwright.sync_api import (
     Playwright,
 )
 
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 version_info = [int(x) for x in __version__.split(".")]
 
 
