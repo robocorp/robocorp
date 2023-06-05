@@ -205,7 +205,17 @@ def setup_stdout_logging(
                                     message_type, message
                                 )
                                 if decoded:
-                                    original_stdout.write(f"{json.dumps(decoded)}\n")
+                                    decoded = json.dumps(decoded)
+                                    if len(decoded) > 1024:
+                                        i = 0
+                                        while True:
+                                            buf = decoded[i : i + 1024]
+                                            if not buf:
+                                                break
+                                            i += 1024
+                                            original_stdout.write(f"{buf}\n")
+                                    else:
+                                        original_stdout.write(f"{decoded}\n")
                                     # Flush (so, clients don't need to execute as unbuffered).
                                     original_stdout.flush()
                         except:
