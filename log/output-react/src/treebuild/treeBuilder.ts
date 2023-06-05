@@ -454,7 +454,7 @@ class FlattenedTree {
     this.updateEntryStatus(methodScopeEntry, msg);
   }
 
-  popTaskScope(msg: IMessage) {
+  popTaskScope(msg: IMessage): EntryTask | undefined {
     const entry: EntryBase | undefined = this.popScope(msg, Type.task);
     if (entry === undefined) {
       return;
@@ -464,6 +464,7 @@ class FlattenedTree {
     // entry that's being used in react).
     const taskScopeEntry: EntryTask = <EntryTask>{ ...entry };
     this.updateEntryStatus(taskScopeEntry, msg);
+    return taskScopeEntry;
   }
 
   popProcessSnapshotScope(msg: IMessage) {
@@ -733,7 +734,12 @@ export class TreeBuilder {
         this.updateRunInfoFinishTime(msg.decoded['time_delta_in_seconds']);
         break;
       case 'ET': // end task
-        this.flattened.popTaskScope(msg);
+        const taskScope = this.flattened.popTaskScope(msg);
+        if (taskScope !== undefined) {
+          if (taskScope.status >= StatusLevel.error) {
+            this.suiteErrored = true;
+          }
+        }
         break;
       case 'EE': // end element
         if (msg.decoded['type'] === 'UNTRACKED_GENERATOR') {

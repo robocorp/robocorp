@@ -79,7 +79,7 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
     <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary" id="base-header">
       <BaseHeader size="medium">
         <BaseHeader.Title title={runInfo.description}>
-          <Badge variant={variant} label={label} size="small" />
+          <Badge variant={variant} label={label} size="small" id="runStatusBadge" />
         </BaseHeader.Title>
         <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
         <BaseHeader.Actions>

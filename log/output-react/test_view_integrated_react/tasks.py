@@ -11,7 +11,7 @@ def open_output_view_for_tests():
     filepath = Path(__file__).absolute().parent.parent / "dist-test_v3" / "index.html"
     if not filepath.exists():
         raise AssertionError(
-            f'File "{filepath}" does not exist (distribution does not seem to be built with "npm run build:test").'
+            f'File "{filepath}" does not exist (distribution does not seem to be built with "npm run build:tests").'
         )
 
     page = open_url(filepath.as_uri(), headless="pydevd" not in sys.modules)
@@ -97,6 +97,9 @@ def case_failure():
 
     root_text_content = page.query_selector("#root1 > .entryName").text_content()
     assert root_text_content == "case_failure"
+
+    runStatus = page.query_selector("#runStatusBadge").text_content()
+    assert runStatus == "Run Failed"
 
     # Expand "case_failure"
     assert (
