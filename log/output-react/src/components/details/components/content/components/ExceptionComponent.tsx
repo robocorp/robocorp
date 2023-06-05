@@ -42,13 +42,22 @@ export const ExceptionComponent: FC<{ entry: Entry }> = (props) => {
   );
 };
 
+function* reversed(arr: any[]) {
+  let i = arr.length - 1;
+
+  while (i >= 0) {
+    yield arr[i];
+    i -= 1;
+  }
+}
+
 function tracebackComponent(tb: PythonTraceback, title: string) {
   const counter = new Counter();
 
   const contents = [];
 
   contents.push(<Box key={counter.next()}>{title}</Box>);
-  for (const tbe of tb.stack) {
+  for (const tbe of reversed(tb.stack)) {
     contents.push(
       <LocationContent key={counter.next()}>
         File "<Bold key={counter.next()}>{tbe.source}</Bold>", line{' '}
