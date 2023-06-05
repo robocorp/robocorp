@@ -5,23 +5,40 @@ from pathlib import Path
 from typing import Any, Optional, Sequence, Tuple, Union
 
 from .protocols import LogElementType, LogHTMLStyle, OptExcInfo
+import traceback
+import threading
+
+
+class _LogErrorLock:
+    tlocal = threading.local()
 
 
 def _log_error(func):
     @functools.wraps(func)
     def new_func(self, *args, **kwargs) -> Any:
-        import traceback
-
         try:
             return func(self, *args, **kwargs)
         except Exception:
-            traceback.print_exc()
-            traceback.print_stack(limit=5)
+            try:
+                writing = _LogErrorLock.tlocal._writing
+            except:
+                writing = _LogErrorLock.tlocal._writing = False
 
-            from robocorp.log._robo_output_impl import _RoboOutputImpl
+            if writing:
+                # Prevent recursing printing errors.
+                return
 
-            robot_output_impl: _RoboOutputImpl = self._robot_output_impl
-            robot_output_impl.log_method_except(sys.exc_info(), True)
+            _LogErrorLock.tlocal._writing = True
+            try:
+                traceback.print_exc()
+                traceback.print_stack(limit=5)
+
+                from robocorp.log._robo_output_impl import _RoboOutputImpl
+
+                robot_output_impl: _RoboOutputImpl = self._robot_output_impl
+                robot_output_impl.log_method_except(sys.exc_info(), True)
+            finally:
+                _LogErrorLock.tlocal._writing = True
 
     return new_func
 
