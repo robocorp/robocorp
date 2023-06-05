@@ -22,7 +22,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@robocorp/components": "1.0.1-RC3",
+    "@robocorp/components": "1.0.2-RC1",
     "@robocorp/icons": "^1.0.0",
     "@robocorp/theme": "^1.0.0",
     "date-fns": "^2.30.0",

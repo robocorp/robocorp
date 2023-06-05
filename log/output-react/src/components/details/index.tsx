@@ -13,7 +13,7 @@ export const Details = () => {
   }, []);
 
   return (
-    <Drawer passive onClose={onClose} open={!!entry}>
+    <Drawer passive onClose={onClose} width={1024} open={!!entry}>
       {entry && (
         <>
           <Title entry={entry} />
