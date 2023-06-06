@@ -85,6 +85,11 @@ case_names = [
 # Can be used to regenerate the cases.
 @pytest.mark.parametrize("case_name", case_names)
 def _test_gen_base_cases(str_regression, case_name, datadir, rcc_loc, resources_dir):
+    """
+    Note: cases generated for:
+
+    robocorp_log_tests.test_view_integrated_react.test_react_integrated
+    """
     create_case = globals()[case_name]
     results = create_case(rcc_loc, resources_dir).replace(r"\\", "/")
     str_regression.check(results, basename=case_name)
