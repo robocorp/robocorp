@@ -5,14 +5,11 @@ import {
   IconCpu,
   IconEmptyCircle,
   IconFrame,
-  IconMenu,
-  IconNote,
   IconPauseCircle,
   IconPlayCircle,
   IconStatusCompleted,
   IconStatusError,
   IconStatusIdle,
-  IconStatusProcessing,
   IconTable,
 } from '@robocorp/icons';
 import { Badge, Box } from '@robocorp/components';

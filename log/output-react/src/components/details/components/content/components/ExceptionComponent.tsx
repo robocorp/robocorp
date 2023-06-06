@@ -1,5 +1,5 @@
 import { Box } from '@robocorp/components';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Counter } from '~/lib';
 
 import styled from 'styled-components';
@@ -7,23 +7,28 @@ import styled from 'styled-components';
 import { Entry, EntryException, EntryThreadDump } from '~/lib/types';
 import { Bold } from './Common';
 import { PythonTraceback } from '~/treebuild/protocols';
+import { IconTextAlignJustified, IconTextAlignLeft } from '@robocorp/icons/iconic';
 
 const LocationContent = styled(Box)`
-  margin-left: ${({ theme }) => theme.space.$12};
   margin-bottom: ${({ theme }) => theme.space.$8};
   margin-top: ${({ theme }) => theme.space.$8};
   font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 const LineContents = styled(Box)`
-  margin-left: ${({ theme }) => theme.space.$20};
   margin-bottom: ${({ theme }) => theme.space.$8};
+  margin-top: ${({ theme }) => theme.space.$8};
   font-weight: bold;
   font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
+  display: inline-block;
 `;
 
 const LineVar = styled(Box)`
-  margin-left: ${({ theme }) => theme.space.$32};
+  margin-bottom: ${({ theme }) => theme.space.$8};
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
+`;
+
+const Title = styled(Box)`
   margin-bottom: ${({ theme }) => theme.space.$8};
   font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
@@ -51,25 +56,62 @@ function* reversed(arr: any[]) {
   }
 }
 
+function* enumerate(it: any) {
+  let i = 0;
+  for (const x of it) {
+    yield [i++, x];
+  }
+}
+
 function tracebackComponent(tb: PythonTraceback, title: string) {
   const counter = new Counter();
 
   const contents = [];
 
-  contents.push(<Box key={counter.next()}>{title}</Box>);
-  for (const tbe of reversed(tb.stack)) {
-    contents.push(
+  const [isWrapped, setIsWrapped] = useState(false);
+
+  const toggleTextWrap = () => {
+    setIsWrapped(!isWrapped);
+  };
+
+  if (tb.stack === undefined || tb.stack.length === 0) {
+    return <>No stack found</>;
+  }
+
+  contents.push(
+    <div style={{ marginBottom: '2em' }} key={counter.next()}>
+      <Title style={{ float: 'left' }} key={counter.next()}>
+        {title}
+      </Title>
+      <Box
+        style={{ float: 'right', cursor: 'pointer' }}
+        onClick={toggleTextWrap}
+        title={isWrapped ? 'Click to unwrap text' : 'Click to wrap text'}
+      >
+        {isWrapped ? (
+          <IconTextAlignLeft color="blue60" />
+        ) : (
+          <IconTextAlignJustified color="blue60" />
+        )}
+      </Box>
+    </div>,
+  );
+  for (const [index, tbe] of enumerate(reversed(tb.stack))) {
+    const isLast = index == tb.stack.length - 1;
+    const locationContent = (
       <LocationContent key={counter.next()}>
         File "<Bold key={counter.next()}>{tbe.source}</Bold>", line{' '}
         <Bold key={counter.next()}>{tbe.lineno}</Bold>, in{' '}
         <Bold key={counter.next()}>{tbe.method}</Bold>
-      </LocationContent>,
+      </LocationContent>
     );
-    contents.push(<LineContents key={counter.next()}>{'⪢ ' + tbe.lineContent}</LineContents>);
+    const lineContent = <LineContents key={counter.next()}>{tbe.lineContent}</LineContents>;
+
+    const variablesContent = [];
     for (const [varName, varTypeAndVal] of tbe.variables) {
       const [varType, varValue] = varTypeAndVal;
-      contents.push(
-        <LineVar key={counter.next()}>
+      variablesContent.push(
+        <LineVar key={counter.next()} style={{ whiteSpace: isWrapped ? 'normal' : 'nowrap' }}>
           <Bold>
             <Bold color="blue50">❖</Bold> {varName}
           </Bold>{' '}
@@ -77,16 +119,26 @@ function tracebackComponent(tb: PythonTraceback, title: string) {
         </LineVar>,
       );
     }
+
     contents.push(
-      <hr
-        key={counter.next()}
-        color="gray"
-        style={{ height: '1px', width: '96%', marginLeft: '2%' }}
-      ></hr>,
+      <details key={counter.next()} open={isLast}>
+        <summary>{lineContent}</summary>
+        <div>
+          {locationContent} {variablesContent}
+        </div>
+      </details>,
     );
+
+    if (!isLast) {
+      contents.push(
+        <hr
+          key={counter.next()}
+          color="gray"
+          style={{ height: '1px', width: '96%', marginLeft: '2%' }}
+        ></hr>,
+      );
+    }
   }
-  // Remove the last hr
-  contents.splice(-1);
 
   return <>{contents}</>;
 }
