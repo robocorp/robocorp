@@ -29,16 +29,15 @@ def _needs_retry(exc: BaseException) -> bool:
     # 403 - auth is in place, but not allowed (insufficient privileges)
     # 409 - payload not good for the affected resource
     no_retry_codes = [400, 401, 403, 409]
-    no_retry_messages = []
 
     if isinstance(exc, RequestsHTTPError):
-        if exc.status_code in no_retry_codes or exc.status_message in no_retry_messages:
+        if exc.status_code in no_retry_codes:
             return False
 
         if exc.status_code == 429:
             # We hit the rate limiter, so sleep extra.
             seconds = random.uniform(1, 3)
-            logging.warning("Rate limit hit, sleeping: %fs", seconds)
+            LOGGER.warning("Rate limit hit, sleeping: %fs", seconds)
             time.sleep(seconds)
 
     return True
@@ -50,7 +49,7 @@ def _before_sleep_log():
     def extensive_log(level, msg, *args, **kwargs):
         log_method(level, msg, *args, **kwargs)
         if DEBUG:
-            logging.debug(msg, *args)
+            LOGGER.debug(msg, *args)
 
     # Monkeypatch inner logging function so it produces an exhaustive log when
     # used under the before-sleep logging utility in `tenacity`.
@@ -79,7 +78,7 @@ class Requests:
 
     def handle_error(self, response: requests.Response):
         resp_status_code = response.status_code
-        log_func = logging.critical if resp_status_code // 100 == 5 else logging.debug
+        log_func = LOGGER.critical if resp_status_code // 100 == 5 else LOGGER.debug
         log_func("API response: %s %r", resp_status_code, response.reason)
 
         if response.ok:
@@ -95,11 +94,11 @@ class Requests:
                 fields = json.loads(fields)
         except (json.JSONDecodeError, ValueError, TypeError):
             # No `fields` dictionary can be obtained at all.
-            logging.critical("No fields were returned by the server")
+            LOGGER.critical("No fields were returned by the server")
             try:
                 response.raise_for_status()
-            except Exception as exc:  # pylint: disable=broad-except
-                logging.exception(exc)
+            except Exception as exc:
+                LOGGER.exception(exc)
                 raise RequestsHTTPError(exc, status_code=resp_status_code) from exc
 
         err_status_code = 0
@@ -111,8 +110,8 @@ class Requests:
                 "message", response.reason
             )
             raise HTTPError(f"{err_status_code} {status_message}: {reason}")
-        except Exception as exc:  # pylint: disable=broad-except
-            logging.exception(exc)
+        except Exception as exc:
+            LOGGER.exception(exc)
             raise RequestsHTTPError(
                 str(fields), status_code=err_status_code, status_message=status_message
             ) from exc
@@ -159,7 +158,7 @@ class Requests:
                 [split.scheme, split.netloc, split.path, "", split.fragment]
             )
 
-        logging.debug("%s %r", verb.__name__.upper(), url_for_log)
+        LOGGER.debug("%s %r", verb.__name__.upper(), url_for_log)
         response = verb(url, *args, headers=headers, **kwargs)
         handle_error(response)
         return response

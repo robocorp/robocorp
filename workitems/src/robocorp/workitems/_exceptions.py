@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Type
 
 from ._types import ExceptionType
 
@@ -27,10 +27,10 @@ class ApplicationException(_BaseException):
     """
 
 
-def to_exception_type(exc: BaseException) -> ExceptionType:
-    if isinstance(exc, BusinessException):
+def to_exception_args(exc_type: Type[BaseException]) -> ExceptionType:
+    if exc_type is BusinessException:
         return ExceptionType.BUSINESS
-    elif isinstance(exc, ApplicationException):
+    elif exc_type is ApplicationException:
         return ExceptionType.APPLICATION
     else:
         return ExceptionType.APPLICATION

@@ -1,4 +1,4 @@
-import copy
+# ruff: noqa: E501
 import json
 import logging
 import os
@@ -7,47 +7,14 @@ from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
 
-try:
-    from contextlib import nullcontext
-except ImportError:
-    from contextlib import suppress as nullcontext
-
 import pytest
 from requests import HTTPError
 
-from robocorp.workitems._adapters import (
-    BaseAdapter,
-    FileAdapter,
-    RobocorpAdapter,
-)
+from robocorp.workitems._adapters import FileAdapter, RobocorpAdapter
 from robocorp.workitems._requests import DEBUG, RequestsHTTPError
-from robocorp.workitems._exceptions import EmptyQueue
-from robocorp.workitems._types import State, ExceptionType
+from robocorp.workitems._types import State
 
-from . import RESOURCES_DIR, RESULTS_DIR
-
-VARIABLES_FIRST = {"username": "testguy", "address": "guy@company.com"}
-VARIABLES_SECOND = {"username": "another", "address": "dude@company.com"}
-IN_OUT_ID = "workitem-id-out"
-VALID_DATA = {
-    "workitem-id-first": VARIABLES_FIRST,
-    "workitem-id-second": VARIABLES_SECOND,
-    IN_OUT_ID: [1, 2, 3],
-}
-VALID_FILES = {
-    "workitem-id-first": {
-        "file1.txt": b"data1",
-        "file2.txt": b"data2",
-        "file3.png": b"data3",
-    },
-    "workitem-id-second": {},
-    IN_OUT_ID: {},
-}
 ITEMS_JSON = [{"payload": {"a-key": "a-value"}, "files": {"a-file": "file.txt"}}]
-FAILURE_ATTRIBUTES = {"status": "FAIL", "message": "The task/suite has failed"}
-
-OUTPUT_DIR = RESULTS_DIR / "output_dir"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class TestFileAdapter:

@@ -3,29 +3,16 @@ import fnmatch
 import json
 import logging
 import os
-import warnings
 from glob import glob
 from pathlib import Path
-from typing import Dict, List, Optional, Union
-
-import yaml
+from typing import Any, Dict, List, Optional, Union
 
 from ._adapters import BaseAdapter
-from ._email import parse_email_body
 from ._exceptions import ApplicationException, BusinessException, to_exception_type
-from ._types import ExceptionType, JSONType, PathType, State
+from ._types import Email, ExceptionType, JSONType, PathType, State
 from ._utils import truncate
 
-WorkItem = Union["Input", "Output"]
-
 LOGGER = logging.getLogger(__name__)
-
-EMAIL_DEPRECATION_MESSAGE = (
-    "Legacy non-parsed e-mail trigger detected! Please enable "
-    '"Parse email" configuration option in Control Room. (more'
-    " details: https://robocorp.com/docs/control-room/attended"
-    "-or-unattended/email-trigger#parse-email)"
-)
 
 
 class Input:
@@ -34,7 +21,6 @@ class Input:
         self._id = item_id
         self._payload: JSONType = self._adapter.load_payload(self.id)
         self._files: List[str] = self._adapter.list_files(self.id)
-        self._email: Optional[str] = None
         self._state: Optional[State] = None
         self._outputs: list[Output] = []
 
@@ -52,6 +38,9 @@ class Input:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        if self.released:
+            return False
+
         if exc_type is not None:
             exception_type = to_exception_type(exc_type)
             self.fail(exception_type=exception_type, message=str(exc_value))
@@ -85,49 +74,65 @@ class Input:
     def outputs(self):
         return list(self._outputs)
 
-    def email(self) -> Optional[JSONType]:
-        if self._email is not None:
-            return self._email
+    def email(
+        self,
+        html=True,
+        encoding="utf-8",
+        ignore_errors=False,
+    ) -> Optional[Email]:
+        email = self._parse_email()
+        if email is None:
+            raise ValueError("No email in work item")
 
-        body = self._email_body()
-        if body is None:
-            return None
+        if email.errors and not ignore_errors:
+            raise ValueError("\n".join(email.errors))
 
-        try:
-            return json.loads(body)
-        except Exception as exc:
-            LOGGER.debug("E-mail body not valid JSON: %s", exc)
+        if html and "__mail.html" in self._files:
+            content = self._adapter.get_file(self.id, "__mail.html")
+            email.html = content.decode(encoding)
 
-        try:
-            return yaml.full_load(body)
-        except Exception as exc:
-            LOGGER.debug("E-mail body not valid YAML: %s", exc)        
+        return email
 
-        return body
-
-    def _email_body(self) -> Optional[str]:
+    def _parse_email(self) -> Optional[Email]:
         if not isinstance(self._payload, dict):
             return None
 
+        # Email was successfully parsed by Control Room
         if "email" in self._payload:
-            content = self._payload["email"]
-            if isinstance(content, dict) and "body" in content:
-                return content["body"]
+            try:
+                fields = self._payload["email"]
+                email = Email.from_dict(fields)  # type: ignore
+                return email
+            except Exception as exc:
+                LOGGER.warning("Malformed 'email' field: %s", exc)
 
-        if "__mail.html" in self._files:
-            content = self._adapter.get_file(self.id, "__mail.html")
-            return content.decode("utf-8")
-
-        if "rawEmail" in self._payload:
-            content = self._payload["rawEmail"]
-            if isinstance(content, str):
-                warnings.warn(
-                    EMAIL_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=2
-                )
-                body, _ = parse_email_body(content)
-                return body
+        # Email parsing by Control Room failed (payload or attachments too big)
+        if "failedEmail" in self._payload:
+            try:
+                fields = self._payload["failedEmail"]
+                email = Email.from_dict(fields)  # type: ignore
+                email.errors = self._parse_email_errors(self._payload)
+                return email
+            except Exception as exc:
+                LOGGER.warning("Malformed 'failedEmail' field: %s", exc)
 
         return None
+
+    def _parse_email_errors(self, payload: dict[str, Any]) -> list[str]:
+        errors = payload.get("errors", [])
+        if not isinstance(errors, list):
+            LOGGER.warning("Expected 'errors' as 'list', was '%s'", type(errors))
+            return []
+
+        result = []
+        for err in errors:
+            msg = err["message"]
+            if files := err.get("files"):
+                names = ", ".join(f["name"] for f in files)
+                msg += f" ({names})"
+            result.append(msg)
+
+        return result
 
     def download_file(self, name: str, path: Optional[PathType] = None) -> Path:
         if name not in self.files:
@@ -149,16 +154,22 @@ class Input:
         if path is None:
             root = os.getenv("ROBOT_ROOT", "")
             path = Path(root)
+        else:
+            path = Path(path)
 
         path.mkdir(parents=True, exist_ok=True)
 
         paths = []
         for name in self.files:
-            if fnmatch.fnmatch(name, pattern):
-                content = self._adapter.get_file(self._id, name)
-                with open(path, "wb") as fd:
-                    fd.write(content)
-                paths.append(path.absolute())
+            if not fnmatch.fnmatch(name, pattern):
+                continue
+
+            filepath = (path / name).absolute()
+            paths.append(filepath)
+
+            content = self._adapter.get_file(self._id, name)
+            with open(filepath, "wb") as fd:
+                fd.write(content)
 
         return paths
 
@@ -273,7 +284,7 @@ class Output:
             raise FileNotFoundError(f"Not a valid file: {path}")
 
         if name in self._files:
-            LOGGER.warning(f'File with name "{name}" already exists')
+            LOGGER.warning('File with name "%s" already exists', name)
 
         self._files[name] = path
         return path
