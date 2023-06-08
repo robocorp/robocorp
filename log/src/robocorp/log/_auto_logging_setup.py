@@ -1,6 +1,6 @@
 import sys
 import threading
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Sequence
 
 from robocorp.log import critical, is_sensitive_variable_name
 
@@ -77,14 +77,14 @@ class _AutoLogging:
         sys.meta_path.remove(self._hook)
         self._hook = None
 
-    def call_before_method(
+    def _call_before_element(
         self,
         method_type: LogElementType,
         mod_name: str,
         filename: str,
         name: str,
         lineno: int,
-        args_dict: dict,
+        args: List[Tuple[str, str, str]],
     ) -> None:
         if self.tid != threading.get_ident():
             return
@@ -93,11 +93,6 @@ class _AutoLogging:
             # We don't change the stack for untracked generators
             # because we don't know when they may yield.
             self.status_stack.append(_StackEntry(mod_name, name, "PASS"))
-
-        args: List[Tuple[str, str, str]] = []
-        for key, val in args_dict.items():
-            obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
-            args.append((f"{key}", obj_type, obj_repr))
 
         with _get_logger_instances() as logger_instances:
             for robo_logger in logger_instances:
@@ -111,7 +106,52 @@ class _AutoLogging:
                     args,
                 )
 
-    def call_after_method(
+    def call_before_method(
+        self,
+        method_type: LogElementType,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        args_dict: dict,
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+        args: List[Tuple[str, str, str]] = []
+        for key, val in args_dict.items():
+            obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
+            args.append((f"{key}", obj_type, obj_repr))
+        self._call_before_element(method_type, mod_name, filename, name, lineno, args)
+
+    def call_before_iterate_step(
+        self,
+        method_type: LogElementType,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        targets: Sequence[Tuple[str, Any]],
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+        args: List[Tuple[str, str, str]] = []
+        if targets is not None:
+            for key, val in targets:
+                obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
+                args.append((f"{key}", obj_type, obj_repr))
+        self._call_before_element(method_type, mod_name, filename, name, lineno, args)
+
+    def call_before_iterate(
+        self,
+        method_type: LogElementType,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+    ) -> None:
+        self._call_before_element(method_type, mod_name, filename, name, lineno, [])
+
+    def _call_after_element(
         self,
         method_type: LogElementType,
         mod_name: str,
@@ -141,6 +181,10 @@ class _AutoLogging:
         with _get_logger_instances() as logger_instances:
             for robo_logger in logger_instances:
                 robo_logger.end_method(method_type, name, mod_name, status)
+
+    call_after_method = _call_after_element
+    call_after_iterate = _call_after_element
+    call_after_iterate_step = _call_after_element
 
     def call_before_yield(
         self,
@@ -298,6 +342,9 @@ class _AutoLogging:
         with _get_logger_instances() as logger_instances:
             for robo_logger in logger_instances:
                 robo_logger.log_method_except(exc_info, unhandled=False)
+
+    call_iterate_except = call_method_except
+    call_iterate_step_except = call_method_except
 
 
 def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):

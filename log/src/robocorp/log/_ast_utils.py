@@ -104,6 +104,21 @@ class NodeInfo(Generic[Y]):
     __repr__ = __str__
 
 
+def _iter_nodes(node, accept=lambda _node: True) -> Iterator[ast_module.AST]:
+    for _field, value in ast_module.iter_fields(node):
+        if isinstance(value, list):
+            for item in value:
+                if isinstance(item, ast_module.AST):
+                    if accept(item):
+                        yield item
+                        yield from _iter_nodes(item, accept)
+
+        elif isinstance(value, ast_module.AST):
+            if accept(value):
+                yield value
+                yield from _iter_nodes(value, accept)
+
+
 def print_ast(node, stream=None):
     if stream is None:
         stream = sys.stderr
@@ -164,12 +179,13 @@ class _RewriteCursor:
 
 
 class ASTRewriter:
-    def __init__(self, ast: AST):
+    def __init__(self, ast: AST) -> None:
         self._memo: dict = {}
         self._ast = ast
         self._stack: List[AST] = []
         self._cursor_stack: List[_RewriteCursor] = []
         self._next_var_id: "partial[int]" = partial(next, itertools.count())
+        self._is_generator_cache: dict = {}
 
     def save_func_to_before_method_call(
         self, function: ast.FunctionDef, call: ast.Call
@@ -277,6 +293,29 @@ class ASTRewriter:
     def NodeFactory(self, lineno: int, col_offset: int) -> "NodeFactory":
         return NodeFactory(lineno, col_offset, self._next_var_id)
 
+    def is_generator(self, function: ast.FunctionDef):
+        # Note: caching is important as it must be called once before the function
+        # is changed.
+        return _compute_is_generator(self._is_generator_cache, function)
+
+
+def _compute_is_generator(cache, function):
+    try:
+        return cache[function]
+    except KeyError:
+        pass
+    for node in _iter_nodes(function, dont_accept_class_nor_funcdef):
+        if isinstance(node, (ast.Yield, ast.YieldFrom)):
+            cache[function] = True
+            return True
+
+    cache[function] = False
+    return False
+
+
+def dont_accept_class_nor_funcdef(node):
+    return not isinstance(node, (ast.FunctionDef, ast.ClassDef))
+
 
 def copy_line_and_col(from_node, to_node):
     to_node.lineno = from_node.lineno
@@ -336,6 +375,9 @@ class NodeFactory:
     def NameLoad(self, name: str) -> ast.Name:
         return self._set_line_col(ast.Name(name, ast.Load()))
 
+    def Tuple(self, *elts) -> ast.Tuple:
+        return self._set_line_col(ast.Tuple(elts=list(elts), ctx=ast.Load()))
+
     def Return(self, value: ast.expr) -> ast.Return:
         return self._set_line_col(ast.Return(value))
 
@@ -378,6 +420,17 @@ class NodeFactory:
         try_node = ast.Try(handlers=[], orelse=[])
         return self._set_line_col(try_node)
 
+    def TryFinally(
+        self,
+        body: list[ast.stmt],
+        final_body: list[ast.stmt],
+        handlers: Optional[list[ast.ExceptHandler]] = None,
+    ) -> ast.Try:
+        try_node = ast.Try(handlers=handlers or [], orelse=[])
+        try_node.body = body
+        try_node.finalbody = final_body
+        return self._set_line_col(try_node)
+
     def Dict(self) -> ast.Dict:
         return self._set_line_col(ast.Dict())
 
@@ -385,7 +438,7 @@ class NodeFactory:
         return self._set_line_col(ast.Constant(self.lineno))
 
     def NoneConstant(self) -> ast.Constant:
-        return self._set_line_col(ast.Constant("None"))
+        return self._set_line_col(ast.Constant(None))
 
     def ExceptHandler(self) -> ast.ExceptHandler:
         return self._set_line_col(ast.ExceptHandler(body=[]))

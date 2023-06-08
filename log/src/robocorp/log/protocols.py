@@ -27,4 +27,6 @@ class Status:
 # 'UNTRACKED_GENERATOR': A generator for which we'll not track pause and resume (thus
 #                        it should not be added to the stack, but we can signal that
 #                        it was created/finished).
-LogElementType = Literal["METHOD", "GENERATOR", "UNTRACKED_GENERATOR"]
+LogElementType = Literal[
+    "METHOD", "GENERATOR", "UNTRACKED_GENERATOR", "FOR", "FOR_STEP"
+]

@@ -369,4 +369,54 @@ def foo():
         assert e.value.value == ["step_a", "step_b"]
 
     # We cannot stack 2 before nor 2 after, it must be always interleaved.
+
     assert found == ["before", "after", "before", "after"]
+
+
+def test_rewrite_for(tmpdir, str_regression):
+    from robocorp.log._config import FilterKind
+    from robocorp.log._lifecycle_hooks import (
+        before_iterate,
+        before_iterate_step,
+        after_iterate,
+        after_iterate_step,
+    )
+    from robocorp.log._rewrite_importhook import _rewrite
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    for a in [1, 2]:
+        call(a)
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    if hasattr(ast, "unparse"):  # 3.9 onwards
+        unparsed = ast.unparse(mod)
+        str_regression.check(unparsed)
+
+    def call(v):
+        return v
+
+    found = []
+
+    def before(*args):
+        found.append("before iterate")
+
+    def after(*args):
+        found.append("after iterate")
+
+    with before_iterate.register(before), after_iterate.register(after):
+        namespace = {"call": call}
+        namespace["__file__"] = "<string>"
+        exec(co, namespace)
+        namespace["foo"]()
+
+    assert found == ["before iterate", "after iterate"]

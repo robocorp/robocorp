@@ -12,6 +12,24 @@ def iterate_entries_in_project(steps: int):
             yield v
 
 
+def for_iter():
+    for i in range(5):
+        a = i
+
+
+def for_iter_multiple_targets():
+    for i, j in enumerate(range(5)):
+        a = i
+        b = j
+
+
+def for_iter_exc():
+    for i in range(5):
+        a = i
+        if i == 2:
+            raise RuntimeError("some error")
+
+
 def call_in_main(value):
     y = value
 

@@ -138,7 +138,12 @@ _EMPTY_LIST: list = []
 
 
 def _create_before_method_ast(
-    rewrite_ctx: ASTRewriter, factory, class_name, function, filter_kind
+    rewrite_ctx: ASTRewriter,
+    factory,
+    class_name,
+    function,
+    filter_kind,
+    log_method_type: LogElementType,
 ) -> list:
     # Target code:
     # def method(a, b):
@@ -157,7 +162,6 @@ def _create_before_method_ast(
         stmts.append(assign)
 
     call = factory.Call(factory.NameLoadRewriteCallback("before_method"))
-    log_method_type: LogElementType = "METHOD"
     call.args.append(factory.Str(log_method_type))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
@@ -200,6 +204,9 @@ def _create_except_handler_ast(
     function: ast.FunctionDef,
     last_body_lineno,
     filter_kind: FilterKind,
+    log_method_type: LogElementType = "METHOD",
+    name: Optional[ast.Str] = None,
+    except_callback_name="method_except",
 ) -> ast.ExceptHandler:
     # Target code:
     #     import sys as @py_sys
@@ -240,12 +247,15 @@ def _create_except_handler_ast(
         factory.Attribute(factory.NameLoad("@py_sys"), "exc_info")
     )
 
-    call_method_except = factory.Call(factory.NameLoadRewriteCallback("method_except"))
-    log_method_type: LogElementType = "METHOD"
+    call_method_except = factory.Call(
+        factory.NameLoadRewriteCallback(except_callback_name)
+    )
     call_method_except.args.append(factory.Str(log_method_type))
     call_method_except.args.append(factory.NameLoad("__name__"))
     call_method_except.args.append(factory.NameLoad("__file__"))
-    call_method_except.args.append(factory.Str(f"{class_name}{function.name}"))
+    call_method_except.args.append(
+        name if name is not None else factory.Str(f"{class_name}{function.name}")
+    )
     call_method_except.args.append(factory.LineConstant())
     call_method_except.args.append(call_exc_info)
     rewrite_ctx.save_func_to_except_method_call(function, call_method_except)
@@ -258,10 +268,14 @@ def _create_except_handler_ast(
 
 
 def _create_after_method_ast(
-    rewrite_ctx: ASTRewriter, factory: NodeFactory, class_name, function, filter_kind
+    rewrite_ctx: ASTRewriter,
+    factory: NodeFactory,
+    class_name,
+    function,
+    filter_kind,
+    log_method_type: LogElementType,
 ) -> ast.Expr:
     call = factory.Call(factory.NameLoadRewriteCallback("after_method"))
-    log_method_type: LogElementType = "METHOD"
     call.args.append(factory.Str(log_method_type))
     call.args.append(factory.NameLoad("__name__"))
     call.args.append(factory.NameLoad("__file__"))
@@ -305,6 +319,18 @@ def _rewrite_funcdef(
             continue
         break
 
+    # Note: we need to compute this before we change the body!
+    # Also, it's important that this is cached as new calls will use the
+    # cached value (for is_generator) directly.
+    log_method_type: LogElementType
+    if rewrite_ctx.is_generator(function):
+        if filter_kind == FilterKind.log_on_project_call:
+            log_method_type = "UNTRACKED_GENERATOR"
+        else:
+            log_method_type = "GENERATOR"
+    else:
+        log_method_type = "METHOD"
+
     function_body = function.body
     function.body = []  # Proper value will be set later.
 
@@ -326,7 +352,7 @@ def _rewrite_funcdef(
     )
 
     before_method_stmts = _create_before_method_ast(
-        rewrite_ctx, factory, class_name, function, filter_kind
+        rewrite_ctx, factory, class_name, function, filter_kind, log_method_type
     )
 
     for stmt in reversed(before_method_stmts):
@@ -340,7 +366,7 @@ def _rewrite_funcdef(
     )
 
     after_expr = _create_after_method_ast(
-        rewrite_ctx, factory, class_name, function, filter_kind
+        rewrite_ctx, factory, class_name, function, filter_kind, log_method_type
     )
     try_finally.finalbody = [after_expr]
 
@@ -351,6 +377,7 @@ def _rewrite_funcdef(
         function,
         function_body[-1].lineno,
         filter_kind,
+        log_method_type=log_method_type,
     )
 
     handlers: List[ast.ExceptHandler] = [except_handler]
@@ -496,18 +523,166 @@ def _handle_assign(
         )
 
 
-def _update_calls_from_func_to_generator(
-    rewrite_ctx: ASTRewriter, function, filter_kind: FilterKind
-):
-    before_call: ast.Call
-    for before_call in rewrite_ctx.iter_func_calls_from_func(function):
-        assert isinstance(before_call.args[0], ast.Str)
-        before_call_method_type: ast.Str = before_call.args[0]
+def _collect_names(target):
+    if isinstance(target, ast.Name):
+        yield target
 
-        log_method_type: LogElementType = "GENERATOR"
-        if filter_kind == FilterKind.log_on_project_call:
-            log_method_type = "UNTRACKED_GENERATOR"
-        before_call_method_type.s = log_method_type
+    elif isinstance(target, ast.Tuple):
+        for el in target.elts:
+            yield from _collect_names(el)
+
+
+def _handle_for(
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path,
+    stack,
+    filter_kind,
+    node: ast.For,
+):
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+    if not _accept_function_rewrite(function) or rewrite_ctx.is_generator(function):
+        return None
+
+    try:
+        if filter_kind != FilterKind.full_log:
+            return None
+
+        # Wrapping of before/after for 'for' statements and each step of its body.
+        factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
+        cursor = rewrite_ctx.cursor
+
+        iter_desc = ast.unparse(node.iter)
+        target_desc = ast.unparse(node.target)
+        name_str = factory.Str(f"for {target_desc} in {iter_desc}")
+
+        body = node.body
+        if body:
+            first_stmt = body[0]
+            factory_first = rewrite_ctx.NodeFactory(
+                first_stmt.lineno, first_stmt.col_offset
+            )
+
+            try_finally = factory_first.Try()
+            try_finally.body = body
+
+            last_stmt = body[-1]
+            factory_last = rewrite_ctx.NodeFactory(
+                last_stmt.lineno, last_stmt.col_offset
+            )
+            try_finally.finalbody = [
+                factory_last.Expr(
+                    _make_func_with_args(
+                        factory_last,
+                        "after_iterate_step",
+                        factory.Str("FOR_STEP"),
+                        factory_last.NameLoad("__name__"),
+                        factory_last.NameLoad("__file__"),
+                        name_str,
+                        factory_last.LineConstant(),
+                    )
+                )
+            ]
+
+            try_finally.handlers = [
+                _create_except_handler_ast(
+                    rewrite_ctx,
+                    factory,
+                    class_name,
+                    function,
+                    last_stmt.lineno,
+                    filter_kind,
+                    "FOR_STEP",
+                    name_str,
+                    "iterate_step_except",
+                )
+            ]
+
+            target_load: Union[ast.Name, ast.Constant]
+            targets: Union[ast.Constant, ast.Tuple]
+            temp_targets = []
+            for name_target in _collect_names(node.target):
+                target_name = name_target.id
+                target_load = factory.NameLoad(name_target.id)
+                temp_targets.append(
+                    factory_first.Tuple(
+                        factory_first.Str(target_name),
+                        target_load,
+                    )
+                )
+
+            if not temp_targets:
+                targets = factory_first.NoneConstant()
+            else:
+                targets = factory_first.Tuple(*temp_targets)
+
+            node.body = [
+                factory_first.Expr(
+                    _make_func_with_args(
+                        factory_first,
+                        "before_iterate_step",
+                        factory.Str("FOR_STEP"),
+                        factory_first.NameLoad("__name__"),
+                        factory_first.NameLoad("__file__"),
+                        name_str,
+                        factory_first.LineConstant(),
+                        targets,
+                    )
+                ),
+                try_finally,
+            ]
+
+        cursor.current = factory.TryFinally(
+            body=[
+                factory.Expr(
+                    _make_func_with_args(
+                        factory,
+                        "before_iterate",
+                        factory.Str("FOR"),
+                        factory.NameLoad("__name__"),
+                        factory.NameLoad("__file__"),
+                        name_str,
+                        factory.LineConstant(),
+                    )
+                ),
+                node,
+            ],
+            handlers=[
+                _create_except_handler_ast(
+                    rewrite_ctx,
+                    factory,
+                    class_name,
+                    function,
+                    node.body[-1].lineno,
+                    filter_kind,
+                    "FOR",
+                    name_str,
+                    "iterate_except",
+                )
+            ],
+            final_body=[
+                factory.Expr(
+                    _make_func_with_args(
+                        factory,
+                        "after_iterate",
+                        factory.Str("FOR"),
+                        factory.NameLoad("__name__"),
+                        factory.NameLoad("__file__"),
+                        name_str,
+                        factory.LineConstant(),
+                    )
+                )
+            ],
+        )
+
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting for: {function.name} line: {node.lineno} at: {module_path}"
+        )
 
 
 def _handle_yield(
@@ -527,8 +702,6 @@ def _handle_yield(
         return None
 
     try:
-        _update_calls_from_func_to_generator(rewrite_ctx, function, filter_kind)
-
         if filter_kind != FilterKind.full_log:
             return None
 
@@ -665,7 +838,7 @@ def _handle_yield(
             )
     except Exception:
         raise RuntimeError(
-            f"Error when rewriting assign: {function.name} line: {node.lineno} at: {module_path}"
+            f"Error when rewriting yield: {function.name} line: {node.lineno} at: {module_path}"
         )
 
 
@@ -678,3 +851,4 @@ _dispatch[ast.Assign] = _handle_assign
 _dispatch[ast.FunctionDef] = _handle_funcdef
 _dispatch[ast.Yield] = _handle_yield
 _dispatch[ast.YieldFrom] = _handle_yield
+_dispatch[ast.For] = _handle_for

@@ -73,6 +73,27 @@ before_yield_from = Callback()
 # Called as: after_yield_from(__name__, filename, name, lineno)
 after_yield_from = Callback()
 
+# Called as: before_iterate(__name__, kind, filename, name, lineno)
+before_iterate = Callback()
+
+# Called as: iterate_except(__name__, filename, name, lineno, exc_info)
+# tp, e, tb = exc_info
+iterate_except = Callback()
+
+# Called as: before_iterate_step(__name__, kind, filename, name, lineno, targets)
+# targets is a tuple(tuple(target_name, target_value))
+before_iterate_step = Callback()
+
+# Called as: after_iterate_step(__name__, kind, filename, name, lineno)
+after_iterate_step = Callback()
+
+# Called as: iterate_step_except(__name__, filename, name, lineno, exc_info)
+# tp, e, tb = exc_info
+iterate_step_except = Callback()
+
+# Called as: after_iterate(__name__, kind, filename, name, lineno)
+after_iterate = Callback()
+
 
 def iter_all_callbacks() -> Iterator[Callback]:
     for _key, val in globals().items():

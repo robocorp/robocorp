@@ -50,7 +50,8 @@ from ._config import BaseConfig, FilterKind
 # 0.0.12: Changed to use robocorp namespace.
 # 0.0.13: Changed to use robocorp.log name.
 # 0.0.14: Rewrite yield from
-version = "0.0.14"
+# 0.0.15: Rewrite for
+version = "0.0.15"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT

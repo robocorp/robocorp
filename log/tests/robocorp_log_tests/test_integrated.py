@@ -150,3 +150,119 @@ def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
     # for m in msgs:
     #     print(m)
     # setup_info.open_log_target()
+
+
+def test_log_with_for_loop(tmpdir, ui_regenerate):
+    from imp import reload
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        check_iterators = reload(check_iterators)
+        check_iterators.for_iter()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    msgs = verify_log_messages_from_log_html(
+        log_target,
+        [
+            {"message_type": "SE", "name": "for i in range(5)", "type": "FOR"},
+            {"message_type": "EE", "type": "FOR", "status": "PASS"},
+            {"message_type": "SE", "name": "for i in range(5)", "type": "FOR_STEP"},
+            {"message_type": "EA", "name": "i", "type": "int", "value": "2"},
+            {
+                "message_type": "AS",
+                "name": "for_iter",
+                "target": "a",
+                "type": "int",
+                "value": "2",
+            },
+            {"message_type": "EE", "type": "FOR_STEP", "status": "PASS"},
+        ],
+    )
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
+
+
+def test_log_with_for_loop_and_exception(tmpdir, ui_regenerate):
+    from imp import reload
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        check_iterators = reload(check_iterators)
+        try:
+            check_iterators.for_iter_exc()
+        except RuntimeError:
+            pass
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    msgs = verify_log_messages_from_log_html(
+        log_target,
+        [
+            {"message_type": "SE", "name": "for i in range(5)", "type": "FOR"},
+            {"message_type": "EE", "type": "FOR", "status": "ERROR"},
+            {"message_type": "SE", "name": "for i in range(5)", "type": "FOR_STEP"},
+            {"message_type": "EA", "name": "i", "type": "int", "value": "2"},
+            {
+                "message_type": "AS",
+                "name": "for_iter_exc",
+                "target": "a",
+                "type": "int",
+                "value": "2",
+            },
+            {"message_type": "EE", "type": "FOR_STEP", "status": "ERROR"},
+        ],
+    )
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
+
+
+def test_log_with_for_loop_multiple_targets(tmpdir, ui_regenerate):
+    from imp import reload
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        check_iterators = reload(check_iterators)
+        check_iterators.for_iter_multiple_targets()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    msgs = verify_log_messages_from_log_html(
+        log_target,
+        [
+            {
+                "message_type": "SE",
+                "name": "for (i, j) in enumerate(range(5))",
+                "type": "FOR",
+            },
+            {"message_type": "EE", "type": "FOR", "status": "PASS"},
+            {
+                "message_type": "SE",
+                "name": "for (i, j) in enumerate(range(5))",
+                "type": "FOR_STEP",
+            },
+            {"message_type": "EA", "name": "i", "type": "int", "value": "2"},
+            {
+                "message_type": "AS",
+                "name": "for_iter_multiple_targets",
+                "target": "a",
+                "type": "int",
+                "value": "2",
+            },
+            {"message_type": "EE", "type": "FOR_STEP", "status": "PASS"},
+        ],
+    )
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
