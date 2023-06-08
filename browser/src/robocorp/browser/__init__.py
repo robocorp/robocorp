@@ -9,7 +9,9 @@ from playwright.sync_api import (
     Playwright,
 )
 
-__version__ = "0.4.4"
+from ._browser_engines import BrowserEngine
+
+__version__ = "0.5.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
@@ -24,7 +26,7 @@ def configure(**kwargs) -> None:
     Args:
         browser_engine:
             help="Browser engine which should be used",
-            choices=["chrome", "firefox"],
+            choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"]
 
         headless: If set to False the browser UI will be shown. If set to True
             the browser UI will be kept hidden. If unset or set to None it'll
@@ -37,7 +39,7 @@ def configure(**kwargs) -> None:
             default="only-on-failure",
             choices=["on", "off", "only-on-failure"],
             help="Whether to automatically capture a screenshot after each task.",
-    """
+    """  # noqa
     from ._browser_context import _browser_config
 
     config = _browser_config()
@@ -131,78 +133,17 @@ def context() -> BrowserContext:
     return _browser_context.context()
 
 
-def open_browser(
-    browser_engine: Optional[Literal["chrome", "firefox"]] = None,
-    headless: Optional[bool] = None,
-    **kwargs,
-) -> Browser:
-    """Shortcut to configure and launch a browser instance (using Playwright).
-
-    Note that if the browser was already previously launched the previous
-    instance will be returned and any configuration passed will be ignored.
-
-    Args:
-        browser_engine: Specifies which browser to use. Supported browsers are:
-            ``chrome`` and ``firefox``.
-
-        headless: If set to False the browser UI will be shown. If set to True
-            the browser UI will be kept hidden. If unset or set to None it'll
-            show the browser UI only if a debugger is detected.
-
-    Note:
-        The arguments related to browser initialization will only be used
-        if this is the first call, on subsequent calls the same browser instance
-        will be used and the current page will open the given url.
-
-    Returns:
-        The browser instance.
-    """
-    if browser_engine is not None:
-        kwargs["browser_engine"] = browser_engine
-    if headless is not None:
-        kwargs["headless"] = headless
-    if kwargs:
-        configure(**kwargs)
-    return browser()
-
-
-def open_url(
-    url: str,
-    browser_engine: Optional[Literal["chrome", "firefox"]] = None,
-    headless: Optional[bool] = None,
-    **kwargs,
-) -> Page:
+def goto(url: str) -> Page:
     """
     Changes the url of the current page (creating a page if needed).
 
     Args:
         url: Navigates to the provided URL.
 
-        browser: Specifies which browser to use. Supported browsers are:
-            ``chrome`` and ``firefox``.
-
-        headless: If set to False the browser UI will be shown. If set to True
-            the browser UI will be kept hidden. If unset or set to None it'll
-            show the browser UI only if a debugger is detected.
-
-        kwargs: Other keyword arguments to be passed to the
-            `configure` function (besides `browser` and `headless`).
-
-    Note:
-        The arguments related to browser initialization will only be used
-        if this is the first call, on subsequent calls the same browser instance
-        will be used and the current page will open the given url.
-
     Returns:
         The page instance managed by the robocorp.tasks framework
         (it will be automatically closed when the task finishes).
     """
-    if browser_engine is not None:
-        kwargs["browser_engine"] = browser_engine
-    if headless is not None:
-        kwargs["headless"] = headless
-    if kwargs:
-        configure(**kwargs)
     p = page()
     p.goto(url)
     return p
@@ -250,9 +191,26 @@ def screenshot(
     return in_bytes
 
 
+def install(browser_engine: BrowserEngine):
+    """
+    Downloads and installs the given browser engine.
+
+    Note: Google Chrome or Microsoft Edge installations will be installed
+    at the default global location of your operating system overriding your
+    current browser installation.
+
+    Args:
+        browser_engine:
+            help="Browser engine which should be installed",
+            choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"]
+    """  # noqa
+    from . import _browser_engines
+
+    _browser_engines.install_browser(browser_engine, force=False)
+
+
 __all__ = [
-    "open_browser",
-    "open_url",
+    "install",
     "configure",
     "page",
     "browser",
