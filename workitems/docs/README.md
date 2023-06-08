@@ -4,14 +4,12 @@
 
 ## Modules
 
-- [`robocorp.workitems.workitem`](./robocorp.workitems.workitem.md#module-robocorpworkitemsworkitem)
-- [`robocorp.workitems.workitems`](./robocorp.workitems.workitems.md#module-robocorpworkitemsworkitems)
+- [`robocorp.workitems`](./robocorp.workitems.md#module-robocorpworkitems): A library for interacting with Control Room work items.
 
 ## Classes
 
-- [`workitem.Error`](./robocorp.workitems.workitem.md#class-error): Failed work item error type.
-- [`workitem.State`](./robocorp.workitems.workitem.md#class-state): Work item state. (set when released)
-- [`workitem.WorkItem`](./robocorp.workitems.workitem.md#class-workitem): Base class for input and output work items.
+- [`workitems.Inputs`](./robocorp.workitems.md#class-inputs): Inputs represents the input queue of work items.
+- [`workitems.Outputs`](./robocorp.workitems.md#class-outputs): Outputs represents the output queue of work items.
 
 ## Functions
 

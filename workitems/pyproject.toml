@@ -1,11 +1,10 @@
 [tool.poetry]
 name = "robocorp-workitems"
-version = "0.3.0"
-description = "Robocorp Control Room Work Items API integration library"
+version = "0.4.0"
+description = "Robocorp Work Items library"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",
 	"Fabio Z. <fabio@robocorp.com>",
-	"Kerkko P. <kerkko@robocorp.com>",
     "Antero V. <antero@robocorp.com>",
 ]
 readme = "README.md"
@@ -20,14 +19,16 @@ profile = "black"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+robocorp-tasks = "^0.4.0"
 requests = "^2.28.2"
 tenacity = "^8.0.1"
-pyyaml = "^6.0"
+dataclasses-json = "^0.5.7"
+python-dateutil = "^2.8.2"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
 types-requests = "^2.30.0.0"
-types-pyyaml = "^6.0.12.9"
+types-python-dateutil = "^2.8.19.13"
 
 [build-system]
 requires = ["poetry-core"]

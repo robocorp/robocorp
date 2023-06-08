@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "master"
-      - "wip"
     paths:
       - "browser/**"
       - ".github/workflows/browser_tests.yml"
@@ -42,15 +41,13 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install poetry
-      run: |
-        pipx install poetry
+      run: pipx install poetry
 
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
         cache: 'poetry'
-
     - name: Setup node 16.x
       uses: actions/setup-node@v3
       with:
@@ -58,12 +55,10 @@ jobs:
         registry-url: "https://npm.pkg.github.com"
         scope: "@robocorp"
 
-    - name: Install project
-      run: poetry install
-
     - name: Install invoke/tomlkit
       run: pip install invoke tomlkit
-
+    - name: Install project
+      run: poetry install
     - name: Install dependencies (in dev mode)
       run: python -m invoke devinstall
 
@@ -75,16 +70,13 @@ jobs:
     # Because we've installed the logging in dev mode we need to build the view too
     - name: npm ci
       working-directory: ./log/output-react/
-      run: |
-        npm ci
+      run: npm ci
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-
     - name: Build the output view
       working-directory: ./log
-      run: |
-        python -m invoke build-output-view-react
+      run: python -m invoke build-output-view-react
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}

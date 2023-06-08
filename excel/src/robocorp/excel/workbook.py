@@ -76,11 +76,3 @@ class Workbook:
             name = sheet
 
         self.excel.remove_worksheet(name)
-
-
-# these may be removed, replaced by handling worksheets yourself? or these will go to workbook!
-
-
-# removed:
-# files.get_active_worksheet()
-# files.set_active_worksheet()

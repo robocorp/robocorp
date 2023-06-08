@@ -4,13 +4,12 @@ from io import BytesIO
 from pathlib import Path
 
 import pytest
-from robocorp.excel.workbook import XlsxWorkbook, XlsWorkbook
-from robocorp.excel import create_workbook, open_workbook, Table
-from robocorp.excel._workbooks import _ensure_unique
 
+from robocorp.excel import Table, create_workbook, open_workbook
+from robocorp.excel._workbooks import _ensure_unique
+from robocorp.excel.workbook import XlsWorkbook, XlsxWorkbook
 
 from . import RESOURCES_DIR, RESULTS_DIR
-
 
 EXCELS_DIR = RESOURCES_DIR / "excels"
 
@@ -54,8 +53,8 @@ def test_create_after_close(fmt):
 
 @pytest.mark.parametrize("fmt", ["xlsx", "xls"])
 def test_create_without_close(fmt):
-    workbook_1 = create_workbook(fmt=fmt)
-    workbook_2 = create_workbook(fmt=fmt)
+    create_workbook(fmt=fmt)
+    create_workbook(fmt=fmt)
 
 
 @pytest.mark.parametrize("filename", ["not-a-file.xlsx", "not-a-file.xls"])
@@ -445,10 +444,16 @@ def test_read_xls_worksheet_with_formulas_data_only(excel_file, data_only):
 @pytest.mark.parametrize("name", ["spaces.xls", "spaces.xlsx"])
 def test_invalid_whitespace_fix(name):
     if name.endswith("xlsx"):
-        get_user = lambda book: book.properties.lastModifiedBy
+
+        def get_user(book):
+            return book.properties.lastModifiedBy
+
         expected_user = "cmin  "
     else:
-        get_user = lambda book: book.user_name
+
+        def get_user(book):
+            return book.user_name
+
         expected_user = "cmin"
 
     workbook = open_workbook(EXCELS_DIR / name)

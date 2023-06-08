@@ -1,5 +1,5 @@
 # type: ignore
-from robocorp.browser import open_url, screenshot
+from robocorp import browser
 from robocorp.excel import open_workbook
 from robocorp.http import download
 
@@ -24,7 +24,8 @@ def fill_and_submit_form(page, person):
 @task
 def solve_challenge():
     """Solve the RPA challenge"""
-    page = open_url("http://rpachallenge.com/", headless=True)
+    browser.configure(headless=True)
+    page = browser.goto("http://rpachallenge.com/")
 
     download("http://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
     people = read_people_from_excel()
@@ -34,4 +35,4 @@ def solve_challenge():
         fill_and_submit_form(page, person)
 
     element = page.query_selector("css=div.congratulations")
-    screenshot(element)
+    browser.screenshot(element)

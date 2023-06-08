@@ -1,13 +1,13 @@
 import os
 import tempfile
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 
 import pytest
-from robocorp.excel.tables import Table, Tables, Dialect
+
+from robocorp.excel.tables import Dialect, Table, Tables
 
 from . import RESOURCES_DIR
-
 
 DATA_COLUMNS = ["one", "two", "three", "four"]
 
@@ -134,7 +134,7 @@ def test_table_negative_row_index(table):
 
 def test_table_negative_column_index(table):
     assert table[0, 1] == 2
-    assert table[0, -1] == None
+    assert table[0, -1] is None
     assert table[0, -2] == 3
 
 
@@ -644,7 +644,7 @@ def test_import_with_integer_keys():
 
     table = Table(data)
     assert table.dimensions == (3, 3)
-    assert table[0, 0] == None
+    assert table[0, 0] is None
 
     table = Table(data, columns=("Field", "Value"))
     assert table.dimensions == (3, 2)

@@ -11,6 +11,13 @@ authors = [
 readme = "README.md"
 packages = [{include = "robocorp", from="src"}]
 
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
 [tool.poetry.dependencies]
 python = "^3.9"
 pillow = "^9.1.1"

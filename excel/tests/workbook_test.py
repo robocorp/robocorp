@@ -47,7 +47,7 @@ def test_worksheet_exists():
     workbook = create_workbook("xlsx", "first sheet")
     assert workbook.worksheet_exists(0)
     assert workbook.worksheet_exists("first sheet")
-    sheet2 = workbook.create_worksheet("second sheet")
+    workbook.create_worksheet("second sheet")
     assert workbook.worksheet_exists(1)
     assert workbook.worksheet_exists("second sheet")
 

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 import copy
 import csv
 import logging
@@ -8,8 +9,18 @@ from itertools import groupby, zip_longest
 from keyword import iskeyword
 from numbers import Number
 from operator import itemgetter
-from typing import (Any, Callable, Dict, Generator, Iterable, List, NamedTuple,
-                    Optional, Tuple, Union)
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
+)
 
 from robocorp.excel._types import is_dict_like, is_list_like, is_namedtuple
 

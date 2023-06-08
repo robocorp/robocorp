@@ -10,7 +10,6 @@ import xlrd
 import xlwt
 from openpyxl.utils import get_column_letter
 from openpyxl.utils.exceptions import InvalidFileException
-from openpyxl.worksheet.cell_range import CellRange
 from xlutils.copy import copy as xlutils_copy
 
 from robocorp.excel._types import PathType

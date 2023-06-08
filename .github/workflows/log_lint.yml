@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "master"
-      - "wip"
     paths:
       - "log/**"
       - ".github/workflows/log_lint.yml"
