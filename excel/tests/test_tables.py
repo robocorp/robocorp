@@ -1,13 +1,13 @@
 import os
 import tempfile
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from contextlib import contextmanager
 
 import pytest
-from robocorp.excel.tables import Table, Tables, Dialect
+
+from robocorp.excel.tables import Dialect, Table, Tables
 
 from . import RESOURCES_DIR
-
 
 DATA_COLUMNS = ["one", "two", "three", "four"]
 

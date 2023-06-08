@@ -1,6 +1,5 @@
 import pytest
 
-
 from robocorp.excel.excel import create_workbook
 
 
