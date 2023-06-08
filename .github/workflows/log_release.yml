@@ -12,7 +12,7 @@ defaults:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     strategy:
       fail-fast: true
 
@@ -29,7 +29,7 @@ jobs:
 
     - name: Install poetry
       run: pipx install poetry
-      
+
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with:
@@ -38,7 +38,7 @@ jobs:
 
     - name: Install project
       run: poetry install
-      
+
     - name: npm ci
       working-directory: ./log/output-react/
       run: |
@@ -53,13 +53,13 @@ jobs:
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-        
+
     - name: Check tag version
       run: poetry run invoke check-tag-version
-      
+
     - name: Build with poetry
       run: poetry build
-      
+
     - name: Upload to PyPI
       run: |
         poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_LOG }}

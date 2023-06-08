@@ -83,7 +83,7 @@ jobs:
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-      
+
     - name: Print robocorp-log info and build the output view.
       run: |
         poetry run python -m invoke build-output-view-react
