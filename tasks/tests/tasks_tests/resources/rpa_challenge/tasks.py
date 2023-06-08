@@ -35,4 +35,4 @@ def solve_challenge():
         fill_and_submit_form(page, person)
 
     element = page.query_selector("css=div.congratulations")
-    screenshot(element)
+    browser.screenshot(element)
