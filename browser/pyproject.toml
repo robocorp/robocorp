@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-browser"
-version = "0.4.4"
+version = "0.5.0"
 description = "Robocorp browser automation library"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
