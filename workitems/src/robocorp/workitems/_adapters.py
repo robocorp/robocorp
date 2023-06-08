@@ -348,7 +348,7 @@ class FileAdapter(BaseAdapter):
             )
             if not path:
                 raise RuntimeError(
-                    "No input path defined, "
+                    "No output path defined, "
                     + "set environment variable 'RC_WORKITEM_OUTPUT_PATH'"
                 )
 

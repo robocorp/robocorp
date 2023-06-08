@@ -27,7 +27,7 @@ class ApplicationException(_BaseException):
     """
 
 
-def to_exception_args(exc_type: Type[BaseException]) -> ExceptionType:
+def to_exception_type(exc_type: Type[BaseException]) -> ExceptionType:
     if exc_type is BusinessException:
         return ExceptionType.BUSINESS
     elif exc_type is ApplicationException:

@@ -41,11 +41,15 @@ class Input:
         if self.released:
             return False
 
-        if exc_type is not None:
-            exception_type = to_exception_type(exc_type)
-            self.fail(exception_type=exception_type, message=str(exc_value))
-        else:
+        if exc_type is None:
             self.done()
+            return False
+
+        exception_type = to_exception_type(exc_type)
+        code = getattr(exc_value, "code", None)
+        message = getattr(exc_value, "message", str(exc_value))
+
+        self.fail(exception_type=exception_type, code=code, message=message)
 
         # Do not propagate library-specific exceptions
         return exc_type in (ApplicationException, BusinessException)

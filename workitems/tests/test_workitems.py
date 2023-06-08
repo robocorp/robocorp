@@ -283,3 +283,26 @@ def test_inputs_throw_business_exception(inputs):
     assert exception["code"] == "SOME_CODE"
     assert exception["message"] == "My message"
 
+
+def test_inputs_throw_unknown_exception(inputs):
+    inputs.current.done()
+
+    with pytest.raises(ValueError):
+        with inputs.reserve():
+            raise ValueError("Some value")
+
+    _, state, exception = inputs.current._adapter.releases[-1]
+    assert state is State.FAILED
+    assert exception["type"] == "APPLICATION"
+    assert exception["code"] is None
+    assert exception["message"] == "Some value"
+
+
+def test_iter_after_release(inputs):
+    first = inputs.current
+    first.done()
+
+    rest = list(inputs)
+    assert len(rest) == 2
+    assert len(inputs.released) == 3
+    assert rest[0] != first

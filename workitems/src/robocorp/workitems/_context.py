@@ -15,7 +15,7 @@ class Context:
 
         # Check RPA_WORKITEMS_ADAPTER for backwards compatibility
         adapter = (
-            os.getenv("RC_WORKITEMS_ADAPTER")
+            os.getenv("RC_WORKITEM_ADAPTER")
             or os.getenv("RPA_WORKITEMS_ADAPTER")
             or default_adapter
         )

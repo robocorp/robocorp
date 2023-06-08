@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Optional, Union
 
 from dataclasses_json import LetterCase, config, dataclass_json
+from dateutil.parser import isoparse
 from marshmallow import fields
 
 JSONType = Union[dict[str, Any], list[Any], str, int, float, bool, None]
@@ -36,6 +37,7 @@ class Address:
 @dataclass
 class Email:
     """Container for Email attached to work item."""
+
     # Unable to use "from" as attribute as it is a reserved word
     from_: Address = field(metadata=config(field_name="from"))
     to: list[Address]
@@ -48,7 +50,7 @@ class Email:
         metadata={
             "dataclasses_json": {
                 "encoder": datetime.isoformat,
-                "decoder": datetime.fromisoformat,
+                "decoder": isoparse,
                 "mm_field": fields.DateTime(format="iso"),
             }
         }
