@@ -44,16 +44,15 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
-    - name: Install poetry/invoke
-      run: |
-        pipx install poetry
-        pipx install invoke
+    - name: Install poetry
+      run: pipx install poetry
 
     - name: Install dependencies
-      run: invoke install
+      run: poetry install
     - name: Run Lint
-      run: invoke lint
+      run: poetry run invoke lint
     - name: Run Typecheck
-      run: invoke typecheck
+      run: poetry run invoke typecheck
     - name: Run Unittests
-      run: invoke test
+      run: poetry run invoke test
+
