@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 import copy
 import csv
 import logging

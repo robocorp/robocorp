@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 from typing import Literal, Optional
 
 from robocorp.excel._types import PathType
