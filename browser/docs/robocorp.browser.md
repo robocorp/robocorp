@@ -1,16 +1,19 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.browser`
 
 
 
 
+**Global Variables**
+---------------
+- **version_info**
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L6"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L18"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `configure`
 
@@ -25,7 +28,7 @@ Calling this method is optional (if not called a default configuration will be u
 
 
 **Args:**
-  browser_engine:  help="Browser engine which should be used",  choices=["chrome", "firefox"], 
+  browser_engine:  help="Browser engine which should be used",  choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"] 
 
 
  - <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True  the browser UI will be kept hidden. If unset or set to None it'll  show the browser UI only if a debugger is detected. 
@@ -37,7 +40,7 @@ screenshot:  default="only-on-failure",  choices=["on", "off", "only-on-failure"
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L41"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L53"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `page`
 
@@ -61,7 +64,7 @@ Provides a managed instance of the browser page to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L61"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `browser`
 
@@ -85,7 +88,7 @@ Provides a managed instance of the browser to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L94"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `playwright`
 
@@ -109,7 +112,7 @@ Provides a managed instance of playwright to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L103"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L115"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `context`
 
@@ -133,53 +136,12 @@ Provides a managed instance of the browser context to interact with.
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L124"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L136"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
-## <kbd>function</kbd> `open_browser`
-
-```python
-open_browser(
-    browser_engine: Literal['firefox', 'chrome'] = 'chrome',
-    headless: Optional[bool] = None
-) → Browser
-```
-
-Shortcut to configure and launch a browser instance (using Playwright). 
-
-Note that if the browser was already previously launched the previous instance will be returned and any configuration passed will be ignored. 
-
-
-
-**Args:**
- 
- - <b>`browser_engine`</b>:  Specifies which browser to use. Supported browsers are:  ``chrome`` and ``firefox``. 
-
-
- - <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True  the browser UI will be kept hidden. If unset or set to None it'll  show the browser UI only if a debugger is detected. 
-
-
-
-**Note:**
-
-> The arguments related to browser initialization will only be used if this is the first call, on subsequent calls the same browser instance will be used and the current page will open the given url. 
->
-
-**Returns:**
- The browser instance. 
-
-
----
-
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L153"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-## <kbd>function</kbd> `open_url`
+## <kbd>function</kbd> `goto`
 
 ```python
-open_url(
-    url: str,
-    browser_engine: Literal['firefox', 'chrome'] = 'chrome',
-    headless: Optional[bool] = None
-) → Page
+goto(url: str) → Page
 ```
 
 Changes the url of the current page (creating a page if needed). 
@@ -191,17 +153,6 @@ Changes the url of the current page (creating a page if needed).
  - <b>`url`</b>:  Navigates to the provided URL. 
 
 
- - <b>`browser`</b>:  Specifies which browser to use. Supported browsers are:  ``chrome`` and ``firefox``. 
-
-
- - <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True  the browser UI will be kept hidden. If unset or set to None it'll  show the browser UI only if a debugger is detected. 
-
-
-
-**Note:**
-
-> The arguments related to browser initialization will only be used if this is the first call, on subsequent calls the same browser instance will be used and the current page will open the given url. 
->
 
 **Returns:**
  The page instance managed by the robocorp.tasks framework (it will be automatically closed when the task finishes). 
@@ -209,33 +160,53 @@ Changes the url of the current page (creating a page if needed).
 
 ---
 
-<a href="..\..\browser\src\robocorp\browser\__init__.py#L186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../browser/src/robocorp/browser/__init__.py#L152"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `screenshot`
 
 ```python
 screenshot(
-    page: Optional[Page] = None,
+    element: Optional[Page, ElementHandle, Locator] = None,
     timeout: int = 5000,
     image_type: Literal['png', 'jpeg'] = 'png',
     log_level: Literal['INFO', 'WARN', 'ERROR'] = 'INFO'
 ) → bytes
 ```
 
-Takes a screenshot of the given page and saves it to the log. If no page is provided the current page is saved. 
+Takes a screenshot of the given page/element/locator and saves it to the log. If no element is provided the screenshot will target the current page. 
 
-Note: the page.screenshot can be used if the screenshot is not expected to be added to the log. 
+Note: the element.screenshot can be used if the screenshot is not expected to be added to the log. 
 
 
 
 **Args:**
  
- - <b>`page`</b>:  The page which should have its screenshot taken. If not given the managed page instance will be used. 
+ - <b>`element`</b>:  The page/element/locator which should have its screenshot taken. If not given the managed page instance will be used. 
 
 
 
 **Returns:**
  The bytes from the screenshot. 
+
+
+---
+
+<a href="../../browser/src/robocorp/browser/__init__.py#L194"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+
+## <kbd>function</kbd> `install`
+
+```python
+install(browser_engine: BrowserEngine)
+```
+
+Downloads and installs the given browser engine. 
+
+Note: Google Chrome or Microsoft Edge installations will be installed at the default global location of your operating system overriding your current browser installation. 
+
+
+
+**Args:**
+  browser_engine:  help="Browser engine which should be installed",  choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"] 
 
 
 

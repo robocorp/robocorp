@@ -42,13 +42,12 @@ jobs:
 
     - name: Install poetry
       run: pipx install poetry
-        
+
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python }}
         cache: 'poetry'
-
     - name: Setup node 16.x
       uses: actions/setup-node@v3
       with:
@@ -56,16 +55,17 @@ jobs:
         registry-url: "https://npm.pkg.github.com"
         scope: "@robocorp"
 
+    - name: Install invoke/tomlkit
+      run: pip install invoke tomlkit
     - name: Install project
       run: poetry install
+    - name: Install dependencies (in dev mode)
+      run: python -m invoke devinstall
 
-    - name: Install dependencies (in dev mode).
-      run: poetry run invoke devinstall
-      
     - name: Run Lint
-      run: poetry run invoke lint
+      run: invoke lint
     - name: Run Typecheck
-      run: poetry run invoke typecheck
+      run: invoke typecheck
 
     # Because we've installed the logging in dev mode we need to build the view too
     - name: npm ci
@@ -76,10 +76,10 @@ jobs:
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
     - name: Build the output view
       working-directory: ./log
-      run: poetry run invoke build-output-view-react
+      run: python -m invoke build-output-view-react
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
     - name: Run Unittests
-      run: poetry run invoke test
+      run: invoke test

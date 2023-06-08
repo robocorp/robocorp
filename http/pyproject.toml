@@ -17,6 +17,7 @@ requests = "^2.28.2"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
+types-requests = "^2.31.0.1"
 
 [build-system]
 requires = ["poetry-core"]

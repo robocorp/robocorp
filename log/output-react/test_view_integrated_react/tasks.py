@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from robocorp.browser import open_url, page
+from robocorp import browser
 from robocorp.tasks import task
 
 
@@ -14,7 +14,9 @@ def open_output_view_for_tests():
             f'File "{filepath}" does not exist (distribution does not seem to be built with "npm run build:tests").'
         )
 
-    page = open_url(filepath.as_uri(), headless="pydevd" not in sys.modules)
+    browser.configure(headless="pydevd" not in sys.modules)
+    page = browser.goto(filepath.as_uri())
+
     return page
 
 
@@ -114,10 +116,10 @@ def collect_full_tree_contents(parent_id="", has_filter=False):
             entry_id = f"{parent_id}-{i}"
         else:
             entry_id = f"#root{i}"
-        element = page().query_selector(f"{entry_id} > .entryName")
+        element = browser.page().query_selector(f"{entry_id} > .entryName")
 
         if element is None:
-            element = page().query_selector(f"{entry_id} > .entryValue")
+            element = browser.page().query_selector(f"{entry_id} > .entryValue")
 
         if element is not None:
             text = element.text_content()
@@ -130,7 +132,7 @@ def collect_full_tree_contents(parent_id="", has_filter=False):
                 continue
             return found
 
-        expand = page().query_selector(f"{entry_id} > .toggleExpand")
+        expand = browser.page().query_selector(f"{entry_id} > .toggleExpand")
         if expand:
             expand.click()
             found.update(collect_full_tree_contents(entry_id, has_filter))

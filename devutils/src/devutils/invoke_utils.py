@@ -156,7 +156,7 @@ def build_common_tasks(root: Path, package_name: str):
             "--show-column-numbers",
             "--namespace-packages",
             "--explicit-package-bases",
-            "-p src",
+            f"-p {package_name}",
         )
 
     @task
