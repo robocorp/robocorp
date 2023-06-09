@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "tasks/**"
+      - "log/**"
       - ".github/workflows/tasks_lint.yml"
   pull_request:
     branches:

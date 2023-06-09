@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "http/**"
       - ".github/workflows/http_tests.yml"

@@ -1,3 +1,11 @@
+0.3.1
+-----------------------------
+
+- `for` loops shown in log.
+- Stack visualization improved.
+- Run properly marked as failed when it fails.
+- Write in chunks to stdout when `RC_LOG_OUTPUT_STDOUT` is specified.
+
 0.3.0
 -----------------------------
 

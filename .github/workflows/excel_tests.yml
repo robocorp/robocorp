@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "excel/**"
       - ".github/workflows/excel_tests.yml"

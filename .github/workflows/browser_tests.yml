@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "browser/**"
+      - "tasks/**"
+      - "log/**"
       - ".github/workflows/browser_tests.yml"
   pull_request:
     branches:

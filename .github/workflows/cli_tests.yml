@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - "master"
+      - "wip"
     paths:
       - "cli/**"
+      - "tasks/**"
+      - "log/**"
       - ".github/workflows/cli_tests.yml"
   pull_request:
     branches:
