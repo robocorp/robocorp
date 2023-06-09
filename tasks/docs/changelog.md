@@ -1,3 +1,8 @@
+NEXT
+-----------------------------
+
+- When collecting tasks properly flush `sys.stdout` prior to exiting process.
+
 0.4.1
 -----------------------------
 

@@ -57,6 +57,7 @@ def list_tasks(
             )
 
         original_stdout.write(json.dumps(tasks_found))
+        original_stdout.flush()
     return 0
 
 
