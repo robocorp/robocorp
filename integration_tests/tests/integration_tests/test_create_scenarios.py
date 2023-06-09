@@ -8,10 +8,9 @@ def case_task_and_element(rcc_loc, resources_dir: Path) -> str:
     from imp import reload
     from io import StringIO
 
+    from robocorp import log
     from robocorp.log import setup_auto_logging
     from tasks_tests.resources import check
-
-    from robocorp import log
 
     s = StringIO()
 

@@ -734,8 +734,13 @@ def verify_log_messages_from_decoded_str(
     """
     log_messages: List[dict] = []
     for log_msg in s.splitlines():
-        log_msg_dict: dict = json.loads(log_msg.strip())
-        log_messages.append(log_msg_dict)
+        stripped = log_msg.strip()
+        if stripped:
+            try:
+                log_msg_dict: dict = json.loads(stripped)
+            except Exception:
+                raise RuntimeError(f"Error json-loading: >>{stripped}<<")
+            log_messages.append(log_msg_dict)
 
     return verify_log_messages_from_messages_iterator(
         iter(log_messages), expected, not_expected

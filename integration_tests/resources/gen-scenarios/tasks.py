@@ -3,10 +3,9 @@ from contextlib import contextmanager
 from pathlib import Path
 from time import sleep
 
-from somelibrary import call_generators_in_library
-
 from robocorp import log
 from robocorp.tasks import task
+from somelibrary import call_generators_in_library
 
 
 def call_method(msg):

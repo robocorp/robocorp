@@ -32,7 +32,10 @@ def _run_in_rcc(
 
     if completed_process.returncode != 0:
         raise AssertionError(
-            f"Expected command to be run successfully. Result: {completed_process.returncode}.\n{completed_process}\nStdout:\n{completed_process.stdout.decode('utf-8')}\n"
+            "Expected command to be run successfully. "
+            f"Result: {completed_process.returncode}.\n"
+            f"{completed_process}\nStdout:\n"
+            f"{completed_process.stdout.decode('utf-8')}\n"
         )
     return completed_process
 
@@ -49,7 +52,6 @@ case_names = [
 @pytest.mark.parametrize("case_name", case_names)
 def test_react_integrated(
     rcc_loc: str,
-    path_for_output_view_react_tests_robo: Path,
     run_integration_tests_flag,
     case_name,
 ):
@@ -63,13 +65,15 @@ def test_react_integrated(
     """
 
     if not run_integration_tests_flag:
-        pytest.skip(f"Disabled (not running integration tests).")
+        pytest.skip("Disabled (not running integration tests).")
 
-    tasks_py = path_for_output_view_react_tests_robo / "tasks.py"
+    path_with_tasks = Path(__file__).parent / "test_view_integrated_react"
+
+    tasks_py = path_with_tasks / "tasks.py"
     assert tasks_py.exists()
     completed_process = _run_in_rcc(
         rcc_loc,
-        path_for_output_view_react_tests_robo,
+        path_with_tasks,
         case_name,
     )
     stdout = completed_process.stdout.decode("utf-8")

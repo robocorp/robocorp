@@ -23,6 +23,6 @@ PATH:
 PYTHONPATH:
   - .
   # We want the 'robocorp.tasks' and 'robocorp.log' to be there too.
-  - ../../../tasks/src
-  - ../../../log/src
-  - ../../../browser/src
+  - ../../../../tasks/src
+  - ../../../../log/src
+  - ../../../../browser/src

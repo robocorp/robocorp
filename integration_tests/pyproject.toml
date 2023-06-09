@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "integration_tests"
+version = "0.0.1"
+description = "Robocorp integration tests"
+authors = [
+	"Fabio Z. <fabio@robocorp.com>",
+]
+readme = "README.md"
+packages = [
+    {include = "integration_tests", from="tests"},
+    
+    {include = "robocorp/log", from = "../log/src"},
+    {include = "robocorp_log_tests", from = "../log/tests"},
+    
+    {include = "robocorp/tasks", from = "../tasks/src"},
+    {include = "tasks_tests", from = "../tasks/tests"},
+    
+    {include = "robocorp/browser", from = "../browser/src"},
+    {include = "browser_tests", from = "../browser/tests"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+playwright = "^1.32.1"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+mypy_path = "tests"

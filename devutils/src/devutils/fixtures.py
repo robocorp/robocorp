@@ -26,8 +26,12 @@ def ci_credentials() -> str:
 
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
-    dirname = tmpdir_factory.mktemp("rcc_dir")
-    location = os.path.join(str(dirname), "rcc")
+    tests_rcc_dir = os.path.expanduser("~/.robocorp_tests_rcc")
+    os.makedirs(tests_rcc_dir, exist_ok=True)
+
+    # tests_rcc_dir = tmpdir_factory.mktemp("rcc_dir")
+
+    location = os.path.join(str(tests_rcc_dir), f"rcc_{RCC_VERSION}")
     if sys.platform == "win32":
         location += ".exe"
     _download_rcc(location, force=False)
@@ -79,6 +83,9 @@ def robocorp_home(tmpdir_factory) -> str:
     return str(dirname)
 
 
+RCC_VERSION = "v14.6.0"
+
+
 def _download_rcc(location: str, force: bool = False) -> None:
     """
     Downloads rcc to the given location. Note that we don't overwrite it if it
@@ -113,7 +120,6 @@ def _download_rcc(location: str, force: bool = False) -> None:
                 else:
                     relative_path = "/linux32/rcc"
 
-            RCC_VERSION = "v14.6.0"
             prefix = f"https://downloads.robocorp.com/rcc/releases/{RCC_VERSION}"
             url = prefix + relative_path
 

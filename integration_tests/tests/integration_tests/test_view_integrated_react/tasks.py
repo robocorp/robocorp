@@ -6,12 +6,17 @@ from typing import Sequence
 from robocorp import browser
 from robocorp.tasks import task
 
+repo_root = Path(__file__).absolute().parent.parent.parent.parent.parent
+
 
 def open_output_view_for_tests():
-    filepath = Path(__file__).absolute().parent.parent / "dist-test_v3" / "index.html"
+    log_root = repo_root / "log"
+    assert log_root.exists(), f"{log_root} does not exist."
+    filepath = log_root / "output-react" / "dist-test_v3" / "index.html"
     if not filepath.exists():
         raise AssertionError(
-            f'File "{filepath}" does not exist (distribution does not seem to be built with "npm run build:tests").'
+            f'File "{filepath}" does not exist (distribution does not seem '
+            'to be built with "npm run build:tests").'
         )
 
     browser.configure(headless="pydevd" not in sys.modules)
@@ -53,7 +58,8 @@ def compare_strlist(lines_obtained, lines_expected):
             )
         obtained = "\n".join(lines_obtained)
         raise AssertionError(
-            f"Strings don't match. Obtained:\n\n{obtained}\n\nComparison:\n{stream.getvalue()}"
+            "Strings don't match. Obtained:\n\n"
+            f"{obtained}\n\nComparison:\n{stream.getvalue()}"
         )
 
 
@@ -64,10 +70,10 @@ def check_labels(page, expected_labels: Sequence[str]):
 
 def setup_scenario(page, case_name: str) -> None:
     case_path: Path = (
-        Path(__file__).absolute().parent.parent.parent.parent
-        / "tasks"
+        repo_root
+        / "integration_tests"
         / "tests"
-        / "tasks_tests"
+        / "integration_tests"
         / "test_create_scenarios"
         / (case_name + ".txt")
     )

@@ -143,7 +143,7 @@ class ConfigForTest(BaseConfig):
 
 
 @pytest.fixture(scope="session")
-def resources_dir(tmpdir_factory):
+def resources_dir():
     f = __file__
     resources_dir = os.path.join(os.path.dirname(f), "_resources")
     assert os.path.exists(resources_dir)
