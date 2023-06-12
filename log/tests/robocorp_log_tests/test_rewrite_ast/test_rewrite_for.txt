@@ -1,8 +1,7 @@
 import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
 
 def foo():
-    try:
-        @robo_lifecycle_hooks.before_method('METHOD', __name__, __file__, 'foo', 3, {})
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 3, {})) as @ctx:
         try:
             @robo_lifecycle_hooks.before_iterate('FOR', __name__, __file__, 'for a in [1, 2]', 3)
             for a in [1, 2]:
@@ -21,9 +20,3 @@ def foo():
             raise
         finally:
             @robo_lifecycle_hooks.after_iterate('FOR', __name__, __file__, 'for a in [1, 2]', 3)
-    except:
-        import sys as @py_sys
-        @robo_lifecycle_hooks.method_except('METHOD', __name__, __file__, 'foo', 3, @py_sys.exc_info())
-        raise
-    finally:
-        @robo_lifecycle_hooks.after_method('METHOD', __name__, __file__, 'foo', 3)

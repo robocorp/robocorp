@@ -1,8 +1,8 @@
 # --- Private API
 import threading
 import typing
-from typing import Dict, Iterator
 from contextlib import contextmanager
+from typing import Dict, Iterator
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger

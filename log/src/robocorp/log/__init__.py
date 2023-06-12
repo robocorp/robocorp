@@ -3,6 +3,7 @@ import functools
 import json
 import sys
 import threading
+import traceback
 import typing
 import weakref
 from contextlib import contextmanager, nullcontext
@@ -28,7 +29,6 @@ from typing import (
 from ._logger_instances import _get_logger_instances
 from ._suppress_helper import SuppressHelper as _SuppressHelper
 from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
-import traceback
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
@@ -818,7 +818,9 @@ def verify_log_messages_from_stream(
 # --- APIs to setup the logging
 
 
-def setup_auto_logging(config: Optional[BaseConfig] = None):
+def setup_auto_logging(
+    config: Optional[BaseConfig] = None, add_rewrite_hook: bool = True
+):
     """
     Sets up automatic logging.
 
@@ -846,7 +848,7 @@ def setup_auto_logging(config: Optional[BaseConfig] = None):
     else:
         use_config = config
 
-    return register_auto_logging_callbacks(use_config)
+    return register_auto_logging_callbacks(use_config, add_rewrite_hook)
 
 
 def add_log_output(
@@ -952,8 +954,8 @@ _files_filtering = FilesFiltering()
 _in_project_roots = _files_filtering.in_project_roots
 
 
-def _caller_in_project_roots() -> bool:
+def _caller_in_project_roots(level=2) -> bool:
     try:
-        return _in_project_roots(sys._getframe(2).f_code.co_filename)
+        return _in_project_roots(sys._getframe(level).f_code.co_filename)
     except ValueError:  # call stack is not deep enough
         return False

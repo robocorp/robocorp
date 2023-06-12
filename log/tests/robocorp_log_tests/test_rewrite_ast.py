@@ -161,11 +161,7 @@ def method():
     if hasattr(ast, "unparse"):  # 3.9 onwards
         unparsed = ast.unparse(mod)
         str_regression.check(unparsed)
-        assert "@caller_in_proj and @robo_lifecycle_hooks.before_method" in unparsed
-        assert "@caller_in_proj and @robo_lifecycle_hooks.after_method" in unparsed
-        assert "if @caller_in_proj:" in unparsed
-        assert "@robo_lifecycle_hooks.method_except" in unparsed
-        assert "after_assign" not in unparsed
+        assert "MethodLifecycleContextCallerInProject" in unparsed
 
 
 @pytest.mark.parametrize("rewrite_assigns", [True, False])
@@ -193,8 +189,7 @@ def method():
     if hasattr(ast, "unparse"):  # 3.9 onwards
         unparsed = ast.unparse(mod)
         str_regression.check(unparsed)
-        assert "@caller_in_proj" not in unparsed
-        assert "before_method" in unparsed
+        assert "MethodLifecycleContext(('METHOD'" in unparsed
         if not rewrite_assigns:
             assert "after_assign" not in unparsed
         else:
@@ -248,9 +243,7 @@ def method():
     if hasattr(ast, "unparse"):  # 3.9 onwards
         unparsed = ast.unparse(mod)
         str_regression.check(unparsed)
-        assert unparsed.count("before_method('GENERATOR'") == 1
-        assert unparsed.count("after_method('GENERATOR'") == 1
-        assert unparsed.count("method_except('GENERATOR'") == 1
+        assert unparsed.count("MethodLifecycleContext(('GENERATOR'") == 1
         assert unparsed.count("before_yield_from") == 2
         assert unparsed.count("after_yield_from") == 2
         assert unparsed.count("after_assign") == 1
@@ -283,9 +276,12 @@ def method():
     if hasattr(ast, "unparse"):  # 3.9 onwards
         unparsed = ast.unparse(mod)
         str_regression.check(unparsed)
-        assert unparsed.count("before_method('UNTRACKED_GENERATOR'") == 1
-        assert unparsed.count("method_except('UNTRACKED_GENERATOR'") == 1
-        assert unparsed.count("after_method('UNTRACKED_GENERATOR'") == 1
+        assert (
+            unparsed.count(
+                "MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR'"
+            )
+            == 1
+        )
 
 
 def test_handle_yield_from_on_log_project_call(tmpdir, str_regression):
@@ -315,9 +311,12 @@ def method():
     if hasattr(ast, "unparse"):  # 3.9 onwards
         unparsed = ast.unparse(mod)
         str_regression.check(unparsed)
-        assert unparsed.count("before_method('UNTRACKED_GENERATOR'") == 1
-        assert unparsed.count("method_except('UNTRACKED_GENERATOR'") == 1
-        assert unparsed.count("after_method('UNTRACKED_GENERATOR'") == 1
+        assert (
+            unparsed.count(
+                "MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR'"
+            )
+            == 1
+        )
 
 
 def test_rewrite_yield_multiple(tmpdir, str_regression):
@@ -376,10 +375,10 @@ def foo():
 def test_rewrite_for(tmpdir, str_regression):
     from robocorp.log._config import FilterKind
     from robocorp.log._lifecycle_hooks import (
-        before_iterate,
-        before_iterate_step,
         after_iterate,
         after_iterate_step,
+        before_iterate,
+        before_iterate_step,
     )
     from robocorp.log._rewrite_importhook import _rewrite
 

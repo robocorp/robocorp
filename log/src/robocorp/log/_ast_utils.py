@@ -420,11 +420,19 @@ class NodeFactory:
         try_node = ast.Try(handlers=[], orelse=[])
         return self._set_line_col(try_node)
 
+    def WithStmt(self, **kwargs) -> ast.With:
+        with_node = ast.With(**kwargs)
+        return self._set_line_col(with_node)
+
+    def withitem(self, **kwargs) -> ast.With:
+        with_node = ast.withitem(**kwargs)
+        return self._set_line_col(with_node)
+
     def TryFinally(
         self,
-        body: list[ast.stmt],
-        final_body: list[ast.stmt],
-        handlers: Optional[list[ast.ExceptHandler]] = None,
+        body: List[ast.stmt],
+        final_body: List[ast.stmt],
+        handlers: Optional[List[ast.ExceptHandler]] = None,
     ) -> ast.Try:
         try_node = ast.Try(handlers=handlers or [], orelse=[])
         try_node.body = body

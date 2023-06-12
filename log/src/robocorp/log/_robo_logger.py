@@ -1,12 +1,12 @@
 import datetime
 import functools
 import sys
+import threading
+import traceback
 from pathlib import Path
 from typing import Any, Optional, Sequence, Tuple, Union
 
 from .protocols import LogElementType, LogHTMLStyle, OptExcInfo
-import traceback
-import threading
 
 
 class _LogErrorLock:

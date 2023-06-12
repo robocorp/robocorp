@@ -6,8 +6,9 @@ def test_log_and_threads(tmpdir):
 
     from robocorp_log_tests._resources import check
     from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
-    from robocorp.log import verify_log_messages_from_log_html
+
     from robocorp import log
+    from robocorp.log import verify_log_messages_from_log_html
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:

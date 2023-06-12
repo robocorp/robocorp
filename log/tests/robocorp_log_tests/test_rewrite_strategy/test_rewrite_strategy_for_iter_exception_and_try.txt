@@ -1,0 +1,9 @@
+
+SE: METHOD: user_method
+    SE: FOR: for a in range(2)
+        SE: FOR_STEP: for a in range(2)
+            EA: int: a: 0
+            STB: RuntimeError: err
+        EE: FOR_STEP: ERROR
+    EE: FOR: ERROR
+EE: METHOD: PASS

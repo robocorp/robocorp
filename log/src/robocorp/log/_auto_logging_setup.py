@@ -1,6 +1,6 @@
 import sys
 import threading
-from typing import Any, List, Optional, Tuple, Sequence
+from typing import Any, List, Optional, Sequence, Tuple
 
 from robocorp.log import critical, is_sensitive_variable_name
 
@@ -56,26 +56,28 @@ class _AutoLogging:
         self._rewrite_hook_config = rewrite_hook_config
         self._hook: Optional[RewriteHook] = None
 
-    def register(self) -> None:
+    def register(self, add_rewrite_hook: bool = True) -> None:
         from robocorp.log import _lifecycle_hooks
-
-        from ._rewrite_importhook import RewriteHook
 
         for name, callback in _lifecycle_hooks.iter_all_name_and_callback():
             callback.register(getattr(self, f"call_{name}"))
 
-        self._hook = hook = RewriteHook(self._rewrite_hook_config)
-        sys.meta_path.insert(0, hook)
+        if add_rewrite_hook:
+            from ._rewrite_importhook import RewriteHook
 
-    def unregister(self) -> None:
+            self._hook = hook = RewriteHook(self._rewrite_hook_config)
+            sys.meta_path.insert(0, hook)
+
+    def unregister(self, add_rewrite_hook: bool = True) -> None:
         from robocorp.log import _lifecycle_hooks
 
         for name, callback in _lifecycle_hooks.iter_all_name_and_callback():
             callback.unregister(getattr(self, f"call_{name}"))
 
-        assert self._hook
-        sys.meta_path.remove(self._hook)
-        self._hook = None
+        if add_rewrite_hook:
+            assert self._hook
+            sys.meta_path.remove(self._hook)
+            self._hook = None
 
     def _call_before_element(
         self,
@@ -339,6 +341,23 @@ class _AutoLogging:
 
         self.status_stack[-1].status = Status.ERROR
 
+        # We just want to report it once. On other cases it should just be
+        # marked as failed.
+        # We should probably have a concept of a "reference" to note that another
+        # context exited to an exception already reported.
+        tp, e, tb = exc_info
+        if e is None or tb is None or tp is None:
+            return
+
+        try:
+            if e.__robocorp_log_reported__:  # type: ignore
+                return
+        except Exception:
+            try:
+                e.__robocorp_log_reported__ = True  # type: ignore
+            except Exception:
+                pass
+
         with _get_logger_instances() as logger_instances:
             for robo_logger in logger_instances:
                 robo_logger.log_method_except(exc_info, unhandled=False)
@@ -347,7 +366,9 @@ class _AutoLogging:
     call_iterate_step_except = call_method_except
 
 
-def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
+def register_auto_logging_callbacks(
+    rewrite_hook_config: BaseConfig, add_rewrite_hook: bool = True
+):
     # Make sure that this method should be called only once.
     registered = getattr(register_auto_logging_callbacks, "registered", False)
     if registered:
@@ -358,14 +379,14 @@ def register_auto_logging_callbacks(rewrite_hook_config: BaseConfig):
     register_auto_logging_callbacks.registered = True  # type: ignore
 
     auto_logging = _AutoLogging(rewrite_hook_config)
-    auto_logging.register()
+    auto_logging.register(add_rewrite_hook=add_rewrite_hook)
 
     def _exit():
         # If the user actually used the with ... statement we'll remove things now.
         # Note: this is meant only for testing as it has caveats (mainly, modules
         # already loaded won't be rewritten and will have the hooks based on
         # the config which was set when it was loaded).
-        auto_logging.unregister()
+        auto_logging.unregister(add_rewrite_hook=add_rewrite_hook)
         register_auto_logging_callbacks.registered = False
 
     return OnExitContextManager(_exit)

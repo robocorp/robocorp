@@ -4,6 +4,7 @@ import json
 import os
 import string
 import sys
+import threading
 import time
 import traceback
 import weakref
@@ -11,6 +12,7 @@ from contextlib import contextmanager
 from datetime import timezone
 from functools import partial
 from pathlib import Path
+from types import FrameType
 from typing import (
     Any,
     Callable,
@@ -25,8 +27,6 @@ from typing import (
 )
 
 from .protocols import LogElementType, OptExcInfo
-import threading
-from types import FrameType
 
 WRITE_CONTENTS_TO_STDERR: bool = False
 
@@ -616,9 +616,7 @@ class _RoboOutputImpl:
         try:
             try:
                 import psutil
-                from psutil import ZombieProcess
-                from psutil import NoSuchProcess
-                from psutil import AccessDenied
+                from psutil import AccessDenied, NoSuchProcess, ZombieProcess
             except ImportError:
                 pass
             else:
@@ -788,6 +786,7 @@ Virtual Memory Size: {vms}"""
 
         # Write the stack now.
         import linecache
+
         from ._obj_info_repr import get_obj_type_and_repr
 
         oid = self._obtain_id

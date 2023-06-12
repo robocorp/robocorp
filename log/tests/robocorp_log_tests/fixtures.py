@@ -9,7 +9,7 @@ from typing import List, Optional
 import pytest
 
 from robocorp.log import BaseConfig, FilterKind
-from robocorp.log.protocols import LogHTMLStyle
+from robocorp.log.protocols import IReadLines, LogHTMLStyle
 
 
 class _SetupInfo:
@@ -242,3 +242,38 @@ def _build_and_copy_robo(location: str, force: bool = False) -> None:
         assert robo_at.exists()
         Path(location).write_bytes(robo_at.read_bytes())
         os.chmod(location, 0x755)
+
+
+_format_msg: dict = {}
+_format_msg["SE"] = lambda msg: f"SE: {msg['type']}: {msg['name']}"
+_format_msg["EE"] = lambda msg: f"EE: {msg['type']}: {msg['status']}"
+_format_msg["EA"] = lambda msg: f"EA: {msg['type']}: {msg['name']}: {msg['value']}"
+_format_msg["STB"] = lambda msg: f"STB: {msg['message']}"
+
+_ignore = {"ETB", "TBV", "TBE", "I", "T", "ID", "V"}
+
+
+def pretty_format_logs_from_stream(stream: IReadLines):
+    from robocorp.log import iter_decoded_log_format_from_stream
+
+    level = 0
+    indent = ""
+    out = ["\n"]
+    for msg in iter_decoded_log_format_from_stream(stream):
+        msg_type = msg["message_type"]
+        if msg_type not in _format_msg:
+            if msg_type in _ignore:
+                continue
+            print("Check: ", msg)
+            continue
+
+        if msg_type in ("EE",):
+            level -= 1
+            indent = "    " * level
+
+        out.append(f"{indent}{_format_msg[msg_type](msg)}\n")
+
+        if msg_type in ("SE",):
+            level += 1
+            indent = "    " * level
+    return "".join(out)

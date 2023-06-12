@@ -1,8 +1,7 @@
 import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
 
 def foo():
-    try:
-        @robo_lifecycle_hooks.before_method('GENERATOR', __name__, __file__, 'foo', 3, {})
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('GENERATOR', __name__, __file__, 'foo', 3, {})) as @ctx:
 
         def @tmp_0():
             @tmp_1 = call()
@@ -22,9 +21,3 @@ def foo():
         @tmp_6 = [b, c]
         @robo_lifecycle_hooks.method_return(__name__, __file__, 'foo', 5, @tmp_6)
         return @tmp_6
-    except:
-        import sys as @py_sys
-        @robo_lifecycle_hooks.method_except('GENERATOR', __name__, __file__, 'foo', 5, @py_sys.exc_info())
-        raise
-    finally:
-        @robo_lifecycle_hooks.after_method('GENERATOR', __name__, __file__, 'foo', 5)

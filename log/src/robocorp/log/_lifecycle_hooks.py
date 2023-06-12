@@ -1,5 +1,8 @@
+import sys
+from collections import deque
 from logging import getLogger
 from typing import Iterator, Tuple
+from robocorp import log
 
 logger = getLogger(__name__)
 
@@ -40,15 +43,15 @@ class Callback(object):
             try:
                 c(*args, **kwargs)
             except:
-                logger.exception(f"Error calling: {c}.")
+                logger.exception(f"Error calling: {c} with: {args} {kwargs}.")
                 if self.raise_exceptions:
                     raise
 
 
-# Called as: before_method(__name__, filename, name, lineno, args_dict)
+# Called as: before_method(log_element_type, __name__, filename, name, lineno, args_dict)
 before_method = Callback()
 
-# Called as: after_method(__name__, filename, name, lineno)
+# Called as: after_method(log_element_type, __name__, filename, name, lineno)
 after_method = Callback()
 
 # Called as: method_return(__name__, filename, name, lineno, return_value)
@@ -73,35 +76,142 @@ before_yield_from = Callback()
 # Called as: after_yield_from(__name__, filename, name, lineno)
 after_yield_from = Callback()
 
-# Called as: before_iterate(__name__, kind, filename, name, lineno)
+# Called as: before_iterate(log_element_type, __name__, filename, name, lineno)
 before_iterate = Callback()
 
-# Called as: iterate_except(__name__, filename, name, lineno, exc_info)
+# Called as: iterate_except(log_element_type, __name__, filename, name, lineno, exc_info)
 # tp, e, tb = exc_info
 iterate_except = Callback()
 
-# Called as: before_iterate_step(__name__, kind, filename, name, lineno, targets)
+# Called as: before_iterate_step(log_element_type, __name__, filename, name, lineno, targets)
 # targets is a tuple(tuple(target_name, target_value))
 before_iterate_step = Callback()
 
-# Called as: after_iterate_step(__name__, kind, filename, name, lineno)
+# Called as: after_iterate_step(log_element_type, __name__, filename, name, lineno)
 after_iterate_step = Callback()
 
-# Called as: iterate_step_except(__name__, filename, name, lineno, exc_info)
+# Called as: iterate_step_except(log_element_type, __name__, filename, name, lineno, exc_info)
 # tp, e, tb = exc_info
 iterate_step_except = Callback()
 
-# Called as: after_iterate(__name__, kind, filename, name, lineno)
+# Called as: after_iterate(log_element_type, __name__, filename, name, lineno)
 after_iterate = Callback()
 
 
 def iter_all_callbacks() -> Iterator[Callback]:
-    for _key, val in globals().items():
+    for _key, val in tuple(globals().items()):
         if isinstance(val, Callback):
             yield val
 
 
 def iter_all_name_and_callback() -> Iterator[Tuple[str, Callback]]:
-    for key, val in globals().items():
+    for key, val in tuple(globals().items()):
         if isinstance(val, Callback):
             yield (key, val)
+
+
+_name_to_callback = {}
+for k, v in iter_all_name_and_callback():
+    _name_to_callback[k] = v
+del k
+del v
+
+
+class MethodLifecycleContext:
+    """
+    See: robocorp_log_tests.test_rewrite_strategy tests to see how the
+    code should be generated.
+    """
+
+    # Flag which subclasses can override.
+    _accept = True
+
+    def __init__(self, tup):
+        if not self._accept:
+            return
+
+        self._stack = deque()
+
+        # tup is log_element_type, mod_name, filename, name, lineno, args_dict
+        before_method(*tup)
+
+        # The after doesn't have the args_dict.
+        self._stack.append((-1, "method", tup[:-1]))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not self._accept:
+            return
+
+        while self._stack:
+            _report_id, method_name, tup = self._stack.pop()
+
+            if exc_type is not None and exc_val is not None:
+                exc_info = (exc_type, exc_val, exc_tb)
+                # Something as 'method_except' or 'iterate_except'
+                method = _name_to_callback[f"{method_name}_except"]
+                method(*tup, exc_info)
+
+            # Something as 'after_method' or 'after_iterate'
+            method = _name_to_callback[f"after_{method_name}"]
+            method(*tup)
+
+    def report_for_start(self, report_id, tup):
+        if not self._accept:
+            return
+
+        # tup is (log_element_type, __name__, filename, name, lineno)
+        before_iterate(*tup)
+        self._stack.append((report_id, "iterate", tup))
+
+    def report_for_step_start(self, report_id, tup):
+        if not self._accept:
+            return
+
+        # tup is (log_element_type, __name__, filename, name, lineno, targets)
+        before_iterate_step(*tup)
+        self._stack.append((report_id, "iterate_step", tup[:-1]))
+
+    def _report_end(self, report_id):
+        if not self._accept:
+            return
+
+        while self._stack:
+            stack_report_id, method_name, tup = self._stack.pop()
+
+            method = _name_to_callback[f"after_{method_name}"]
+            method(*tup)
+
+            if stack_report_id == report_id:
+                break
+
+    report_for_end = _report_end
+    report_for_step_end = _report_end
+
+    def report_exception(self, report_ids):
+        if not self._accept:
+            return
+
+        while self._stack:
+            stack_report_id = self._stack[-1][0]
+            if stack_report_id not in report_ids:
+                break
+            stack_report_id, method_name, tup = self._stack.pop()
+
+            exc_info = sys.exc_info()
+            # Something as 'method_except' or 'iterate_except'
+            method = _name_to_callback[f"{method_name}_except"]
+            method(*tup, exc_info)
+
+            method = _name_to_callback[f"after_{method_name}"]
+            method(*tup)
+
+
+class MethodLifecycleContextCallerInProject(MethodLifecycleContext):
+    def __init__(self, tup):
+        self._caller_in_project_roots = log._caller_in_project_roots(level=3)
+        self._accept = self._caller_in_project_roots
+
+        MethodLifecycleContext.__init__(self, tup)

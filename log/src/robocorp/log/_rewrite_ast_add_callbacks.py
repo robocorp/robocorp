@@ -137,38 +137,33 @@ def _make_after_yield_from_expr(factory, function, class_name) -> ast.Expr:
 _EMPTY_LIST: list = []
 
 
-def _create_before_method_ast(
+def _create_method_with_stmt(
     rewrite_ctx: ASTRewriter,
     factory,
     class_name,
     function,
     filter_kind,
     log_method_type: LogElementType,
-) -> list:
+    function_body: List[ast.stmt],
+) -> ast.With:
     # Target code:
     # def method(a, b):
-    #     before_method(__name, __file__, "method_name", 11, {'a': a, 'b': b})
-    stmts: list = []
-
+    #     with MethodLifecycleContextCallerInProject(__name, __file__, "method_name", 11, {'a': a, 'b': b}) as ctx:
+    #         ...
     if filter_kind == FilterKind.log_on_project_call:
-        # In this case we need to create a local variable signaling whether
-        # the caller is in the project (as if it's not we won't log the calls).
-        call = factory.Call(factory.NameLoadRobo("_caller_in_project_roots"))
+        name = "MethodLifecycleContextCallerInProject"
+    else:
+        name = "MethodLifecycleContext"
 
-        assign = factory.Assign()
-        caller_in_proj_name = factory.NameStore("@caller_in_proj")
-        assign.targets = [caller_in_proj_name]
-        assign.value = call
-        stmts.append(assign)
+    call = factory.Call(factory.NameLoadRewriteCallback(name))
 
-    call = factory.Call(factory.NameLoadRewriteCallback("before_method"))
-    call.args.append(factory.Str(log_method_type))
-    call.args.append(factory.NameLoad("__name__"))
-    call.args.append(factory.NameLoad("__file__"))
-    call.args.append(factory.Str(f"{class_name}{function.name}"))
-    call.args.append(factory.LineConstant())
-
-    rewrite_ctx.save_func_to_before_method_call(function, call)
+    tup_elts = [
+        factory.Str(log_method_type),
+        factory.NameLoad("__name__"),
+        factory.NameLoad("__file__"),
+        factory.Str(f"{class_name}{function.name}"),
+        factory.LineConstant(),
+    ]
 
     dct = factory.Dict()
     keys: list[Union[ast.expr, None]] = []
@@ -188,13 +183,19 @@ def _create_before_method_ast(
         values.append(factory.NameLoad(function.args.kwarg.arg))
     dct.keys = keys
     dct.values = values
-    call.args.append(dct)
+    tup_elts.append(dct)
+    call.args.append(factory.Tuple(*tup_elts))
 
-    if filter_kind == FilterKind.log_on_project_call:
-        stmts.append(factory.AndExpr(factory.NameLoad("@caller_in_proj"), call))
-    else:
-        stmts.append(factory.Expr(call))
-    return stmts
+    with_stmt = factory.WithStmt(
+        items=[
+            factory.withitem(
+                context_expr=call,
+                optional_vars=factory.NameStore("@ctx"),
+            )
+        ],
+        body=function_body,
+    )
+    return with_stmt
 
 
 def _create_except_handler_ast(
@@ -267,29 +268,6 @@ def _create_except_handler_ast(
     return except_handler
 
 
-def _create_after_method_ast(
-    rewrite_ctx: ASTRewriter,
-    factory: NodeFactory,
-    class_name,
-    function,
-    filter_kind,
-    log_method_type: LogElementType,
-) -> ast.Expr:
-    call = factory.Call(factory.NameLoadRewriteCallback("after_method"))
-    call.args.append(factory.Str(log_method_type))
-    call.args.append(factory.NameLoad("__name__"))
-    call.args.append(factory.NameLoad("__file__"))
-    call.args.append(factory.Str(f"{class_name}{function.name}"))
-    call.args.append(factory.LineConstant())
-
-    rewrite_ctx.save_func_to_after_method_call(function, call)
-
-    if filter_kind == FilterKind.log_on_project_call:
-        return factory.AndExpr(factory.NameLoad("@caller_in_proj"), call)
-    else:
-        return factory.Expr(call)
-
-
 def _accept_function_rewrite(function: ast.FunctionDef):
     if function.name.startswith("_") and function.name != "__init__":
         return False
@@ -351,39 +329,17 @@ def _rewrite_funcdef(
         function_body[0].lineno, function_body[0].col_offset
     )
 
-    before_method_stmts = _create_before_method_ast(
-        rewrite_ctx, factory, class_name, function, filter_kind, log_method_type
-    )
-
-    for stmt in reversed(before_method_stmts):
-        function_body.insert(0, stmt)
-
-    try_finally = factory.Try()
-    try_finally.body = function_body
-
-    factory = rewrite_ctx.NodeFactory(
-        function_body[-1].lineno, function_body[-1].col_offset
-    )
-
-    after_expr = _create_after_method_ast(
-        rewrite_ctx, factory, class_name, function, filter_kind, log_method_type
-    )
-    try_finally.finalbody = [after_expr]
-
-    except_handler = _create_except_handler_ast(
+    with_stmt = _create_method_with_stmt(
         rewrite_ctx,
         factory,
         class_name,
         function,
-        function_body[-1].lineno,
         filter_kind,
-        log_method_type=log_method_type,
+        log_method_type,
+        function_body,
     )
 
-    handlers: List[ast.ExceptHandler] = [except_handler]
-    try_finally.handlers = handlers
-
-    function.body = function_body_prefix + [try_finally]
+    function.body = function_body_prefix + [with_stmt]
 
 
 def rewrite_ast_add_callbacks(
