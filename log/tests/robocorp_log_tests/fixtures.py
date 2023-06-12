@@ -249,17 +249,34 @@ _format_msg["SE"] = lambda msg: f"SE: {msg['type']}: {msg['name']}"
 _format_msg["EE"] = lambda msg: f"EE: {msg['type']}: {msg['status']}"
 _format_msg["EA"] = lambda msg: f"EA: {msg['type']}: {msg['name']}: {msg['value']}"
 _format_msg["STB"] = lambda msg: f"STB: {msg['message']}"
+_format_msg["AS"] = lambda msg: f"AS: {msg['target']}: {msg['value']}"
+_format_msg["ST"] = lambda msg: f"ST: {msg['name']}"
+_format_msg["ET"] = lambda msg: f"ST: {msg['status']}"
+_format_msg["SR"] = lambda msg: f"ST: {msg['name']}"
+_format_msg["ER"] = lambda msg: f"ST: {msg['status']}"
 
 _ignore = {"ETB", "TBV", "TBE", "I", "T", "ID", "V"}
+
+
+def pretty_format_logs_from_log_html(log_html: Path):
+    from robocorp.log import iter_decoded_log_format_from_log_html
+
+    iter_in = iter_decoded_log_format_from_log_html(log_html)
+    return pretty_format_logs_from_iter(iter_in)
 
 
 def pretty_format_logs_from_stream(stream: IReadLines):
     from robocorp.log import iter_decoded_log_format_from_stream
 
+    iter_in = iter_decoded_log_format_from_stream(stream)
+    return pretty_format_logs_from_iter(iter_in)
+
+
+def pretty_format_logs_from_iter(iter_in):
     level = 0
     indent = ""
     out = ["\n"]
-    for msg in iter_decoded_log_format_from_stream(stream):
+    for msg in iter_in:
         msg_type = msg["message_type"]
         if msg_type not in _format_msg:
             if msg_type in _ignore:
@@ -267,13 +284,13 @@ def pretty_format_logs_from_stream(stream: IReadLines):
             print("Check: ", msg)
             continue
 
-        if msg_type in ("EE",):
+        if msg_type in ("EE", "ET", "ER"):
             level -= 1
             indent = "    " * level
 
         out.append(f"{indent}{_format_msg[msg_type](msg)}\n")
 
-        if msg_type in ("SE",):
+        if msg_type in ("SE", "ST", "SR"):
             level += 1
             indent = "    " * level
     return "".join(out)

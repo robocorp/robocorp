@@ -259,7 +259,6 @@ def _create_except_handler_ast(
     )
     call_method_except.args.append(factory.LineConstant())
     call_method_except.args.append(call_exc_info)
-    rewrite_ctx.save_func_to_except_method_call(function, call_method_except)
 
     add_to_body.extend(imports)
     add_to_body.append(factory.Expr(call_method_except))
@@ -502,6 +501,10 @@ def _handle_for(
 
     function, class_name = func_and_class_name
     if not _accept_function_rewrite(function) or rewrite_ctx.is_generator(function):
+        # On generators we can't really track things inside the function because
+        # pausing and unpausing of generators would need to recreate the whole context
+        # up to the inner statement (i.e.: it'd need to pop/push the for which we
+        # can't really do right now).
         return None
 
     try:
@@ -510,11 +513,40 @@ def _handle_for(
 
         # Wrapping of before/after for 'for' statements and each step of its body.
         factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
-        cursor = rewrite_ctx.cursor
+        stmts_cursor = rewrite_ctx.stmts_cursor
 
         iter_desc = ast.unparse(node.iter)
         target_desc = ast.unparse(node.target)
+
         name_str = factory.Str(f"for {target_desc} in {iter_desc}")
+
+        # We want to generate something as:
+        #
+        # @ctx.report_for_start(1, ("FOR", __name__, "filename", "for a in range(2)", 2))
+        # for a in b:
+        #     @ctx.report_for_step_start(2, ("FOR", __name__, "filename", "for a in range(2)", 2), [('a', a)])
+        #     print(a)
+        #     @ctx.report_for_step_end(2)
+        #
+        # @ctx.report_for_end(1)
+
+        call = factory.Call(factory.NameLoadCtx("report_for_start"))
+        for_id = rewrite_ctx.next_context_id()
+        call.args.append(factory.IntConstant(for_id))
+        call.args.append(
+            factory.Tuple(
+                factory.Str("FOR"),
+                factory.NameLoad("__name__"),
+                factory.NameLoad("__file__"),
+                name_str,
+                factory.LineConstant(),
+            )
+        )
+        stmts_cursor.before_append(factory.Expr(call))
+
+        call = factory.Call(factory.NameLoadCtx("report_for_end"))
+        call.args.append(factory.IntConstant(for_id))
+        stmts_cursor.after_append(factory.Expr(call))
 
         body = node.body
         if body:
@@ -522,41 +554,6 @@ def _handle_for(
             factory_first = rewrite_ctx.NodeFactory(
                 first_stmt.lineno, first_stmt.col_offset
             )
-
-            try_finally = factory_first.Try()
-            try_finally.body = body
-
-            last_stmt = body[-1]
-            factory_last = rewrite_ctx.NodeFactory(
-                last_stmt.lineno, last_stmt.col_offset
-            )
-            try_finally.finalbody = [
-                factory_last.Expr(
-                    _make_func_with_args(
-                        factory_last,
-                        "after_iterate_step",
-                        factory.Str("FOR_STEP"),
-                        factory_last.NameLoad("__name__"),
-                        factory_last.NameLoad("__file__"),
-                        name_str,
-                        factory_last.LineConstant(),
-                    )
-                )
-            ]
-
-            try_finally.handlers = [
-                _create_except_handler_ast(
-                    rewrite_ctx,
-                    factory,
-                    class_name,
-                    function,
-                    last_stmt.lineno,
-                    filter_kind,
-                    "FOR_STEP",
-                    name_str,
-                    "iterate_step_except",
-                )
-            ]
 
             target_load: Union[ast.Name, ast.Constant]
             targets: Union[ast.Constant, ast.Tuple]
@@ -576,64 +573,28 @@ def _handle_for(
             else:
                 targets = factory_first.Tuple(*temp_targets)
 
-            node.body = [
-                factory_first.Expr(
-                    _make_func_with_args(
-                        factory_first,
-                        "before_iterate_step",
-                        factory.Str("FOR_STEP"),
-                        factory_first.NameLoad("__name__"),
-                        factory_first.NameLoad("__file__"),
-                        name_str,
-                        factory_first.LineConstant(),
-                        targets,
-                    )
-                ),
-                try_finally,
-            ]
-
-        cursor.current = factory.TryFinally(
-            body=[
-                factory.Expr(
-                    _make_func_with_args(
-                        factory,
-                        "before_iterate",
-                        factory.Str("FOR"),
-                        factory.NameLoad("__name__"),
-                        factory.NameLoad("__file__"),
-                        name_str,
-                        factory.LineConstant(),
-                    )
-                ),
-                node,
-            ],
-            handlers=[
-                _create_except_handler_ast(
-                    rewrite_ctx,
-                    factory,
-                    class_name,
-                    function,
-                    node.body[-1].lineno,
-                    filter_kind,
-                    "FOR",
+            call = factory.Call(factory.NameLoadCtx("report_for_step_start"))
+            for_step_id = rewrite_ctx.next_context_id()
+            call.args.append(factory.IntConstant(for_step_id))
+            call.args.append(
+                factory.Tuple(
+                    factory.Str("FOR_STEP"),
+                    factory_first.NameLoad("__name__"),
+                    factory_first.NameLoad("__file__"),
                     name_str,
-                    "iterate_except",
+                    factory_first.LineConstant(),
+                    targets,
                 )
-            ],
-            final_body=[
-                factory.Expr(
-                    _make_func_with_args(
-                        factory,
-                        "after_iterate",
-                        factory.Str("FOR"),
-                        factory.NameLoad("__name__"),
-                        factory.NameLoad("__file__"),
-                        name_str,
-                        factory.LineConstant(),
-                    )
-                )
-            ],
-        )
+            )
+            body.insert(0, factory.Expr(call))
+
+            last_stmt = body[-1]
+            factory_last = rewrite_ctx.NodeFactory(
+                last_stmt.lineno, last_stmt.col_offset
+            )
+            call = factory_last.Call(factory_last.NameLoadCtx("report_for_step_end"))
+            call.args.append(factory_last.IntConstant(for_step_id))
+            body.append(factory_last.Expr(call))
 
     except Exception:
         raise RuntimeError(

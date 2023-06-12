@@ -1,0 +1,21 @@
+
+ST: Root Suite
+    ST: my_task
+        SE: METHOD: for_iter_multiple_targets
+            SE: FOR: for (i, j) in enumerate(range(2))
+                SE: FOR_STEP: for (i, j) in enumerate(range(2))
+                    EA: int: i: 0
+                    EA: int: j: 0
+                    AS: a: 0
+                    AS: b: 0
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for (i, j) in enumerate(range(2))
+                    EA: int: i: 1
+                    EA: int: j: 1
+                    AS: a: 1
+                    AS: b: 1
+                EE: FOR_STEP: PASS
+            EE: FOR: PASS
+        EE: METHOD: PASS
+    ST: PASS
+ST: PASS

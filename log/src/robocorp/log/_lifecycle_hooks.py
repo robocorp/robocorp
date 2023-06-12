@@ -2,6 +2,7 @@ import sys
 from collections import deque
 from logging import getLogger
 from typing import Iterator, Tuple
+
 from robocorp import log
 
 logger = getLogger(__name__)

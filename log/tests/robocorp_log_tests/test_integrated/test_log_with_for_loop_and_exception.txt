@@ -1,0 +1,22 @@
+
+ST: Root Suite
+    ST: my_task
+        SE: METHOD: for_iter_exc
+            SE: FOR: for i in range(5)
+                SE: FOR_STEP: for i in range(5)
+                    EA: int: i: 0
+                    AS: a: 0
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for i in range(5)
+                    EA: int: i: 1
+                    AS: a: 1
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for i in range(5)
+                    EA: int: i: 2
+                    AS: a: 2
+                    STB: RuntimeError: some error
+                EE: FOR_STEP: ERROR
+            EE: FOR: ERROR
+        EE: METHOD: ERROR
+    ST: PASS
+ST: PASS

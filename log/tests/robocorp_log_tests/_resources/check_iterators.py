@@ -18,7 +18,7 @@ def for_iter():
 
 
 def for_iter_multiple_targets():
-    for i, j in enumerate(range(5)):
+    for i, j in enumerate(range(2)):
         a = i
         b = j
 

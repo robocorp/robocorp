@@ -4,7 +4,7 @@ import itertools
 import sys
 from ast import AST
 from functools import partial
-from typing import Generator, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
+from typing import Generic, Iterator, List, Optional, Tuple, TypeVar, Union
 
 
 class _NodesProviderVisitor(ast_module.NodeVisitor):
@@ -178,35 +178,41 @@ class _RewriteCursor:
         return False
 
 
+class FuncdefMemoStack:
+    def __init__(self):
+        self._ctx_id = itertools.count(1)
+
+    def next_context_id(self):
+        return next(self._ctx_id)
+
+
 class ASTRewriter:
     def __init__(self, ast: AST) -> None:
-        self._memo: dict = {}
         self._ast = ast
         self._stack: List[AST] = []
         self._cursor_stack: List[_RewriteCursor] = []
         self._next_var_id: "partial[int]" = partial(next, itertools.count())
         self._is_generator_cache: dict = {}
-
-    def save_func_to_before_method_call(
-        self, function: ast.FunctionDef, call: ast.Call
-    ):
-        self._memo.setdefault(function, []).append(call)
-
-    def save_func_to_except_method_call(self, function, call):
-        self._memo.setdefault(function, []).append(call)
-
-    def save_func_to_after_method_call(self, function, call):
-        self._memo.setdefault(function, []).append(call)
-
-    def iter_func_calls_from_func(self, func: ast.FunctionDef) -> Iterator[ast.Call]:
-        yield from iter(self._memo[func])
+        self._funcdef_memo_stack: List[FuncdefMemoStack] = [FuncdefMemoStack()]
 
     def iter_and_replace_nodes(
         self,
     ) -> Iterator[Tuple[List[AST], AST]]:
         yield from self._iter_and_replace_nodes(self._ast)
 
+    def next_context_id(self) -> int:
+        return self._funcdef_memo_stack[-1].next_context_id()
+
     def _iter_and_replace_nodes(self, node) -> Iterator[Tuple[List[AST], AST]]:
+        if isinstance(node, ast.FunctionDef):
+            self._funcdef_memo_stack.append(FuncdefMemoStack())
+        try:
+            yield from self._inner_iter_and_replace_nodes(node)
+        finally:
+            if isinstance(node, ast.FunctionDef):
+                self._funcdef_memo_stack.pop(-1)
+
+    def _inner_iter_and_replace_nodes(self, node) -> Iterator[Tuple[List[AST], AST]]:
         """
         :note: the yielded stack is actually always the same (mutable) list, so,
         clients that want to return it somewhere else should create a copy.
@@ -396,6 +402,11 @@ class NodeFactory:
 
         return self._set_line_col(self.Attribute(ref, builtin_name))
 
+    def NameLoadCtx(self, attr_name: str) -> ast.Attribute:
+        ref = self.NameLoad("@ctx")
+
+        return self._set_line_col(self.Attribute(ref, attr_name))
+
     def NameLoadRobo(self, builtin_name: str) -> ast.Attribute:
         ref = self.NameLoad("@robolog")
 
@@ -444,6 +455,9 @@ class NodeFactory:
 
     def LineConstant(self) -> ast.Constant:
         return self._set_line_col(ast.Constant(self.lineno))
+
+    def IntConstant(self, value: int) -> ast.Constant:
+        return self._set_line_col(ast.Constant(value))
 
     def NoneConstant(self) -> ast.Constant:
         return self._set_line_col(ast.Constant(None))
