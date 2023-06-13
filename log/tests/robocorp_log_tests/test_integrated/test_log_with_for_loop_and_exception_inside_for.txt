@@ -1,0 +1,13 @@
+
+ST: Root Suite
+    ST: my_task
+        SE: METHOD: for_with_exception
+            SE: FOR: for _a in range(2)
+                SE: FOR_STEP: for _a in range(2)
+                    EA: int: _a: 0
+                    STB: RuntimeError: 
+                EE: FOR_STEP: ERROR
+            EE: FOR: ERROR
+        EE: METHOD: PASS
+    ST: PASS
+ST: PASS

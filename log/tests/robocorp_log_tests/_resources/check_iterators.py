@@ -74,3 +74,11 @@ def main_yield_augassign():
         s += e.value
 
     assert s == "aug1 aug2 aug3 finish"
+
+
+def for_with_exception():
+    try:
+        for _a in range(2):
+            raise RuntimeError()
+    except RuntimeError:
+        pass

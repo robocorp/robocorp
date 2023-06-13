@@ -6,6 +6,7 @@ from robocorp.log._ast_utils import NodeFactory
 from ._ast_utils import ASTRewriter
 from ._config import BaseConfig, FilterKind
 from .protocols import LogElementType
+import types
 
 DEBUG = False
 
@@ -33,7 +34,7 @@ def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
     return imports
 
 
-def _get_function_and_class_name(stack) -> Optional[Tuple[Any, str]]:
+def _get_function_and_class_name(stack) -> Optional[Tuple[ast.FunctionDef, str]]:
     if not stack:
         return None
     stack_it = reversed(stack)
@@ -395,12 +396,40 @@ def rewrite_ast_add_callbacks(
 
     node: ast.AST
 
-    for stack, node in rewrite_ctx.iter_and_replace_nodes():
-        handler = _dispatch.get(node.__class__)
-        if handler:
-            result = handler(rewrite_ctx, config, module_path, stack, filter_kind, node)
-            if result is not None:
-                rewrite_ctx.cursor.current = result
+    iter_in = rewrite_ctx.iter_and_replace_nodes()
+
+    feed_generator: Optional[types.GeneratorType] = None
+    while True:
+        if feed_generator is not None:
+            temp = feed_generator
+            feed_generator = None
+            try:
+                ev, stack, node = iter_in.send(temp)
+            except StopIteration:
+                break
+        else:
+            try:
+                ev, stack, node = next(iter_in)
+            except StopIteration:
+                break
+
+        if ev == "before":
+            handler = _dispatch_before.get(node.__class__)
+            if handler:
+                result = handler(
+                    rewrite_ctx, config, module_path, stack, filter_kind, node
+                )
+                if isinstance(result, types.GeneratorType):
+                    feed_generator = result
+
+        else:
+            handler = _dispatch_after.get(node.__class__)
+            if handler:
+                result = handler(
+                    rewrite_ctx, config, module_path, stack, filter_kind, node
+                )
+                if result is not None:
+                    rewrite_ctx.cursor.current = result
 
     if DEBUG:
         print("\n============ New AST (with hooks in place) ==============\n")
@@ -485,6 +514,67 @@ def _collect_names(target):
     elif isinstance(target, ast.Tuple):
         for el in target.elts:
             yield from _collect_names(el)
+
+
+def _accept_generator_full_log(
+    rewrite_ctx: ASTRewriter, stack, filter_kind: FilterKind
+) -> Optional[Tuple[ast.FunctionDef, str]]:
+    """
+    If it's accepted returns the function and class name, otherwise
+    returns None.
+    """
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+    if not _accept_function_rewrite(function) or rewrite_ctx.is_generator(function):
+        # On generators we can't really track things inside the function because
+        # pausing and unpausing of generators would need to recreate the whole context
+        # up to the inner statement (i.e.: it'd need to pop/push the for which we
+        # can't really do right now).
+        return None
+
+    if filter_kind != FilterKind.full_log:
+        return None
+    return function, class_name
+
+
+def _handle_before_try(
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path,
+    stack,
+    filter_kind,
+    node: ast.Try,
+):
+    func_and_class_name = _accept_generator_full_log(rewrite_ctx, stack, filter_kind)
+    if not func_and_class_name:
+        yield
+        return
+
+    function, class_name = func_and_class_name
+
+    try:
+        with rewrite_ctx.record_context_ids() as ids:
+            yield
+
+        if ids:
+            if node.handlers:
+                handler: ast.ExceptHandler
+                for handler in node.handlers:
+                    factory = rewrite_ctx.NodeFactory(
+                        handler.body[0].lineno, handler.body[0].col_offset
+                    )
+
+                    call = factory.Call(factory.NameLoadCtx("report_exception"))
+                    node_ids = [factory.IntConstant(ctx_id) for ctx_id in ids]
+                    call.args.append(factory.Tuple(*node_ids))
+                    handler.body.insert(0, factory.Expr(call))
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting try: {function.name} line: {node.lineno} at: {module_path}"
+        )
 
 
 def _handle_for(
@@ -759,13 +849,22 @@ def _handle_yield(
         )
 
 
-_dispatch: Dict[
+_dispatch_before: Dict[
     type,
     Callable[[ASTRewriter, BaseConfig, str, list, FilterKind, Any], Optional[list]],
 ] = {}
-_dispatch[ast.Return] = _handle_return
-_dispatch[ast.Assign] = _handle_assign
-_dispatch[ast.FunctionDef] = _handle_funcdef
-_dispatch[ast.Yield] = _handle_yield
-_dispatch[ast.YieldFrom] = _handle_yield
-_dispatch[ast.For] = _handle_for
+
+_dispatch_after: Dict[
+    type,
+    Callable[[ASTRewriter, BaseConfig, str, list, FilterKind, Any], Optional[list]],
+] = {}
+
+_dispatch_after[ast.Return] = _handle_return
+_dispatch_after[ast.Assign] = _handle_assign
+_dispatch_after[ast.FunctionDef] = _handle_funcdef
+_dispatch_after[ast.Yield] = _handle_yield
+_dispatch_after[ast.YieldFrom] = _handle_yield
+_dispatch_after[ast.For] = _handle_for
+
+# Note: returns generator which is called when it finishes (right before _dispatch_after)
+_dispatch_before[ast.Try] = _handle_before_try

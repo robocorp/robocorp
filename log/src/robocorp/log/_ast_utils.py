@@ -4,7 +4,20 @@ import itertools
 import sys
 from ast import AST
 from functools import partial
-from typing import Generic, Iterator, List, Optional, Tuple, TypeVar, Union
+from typing import (
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    Literal,
+    Generator,
+)
+import types
+from contextlib import contextmanager
+from robocorp.log._lifecycle_hooks import Callback
 
 
 class _NodesProviderVisitor(ast_module.NodeVisitor):
@@ -186,6 +199,9 @@ class FuncdefMemoStack:
         return next(self._ctx_id)
 
 
+ASTRewriteEv = Literal["before", "after"]
+
+
 class ASTRewriter:
     def __init__(self, ast: AST) -> None:
         self._ast = ast
@@ -194,16 +210,62 @@ class ASTRewriter:
         self._next_var_id: "partial[int]" = partial(next, itertools.count())
         self._is_generator_cache: dict = {}
         self._funcdef_memo_stack: List[FuncdefMemoStack] = [FuncdefMemoStack()]
+        self._on_context_id_generated = Callback()
 
     def iter_and_replace_nodes(
         self,
-    ) -> Iterator[Tuple[List[AST], AST]]:
+    ) -> Generator[
+        Tuple[ASTRewriteEv, List[AST], AST], Optional[types.GeneratorType], None
+    ]:
         yield from self._iter_and_replace_nodes(self._ast)
 
     def next_context_id(self) -> int:
-        return self._funcdef_memo_stack[-1].next_context_id()
+        """
+        The id returned should be used for control statements such as for or
+        while loops.
 
-    def _iter_and_replace_nodes(self, node) -> Iterator[Tuple[List[AST], AST]]:
+        If there's some structure with an except it needs to mark all control
+        statements that were unfinished.
+
+        i.e.: Something as:
+
+        try:
+            id = next_context_id()
+            before_iter(id, ...)
+            for a in xxx:
+                id2 = next_context_id()
+                before_step_iter(id2, ...)
+                ...
+                after_step_iter(id2, ...)
+            after_iter(id)
+        except:
+            handle_except((id, id2))
+        """
+        stack = self._funcdef_memo_stack[-1]
+        next_id = stack.next_context_id()
+        self._on_context_id_generated(stack, next_id)
+        return next_id
+
+    @contextmanager
+    def record_context_ids(self) -> Iterator[List[int]]:
+        curr = self._funcdef_memo_stack[-1]
+        ids = []
+
+        def on_generated(stack, next_id):
+            if stack is curr:
+                ids.append(next_id)
+
+        with self._on_context_id_generated.register(on_generated):
+            yield ids
+
+    def current_funcdef_memo_stack(self) -> FuncdefMemoStack:
+        return self._funcdef_memo_stack[-1]
+
+    def _iter_and_replace_nodes(
+        self, node
+    ) -> Generator[
+        Tuple[ASTRewriteEv, List[AST], AST], Optional[types.GeneratorType], None
+    ]:
         if isinstance(node, ast.FunctionDef):
             self._funcdef_memo_stack.append(FuncdefMemoStack())
         try:
@@ -212,7 +274,11 @@ class ASTRewriter:
             if isinstance(node, ast.FunctionDef):
                 self._funcdef_memo_stack.pop(-1)
 
-    def _inner_iter_and_replace_nodes(self, node) -> Iterator[Tuple[List[AST], AST]]:
+    def _inner_iter_and_replace_nodes(
+        self, node
+    ) -> Generator[
+        Tuple[ASTRewriteEv, List[AST], AST], Optional[types.GeneratorType], None
+    ]:
         """
         :note: the yielded stack is actually always the same (mutable) list, so,
         clients that want to return it somewhere else should create a copy.
@@ -228,11 +294,25 @@ class ASTRewriter:
                     if isinstance(item, AST):
                         self._cursor_stack.append(_RewriteCursor(node, item))
 
-                        yield stack, item
+                        gen = yield "before", stack, item
+                        if gen is not None:
+                            try:
+                                next(gen)
+                            except StopIteration:
+                                raise AssertionError(
+                                    f"Expected generator {gen} to yield once!"
+                                )
 
                         stack.append(item)
                         yield from self._iter_and_replace_nodes(item)
                         stack.pop()
+
+                        try:
+                            if gen is not None:
+                                next(gen)
+                        except StopIteration:
+                            pass
+                        yield "after", stack, item
 
                         last_cursor = self._cursor_stack.pop(-1)
                         if last_cursor.before is not None:
@@ -267,10 +347,11 @@ class ASTRewriter:
             elif isinstance(value, AST):
                 self._cursor_stack.append(_RewriteCursor(node, value))
 
-                yield stack, value
+                yield "before", stack, value
                 stack.append(value)
                 yield from self._iter_and_replace_nodes(value)
                 stack.pop()
+                yield "after", stack, value
 
                 last_cursor = self._cursor_stack.pop(-1)
                 if last_cursor.before is not None or last_cursor.after is not None:

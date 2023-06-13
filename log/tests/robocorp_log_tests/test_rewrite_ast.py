@@ -40,7 +40,10 @@ def method():
     )
 
     ast_rewriter = ASTRewriter(mod)
-    for _stack, node in ast_rewriter.iter_and_replace_nodes():
+    for ev, _stack, node in ast_rewriter.iter_and_replace_nodes():
+        if ev != "after":
+            continue
+
         if isinstance(node, ast_module.Constant):
             factory = NodeFactory(node.lineno, node.col_offset)
             s = factory.Str("some str")
@@ -64,7 +67,10 @@ def method():
     ast_rewriter = ASTRewriter(mod)
 
     with pytest.raises(RuntimeError) as e:
-        for _stack, node in ast_rewriter.iter_and_replace_nodes():
+        for ev, _stack, node in ast_rewriter.iter_and_replace_nodes():
+            if ev != "after":
+                continue
+
             if isinstance(node, ast_module.Constant):
                 factory = NodeFactory(node.lineno, node.col_offset)
                 # This cannot be done because the current cursor points to a name
@@ -89,7 +95,9 @@ def method():
 
     ast_rewriter = ASTRewriter(mod)
 
-    for _stack, node in ast_rewriter.iter_and_replace_nodes():
+    for ev, _stack, node in ast_rewriter.iter_and_replace_nodes():
+        if ev != "after":
+            continue
         if isinstance(node, ast_module.Constant):
             factory = NodeFactory(node.lineno, node.col_offset)
             # This cannot be done because the current cursor points to a name

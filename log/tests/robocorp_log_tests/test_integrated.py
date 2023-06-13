@@ -234,3 +234,28 @@ def test_log_with_for_loop_multiple_targets(tmpdir, ui_regenerate, str_regressio
     # for m in msgs:
     #     print(m)
     # setup_info.open_log_target()
+
+
+def test_log_with_for_loop_and_exception_inside_for(
+    tmpdir, ui_regenerate, str_regression
+):
+    from imp import reload
+
+    from robocorp_log_tests._resources import check_iterators
+    from robocorp_log_tests.fixtures import (
+        ConfigForTest,
+        basic_log_setup,
+        pretty_format_logs_from_log_html,
+    )
+
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        check_iterators = reload(check_iterators)
+        check_iterators.for_with_exception()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
