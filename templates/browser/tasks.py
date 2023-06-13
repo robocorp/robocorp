@@ -15,7 +15,7 @@ def solve_challenge():
     http.download("http://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
     worksheet = excel.open_workbook("challenge.xlsx").worksheet("Sheet1")
 
-    page = browser.open_url("http://rpachallenge.com/")
+    page = browser.goto("http://rpachallenge.com/")
     page.click("button:text('Start')")
 
     for row in worksheet.as_table(header=True):
