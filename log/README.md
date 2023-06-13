@@ -4,8 +4,9 @@
 a focus on python automation, where detailed information on what happened and why a
 failure occurs is of vital importance.
 
-> Note: The current version is still alpha and it's expected that its
-> internal format and APIs may change.
+> Note: The current version (1.0.0) is now in beta. Semantic versioning is used in the project.
+> Note: Please note that the format of the log is not a part of the API and should 
+> not be relied upon as it can change even among minor versions.
 
 ## Why
 

@@ -2,21 +2,22 @@ import ast
 import ast as ast_module
 import itertools
 import sys
+import types
 from ast import AST
+from contextlib import contextmanager
 from functools import partial
 from typing import (
+    Generator,
     Generic,
     Iterator,
     List,
+    Literal,
     Optional,
     Tuple,
     TypeVar,
     Union,
-    Literal,
-    Generator,
 )
-import types
-from contextlib import contextmanager
+
 from robocorp.log._lifecycle_hooks import Callback
 
 

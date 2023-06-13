@@ -1,3 +1,10 @@
+1.0.0
+-----------------------------
+
+- `for` statement: code is no longer rewritten to add two `try..except..finally` blocks for each for loop. 
+- Semantic versioning now used.
+- Classifier changed to `Beta`.
+
 0.3.1
 -----------------------------
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-log"
-version = "0.3.1"
+version = "1.0.0"
 description = "Automatic trace logging for Python"
 authors = [
     "Fabio Zadrozny <fabio@robocorp.com>",
@@ -9,7 +9,7 @@ readme = "README.md"
 packages = [{include = "robocorp/log", from = "src"}]
 include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Logging",
     "Programming Language :: Python :: 3.9",

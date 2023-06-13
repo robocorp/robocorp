@@ -33,7 +33,7 @@ from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
 
-__version__ = "0.3.1"
+__version__ = "1.0.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 from . import _config
