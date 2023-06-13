@@ -267,6 +267,7 @@ def test_duplicate_reserve(inputs):
 
 
 def test_inputs_iter_explicit_release(inputs):
+    # Should not raise / double release
     for item in inputs:
         item.done()
 

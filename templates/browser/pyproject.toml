@@ -1,17 +1,13 @@
 [tool.robo]
-name = "RPA Challenge"
-description = "A simple example robot that solves the RPA Challenge"
+name = "Browser"
+description = "Example of browser automation that solves the RPA Challenge"
 python = "3.9.13"
 
 [tool.robo.dependencies]
-robocorp-tasks="0.4.1"
-robocorp-browser="0.4.2"
+robocorp-tasks="1.0.0"
+robocorp-browser="1.0.1"
 robocorp-excel="0.4.0"
 robocorp-http="0.2.0"
-
-[tool.robo.dev-dependencies]
-ruff="0.0.260"
-black="23.3.0"
 
 [tool.robocorp.log]
 log_filter_rules = [

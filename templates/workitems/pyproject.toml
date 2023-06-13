@@ -1,0 +1,15 @@
+[tool.robo]
+name = "Work Items"
+description = "Example of using work items in Control Room"
+python = "3.9.13"
+
+[tool.robo.dependencies]
+robocorp-tasks="1.0.0"
+robocorp-workitems="1.0.1"
+robocorp-excel="0.4.0"
+
+[tool.robocorp.log]
+log_filter_rules = [
+    {name = "robocorp.excel", kind = "log_on_project_call"},
+    {name = "robocorp.workitems", kind = "log_on_project_call"},
+]
