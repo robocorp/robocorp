@@ -3,8 +3,7 @@
 `robocorp-tasks` is a Python framework designed to simplify the development 
 of Python automations.
 
-> Note: The current version is still alpha but its public API is already meant
-> to be stable and new releases should keep backward compatibility.
+> Note: The current version (1.0.0) is now in beta. Semantic versioning is used in the project.
 
 ## Why
 

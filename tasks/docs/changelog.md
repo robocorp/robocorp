@@ -1,7 +1,8 @@
-NEXT
+1.0.0
 -----------------------------
 
 - When collecting tasks properly flush `sys.stdout` prior to exiting process.
+- Semantic versioning now followed.
 
 0.4.1
 -----------------------------
