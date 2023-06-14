@@ -1,3 +1,10 @@
+1.0.1
+-----------------------------
+
+- Improvements in `log.html`:
+    - Variables are now pretty-printed in details.
+    - Variables in the tree are always shown in a single line.
+
 1.0.0
 -----------------------------
 
