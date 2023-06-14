@@ -21,3 +21,16 @@ def recurse_some_method():
 class SomeClass:
     def __init__(self, arg1, arg2):
         pass
+
+
+def another(var):
+    pass
+
+
+def check_multiline():
+    var = """
+This is
+a multiline
+string
+"""
+    another(var)

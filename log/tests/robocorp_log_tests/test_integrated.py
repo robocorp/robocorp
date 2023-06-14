@@ -259,3 +259,24 @@ def test_log_with_for_loop_and_exception_inside_for(
     # for m in msgs:
     #     print(m)
     # setup_info.open_log_target()
+
+
+def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
+    from imp import reload
+
+    from robocorp_log_tests._resources import check
+    from robocorp_log_tests.fixtures import (
+        ConfigForTest,
+        basic_log_setup,
+        pretty_format_logs_from_log_html,
+    )
+
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        check = reload(check)
+        check.check_multiline()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()

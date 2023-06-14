@@ -1,9 +1,9 @@
-import { Box, Header, Typography } from '@robocorp/components';
+import { Box, Header } from '@robocorp/components';
 import { FC } from 'react';
 import styled from 'styled-components';
 
 import { Entry, EntryMethodBase, EntrySuspendYield, Type } from '~/lib/types';
-import { Bold, LocationContent } from './Common';
+import { Bold, FormatHeaderActions, LocationContent, VariableValue } from './Common';
 import { Counter } from '~/lib';
 
 const Content = styled(Box)`
@@ -29,11 +29,6 @@ const ArgumentType = styled(Box)`
   font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
-const ArgumentValue = styled(Box)`
-  margin-left: ${({ theme }) => theme.space.$12};
-  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
-`;
-
 export const Method: FC<{ entry: Entry }> = (props) => {
   const entryMethod: EntryMethodBase = props.entry as EntryMethodBase;
   const argumentsList = [];
@@ -44,6 +39,7 @@ export const Method: FC<{ entry: Entry }> = (props) => {
     argumentsHeader = (
       <Header size="medium">
         <Header.Title title="Arguments" />
+        <FormatHeaderActions />
       </Header>
     );
     for (const arg of entryMethod.arguments) {
@@ -51,7 +47,7 @@ export const Method: FC<{ entry: Entry }> = (props) => {
         <ArgumentContent key={counter.next()} className="argument">
           <ArgumentName className="argumentName">{`${arg.name}`}</ArgumentName>
           <ArgumentType>{`(type: ${arg.type})`}</ArgumentType>
-          <ArgumentValue>{`${arg.value}`}</ArgumentValue>
+          <VariableValue value={arg.value}></VariableValue>
         </ArgumentContent>,
       );
     }

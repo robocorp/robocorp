@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Box, Drawer } from '@robocorp/components';
+import { Box } from '@robocorp/components';
 
 import { Entry, Type } from '~/lib/types';
 import { ExceptionComponent, ThreadDumpComponent } from './components/ExceptionComponent';
@@ -47,7 +47,8 @@ export const Content: FC<{ entry: Entry }> = ({ entry }) => {
   const Component = getContentComponent(entry.type);
 
   return (
-    <Box p="$32" borderColor="border.inversed" borderRadius="$16" margin="$8">
+    // <Box p="$32" borderColor="border.inversed" borderRadius="$16" margin="$8">
+    <Box p="$16" margin="$8">
       <Component entry={entry} />
     </Box>
   );

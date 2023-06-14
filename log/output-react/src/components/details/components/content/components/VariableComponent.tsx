@@ -3,7 +3,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 
 import { Entry, EntryVariable } from '~/lib/types';
-import { Bold, LocationContent } from './Common';
+import { Bold, FormatHeaderActions, LocationContent, VariableValue } from './Common';
 
 const Content = styled(Box)`
   position: relative;
@@ -16,8 +16,9 @@ export const VariableComponent: FC<{ entry: Entry }> = (props) => {
     <Content>
       <Header size="medium">
         <Header.Title title="Variable Value" />
+        <FormatHeaderActions />
       </Header>
-      <LocationContent>{entryVariable.value}</LocationContent>
+      <VariableValue value={entryVariable.value}></VariableValue>
       <Header size="medium">
         <Header.Title title="Location" />
       </Header>

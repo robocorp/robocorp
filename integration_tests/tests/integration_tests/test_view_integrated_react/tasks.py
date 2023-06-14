@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 import json
 import sys
 from pathlib import Path
@@ -56,10 +57,10 @@ def compare_strlist(lines_obtained, lines_expected):
                 ),
                 file=stream,
             )
-        obtained = "\n".join(lines_obtained)
+        obtained = "\\n".join(lines_obtained)
         raise AssertionError(
-            "Strings don't match. Obtained:\n\n"
-            f"{obtained}\n\nComparison:\n{stream.getvalue()}"
+            "Strings don't match. Obtained:\\n\\n"
+            f"{obtained}\\n\\nComparison:\\n{stream.getvalue()}"
         )
 
 
@@ -115,22 +116,34 @@ def case_failure():
     ), "Expected exception to be expanded by default."
 
 
-def collect_full_tree_contents(parent_id="", has_filter=False):
+def collect_full_tree_contents(
+    parent_id="", has_filter=False, force_name_and_value=False
+):
     found = {}
     for i in range(100):
         if parent_id:
             entry_id = f"{parent_id}-{i}"
         else:
             entry_id = f"#root{i}"
-        element = browser.page().query_selector(f"{entry_id} > .entryName")
+        element_name = browser.page().query_selector(f"{entry_id} > .entryName")
+        element_value = browser.page().query_selector(f"{entry_id} > .entryValue")
 
-        if element is None:
-            element = browser.page().query_selector(f"{entry_id} > .entryValue")
+        if element_name is not None or element_value is not None:
+            if element_name is None:
+                text = element_value.text_content()
+            else:
+                text = element_name.text_content()
+                if force_name_and_value:
+                    if element_value is not None:
+                        if text:
+                            text += " - " + element_value.text_content()
+                        else:
+                            text = element_value.text_content()
 
-        if element is not None:
-            text = element.text_content()
             if not text.strip():
-                text = element.evaluate("(element) => element.tagName")
+                text = (element_name or element_value).evaluate(
+                    "(element) => element.tagName"
+                )
             found[entry_id] = text
 
         else:
@@ -141,7 +154,9 @@ def collect_full_tree_contents(parent_id="", has_filter=False):
         expand = browser.page().query_selector(f"{entry_id} > .toggleExpand")
         if expand:
             expand.click()
-            found.update(collect_full_tree_contents(entry_id, has_filter))
+            found.update(
+                collect_full_tree_contents(entry_id, has_filter, force_name_and_value)
+            )
 
     if not has_filter:
         raise AssertionError("Not expecting that many elements...")
@@ -331,3 +346,37 @@ def case_task_and_element():
         page.query_selector("#base-header").query_selector("h1").text_content()
     )
     assert header_text == "Robot1"
+
+
+@task
+def case_big_structures():
+    page = open_output_view_for_tests()
+    page.wait_for_selector("#base-header")  # Check that the page header was loaded
+
+    setup_scenario(page, "case_big_structures")
+
+    root_text_content = page.locator("#root0 > .entryName").text_content()
+    assert root_text_content == "Simple Task"
+
+    full_tree_contents = collect_full_tree_contents(force_name_and_value=True)
+
+    found = []
+    for name, value in full_tree_contents.items():
+        found.append(f"{name} {value}".strip())
+
+    expected = """
+#root0 Simple Task -
+#root0-0 check -
+#root0-0-0 a - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] (list)
+#root0-0-1 dct - {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19} (dict)
+#root0-0-2 dct2 - {1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'some key': 'some value', 'another': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}} (dict)
+#root0-0-3 date - {'beautiful output': datetime.datetime(2017, 12, 12, 0, 43, 4, 752094)} (dict)
+#root0-0-4 mydata - MyData(one='one', two='two') (MyData)
+#root0-0-5 bigmultiline - '\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n' (str)
+#root0-0-6 WrapAStr.__init__ - s='\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n'
+#root0-0-7 wrapped - WrapStr(\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n) (WrapAStr)
+#root0-0-8 callit - arg={1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'some key': 'some value', 'another': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}}, date={'beautiful output': datetime.datetime(2017, 12, 12, 0, 43, 4, 752094)}, mydata=MyData(one='one', two='two'), bigmultiline='\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n', wrapped=WrapStr(\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n)
+"""
+    compare_strlist(
+        found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
+    )

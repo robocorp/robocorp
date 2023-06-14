@@ -16,6 +16,7 @@ if __name__ == "__main__":
         "case_task_and_element",
         "case_log",
         "case_filter",
+        "case_big_structures",
     ]
 
     cli.main(["run", str(target)] + [f"-t={c}" for c in cases], exit=True)

@@ -5,6 +5,8 @@ from typing import Optional, Union
 
 import pytest
 
+from integration_tests import _case_names
+
 
 def _run_in_rcc(
     rcc_loc: str,
@@ -40,16 +42,7 @@ def _run_in_rcc(
     return completed_process
 
 
-case_names = [
-    "case_task_and_element",
-    "case_failure",
-    "case_generators",
-    "case_log",
-    "case_filter",
-]
-
-
-@pytest.mark.parametrize("case_name", case_names)
+@pytest.mark.parametrize("case_name", _case_names.case_names)
 def test_react_integrated(
     rcc_loc: str,
     run_integration_tests_flag,

@@ -41,6 +41,7 @@ export const defaultLogState: LogContextType = {
       duration: true,
       location: true,
     },
+    format: 'auto' as const,
   },
   setViewSettings: () => null,
   runInfo: {

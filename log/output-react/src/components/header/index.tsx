@@ -11,6 +11,7 @@ import {
 import { IconCloseSmall } from '@robocorp/icons';
 import { IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
 import { RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
+import { CustomActions } from '~/lib/CustomActions';
 
 type Props = {
   filter: string;
@@ -82,7 +83,7 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
           <Badge variant={variant} label={label} size="small" id="runStatusBadge" />
         </BaseHeader.Title>
         <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
-        <BaseHeader.Actions>
+        <CustomActions>
           <Menu
             trigger={
               <Button icon={IconSettingsSliders} variant="secondary" aria-label="Toggle option" />
@@ -114,7 +115,7 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
             onIconRightClick={onFilterReset}
             iconRightLabel="Reset filter"
           />
-        </BaseHeader.Actions>
+        </CustomActions>
       </BaseHeader>
     </Box>
   );

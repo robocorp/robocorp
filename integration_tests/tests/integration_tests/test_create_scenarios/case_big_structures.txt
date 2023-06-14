@@ -1,0 +1,72 @@
+V 0.0.2
+T 2023-06-14T11:57:42.110+00:00
+ID 1|aac969db-0aaa-11ee-b74d-202b20a029af
+I "sys.platform=win32"
+I "python=3.9.16 (main, Mar  8 2023, 10:39:24) [MSC v.1916 64 bit (AMD64)]"
+M a:"Robot1"
+SR a|0.003
+M c:"Simple Task"
+M d:"task_mod"
+M e:"D:\\x\\robocorpws\\robo\\integration_tests\\tests\\integration_tests\\test_create_scenarios.py"
+M f:""
+P b:c|d|e|f|0
+ST b|0.003
+M h:"check"
+M i:"integration_tests.resources.check_big_structures"
+M j:"D:\\x\\robocorpws\\robo\\integration_tests\\tests\\integration_tests\\resources\\check_big_structures.py"
+P g:h|i|j|f|26
+M k:"METHOD"
+SE g|k|0.003
+M l:"a"
+M m:"list"
+M n:"[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]"
+AS g|l|m|n|0.005
+P o:h|i|j|f|27
+M p:"dct"
+M q:"dict"
+M r:"{0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}"
+AS o|p|q|r|0.005
+P s:h|i|j|f|28
+M t:"dct2"
+M u:"{1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'some key': 'some value', 'another': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}}"
+AS s|t|q|u|0.005
+P v:h|i|j|f|29
+M w:"date"
+M x:"{'beautiful output': datetime.datetime(2017, 12, 12, 0, 43, 4, 752094)}"
+AS v|w|q|x|0.005
+P y:h|i|j|f|34
+M z:"mydata"
+M A:"MyData"
+M B:"MyData(one='one', two='two')"
+AS y|z|A|B|0.005
+P C:h|i|j|f|35
+M D:"bigmultiline"
+M E:"str"
+M F:"'\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n'"
+AS C|D|E|F|0.005
+M H:"WrapAStr.__init__"
+P G:H|i|j|f|17
+SE G|k|0.005
+M I:"s"
+EA I|E|F
+M J:"PASS"
+EE k|J|0.005
+P K:h|i|j|f|44
+M L:"wrapped"
+M M:"WrapAStr"
+M N:"WrapStr(\nThis is a big multiline\nstring.\n\nThe text that is in this string\ndoes span across multiple lines.\n\nIt should appear well in logs anyways!\n)"
+AS K|L|M|N|0.005
+M P:"callit"
+P O:P|i|j|f|6
+SE O|k|0.005
+M Q:"arg"
+EA Q|q|u
+EA w|q|x
+EA z|A|B
+EA D|E|F
+EA L|M|N
+EE k|J|0.005
+EE k|J|0.005
+M R:"Ok"
+ET J|R|0.005
+ER J|0.005

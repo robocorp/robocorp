@@ -48,7 +48,7 @@ const getTitle = (entry: Entry) => {
     case Type.variable:
       const excVar = entry as EntryVariable;
       return {
-        title: `Variable: ${excVar.name}`,
+        title: `Assign to Variable: ${excVar.name}`,
         description: <PreBox>Type: {excVar.varType.trim()}</PreBox>,
       };
     case Type.task:

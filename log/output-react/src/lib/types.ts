@@ -1,11 +1,14 @@
 import { PythonTraceback } from '~/treebuild/protocols';
 
+export type FormatType = 'auto' | 'raw' | 'pretty';
+
 export type ViewSettings = {
   columns: {
     duration: boolean;
     location: boolean;
   };
   theme: 'dark' | 'light';
+  format: FormatType;
 };
 
 export enum StatusLevel {

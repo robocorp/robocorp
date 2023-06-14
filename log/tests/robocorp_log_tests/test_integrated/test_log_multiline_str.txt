@@ -1,0 +1,11 @@
+
+ST: Root Suite
+    ST: my_task
+        SE: METHOD: check_multiline
+            AS: var: '\nThis is\na multiline\nstring\n'
+            SE: METHOD: another
+                EA: str: var: '\nThis is\na multiline\nstring\n'
+            EE: METHOD: PASS
+        EE: METHOD: PASS
+    ST: PASS
+ST: PASS

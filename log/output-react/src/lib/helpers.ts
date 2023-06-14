@@ -103,6 +103,10 @@ function padZero(n: number) {
   return n.toFixed(0).padStart(2, '0');
 }
 
+export function replaceNewLineChars(text: string) {
+  return text.replace(/\n/g, '\\n').replace(/\r/g, '\\r');
+}
+
 export function formatArguments(
   entry: EntryMethodBase | EntryGenerator | EntryUntrackedGenerator,
 ): string {
@@ -110,7 +114,7 @@ export function formatArguments(
   if (args !== undefined && args.length > 0) {
     let rep = [];
     for (const arg of args) {
-      rep.push(`${arg.name}=${arg.value}`);
+      rep.push(replaceNewLineChars(`${arg.name}=${arg.value}`));
     }
     return rep.join(', ');
   }

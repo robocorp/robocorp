@@ -13,6 +13,9 @@ tasks:
     
   case_filter:
     shell: python -m robocorp.tasks run tasks.py -t case_filter --console-colors=plain
+    
+  case_big_structures:
+    shell: python -m robocorp.tasks run tasks.py -t case_big_structures --console-colors=plain
 
 condaConfigFile: conda.yaml
 artifactsDir: output

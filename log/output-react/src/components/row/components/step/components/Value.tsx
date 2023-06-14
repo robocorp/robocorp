@@ -19,6 +19,7 @@ import {
   IMG_MARGIN_SMALL,
   extractDataFromImg,
   formatArguments,
+  replaceNewLineChars,
   sanitizeHTML,
 } from '~/lib/helpers';
 
@@ -51,9 +52,9 @@ export const getValue = (entry: Entry): ReactNode | string => {
     case Type.processSnapshot:
       return '';
     case Type.exception:
-      return (entry as EntryException).excMsg;
+      return (entry as EntryException).excMsg; // We resize this one (so, don't remove new lines)
     case Type.threadDump:
-      return (entry as EntryThreadDump).threadDetails;
+      return replaceNewLineChars((entry as EntryThreadDump).threadDetails);
     case Type.log:
       const entryLog = entry as EntryLog;
       if (entryLog.isHtml) {
@@ -72,14 +73,16 @@ export const getValue = (entry: Entry): ReactNode | string => {
         const sanitizedHTML = sanitizeHTML(handledHTML);
         return <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }}></div>;
       } else {
-        return entryLog.message;
+        return entryLog.message; // We resize this one (so, don't remove new lines)
       }
     case Type.variable:
       const entryVariable = entry as EntryVariable;
-      return `${entryVariable.value} (${entryVariable.varType})`;
+      return replaceNewLineChars(`${entryVariable.value} (${entryVariable.varType})`);
     case Type.suspendYield:
       const entrySuspendYield = entry as EntrySuspendYield;
-      return `Yielded: ${entrySuspendYield.value} (${entrySuspendYield.varType})`;
+      return replaceNewLineChars(
+        `Yielded: ${entrySuspendYield.value} (${entrySuspendYield.varType})`,
+      );
     default:
       return 'TODO: provide getValue for: ' + entry.type;
   }
