@@ -12,10 +12,10 @@ def solve_challenge():
         headless=False,
     )
 
-    http.download("http://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
+    http.download("https://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
     worksheet = excel.open_workbook("challenge.xlsx").worksheet("Sheet1")
 
-    page = browser.goto("http://rpachallenge.com/")
+    page = browser.goto("https://rpachallenge.com/")
     page.click("button:text('Start')")
 
     for row in worksheet.as_table(header=True):
