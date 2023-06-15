@@ -28,6 +28,7 @@ from typing import (
 
 from .protocols import LogElementType, OptExcInfo
 
+
 WRITE_CONTENTS_TO_STDERR: bool = False
 
 
@@ -142,6 +143,12 @@ class _Config:
     output_dir: Optional[str]
     max_file_size_in_bytes: int
     max_files: int
+
+    # Note that this limit is counted without considering the messages
+    # written internally right after the rotation, which add info
+    # on the part or the python version.
+    min_messages_per_file: int
+
     log_html: Optional[str]
     log_html_style: int
     uuid: str
@@ -342,8 +349,12 @@ class _RoboOutputImpl:
         self._move_old_runs()
 
         self._current_entry = 0
+        self._messages_written_after_rotation = 0
         self._current_file: Optional[Path] = None
-        self._stream = None
+
+        from io import BufferedWriter
+
+        self._stream: Optional[BufferedWriter] = None
 
         if config.initial_time is None:
             self._initial_time = datetime.datetime.now(timezone.utc)
@@ -353,6 +364,7 @@ class _RoboOutputImpl:
 
         self._stack_handler = _StackHandler(self)
 
+        self._rotating = False
         self._rotate_handler = _RotateHandler(
             config.max_file_size_in_bytes, config.max_files
         )
@@ -396,8 +408,18 @@ class _RoboOutputImpl:
     def initial_time(self) -> datetime.datetime:
         return self._initial_time
 
-    def _rotate_output(self):
-        if self._output_dir is not None:
+    def _rotate_output(self) -> None:
+        if self._output_dir is None:
+            return
+
+        if self._rotating:
+            # Prevent trying to rotate while in the rotation already
+            # (on corner case where just the initial messages would
+            # be too much).
+            return
+
+        self._rotating = True
+        try:
             self._current_memo = {}
 
             self._current_entry += 1
@@ -416,6 +438,9 @@ class _RoboOutputImpl:
 
             self._stream = self._current_file.open("wb")
             self._write_on_start_or_after_rotate()
+            self._messages_written_after_rotation = 0
+        finally:
+            self._rotating = False
 
     def _write_on_start_or_after_rotate(self):
         from ._decoder import DOC_VERSION
@@ -450,8 +475,14 @@ class _RoboOutputImpl:
         if self._stream is not None:
             self._stream.write(in_bytes)
             self._stream.flush()
-        if self._rotate_handler.rotate_after(in_bytes):
-            self._rotate_output()
+
+        self._messages_written_after_rotation += 1
+        if (
+            self._messages_written_after_rotation > self._config.min_messages_per_file
+            and not self._rotating
+        ):
+            if self._rotate_handler.rotate_after(in_bytes):
+                self._rotate_output()
 
     def _write_json(self, msg_type, args):
         args_as_str = json.dumps(args)
@@ -738,8 +769,8 @@ Virtual Memory Size: {vms}"""
             was already previously logged (see the `unhandled` parameter for
             details on the use-cases where it may be skipped).
         """
-        tp, e, tb = exc_info
-        if e is None or tb is None or tp is None:
+        exception_type, exception, tb = exc_info
+        if exception is None or tb is None or exception_type is None:
             return False
 
         f = tb.tb_frame.f_back
@@ -768,7 +799,7 @@ Virtual Memory Size: {vms}"""
             tb = tb.tb_next
 
         self._write_stack(
-            f"{tp.__name__}: {e}",
+            f"{exception_type.__name__}: {exception}",
             stack,
             entry_type="traceback",
             start_message_types=("STB", "RTB", "ETB"),
@@ -781,7 +812,7 @@ Virtual Memory Size: {vms}"""
         stack: List[tuple],
         entry_type: str,
         start_message_types: Tuple[str, str, str],
-    ):
+    ) -> None:
         start_message_type, restart_message_type, end_message_type = start_message_types
 
         # Write the stack now.

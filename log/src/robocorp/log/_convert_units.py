@@ -1,3 +1,5 @@
+import typing
+
 _convert = {
     "gb": lambda s: s * 1e9,
     "g": lambda s: s * 1e9,
@@ -10,16 +12,19 @@ _convert = {
 }
 
 
-def _convert_to_bytes(s):
+def _convert_to_bytes(s: typing.Union[int, float, str]) -> int:
+    if not isinstance(s, str):
+        return int(s)
+
     initial = s
-    num = []
+    num_lst = []
     while s and (s[0].isdigit() or s[0] == "."):
-        num.append(s[0])
+        num_lst.append(s[0])
         s = s[1:]
-    num = float("".join(num))
+    num = float("".join(num_lst))
     unit = s.strip()
     conv = _convert.get(unit.lower())
     if conv is None:
         raise ValueError(f"Cannot get in bytes: {initial}")
 
-    return conv(num)
+    return int(conv(num))

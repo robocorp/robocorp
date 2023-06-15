@@ -8,17 +8,7 @@ from ._config import BaseConfig
 from ._logger_instances import _get_logger_instances
 from ._obj_info_repr import get_obj_type_and_repr
 from .protocols import LogElementType, OptExcInfo, Status
-
-
-class OnExitContextManager:
-    def __init__(self, on_exit):
-        self.on_exit = on_exit
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.on_exit()
+from ._on_exit_context_manager import OnExitContextManager
 
 
 def _get_obj_type_and_repr_and_hide_if_needed(key, val):

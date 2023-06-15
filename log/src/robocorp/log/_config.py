@@ -20,10 +20,36 @@ class FilterKind(enum.Enum):
     exclude = "exc"
 
 
+class GeneralLogConfig:
+    __slots__ = ["max_value_repr_size"]
+
+    def __init__(self) -> None:
+        from ._convert_units import _convert_to_bytes
+
+        # Setup defaults.
+        self.max_value_repr_size: int = _convert_to_bytes("200k")
+
+    def get_max_value_repr_size(self) -> int:
+        return self.max_value_repr_size
+
+
+# Default instance. Not exposed to clients.
+_general_log_config = GeneralLogConfig()
+
+
 class BaseConfig:
-    def __init__(self, rewrite_assigns=True, rewrite_yields=True):
+    def __init__(
+        self,
+        rewrite_assigns=True,
+        rewrite_yields=True,
+        min_messages_per_file=50,
+    ):
         self.rewrite_assigns = rewrite_assigns
         self.rewrite_yields = rewrite_yields
+        self._min_messages_per_file = min_messages_per_file
+
+    def get_min_messages_per_file(self) -> int:
+        return self._min_messages_per_file
 
     def get_rewrite_yields(self) -> bool:
         """

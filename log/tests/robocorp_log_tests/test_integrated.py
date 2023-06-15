@@ -1,4 +1,5 @@
-from robocorp.log import verify_log_messages_from_log_html
+from robocorp.log import verify_log_messages_from_log_html, setup_log
+from pathlib import Path
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate):
@@ -275,6 +276,70 @@ def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
     with basic_log_setup(tmpdir, config=config) as setup_info:
         check = reload(check)
         check.check_multiline()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
+def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
+    """
+    This tests checks limits for messages and checks that the logging
+    still behaves properly on corner cases (such as when a message would
+    be greater than the max log size).
+    """
+    from imp import reload
+
+    from robocorp_log_tests._resources import check
+    from robocorp_log_tests.fixtures import (
+        ConfigForTest,
+        basic_log_setup,
+        pretty_format_logs_from_log_html,
+    )
+
+    config = ConfigForTest(min_messages_per_file=10)
+
+    with setup_log(max_value_repr_size="50kb"):
+        with basic_log_setup(
+            tmpdir, config=config, max_file_size="10kb", max_files=2
+        ) as setup_info:
+            check = reload(check)
+            check.check_message_really_big()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    files = list(log_target.parent.glob("*.robolog"))
+    assert len(files) == 1
+    f: Path = files[0]
+
+    # i.e.: the file has more than 100kb because of the min_messages_per_file.
+    assert f.stat().st_size > 100_000
+    # setup_info.open_log_target()
+
+
+def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
+    """
+    This tests checks limits for messages and checks that the logging
+    still behaves properly on corner cases (such as when a message would
+    be greater than the max log size).
+    """
+    from imp import reload
+
+    from robocorp_log_tests._resources import check
+    from robocorp_log_tests.fixtures import (
+        ConfigForTest,
+        basic_log_setup,
+        pretty_format_logs_from_log_html,
+    )
+
+    config = ConfigForTest()
+    with basic_log_setup(
+        tmpdir, config=config, max_file_size="100kb", max_files=2
+    ) as setup_info:
+        check = reload(check)
+        check.check_stack_overflow()
 
     log_target = setup_info.log_target
     assert log_target.exists()

@@ -33,9 +33,7 @@ def _log_error(func):
                 traceback.print_exc()
                 traceback.print_stack(limit=5)
 
-                from robocorp.log._robo_output_impl import _RoboOutputImpl
-
-                robot_output_impl: _RoboOutputImpl = self._robot_output_impl
+                robot_output_impl: _RoboLogger = self
                 robot_output_impl.log_method_except(sys.exc_info(), True)
             finally:
                 _LogErrorLock.tlocal._writing = True
@@ -51,6 +49,7 @@ class _RoboLogger:
         max_files: int = 5,
         log_html: Optional[Union[Path, str]] = None,
         log_html_style: LogHTMLStyle = "standalone",
+        min_messages_per_file: int = 50,
         **kwargs,
     ):
         from ._convert_units import _convert_to_bytes
@@ -78,9 +77,15 @@ class _RoboLogger:
         config.max_file_size_in_bytes = _convert_to_bytes(max_file_size)
         config.max_files = max_files
 
-        if config.max_file_size_in_bytes < 10000:
+        if min_messages_per_file < 10:
+            # Minimum is at least 10 messages per file.
+            min_messages_per_file = 10
+
+        config.min_messages_per_file = min_messages_per_file
+
+        if config.max_file_size_in_bytes < _convert_to_bytes("10kb"):
             raise ValueError(
-                f"Cannot generate logs where the max file size in bytes is less that 10000 bytes."
+                f"Cannot generate logs where the max file size in bytes is less than 10kb."
                 f" Found: {config.max_file_size_in_bytes}."
                 f" Arg: {max_file_size}."
             )
@@ -359,12 +364,22 @@ class _RoboLogger:
         exc_info: OptExcInfo,
         unhandled: bool,
     ):
+        # TODO: Improve this: getting the stack and info should be done once
+        # outside and then just the messages should be replicated to the actual
+        # loggers.
+        # Right now we'll do the repr of objects twice for the whole stack...
+
         return self._robot_output_impl.log_method_except(exc_info, unhandled)
 
     @_log_error
     def process_snapshot(
         self,
     ):
+        # TODO: Improve this: getting the stack and info should be done once
+        # outside and then just the messages should be replicated to the actual
+        # loggers.
+        # Right now we'll do the repr of objects twice for the whole stack...
+
         return self._robot_output_impl.process_snapshot()
 
     @_log_error

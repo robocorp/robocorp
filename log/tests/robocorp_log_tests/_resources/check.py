@@ -34,3 +34,25 @@ a multiline
 string
 """
     another(var)
+
+
+def check_message_really_big():
+    v1 = "abcd1234_" * 10000
+    v2 = "abcde12345_" * 10000
+    call_another_method(v1, v2)
+
+
+def call_recursive_function():
+    # Let some big contents in the frame...
+    v1 = "abcd1234_" * 10000
+    v2 = "abcde12345_" * 10000
+    call_recursive_function()
+
+
+def check_stack_overflow():
+    try:
+        call_recursive_function()
+    except Exception:
+        pass
+    else:
+        raise AssertionError("Expected stack overflow error")

@@ -38,11 +38,22 @@ version_info = [int(x) for x in __version__.split(".")]
 
 from . import _config
 
-# --- Make these a part of the public API.
+# --- Export parts of the public API below (imports above aren't part of
+# the public API).
 
 Filter = _config.Filter
 FilterKind = _config.FilterKind
+
+# TODO: BaseConfig isn't a good name. This should be something as
+# 'AutoLogBaseConfig`. Maybe rename and keep alias as backward compatibility?
+#
+# Note: clients are not meant to instance this class, it's just meant to be
+# available for typing.
 BaseConfig = _config.BaseConfig
+
+# Subclass of the BaseConfig. Clients are expected to instance it to
+# configure auto-logging. Maybe a better name would've been
+# 'DefaultAutoLogConfig'?.
 ConfigFilesFiltering = _config.ConfigFilesFiltering
 
 
@@ -818,6 +829,52 @@ def verify_log_messages_from_stream(
 # --- APIs to setup the logging
 
 
+def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
+    """
+    Setups the log "general" settings.
+
+    Args:
+        max_value_repr_size: This is the maximum number of chars which
+            may be used for a repr (values are clipped if a `repr(obj)` would
+            return a bigger representation).
+            May be passed directly as the value as an int or a string with the
+            value and associated unit.
+            Accepted units are: `k`, `m`.
+            Example: `"1000k"`, `"1m"`.
+
+            The default value for this setting is "200k".
+
+    Example:
+
+    ```python
+    from robocorp import log
+    # If a repr(obj) returns a string bigger than 100000 chars it'll
+    # be clipped to 100000 chars.
+    log.setup_log(max_value_repr_size=100_000)
+    ```
+    """
+    prev_values = {}
+
+    if max_value_repr_size:
+        from ._convert_units import _convert_to_bytes
+
+        prev_values[
+            "max_value_repr_size"
+        ] = _config._general_log_config.max_value_repr_size
+
+        _config._general_log_config.max_value_repr_size = _convert_to_bytes(
+            max_value_repr_size
+        )
+
+    from ._on_exit_context_manager import OnExitContextManager
+
+    def on_exit():
+        for k, v in prev_values.items():
+            setattr(_config._general_log_config, k, v)
+
+    return OnExitContextManager(on_exit)
+
+
 def setup_auto_logging(
     config: Optional[BaseConfig] = None, add_rewrite_hook: bool = True
 ):
@@ -857,6 +914,7 @@ def add_log_output(
     max_files: int = 5,
     log_html: Optional[Union[str, Path]] = None,
     log_html_style: LogHTMLStyle = "standalone",
+    min_messages_per_file: int = 50,
 ):
     """
     Adds a log output which will write the contents to the given output directory.
@@ -866,13 +924,23 @@ def add_log_output(
 
     Args:
         output_dir: The output directory where the log contents should be saved.
-        max_file_size: The maximum file size for one log file.
+        max_file_size: The maximum file size for one log file (as a string with
+            the value and the unit -- accepted units are: `b`, `kb`, `mb`, `gb`
+            if no unit is passed it's considered `b` (bytes)).
+            Note that the max size is not a hard guarantee, rather it's a
+            guideline that the logging tries to follow (usually it's very close,
+            although on degenerate cases it can be considerably different).
         max_files: The maximum amount of files which can be added (if more would
             be needed the oldest one is erased).
         log_html: If given this is the path (file) where the log.html contents
             should be written (the log.html will include all the logs from the
             run along with a viewer for such logs).
         log_html_style: The style to be used for the log.html.
+        min_messages_per_file: This is the minimum number of messages that need
+            to be added to a file for it to be rotated (if messages are too big
+            this may make the max_file_size be surpassed). This is needed to
+            prevent a case where a whole new file could be created after just
+            a single message if the message was too big for the max file size.
 
     Note:
         It's Ok to add more than one log output, but if 2 log outputs point
@@ -886,7 +954,12 @@ def add_log_output(
         raise RuntimeError("The output directory must be specified.")
 
     logger = _RoboLogger(
-        output_dir, max_file_size, max_files, log_html, log_html_style=log_html_style
+        output_dir,
+        max_file_size,
+        max_files,
+        log_html,
+        log_html_style=log_html_style,
+        min_messages_per_file=min_messages_per_file,
     )
     with _get_logger_instances() as logger_instances:
         logger_instances[logger] = 1

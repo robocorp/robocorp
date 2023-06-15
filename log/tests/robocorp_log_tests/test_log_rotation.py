@@ -13,7 +13,11 @@ def test_rotate_logs(tmpdir) -> None:
         check = reload(check)
 
         with robolog.add_log_output(
-            tmpdir, max_file_size="10kb", max_files=2, log_html=log_target
+            tmpdir,
+            max_file_size="10kb",
+            max_files=2,
+            log_html=log_target,
+            min_messages_per_file=10,
         ):
             robolog.start_run("Root Suite")
             robolog.start_task("my_task", "task_mod", __file__, 0)
@@ -29,8 +33,8 @@ def test_rotate_logs(tmpdir) -> None:
     assert len(files) == 2, f"Found: {files}"
 
     name_to_file = dict((f.name, f) for f in files)
-    assert set(name_to_file.keys()) == {"output_15.robolog", "output_16.robolog"}
-    output_at_step = name_to_file["output_16.robolog"]
+    assert set(name_to_file.keys()) == {"output_13.robolog", "output_14.robolog"}
+    output_at_step = name_to_file["output_14.robolog"]
 
     # Check that replay suite/test/keyword are properly sent on rotate.
     expect_types = {"RR", "RT", "RE"}
@@ -44,4 +48,4 @@ def test_rotate_logs(tmpdir) -> None:
                 break
         else:
             raise AssertionError(f"Some expected messages not found: {expect_types}")
-    assert found_ids_at_step[0]["part"] == 16
+    assert found_ids_at_step[0]["part"] == 14
