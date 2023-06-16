@@ -105,7 +105,9 @@ class Requests:
         status_message = "Error"
         try:
             err_status_code = int(fields.get("status", resp_status_code))
-            status_message = fields.get("error", {}).get("code", "Error")
+            status_message = fields.get("code") or fields.get("error", {}).get(
+                "code", "Error"
+            )
             reason = fields.get("message") or fields.get("error", {}).get(
                 "message", response.reason
             )
