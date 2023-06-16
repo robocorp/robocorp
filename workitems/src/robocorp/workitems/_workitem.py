@@ -85,8 +85,6 @@ class Input:
         ignore_errors=False,
     ) -> Optional[Email]:
         email = self._parse_email()
-        if email is None:
-            raise ValueError("No email in work item")
 
         if email.errors and not ignore_errors:
             raise ValueError("\n".join(email.errors))
@@ -97,30 +95,35 @@ class Input:
 
         return email
 
-    def _parse_email(self) -> Optional[Email]:
+    def _parse_email(self) -> Email:
         if not isinstance(self._payload, dict):
-            return None
+            typename = type(self._payload).__name__
+            raise ValueError(f"Expected 'dict' payload, was '{typename}'")
+
+        def _try_parse(fields):
+            try:
+                email = Email.from_dict(fields)  # type: ignore
+                return email
+            except KeyError as err:
+                raise ValueError(f"Missing key in 'email' field: {err}") from err
+            except Exception as err:
+                raise ValueError(f"Malformed 'email' field: {err}") from err
 
         # Email was successfully parsed by Control Room
         if "email" in self._payload:
-            try:
-                fields = self._payload["email"]
-                email = Email.from_dict(fields)  # type: ignore
-                return email
-            except Exception as exc:
-                LOGGER.warning("Malformed 'email' field: %s", exc)
+            fields = self._payload["email"]
+            email = _try_parse(fields)
+            return email
 
         # Email parsing by Control Room failed (payload or attachments too big)
         if "failedEmail" in self._payload:
-            try:
-                fields = self._payload["failedEmail"]
-                email = Email.from_dict(fields)  # type: ignore
-                email.errors = self._parse_email_errors(self._payload)
-                return email
-            except Exception as exc:
-                LOGGER.warning("Malformed 'failedEmail' field: %s", exc)
+            fields = self._payload["failedEmail"]
+            email = _try_parse(fields)
+            email.errors = self._parse_email_errors(self._payload)
+            return email
 
-        return None
+        # No email fields in payload
+        raise ValueError("No email in work item")
 
     def _parse_email_errors(self, payload: dict[str, Any]) -> list[str]:
         errors = payload.get("errors", [])
