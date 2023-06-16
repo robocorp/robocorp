@@ -136,6 +136,11 @@ func (m model) View() string {
 			faintText("\nPress ctrl-c to abort"),
 		)
 	case StateDone:
+		guide := ("Created project ✨" +
+			faintText("To run the project ") +
+			"cd " + m.dirName +
+			faintText(" and then ") +
+			"robo run")
 		sections = append(
 			sections,
 			section("Selected template:", m.template.Name),
@@ -143,8 +148,7 @@ func (m model) View() string {
 			section("Directory name:", m.dirName),
 			m.installProgress.ViewAs(1.0),
 			"",
-			"Created project ✨",
-			faintText("To run the project ")+"cd "+m.dirName+faintText(" and then ")+"robo run",
+			guide,
 			"",
 		)
 	}

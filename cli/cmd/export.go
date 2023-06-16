@@ -7,8 +7,7 @@ import (
 )
 
 var (
-	forceFlag bool
-	robotZip  string
+	robotZip string
 )
 
 var exportCmd = &cobra.Command{
