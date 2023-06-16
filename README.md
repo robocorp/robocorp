@@ -1,14 +1,10 @@
-<h1>
-  <a href="https://github.com/robocorp/robo/">
-    <img src="./docs/include/logo.png" alt="Robo Logo" height="100">
-  </a>
-</h1>
+<a href="https://github.com/robocorp/robo/">
+  <img src="./docs/include/logo.svg" alt="Robo Logo" width="100%">
+</a>
 
-# Robo is an all-in-one Python automation framework
+## Robo is an all-in-one Python automation framework
 
-## Create, develop, run, and deploy your automation code with Robo - and operate it all with [Control Room](https://robocorp.com/products/control-room)
-
-Supports Windows, MacOS, and Linux
+### Create, develop, run, and deploy your automation code with Robo - and operate it all with [Control Room](https://robocorp.com/products/control-room)
 
 <br/>
 <details open="open">
@@ -75,6 +71,10 @@ Run your defined Python tasks. Robo instruments the running code, and generates 
 
 Easily run an arbitrary command within the isolated environment, such as shell commands or a locally installed application.
 
+#### `robo lock`
+
+Generate configuration files compatible with [rcc](https://github.com/robocorp/rcc).
+
 #### `robo export`
 
 Package your project as a Control Room compatible bundle, ready for deployment.
@@ -83,26 +83,30 @@ Package your project as a Control Room compatible bundle, ready for deployment.
 
 The framework includes Python libraries for configuring project entrypoints and controlling features such as a logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
 
-#### `robocorp.tasks`
+#### [`robocorp.tasks`](./tasks)
 
 Create entrypoints for your automation project.
 
-#### `robocorp.log`
+#### [`robocorp.log`](./log)
 
 Configure and control the execution log.
 
-#### `robocorp.vault`
+#### [`robocorp.vault`](./vault)
 
 Store secret values in Control Room and access them during the execution.
 
-#### `robocorp.workitems`
+#### [`robocorp.workitems`](./workitems)
 
 Interact with Control Room work items; Read data from previous steps, create output data.
 
-#### `robocorp.browser`
+#### [`robocorp.browser`](./browser)
 
 Automate actions in a browser, powered by [Playwright](https://playwright.dev/).
 
-#### `robocorp.http`
+#### [`robocorp.excel`](./excel)
+
+Read and write Excel files directly, with support for both .xlsx and .xls.
+
+#### [`robocorp.http`](./http)
 
 Download files easily, or make custom HTTP requests.
