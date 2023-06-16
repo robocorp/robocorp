@@ -1,8 +1,11 @@
 NEXT (xxx-xx-xx)
 -----------------------------
 
-This release focused on improving the degenerate case where the chosen max log file
-was too close to the size of a single message.
+- If the depth of a recursion is > 20 it will be shown in the same level so
+  that messages are still readable.
+  
+- Improvements to the degenerate case where the chosen max log file
+is too close to the size of a single message:
 
 To improve this case, a `min_messages_per_file` was added to 
 `robocorp.log.add_log_output` where it'll only start rotating to a new file after

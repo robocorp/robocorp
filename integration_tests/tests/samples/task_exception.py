@@ -1,3 +1,4 @@
+# ruff: noqa: F841
 from robocorp.tasks import task
 
 

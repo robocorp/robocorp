@@ -321,9 +321,7 @@ def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
 
 def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
     """
-    This tests checks limits for messages and checks that the logging
-    still behaves properly on corner cases (such as when a message would
-    be greater than the max log size).
+    This test checks the stack overflow case (disabled for now).
     """
     from imp import reload
 

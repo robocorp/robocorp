@@ -16,7 +16,12 @@ const Container = styled.div<{ depth: number }>`
 `;
 
 export const Step: FC<Props> = ({ entry }) => {
-  const depth = entry.id.split('-').length - 1;
+  let depth = entry.id.split('-').length - 1;
+  if (depth > 20) {
+    // Flatten after it's 20 levels deep.
+    // (when it's too deep we can't really see it)
+    depth = 20;
+  }
 
   return (
     <Container depth={depth} id={entry.id}>
