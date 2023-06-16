@@ -110,3 +110,7 @@ Read and write Excel files directly, with support for both .xlsx and .xls.
 #### [`robocorp.http`](./http)
 
 Download files easily, or make custom HTTP requests.
+
+## Documentation
+
+To find further user guides and read API documentation, see the internal [documentation](./docs).
