@@ -12,12 +12,18 @@ __version__ = "0.1.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 LOGGER = logging.getLogger(__name__)
-_with_lazy_assets = _with_lazy_objects(assets_client=_get_assets_client)
+_with_lazy_assets = _with_lazy_objects(_assets_client=_get_assets_client)
 
 
 @_with_lazy_assets
-def list_assets(*, assets_client: Requests) -> List[Dict]:
-    assets = assets_client.get("").json()
+def list_assets(*, _assets_client: Requests) -> List[Dict]:
+    """List all the existing assets.
+
+    Returns:
+        A list of assets where each asset is a dictionary with fields like 'id' and
+        'name'.
+    """
+    assets = _assets_client.get("").json()
     LOGGER.info("Found %d assets.", len(assets))
     return assets
 
@@ -34,7 +40,7 @@ def _retrieve_asset_id(name: str) -> str:
 
 
 @_with_lazy_assets
-def _get_asset(name: str, *, assets_client: Requests, raise_if_missing: bool = True) -> Optional[Dict]:
+def _get_asset(name: str, *, _assets_client: Requests, raise_if_missing: bool = True) -> Optional[Dict]:
     asset_id = _retrieve_asset_id(name)
     exception = None
 
@@ -43,7 +49,7 @@ def _get_asset(name: str, *, assets_client: Requests, raise_if_missing: bool = T
         #  server, therefore don't let this raise, nor retry given this custom handler.
         nonlocal exception
         try:
-            assets_client.handle_error(resp)
+            _assets_client.handle_error(resp)
         except RequestsHTTPError as exc:
             if exc.status_code == 404:
                 exception = exc
@@ -51,7 +57,7 @@ def _get_asset(name: str, *, assets_client: Requests, raise_if_missing: bool = T
                 raise
 
     LOGGER.debug("Retrieving asset %r with resulted ID %r.", name, asset_id)
-    response = assets_client.get(asset_id, _handle_error=_handle_error)
+    response = _assets_client.get(asset_id, _handle_error=_handle_error)
     if response.ok:
         return response.json()
 
@@ -66,7 +72,18 @@ def _get_asset(name: str, *, assets_client: Requests, raise_if_missing: bool = T
 
 
 @_with_lazy_assets
-def get_asset(name: str, *, assets_client: Requests) -> str:
+def get_asset(name: str, *, _assets_client: Requests) -> str:
+    """Get the asset's value by providing its `name`.
+
+    Args:
+        name: Name of the asset to fetch.
+
+    Returns:
+        The previously set value of this asset. (empty if it was never set)
+
+    Raises:
+        AssetNotFound: When the queried asset doesn't exist.
+    """
     LOGGER.info("Retrieving asset %r.", name)
     payload = _get_asset(name)["payload"]
     if payload["type"] == "empty":
@@ -74,18 +91,28 @@ def get_asset(name: str, *, assets_client: Requests) -> str:
         return ""
 
     url = payload["url"]
-    return assets_client.get(url, headers={}).text
+    return _assets_client.get(url, headers={}).text
 
 
 @_with_lazy_assets
-def _create_asset(name: str, *, assets_client: Requests):
+def _create_asset(name: str, *, _assets_client: Requests):
     LOGGER.debug("Creating new asset with name %r.", name)
     body = {"name": name}
-    return assets_client.post("", json=body).json()
+    return _assets_client.post("", json=body).json()
 
 
 @_with_lazy_assets
-def set_asset(name: str, value: str, *, assets_client: Requests, wait: bool = True):
+def set_asset(name: str, value: str, *, _assets_client: Requests, wait: bool = True):
+    """Sets/Creates an asset named `name` with the provided `value`.
+
+    Args:
+        name: Name of the existing or new asset to create. (if missing)
+        value: The new value set within the asset.
+        wait: Blocks until the new value is reflected within the asset.
+
+    Raises:
+        AssetNotFound: When the queried asset doesn't exist.
+    """
     existing_asset = _get_asset(name, raise_if_missing=False)
     if existing_asset:
         asset_id = existing_asset["id"]
@@ -95,8 +122,8 @@ def set_asset(name: str, value: str, *, assets_client: Requests, wait: bool = Tr
         LOGGER.debug("Updating newly created asset with ID %r.", asset_id)
 
     body = {"content_type": "text/plain"}
-    upload_data = assets_client.post(f"{asset_id}/upload", json=body).json()
-    assets_client.put(upload_data["upload_url"], data=value, headers={})
+    upload_data = _assets_client.post(f"{asset_id}/upload", json=body).json()
+    _assets_client.put(upload_data["upload_url"], data=value, headers={})
 
     if wait:
         LOGGER.info(
@@ -105,7 +132,7 @@ def set_asset(name: str, value: str, *, assets_client: Requests, wait: bool = Tr
         )
         upload_url = f"{asset_id}/uploads/{upload_data['id']}"
         while True:
-            upload_data = assets_client.get(upload_url).json()
+            upload_data = _assets_client.get(upload_url).json()
             status = upload_data["status"]
             if status == "pending":
                 sleep_time = round(random.uniform(0, 1), 2)
@@ -125,9 +152,17 @@ def set_asset(name: str, value: str, *, assets_client: Requests, wait: bool = Tr
 
 
 @_with_lazy_assets
-def delete_asset(name: str, *, assets_client: Requests):
+def delete_asset(name: str, *, _assets_client: Requests):
+    """Delete an asset by providing its `name`.
+
+    Args:
+        name: Name of the asset to delete.
+
+    Raises:
+        AssetNotFound: When the queried asset doesn't exist.
+    """
     LOGGER.info("Deleting asset %r.", name)
-    assets_client.delete(_get_asset(name)["id"])
+    _assets_client.delete(_get_asset(name)["id"])
 
 
 __all__ = [
