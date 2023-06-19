@@ -66,12 +66,6 @@ class Inputs:
 
     It can be used to reserve and release items from the queue,
     and iterate over them.
-
-    Example:
-        Multiple items can behandled by iterating over this class::
-
-            for item in inputs:
-                handle_item(item.payload)
     """
 
     def __iter__(self):
@@ -117,11 +111,6 @@ class Outputs:
     """Outputs represents the output queue of work items.
 
     It can be used to create outputs and inspect the items created during the execution.
-
-    Example:
-        The class can be used to create outputs::
-
-            outputs.create({"key": "value"})
     """
 
     def __len__(self):
