@@ -55,8 +55,8 @@ class Email:
         }
     )
 
-    # NB (2023-06-16): Documented as non-optional, but seems to be missing in CR
     reply_to: Optional[Address] = None
+    message_id: Optional[str] = None
 
     text: Optional[str] = None
     html: Optional[str] = None

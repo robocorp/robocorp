@@ -1,4 +1,5 @@
 # ruff: noqa: E501
+import copy
 from datetime import datetime, timezone
 
 import pytest
@@ -226,3 +227,13 @@ def test_html_attachment_skip(inputs, adapter):
 
     email = inputs.current.email(html=False)
     assert email.html is None
+
+
+def test_email_extra_field(inputs):
+    email_extra_field = copy.deepcopy(EMAIL_VALID)
+    email_extra_field["email"]["unknown"] = "Some value"
+
+    inputs.current._payload = email_extra_field
+
+    email = inputs.current.email()
+    assert email.from_.name == "Mark the Monkey"
