@@ -3,7 +3,7 @@
     "payload": {
       "Name": "Sol Heaton",
       "Zip": 3695,
-      "Item": "Sauce Labs Bolt T-Shirt"
+      "Product": "Sauce Labs Bolt T-Shirt"
     },
     "files": {}
   },
@@ -11,7 +11,7 @@
     "payload": {
       "Name": "Gregg Arroyo",
       "Zip": 4418,
-      "Item": "Sauce Labs Onesie"
+      "Product": "Sauce Labs Onesie"
     },
     "files": {}
   },
@@ -19,7 +19,7 @@
     "payload": {
       "Name": "Zoya Roche",
       "Zip": 3013,
-      "Item": "Sauce Labs Bolt T-Shirt"
+      "Product": "Sauce Labs Bolt T-Shirt"
     },
     "files": {}
   },
@@ -27,7 +27,7 @@
     "payload": {
       "Name": "Gregg Arroyo",
       "Zip": 4418,
-      "Item": "Sauce Labs Bolt T-Shirt"
+      "Product": "Sauce Labs Bolt T-Shirt"
     },
     "files": {}
   },
@@ -35,7 +35,7 @@
     "payload": {
       "Name": "Camden Martin",
       "Zip": 1196,
-      "Item": "Sauce Labs Bolt T-Shirt"
+      "Product": "Sauce Labs Bolt T-Shirt"
     },
     "files": {}
   },
@@ -43,7 +43,7 @@
     "payload": {
       "Name": "Zoya Roche",
       "Zip": 3013,
-      "Item": "Sauce Labs Fleece Jacket"
+      "Product": "Sauce Labs Fleece Jacket"
     },
     "files": {}
   },
@@ -51,7 +51,7 @@
     "payload": {
       "Name": "Zoya Roche",
       "Zip": 3013,
-      "Item": "Sauce Labs Onesie"
+      "Product": "Sauce Labs Onesie"
     },
     "files": {}
   },
@@ -59,7 +59,7 @@
     "payload": {
       "Name": "Sol Heaton",
       "Zip": 3695,
-      "Item": "Sauce Labs Fleece Jacket"
+      "Product": "Sauce Labs Fleece Jacket"
     },
     "files": {}
   },
@@ -67,7 +67,7 @@
     "payload": {
       "Name": "Sol Heaton",
       "Zip": 3695,
-      "Item": "Sauce Labs Onesee"
+      "Product": "Sauce Labs Onesee"
     },
     "files": {}
   }
