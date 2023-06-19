@@ -3,7 +3,6 @@ import os
 import urllib.parse as urlparse
 from typing import Any, Optional
 
-
 # Sentinel value for undefined arguments.
 UNDEFINED = object()
 
@@ -63,7 +62,6 @@ class with_lazy_objects:
         self._initialized_on_call = True
 
     def __call__(self, func):
-
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             self._initialize_on_call()

@@ -3,7 +3,6 @@ import logging
 from ._requests import Requests
 from ._utils import RequiresEnv, url_join
 
-
 LOGGER = logging.getLogger(__name__)
 
 

@@ -5,8 +5,7 @@ import pytest
 
 from robocorp import storage
 
-
-random_str = lambda length: "".join(
+random_str = lambda length: "".join(  # noqa: E731
     random.choice(string.ascii_lowercase) for _ in range(length)
 )
 

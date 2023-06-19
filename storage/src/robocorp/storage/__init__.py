@@ -4,9 +4,9 @@ import time
 from typing import Dict, List, Optional
 
 from ._requests import Requests, RequestsHTTPError
-from ._storage import AssetNotFound, get_assets_client as _get_assets_client
+from ._storage import AssetNotFound
+from ._storage import get_assets_client as _get_assets_client
 from ._utils import with_lazy_objects as _with_lazy_objects
-
 
 __version__ = "0.1.0"
 version_info = [int(x) for x in __version__.split(".")]
@@ -40,7 +40,9 @@ def _retrieve_asset_id(name: str) -> str:
 
 
 @_with_lazy_assets
-def _get_asset(name: str, *, _assets_client: Requests, raise_if_missing: bool = True) -> Optional[Dict]:
+def _get_asset(
+    name: str, *, _assets_client: Requests, raise_if_missing: bool = True
+) -> Optional[Dict]:
     asset_id = _retrieve_asset_id(name)
     exception = None
 
@@ -61,9 +63,7 @@ def _get_asset(name: str, *, _assets_client: Requests, raise_if_missing: bool = 
     if response.ok:
         return response.json()
 
-    message = (
-        f"asset with name {name!r} and resulted ID {asset_id!r} couldn't be found"
-    )
+    message = f"asset with name {name!r} and resulted ID {asset_id!r} couldn't be found"
     if raise_if_missing:
         raise AssetNotFound(message) from exception
 
@@ -127,8 +127,7 @@ def set_asset(name: str, value: str, *, _assets_client: Requests, wait: bool = T
 
     if wait:
         LOGGER.info(
-            "Waiting for the sent value to be set successfully in the %r asset...",
-            name
+            "Waiting for the sent value to be set successfully in the %r asset...", name
         )
         upload_url = f"{asset_id}/uploads/{upload_data['id']}"
         while True:
