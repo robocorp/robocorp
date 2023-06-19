@@ -6,6 +6,8 @@ authors = [
     "Fabio Zadrozny <fabio@robocorp.com>",
 ]
 readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
 packages = [{include = "robocorp/log", from = "src"}]
 include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]
 classifiers = [
