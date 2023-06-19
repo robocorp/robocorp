@@ -170,6 +170,11 @@ def build_common_tasks(root: Path, package_name: str):
         """Run unittests"""
         poetry(ctx, f"run pytest")
 
+    @task(lint, typecheck, test)
+    def check_all(ctx):
+        """Run all checks"""
+        pass
+
     @task
     def build(ctx):
         """Build distributable .tar.gz and .wheel files"""
