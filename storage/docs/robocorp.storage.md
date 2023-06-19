@@ -13,7 +13,7 @@
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L16"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `list_assets`
 
@@ -31,7 +31,7 @@ List all the existing assets.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L70"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_asset`
 
@@ -61,7 +61,7 @@ Get the asset's value by providing its `name`.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L103"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_asset`
 
@@ -88,7 +88,7 @@ Sets/Creates an asset named `name` with the provided `value`.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L152"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L149"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `delete_asset`
 

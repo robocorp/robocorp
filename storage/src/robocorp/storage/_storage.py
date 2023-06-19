@@ -1,10 +1,25 @@
 import logging
 from functools import lru_cache
+from typing import Dict, Optional, TypedDict
 
 from ._requests import Requests
 from ._utils import RequiresEnv, url_join
 
 LOGGER = logging.getLogger(__name__)
+
+
+AssetMeta = Dict[str, str]
+Payload = TypedDict(
+    "Payload", {"type": str, "content_type": Optional[str], "url": Optional[str]}
+)
+Asset = TypedDict(
+    "Asset",
+    {
+        "id": str,
+        "name": str,
+        "payload": Payload,
+    },
+)
 
 
 class AssetNotFound(KeyError):

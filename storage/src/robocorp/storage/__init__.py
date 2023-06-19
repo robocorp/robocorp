@@ -1,10 +1,10 @@
 import logging
 import random
 import time
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, cast
 
 from ._requests import RequestsHTTPError
-from ._storage import AssetNotFound
+from ._storage import Asset, AssetMeta, AssetNotFound
 from ._storage import get_assets_client as _get_assets_client
 
 __version__ = "0.1.0"
@@ -12,11 +12,8 @@ version_info = [int(x) for x in __version__.split(".")]
 
 LOGGER = logging.getLogger(__name__)
 
-AssetMetaType = Dict[str, str]
-AssetType = Dict[str, Union[str, Dict[str, str]]]
 
-
-def list_assets() -> List[AssetMetaType]:
+def list_assets() -> List[AssetMeta]:
     """List all the existing assets.
 
     Returns:
@@ -40,7 +37,7 @@ def _retrieve_asset_id(name: str) -> str:
     return name
 
 
-def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[AssetType]:
+def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[Asset]:
     assets_client = _get_assets_client()
     asset_id = _retrieve_asset_id(name)
     exception = None
@@ -60,7 +57,7 @@ def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[AssetType]:
     LOGGER.debug("Retrieving asset %r with resulted ID %r.", name, asset_id)
     response = assets_client.get(asset_id, _handle_error=_handle_error)
     if response.ok:
-        return response.json()
+        return cast(Asset, response.json())
 
     message = f"asset with name {name!r} and resulted ID {asset_id!r} couldn't be found"
     if raise_if_missing:
@@ -84,12 +81,12 @@ def get_asset(name: str) -> str:
     """
     LOGGER.info("Retrieving asset %r.", name)
     payload = _get_asset(name)["payload"]  # type: ignore
-    if payload["type"] == "empty":  # type: ignore
+    if payload["type"] == "empty":
         LOGGER.warning("Asset %r has no value set!", name)
         return ""
 
     assets_client = _get_assets_client()
-    url = payload["url"]  # type: ignore
+    url = payload["url"]
     return assets_client.get(url, headers={}).text
 
 
