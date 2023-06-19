@@ -44,28 +44,3 @@ def url_join(*parts: str) -> Optional[str]:
     for part in parts:
         url = urlparse.urljoin(url, part.strip("/") + "/")
     return url
-
-
-class with_lazy_objects:
-    """Decorator providing functions with lazily initialized keyword arguments."""
-
-    def __init__(self, **kwargs):
-        self._lazy = kwargs
-        self._initialized_on_call = False
-
-    def _initialize_on_call(self):
-        if self._initialized_on_call:
-            return
-
-        for name, callable in self._lazy.items():
-            self._lazy[name] = callable()
-        self._initialized_on_call = True
-
-    def __call__(self, func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            self._initialize_on_call()
-            kwargs.update(self._lazy)
-            return func(*args, **kwargs)
-
-        return wrapper
