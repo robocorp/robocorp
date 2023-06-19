@@ -7,6 +7,10 @@ from ._utils import required_env, url_join
 LOGGER = logging.getLogger(__name__)
 
 
+class AssetNotFound(KeyError):
+    """Raised when the queried asset couldn't be found."""
+
+
 def get_assets_client():
     """Creates and returns an API client based on the injected env vars in CR."""
     api_url = required_env("RC_API_URL_V1")
