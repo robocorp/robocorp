@@ -114,3 +114,9 @@ Download files easily, or make custom HTTP requests.
 ## Documentation
 
 To find further user guides and read API documentation, see the internal [documentation](./docs).
+
+## License
+
+Source code licensed under [Apache-2.0](./LICENSE).
+
+The End User License Agreement (EULA) for the distributed `robo` binary can be found [here](https://cdn.robocorp.com/legal/Robocorp-EULA-v1.0.pdf).
