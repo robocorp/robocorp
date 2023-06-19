@@ -3,19 +3,21 @@ import random
 import time
 from typing import Dict, List, Optional
 
-from ._requests import RequestsHTTPError
-from ._storage import AssetNotFound, get_assets_client
+from ._requests import Requests, RequestsHTTPError
+from ._storage import AssetNotFound, get_assets_client as _get_assets_client
+from ._utils import with_lazy_objects as _with_lazy_objects
 
 
 __version__ = "0.1.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 LOGGER = logging.getLogger(__name__)
-ASSETS_CLIENT = get_assets_client()
+_with_lazy_assets = _with_lazy_objects(assets_client=_get_assets_client)
 
 
-def list_assets() -> List[Dict]:
-    assets = ASSETS_CLIENT.get("").json()
+@_with_lazy_assets
+def list_assets(*, assets_client: Requests) -> List[Dict]:
+    assets = assets_client.get("").json()
     LOGGER.info("Found %d assets.", len(assets))
     return assets
 
@@ -31,7 +33,8 @@ def _retrieve_asset_id(name: str) -> str:
     return name
 
 
-def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[Dict]:
+@_with_lazy_assets
+def _get_asset(name: str, *, assets_client: Requests, raise_if_missing: bool = True) -> Optional[Dict]:
     asset_id = _retrieve_asset_id(name)
     exception = None
 
@@ -40,7 +43,7 @@ def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[Dict]:
         #  server, therefore don't let this raise, nor retry given this custom handler.
         nonlocal exception
         try:
-            ASSETS_CLIENT.handle_error(resp)
+            assets_client.handle_error(resp)
         except RequestsHTTPError as exc:
             if exc.status_code == 404:
                 exception = exc
@@ -48,7 +51,7 @@ def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[Dict]:
                 raise
 
     LOGGER.debug("Retrieving asset %r with resulted ID %r.", name, asset_id)
-    response = ASSETS_CLIENT.get(asset_id, _handle_error=_handle_error)
+    response = assets_client.get(asset_id, _handle_error=_handle_error)
     if response.ok:
         return response.json()
 
@@ -62,7 +65,8 @@ def _get_asset(name: str, raise_if_missing: bool = True) -> Optional[Dict]:
     return None
 
 
-def get_asset(name: str) -> str:
+@_with_lazy_assets
+def get_asset(name: str, *, assets_client: Requests) -> str:
     LOGGER.info("Retrieving asset %r.", name)
     payload = _get_asset(name)["payload"]
     if payload["type"] == "empty":
@@ -70,16 +74,18 @@ def get_asset(name: str) -> str:
         return ""
 
     url = payload["url"]
-    return ASSETS_CLIENT.get(url, headers={}).text
+    return assets_client.get(url, headers={}).text
 
 
-def _create_asset(name):
+@_with_lazy_assets
+def _create_asset(name: str, *, assets_client: Requests):
     LOGGER.debug("Creating new asset with name %r.", name)
     body = {"name": name}
-    return ASSETS_CLIENT.post("", json=body).json()
+    return assets_client.post("", json=body).json()
 
 
-def set_asset(name: str, value: str, wait: bool = True):
+@_with_lazy_assets
+def set_asset(name: str, value: str, *, assets_client: Requests, wait: bool = True):
     existing_asset = _get_asset(name, raise_if_missing=False)
     if existing_asset:
         asset_id = existing_asset["id"]
@@ -89,8 +95,8 @@ def set_asset(name: str, value: str, wait: bool = True):
         LOGGER.debug("Updating newly created asset with ID %r.", asset_id)
 
     body = {"content_type": "text/plain"}
-    upload_data = ASSETS_CLIENT.post(f"{asset_id}/upload", json=body).json()
-    ASSETS_CLIENT.put(upload_data["upload_url"], data=value, headers={})
+    upload_data = assets_client.post(f"{asset_id}/upload", json=body).json()
+    assets_client.put(upload_data["upload_url"], data=value, headers={})
 
     if wait:
         LOGGER.info(
@@ -99,7 +105,7 @@ def set_asset(name: str, value: str, wait: bool = True):
         )
         upload_url = f"{asset_id}/uploads/{upload_data['id']}"
         while True:
-            upload_data = ASSETS_CLIENT.get(upload_url).json()
+            upload_data = assets_client.get(upload_url).json()
             status = upload_data["status"]
             if status == "pending":
                 sleep_time = round(random.uniform(0, 1), 2)
@@ -118,12 +124,14 @@ def set_asset(name: str, value: str, wait: bool = True):
     LOGGER.info("Asset with name %r set successfully.", name)
 
 
-def delete_asset(name: str):
+@_with_lazy_assets
+def delete_asset(name: str, *, assets_client: Requests):
     LOGGER.info("Deleting asset %r.", name)
-    ASSETS_CLIENT.delete(_get_asset(name)["id"])
+    assets_client.delete(_get_asset(name)["id"])
 
 
 __all__ = [
+    "AssetNotFound",
     "list_assets",
     "get_asset",
     "set_asset",

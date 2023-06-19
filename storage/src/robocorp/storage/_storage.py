@@ -1,7 +1,7 @@
 import logging
 
 from ._requests import Requests
-from ._utils import required_env, url_join
+from ._utils import RequiresEnv, url_join
 
 
 LOGGER = logging.getLogger(__name__)
@@ -13,10 +13,13 @@ class AssetNotFound(KeyError):
 
 def get_assets_client():
     """Creates and returns an API client based on the injected env vars in CR."""
-    api_url = required_env("RC_API_URL_V1")
-    api_token = required_env("RC_API_TOKEN_V1", "")
-    api_key = required_env("RC_API_KEY", "")  # for local tests only
-    workspace_id = required_env("RC_WORKSPACE_ID")
+    requires_env = RequiresEnv(
+        "Asset Storage feature can be used with Control Room only"
+    )
+    api_url = requires_env("RC_API_URL_V1")
+    workspace_id = requires_env("RC_WORKSPACE_ID")
+    api_token = requires_env("RC_API_TOKEN_V1", "")  # production availability
+    api_key = requires_env("RC_API_KEY", "")  # for local tests only
 
     route_prefix = url_join(api_url, "workspaces", workspace_id, "assets")
     assert any([api_token, api_key]), "API token or key missing"

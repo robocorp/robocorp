@@ -17,7 +17,7 @@ from tenacity import (
 )
 
 LOGGER = logging.getLogger(__name__)
-DEBUG = bool(os.getenv("RC_WORKITEM_DEBUG") or os.getenv("RPA_DEBUG_API"))
+DEBUG = bool(os.getenv("RPA_DEBUG_API"))
 
 
 def _needs_retry(exc: BaseException) -> bool:
