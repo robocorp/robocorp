@@ -43,7 +43,6 @@ class Email:
     to: list[Address]
     cc: list[Address]
     bcc: list[Address]
-    reply_to: Address
 
     subject: str
     date: datetime = field(
@@ -55,6 +54,9 @@ class Email:
             }
         }
     )
+
+    # NB (2023-06-16): Documented as non-optional, but seems to be missing in CR
+    reply_to: Optional[Address] = None
 
     text: Optional[str] = None
     html: Optional[str] = None

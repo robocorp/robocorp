@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/robocorp/robo/cli/config"
-	"github.com/robocorp/robo/cli/config/conda"
 	"github.com/robocorp/robo/cli/config/robot"
 	"github.com/robocorp/robo/cli/environment"
+	"github.com/robocorp/robo/cli/operations/lock"
 	"github.com/robocorp/robo/cli/rcc"
 	"github.com/robocorp/robo/cli/tasks"
 	"github.com/robocorp/robo/cli/ui"
@@ -24,43 +24,18 @@ var (
 )
 
 func ExportProject(dir, zipFile string, force bool) error {
-	cfg, err := config.FromPath(dir)
+	files, err := lock.CreateLockFiles(dir, force)
 	if err != nil {
 		return err
 	}
 
-	robotTasks, err := parseTasks(cfg)
-	if err != nil {
-		return err
+	for _, f := range files {
+		defer os.Remove(f)
 	}
-
-	condaYaml := conda.NewFromConfig(cfg)
-	if err := condaYaml.SaveAs(CondaPath, force); err != nil {
-		return err
-	}
-
-	defer os.Remove(CondaPath)
-
-	robotYaml := robot.NewFromConfig(cfg)
-	robotYaml.Conda = CondaPath
-	robotYaml.Tasks = robotTasks
-	if err = robotYaml.SaveAs(RobotPath, force); err != nil {
-		return err
-	}
-
-	defer os.Remove(RobotPath)
 
 	if err := rcc.RobotWrap(zipFile); err != nil {
 		return fmt.Errorf("Failed to create zip file: %v", err)
 	}
-
-	// TODO: Convert to debug/verbose print
-
-	fmt.Println(title.Render("Conda configuration"))
-	fmt.Println(condaYaml.Pretty())
-
-	fmt.Println(title.Render("Robot configuration"))
-	fmt.Println(robotYaml.Pretty())
 
 	fmt.Println(bold.Inline(true).Render("Created zipfile:"), zipFile)
 
