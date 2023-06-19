@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "robocorp-storage"
+version = "0.1.0"
+description = "Robocorp Asset Storage library"
+authors = [
+	"Cosmin P. <cosmin@robocorp.com>",
+]
+readme = "README.md"
+packages = [{include = "robocorp", from="src"}]
+
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.28.2"
+tenacity = "^8.0.1"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+types-requests = "^2.30.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

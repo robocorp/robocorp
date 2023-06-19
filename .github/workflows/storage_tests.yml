@@ -1,0 +1,60 @@
+name: Asset Storage Tests
+
+on:
+  push:
+    branches:
+      - "master"
+      - "wip"
+    paths:
+      - "storage/**"
+      - "tasks/**"
+      - "log/**"
+      - ".github/workflows/storage_tests.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "storage/**"
+      - ".github/workflows/storage_tests.yml"
+
+defaults:
+  run:
+    working-directory: './storage'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "ubuntu-py310"
+            python: "3.10"
+            os: ubuntu-latest
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+          - name: "macos-py310"
+            os: macos-latest
+            python: "3.10"
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Install dependencies
+      run: poetry install
+    - name: Run Lint
+      run: poetry run invoke lint
+    - name: Run Typecheck
+      run: poetry run invoke typecheck
+    - name: Run Unittests
+      run: poetry run invoke test

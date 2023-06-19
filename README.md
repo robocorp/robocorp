@@ -99,6 +99,10 @@ Store secret values in Control Room and access them during the execution.
 
 Interact with Control Room work items; Read data from previous steps, create output data.
 
+#### [`robocorp.storage`](./storage)
+
+Store values by keys in Control Room and manage them during the execution.
+
 #### [`robocorp.browser`](./browser)
 
 Automate actions in a browser, powered by [Playwright](https://playwright.dev/).
