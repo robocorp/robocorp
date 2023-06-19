@@ -13,12 +13,12 @@
 
 ---
 
-<a href="../../storage/src/robocorp/storage/_utils.py#L18"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `list_assets`
 
 ```python
-list_assets(_assets_client: Requests) → List[Dict]
+list_assets() → List[Dict[str, str]]
 ```
 
 List all the existing assets. 
@@ -31,12 +31,12 @@ List all the existing assets.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/_utils.py#L74"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_asset`
 
 ```python
-get_asset(name: str, _assets_client: Requests) → str
+get_asset(name: str) → str
 ```
 
 Get the asset's value by providing its `name`. 
@@ -61,12 +61,12 @@ Get the asset's value by providing its `name`.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/_utils.py#L104"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L103"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_asset`
 
 ```python
-set_asset(name: str, value: str, _assets_client: Requests, wait: bool = True)
+set_asset(name: str, value: str, wait: bool = True)
 ```
 
 Sets/Creates an asset named `name` with the provided `value`. 
@@ -88,12 +88,12 @@ Sets/Creates an asset named `name` with the provided `value`.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/_utils.py#L153"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L152"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `delete_asset`
 
 ```python
-delete_asset(name: str, _assets_client: Requests)
+delete_asset(name: str)
 ```
 
 Delete an asset by providing its `name`. 
