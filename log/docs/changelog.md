@@ -4,6 +4,18 @@ NEXT (xxx-xx-xx)
 - If the depth of a recursion is > 20 it will be shown in the same level so
   that messages are still readable.
   
+- It's possible to specify whether the default theme to be used is `dark` 
+  or `light` by passing arguments in the `log.html`. 
+  
+  i.e.: `log.html?theme=dark`
+  
+- Variable pretty-printing improvements
+    - if a variable representation is considered small its contents won't be broken into new lines.
+
+      i.e.: `(a, b, c)` will be shown as is instead of being broken into 5 lines.
+
+    - Unbalanced tokens such as `[` or `]` without a counterpart are better handled.
+  
 - Improvements to the degenerate case where the chosen max log file
 is too close to the size of a single message:
 
