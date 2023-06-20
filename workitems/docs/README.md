@@ -4,7 +4,7 @@
 
 ## Modules
 
-- [`robocorp.workitems`](./robocorp.workitems.md#module-robocorpworkitems): A library for interacting with Control Room work items.
+- [`robocorp.workitems`](./robocorp.workitems.md#module-robocorpworkitems)
 
 ## Classes
 

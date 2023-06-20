@@ -7,6 +7,7 @@ import {
   defaultLogState,
   LogContextType,
   RunInfo,
+  createDefaultRunInfo,
 } from '~/lib';
 import { Entry, ViewSettings } from './lib/types';
 import {
@@ -26,12 +27,7 @@ export const Log = () => {
   const [filter, setFilter] = useState('');
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [runInfo, setRunInfo] = useState<RunInfo>({
-    description: 'Waiting for run to start ...',
-    time: '',
-    status: 'UNSET',
-    finishTimeDeltaInSeconds: undefined,
-  });
+  const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
   const lastUpdatedIndex = useRef<number>(0);

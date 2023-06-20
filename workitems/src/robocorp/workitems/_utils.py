@@ -63,6 +63,7 @@ def import_by_name(name: str, caller: Optional[str] = None) -> Any:
 
 def resolve_path(path: str) -> Path:
     """Resolve a string-based path, and replace variables."""
+    # TODO: Support RF syntax for replacement, such as ${ROBOT_ROOT}?
     return Path(path).expanduser().resolve()
 
 

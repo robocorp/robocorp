@@ -8,7 +8,6 @@ import threading
 import time
 import traceback
 import weakref
-from contextlib import contextmanager
 from datetime import timezone
 from functools import partial
 from pathlib import Path
@@ -179,8 +178,10 @@ class _RotateHandler:
         self._found_files: List[Path] = []
         self._max_files = max_files
 
-    def rotate_after(self, in_bytes: bytes):
-        self._total_bytes += len(in_bytes)
+    def add_bytes(self, bytes_len):
+        self._total_bytes += bytes_len
+
+    def rotate_after(self):
         if self._total_bytes >= self._max_file_size_in_bytes:
             self._total_bytes = 0
             return True
@@ -202,24 +203,18 @@ class _RotateHandler:
 
 class _StackEntry:
     def __init__(
-        self, entry_type, entry_id, msg_type, new_msg_type, hide_from_logs
+        self, entry_type, entry_id, msg_type, replay_msg_type, hide_from_logs, write_it
     ) -> None:
         self.entry_type = entry_type
         self.entry_id = entry_id
         self.msg_type = msg_type
-        self.new_msg_type = new_msg_type
+        self.replay_msg_type = replay_msg_type
         self.hide_from_logs = hide_from_logs
         self._messages: List[str] = []
+        self.write_it = write_it
 
-    def append(self, msg: str):
-        self._messages.append(msg)
-
-    def translated_messages(self) -> Iterator[str]:
-        iter_in = iter(self._messages)
-        for msg in iter_in:
-            if msg.startswith(self.msg_type):
-                msg = msg.replace(self.msg_type, self.new_msg_type, 1)
-            yield msg
+    def rewrite(self, robot_output_impl):
+        self.write_it(robot_output_impl, self.replay_msg_type)
 
     def __str__(self):
         return f"StackEntry({self.entry_type}, {self.entry_id}, {self.msg_type}, hide: {self.hide_from_logs})"
@@ -230,31 +225,22 @@ class _StackEntry:
 class _StackHandler:
     def __init__(self, robot_output_impl):
         self._queue = []
-        self.recording_writes = False
-        self._record_to = None
         self._robot_output_impl = weakref.ref(robot_output_impl)
 
-    @contextmanager
     def push_record(
         self,
         entry_type: str,
         entry_id: str,
         msg_type: str,
-        new_msg_type: str,
-        hide_from_logs: bool = False,
-    ):
-        self.recording_writes = True
-        self._record_to = _StackEntry(
-            entry_type, entry_id, msg_type, new_msg_type, hide_from_logs
+        replay_msg_type: str,
+        hide_from_logs: bool,
+        write_it: Callable[[Any, str], Any],
+    ) -> None:
+        entry = _StackEntry(
+            entry_type, entry_id, msg_type, replay_msg_type, hide_from_logs, write_it
         )
-        try:
-            yield
-        finally:
-            self._queue.append(self._record_to)
-            self.recording_writes = False
-
-    def record_msg(self, msg):
-        self._record_to.append(msg)
+        write_it(self._robot_output_impl(), msg_type)
+        self._queue.append(entry)
 
     def pop(self, entry_type, entry_id) -> Optional[_StackEntry]:
         if not self._queue:
@@ -421,6 +407,7 @@ class _RoboOutputImpl:
         self._rotating = True
         try:
             self._current_memo = {}
+            self._current_loc_memo = {}
 
             self._current_entry += 1
             if self._current_entry != 1:
@@ -461,13 +448,9 @@ class _RoboOutputImpl:
             self._write_json("I ", f"python={sys.version}")
 
         for stack_entry in self._stack_handler:
-            for msg in stack_entry.translated_messages():
-                self._do_write(msg)
+            stack_entry.rewrite(self)
 
     def _do_write(self, s: str) -> None:
-        if self._stack_handler.recording_writes:
-            self._stack_handler.record_msg(s)
-
         if self._write is not None:
             self._write(s)
 
@@ -477,11 +460,14 @@ class _RoboOutputImpl:
             self._stream.flush()
 
         self._messages_written_after_rotation += 1
+        self._rotate_handler.add_bytes(len(in_bytes))
+
+    def _rotate_if_needed(self):
         if (
             self._messages_written_after_rotation > self._config.min_messages_per_file
             and not self._rotating
         ):
-            if self._rotate_handler.rotate_after(in_bytes):
+            if self._rotate_handler.rotate_after():
                 self._rotate_output()
 
     def _write_json(self, msg_type, args):
@@ -515,8 +501,6 @@ class _RoboOutputImpl:
     def _obtain_id(self, s: str) -> str:
         curr_id = self._current_memo.get(s)
         if curr_id is not None:
-            if self._stack_handler.recording_writes:
-                self._stack_handler.record_msg(f"M {curr_id}:{json.dumps(s)}\n")
             return curr_id
 
         curr_id = self._base_memo.get(s)
@@ -536,14 +520,9 @@ class _RoboOutputImpl:
     ) -> str:
         key = (name, libname, source, lineno)
         curr_id = self._current_loc_memo.get(key)
-        oid = self._obtain_id
-
         if curr_id is not None:
-            if self._stack_handler.recording_writes:
-                self._stack_handler.record_msg(
-                    f"P {curr_id}:{oid(name)}|{oid(libname)}|{oid(source)}|{oid(docstring)}|{lineno}\n"
-                )
             return curr_id
+        oid = self._obtain_id
 
         curr_id = self._base_loc_memo.get(key)
         if curr_id is not None:
@@ -564,16 +543,25 @@ class _RoboOutputImpl:
     def _number(self, v):
         return str(v)
 
-    def start_run(self, name: str, time_delta: float) -> None:
-        oid = self._obtain_id
-        with self._stack_handler.push_record("run", name, "SR", "RR"):
-            self._write_with_separator(
-                "SR ",
+    class _WriteStartRun:
+        def __init__(self, name, time_delta):
+            self.name = name
+            self.time_delta = time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            oid = robot_impl._obtain_id
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
                 [
-                    oid(name),
-                    self._number(time_delta),
+                    oid(self.name),
+                    robot_impl._number(self.time_delta),
                 ],
-            )
+            ),
+
+    def start_run(self, name: str, time_delta: float) -> None:
+        self._stack_handler.push_record(
+            "run", name, "SR", "RR", False, self._WriteStartRun(name, time_delta)
+        )
 
     def end_run(self, name: str, status: str, time_delta: float) -> None:
         oid = self._obtain_id
@@ -586,6 +574,26 @@ class _RoboOutputImpl:
         )
         self._stack_handler.pop("run", name)
 
+    class _WriteStartTask:
+        def __init__(self, name, libname, source, line, doc, time_delta):
+            self.name = name
+            self.libname = libname
+            self.source = source
+            self.line = line
+            self.doc = doc
+            self.time_delta = time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            loc_id = robot_impl._obtain_loc_id
+
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
+                [
+                    loc_id(self.name, self.libname, self.source, self.line, self.doc),
+                    robot_impl._number(self.time_delta),
+                ],
+            ),
+
     def start_task(
         self,
         name: str,
@@ -595,16 +603,17 @@ class _RoboOutputImpl:
         doc: str,
         time_delta: float,
     ):
-        loc_id = self._obtain_loc_id
+        self._rotate_if_needed()
+
         task_id = f"{libname}.{name}"
-        with self._stack_handler.push_record("task", task_id, "ST", "RT"):
-            self._write_with_separator(
-                "ST ",
-                [
-                    loc_id(name, libname, source, line, doc),
-                    self._number(time_delta),
-                ],
-            )
+        self._stack_handler.push_record(
+            "task",
+            task_id,
+            "ST",
+            "RT",
+            False,
+            self._WriteStartTask(name, libname, source, line, doc, time_delta),
+        )
 
     def send_info(self, info: str):
         self._write_json("I ", info)
@@ -627,22 +636,34 @@ class _RoboOutputImpl:
         task_id = f"{libname}.{name}"
         self._stack_handler.pop("task", task_id)
 
+    class _WriteProcessSnapshot:
+        def __init__(self, time_delta):
+            self.time_delta = time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            oid = robot_impl._obtain_id
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
+                [
+                    oid("Process snapshot"),
+                    robot_impl._number(self.time_delta),
+                ],
+            ),
+
     def process_snapshot(self) -> None:
-        oid = self._obtain_id
+        self._rotate_if_needed()
+
         entry_id = f"ps_{self._next_int()}"
         entry_type = "process_snapshot"
 
-        with self._stack_handler.push_record(
+        self._stack_handler.push_record(
             entry_type,
             entry_id,
             "SPS",
             "RPS",
-            hide_from_logs=False,
-        ):
-            self._write_with_separator(
-                f"SPS ",
-                [oid("Process snapshot"), self._number(self.get_time_delta())],
-            )
+            False,
+            self._WriteProcessSnapshot(self.get_time_delta()),
+        )
 
         try:
             try:
@@ -769,6 +790,8 @@ Virtual Memory Size: {vms}"""
             was already previously logged (see the `unhandled` parameter for
             details on the use-cases where it may be skipped).
         """
+        self._rotate_if_needed()
+
         exception_type, exception, tb = exc_info
         if exception is None or tb is None or exception_type is None:
             return False
@@ -806,6 +829,18 @@ Virtual Memory Size: {vms}"""
         )
         return True
 
+    class _WriteStack:
+        def __init__(self, title, time_delta):
+            self.title = title
+            self.time_delta = time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            oid = robot_impl._obtain_id
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
+                [oid(self.title), robot_impl._number(self.time_delta)],
+            ),
+
     def _write_stack(
         self,
         title: str,
@@ -823,17 +858,14 @@ Virtual Memory Size: {vms}"""
         oid = self._obtain_id
         entry_id = f"tb_{self._next_int()}"
 
-        with self._stack_handler.push_record(
+        self._stack_handler.push_record(
             entry_type,
             entry_id,
             start_message_type,
             restart_message_type,
-            hide_from_logs=False,
-        ):
-            self._write_with_separator(
-                f"{start_message_type} ",
-                [oid(title), self._number(self.get_time_delta())],
-            )
+            False,
+            self._WriteStack(title, self.get_time_delta()),
+        )
 
         for frame, tb_lineno in stack:
             code = frame.f_code
@@ -879,6 +911,31 @@ Virtual Memory Size: {vms}"""
             f"{end_message_type} ", [self._number(self.get_time_delta())]
         )
 
+    class _WriteStartElement:
+        def __init__(
+            self, name, libname, source, lineno, doc, element_type, start_time_delta
+        ):
+            self.name = name
+            self.libname = libname
+            self.source = source
+            self.lineno = lineno
+            self.doc = doc
+            self.element_type = element_type
+            self.start_time_delta = start_time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            oid = robot_impl._obtain_id
+            loc_id = robot_impl._obtain_loc_id
+
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
+                [
+                    loc_id(self.name, self.libname, self.source, self.lineno, self.doc),
+                    oid(self.element_type),
+                    robot_impl._number(self.start_time_delta),
+                ],
+            )
+
     def start_element(
         self,
         name: str,
@@ -891,33 +948,38 @@ Virtual Memory Size: {vms}"""
         args: Sequence[Tuple[str, str, str]],
         hide_from_logs: bool,
     ) -> None:
+        self._rotate_if_needed()
+
         from ._null import NULL
 
         oid = self._obtain_id
-        loc_id = self._obtain_loc_id
         element_id = f"{libname}.{name}"
 
         ctx: Any = NULL
+
+        if hide_from_logs:
+            # I.e.: add to internal stack but don't write it.
+            write_it = lambda self, msg_type: None
+        else:
+            write_it = self._WriteStartElement(
+                name, libname, source, lineno, doc, element_type, start_time_delta
+            )
+
         if element_type != "UNTRACKED_GENERATOR":
             # We don't change the scope for untracked generators as
             # we have no idea when it'll pause/resume.
-            ctx = self._stack_handler.push_record(
-                "element", element_id, "SE", "RE", hide_from_logs
+            self._stack_handler.push_record(
+                "element", element_id, "SE", "RE", hide_from_logs, write_it
             )
-
-        with ctx:
             if hide_from_logs:
-                # I.e.: add to internal stack but don't write it.
+                # I.e.: add to internal stack but don't write anything else.
                 return
-
-            self._write_with_separator(
-                "SE ",
-                [
-                    loc_id(name, libname, source, lineno, doc),
-                    oid(element_type),
-                    self._number(start_time_delta),
-                ],
-            )
+        else:
+            if hide_from_logs:
+                # Don't write anything
+                return
+            # Just write, don't add to stack.
+            write_it(self, "SE")
 
         if args:
             for name, arg_type, arg in args:
@@ -984,6 +1046,8 @@ Virtual Memory Size: {vms}"""
             # (and if it was logged, the stop should be also logged).
             return
 
+        self._rotate_if_needed()
+
         oid = self._obtain_id
 
         hide_strings_re = self._hide_strings_re
@@ -1000,6 +1064,24 @@ Virtual Memory Size: {vms}"""
             ],
         )
 
+    class _WriteYieldResume:
+        def __init__(self, name, libname, source, lineno, time_delta):
+            self.name = name
+            self.libname = libname
+            self.source = source
+            self.lineno = lineno
+            self.time_delta = time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            loc_id = robot_impl._obtain_loc_id
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
+                [
+                    loc_id(self.name, self.libname, self.source, self.lineno),
+                    robot_impl._number(self.time_delta),
+                ],
+            )
+
     def yield_resume(
         self,
         name: str,
@@ -1013,21 +1095,17 @@ Virtual Memory Size: {vms}"""
         Note that a yield resume is semantically very close to a start element
         but it doesn't have any arguments.
         """
-        element_id = f"{libname}.{name}"
-        with self._stack_handler.push_record(
-            "element", element_id, "YR", "RYR", hide_from_logs
-        ):
-            if hide_from_logs:
-                # I.e.: add to internal stack but don't write it.
-                return
+        self._rotate_if_needed()
 
-            self._write_with_separator(
-                "YR ",
-                [
-                    self._obtain_loc_id(name, libname, source, lineno),
-                    self._number(time_delta),
-                ],
-            )
+        element_id = f"{libname}.{name}"
+        if hide_from_logs:
+            write_it = lambda self, msg_type: None
+        else:
+            write_it = self._WriteYieldResume(name, libname, source, lineno, time_delta)
+
+        self._stack_handler.push_record(
+            "element", element_id, "YR", "RYR", hide_from_logs, write_it
+        )
 
     def yield_from_suspend(
         self,
@@ -1050,6 +1128,8 @@ Virtual Memory Size: {vms}"""
             # (and if it was logged, the stop should be also logged).
             return
 
+        self._rotate_if_needed()
+
         self._write_with_separator(
             "YFS ",
             [
@@ -1057,6 +1137,24 @@ Virtual Memory Size: {vms}"""
                 self._number(time_delta),
             ],
         )
+
+    class _WriteYieldFromResume:
+        def __init__(self, name, libname, source, lineno, time_delta):
+            self.name = name
+            self.libname = libname
+            self.source = source
+            self.lineno = lineno
+            self.time_delta = time_delta
+
+        def __call__(self, robot_impl, msg_type):
+            loc_id = robot_impl._obtain_loc_id
+            robot_impl._write_with_separator(
+                f"{msg_type} ",
+                [
+                    loc_id(self.name, self.libname, self.source, self.lineno),
+                    robot_impl._number(self.time_delta),
+                ],
+            )
 
     def yield_from_resume(
         self,
@@ -1071,21 +1169,19 @@ Virtual Memory Size: {vms}"""
         Note that a yield resume is semantically very close to a start element
         but it doesn't have any arguments.
         """
-        element_id = f"{libname}.{name}"
-        with self._stack_handler.push_record(
-            "element", element_id, "YR", "RYR", hide_from_logs
-        ):
-            if hide_from_logs:
-                # I.e.: add to internal stack but don't write it.
-                return
+        self._rotate_if_needed()
 
-            self._write_with_separator(
-                "YFR ",
-                [
-                    self._obtain_loc_id(name, libname, source, lineno),
-                    self._number(time_delta),
-                ],
+        element_id = f"{libname}.{name}"
+        if hide_from_logs:
+            # I.e.: add to internal stack but don't write it.
+            write_it = lambda self, msg_type: None
+        else:
+            write_it = self._WriteYieldFromResume(
+                name, libname, source, lineno, time_delta
             )
+        self._stack_handler.push_record(
+            "element", element_id, "YFR", "RYFR", hide_from_logs, write_it
+        )
 
     def after_assign(
         self,
@@ -1098,6 +1194,8 @@ Virtual Memory Size: {vms}"""
         assign_repr: str,
         time_delta: float,
     ):
+        self._rotate_if_needed()
+
         oid = self._obtain_id
 
         hide_strings_re = self._hide_strings_re
@@ -1126,6 +1224,7 @@ Virtual Memory Size: {vms}"""
         lineno,
         time_delta,
     ) -> None:
+        self._rotate_if_needed()
         oid = self._obtain_id
 
         msg_type = "L "
@@ -1162,6 +1261,7 @@ Virtual Memory Size: {vms}"""
         kind: str,
         time_delta: float,
     ) -> None:
+        self._rotate_if_needed()
         hide_strings_re = self._hide_strings_re
         if hide_strings_re:
             message = hide_strings_re.sub("&lt;redacted&gt;", message)

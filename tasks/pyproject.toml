@@ -6,6 +6,8 @@ authors = [
 	"Fabio Zadrozny <fabio@robocorp.com>",
 ]
 readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
 packages = [{include = "robocorp/tasks", from = "src"}]
 classifiers = [
     "Development Status :: 4 - Beta",

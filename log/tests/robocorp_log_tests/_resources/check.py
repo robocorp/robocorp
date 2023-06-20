@@ -56,3 +56,26 @@ def check_stack_overflow():
         pass
     else:
         raise AssertionError("Expected stack overflow error")
+
+
+def check_big_for_in_for():
+    rows = 30
+    cols = 30
+
+    matrix = []
+    for x in range(rows):
+        row = []
+        for y in range(cols):
+            row.append(0)
+            if (x == 27 and y == 27) or (x == 28 and y == 28):
+                from robocorp import log
+
+                with log.suppress():
+                    with log._get_logger_instances() as logger_instances:
+                        for robo_logger in logger_instances:
+                            # Rotate output at this point
+                            robo_logger._robot_output_impl._rotate_output()
+
+        matrix.append(row)
+
+    final_matrix = matrix

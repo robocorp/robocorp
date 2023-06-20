@@ -427,3 +427,32 @@ def foo():
         namespace["foo"]()
 
     assert found == ["before iterate", "after iterate"]
+
+
+def test_rewrite_await(tmpdir, str_regression):
+    # On await it should just skip the function.
+    from robocorp.log._config import FilterKind
+    from robocorp.log._rewrite_importhook import _rewrite
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def a():
+    async def something():
+        for a in range(10):
+            try:
+                x = a
+            except:
+                pass
+        return 1
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)

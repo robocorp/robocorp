@@ -1,0 +1,12 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def a():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'a', 3, {})) as @ctx:
+
+        async def something():
+            for a in range(10):
+                try:
+                    x = a
+                except:
+                    pass
+            return 1

@@ -39,7 +39,11 @@ def _get_function_and_class_name(stack) -> Optional[Tuple[ast.FunctionDef, str]]
         return None
     stack_it = reversed(stack)
     for function in stack_it:
-        if function.__class__.__name__ != "FunctionDef":
+        funcname = function.__class__.__name__
+        if funcname != "FunctionDef":
+            if funcname == "AsyncFunctionDef":
+                # We don't rewrite 'AsyncFunctionDef'
+                return None
             continue
         break
     else:

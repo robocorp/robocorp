@@ -1,4 +1,4 @@
-def test_rotate_logs(tmpdir) -> None:
+def test_rotate_logs(tmpdir, str_regression) -> None:
     from imp import reload
     from pathlib import Path
 
@@ -6,6 +6,7 @@ def test_rotate_logs(tmpdir) -> None:
 
     from robocorp import log as robolog
     from robocorp.log import iter_decoded_log_format_from_stream
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
 
     log_target = Path(tmpdir.join("log.html"))
 
@@ -33,8 +34,13 @@ def test_rotate_logs(tmpdir) -> None:
     assert len(files) == 2, f"Found: {files}"
 
     name_to_file = dict((f.name, f) for f in files)
-    assert set(name_to_file.keys()) == {"output_13.robolog", "output_14.robolog"}
-    output_at_step = name_to_file["output_14.robolog"]
+
+    expected = 15
+    assert set(name_to_file.keys()) == {
+        f"output_{expected-1}.robolog",
+        f"output_{expected}.robolog",
+    }
+    output_at_step = name_to_file[f"output_{expected}.robolog"]
 
     # Check that replay suite/test/keyword are properly sent on rotate.
     expect_types = {"RR", "RT", "RE"}
@@ -48,4 +54,7 @@ def test_rotate_logs(tmpdir) -> None:
                 break
         else:
             raise AssertionError(f"Some expected messages not found: {expect_types}")
-    assert found_ids_at_step[0]["part"] == 14
+    assert found_ids_at_step[0]["part"] == expected
+
+    # Depending on the times printed it may break a bit different.
+    # str_regression.check(pretty_format_logs_from_log_html(log_target))

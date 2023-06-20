@@ -33,7 +33,7 @@ from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 from . import _config
@@ -643,6 +643,8 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         stream.write(decoded.decode("utf-8"))
 
     stream.seek(0)
+    # Uncomment to see contents loaded.
+    # print(stream.getvalue())
     yield from iter_decoded_log_format_from_stream(stream)
 
 

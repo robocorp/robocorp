@@ -1,5 +1,6 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
 import { Entry, ViewSettings } from './types';
+import { logError } from './helpers';
 
 export interface FilteredEntries {
   entries: Entry[];
@@ -12,6 +13,8 @@ export interface RunInfo {
   time: string;
   status: RunInfoStatus;
   finishTimeDeltaInSeconds: number | undefined;
+  firstPart: number;
+  lastPart: number;
 }
 
 export type LogContextType = {
@@ -26,6 +29,36 @@ export type LogContextType = {
   lastUpdatedIndex: MutableRefObject<number>;
 };
 
+let defaultTheme: 'light' | 'dark' = 'light';
+try {
+  // User can specify log.html?theme=dark|light in url.
+  const params = new URLSearchParams(document.location.search);
+  const s = params.get('theme');
+  if (s === 'light' || s === 'dark') {
+    defaultTheme = s;
+  } else {
+    // if not specified through url, use from color scheme match.
+    if (window.matchMedia) {
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        defaultTheme = 'dark';
+      } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+        defaultTheme = 'light';
+      }
+    }
+  }
+} catch (err) {
+  logError(err);
+}
+
+export const createDefaultRunInfo = (): RunInfo => ({
+  description: 'Wating for run to start ...',
+  time: '',
+  status: 'UNSET',
+  finishTimeDeltaInSeconds: undefined,
+  firstPart: -1,
+  lastPart: -1,
+});
+
 export const defaultLogState: LogContextType = {
   expandedEntries: new Set<string>(),
   filteredEntries: {
@@ -36,7 +69,7 @@ export const defaultLogState: LogContextType = {
   activeIndex: null,
   setActiveIndex: () => null,
   viewSettings: {
-    theme: 'light' as const,
+    theme: defaultTheme,
     columns: {
       duration: true,
       location: true,
@@ -44,12 +77,7 @@ export const defaultLogState: LogContextType = {
     format: 'auto' as const,
   },
   setViewSettings: () => null,
-  runInfo: {
-    description: 'Wating for run to start ...',
-    time: '',
-    status: 'UNSET',
-    finishTimeDeltaInSeconds: undefined,
-  },
+  runInfo: createDefaultRunInfo(),
   lastUpdatedIndex: { current: 0 },
 };
 
