@@ -35,6 +35,8 @@ Robo is designed to function as a single tool that helps you more easily get thi
 
 ## Getting started
 
+**If you are new to Robocorp, and looking to work a production-grade project, please start from our official [Quick Start Guide](https://robocorp.com/docs/quickstart-guide).**
+
 To install Robo, visit our [downloads site](https://downloads.robocorp.com/robo/releases/index.html) to get the latest version.
 
 After downloading, you can create a new project with:
