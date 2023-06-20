@@ -1,7 +1,10 @@
+import functools
 import logging
 import random
 import time
 from typing import List, cast
+
+import requests
 
 from ._requests import RequestsHTTPError
 from ._storage import Asset, AssetMeta, AssetNotFound, AssetUploadFailed
@@ -13,12 +16,28 @@ version_info = [int(x) for x in __version__.split(".")]
 LOGGER = logging.getLogger(__name__)
 
 
+def _handle_missing_asset(response: requests.Response, *, name: str, asset_id: str):
+    assets_client = _get_assets_client()
+    try:
+        assets_client.handle_error(response)
+    except RequestsHTTPError as exc:
+        if exc.status_code == 404:
+            # NOTE(cmin764): Any `404 Not Found` error won't be retried and will
+            #  bubble-up from the first request.
+            message = f"Asset {name!r} with id {asset_id!r} not found"
+            raise AssetNotFound(
+                message, status_code=exc.status_code, status_message=exc.status_message
+            ) from exc
+        else:
+            raise exc
+
+
 def list_assets() -> List[AssetMeta]:
     """List all the existing assets.
 
     Returns:
         A list of assets where each asset is a dictionary with fields like 'id' and
-        'name'.
+        'name'
     """
     assets_client = _get_assets_client()
     assets = assets_client.get("").json()
@@ -38,19 +57,12 @@ def _retrieve_asset_id(name: str) -> str:
 
 
 def _get_asset(name: str) -> Asset:
-    assets_client = _get_assets_client()
     asset_id = _retrieve_asset_id(name)
 
-    def _handle_error(resp):
-        try:
-            assets_client.handle_error(resp)
-        except RequestsHTTPError as exc:
-            if exc.status_code == 404:
-                message = f"Asset {name!r} with id {asset_id!r} not found"
-                raise AssetNotFound(message) from exc
-            else:
-                raise exc
-
+    assets_client = _get_assets_client()
+    _handle_error = functools.partial(
+        _handle_missing_asset, name=name, asset_id=asset_id
+    )
     response = assets_client.get(asset_id, _handle_error=_handle_error)
     return cast(Asset, response.json())
 
@@ -90,11 +102,11 @@ def set_asset(name: str, value: str, wait: bool = True):
 
     Args:
         name: Name of the existing or new asset to create (if missing)
-        value: The new value set within the asset
-        wait: Wait for value to be set succesfully
+        value: The new value to set within the asset
+        wait: Wait for value to be set successfully
 
     Raises:
-        AssetUploadFailed: Unexpected error while uploading asset
+        AssetUploadFailed: Unexpected error while uploading the asset
     """
     try:
         asset_id = _get_asset(name)["id"]
@@ -111,7 +123,7 @@ def set_asset(name: str, value: str, wait: bool = True):
     if not wait:
         return
 
-    LOGGER.info("Waiting for asset %r value to update succesfully", name)
+    LOGGER.info("Waiting for asset %r value to update successfully", name)
     upload_url = f"{asset_id}/uploads/{upload_data['id']}"
     while True:
         upload_data = assets_client.get(upload_url).json()
@@ -125,9 +137,9 @@ def set_asset(name: str, value: str, wait: bool = True):
             break
         elif status == "failed":
             reason = upload_data["reason"]
-            raise AssetUploadFailed(f"Asset {name!r} upload failed: {reason!r}")
+            raise AssetUploadFailed(f"Asset {name!r} upload failed: {reason}")
         else:
-            raise AssetUploadFailed(f"Asset {name!r} got invalid status: {status!r}")
+            raise AssetUploadFailed(f"Asset {name!r} got invalid status: {status}")
 
     LOGGER.info("Asset %r set successfully", name)
 
@@ -139,17 +151,22 @@ def delete_asset(name: str):
         name: Name of the asset to delete
 
     Raises:
-        AssetNotFound: Asset with given name does not exist
+        AssetNotFound: Asset with the given name does not exist
     """
     LOGGER.info("Deleting asset: %r", name)
+    asset_id = _retrieve_asset_id(name)
     assets_client = _get_assets_client()
-    assets_client.delete(_get_asset(name)["id"])
+    _handle_error = functools.partial(
+        _handle_missing_asset, name=name, asset_id=asset_id
+    )
+    assets_client.delete(asset_id, _handle_error=_handle_error)
 
 
 __all__ = [
     "AssetNotFound",
-    "list_assets",
-    "get_asset",
-    "set_asset",
+    "AssetUploadFailed",
     "delete_asset",
+    "get_asset",
+    "list_assets",
+    "set_asset",
 ]

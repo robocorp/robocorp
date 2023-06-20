@@ -11,9 +11,9 @@ def required_env(name: str, default: Any = UNDEFINED) -> str:
     """Load required environment variable.
 
     Args:
-        name: Name of the requested environment variable.
+        name: Name of the requested environment variable
         default: Value to return if no such env var is found, otherwise `KeyError` is
-            raised.
+            raised
     """
     val = os.getenv(name, default)
     if val is UNDEFINED:
@@ -36,10 +36,7 @@ class RequiresEnv:
 
 
 def url_join(*parts: str) -> str:
-    """Join parts of URL and handle missing/duplicate slashes."""
-    if not parts:
-        return ""
-
+    """Join parts into a URL and handle missing/duplicate slashes."""
     url = ""
     for part in parts:
         url = urlparse.urljoin(url, part.strip("/") + "/")

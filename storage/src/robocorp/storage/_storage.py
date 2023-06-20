@@ -3,7 +3,7 @@ import sys
 from functools import lru_cache
 from typing import Dict, Optional
 
-from ._requests import Requests
+from ._requests import Requests, RequestsHTTPError
 from ._utils import RequiresEnv, url_join
 
 if sys.version_info >= (3, 8):
@@ -33,12 +33,12 @@ Asset = TypedDict(
 )
 
 
-class AssetNotFound(KeyError):
-    """No asset with given name/id found"""
+class AssetNotFound(RequestsHTTPError):
+    """No asset with given name/id found."""
 
 
 class AssetUploadFailed(RuntimeError):
-    """There was an unexpected error while uploading an asset"""
+    """There was an unexpected error while uploading an asset."""
 
 
 @lru_cache(maxsize=1)

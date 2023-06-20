@@ -13,7 +13,7 @@
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L16"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L35"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `list_assets`
 
@@ -26,12 +26,12 @@ List all the existing assets.
 
 
 **Returns:**
-  A list of assets where each asset is a dictionary with fields like 'id' and  'name'. 
+  A list of assets where each asset is a dictionary with fields like 'id' and  'name' 
 
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L58"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L70"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_asset`
 
@@ -61,7 +61,7 @@ Get an asset's value by providing its `name`.
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L88"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_asset`
 
@@ -76,19 +76,19 @@ Creates or updates an asset named `name` with the provided `value`.
 **Args:**
  
  - <b>`name`</b>:  Name of the existing or new asset to create (if missing) 
- - <b>`value`</b>:  The new value set within the asset 
- - <b>`wait`</b>:  Wait for value to be set succesfully 
+ - <b>`value`</b>:  The new value to set within the asset 
+ - <b>`wait`</b>:  Wait for value to be set successfully 
 
 
 
 **Raises:**
  
- - <b>`RuntimeError`</b>:  Asset upload failed 
+ - <b>`AssetUploadFailed`</b>:  Unexpected error while uploading the asset 
 
 
 ---
 
-<a href="../../storage/src/robocorp/storage/__init__.py#L135"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../storage/src/robocorp/storage/__init__.py#L147"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `delete_asset`
 
@@ -108,7 +108,7 @@ Delete an asset by providing its `name`.
 
 **Raises:**
  
- - <b>`AssetNotFound`</b>:  Asset with given name does not exist 
+ - <b>`AssetNotFound`</b>:  Asset with the given name does not exist 
 
 
 
