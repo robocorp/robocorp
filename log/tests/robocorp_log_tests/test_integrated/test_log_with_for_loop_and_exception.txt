@@ -1,5 +1,5 @@
 
-ST: Root Suite
+SR: Root Suite
     ST: my_task
         SE: METHOD: for_iter_exc
             SE: FOR: for i in range(5)
@@ -18,5 +18,5 @@ ST: Root Suite
                 EE: FOR_STEP: ERROR
             EE: FOR: ERROR
         EE: METHOD: ERROR
-    ST: PASS
-ST: PASS
+    ET: PASS
+ER: PASS

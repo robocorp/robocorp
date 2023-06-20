@@ -3,12 +3,15 @@ import json
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 from .protocols import IReadLines
+from logging import getLogger
 
 # Whenever the decoding changes we should bump up this version.
 DOC_VERSION = "0.0.2"
 
 # name, libname, source, docstring, lineno
 Location = Tuple[str, str, str, str, int]
+
+_LOGGER = getLogger(__name__)
 
 
 class Decoder:
@@ -117,14 +120,22 @@ def _decode(message_definition: str) -> Callable[[Decoder, str], Any]:
             try:
                 dec_func = name_to_decode[name]
                 if dec_func == "loc_id":
-                    info = decoder.location_memo[s]
+                    try:
+                        info = decoder.location_memo[s]
+                    except:
+                        _LOGGER.critical(f"Could not find memo: {s}")
+                        raise
                     ret["name"] = info[0]
                     ret["libname"] = info[1]
                     ret["source"] = info[2]
                     ret["lineno"] = info[4]
 
                 elif dec_func == "loc_and_doc_id":
-                    info = decoder.location_memo[s]
+                    try:
+                        info = decoder.location_memo[s]
+                    except:
+                        _LOGGER.critical(f"Could not find location_memo: {s}")
+                        raise
                     ret["name"] = info[0]
                     ret["libname"] = info[1]
                     ret["source"] = info[2]

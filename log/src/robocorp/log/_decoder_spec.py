@@ -193,6 +193,8 @@ RE=SE
 RTB=STB
 # Restart yield resume
 RYR=YR
+# Restart yield from resume
+RYFR=YFR
 # Restart process snapshot
 RPS=SPS
 # Restart thread dump

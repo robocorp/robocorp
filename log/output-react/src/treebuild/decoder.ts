@@ -265,6 +265,9 @@ ET: status:oid, message:oid, time_delta_in_seconds:float
 #
 # UNTRACKED_GENERATOR (untracked generator is a generator in a library, where we
 # just track the start/end and not what happens inside it).
+#
+# FOR
+# FOR_STEP
 SE: loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float
 
 # Yield Resume (coming back to a suspended frame).
@@ -292,6 +295,7 @@ YFS: loc:loc_id, time_delta_in_seconds:float
 AS: loc:loc_id, target:oid, type:oid, value:oid, time_delta_in_seconds:float
 
 # Element/method argument (name and value of the argument).
+# If it's a FOR, this is the target of the for.
 # Adds some argument (name) to the current element (with the given type and value).
 EA: name:oid, type:oid, value:oid
 
@@ -345,6 +349,8 @@ RE=SE
 RTB=STB
 # Restart yield resume
 RYR=YR
+# Restart yield from resume
+RYFR=YFR
 # Restart process snapshot
 RPS=SPS
 # Restart thread dump
@@ -378,6 +384,26 @@ RTD=STD
 }
 
 buildDecoding();
+
+export const SPEC_RESTARTS = `
+# These messages have the same format (just the message type is different).
+# Restart Run
+RR=SR
+# Restart Test
+RT=ST
+# Restart Entry
+RE=SE
+# Restart traceback
+RTB=STB
+# Restart yield resume
+RYR=YR
+# Restart yield from resume
+RYFR=YFR
+# Restart process snapshot
+RPS=SPS
+# Restart thread dump
+RTD=STD
+`;
 
 export class Decoder {
   memo: any;

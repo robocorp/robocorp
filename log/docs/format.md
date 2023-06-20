@@ -82,8 +82,8 @@ The file should be always written and flushed at each log entry and it should be
     # 'ID: 2|36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2'     2nd part with identifier 36ac1f85-6d32-45b0-8ebf-3bbf8d7482f2.
     ID: part:int, id:str
     
-    # Initial time (all others are based on a delta from this date).
-    # Example: 'T 2022-10-03T11:30:54.927'
+    # Initial time in UTC (all others are based on a delta from this date).
+    # Example: 'T 2022-10-03T11:30:54.927+00:00'
     T: time:dateisoformat
     
     # Memorize some word (to be used as oid).
@@ -161,6 +161,9 @@ The file should be always written and flushed at each log entry and it should be
     #
     # UNTRACKED_GENERATOR (untracked generator is a generator in a library, where we
     # just track the start/end and not what happens inside it).
+    #
+    # FOR
+    # FOR_STEP
     SE: loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float
     
     # Yield Resume (coming back to a suspended frame).
@@ -188,6 +191,7 @@ The file should be always written and flushed at each log entry and it should be
     AS: loc:loc_id, target:oid, type:oid, value:oid, time_delta_in_seconds:float
     
     # Element/method argument (name and value of the argument).
+    # If it's a FOR, this is the target of the for.
     # Adds some argument (name) to the current element (with the given type and value).
     EA: name:oid, type:oid, value:oid
     
@@ -212,9 +216,38 @@ The file should be always written and flushed at each log entry and it should be
     # End Traceback
     ETB: time_delta_in_seconds:float
     
+    # ---------------------------------------------------------- Process snapshots
+    # Process snapshots mean that a dump with information of the current
+    # process was requested. The idea is that the 'start process snapshot' message
+    # is sent and then a number of 'log info' messages are sent with details on the
+    # process (such as memory, subprocesses, etc) and then a thread dump is created
+    # (very close to a traceback but the kind is different and the message is not
+    # the exception message but contains information on the thread dumped).
+    
+    # Start process snapshot 
+    SPS: message:oid, time_delta_in_seconds:float
+    # End process snapshot 
+    EPS: time_delta_in_seconds:float
+    
+    # Start thread dump (message has thread name/info)
+    STD=STB
+    # End thread dump
+    ETD=ETB
+    
     # These messages have the same format (just the message type is different).
+    # Restart Run
     RR=SR
+    # Restart Test
     RT=ST
+    # Restart Entry
     RE=SE
+    # Restart traceback
     RTB=STB
+    # Restart yield resume
     RYR=YR
+    # Restart yield from resume
+    RYFR=YFR
+    # Restart process snapshot
+    RPS=SPS
+    # Restart thread dump
+    RTD=STD

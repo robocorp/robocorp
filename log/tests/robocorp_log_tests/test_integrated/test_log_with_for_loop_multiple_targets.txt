@@ -1,5 +1,5 @@
 
-ST: Root Suite
+SR: Root Suite
     ST: my_task
         SE: METHOD: for_iter_multiple_targets
             SE: FOR: for (i, j) in enumerate(range(2))
@@ -17,5 +17,5 @@ ST: Root Suite
                 EE: FOR_STEP: PASS
             EE: FOR: PASS
         EE: METHOD: PASS
-    ST: PASS
-ST: PASS
+    ET: PASS
+ER: PASS

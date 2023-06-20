@@ -21,7 +21,7 @@ import {
   EntryProcessSnapshot,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
-import { Decoder, iter_decoded_log_format, IMessage, splitInChar } from './decoder';
+import { Decoder, iter_decoded_log_format, IMessage, splitInChar, SPEC_RESTARTS } from './decoder';
 import { IOpts, ITracebackEntry, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
 import { Counter, RunInfo, RunInfoStatus, logError } from '../lib';
@@ -516,6 +516,7 @@ export class TreeBuilder {
     this.opts = opts;
     this.runId = this.opts.runId;
     this.lease = obtainNewLease();
+    this.updateSpecRestartInfo();
     this.resetState();
   }
 
@@ -643,55 +644,49 @@ export class TreeBuilder {
     }
   }
 
+  restartMsgToOriginalMsgType = new Map<string, string>();
+  regularContextMsgType = new Set<string>();
+
+  private updateSpecRestartInfo() {
+    const restartMsgToOriginalMsgType = new Map<string, string>();
+    const regularContextMsgType = new Set<string>();
+
+    for (let line of SPEC_RESTARTS.split(/\r?\n/)) {
+      line = line.trim();
+      if (line.length === 0 || line.startsWith('#')) {
+        continue;
+      }
+      const split2 = splitInChar(line, '=');
+      if (split2 === undefined) {
+        throw new Error(`Unable to split on ':' and '=' in ${line}.`);
+      } else {
+        let [key, val] = split2;
+        key = key.trim();
+        val = val.trim();
+        restartMsgToOriginalMsgType.set(key, val);
+        regularContextMsgType.add(val);
+      }
+    }
+    this.restartMsgToOriginalMsgType = restartMsgToOriginalMsgType;
+    this.regularContextMsgType = regularContextMsgType;
+  }
+
   private addOneMessageSync(msg: IMessage): void {
     let msgType = msg.message_type;
-    switch (msgType) {
-      // if it's a replay suite/test/keyword/exception, skip it if we've already seen
-      // a suit/test/keyword/exception (otherwise, change the replay to the actual
-      // type being replayed to have it properly handled).
-      case 'SR':
-      case 'ST':
-      case 'SE':
-      case 'STB':
-        this.seenSuiteTaskOrElement = true;
-        break;
-
-      case 'RR':
-        if (this.seenSuiteTaskOrElement) {
-          return;
-        }
-        msgType = 'SR';
-        break;
-      case 'RT':
-        if (this.seenSuiteTaskOrElement) {
-          return;
-        }
-        msgType = 'ST';
-        break;
-      case 'RE':
-        if (this.seenSuiteTaskOrElement) {
-          return;
-        }
-        msgType = 'SE';
-        break;
-      case 'RTB':
-        if (this.seenSuiteTaskOrElement) {
-          return;
-        }
-        msgType = 'STB';
-        break;
-      case 'RTD':
-        if (this.seenSuiteTaskOrElement) {
-          return;
-        }
-        msgType = 'STD';
-        break;
-      case 'RPS':
-        if (this.seenSuiteTaskOrElement) {
-          return;
-        }
-        msgType = 'SPS';
-        break;
+    if (this.regularContextMsgType.has(msgType)) {
+      this.seenSuiteTaskOrElement = true;
+    }
+    const translated = this.restartMsgToOriginalMsgType.get(msgType);
+    // if it's a replay suite/test/keyword/exception, skip it if we've already seen
+    // a suit/test/keyword/exception (otherwise, change the replay to the actual
+    // type being replayed to have it properly handled).
+    if (translated !== undefined) {
+      // msgType is a replay
+      if (this.seenSuiteTaskOrElement) {
+        // We've already seen a regular message. Ignore it.
+        return;
+      }
+      msgType = translated;
     }
     this.id += 1;
 

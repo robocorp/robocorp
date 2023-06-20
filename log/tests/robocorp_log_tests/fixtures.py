@@ -251,9 +251,14 @@ _format_msg["EA"] = lambda msg: f"EA: {msg['type']}: {msg['name']}: {msg['value'
 _format_msg["STB"] = lambda msg: f"STB: {msg['message']}"
 _format_msg["AS"] = lambda msg: f"AS: {msg['target']}: {msg['value']}"
 _format_msg["ST"] = lambda msg: f"ST: {msg['name']}"
-_format_msg["ET"] = lambda msg: f"ST: {msg['status']}"
-_format_msg["SR"] = lambda msg: f"ST: {msg['name']}"
-_format_msg["ER"] = lambda msg: f"ST: {msg['status']}"
+_format_msg["ET"] = lambda msg: f"ET: {msg['status']}"
+_format_msg["SR"] = lambda msg: f"SR: {msg['name']}"
+_format_msg["ER"] = lambda msg: f"ER: {msg['status']}"
+
+_format_msg["RR"] = lambda msg: f"RR: {msg['name']}"
+_format_msg["RT"] = lambda msg: f"RT: {msg['name']}"
+_format_msg["RE"] = lambda msg: f"RE: {msg['type']}: {msg['name']}"
+
 
 _ignore = {"ETB", "TBV", "TBE", "I", "T", "ID", "V"}
 
@@ -276,6 +281,7 @@ def pretty_format_logs_from_iter(iter_in):
     level = 0
     indent = ""
     out = ["\n"]
+    regular_start_found = False
     for msg in iter_in:
         msg_type = msg["message_type"]
         if msg_type not in _format_msg:
@@ -288,9 +294,20 @@ def pretty_format_logs_from_iter(iter_in):
             level -= 1
             indent = "    " * level
 
-        out.append(f"{indent}{_format_msg[msg_type](msg)}\n")
+        try:
+            out.append(f"{indent}{_format_msg[msg_type](msg)}\n")
+        except:
+            raise RuntimeError(f"Error handling message: {msg}")
 
-        if msg_type in ("SE", "ST", "SR"):
+        is_restart = msg_type in ("RR", "RT", "RE")
+        if is_restart and regular_start_found:
+            continue
+
+        if not regular_start_found:
+            if msg_type in ("SE", "ST", "SR"):
+                regular_start_found = True
+
+        if msg_type in ("SE", "ST", "SR") or is_restart:
             level += 1
             indent = "    " * level
     return "".join(out)

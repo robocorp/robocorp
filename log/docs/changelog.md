@@ -4,6 +4,8 @@ NEXT (xxx-xx-xx)
 - If the depth of a recursion is > 20 it will be shown in the same level so
   that messages are still readable.
   
+- Fixes regarding reinitializing the stack state when a file is rotated.
+  
 - It's possible to specify whether the default theme to be used is `dark` 
   or `light` by passing arguments in the `log.html`. 
   

@@ -343,3 +343,32 @@ def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
     assert log_target.exists()
     str_regression.check(pretty_format_logs_from_log_html(log_target))
     # setup_info.open_log_target()
+
+
+def test_partial_logs(tmpdir, ui_regenerate, str_regression) -> None:
+    """ """
+    from imp import reload
+
+    from robocorp_log_tests._resources import check
+    from robocorp_log_tests.fixtures import (
+        ConfigForTest,
+        basic_log_setup,
+        pretty_format_logs_from_log_html,
+    )
+
+    config = ConfigForTest(min_messages_per_file=10)
+
+    with setup_log(max_value_repr_size="100kb"):
+        with basic_log_setup(
+            tmpdir, config=config, max_file_size="10MB", max_files=2
+        ) as setup_info:
+            check = reload(check)
+            check.check_big_for_in_for()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    files = list(log_target.parent.glob("*.robolog"))
+    assert len(files) == 2
+
+    # setup_info.open_log_target()
