@@ -1,4 +1,4 @@
-NEXT (xxx-xx-xx)
+1.1.0 (2023-06-20)
 -----------------------------
 
 - If the depth of a recursion is > 20 it will be shown in the same level so
