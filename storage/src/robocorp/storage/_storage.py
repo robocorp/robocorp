@@ -1,12 +1,18 @@
 import logging
+import sys
 from functools import lru_cache
-from typing import Dict, Optional, TypedDict
+from typing import Dict, Optional
 
 from ._requests import Requests
 from ._utils import RequiresEnv, url_join
 
-LOGGER = logging.getLogger(__name__)
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
 
+
+LOGGER = logging.getLogger(__name__)
 
 AssetMeta = Dict[str, str]
 Payload = TypedDict(
