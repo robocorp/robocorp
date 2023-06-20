@@ -14,7 +14,7 @@
 - [Libraries](#libraries)
 - [CLI](#cli)
 - [Documentation](#documentation)
-- [Licence] (#licence)
+- [Licence](#licence)
 
 </details>
 
