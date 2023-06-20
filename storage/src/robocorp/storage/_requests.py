@@ -62,7 +62,11 @@ class RequestsHTTPError(HTTPError):
     """Custom `requests` HTTP error with status code and message."""
 
     def __init__(
-        self, *args, status_code: int = 0, status_message: str = "Error", **kwargs
+        self,
+        *args,
+        status_code: int = 0,
+        status_message: str = "Error",
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 

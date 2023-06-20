@@ -28,7 +28,11 @@ Asset = TypedDict(
 
 
 class AssetNotFound(KeyError):
-    """Raised when the queried asset couldn't be found."""
+    """No asset with given name/id found"""
+
+
+class AssetUploadFailed(RuntimeError):
+    """There was an unexpected error while uploading an asset"""
 
 
 @lru_cache(maxsize=1)

@@ -4,7 +4,7 @@ import time
 from typing import List, cast
 
 from ._requests import RequestsHTTPError
-from ._storage import Asset, AssetMeta, AssetNotFound
+from ._storage import Asset, AssetMeta, AssetNotFound, AssetUploadFailed
 from ._storage import get_assets_client as _get_assets_client
 
 __version__ = "0.1.0"
@@ -94,7 +94,7 @@ def set_asset(name: str, value: str, wait: bool = True):
         wait: Wait for value to be set succesfully
 
     Raises:
-        RuntimeError: Asset upload failed
+        AssetUploadFailed: Unexpected error while uploading asset
     """
     try:
         asset_id = _get_asset(name)["id"]
@@ -125,9 +125,9 @@ def set_asset(name: str, value: str, wait: bool = True):
             break
         elif status == "failed":
             reason = upload_data["reason"]
-            raise RuntimeError(f"Asset {name!r} upload failed: {reason!r}")
+            raise AssetUploadFailed(f"Asset {name!r} upload failed: {reason!r}")
         else:
-            raise RuntimeError(f"Asset {name!r} got invalid status: {status!r}")
+            raise AssetUploadFailed(f"Asset {name!r} got invalid status: {status!r}")
 
     LOGGER.info("Asset %r set successfully", name)
 
