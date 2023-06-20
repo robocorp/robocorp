@@ -11,9 +11,10 @@
 <summary>Table of Contents</summary>
 
 - [What is Robo?](#what-is-robo)
-- [CLI](#cli)
 - [Libraries](#libraries)
+- [CLI](#cli)
 - [Documentation](#documentation)
+- [Licence](#licence)
 
 </details>
 
@@ -21,7 +22,9 @@
 
 ## What is Robo?
 
-Robo is both a CLI for managing your Python projects, and a set of libraries for automating your tasks. It handles your entire automation development lifecycle, and has several key features:
+Robo is both a CLI for managing your Python projects, and a set of libraries for automating your tasks. It handles your entire automation development lifecycle. Robo's key features are:
+
+> **_NOTE:_**  Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
 
 - **Isolated environments.** Get started without installing any other tools, not even Python. Robo automatically creates fully isolated environments for projects, which can be reproduced anywhere else.
 - **Batteries included.** Robo ships with a broad set of libraries for automating common tasks, be it browser automation, document processing, or navigating desktop applications.
@@ -31,6 +34,8 @@ Robo is both a CLI for managing your Python projects, and a set of libraries for
 Robo is designed to function as a single tool that helps you more easily get things done. It is entirely compatible with the PyPI and Conda ecosystems, but also brings in a set of libraries designed from the ground up to be focused on automation.
 
 ## Getting started
+
+**If you are new to Robocorp, and looking to work on a production-grade project, please start from our official [Quick Start Guide](https://robocorp.com/docs/quickstart-guide).**
 
 To install Robo, visit our [downloads site](https://downloads.robocorp.com/robo/releases/index.html) to get the latest version.
 
@@ -51,37 +56,17 @@ def hello():
     print("Hello World!")
 ```
 
-The above minimum example defines a task, which can then be executed with `robo run`.
+The above minimum example defines a task, which can then be executed with `robo run`. Once execution is finished, you can view the log generated (by default) to log.html file.
+
+<img src="./docs/include/task-log.png" alt="Task Log Example Screenshot">
 
 Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials, and refer to the [API documentation](docs/README.md) to learn how to use the different libraries. If you have further questions or want to help, join our [Forum](https://forum.robocorp.com/).
-
-## CLI
-
-The `robo` CLI is used to manage and run your projects during development, and it bundles your project for deployment.
-
-#### `robo new`
-
-Create an entirely new Python project, isolated from the rest of your system. No need to install Python separately or manually manage virtual environments.
-
-#### `robo run`
-
-Run your defined Python tasks. Robo instruments the running code, and generates a pretty report of what was executed.
-
-#### `robo exec`
-
-Easily run an arbitrary command within the isolated environment, such as shell commands or a locally installed application.
-
-#### `robo lock`
-
-Generate configuration files compatible with [rcc](https://github.com/robocorp/rcc).
-
-#### `robo export`
-
-Package your project as a Control Room compatible bundle, ready for deployment.
 
 ## Libraries
 
 The framework includes Python libraries for configuring project entrypoints and controlling features such as a logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
+
+> **_NOTE:_**  For additional automation capabilities on Robocorp platform, please refer to wide array of libraries and keywords available in [RPA Framework](https://robocorp.com/docs/libraries/rpa-framework).
 
 #### [`robocorp.tasks`](./tasks)
 
@@ -114,6 +99,32 @@ Read and write Excel files directly, with support for both .xlsx and .xls.
 #### [`robocorp.http`](./http)
 
 Download files easily, or make custom HTTP requests.
+
+## CLI
+
+> **_NOTE:_**  Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
+
+The `robo` CLI is used to manage and run your projects during development, and it bundles your project for deployment.
+
+#### `robo new`
+
+Create an entirely new Python project, isolated from the rest of your system. No need to install Python separately or manually manage virtual environments.
+
+#### `robo run`
+
+Run your defined Python tasks. Robo instruments the running code, and generates a pretty report of what was executed.
+
+#### `robo exec`
+
+Easily run an arbitrary command within the isolated environment, such as shell commands or a locally installed application.
+
+#### `robo lock`
+
+Generate configuration files compatible with [rcc](https://github.com/robocorp/rcc).
+
+#### `robo export`
+
+Package your project as a Control Room compatible bundle, ready for deployment.
 
 ## Documentation
 
