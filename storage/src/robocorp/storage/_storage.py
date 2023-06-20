@@ -1,16 +1,27 @@
 import logging
+import sys
 from functools import lru_cache
-from typing import Dict, Optional, TypedDict
+from typing import Dict, Optional
 
-from ._requests import Requests
+from ._requests import Requests, RequestsHTTPError
 from ._utils import RequiresEnv, url_join
+
+if sys.version_info >= (3, 8):
+    from typing import TypedDict
+else:
+    from typing_extensions import TypedDict
+
 
 LOGGER = logging.getLogger(__name__)
 
-
 AssetMeta = Dict[str, str]
 Payload = TypedDict(
-    "Payload", {"type": str, "content_type": Optional[str], "url": Optional[str]}
+    "Payload",
+    {
+        "type": str,
+        "content_type": Optional[str],
+        "url": Optional[str],
+    },
 )
 Asset = TypedDict(
     "Asset",
@@ -22,8 +33,12 @@ Asset = TypedDict(
 )
 
 
-class AssetNotFound(KeyError):
-    """Raised when the queried asset couldn't be found."""
+class AssetNotFound(RequestsHTTPError):
+    """No asset with given name/id found."""
+
+
+class AssetUploadFailed(RuntimeError):
+    """There was an unexpected error while uploading an asset."""
 
 
 @lru_cache(maxsize=1)

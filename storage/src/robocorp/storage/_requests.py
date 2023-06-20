@@ -27,17 +27,18 @@ def _needs_retry(exc: BaseException) -> bool:
     # 400 - payload is bad and needs to be changed
     # 401 - missing auth bearer token
     # 403 - auth is in place, but not allowed (insufficient privileges)
+    # 404 - resource does not exist
     # 409 - payload not good for the affected resource
-    no_retry_codes = [400, 401, 403, 409]
+    no_retry_codes = [400, 401, 403, 404, 409]
 
     if isinstance(exc, RequestsHTTPError):
         if exc.status_code in no_retry_codes:
             return False
 
         if exc.status_code == 429:
-            # We hit the rate limiter, so sleep extra.
-            seconds = random.uniform(1, 3)
-            LOGGER.warning("Rate limit hit, sleeping: %fs", seconds)
+            # We hit the rate limiter, so sleep extra before retrying.
+            seconds = round(random.uniform(1, 3), 2)
+            LOGGER.warning("Rate limit hit, sleeping %.2fs...", seconds)
             time.sleep(seconds)
 
     return True
@@ -61,7 +62,11 @@ class RequestsHTTPError(HTTPError):
     """Custom `requests` HTTP error with status code and message."""
 
     def __init__(
-        self, *args, status_code: int = 0, status_message: str = "Error", **kwargs
+        self,
+        *args,
+        status_code: int = 0,
+        status_message: str = "Error",
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 

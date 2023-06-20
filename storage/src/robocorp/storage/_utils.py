@@ -1,7 +1,7 @@
 import functools
 import os
 import urllib.parse as urlparse
-from typing import Any, Optional
+from typing import Any
 
 # Sentinel value for undefined arguments.
 UNDEFINED = object()
@@ -11,9 +11,9 @@ def required_env(name: str, default: Any = UNDEFINED) -> str:
     """Load required environment variable.
 
     Args:
-        name: Name of the requested environment variable.
+        name: Name of the requested environment variable
         default: Value to return if no such env var is found, otherwise `KeyError` is
-            raised.
+            raised
     """
     val = os.getenv(name, default)
     if val is UNDEFINED:
@@ -35,11 +35,8 @@ class RequiresEnv:
             raise self._exception from exc
 
 
-def url_join(*parts: str) -> Optional[str]:
-    """Join parts of URL and handle missing/duplicate slashes."""
-    if not parts:
-        return None
-
+def url_join(*parts: str) -> str:
+    """Join parts into a URL and handle missing/duplicate slashes."""
     url = ""
     for part in parts:
         url = urlparse.urljoin(url, part.strip("/") + "/")
