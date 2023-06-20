@@ -5,6 +5,8 @@ NEXT (xxx-xx-xx)
   that messages are still readable.
   
 - Fixes regarding reinitializing the stack state when a file is rotated.
+
+- If the log is partial a message is shown to the user.
   
 - It's possible to specify whether the default theme to be used is `dark` 
   or `light` by passing arguments in the `log.html`. 

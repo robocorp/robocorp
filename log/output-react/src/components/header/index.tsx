@@ -7,6 +7,7 @@ import {
   Input,
   Menu,
   BadgeVariant,
+  Tooltip,
 } from '@robocorp/components';
 import { IconCloseSmall } from '@robocorp/icons';
 import { IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
@@ -53,6 +54,16 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
 
   let variant: BadgeVariant = 'magenta';
   let label: string = 'TODO: set label for: ' + runInfo.status;
+
+  let partLabel: string | undefined = undefined;
+  let partTooltipText: string | undefined = undefined;
+  if (runInfo.firstPart != -1) {
+    if (runInfo.firstPart > 1) {
+      partLabel = `Log parts rotated out (showing part ${runInfo.firstPart} onwards).`;
+      partTooltipText = `Note that the log contents being shown do not have contents from the start of the run. The logged contents prior to part ${runInfo.firstPart} were rotated out.`;
+    }
+  }
+
   switch (runInfo.status) {
     case 'ERROR':
       label = 'Run Failed';
@@ -81,6 +92,13 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
       <BaseHeader size="medium">
         <BaseHeader.Title title={runInfo.description}>
           <Badge variant={variant} label={label} size="small" id="runStatusBadge" />
+          {partLabel !== undefined ? (
+            <Tooltip text={partTooltipText}>
+              <Badge variant={'magenta'} label={partLabel} size="small" id="runPartBadge" />
+            </Tooltip>
+          ) : (
+            <></>
+          )}
         </BaseHeader.Title>
         <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
         <CustomActions>

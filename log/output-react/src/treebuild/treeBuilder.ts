@@ -24,7 +24,7 @@ import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallb
 import { Decoder, iter_decoded_log_format, IMessage, splitInChar, SPEC_RESTARTS } from './decoder';
 import { IOpts, ITracebackEntry, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
-import { Counter, RunInfo, RunInfoStatus, logError } from '../lib';
+import { Counter, RunInfo, RunInfoStatus, createDefaultRunInfo, logError } from '../lib';
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -520,12 +520,7 @@ export class TreeBuilder {
     this.resetState();
   }
 
-  private runInfo: RunInfo = {
-    description: 'Waiting for run to start ...',
-    time: '',
-    status: 'UNSET',
-    finishTimeDeltaInSeconds: undefined,
-  };
+  private runInfo: RunInfo = createDefaultRunInfo();
 
   private runInfoChanged: boolean = false;
 
@@ -536,6 +531,15 @@ export class TreeBuilder {
 
   updateRunInfoTime(time: string) {
     this.runInfo.time = time;
+    this.runInfoChanged = true;
+  }
+
+  updateID(id: IMessage) {
+    const part = id.decoded['part'];
+    if (this.runInfo.firstPart === -1) {
+      this.runInfo.firstPart = part;
+    }
+    this.runInfo.lastPart = part;
     this.runInfoChanged = true;
   }
 
@@ -691,6 +695,9 @@ export class TreeBuilder {
     this.id += 1;
 
     switch (msgType) {
+      case 'ID':
+        this.updateID(msg);
+        break;
       case 'SR':
         // start run
         this.updateRunInfoName(msg.decoded['name']);

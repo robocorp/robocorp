@@ -13,6 +13,8 @@ export interface RunInfo {
   time: string;
   status: RunInfoStatus;
   finishTimeDeltaInSeconds: number | undefined;
+  firstPart: number;
+  lastPart: number;
 }
 
 export type LogContextType = {
@@ -48,6 +50,15 @@ try {
   logError(err);
 }
 
+export const createDefaultRunInfo = (): RunInfo => ({
+  description: 'Wating for run to start ...',
+  time: '',
+  status: 'UNSET',
+  finishTimeDeltaInSeconds: undefined,
+  firstPart: -1,
+  lastPart: -1,
+});
+
 export const defaultLogState: LogContextType = {
   expandedEntries: new Set<string>(),
   filteredEntries: {
@@ -66,12 +77,7 @@ export const defaultLogState: LogContextType = {
     format: 'auto' as const,
   },
   setViewSettings: () => null,
-  runInfo: {
-    description: 'Wating for run to start ...',
-    time: '',
-    status: 'UNSET',
-    finishTimeDeltaInSeconds: undefined,
-  },
+  runInfo: createDefaultRunInfo(),
   lastUpdatedIndex: { current: 0 },
 };
 

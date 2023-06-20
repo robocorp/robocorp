@@ -643,6 +643,8 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         stream.write(decoded.decode("utf-8"))
 
     stream.seek(0)
+    # Uncomment to see contents loaded.
+    # print(stream.getvalue())
     yield from iter_decoded_log_format_from_stream(stream)
 
 
