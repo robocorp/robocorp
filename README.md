@@ -104,7 +104,8 @@ Download files easily, or make custom HTTP requests.
 
 ## CLI
 
-> **_NOTE:_**  Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
+> **Warning**<br/>
+> Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
 
 The `robo` CLI is used to manage and run your projects during development, and it bundles your project for deployment.
 
