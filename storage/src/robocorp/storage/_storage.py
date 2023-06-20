@@ -10,7 +10,12 @@ LOGGER = logging.getLogger(__name__)
 
 AssetMeta = Dict[str, str]
 Payload = TypedDict(
-    "Payload", {"type": str, "content_type": Optional[str], "url": Optional[str]}
+    "Payload",
+    {
+        "type": str,
+        "content_type": Optional[str],
+        "url": Optional[str],
+    },
 )
 Asset = TypedDict(
     "Asset",

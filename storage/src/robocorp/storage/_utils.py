@@ -1,7 +1,7 @@
 import functools
 import os
 import urllib.parse as urlparse
-from typing import Any, Optional
+from typing import Any
 
 # Sentinel value for undefined arguments.
 UNDEFINED = object()
@@ -35,10 +35,10 @@ class RequiresEnv:
             raise self._exception from exc
 
 
-def url_join(*parts: str) -> Optional[str]:
+def url_join(*parts: str) -> str:
     """Join parts of URL and handle missing/duplicate slashes."""
     if not parts:
-        return None
+        return ""
 
     url = ""
     for part in parts:
