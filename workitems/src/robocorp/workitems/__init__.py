@@ -3,6 +3,7 @@ from typing import Callable, Optional, Union, cast
 
 from robocorp.tasks import get_current_task, task_cache
 
+from ._adapters import BaseAdapter, FileAdapter, RobocorpAdapter
 from ._context import Context
 from ._exceptions import (
     ApplicationException,
@@ -174,6 +175,9 @@ inputs = Inputs()
 outputs = Outputs()
 
 __all__ = [
+    "BaseAdapter",
+    "FileAdapter",
+    "RobocorpAdapter",
     "EmptyQueue",
     "BusinessException",
     "ApplicationException",
