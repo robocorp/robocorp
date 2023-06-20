@@ -13,18 +13,18 @@
 - [What is Robo?](#what-is-robo)
 - [Libraries](#libraries)
 - [CLI](#cli)
-- [Documentation](#documentation)
 - [Licence](#licence)
 
 </details>
 
 ---
 
+> **Warning**
+> Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
+
 ## What is Robo?
 
 Robo is both a CLI for managing your Python projects, and a set of libraries for automating your tasks. It handles your entire automation development lifecycle. Robo's key features are:
-
-> **_NOTE:_**  Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
 
 - **Isolated environments.** Get started without installing any other tools, not even Python. Robo automatically creates fully isolated environments for projects, which can be reproduced anywhere else.
 - **Batteries included.** Robo ships with a broad set of libraries for automating common tasks, be it browser automation, document processing, or navigating desktop applications.
@@ -35,7 +35,8 @@ Robo is designed to function as a single tool that helps you more easily get thi
 
 ## Getting started
 
-**If you are new to Robocorp, and looking to work on a production-grade project, please start from our official [Quick Start Guide](https://robocorp.com/docs/quickstart-guide).**
+> **Note**
+> If you are new to Robocorp, and looking to work on a production-grade project, please start from our official [Quick Start Guide](https://robocorp.com/docs/quickstart-guide).**
 
 To install Robo, visit our [downloads site](https://downloads.robocorp.com/robo/releases/index.html) to get the latest version.
 
@@ -66,7 +67,8 @@ Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials
 
 The framework includes Python libraries for configuring project entrypoints and controlling features such as a logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
 
-> **_NOTE:_**  For additional automation capabilities on Robocorp platform, please refer to wide array of libraries and keywords available in [RPA Framework](https://robocorp.com/docs/libraries/rpa-framework).
+> **Note**
+> For additional automation capabilities on the Robocorp platform, please refer to the wide array of libraries and keywords available in [RPA Framework](https://robocorp.com/docs/libraries/rpa-framework).
 
 #### [`robocorp.tasks`](./tasks)
 
@@ -125,10 +127,6 @@ Generate configuration files compatible with [rcc](https://github.com/robocorp/r
 #### `robo export`
 
 Package your project as a Control Room compatible bundle, ready for deployment.
-
-## Documentation
-
-To find further user guides and read API documentation, see the internal [documentation](./docs).
 
 ## License
 
