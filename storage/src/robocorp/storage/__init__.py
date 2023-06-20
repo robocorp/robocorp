@@ -10,7 +10,7 @@ from ._requests import RequestsHTTPError
 from ._storage import Asset, AssetMeta, AssetNotFound, AssetUploadFailed
 from ._storage import get_assets_client as _get_assets_client
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 version_info = [int(x) for x in __version__.split(".")]
 
 LOGGER = logging.getLogger(__name__)
