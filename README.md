@@ -19,7 +19,7 @@
 
 ---
 
-> **Warning**
+> **Warning**<br/>
 > Robo CLI is not yet recommended for production use, while libraries are ready for prime time. Refer to Robocorp's production tooling for managing Python projects [here](https://robocorp.com/docs/quickstart-guide/python).
 
 ## What is Robo?
@@ -35,8 +35,8 @@ Robo is designed to function as a single tool that helps you more easily get thi
 
 ## Getting started
 
-> **Note**
-> If you are new to Robocorp, and looking to work on a production-grade project, please start from our official [Quick Start Guide](https://robocorp.com/docs/quickstart-guide).**
+> **Note**<br/>
+> If you are new to Robocorp, and looking to work on a production-grade project, please start from our official [Quick Start Guide](https://robocorp.com/docs/quickstart-guide).
 
 To install Robo, visit our [downloads site](https://downloads.robocorp.com/robo/releases/index.html) to get the latest version.
 
@@ -67,7 +67,7 @@ Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials
 
 The framework includes Python libraries for configuring project entrypoints and controlling features such as a logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
 
-> **Note**
+> **Note**<br/>
 > For additional automation capabilities on the Robocorp platform, please refer to the wide array of libraries and keywords available in [RPA Framework](https://robocorp.com/docs/libraries/rpa-framework).
 
 #### [`robocorp.tasks`](./tasks)
