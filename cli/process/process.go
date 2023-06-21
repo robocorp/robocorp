@@ -3,6 +3,7 @@ package process
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os/exec"
 	"strings"
 	"sync"
@@ -55,42 +56,56 @@ func (proc *Process) Run() (*Output, error) {
 
 	stdoutPipe, err := proc.cmd.StdoutPipe()
 	if err != nil {
-		panic(err)
+		return nil, ProcessError{Err: err}
 	}
 
 	stderrPipe, err := proc.cmd.StderrPipe()
 	if err != nil {
-		panic(err)
+		return nil, ProcessError{Err: err}
 	}
 
 	wg.Add(1)
 	go func() {
-		scanner := bufio.NewScanner(stdoutPipe)
-		for scanner.Scan() {
-			line := scanner.Text()
+		var line string
+		var err error
+		reader := bufio.NewReader(stdoutPipe)
+		for err == nil {
+			line, err = reader.ReadString('\n')
 			if proc.StdoutListener != nil {
 				proc.StdoutListener(line)
 			}
 			stdout = append(stdout, line)
 		}
 		wg.Done()
+		if err != io.EOF {
+			panic(err)
+		}
 	}()
 
 	wg.Add(1)
 	go func() {
-		scanner := bufio.NewScanner(stderrPipe)
-		for scanner.Scan() {
-			line := scanner.Text()
+		var line string
+		var err error
+		reader := bufio.NewReader(stderrPipe)
+		for err == nil {
+			line, err = reader.ReadString('\n')
 			if proc.StderrListener != nil {
 				proc.StderrListener(line)
 			}
 			stderr = append(stderr, line)
 		}
 		wg.Done()
+		if err != io.EOF {
+			panic(err)
+		}
 	}()
 
-	err = proc.cmd.Run()
+	if err := proc.cmd.Start(); err != nil {
+		return nil, ProcessError{Err: err}
+	}
+
 	wg.Wait()
+	err = proc.cmd.Wait()
 
 	output := &Output{
 		Stdout: strings.Join(stdout, "\n"),
