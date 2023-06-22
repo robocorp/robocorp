@@ -2,8 +2,6 @@ import ast
 import types
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-from robocorp.log._ast_utils import NodeFactory
-
 from ._ast_utils import ASTRewriter
 from ._config import BaseConfig, FilterKind
 from .protocols import LogElementType
@@ -511,13 +509,21 @@ def _handle_assign(
         )
 
 
+def _filter_calls(node):
+    if isinstance(node, ast.Call):
+        return False
+    return True
+
+
 def _collect_names(target):
+    from robocorp.log import _ast_utils
+
     if isinstance(target, ast.Name):
         yield target
 
-    elif isinstance(target, ast.Tuple):
-        for el in target.elts:
-            yield from _collect_names(el)
+    for node in _ast_utils.iter_nodes(target, accept=_filter_calls):
+        if isinstance(node, ast.Name):
+            yield node
 
 
 def _accept_generator_full_log(
@@ -581,13 +587,13 @@ def _handle_before_try(
         )
 
 
-def _handle_for(
+def _handle_for_or_while(
     rewrite_ctx: ASTRewriter,
     config,
     module_path,
     stack,
     filter_kind,
-    node: ast.For,
+    node: Union[ast.For, ast.While],
 ):
     func_and_class_name = _get_function_and_class_name(stack)
     if not func_and_class_name:
@@ -609,27 +615,50 @@ def _handle_for(
         factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
         stmts_cursor = rewrite_ctx.stmts_cursor
 
-        iter_desc = ast.unparse(node.iter)
-        target_desc = ast.unparse(node.target)
+        stmt_name: str
+        if isinstance(node, ast.For):
+            iter_desc = ast.unparse(node.iter)
+            collect_names_from_node = node.target
+            target_desc = ast.unparse(node.target)
+            name_str = factory.Str(f"for {target_desc} in {iter_desc}")
+            stmt_name = "for"
 
-        name_str = factory.Str(f"for {target_desc} in {iter_desc}")
+        elif isinstance(node, ast.While):
+            while_desc = ast.unparse(node.test)
+            collect_names_from_node = node.test
+            name_str = factory.Str(f"while {while_desc}")
+            stmt_name = "while"
+        else:
+            raise RuntimeError(f"Unexpected node: {node}.")
 
-        # We want to generate something as:
+        stmt_name_upper = stmt_name.upper()
+
+        # With a FOR we want to generate something as:
         #
         # @ctx.report_for_start(1, ("FOR", __name__, "filename", "for a in range(2)", 2))
         # for a in b:
-        #     @ctx.report_for_step_start(2, ("FOR", __name__, "filename", "for a in range(2)", 2), [('a', a)])
+        #     @ctx.report_for_step_start(2, ("FOR_STEP", __name__, "filename", "for a in range(2)", 2), [('a', a)])
         #     print(a)
         #     @ctx.report_for_step_end(2)
         #
         # @ctx.report_for_end(1)
 
-        call = factory.Call(factory.NameLoadCtx("report_for_start"))
+        # With a WHILE we want to generate something as:
+        #
+        # @ctx.report_while_start(1, ("WHILE", __name__, "filename", "while a < 1", 2))
+        # while a < 1:
+        #     @ctx.report_while_step_start(2, ("WHILE_STEP", __name__, "filename", "while a < 1", 2), [('a', a)])
+        #     print(a)
+        #     @ctx.report_while_step_end(2)
+        #
+        # @ctx.report_while_end(1)
+
+        call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_start"))
         for_id = rewrite_ctx.next_context_id()
         call.args.append(factory.IntConstant(for_id))
         call.args.append(
             factory.Tuple(
-                factory.Str("FOR"),
+                factory.Str(stmt_name_upper),  # FOR/WHILE
                 factory.NameLoad("__name__"),
                 factory.NameLoad("__file__"),
                 name_str,
@@ -638,7 +667,7 @@ def _handle_for(
         )
         stmts_cursor.before_append(factory.Expr(call))
 
-        call = factory.Call(factory.NameLoadCtx("report_for_end"))
+        call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_end"))
         call.args.append(factory.IntConstant(for_id))
         stmts_cursor.after_append(factory.Expr(call))
 
@@ -652,7 +681,7 @@ def _handle_for(
             target_load: Union[ast.Name, ast.Constant]
             targets: Union[ast.Constant, ast.Tuple]
             temp_targets = []
-            for name_target in _collect_names(node.target):
+            for name_target in _collect_names(collect_names_from_node):
                 target_name = name_target.id
                 target_load = factory.NameLoad(name_target.id)
                 temp_targets.append(
@@ -667,12 +696,12 @@ def _handle_for(
             else:
                 targets = factory_first.Tuple(*temp_targets)
 
-            call = factory.Call(factory.NameLoadCtx("report_for_step_start"))
+            call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_step_start"))
             for_step_id = rewrite_ctx.next_context_id()
             call.args.append(factory.IntConstant(for_step_id))
             call.args.append(
                 factory.Tuple(
-                    factory.Str("FOR_STEP"),
+                    factory.Str(f"{stmt_name_upper}_STEP"),  # FOR_STEP / WHILE_STEP
                     factory_first.NameLoad("__name__"),
                     factory_first.NameLoad("__file__"),
                     name_str,
@@ -686,7 +715,9 @@ def _handle_for(
             factory_last = rewrite_ctx.NodeFactory(
                 last_stmt.lineno, last_stmt.col_offset
             )
-            call = factory_last.Call(factory_last.NameLoadCtx("report_for_step_end"))
+            call = factory_last.Call(
+                factory_last.NameLoadCtx(f"report_{stmt_name}_step_end")
+            )
             call.args.append(factory_last.IntConstant(for_step_id))
             body.append(factory_last.Expr(call))
 
@@ -868,7 +899,8 @@ _dispatch_after[ast.Assign] = _handle_assign
 _dispatch_after[ast.FunctionDef] = _handle_funcdef
 _dispatch_after[ast.Yield] = _handle_yield
 _dispatch_after[ast.YieldFrom] = _handle_yield
-_dispatch_after[ast.For] = _handle_for
+_dispatch_after[ast.For] = _handle_for_or_while
+_dispatch_after[ast.While] = _handle_for_or_while
 
 # Note: returns generator which is called when it finishes (right before _dispatch_after)
 _dispatch_before[ast.Try] = _handle_before_try

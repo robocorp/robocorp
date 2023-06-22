@@ -13,7 +13,7 @@ def method():
     )
 
     functions = list(
-        _ast_utils._iter_nodes(
+        _ast_utils.iter_nodes(
             tree, accept=lambda node: isinstance(node, ast.FunctionDef)
         )
     )
@@ -48,18 +48,18 @@ def method():
             return True
         return False
 
-    nodes = list(x.__class__.__name__ for x in _ast_utils._iter_nodes(tree))
+    nodes = list(x.__class__.__name__ for x in _ast_utils.iter_nodes(tree))
     assert nodes == ["FunctionDef", "arguments", "FunctionDef", "arguments", "Pass"]
     nodes = list(
-        x.__class__.__name__ for x in _ast_utils._iter_nodes(tree, accept=accept)
+        x.__class__.__name__ for x in _ast_utils.iter_nodes(tree, accept=accept)
     )
     assert nodes == ["FunctionDef", "arguments"]
 
-    func_def = next(_ast_utils._iter_nodes(tree))
-    nodes = list(x.__class__.__name__ for x in _ast_utils._iter_nodes(func_def))
+    func_def = next(_ast_utils.iter_nodes(tree))
+    nodes = list(x.__class__.__name__ for x in _ast_utils.iter_nodes(func_def))
     assert nodes == ["arguments", "FunctionDef", "arguments", "Pass"]
 
     nodes = list(
-        x.__class__.__name__ for x in _ast_utils._iter_nodes(func_def, accept=accept)
+        x.__class__.__name__ for x in _ast_utils.iter_nodes(func_def, accept=accept)
     )
     assert nodes == ["arguments"]

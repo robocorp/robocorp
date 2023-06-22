@@ -429,6 +429,76 @@ def foo():
     assert found == ["before iterate", "after iterate"]
 
 
+def test_rewrite_while(tmpdir, str_regression):
+    from robocorp.log._config import FilterKind
+    from robocorp.log._lifecycle_hooks import (
+        after_iterate,
+        after_iterate_step,
+        before_iterate,
+        before_iterate_step,
+    )
+    from robocorp.log._rewrite_importhook import _rewrite
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    a = 1
+    while a < 3:
+        a += 1
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+
+    found = []
+
+    def before(*args):
+        found.append("before iterate")
+
+    def after(*args):
+        found.append("after iterate")
+
+    with before_iterate.register(before), after_iterate.register(after):
+        namespace = {}
+        namespace["__file__"] = "<string>"
+        exec(co, namespace)
+        namespace["foo"]()
+
+    assert found == ["before iterate", "after iterate"]
+
+
+def test_rewrite_while_no_call_in_target(tmpdir, str_regression):
+    from robocorp.log._config import FilterKind
+    from robocorp.log._rewrite_importhook import _rewrite
+
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    a = 1
+    while call() < 3:
+        a += 1
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+
+
 def test_rewrite_await(tmpdir, str_regression):
     # On await it should just skip the function.
     from robocorp.log._config import FilterKind

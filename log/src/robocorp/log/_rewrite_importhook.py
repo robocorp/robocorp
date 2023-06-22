@@ -52,7 +52,8 @@ from ._config import BaseConfig, FilterKind
 # 0.0.14: Rewrite yield from
 # 0.0.15: Rewrite for
 # 0.0.16: Rewrite for without try..except
-version = "0.0.16"
+# 0.0.17: Rewrite while
+version = "0.0.17"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT

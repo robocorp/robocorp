@@ -118,19 +118,19 @@ class NodeInfo(Generic[Y]):
     __repr__ = __str__
 
 
-def _iter_nodes(node, accept=lambda _node: True) -> Iterator[ast_module.AST]:
+def iter_nodes(node, accept=lambda _node: True) -> Iterator[ast_module.AST]:
     for _field, value in ast_module.iter_fields(node):
         if isinstance(value, list):
             for item in value:
                 if isinstance(item, ast_module.AST):
                     if accept(item):
                         yield item
-                        yield from _iter_nodes(item, accept)
+                        yield from iter_nodes(item, accept)
 
         elif isinstance(value, ast_module.AST):
             if accept(value):
                 yield value
-                yield from _iter_nodes(value, accept)
+                yield from iter_nodes(value, accept)
 
 
 def print_ast(node, stream=None):
@@ -392,7 +392,7 @@ def _compute_is_generator(cache, function):
         return cache[function]
     except KeyError:
         pass
-    for node in _iter_nodes(function, dont_accept_class_nor_funcdef):
+    for node in iter_nodes(function, dont_accept_class_nor_funcdef):
         if isinstance(node, (ast.Yield, ast.YieldFrom)):
             cache[function] = True
             return True

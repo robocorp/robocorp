@@ -167,6 +167,8 @@ class MethodLifecycleContext:
         before_iterate(*tup)
         self._stack.append((report_id, "iterate", tup))
 
+    report_while_start = report_for_start
+
     def report_for_step_start(self, report_id, tup):
         if not self._accept:
             return
@@ -174,6 +176,8 @@ class MethodLifecycleContext:
         # tup is (log_element_type, __name__, filename, name, lineno, targets)
         before_iterate_step(*tup)
         self._stack.append((report_id, "iterate_step", tup[:-1]))
+
+    report_while_step_start = report_for_step_start
 
     def _report_end(self, report_id):
         if not self._accept:
@@ -190,6 +194,8 @@ class MethodLifecycleContext:
 
     report_for_end = _report_end
     report_for_step_end = _report_end
+    report_while_end = _report_end
+    report_while_step_end = _report_end
 
     def report_exception(self, report_ids):
         if not self._accept:

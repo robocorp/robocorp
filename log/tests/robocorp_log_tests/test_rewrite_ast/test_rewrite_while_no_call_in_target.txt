@@ -1,0 +1,12 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def foo():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 3, {})) as @ctx:
+        a = 1
+        @robo_lifecycle_hooks.after_assign(__name__, __file__, 'foo', 3, 'a', a)
+        @ctx.report_while_start(1, ('WHILE', __name__, __file__, 'while call() < 3', 4))
+        while call() < 3:
+            @ctx.report_while_step_start(2, ('WHILE_STEP', __name__, __file__, 'while call() < 3', 5, None))
+            a += 1
+            @ctx.report_while_step_end(2)
+        @ctx.report_while_end(1)

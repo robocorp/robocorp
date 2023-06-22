@@ -23,6 +23,16 @@ def for_iter_multiple_targets():
         b = j
 
 
+def while_loop_multiple_targets():
+    i = 0
+    j = 0
+    while i < 10 and j < 10:
+        i += 1
+        j += 1
+        a = i
+        b = j
+
+
 def for_iter_exc():
     for i in range(5):
         a = i
