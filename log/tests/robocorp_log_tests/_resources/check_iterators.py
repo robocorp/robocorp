@@ -40,6 +40,13 @@ def for_iter_exc():
             raise RuntimeError("some error")
 
 
+def for_early_return():
+    for i in range(5):
+        a = i
+        if i == 2:
+            return
+
+
 def call_in_main(value):
     y = value
 

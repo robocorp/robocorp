@@ -1,13 +1,19 @@
 from robocorp.log import verify_log_messages_from_log_html, setup_log
 from pathlib import Path
 
+from imp import reload
+
+from robocorp_log_tests.fixtures import (
+    ConfigForTest,
+    basic_log_setup,
+    pretty_format_logs_from_log_html,
+)
+
+from robocorp_log_tests._resources import check_iterators
+from robocorp_log_tests._resources import check
+
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
-
     from robocorp.log._decoder import (
         MESSAGE_TYPE_YIELD_RESUME,
         MESSAGE_TYPE_YIELD_SUSPEND,
@@ -15,8 +21,7 @@ def test_log_with_yield_iterator(tmpdir, ui_regenerate):
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.main()
+        reload(check_iterators).main()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -47,11 +52,6 @@ def test_log_with_yield_iterator(tmpdir, ui_regenerate):
 
 
 def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
-
     from robocorp.log._decoder import (
         MESSAGE_TYPE_YIELD_RESUME,
         MESSAGE_TYPE_YIELD_SUSPEND,
@@ -59,8 +59,7 @@ def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.main_yield_augassign()
+        reload(check_iterators).main_yield_augassign()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -116,11 +115,6 @@ def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
 
 
 def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
-
     from robocorp.log._decoder import (
         MESSAGE_TYPE_YIELD_FROM_RESUME,
         MESSAGE_TYPE_YIELD_FROM_SUSPEND,
@@ -128,8 +122,7 @@ def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
 
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.main_yield_from()
+        reload(check_iterators).main_yield_from()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -154,15 +147,9 @@ def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
 
 
 def test_log_with_for_loop(tmpdir, ui_regenerate):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
-
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.for_iter()
+        reload(check_iterators).for_iter()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -189,22 +176,27 @@ def test_log_with_for_loop(tmpdir, ui_regenerate):
 
 
 def test_log_with_for_loop_and_exception(tmpdir, ui_regenerate, str_regression):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
-
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
         try:
-            check_iterators.for_iter_exc()
+            reload(check_iterators).for_iter_exc()
         except RuntimeError:
             pass
+        else:
+            raise AssertionError("Expected RuntimeError.")
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
+
+
+def test_log_with_for_loop_and_early_return(tmpdir, ui_regenerate, str_regression):
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check_iterators).for_early_return()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -215,19 +207,9 @@ def test_log_with_for_loop_and_exception(tmpdir, ui_regenerate, str_regression):
 
 
 def test_log_with_for_loop_multiple_targets(tmpdir, ui_regenerate, str_regression):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
-
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.for_iter_multiple_targets()
+        reload(check_iterators).for_iter_multiple_targets()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -238,19 +220,9 @@ def test_log_with_for_loop_multiple_targets(tmpdir, ui_regenerate, str_regressio
 
 
 def test_log_with_while_loop(tmpdir, ui_regenerate, str_regression):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
-
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.while_loop_multiple_targets()
+        reload(check_iterators).while_loop_multiple_targets()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -263,19 +235,9 @@ def test_log_with_while_loop(tmpdir, ui_regenerate, str_regression):
 def test_log_with_for_loop_and_exception_inside_for(
     tmpdir, ui_regenerate, str_regression
 ):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check_iterators
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
-
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check_iterators = reload(check_iterators)
-        check_iterators.for_with_exception()
+        reload(check_iterators).for_with_exception()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -286,19 +248,9 @@ def test_log_with_for_loop_and_exception_inside_for(
 
 
 def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
-    from imp import reload
-
-    from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
-
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
-        check = reload(check)
-        check.check_multiline()
+        reload(check).check_multiline()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -312,14 +264,6 @@ def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
     still behaves properly on corner cases (such as when a message would
     be greater than the max log size).
     """
-    from imp import reload
-
-    from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
 
     config = ConfigForTest(min_messages_per_file=10)
 
@@ -327,8 +271,7 @@ def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
         with basic_log_setup(
             tmpdir, config=config, max_file_size="10kb", max_files=2
         ) as setup_info:
-            check = reload(check)
-            check.check_message_really_big()
+            reload(check).check_message_really_big()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -346,21 +289,12 @@ def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
     """
     This test checks the stack overflow case (disabled for now).
     """
-    from imp import reload
-
-    from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
 
     config = ConfigForTest()
     with basic_log_setup(
         tmpdir, config=config, max_file_size="100kb", max_files=2
     ) as setup_info:
-        check = reload(check)
-        check.check_stack_overflow()
+        reload(check).check_stack_overflow()
 
     log_target = setup_info.log_target
     assert log_target.exists()
@@ -370,14 +304,6 @@ def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
 
 def test_partial_logs(tmpdir, ui_regenerate, str_regression) -> None:
     """ """
-    from imp import reload
-
-    from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import (
-        ConfigForTest,
-        basic_log_setup,
-        pretty_format_logs_from_log_html,
-    )
 
     config = ConfigForTest(min_messages_per_file=10)
 
@@ -385,8 +311,7 @@ def test_partial_logs(tmpdir, ui_regenerate, str_regression) -> None:
         with basic_log_setup(
             tmpdir, config=config, max_file_size="10MB", max_files=2
         ) as setup_info:
-            check = reload(check)
-            check.check_big_for_in_for()
+            reload(check).check_big_for_in_for()
 
     log_target = setup_info.log_target
     assert log_target.exists()

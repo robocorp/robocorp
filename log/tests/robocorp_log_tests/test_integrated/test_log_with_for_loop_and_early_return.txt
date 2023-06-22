@@ -1,0 +1,21 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: for_early_return
+            SE: FOR: for i in range(5)
+                SE: FOR_STEP: for i in range(5)
+                    EA: int: i: 0
+                    AS: a: 0
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for i in range(5)
+                    EA: int: i: 1
+                    AS: a: 1
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for i in range(5)
+                    EA: int: i: 2
+                    AS: a: 2
+                EE: FOR_STEP: PASS
+            EE: FOR: PASS
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS
