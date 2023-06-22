@@ -10,7 +10,7 @@ from ._requests import RequestsHTTPError
 from ._storage import Asset, AssetMeta, AssetNotFound, AssetUploadFailed
 from ._storage import get_assets_client as _get_assets_client
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 LOGGER = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ def get_asset(name: str) -> str:
         The previously set value of this asset, or empty string if not set
 
     Raises:
-        AssetNotFound: Asset with given name does not exist
+        AssetNotFound: Asset with the given name does not exist
     """
     LOGGER.info("Retrieving asset: %r", name)
     payload = _get_asset(name)["payload"]

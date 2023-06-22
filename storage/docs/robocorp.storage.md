@@ -56,7 +56,7 @@ Get an asset's value by providing its `name`.
 
 **Raises:**
  
- - <b>`AssetNotFound`</b>:  Asset with given name does not exist 
+ - <b>`AssetNotFound`</b>:  Asset with the given name does not exist 
 
 
 ---
