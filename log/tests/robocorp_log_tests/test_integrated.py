@@ -258,6 +258,17 @@ def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
     # setup_info.open_log_target()
 
 
+def test_log_if_stmt(tmpdir, ui_regenerate, str_regression):
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check).check_if()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
 def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
     """
     This tests checks limits for messages and checks that the logging

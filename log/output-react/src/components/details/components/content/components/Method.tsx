@@ -35,10 +35,14 @@ export const Method: FC<{ entry: Entry }> = (props) => {
   let argumentsHeader = <></>;
 
   let counter = new Counter();
+  let title = 'Arguments';
+  if (entryMethod.type === Type.elseElement || entryMethod.type === Type.ifElement) {
+    title = 'Variables';
+  }
   if (entryMethod.arguments && entryMethod.arguments.length > 0) {
     argumentsHeader = (
       <Header size="medium">
-        <Header.Title title="Arguments" />
+        <Header.Title title={title} />
         <FormatHeaderActions />
       </Header>
     );

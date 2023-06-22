@@ -1,0 +1,14 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_if
+            AS: a: 10
+            SE: ELSE: else (to if a < 10)
+            EA: int: a: 10
+            AS: y: 20
+            SE: IF: if a == 10
+            EA: int: a: 10
+            AS: y: 30
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

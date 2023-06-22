@@ -4,7 +4,9 @@ import { FC } from 'react';
 
 import {
   Entry,
+  EntryElse,
   EntryException,
+  EntryIf,
   EntryLog,
   EntryMethodBase,
   EntryProcessSnapshot,
@@ -75,6 +77,16 @@ const getTitle = (entry: Entry) => {
       return {
         title: `${prefix}: ${methodEntry.name}`,
         description: `Module: ${methodEntry.libname}`,
+      };
+    case Type.ifElement:
+      return {
+        title: `Entered if statement: ${(entry as EntryIf).name}`,
+        description: `Module: ${(entry as EntryIf).libname}`,
+      };
+    case Type.elseElement:
+      return {
+        title: `Entered else statement: ${(entry as EntryElse).name}`,
+        description: `Module: ${(entry as EntryElse).libname}`,
       };
     case Type.log:
       const entryLog = entry as EntryLog;

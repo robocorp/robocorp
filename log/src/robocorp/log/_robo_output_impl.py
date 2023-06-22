@@ -965,7 +965,7 @@ Virtual Memory Size: {vms}"""
                 name, libname, source, lineno, doc, element_type, start_time_delta
             )
 
-        if element_type != "UNTRACKED_GENERATOR":
+        if element_type not in ("UNTRACKED_GENERATOR", "IF", "ELSE"):
             # We don't change the scope for untracked generators as
             # we have no idea when it'll pause/resume.
             self._stack_handler.push_record(

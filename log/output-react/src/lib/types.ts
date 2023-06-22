@@ -33,8 +33,10 @@ export enum Type {
   log = 1 << 10, // 1024
   threadDump = 1 << 11, // 2048
   processSnapshot = 1 << 12, // 4096
+  ifElement = 1 << 13,
+  elseElement = 1 << 14,
 
-  unhandled = 1 << 13,
+  unhandled = 1 << 15,
 }
 
 export enum ConsoleMessageKind {
@@ -110,6 +112,14 @@ export interface EntryResumeYieldFrom extends EntryMethodBase {
   type: Type.resumeYieldFrom;
 }
 
+export interface EntryIf extends EntryMethodBase {
+  type: Type.ifElement;
+}
+
+export interface EntryElse extends EntryMethodBase {
+  type: Type.elseElement;
+}
+
 export interface EntrySuspendYield extends EntryMethodBase {
   type: Type.suspendYield;
   value: string; // the yielded value
@@ -159,4 +169,6 @@ export type Entry =
   | EntrySuspendYieldFrom
   | EntryUntrackedGenerator
   | EntryThreadDump
+  | EntryIf
+  | EntryElse
   | EntryProcessSnapshot;

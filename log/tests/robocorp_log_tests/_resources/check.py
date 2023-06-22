@@ -27,6 +27,17 @@ def another(var):
     pass
 
 
+def check_if():
+    a = 10
+    if a < 10:
+        y = 9
+    else:
+        y = 20
+
+    if a == 10:
+        y = 30
+
+
 def check_multiline():
     var = """
 This is

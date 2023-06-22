@@ -15,6 +15,8 @@ import {
   EntrySuspendYield,
   EntrySuspendYieldFrom,
   EntryThreadDump,
+  EntryIf,
+  EntryElse,
 } from '~/lib/types';
 
 type Props = {
@@ -43,6 +45,10 @@ export const getTitle = (entry: Entry): string => {
       return `${(entry as EntrySuspendYieldFrom).name} (suspend generator)`;
     case Type.method:
       return (entry as EntryMethod).name;
+    case Type.ifElement:
+      return `Entered "${(entry as EntryIf).name}"`;
+    case Type.elseElement:
+      return `Entered "${(entry as EntryElse).name}"`;
     case Type.log:
       return ''; // the log type is added in the icon.
     case Type.variable:

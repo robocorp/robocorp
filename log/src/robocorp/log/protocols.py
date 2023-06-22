@@ -28,5 +28,12 @@ class Status:
 #                        it should not be added to the stack, but we can signal that
 #                        it was created/finished).
 LogElementType = Literal[
-    "METHOD", "GENERATOR", "UNTRACKED_GENERATOR", "FOR", "FOR_STEP"
+    "METHOD",
+    "GENERATOR",
+    "UNTRACKED_GENERATOR",
+    "FOR",
+    "FOR_STEP",
+    "WHILE",
+    "WHILE_STEP" "IF",
+    "ELSE",
 ]

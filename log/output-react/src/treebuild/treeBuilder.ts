@@ -19,6 +19,8 @@ import {
   ConsoleMessageKind,
   EntryThreadDump,
   EntryProcessSnapshot,
+  EntryIf,
+  EntryElse,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage, splitInChar, SPEC_RESTARTS } from './decoder';
@@ -233,6 +235,42 @@ class FlattenedTree {
     const entry: EntryUntrackedGenerator = {
       id: this.newScopeId(false),
       type: Type.untrackedGenerator,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  pushIf(msg: IMessage) {
+    const entry: EntryIf = {
+      id: this.newScopeId(false),
+      type: Type.ifElement,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  pushElse(msg: IMessage) {
+    const entry: EntryElse = {
+      id: this.newScopeId(false),
+      type: Type.elseElement,
       name: msg.decoded.name,
       libname: msg.decoded.libname,
       source: msg.decoded.source,
@@ -718,6 +756,10 @@ export class TreeBuilder {
       case 'SE': // start element
         if (msg.decoded['type'] === 'UNTRACKED_GENERATOR') {
           this.flattened.pushUntrackedGeneratorScope(msg);
+        } else if (msg.decoded['type'] === 'IF') {
+          this.flattened.pushIf(msg);
+        } else if (msg.decoded['type'] === 'ELSE') {
+          this.flattened.pushElse(msg);
         } else {
           this.flattened.pushMethodScope(msg);
         }

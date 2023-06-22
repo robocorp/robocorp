@@ -308,6 +308,13 @@ def pretty_format_logs_from_iter(iter_in):
                 regular_start_found = True
 
         if msg_type in ("SE", "ST", "SR") or is_restart:
+            if msg_type == "SE" and msg["type"] in (
+                "UNTRACKED_GENERATOR",
+                "IF",
+                "ELSE",
+            ):
+                continue
+
             level += 1
             indent = "    " * level
     return "".join(out)

@@ -110,8 +110,18 @@ ET: status:oid, message:oid, time_delta_in_seconds:float
 # UNTRACKED_GENERATOR (untracked generator is a generator in a library, where we
 # just track the start/end and not what happens inside it).
 #
-# FOR
-# FOR_STEP
+# FOR (start a for loop)
+#
+# FOR_STEP (start a step in a for loop)
+#
+# WHILE (start a while loop)
+#
+# WHILE_STEP (start a step in a while loop)
+#
+# IF (note: doesn't add to the stack, just notifies that an if statement was entered)
+#
+# ELSE (note: doesn't add to the stack, just notifies that an if statement was entered)
+#
 SE: loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float
 
 # Yield Resume (coming back to a suspended frame).

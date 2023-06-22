@@ -24,7 +24,8 @@ const getContentComponent = (type: Type) => {
     case Type.resumeYield:
     case Type.resumeYieldFrom:
     case Type.suspendYield:
-    case Type.suspendYieldFrom:
+    case Type.ifElement:
+    case Type.elseElement:
       return Method;
     case Type.exception:
       return ExceptionComponent;

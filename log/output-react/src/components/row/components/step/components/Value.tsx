@@ -44,6 +44,8 @@ export const getValue = (entry: Entry): ReactNode | string => {
     case Type.untrackedGenerator:
     case Type.resumeYield:
     case Type.resumeYieldFrom:
+    case Type.ifElement:
+    case Type.elseElement:
       return formatArguments(entry as EntryMethodBase | EntryGenerator | EntryUntrackedGenerator);
     case Type.task:
       return '';

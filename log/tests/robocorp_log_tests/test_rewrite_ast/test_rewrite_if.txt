@@ -1,0 +1,15 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def foo():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 3, {})) as @ctx:
+        a = 20
+        @robo_lifecycle_hooks.after_assign(__name__, __file__, 'foo', 3, 'a', a)
+        if a > 10:
+            @robo_lifecycle_hooks.method_if(__name__, __file__, 'if a > 10', 5, (('a', a),))
+            pass
+        elif b == 10:
+            @robo_lifecycle_hooks.method_if(__name__, __file__, 'elif b == 10', 7, (('b', b),))
+            pass
+        else:
+            @robo_lifecycle_hooks.method_else(__name__, __file__, 'else (to if b == 10)', 9, (('b', b),))
+            pass

@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 from robocorp_log_tests.test_rewrite_hook import ConfigForTest
+from robocorp.log._config import FilterKind
+from robocorp.log._rewrite_importhook import _rewrite
 
 
 def test_ast_utils() -> None:
@@ -110,9 +112,6 @@ def method():
 
 
 def test_rewrite_ast_just_docstring(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
-
     config = ConfigForTest()
 
     target = Path(tmpdir)
@@ -137,18 +136,14 @@ def _ignore_this_too():
     mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
-        assert "before_method" not in unparsed
-        assert "after_method" not in unparsed
-        assert "method_except" not in unparsed
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert "before_method" not in unparsed
+    assert "after_method" not in unparsed
+    assert "method_except" not in unparsed
 
 
 def test_rewrite_simple_on_project(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
-
     config = ConfigForTest()
 
     target = Path(tmpdir)
@@ -166,17 +161,13 @@ def method():
     mod = _rewrite(target, config, filter_kind=FilterKind.log_on_project_call)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
-        assert "MethodLifecycleContextCallerInProject" in unparsed
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert "MethodLifecycleContextCallerInProject" in unparsed
 
 
 @pytest.mark.parametrize("rewrite_assigns", [True, False])
 def test_rewrite_simple_full(tmpdir, rewrite_assigns, str_regression):
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
-
     config = ConfigForTest(rewrite_assigns=rewrite_assigns)
 
     target = Path(tmpdir)
@@ -194,20 +185,16 @@ def method():
     mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
-        assert "MethodLifecycleContext(('METHOD'" in unparsed
-        if not rewrite_assigns:
-            assert "after_assign" not in unparsed
-        else:
-            assert unparsed.count("after_assign") == 1
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert "MethodLifecycleContext(('METHOD'" in unparsed
+    if not rewrite_assigns:
+        assert "after_assign" not in unparsed
+    else:
+        assert unparsed.count("after_assign") == 1
 
 
 def test_rewrite_yield(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
-
     config = ConfigForTest()
 
     target = Path(tmpdir)
@@ -224,15 +211,11 @@ def method():
     mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
 
 
 def test_rewrite_yield_from(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
-
     config = ConfigForTest()
 
     target = Path(tmpdir)
@@ -248,13 +231,12 @@ def method():
     mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
-        assert unparsed.count("MethodLifecycleContext(('GENERATOR'") == 1
-        assert unparsed.count("before_yield_from") == 2
-        assert unparsed.count("after_yield_from") == 2
-        assert unparsed.count("after_assign") == 1
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert unparsed.count("MethodLifecycleContext(('GENERATOR'") == 1
+    assert unparsed.count("before_yield_from") == 2
+    assert unparsed.count("after_yield_from") == 2
+    assert unparsed.count("after_assign") == 1
 
 
 def test_handle_iterators_on_log_project_call(tmpdir, str_regression):
@@ -263,8 +245,6 @@ def test_handle_iterators_on_log_project_call(tmpdir, str_regression):
     # the stack will be unsynchronized, so, we have to do something as
     # library generator start/generator end (as we won't log things inside
     # it, this should be ok).
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
 
     config = ConfigForTest()
 
@@ -281,15 +261,12 @@ def method():
     mod = _rewrite(target, config, filter_kind=FilterKind.log_on_project_call)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
-        assert (
-            unparsed.count(
-                "MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR'"
-            )
-            == 1
-        )
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert (
+        unparsed.count("MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR'")
+        == 1
+    )
 
 
 def test_handle_yield_from_on_log_project_call(tmpdir, str_regression):
@@ -298,8 +275,6 @@ def test_handle_yield_from_on_log_project_call(tmpdir, str_regression):
     # the stack will be unsynchronized, so, we have to do something as
     # library generator start/generator end (as we won't log things inside
     # it, this should be ok).
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
 
     config = ConfigForTest()
 
@@ -316,21 +291,16 @@ def method():
     mod = _rewrite(target, config, filter_kind=FilterKind.log_on_project_call)[-1]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
-        assert (
-            unparsed.count(
-                "MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR'"
-            )
-            == 1
-        )
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert (
+        unparsed.count("MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR'")
+        == 1
+    )
 
 
 def test_rewrite_yield_multiple(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
     from robocorp.log._lifecycle_hooks import after_yield, before_yield
-    from robocorp.log._rewrite_importhook import _rewrite
 
     config = ConfigForTest()
 
@@ -348,9 +318,8 @@ def foo():
     co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
 
     def call():
         return 1
@@ -381,14 +350,10 @@ def foo():
 
 
 def test_rewrite_for(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
     from robocorp.log._lifecycle_hooks import (
         after_iterate,
-        after_iterate_step,
         before_iterate,
-        before_iterate_step,
     )
-    from robocorp.log._rewrite_importhook import _rewrite
 
     config = ConfigForTest()
 
@@ -405,9 +370,8 @@ def foo():
     co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
     import ast
 
-    if hasattr(ast, "unparse"):  # 3.9 onwards
-        unparsed = ast.unparse(mod)
-        str_regression.check(unparsed)
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
 
     def call(v):
         return v
@@ -430,14 +394,10 @@ def foo():
 
 
 def test_rewrite_while(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
     from robocorp.log._lifecycle_hooks import (
         after_iterate,
-        after_iterate_step,
         before_iterate,
-        before_iterate_step,
     )
-    from robocorp.log._rewrite_importhook import _rewrite
 
     config = ConfigForTest()
 
@@ -476,9 +436,6 @@ def foo():
 
 
 def test_rewrite_while_no_call_in_target(tmpdir, str_regression):
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
-
     config = ConfigForTest()
 
     target = Path(tmpdir)
@@ -501,8 +458,6 @@ def foo():
 
 def test_rewrite_await(tmpdir, str_regression):
     # On await it should just skip the function.
-    from robocorp.log._config import FilterKind
-    from robocorp.log._rewrite_importhook import _rewrite
 
     config = ConfigForTest()
 
@@ -518,6 +473,31 @@ def a():
             except:
                 pass
         return 1
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+
+
+def test_rewrite_if(tmpdir, str_regression):
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    a = 20
+    if a > 10:
+        pass
+    elif b == 10:
+        pass
+    else:
+        pass
 """
     )
 

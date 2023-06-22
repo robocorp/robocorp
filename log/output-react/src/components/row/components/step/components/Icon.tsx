@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react';
-import { IconBox, IconInformation, IconWarningTriangle } from '@robocorp/icons/iconic';
+import { IconBox, IconCircle, IconInformation, IconWarningTriangle } from '@robocorp/icons/iconic';
 import {
   IconAtSign,
   IconCpu,
@@ -7,6 +7,7 @@ import {
   IconFrame,
   IconPauseCircle,
   IconPlayCircle,
+  IconQuestionCircle,
   IconStatusCompleted,
   IconStatusError,
   IconStatusIdle,
@@ -87,6 +88,13 @@ const getSuspendYieldIcon = (): ReactNode => {
   return <IconPauseCircle color="magenta60" size="small" />;
 };
 
+const getIfIcon = (): ReactNode => {
+  return <IconQuestionCircle color="magenta60" size="small" />;
+};
+const getElseIcon = (): ReactNode => {
+  return <IconCircle color="magenta60" size="medium" />;
+};
+
 export const getIcon = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.task:
@@ -94,6 +102,10 @@ export const getIcon = (entry: Entry): ReactNode => {
       return getTaskIcon(entryTask.status);
     case Type.method:
       return getLogIcon((entry as EntryMethodBase).status);
+    case Type.ifElement:
+      return getIfIcon();
+    case Type.elseElement:
+      return getElseIcon();
     case Type.generator:
       return getGeneratorIcon((entry as EntryMethodBase).status);
     case Type.untrackedGenerator:

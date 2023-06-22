@@ -58,40 +58,6 @@ def _get_function_and_class_name(stack) -> Optional[Tuple[ast.FunctionDef, str]]
     return function, class_name
 
 
-def _rewrite_return(
-    rewrite_ctx: ASTRewriter, function, class_name, node: ast.Return
-) -> Optional[list]:
-    if function.name.startswith("_"):
-        return None
-
-    factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
-
-    result: List[ast.stmt] = []
-
-    call = factory.Call(factory.NameLoadRewriteCallback("method_return"))
-    call.args.append(factory.NameLoad("__name__"))
-    call.args.append(factory.NameLoad("__file__"))
-    call.args.append(factory.Str(f"{class_name}{function.name}"))
-    call.args.append(factory.LineConstant())
-
-    if node.value:
-        assign = factory.Assign()
-        store_name = factory.NameTempStore()
-        assign.targets = [store_name]
-        assign.value = node.value
-
-        node.value = factory.NameLoad(store_name.id)
-
-        result.append(assign)
-        call.args.append(factory.NameLoad(store_name.id))
-    else:
-        call.args.append(factory.NoneConstant())
-
-    result.append(factory.Expr(call))
-    result.append(node)
-    return result
-
-
 def _make_func_with_args(factory, func_name, *args):
     call = factory.Call(factory.NameLoadRewriteCallback(func_name))
     call.args.extend(args)
@@ -466,7 +432,91 @@ def _handle_return(
         return
 
     try:
-        return _rewrite_return(rewrite_ctx, function, class_name, node)
+        factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
+
+        result: List[ast.stmt] = []
+
+        call = factory.Call(factory.NameLoadRewriteCallback("method_return"))
+        call.args.append(factory.NameLoad("__name__"))
+        call.args.append(factory.NameLoad("__file__"))
+        call.args.append(factory.Str(f"{class_name}{function.name}"))
+        call.args.append(factory.LineConstant())
+
+        if node.value:
+            assign = factory.Assign()
+            store_name = factory.NameTempStore()
+            assign.targets = [store_name]
+            assign.value = node.value
+
+            node.value = factory.NameLoad(store_name.id)
+
+            result.append(assign)
+            call.args.append(factory.NameLoad(store_name.id))
+        else:
+            call.args.append(factory.NoneConstant())
+
+        result.append(factory.Expr(call))
+        result.append(node)
+        return result
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting function return: {function.name} line: {node.lineno} at: {module_path}"
+        )
+
+
+def _handle_if(
+    rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node: ast.If
+):
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+    if not _accept_function_rewrite(function):
+        return
+
+    try:
+        stmt_name = "if"
+        parent_node = stack[-1]
+        iselif = False
+        if isinstance(parent_node, ast.If):
+            iselif = bool(
+                parent_node.orelse
+                and len(parent_node.orelse) == 1
+                and parent_node.orelse[0] is node
+            )
+            if iselif:
+                stmt_name = "elif"
+
+        if node.body:
+            factory = rewrite_ctx.NodeFactory(
+                node.body[0].lineno, node.body[0].col_offset
+            )
+            call = factory.Call(factory.NameLoadRewriteCallback("method_if"))
+            call.args.append(factory.NameLoad("__name__"))
+            call.args.append(factory.NameLoad("__file__"))
+            call.args.append(factory.Str(f"{stmt_name} {ast.unparse(node.test)}"))
+            call.args.append(factory.LineConstant())
+
+            targets = _collect_names_used_as_node_or_none(factory, node.test)
+            call.args.append(targets)
+            node.body.insert(0, factory.Expr(call))
+
+        if node.orelse and not (
+            len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)
+        ):
+            factory = rewrite_ctx.NodeFactory(
+                node.orelse[0].lineno, node.orelse[0].col_offset
+            )
+            call = factory.Call(factory.NameLoadRewriteCallback("method_else"))
+            call.args.append(factory.NameLoad("__name__"))
+            call.args.append(factory.NameLoad("__file__"))
+            call.args.append(factory.Str(f"else (to if {ast.unparse(node.test)})"))
+            call.args.append(factory.LineConstant())
+            targets = _collect_names_used_as_node_or_none(factory, node.test)
+            call.args.append(targets)
+            node.orelse.insert(0, factory.Expr(call))
+
     except Exception:
         raise RuntimeError(
             f"Error when rewriting function return: {function.name} line: {node.lineno} at: {module_path}"
@@ -510,9 +560,26 @@ def _handle_assign(
 
 
 def _filter_calls(node):
-    if isinstance(node, ast.Call):
-        return False
-    return True
+    # We can't go into calls or list comprehensions as we could end up loading
+    # names which are just being created.
+    if isinstance(
+        node,
+        (
+            ast.Name,
+            ast.Tuple,
+            ast.List,
+            ast.Dict,
+            ast.BinOp,
+            ast.BoolOp,
+            ast.Compare,
+            ast.Set,
+            ast.operator,
+            ast.boolop,
+            ast.cmpop,
+        ),
+    ):
+        return True
+    return False
 
 
 def _collect_names(target):
@@ -678,23 +745,9 @@ def _handle_for_or_while(
                 first_stmt.lineno, first_stmt.col_offset
             )
 
-            target_load: Union[ast.Name, ast.Constant]
-            targets: Union[ast.Constant, ast.Tuple]
-            temp_targets = []
-            for name_target in _collect_names(collect_names_from_node):
-                target_name = name_target.id
-                target_load = factory.NameLoad(name_target.id)
-                temp_targets.append(
-                    factory_first.Tuple(
-                        factory_first.Str(target_name),
-                        target_load,
-                    )
-                )
-
-            if not temp_targets:
-                targets = factory_first.NoneConstant()
-            else:
-                targets = factory_first.Tuple(*temp_targets)
+            targets = _collect_names_used_as_node_or_none(
+                factory_first, collect_names_from_node
+            )
 
             call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_step_start"))
             for_step_id = rewrite_ctx.next_context_id()
@@ -725,6 +778,48 @@ def _handle_for_or_while(
         raise RuntimeError(
             f"Error when rewriting for: {function.name} line: {node.lineno} at: {module_path}"
         )
+
+
+def _collect_names_used_as_node_or_none(
+    factory, collect_names_from_node
+) -> Union[ast.Constant, ast.Tuple]:
+    """
+    i.e.:
+    In something as:
+
+    for a,b in iter_in():
+        ...
+
+    We should collect a node as (('a', a), ('b', b),)
+
+    In something as:
+
+    if a > 10:
+        ...
+
+    We should collect a node as (('a', a),)
+
+    If no names are available it should return a `None` node.
+    """
+    target_load: Union[ast.Name, ast.Constant]
+    targets: Union[ast.Constant, ast.Tuple]
+    temp_targets = []
+    for name_target in _collect_names(collect_names_from_node):
+        target_name = name_target.id
+        target_load = factory.NameLoad(name_target.id)
+        temp_targets.append(
+            factory.Tuple(
+                factory.Str(target_name),
+                target_load,
+            )
+        )
+
+    if not temp_targets:
+        targets = factory.NoneConstant()
+    else:
+        targets = factory.Tuple(*temp_targets)
+
+    return targets
 
 
 def _handle_yield(
@@ -901,6 +996,7 @@ _dispatch_after[ast.Yield] = _handle_yield
 _dispatch_after[ast.YieldFrom] = _handle_yield
 _dispatch_after[ast.For] = _handle_for_or_while
 _dispatch_after[ast.While] = _handle_for_or_while
+_dispatch_after[ast.If] = _handle_if
 
 # Note: returns generator which is called when it finishes (right before _dispatch_after)
 _dispatch_before[ast.Try] = _handle_before_try

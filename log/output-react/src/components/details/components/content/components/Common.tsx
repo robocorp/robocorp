@@ -72,6 +72,8 @@ export const VariableValue: FC<{ value: string }> = (props) => {
     );
   }, [copiedToClipboard, value]);
 
+  let showLineNumbers = props.value.includes('\n');
+
   return (
     <VariableContent>
       <Code
@@ -79,6 +81,7 @@ export const VariableValue: FC<{ value: string }> = (props) => {
         toolbar={toolbar}
         extensions={extensions}
         aria-label="Code editor"
+        lineNumbers={showLineNumbers}
         readOnly={true}
       />
     </VariableContent>

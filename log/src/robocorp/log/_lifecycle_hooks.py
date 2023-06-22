@@ -62,6 +62,14 @@ method_return = Callback()
 # tp, e, tb = exc_info
 method_except = Callback()
 
+# Called as: method_if(__name__, filename, name, lineno, variables)
+# variables is a tuple(tuple(variable_name, variable_value))
+method_if = Callback()
+
+# Called as: method_else(__name__, filename, name, lineno, variables)
+# variables is a tuple(tuple(variable_name, variable_value))
+method_else = Callback()
+
 # Called as: after_assign(__name__, filename, name, lineno, assign_name, assign_value)
 after_assign = Callback()
 

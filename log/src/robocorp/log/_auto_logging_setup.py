@@ -231,6 +231,64 @@ class _AutoLogging:
             for robo_logger in logger_instances:
                 robo_logger.yield_resume(name, mod_name, filename, lineno)
 
+    def call_method_if(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        variables: Sequence[Tuple[str, Any]],
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+
+        variables_name_type_repr = []
+        if variables is not None:
+            for key, val in variables:
+                obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
+                variables_name_type_repr.append((f"{key}", obj_type, obj_repr))
+
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.start_element(
+                    name,
+                    mod_name,
+                    filename,
+                    lineno,
+                    "IF",
+                    "",
+                    variables_name_type_repr,
+                )
+
+    def call_method_else(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        variables: Sequence[Tuple[str, Any]],
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+
+        variables_name_type_repr = []
+        if variables is not None:
+            for key, val in variables:
+                obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
+                variables_name_type_repr.append((f"{key}", obj_type, obj_repr))
+
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.start_element(
+                    name,
+                    mod_name,
+                    filename,
+                    lineno,
+                    "ELSE",
+                    "",
+                    variables_name_type_repr,
+                )
+
     def call_before_yield_from(
         self,
         mod_name: str,
