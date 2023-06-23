@@ -1,0 +1,12 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_suppress_exc_values
+            SE: METHOD: some_call_with_exc
+                STB: RuntimeError: some_exc
+                TBE --- check_suppress_exc_values ---
+                TBE --- some_call_with_exc ---
+            EE: METHOD: ERROR
+        EE: METHOD: ERROR
+    ET: PASS
+ER: PASS

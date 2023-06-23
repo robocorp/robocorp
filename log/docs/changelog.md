@@ -4,6 +4,7 @@ NEXT
 - The execution of `while` statements is now shown in the log.
 - The execution of `if/elif/else` statements is now shown in the log.
 - The execution of `return` statements is now shown in the log.
+- Variables are not shown in tracebacks if variables are being suppressed.
 
 1.1.0 (2023-06-20)
 -----------------------------

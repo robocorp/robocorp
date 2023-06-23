@@ -1,3 +1,6 @@
+from robocorp import log
+
+
 def _dont_log_this():
     pass
 
@@ -103,3 +106,13 @@ def check_big_for_in_for():
         matrix.append(row)
 
     final_matrix = matrix
+
+
+def some_call_with_exc():
+    v = 10
+    raise RuntimeError("some_exc")
+
+
+def check_suppress_exc_values():
+    with log.suppress_variables():
+        some_call_with_exc()

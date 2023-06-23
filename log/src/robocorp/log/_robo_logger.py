@@ -317,7 +317,7 @@ class _RoboLogger:
         assign_type: str,
         assign_repr: str,
     ):
-        if self._skip_log_variables:
+        if self._skip_log_variables or self._skip_log_methods:
             return
 
         return self._robot_output_impl.after_assign(
@@ -341,7 +341,7 @@ class _RoboLogger:
         return_type: str,
         return_repr: str,
     ):
-        if self._skip_log_variables:
+        if self._skip_log_variables or self._skip_log_methods:
             return
 
         return self._robot_output_impl.method_return(
@@ -392,7 +392,9 @@ class _RoboLogger:
         # loggers.
         # Right now we'll do the repr of objects twice for the whole stack...
 
-        return self._robot_output_impl.log_method_except(exc_info, unhandled)
+        hide_vars = bool(self._skip_log_variables or self._skip_log_methods)
+
+        return self._robot_output_impl.log_method_except(exc_info, unhandled, hide_vars)
 
     @_log_error
     def process_snapshot(
@@ -403,7 +405,9 @@ class _RoboLogger:
         # loggers.
         # Right now we'll do the repr of objects twice for the whole stack...
 
-        return self._robot_output_impl.process_snapshot()
+        hide_vars = bool(self._skip_log_variables or self._skip_log_methods)
+
+        return self._robot_output_impl.process_snapshot(hide_vars)
 
     @_log_error
     def console_message(

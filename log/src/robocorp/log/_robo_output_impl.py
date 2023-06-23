@@ -649,7 +649,7 @@ class _RoboOutputImpl:
                 ],
             ),
 
-    def process_snapshot(self) -> None:
+    def process_snapshot(self, hide_vars: bool) -> None:
         self._rotate_if_needed()
 
         entry_id = f"ps_{self._next_int()}"
@@ -737,12 +737,12 @@ Resident Set Size: {rss}
 Virtual Memory Size: {vms}"""
                     log_info(message)
 
-            self._dump_threads()
+            self._dump_threads(hide_vars)
         finally:
             self._stack_handler.pop(entry_type, entry_id)
             self._write_with_separator(f"EPS ", [self._number(self.get_time_delta())])
 
-    def _dump_threads(self) -> None:
+    def _dump_threads(self, hide_vars: bool) -> None:
         for thread_id, frame in sys._current_frames().items():
             try:
                 thread = threading._active[thread_id]  # type: ignore [attr-defined] # @UndefinedVariable
@@ -764,12 +764,14 @@ Virtual Memory Size: {vms}"""
                 stack,
                 entry_type="thread_dump",
                 start_message_types=("STD", "RTD", "ETD"),
+                hide_vars=hide_vars,
             )
 
     def log_method_except(
         self,
         exc_info: OptExcInfo,
         unhandled: bool,
+        hide_vars: bool,
     ) -> bool:
         """
         :param exc_info:
@@ -825,6 +827,7 @@ Virtual Memory Size: {vms}"""
             stack,
             entry_type="traceback",
             start_message_types=("STB", "RTB", "ETB"),
+            hide_vars=hide_vars,
         )
         return True
 
@@ -846,6 +849,7 @@ Virtual Memory Size: {vms}"""
         stack: List[tuple],
         entry_type: str,
         start_message_types: Tuple[str, str, str],
+        hide_vars: bool,
     ) -> None:
         start_message_type, restart_message_type, end_message_type = start_message_types
 
@@ -884,24 +888,25 @@ Virtual Memory Size: {vms}"""
                 ],
             )
 
-            for key, val in tuple(frame.f_locals.items()):
-                if key.startswith("@"):
-                    # Skip our own variables.
-                    continue
+            if not hide_vars:
+                for key, val in tuple(frame.f_locals.items()):
+                    if key.startswith("@"):
+                        # Skip our own variables.
+                        continue
 
-                obj_type, obj_repr = get_obj_type_and_repr(val)
+                    obj_type, obj_repr = get_obj_type_and_repr(val)
 
-                hide_strings_re = self._hide_strings_re
-                if hide_strings_re:
-                    obj_repr = hide_strings_re.sub("<redacted>", obj_repr)
-                self._write_with_separator(
-                    "TBV ",
-                    [
-                        oid(str(key)),
-                        oid(obj_type),
-                        oid(obj_repr),
-                    ],
-                )
+                    hide_strings_re = self._hide_strings_re
+                    if hide_strings_re:
+                        obj_repr = hide_strings_re.sub("<redacted>", obj_repr)
+                    self._write_with_separator(
+                        "TBV ",
+                        [
+                            oid(str(key)),
+                            oid(obj_type),
+                            oid(obj_repr),
+                        ],
+                    )
 
         stack_entry = self._stack_handler.pop(entry_type, entry_id)
         assert stack_entry

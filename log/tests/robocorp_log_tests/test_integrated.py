@@ -245,6 +245,27 @@ def test_log_with_for_loop_and_exception_inside_for(
     # setup_info.open_log_target()
 
 
+def test_exception_suppress_variables(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        try:
+            reload(check).check_suppress_exc_values()
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("Expected RuntimeError")
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(
+        pretty_format_logs_from_log_html(log_target, show_exception_vars=True)
+    )
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
+
+
 def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:

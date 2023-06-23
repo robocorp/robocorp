@@ -264,29 +264,43 @@ _format_msg["R"] = lambda msg: f"R: {msg['type']}: {msg['value']}"
 _ignore = {"ETB", "TBV", "TBE", "I", "T", "ID", "V"}
 
 
-def pretty_format_logs_from_log_html(log_html: Path):
+def pretty_format_logs_from_log_html(log_html: Path, show_exception_vars=False):
     from robocorp.log import iter_decoded_log_format_from_log_html
 
     iter_in = iter_decoded_log_format_from_log_html(log_html)
-    return pretty_format_logs_from_iter(iter_in)
+    return pretty_format_logs_from_iter(
+        iter_in, show_exception_vars=show_exception_vars
+    )
 
 
-def pretty_format_logs_from_stream(stream: IReadLines):
+def pretty_format_logs_from_stream(stream: IReadLines, show_exception_vars=False):
     from robocorp.log import iter_decoded_log_format_from_stream
 
     iter_in = iter_decoded_log_format_from_stream(stream)
-    return pretty_format_logs_from_iter(iter_in)
+    return pretty_format_logs_from_iter(
+        iter_in, show_exception_vars=show_exception_vars
+    )
 
 
-def pretty_format_logs_from_iter(iter_in):
+def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
+    format_msg = _format_msg
+    ignore = _ignore
+    if show_exception_vars:
+        ignore = _ignore.copy()
+        ignore.remove("TBV")
+        ignore.remove("TBE")
+        format_msg = _format_msg.copy()
+        format_msg["TBE"] = lambda msg: f"TBE --- {msg['method']} ---"
+        format_msg["TBV"] = lambda msg: f"TBV: {msg['name']}: {msg['value']}"
+
     level = 0
     indent = ""
     out = ["\n"]
     regular_start_found = False
     for msg in iter_in:
         msg_type = msg["message_type"]
-        if msg_type not in _format_msg:
-            if msg_type in _ignore:
+        if msg_type not in format_msg:
+            if msg_type in ignore:
                 continue
             print("Check: ", msg)
             continue
@@ -296,7 +310,7 @@ def pretty_format_logs_from_iter(iter_in):
             indent = "    " * level
 
         try:
-            out.append(f"{indent}{_format_msg[msg_type](msg)}\n")
+            out.append(f"{indent}{format_msg[msg_type](msg)}\n")
         except:
             raise RuntimeError(f"Error handling message: {msg}")
 
