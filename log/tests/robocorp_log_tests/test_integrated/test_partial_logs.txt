@@ -108,8 +108,6 @@ RR: Root Suite
                             SE: IF: if x == 27 and y == 27 or (x == 28 and y == 28)
                             EA: int: x: 28
                             EA: int: y: 28
-                            EA: int: x: 28
-                            EA: int: y: 28
                             RR: Root Suite
                             RT: my_task
                             RE: METHOD: check_big_for_in_for

@@ -804,8 +804,12 @@ def _collect_names_used_as_node_or_none(
     target_load: Union[ast.Name, ast.Constant]
     targets: Union[ast.Constant, ast.Tuple]
     temp_targets = []
+    found = set()
     for name_target in _collect_names(collect_names_from_node):
         target_name = name_target.id
+        if target_name in found:
+            continue
+        found.add(target_name)
         target_load = factory.NameLoad(name_target.id)
         temp_targets.append(
             factory.Tuple(
