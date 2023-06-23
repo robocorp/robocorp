@@ -1,4 +1,5 @@
 import logging
+import random
 import sys
 import time
 
@@ -84,8 +85,21 @@ def test_vault_integrated(
 
     assert "VAULT_KEY1" in secret_container
     assert "vault_key2" in secret_container
-    new_value = secret_container["vault_key3"] = str(time.time())
-    vault.set_secret(secret_container)
+    for i in range(3):
+        new_value = secret_container["vault_key3"] = str(time.time())
+        vault.set_secret(secret_container)
 
-    vault._get_vault.cache_clear()
-    assert vault.get_secret("ROBOCORP_VAULT_TEST")["vault_key3"] == new_value
+        vault._get_vault.cache_clear()
+        found = vault.get_secret("ROBOCORP_VAULT_TEST")["vault_key3"]
+
+        # This is more complicated because when running in the ci we have a test
+        # on linux/window/mac os at the same time and a single resource (the vault)
+        # so, if we don't have the same value wait a bit and retry.
+        if found == new_value:
+            break
+        if i == 2:
+            # Fail in the last attempt.
+            assert found == new_value
+        else:
+            # Sleep up to 3 seconds before retrying.
+            time.sleep(random.random() * 3)
