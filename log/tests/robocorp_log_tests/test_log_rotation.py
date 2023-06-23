@@ -3,10 +3,10 @@ def test_rotate_logs(tmpdir, str_regression) -> None:
     from pathlib import Path
 
     from robocorp_log_tests._resources import check
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
 
     from robocorp import log as robolog
     from robocorp.log import iter_decoded_log_format_from_stream
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
 
     log_target = Path(tmpdir.join("log.html"))
 
@@ -35,7 +35,7 @@ def test_rotate_logs(tmpdir, str_regression) -> None:
 
     name_to_file = dict((f.name, f) for f in files)
 
-    expected = 15
+    expected = 17
     assert set(name_to_file.keys()) == {
         f"output_{expected-1}.robolog",
         f"output_{expected}.robolog",

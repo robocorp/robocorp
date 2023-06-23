@@ -1,16 +1,14 @@
-from robocorp.log import verify_log_messages_from_log_html, setup_log
+from imp import reload
 from pathlib import Path
 
-from imp import reload
-
+from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
     ConfigForTest,
     basic_log_setup,
     pretty_format_logs_from_log_html,
 )
 
-from robocorp_log_tests._resources import check_iterators
-from robocorp_log_tests._resources import check
+from robocorp.log import setup_log, verify_log_messages_from_log_html
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate):
@@ -262,6 +260,17 @@ def test_log_if_stmt(tmpdir, ui_regenerate, str_regression):
     config = ConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check).check_if()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
+def test_log_return(tmpdir, ui_regenerate, str_regression):
+    config = ConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check).check_return()
 
     log_target = setup_info.log_target
     assert log_target.exists()

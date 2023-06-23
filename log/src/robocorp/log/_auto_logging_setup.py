@@ -7,8 +7,8 @@ from robocorp.log import critical, is_sensitive_variable_name
 from ._config import BaseConfig
 from ._logger_instances import _get_logger_instances
 from ._obj_info_repr import get_obj_type_and_repr
-from .protocols import LogElementType, OptExcInfo, Status
 from ._on_exit_context_manager import OnExitContextManager
+from .protocols import LogElementType, OptExcInfo, Status
 
 
 def _get_obj_type_and_repr_and_hide_if_needed(key, val):
@@ -360,8 +360,31 @@ class _AutoLogging:
                     assign_repr,
                 )
 
-    def call_method_return(self, *args, **kwargs):
-        pass
+    def call_method_return(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        return_value: Any,
+    ):
+        if self.tid != threading.get_ident():
+            return
+
+        return_type, return_repr = _get_obj_type_and_repr_and_hide_if_needed(
+            "", return_value
+        )
+
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.method_return(
+                    name,
+                    mod_name,
+                    filename,
+                    lineno,
+                    return_type,
+                    return_repr,
+                )
 
     def call_method_except(
         self,

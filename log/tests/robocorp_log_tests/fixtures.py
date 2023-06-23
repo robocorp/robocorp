@@ -258,6 +258,7 @@ _format_msg["ER"] = lambda msg: f"ER: {msg['status']}"
 _format_msg["RR"] = lambda msg: f"RR: {msg['name']}"
 _format_msg["RT"] = lambda msg: f"RT: {msg['name']}"
 _format_msg["RE"] = lambda msg: f"RE: {msg['type']}: {msg['name']}"
+_format_msg["R"] = lambda msg: f"R: {msg['type']}: {msg['value']}"
 
 
 _ignore = {"ETB", "TBV", "TBE", "I", "T", "ID", "V"}

@@ -1,9 +1,9 @@
 import datetime
 import json
+from logging import getLogger
 from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 
 from .protocols import IReadLines
-from logging import getLogger
 
 # Whenever the decoding changes we should bump up this version.
 DOC_VERSION = "0.0.2"

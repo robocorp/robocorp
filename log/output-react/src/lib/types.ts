@@ -35,8 +35,9 @@ export enum Type {
   processSnapshot = 1 << 12, // 4096
   ifElement = 1 << 13,
   elseElement = 1 << 14,
+  returnElement = 1 << 15, // 32768
 
-  unhandled = 1 << 15,
+  unhandled = 1 << 16,
 }
 
 export enum ConsoleMessageKind {
@@ -149,6 +150,14 @@ export interface EntryVariable extends EntryWithLocationBase {
   varType: string;
 }
 
+export interface EntryReturn extends EntryWithLocationBase {
+  type: Type.returnElement;
+  name: string;
+  libname: string;
+  value: string;
+  varType: string;
+}
+
 export interface EntryLog extends EntryWithLocationBase {
   type: Type.log;
   status: StatusLevel;
@@ -171,4 +180,5 @@ export type Entry =
   | EntryThreadDump
   | EntryIf
   | EntryElse
+  | EntryReturn
   | EntryProcessSnapshot;

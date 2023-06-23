@@ -21,6 +21,7 @@ import {
   EntryProcessSnapshot,
   EntryIf,
   EntryElse,
+  EntryReturn,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import { Decoder, iter_decoded_log_format, IMessage, splitInChar, SPEC_RESTARTS } from './decoder';
@@ -391,6 +392,21 @@ class FlattenedTree {
     // `Assign to name: ${msg.decoded['target']}\nAn object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
   }
 
+  pushReturn(msg: IMessage) {
+    const entry: EntryReturn = {
+      id: this.newScopeId(false),
+      type: Type.returnElement,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded['source'],
+      lineno: msg.decoded['lineno'],
+      value: msg.decoded['value'],
+      varType: msg.decoded['type'],
+      entriesIndex: this.entries.length,
+    };
+    this.entries.push(entry);
+  }
+
   pushTaskScope(msg: IMessage) {
     // console.log('pushTaskScope');
     const entry: EntryTask = {
@@ -744,6 +760,10 @@ export class TreeBuilder {
       case 'AS':
         // assign
         this.flattened.pushAssign(msg);
+        break;
+      case 'R':
+        // return
+        this.flattened.pushReturn(msg);
         break;
       case 'ST':
         // start task

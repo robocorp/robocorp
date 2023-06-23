@@ -332,6 +332,29 @@ class _RoboLogger:
         )
 
     @_log_error
+    def method_return(
+        self,
+        name: str,
+        libname: str,
+        filename: str,
+        lineno: int,
+        return_type: str,
+        return_repr: str,
+    ):
+        if self._skip_log_variables:
+            return
+
+        return self._robot_output_impl.method_return(
+            name,
+            libname,
+            filename,
+            lineno,
+            return_type,
+            return_repr,
+            self._get_time_delta(),
+        )
+
+    @_log_error
     def end_method(
         self,
         element_type: LogElementType,

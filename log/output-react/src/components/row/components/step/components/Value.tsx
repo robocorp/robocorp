@@ -8,6 +8,7 @@ import {
   EntryGenerator,
   EntryLog,
   EntryMethodBase,
+  EntryReturn,
   EntrySuspendYield,
   EntryThreadDump,
   EntryUntrackedGenerator,
@@ -80,6 +81,9 @@ export const getValue = (entry: Entry): ReactNode | string => {
     case Type.variable:
       const entryVariable = entry as EntryVariable;
       return replaceNewLineChars(`${entryVariable.value} (${entryVariable.varType})`);
+    case Type.returnElement:
+      const entryReturn = entry as EntryReturn;
+      return replaceNewLineChars(`${entryReturn.value} (${entryReturn.varType})`);
     case Type.suspendYield:
       const entrySuspendYield = entry as EntrySuspendYield;
       return replaceNewLineChars(

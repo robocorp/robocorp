@@ -27,7 +27,6 @@ from typing import (
 
 from .protocols import LogElementType, OptExcInfo
 
-
 WRITE_CONTENTS_TO_STDERR: bool = False
 
 
@@ -1060,6 +1059,32 @@ Virtual Memory Size: {vms}"""
                 self._obtain_loc_id(name, libname, source, lineno),
                 oid(yielded_value_type),
                 oid(yielded_value_repr),
+                self._number(time_delta),
+            ],
+        )
+
+    def method_return(
+        self,
+        name: str,
+        libname: str,
+        filename: str,
+        lineno: int,
+        return_type: str,
+        return_repr: str,
+        time_delta: float,
+    ):
+        oid = self._obtain_id
+
+        hide_strings_re = self._hide_strings_re
+        if hide_strings_re:
+            return_repr = hide_strings_re.sub("<redacted>", return_repr)
+
+        self._write_with_separator(
+            "R ",
+            [
+                self._obtain_loc_id(name, libname, filename, lineno),
+                oid(return_type),
+                oid(return_repr),
                 self._number(time_delta),
             ],
         )

@@ -292,6 +292,10 @@ YFR: loc:loc_id, time_delta_in_seconds:float
 # When the element ends, provide its status ("PASS", "ERROR") and the time at which it finished.
 EE: type:oid, status:oid, time_delta_in_seconds:float
 
+# Return
+# When a return value is found it can be reported.
+R: loc:loc_id, type:oid, value:oid, time_delta_in_seconds:float
+
 # Yield Suspend (pausing a frame)
 # Should be sent when a given frame is suspended in a yield.
 YS: loc:loc_id, type:oid, value:oid, time_delta_in_seconds:float

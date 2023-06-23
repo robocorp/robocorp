@@ -16,6 +16,7 @@ SR: Root Suite
                     AS: a: 2
                     SE: IF: if i == 2
                     EA: int: i: 2
+                    R: NoneType: None
                 EE: FOR_STEP: PASS
             EE: FOR: PASS
         EE: METHOD: PASS

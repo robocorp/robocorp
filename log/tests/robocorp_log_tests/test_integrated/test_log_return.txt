@@ -1,0 +1,13 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_return
+            SE: METHOD: call1
+                R: str: 'ret 1'
+            EE: METHOD: PASS
+            SE: METHOD: call2
+                R: int: 2
+            EE: METHOD: PASS
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

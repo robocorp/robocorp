@@ -38,6 +38,19 @@ def check_if():
         y = 30
 
 
+def call1():
+    return "ret 1"
+
+
+def call2():
+    return 2
+
+
+def check_return():
+    call1()
+    call2()
+
+
 def check_multiline():
     var = """
 This is

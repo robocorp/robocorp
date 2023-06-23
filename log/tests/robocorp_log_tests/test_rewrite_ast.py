@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 from robocorp_log_tests.test_rewrite_hook import ConfigForTest
+
 from robocorp.log._config import FilterKind
 from robocorp.log._rewrite_importhook import _rewrite
 
@@ -155,6 +156,27 @@ def method():
     just docstring
     '''
     a = 1
+"""
+    )
+
+    mod = _rewrite(target, config, filter_kind=FilterKind.log_on_project_call)[-1]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert "MethodLifecycleContextCallerInProject" in unparsed
+
+
+def test_no_rewrite_return_on_untracked_generator(tmpdir, str_regression):
+    config = ConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def method():
+    yield 1
+    return 2
 """
     )
 
@@ -350,10 +372,7 @@ def foo():
 
 
 def test_rewrite_for(tmpdir, str_regression):
-    from robocorp.log._lifecycle_hooks import (
-        after_iterate,
-        before_iterate,
-    )
+    from robocorp.log._lifecycle_hooks import after_iterate, before_iterate
 
     config = ConfigForTest()
 
@@ -394,10 +413,7 @@ def foo():
 
 
 def test_rewrite_while(tmpdir, str_regression):
-    from robocorp.log._lifecycle_hooks import (
-        after_iterate,
-        before_iterate,
-    )
+    from robocorp.log._lifecycle_hooks import after_iterate, before_iterate
 
     config = ConfigForTest()
 

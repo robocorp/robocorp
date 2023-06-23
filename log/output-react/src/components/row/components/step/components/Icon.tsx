@@ -5,6 +5,7 @@ import {
   IconCpu,
   IconEmptyCircle,
   IconFrame,
+  IconLogOut,
   IconPauseCircle,
   IconPlayCircle,
   IconQuestionCircle,
@@ -88,13 +89,6 @@ const getSuspendYieldIcon = (): ReactNode => {
   return <IconPauseCircle color="magenta60" size="small" />;
 };
 
-const getIfIcon = (): ReactNode => {
-  return <IconQuestionCircle color="magenta60" size="small" />;
-};
-const getElseIcon = (): ReactNode => {
-  return <IconCircle color="magenta60" size="medium" />;
-};
-
 export const getIcon = (entry: Entry): ReactNode => {
   switch (entry.type) {
     case Type.task:
@@ -103,9 +97,11 @@ export const getIcon = (entry: Entry): ReactNode => {
     case Type.method:
       return getLogIcon((entry as EntryMethodBase).status);
     case Type.ifElement:
-      return getIfIcon();
+      return <IconQuestionCircle color="magenta60" size="small" />;
     case Type.elseElement:
-      return getElseIcon();
+      return <IconCircle color="magenta60" size="medium" />;
+    case Type.returnElement:
+      return <IconLogOut color="magenta60" size="small" />;
     case Type.generator:
       return getGeneratorIcon((entry as EntryMethodBase).status);
     case Type.untrackedGenerator:

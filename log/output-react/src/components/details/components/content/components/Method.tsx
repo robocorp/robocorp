@@ -2,7 +2,7 @@ import { Box, Header } from '@robocorp/components';
 import { FC } from 'react';
 import styled from 'styled-components';
 
-import { Entry, EntryMethodBase, EntrySuspendYield, Type } from '~/lib/types';
+import { Entry, EntryMethodBase, EntryReturn, EntrySuspendYield, Type } from '~/lib/types';
 import { Bold, FormatHeaderActions, LocationContent, VariableValue } from './Common';
 import { Counter } from '~/lib';
 
@@ -30,30 +30,48 @@ const ArgumentType = styled(Box)`
 `;
 
 export const Method: FC<{ entry: Entry }> = (props) => {
-  const entryMethod: EntryMethodBase = props.entry as EntryMethodBase;
+  const entryMethod: EntryMethodBase | EntryReturn = props.entry as EntryMethodBase | EntryReturn;
   const argumentsList = [];
   let argumentsHeader = <></>;
 
   let counter = new Counter();
-  let title = 'Arguments';
-  if (entryMethod.type === Type.elseElement || entryMethod.type === Type.ifElement) {
-    title = 'Variables';
-  }
-  if (entryMethod.arguments && entryMethod.arguments.length > 0) {
+
+  if (entryMethod.type == Type.returnElement) {
+    let entryReturn = entryMethod as EntryReturn;
     argumentsHeader = (
       <Header size="medium">
-        <Header.Title title={title} />
+        <Header.Title title={'Return'} />
         <FormatHeaderActions />
       </Header>
     );
-    for (const arg of entryMethod.arguments) {
-      argumentsList.push(
-        <ArgumentContent key={counter.next()} className="argument">
-          <ArgumentName className="argumentName">{`${arg.name}`}</ArgumentName>
-          <ArgumentType>{`(type: ${arg.type})`}</ArgumentType>
-          <VariableValue value={arg.value}></VariableValue>
-        </ArgumentContent>,
+    argumentsList.push(
+      <ArgumentContent key={counter.next()} className="argument">
+        <ArgumentType>{`(type: ${entryReturn.varType})`}</ArgumentType>
+        <VariableValue value={entryReturn.value}></VariableValue>
+      </ArgumentContent>,
+    );
+  } else {
+    let title = 'Arguments';
+    if (entryMethod.type === Type.elseElement || entryMethod.type === Type.ifElement) {
+      title = 'Variables';
+    }
+
+    if (entryMethod.arguments && entryMethod.arguments.length > 0) {
+      argumentsHeader = (
+        <Header size="medium">
+          <Header.Title title={title} />
+          <FormatHeaderActions />
+        </Header>
       );
+      for (const arg of entryMethod.arguments) {
+        argumentsList.push(
+          <ArgumentContent key={counter.next()} className="argument">
+            <ArgumentName className="argumentName">{`${arg.name}`}</ArgumentName>
+            <ArgumentType>{`(type: ${arg.type})`}</ArgumentType>
+            <VariableValue value={arg.value}></VariableValue>
+          </ArgumentContent>,
+        );
+      }
     }
   }
 

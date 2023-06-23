@@ -1,6 +1,6 @@
 import ast
 import types
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Literal
 
 from ._ast_utils import ASTRewriter
 from ._config import BaseConfig, FilterKind
@@ -236,12 +236,50 @@ def _create_except_handler_ast(
     return except_handler
 
 
-def _accept_function_rewrite(function: ast.FunctionDef):
+AcceptedCases = Literal[
+    # Only when full logging is available for a function.
+    "full_log",
+    # Can be used on external libraries when the function is called from the user code.
+    "log_on_project_call",
+    # Can be used for generators being tracked (used for things which don't add to the stack internally)
+    # i.e.: for loop can't use it but an assign can.
+    "generator",
+    # Can be used even for generators which aren't internally tracked (usually just the function itself).
+    "untracked_generator",
+]
+
+
+def _accept_function_rewrite(
+    function: ast.FunctionDef,
+    rewrite_ctx,
+    filter_kind,
+    cases: Tuple[AcceptedCases, ...],
+) -> bool:
     if function.name.startswith("_") and function.name != "__init__":
         return False
 
     if not function.body:
         return False
+
+    if filter_kind == FilterKind.full_log:
+        if "full_log" not in cases:
+            return False
+
+    elif filter_kind == FilterKind.log_on_project_call:
+        if "log_on_project_call" not in cases:
+            return False
+
+    is_generator = rewrite_ctx.is_generator(function)
+
+    if is_generator:
+        if "generator" not in cases:
+            return False
+
+        if "untracked_generator" not in cases:
+            if filter_kind == FilterKind.log_on_project_call:
+                # Don't rewrite untracked generators.
+                return False
+
     return True
 
 
@@ -410,7 +448,17 @@ def _handle_funcdef(
 ):
     try:
         function: ast.FunctionDef = node
-        if not _accept_function_rewrite(function):
+        if not _accept_function_rewrite(
+            function,
+            rewrite_ctx,
+            filter_kind,
+            cases=(
+                "full_log",
+                "log_on_project_call",
+                "untracked_generator",
+                "generator",
+            ),
+        ):
             return
 
         _rewrite_funcdef(rewrite_ctx, stack, node, filter_kind)
@@ -428,7 +476,12 @@ def _handle_return(
         return None
 
     function, class_name = func_and_class_name
-    if not _accept_function_rewrite(function):
+    if not _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=("full_log", "log_on_project_call", "generator"),
+    ):
         return
 
     try:
@@ -472,7 +525,12 @@ def _handle_if(
         return None
 
     function, class_name = func_and_class_name
-    if not _accept_function_rewrite(function):
+    if not _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=("full_log", "generator"),
+    ):
         return
 
     try:
@@ -534,7 +592,12 @@ def _handle_assign(
         return None
 
     function, class_name = func_and_class_name
-    if not _accept_function_rewrite(function):
+    if not _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=("full_log", "generator"),
+    ):
         return
 
     try:
@@ -605,15 +668,14 @@ def _accept_generator_full_log(
         return None
 
     function, class_name = func_and_class_name
-    if not _accept_function_rewrite(function) or rewrite_ctx.is_generator(function):
-        # On generators we can't really track things inside the function because
-        # pausing and unpausing of generators would need to recreate the whole context
-        # up to the inner statement (i.e.: it'd need to pop/push the for which we
-        # can't really do right now).
+    if not _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=("full_log", "generator"),
+    ):
         return None
 
-    if filter_kind != FilterKind.full_log:
-        return None
     return function, class_name
 
 
@@ -667,7 +729,15 @@ def _handle_for_or_while(
         return None
 
     function, class_name = func_and_class_name
-    if not _accept_function_rewrite(function) or rewrite_ctx.is_generator(function):
+    if not _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=("full_log",),
+    ):
+        return None
+
+    if rewrite_ctx.is_generator(function):
         # On generators we can't really track things inside the function because
         # pausing and unpausing of generators would need to recreate the whole context
         # up to the inner statement (i.e.: it'd need to pop/push the for which we
@@ -675,9 +745,6 @@ def _handle_for_or_while(
         return None
 
     try:
-        if filter_kind != FilterKind.full_log:
-            return None
-
         # Wrapping of before/after for 'for' statements and each step of its body.
         factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
         stmts_cursor = rewrite_ctx.stmts_cursor
@@ -839,13 +906,12 @@ def _handle_yield(
         return None
 
     function, class_name = func_and_class_name
-    if not _accept_function_rewrite(function):
+    if not _accept_function_rewrite(
+        function, rewrite_ctx, filter_kind, cases=("full_log", "generator")
+    ):
         return None
 
     try:
-        if filter_kind != FilterKind.full_log:
-            return None
-
         # Wrapping of before/after for yield statements.
         factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
         stmts_cursor = rewrite_ctx.stmts_cursor

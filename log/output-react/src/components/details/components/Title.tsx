@@ -10,6 +10,7 @@ import {
   EntryLog,
   EntryMethodBase,
   EntryProcessSnapshot,
+  EntryReturn,
   EntryTask,
   EntryThreadDump,
   EntryVariable,
@@ -87,6 +88,11 @@ const getTitle = (entry: Entry) => {
       return {
         title: `Entered else statement: ${(entry as EntryElse).name}`,
         description: `Module: ${(entry as EntryElse).libname}`,
+      };
+    case Type.returnElement:
+      return {
+        title: `Return from "${(entry as EntryReturn).name}"`,
+        description: `Module: ${(entry as EntryReturn).libname}`,
       };
     case Type.log:
       const entryLog = entry as EntryLog;
