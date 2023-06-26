@@ -13,6 +13,7 @@ packages = [{include = "robocorp", from="src"}]
 [tool.poetry.dependencies]
 python = "^3.9"
 robocorp-tasks = "1.0.0"
+robocorp-log = "1.2.0"
 robocorp-workitems = "1.2.0"
 robocorp-vault = "0.4.0"
 robocorp-storage = "0.1.2"
