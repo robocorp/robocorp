@@ -16,7 +16,7 @@
 
 ---
 
-<a href="../../workitems/src/robocorp/workitems/__init__.py#L64"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../workitems/src/robocorp/workitems/__init__.py#L65"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `Inputs`
 Inputs represents the input queue of work items. 
@@ -40,7 +40,7 @@ A list of inputs reserved and released during the lifetime of the library.
 
 ---
 
-<a href="../../workitems/src/robocorp/workitems/__init__.py#L95"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../workitems/src/robocorp/workitems/__init__.py#L96"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `reserve`
 
@@ -67,7 +67,7 @@ There can only be one item reserved at a time.
 
 ---
 
-<a href="../../workitems/src/robocorp/workitems/__init__.py#L110"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../workitems/src/robocorp/workitems/__init__.py#L111"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `Outputs`
 Outputs represents the output queue of work items. 
@@ -85,7 +85,7 @@ The most recently created output work item, or `None`.
 
 ---
 
-<a href="../../workitems/src/robocorp/workitems/__init__.py#L136"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../workitems/src/robocorp/workitems/__init__.py#L137"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `create`
 
