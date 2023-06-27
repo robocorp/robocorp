@@ -306,7 +306,7 @@ def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
     be greater than the max log size).
     """
 
-    config = AutoLogConfigForTest(min_messages_per_file=10)
+    config = AutoLogConfigForTest()
 
     with setup_log(max_value_repr_size="50kb"):
         with basic_log_setup(
@@ -346,7 +346,7 @@ def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
 def test_partial_logs(tmpdir, ui_regenerate, str_regression) -> None:
     """ """
 
-    config = AutoLogConfigForTest(min_messages_per_file=10)
+    config = AutoLogConfigForTest()
 
     with setup_log(max_value_repr_size="100kb"):
         with basic_log_setup(

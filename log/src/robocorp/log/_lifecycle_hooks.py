@@ -108,13 +108,13 @@ after_iterate = Callback()
 
 
 def iter_all_callbacks() -> Iterator[Callback]:
-    for _key, val in tuple(globals().items()):
+    for _key, val in globals().copy().items():
         if isinstance(val, Callback):
             yield val
 
 
 def iter_all_name_and_callback() -> Iterator[Tuple[str, Callback]]:
-    for key, val in tuple(globals().items()):
+    for key, val in globals().copy().items():
         if isinstance(val, Callback):
             yield (key, val)
 

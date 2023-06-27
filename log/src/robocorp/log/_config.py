@@ -1,16 +1,16 @@
 import enum
-from collections import namedtuple
-from typing import Dict, Optional, Sequence
+from typing import Dict, Optional, Sequence, Callable
 
 from robocorp import log
-
-_ROBO_LOG_MODULE_NAME = log.__name__
+from functools import partial
+from fnmatch import fnmatch
+import itertools
+from dataclasses import dataclass
 
 # Examples:
-# Filter("mymodule.ignore", kind="exclude")
-# Filter("mymodule.rpa", kind="full_log")
-# Filter("RPA", kind="log_on_project_call")
-Filter = namedtuple("Filter", "name, kind")
+# Filter("mymodule.ignore", kind=FilterKind.exclude)
+# Filter("mymodule.rpa", kind=FilterKind.full_log)
+# Filter("RPA", kind=FilterKind.log_on_project_call)
 
 
 class FilterKind(enum.Enum):
@@ -18,6 +18,12 @@ class FilterKind(enum.Enum):
     full_log = "full"
     log_on_project_call = "call"
     exclude = "exc"
+
+
+@dataclass
+class Filter:
+    name: str
+    kind: FilterKind
 
 
 class GeneralLogConfig:
@@ -42,14 +48,9 @@ class AutoLogConfigBase:
         self,
         rewrite_assigns=True,
         rewrite_yields=True,
-        min_messages_per_file=50,
     ):
         self.rewrite_assigns = rewrite_assigns
         self.rewrite_yields = rewrite_yields
-        self._min_messages_per_file = min_messages_per_file
-
-    def get_min_messages_per_file(self) -> int:
-        return self._min_messages_per_file
 
     def get_rewrite_yields(self) -> bool:
         """
@@ -100,10 +101,69 @@ class AutoLogConfigBase:
         """
 
 
+class _FiterMatch:
+    _match_filter: Callable[[str], bool]
+
+    def __init__(self, filter: Filter) -> None:  # @ReservedAssignment
+        self._filter = filter
+        name = filter.name
+        self._filter_name = name
+
+        if "*" in name or "[" in name or "?" in name:
+            self._match_filter = partial(self._fnmatch, name)
+        else:
+            self._match_filter = self._match_module_name
+
+        self._kind = filter.kind
+
+    def _fnmatch(self, pattern: str, module_name: str) -> bool:
+        return fnmatch(module_name, pattern)
+
+    def _match_module_name(self, module_name: str) -> bool:
+        return self._filter_name == module_name or module_name.startswith(
+            self._filter_name + "."
+        )
+
+    def get_filter_kind_match(self, module_name: str) -> Optional[FilterKind]:
+        if self._match_filter(module_name):
+            return self._kind
+        return None
+
+
 class DefaultAutoLogConfig(AutoLogConfigBase):
     """
     Configuration which provides information on which modules have to be rewritten
     and how to rewrite them based on filters.
+
+    Note: Regular module names are accepted so that something as:
+
+    `Filter("RPA", kind="log_on_project_call")`
+
+    would match modules such as `RPA` or `RPA.Browser.Selenium` but not `RPA2`.
+
+    Added in `robocorp.log 2.x`:
+
+    Names can also be matched in `fnmatch` style, so, it's possible to create
+    filters such as:
+
+    `Filter("RPA.*", kind="log_on_project_call")`
+
+    which would match only submodules starting with `RPA.` but would not
+    match `RPA` directly.
+
+    or even do something as:
+
+    `Filter("*", kind="log_on_project_call")`
+
+    which would match any module.
+
+    Note: fnmatch-style filtering is used only if the name has a special
+    character (such as `*`, `?` or `[`). Names without the special character
+    match module names or submodules.
+
+    Note that the order of the filter is important as filters are matched based
+    on the ordering given, so, filters given first have higher priority as they
+    are matched before filters which appear later.
     """
 
     def __init__(
@@ -114,19 +174,20 @@ class DefaultAutoLogConfig(AutoLogConfigBase):
         default_filter_kind=FilterKind.exclude,
     ):
         super().__init__(rewrite_assigns=rewrite_assigns, rewrite_yields=rewrite_yields)
-        self._filters = filters
+
+        # Make sure we don't log things internal to robocorp.log.
+        high_priority_filters = [
+            Filter("robocorp.log", FilterKind.exclude),
+        ]
+
+        self._filters = [
+            _FiterMatch(f) for f in itertools.chain(high_priority_filters, filters)
+        ]
         self._cache_modname_to_kind: Dict[str, Optional[FilterKind]] = {}
         self._cache_filename_to_kind: Dict[str, FilterKind] = {}
         self._default_filter_kind = default_filter_kind
 
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
-        if module_name.startswith(_ROBO_LOG_MODULE_NAME):
-            # We can't rewrite our own modules (we could end up recursing).
-            if "check" in module_name:
-                # Exception just for testing.
-                return FilterKind.full_log
-            return FilterKind.exclude
-
         return self._get_modname_filter_kind(module_name)
 
     def get_filter_kind_by_module_name_and_path(
@@ -138,14 +199,13 @@ class DefaultAutoLogConfig(AutoLogConfigBase):
 
     def _compute_filter_kind(self, module_name: str) -> Optional[FilterKind]:
         """
-        :return: True if it should be excluded, False if it should be included and None
-            if no rule matched the given file.
+        :return: True if it should be excluded, False if it should be included
+            and None if no rule matched the given file.
         """
-        for exclude_filter in self._filters:
-            if exclude_filter.name == module_name or module_name.startswith(
-                exclude_filter.name + "."
-            ):
-                return exclude_filter.kind
+        for filter_match in self._filters:
+            filter_kind_match = filter_match.get_filter_kind_match(module_name)
+            if filter_kind_match is not None:
+                return filter_kind_match
         return None
 
     def _get_modname_filter_kind(self, module_name: str) -> Optional[FilterKind]:

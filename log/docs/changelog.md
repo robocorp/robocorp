@@ -3,6 +3,9 @@
 
 - Fixed handling `return` statement: when `log_on_project_call` matches for a module it'll only
   show the return value if the function was called from user code.
+  
+- Filters passed for the auto-logging now accept fnmatch-style names (i.e.: `Filter("*pydev*", kind="exclude")` 
+  or `Filter("*", kind="exclude")`).
 
 Backward incompatible changes:
 
