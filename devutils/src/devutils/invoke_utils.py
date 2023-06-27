@@ -55,7 +55,7 @@ def get_tag(tag_prefix: str) -> str:
     import subprocess
 
     # i.e.: Gets the last tagged version
-    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}*".split()
+    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}-[0-9]*".split()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     stdout, stderr = popen.communicate()
 
