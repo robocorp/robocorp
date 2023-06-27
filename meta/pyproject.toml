@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "robocorp"
+version = "0.1.0"
+description = "Robocorp core libraries for Python automation"
+authors = [
+	"Ossi Rajuvaara <ossi@robocorp.com>",
+]
+readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
+packages = [{include = "robocorp", from="src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+robocorp-tasks = "1.0.0"
+robocorp-log = "1.2.0"
+robocorp-workitems = "1.2.0"
+robocorp-vault = "0.4.0"
+robocorp-storage = "0.1.2"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

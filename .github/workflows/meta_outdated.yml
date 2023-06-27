@@ -1,0 +1,35 @@
+name: Metapackage Outdated
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+defaults:
+  run:
+    working-directory: './meta'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+        cache: 'poetry'
+
+    - name: Install project
+      run: poetry install
+
+    - name: Check tag version
+      run: poetry run invoke outdated
