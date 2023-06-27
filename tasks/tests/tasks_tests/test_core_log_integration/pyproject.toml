@@ -43,3 +43,5 @@
 log_filter_rules = [
     {name = "difflib", kind = "log_on_project_call"}
 ]
+
+default_library_filter_kind = "exclude"

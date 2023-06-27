@@ -1,0 +1,17 @@
+{
+  "log_filter_rules": [
+    {
+      "name": "RPA",
+      "kind": "log_on_project_call"
+    },
+    {
+      "name": "selenium",
+      "kind": "log_on_project_call"
+    },
+    {
+      "name": "SeleniumLibrary",
+      "kind": "log_on_project_call"
+    }
+  ],
+  "default_library_filter_kind": "log_on_project_call"
+}

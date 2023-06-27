@@ -168,7 +168,7 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
             module.__name__, module.__spec__.origin
         )
 
-        cache_name = fn.name[:-3] + filter_kind.value + PYC_TAIL
+        cache_name = fn.name[:-3] + "-" + filter_kind.value + PYC_TAIL
 
         pyc = cache_dir / cache_name
         # Notice that even if we're in a read-only directory, I'm going

@@ -171,21 +171,81 @@ class DefaultAutoLogConfig(AutoLogConfigBase):
         filters: Sequence[Filter] = (),
         rewrite_assigns=True,
         rewrite_yields=True,
-        default_filter_kind=FilterKind.exclude,
+        default_library_filter_kind=FilterKind.log_on_project_call,
     ):
         super().__init__(rewrite_assigns=rewrite_assigns, rewrite_yields=rewrite_yields)
 
-        # Make sure we don't log things internal to robocorp.log.
         high_priority_filters = [
+            # Make sure we don't log things internal to robocorp.log.
             Filter("robocorp.log", FilterKind.exclude),
+            # Do you think there'll be anything good coming out of logging a debugger?
+            # Exclude pydevd
+            Filter("_pydev_*", FilterKind.exclude),
+            Filter("_pydevd_*", FilterKind.exclude),
+            Filter("pydev_*", FilterKind.exclude),
+            Filter("pydevd_*", FilterKind.exclude),
+            Filter("pydevd", FilterKind.exclude),
+            Filter("pydevconsole", FilterKind.exclude),
+            # Exclude pdb
+            Filter("bdb", FilterKind.exclude),
+            Filter("pdb", FilterKind.exclude),
+            # The ones below are sensitive. Let's not log them.
+            Filter("threading", FilterKind.exclude),
+            Filter("queue", FilterKind.exclude),
+            Filter("json", FilterKind.exclude),
+            # Let's not log modules which aren't real.
+            Filter("<*", FilterKind.exclude),
         ]
 
-        self._filters = [
-            _FiterMatch(f) for f in itertools.chain(high_priority_filters, filters)
+        low_priority_filters = [
+            # The ones below aren't very interesting in general (exclude those
+            # if no rule matching those was used).
+            Filter("pkg_resources", FilterKind.exclude),
+            Filter("collections", FilterKind.exclude),
+            Filter("tkinter", FilterKind.exclude),
+            Filter("unittest", FilterKind.exclude),
+            Filter("linecache", FilterKind.exclude),
+            Filter("string", FilterKind.exclude),
+            Filter("trace", FilterKind.exclude),
+            Filter("numpy", FilterKind.exclude),
+            Filter("typing_extensions", FilterKind.exclude),
+            Filter("pandas", FilterKind.exclude),
+        ]
+
+        has_robocorp_tasks = bool(
+            tuple(f for f in filters if f.name == "robocorp.tasks")
+        )
+        if not has_robocorp_tasks:
+            # If robocorp.tasks wasn't explicitly customized, add a high priority
+            # rule for it.
+            high_priority_filters.append(Filter("robocorp.tasks", FilterKind.exclude))
+
+        self._filters = filters
+        self._filter_matches = [
+            _FiterMatch(f)
+            for f in itertools.chain(
+                high_priority_filters, filters, low_priority_filters
+            )
         ]
         self._cache_modname_to_kind: Dict[str, Optional[FilterKind]] = {}
         self._cache_filename_to_kind: Dict[str, FilterKind] = {}
-        self._default_filter_kind = default_filter_kind
+        self._default_library_filter_kind = default_library_filter_kind
+
+    def _to_dict(self):
+        return {
+            "log_filter_rules": [
+                {"name": f.name, "kind": str(f.kind).split(".")[-1]}
+                for f in self._filters
+            ],
+            "default_library_filter_kind": str(self._default_library_filter_kind).split(
+                "."
+            )[-1],
+        }
+
+    def __repr__(self):
+        import json
+
+        return json.dumps(self._to_dict(), indent=2)
 
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
         return self._get_modname_filter_kind(module_name)
@@ -202,7 +262,7 @@ class DefaultAutoLogConfig(AutoLogConfigBase):
         :return: True if it should be excluded, False if it should be included
             and None if no rule matched the given file.
         """
-        for filter_match in self._filters:
+        for filter_match in self._filter_matches:
             filter_kind_match = filter_match.get_filter_kind_match(module_name)
             if filter_kind_match is not None:
                 return filter_kind_match
@@ -238,7 +298,7 @@ class DefaultAutoLogConfig(AutoLogConfigBase):
         if in_project_roots:
             filter_kind = FilterKind.full_log
         else:
-            filter_kind = self._default_filter_kind
+            filter_kind = self._default_library_filter_kind
 
         self._cache_filename_to_kind[cache_key] = filter_kind
         return filter_kind

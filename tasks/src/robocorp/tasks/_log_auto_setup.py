@@ -12,12 +12,16 @@ def read_robocorp_log_config(
     context: IContextErrorReport, pyproject: PyProjectInfo
 ) -> log.AutoLogConfigBase:
     from ._toml_settings import read_section_from_toml
+    from robocorp.log import FilterKind
 
     if not pyproject.toml_contents:
         log.DefaultAutoLogConfig()
 
     obj: Any = pyproject.toml_contents
     filters: List[log.Filter] = []
+
+    default_library_filter_kind = FilterKind.log_on_project_call
+
     if isinstance(obj, dict):
         # Filter(name="RPA", kind=FilterKind.log_on_project_call),
         # Filter("selenium", FilterKind.log_on_project_call),
@@ -26,8 +30,25 @@ def read_robocorp_log_config(
 
         if isinstance(obj, dict):
             filters = _load_filters(obj, context, pyproject.pyproject)
+            kind = obj.get("default_library_filter_kind")
 
-    return log.DefaultAutoLogConfig(filters=filters)
+            if kind is not None:
+                if not isinstance(kind, str):
+                    context.show_error(
+                        f"Expected 'tool.robocorp.log.log_filter_rules.default_library_filter_kind' to have 'kind' as a str (and not {type(kind)} in {pyproject}."
+                    )
+                else:
+                    f: Optional[log.FilterKind] = getattr(log.FilterKind, kind, None)
+                    if f is None:
+                        context.show_error(
+                            f"Rule from 'tool.robocorp.log.log_filter_rules.default_library_filter_kind' has invalid 'kind': >>{kind}<< in {pyproject}."
+                        )
+                    else:
+                        default_library_filter_kind = f
+
+    return log.DefaultAutoLogConfig(
+        filters=filters, default_library_filter_kind=default_library_filter_kind
+    )
 
 
 def _load_filters(

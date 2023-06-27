@@ -1,3 +1,46 @@
+2.0.0
+-----------------------------
+
+Backward incompatible changes:
+
+    By default all the libraries are now logged (so, now rules should be
+    added to opt-out of the logging instead of opting in to the logging).
+    
+    To opt-out edit the `pyproject.toml` excluding what should not be logged.
+    
+    i.e.:
+    
+    ```
+    [tool.robocorp.log]
+    
+    log_filter_rules = [
+        # Opt-out to the libraries which should not be logged.
+        {name = "email", kind = "exclude"},
+        {name = "urllib", kind = "exclude"},
+    ]
+    
+    default_library_filter_kind = "exclude"
+    ```
+    
+    
+    It's possible to revert to the old behaviour (to opt-in selecting the
+    libraries to be logged by configuring the `default_library_filter_kind`
+    in `pyproject.toml`.
+    
+    i.e.:
+    
+    ```
+    [tool.robocorp.log]
+    
+    log_filter_rules = [
+        # Opt-in to the libraries to be logged.
+        {name = "RPA", kind = "log_on_project_call"},
+    ]
+    
+    default_library_filter_kind = "exclude"
+    ```
+
+
 1.0.0
 -----------------------------
 

@@ -101,8 +101,15 @@ def test_core_log_integration_config_log(datadir, str_regression):
 
 
 def test_core_log_integration_empty_pyproject(datadir) -> None:
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+
     pyproject: Path = datadir / "pyproject.toml"
-    pyproject.write_text("")
+    pyproject.write_text(
+        """
+[tool.robocorp.log]
+default_library_filter_kind = "exclude"
+"""
+    )
     from robocorp.log import verify_log_messages_from_log_html
 
     result = robocorp_tasks_run(["run", "simple.py"], returncode=0, cwd=str(datadir))

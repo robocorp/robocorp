@@ -78,12 +78,15 @@ how to handle logging for a particular module.
 
 There are three different logging configurations that may be applied:
 
-- `exclude` (default for library code): skips logging a module.
+- `exclude`: skips logging a module.
 - `full_log` (default for user code): logs a module with full information, such as method calls, arguments, yields, local assigns, and more.
-- `log_on_project_call` logs only method calls, arguments, return values and exceptions, but only when a library method is called from user code. This configuration is meant to be used for library logging.
+- `log_on_project_call` (default for library code -- since 2.0): logs only method calls, arguments, return values and exceptions, but only when a library method is called from user code. This configuration is meant to be used for library logging.
+
+Note that the default for the library code may be configured through `default_library_filter_kind`.
 
 Example of `pyproject.toml` where the `rpaframework` and `selenium` 
-libraries are configured to be logged:
+libraries are configured to be logged and all other libraries are
+excluded by default:
 
 
 ```
@@ -94,6 +97,8 @@ log_filter_rules = [
     {name = "selenium", kind = "log_on_project_call"},
     {name = "SeleniumLibrary", kind = "log_on_project_call"},
 ]
+
+default_library_filter_kind = "exclude"
 ```
 
 Note that when specifying a module name to match in `log_filter_rules`, 
@@ -102,6 +107,22 @@ name followed by a dot.
 
 This means that, for example, `RPA` would match `RPA.Browser`,
 but not `RPAmodule` nor `another.RPA`.
+
+Also, as of `robocorp-tasks 2.0`, it's also possible to use `fnmatch` style names.
+
+i.e.:
+
+```
+[tool.robocorp.log]
+
+log_filter_rules = [
+    {name = "proj.*", kind = "full_log"},
+    {name = "proj[AB]", kind = "full_log"},
+]
+```
+
+Note that the order of the rules is important as rules which appear
+first are matched before the ones that appear afterwards.
 
 
 ## Log output customization
