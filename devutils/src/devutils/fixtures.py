@@ -176,7 +176,8 @@ class StrRegression:
 
         ``basename`` and ``fullpath`` are exclusive.
         """
-        from pytest_regressions.common import perform_regression_check  # type: ignore
+        from pytest_regressions.common import \
+            perform_regression_check  # type: ignore
 
         __tracebackhide__ = True
 

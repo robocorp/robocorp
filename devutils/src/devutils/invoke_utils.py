@@ -1,7 +1,7 @@
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 
 from invoke import run, task
 
@@ -74,17 +74,18 @@ def get_all_tags(tag_prefix: str) -> List[str]:
     return [x for x in found.splitlines() if x.startswith(tag_prefix)]
 
 
-def build_common_tasks(root: Path, package_name: str):
+def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] = None):
     """
     Args:
         root: The path to the package root (i.e.: /tasks in the repo)
         package_name: The name of the python package (i.e.: robocorp.tasks)
+        tag_prefix: Prefix for tags / PyPI package name
     """
-
-    # The tag for releases should be `robocorp-tasks-{version}`
-    # i.e.: robocorp-tasks-0.1.1
-    # Here we just want the prefix.
-    tag_prefix = package_name.replace(".", "-")
+    if tag_prefix is None:
+        # The tag for releases should be `robocorp-tasks-{version}`
+        # i.e.: robocorp-tasks-0.1.1
+        # Here we just want the prefix.
+        tag_prefix = package_name.replace(".", "-")
 
     DIST = root / "dist"
 
