@@ -1,9 +1,9 @@
 from contextlib import contextmanager
 
 import pytest
-from robocorp_log_tests.fixtures import ConfigForTest
+from robocorp_log_tests.fixtures import AutoLogConfigForTest
 
-from robocorp.log._config import ConfigFilesFiltering
+from robocorp.log._config import DefaultAutoLogConfig
 from robocorp.log.protocols import LogElementType
 
 
@@ -71,7 +71,7 @@ def _setup_test_callbacks():
         yield setup_callback
 
 
-@pytest.mark.parametrize("config", [ConfigForTest(), ConfigFilesFiltering()])
+@pytest.mark.parametrize("config", [AutoLogConfigForTest(), DefaultAutoLogConfig()])
 def test_rewrite_hook_basic(config):
     import sys
     from imp import reload
@@ -120,7 +120,7 @@ def test_rewrite_hook_except():
 
     from robocorp.log._rewrite_importhook import RewriteHook
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     hook = RewriteHook(config)
     sys.meta_path.insert(0, hook)
@@ -160,7 +160,7 @@ def test_rewrite_hook_log_on_project_call():
     from robocorp import log as robolog
     from robocorp.log._rewrite_importhook import RewriteHook
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     hook = RewriteHook(config)
     sys.meta_path.insert(0, hook)

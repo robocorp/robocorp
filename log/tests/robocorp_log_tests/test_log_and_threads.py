@@ -5,12 +5,12 @@ def test_log_and_threads(tmpdir):
     from imp import reload
 
     from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import ConfigForTest, basic_log_setup
+    from robocorp_log_tests.fixtures import AutoLogConfigForTest, basic_log_setup
 
     from robocorp import log
     from robocorp.log import verify_log_messages_from_log_html
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         check = reload(check)
 

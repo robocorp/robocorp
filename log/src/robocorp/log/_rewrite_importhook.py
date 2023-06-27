@@ -34,7 +34,7 @@ import types
 from pathlib import Path
 from typing import IO, Callable, Dict, Optional, Sequence, Tuple, Union
 
-from ._config import BaseConfig, FilterKind
+from ._config import AutoLogConfigBase, FilterKind
 
 # caches rewritten pycs in pycache dirs
 # 0.0.1: Initial version
@@ -54,7 +54,8 @@ from ._config import BaseConfig, FilterKind
 # 0.0.16: Rewrite for without try..except
 # 0.0.17: Rewrite while
 # 0.0.18: Fixes in generation based on scoping (generator/untracked_generator,full_log,log_on_project_call).
-version = "0.0.18"
+# 0.0.19: Fixed return with log_on_project_call.
+version = "0.0.19"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT
@@ -77,7 +78,7 @@ else:
 class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
     """PEP302/PEP451 import hook which rewrites asserts."""
 
-    def __init__(self, config: BaseConfig) -> None:
+    def __init__(self, config: AutoLogConfigBase) -> None:
         self.config = config
         self._rewritten_names: Dict[str, Path] = {}
         # flag to guard against trying to rewrite a pyc file while we are already writing another pyc file,
@@ -254,7 +255,7 @@ def _write_pyc(
 
 
 def _rewrite(
-    fn: Path, config: BaseConfig, filter_kind: FilterKind
+    fn: Path, config: AutoLogConfigBase, filter_kind: FilterKind
 ) -> Tuple[os.stat_result, types.CodeType, ast.AST]:
     """Read and rewrite *fn* and return the code object."""
     from ._rewrite_ast_add_callbacks import rewrite_ast_add_callbacks

@@ -3,7 +3,7 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
-from robocorp_log_tests.test_rewrite_hook import ConfigForTest
+from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
 
 from robocorp.log._config import FilterKind
 from robocorp.log._rewrite_importhook import _rewrite
@@ -113,7 +113,7 @@ def method():
 
 
 def test_rewrite_ast_just_docstring(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -145,7 +145,7 @@ def _ignore_this_too():
 
 
 def test_rewrite_simple_on_project(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -167,8 +167,48 @@ def method():
     assert "MethodLifecycleContextCallerInProject" in unparsed
 
 
+def test_rewrite_return_full(tmpdir, str_regression):
+    config = AutoLogConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def method():
+    return 1
+"""
+    )
+
+    mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[-1]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert "MethodLifecycleContext(" in unparsed
+
+
+def test_rewrite_return_log_on_project_call(tmpdir, str_regression):
+    config = AutoLogConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def method():
+    return 1
+"""
+    )
+
+    mod = _rewrite(target, config, filter_kind=FilterKind.log_on_project_call)[-1]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+    assert "MethodLifecycleContextCallerInProject" in unparsed
+
+
 def test_no_rewrite_return_on_untracked_generator(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -190,7 +230,7 @@ def method():
 
 @pytest.mark.parametrize("rewrite_assigns", [True, False])
 def test_rewrite_simple_full(tmpdir, rewrite_assigns, str_regression):
-    config = ConfigForTest(rewrite_assigns=rewrite_assigns)
+    config = AutoLogConfigForTest(rewrite_assigns=rewrite_assigns)
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -217,7 +257,7 @@ def method():
 
 
 def test_rewrite_yield(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -238,7 +278,7 @@ def method():
 
 
 def test_rewrite_yield_from(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -268,7 +308,7 @@ def test_handle_iterators_on_log_project_call(tmpdir, str_regression):
     # library generator start/generator end (as we won't log things inside
     # it, this should be ok).
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -298,7 +338,7 @@ def test_handle_yield_from_on_log_project_call(tmpdir, str_regression):
     # library generator start/generator end (as we won't log things inside
     # it, this should be ok).
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -324,7 +364,7 @@ def method():
 def test_rewrite_yield_multiple(tmpdir, str_regression):
     from robocorp.log._lifecycle_hooks import after_yield, before_yield
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -374,7 +414,7 @@ def foo():
 def test_rewrite_for(tmpdir, str_regression):
     from robocorp.log._lifecycle_hooks import after_iterate, before_iterate
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -415,7 +455,7 @@ def foo():
 def test_rewrite_while(tmpdir, str_regression):
     from robocorp.log._lifecycle_hooks import after_iterate, before_iterate
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -452,7 +492,7 @@ def foo():
 
 
 def test_rewrite_while_no_call_in_target(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -475,7 +515,7 @@ def foo():
 def test_rewrite_await(tmpdir, str_regression):
     # On await it should just skip the function.
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"
@@ -500,7 +540,7 @@ def a():
 
 
 def test_rewrite_if(tmpdir, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
     target /= "check.py"

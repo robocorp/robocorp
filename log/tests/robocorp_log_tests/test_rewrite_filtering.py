@@ -2,10 +2,10 @@ def test_rewrite_filtering() -> None:
     import email
     import threading
 
-    from robocorp.log import ConfigFilesFiltering, Filter, FilterKind
+    from robocorp.log import DefaultAutoLogConfig, Filter, FilterKind
 
     # By default accept what's not in the library.
-    files_filtering = ConfigFilesFiltering()
+    files_filtering = DefaultAutoLogConfig()
     assert (
         files_filtering.get_filter_kind_by_module_name_and_path(__name__, __file__)
         == FilterKind.full_log
@@ -24,7 +24,7 @@ def test_rewrite_filtering() -> None:
         == FilterKind.exclude
     )
 
-    files_filtering = ConfigFilesFiltering(
+    files_filtering = DefaultAutoLogConfig(
         filters=[Filter(threading.__name__, FilterKind.log_on_project_call)]
     )
     assert (

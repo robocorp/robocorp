@@ -1,0 +1,8 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+import robocorp.log as @robolog
+
+def method():
+    with @robo_lifecycle_hooks.MethodLifecycleContextCallerInProject(('METHOD', __name__, __file__, 'method', 3, {})) as @ctx:
+        @tmp_0 = 1
+        @ctx._accept and @robo_lifecycle_hooks.method_return(__name__, __file__, 'method', 3, @tmp_0)
+        return @tmp_0

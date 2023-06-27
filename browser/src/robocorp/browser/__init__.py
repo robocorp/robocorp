@@ -188,7 +188,8 @@ def screenshot(
         f'<img src="data:image/{image_type};base64,{in_base64}"/>', level=log_level
     )
 
-    return in_bytes
+    with log.suppress():
+        return in_bytes
 
 
 def install(browser_engine: BrowserEngine):

@@ -44,17 +44,13 @@ from . import _config
 Filter = _config.Filter
 FilterKind = _config.FilterKind
 
-# TODO: BaseConfig isn't a good name. This should be something as
-# 'AutoLogBaseConfig`. Maybe rename and keep alias as backward compatibility?
-#
 # Note: clients are not meant to instance this class, it's just meant to be
 # available for typing.
-BaseConfig = _config.BaseConfig
+AutoLogConfigBase = _config.AutoLogConfigBase
 
-# Subclass of the BaseConfig. Clients are expected to instance it to
-# configure auto-logging. Maybe a better name would've been
-# 'DefaultAutoLogConfig'?.
-ConfigFilesFiltering = _config.ConfigFilesFiltering
+# Subclass of the AutoLogConfigBase. Clients are expected to instance it to
+# configure auto-logging.
+DefaultAutoLogConfig = _config.DefaultAutoLogConfig
 
 
 # --- Logging methods for custom messaging.
@@ -878,7 +874,7 @@ def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
 
 
 def setup_auto_logging(
-    config: Optional[BaseConfig] = None, add_rewrite_hook: bool = True
+    config: Optional[AutoLogConfigBase] = None, add_rewrite_hook: bool = True
 ):
     """
     Sets up automatic logging.
@@ -900,10 +896,10 @@ def setup_auto_logging(
     """
     from ._auto_logging_setup import register_auto_logging_callbacks
 
-    use_config: BaseConfig
+    use_config: AutoLogConfigBase
     if config is None:
         # If not passed, use default.
-        use_config = ConfigFilesFiltering()
+        use_config = DefaultAutoLogConfig()
     else:
         use_config = config
 

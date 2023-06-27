@@ -4,7 +4,7 @@ from typing import Any, List, Optional, Sequence, Tuple
 
 from robocorp.log import critical, is_sensitive_variable_name
 
-from ._config import BaseConfig
+from ._config import AutoLogConfigBase
 from ._logger_instances import _get_logger_instances
 from ._obj_info_repr import get_obj_type_and_repr
 from ._on_exit_context_manager import OnExitContextManager
@@ -38,7 +38,7 @@ class _AutoLogging:
     to the logger.
     """
 
-    def __init__(self, rewrite_hook_config: BaseConfig) -> None:
+    def __init__(self, rewrite_hook_config: AutoLogConfigBase) -> None:
         from ._rewrite_importhook import RewriteHook
 
         self.tid = threading.get_ident()
@@ -438,7 +438,7 @@ class _AutoLogging:
 
 
 def register_auto_logging_callbacks(
-    rewrite_hook_config: BaseConfig, add_rewrite_hook: bool = True
+    rewrite_hook_config: AutoLogConfigBase, add_rewrite_hook: bool = True
 ):
     # Make sure that this method should be called only once.
     registered = getattr(register_auto_logging_callbacks, "registered", False)

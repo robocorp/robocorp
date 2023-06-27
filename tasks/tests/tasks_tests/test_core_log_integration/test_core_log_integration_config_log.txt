@@ -1,0 +1,23 @@
+
+SR: simple.py
+    ST: Collect tasks
+    ET: PASS
+    ST: check_difflib_log
+        SE: METHOD: check_difflib_log
+            SE: METHOD: ndiff
+                EA: list: a: ['aaaa', 'bbb', 'ccc', 'ddd']
+                EA: list: b: ['aaaa', 'bbb', 'eee', 'ddd']
+                EA: NoneType: linejunk: None
+                EA: function: charjunk: <function IS_CHARACTER_JUNK at 0xXXXXXXXXX>
+                R: generator: <generator object Differ.compare at 0xXXXXXXXXX>
+            EE: METHOD: PASS
+            AS: diff: <generator object Differ.compare at 0xXXXXXXXXX>
+            SE: UNTRACKED_GENERATOR: Differ.compare
+            EA: list: a: ['aaaa', 'bbb', 'ccc', 'ddd']
+            EA: list: b: ['aaaa', 'bbb', 'eee', 'ddd']
+        EE: UNTRACKED_GENERATOR: PASS
+    EE: METHOD: PASS
+ET: PASS
+ST: Teardown tasks
+ET: PASS
+ER: PASS

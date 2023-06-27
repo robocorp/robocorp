@@ -8,7 +8,7 @@ from typing import List, Optional
 
 import pytest
 
-from robocorp.log import BaseConfig, FilterKind
+from robocorp.log import AutoLogConfigBase, FilterKind
 from robocorp.log.protocols import IReadLines, LogHTMLStyle
 
 
@@ -100,7 +100,7 @@ def ui_regenerate():
 
 @contextmanager
 def basic_log_setup(
-    tmpdir, max_file_size="1MB", max_files=5, config: Optional[BaseConfig] = None
+    tmpdir, max_file_size="1MB", max_files=5, config: Optional[AutoLogConfigBase] = None
 ):
     from robocorp import log
 
@@ -124,7 +124,7 @@ def basic_log_setup(
         assert log_target.exists()
 
 
-class ConfigForTest(BaseConfig):
+class AutoLogConfigForTest(AutoLogConfigBase):
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
         if "check_lib_lib" in module_name or "check_iterators_lib" in module_name:
             return FilterKind.log_on_project_call
@@ -261,7 +261,21 @@ _format_msg["RE"] = lambda msg: f"RE: {msg['type']}: {msg['name']}"
 _format_msg["R"] = lambda msg: f"R: {msg['type']}: {msg['value']}"
 
 
-_ignore = {"ETB", "TBV", "TBE", "I", "T", "ID", "V"}
+_ignore = {
+    "ETB",
+    "TBV",
+    "TBE",
+    "I",
+    "T",
+    "ID",
+    "V",
+    "C",
+    "STD",
+    "ETD",
+    "EPS",
+    "L",
+    "SPS",
+}
 
 
 def pretty_format_logs_from_log_html(log_html: Path, show_exception_vars=False):
@@ -283,6 +297,8 @@ def pretty_format_logs_from_stream(stream: IReadLines, show_exception_vars=False
 
 
 def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
+    import re
+
     format_msg = _format_msg
     ignore = _ignore
     if show_exception_vars:
@@ -310,7 +326,10 @@ def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
             indent = "    " * level
 
         try:
-            out.append(f"{indent}{format_msg[msg_type](msg)}\n")
+            formatted = format_msg[msg_type](msg)
+            pattern = r"at 0x[0-9A-Fa-f]+>"
+            formatted = re.sub(pattern, "at 0xXXXXXXXXX>", formatted)
+            out.append(f"{indent}{formatted}\n")
         except:
             raise RuntimeError(f"Error handling message: {msg}")
 

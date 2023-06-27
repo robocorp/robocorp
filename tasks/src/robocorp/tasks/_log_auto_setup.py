@@ -10,11 +10,11 @@ from ._protocols import IContextErrorReport, ITask
 
 def read_robocorp_log_config(
     context: IContextErrorReport, pyproject: PyProjectInfo
-) -> log.BaseConfig:
+) -> log.AutoLogConfigBase:
     from ._toml_settings import read_section_from_toml
 
     if not pyproject.toml_contents:
-        log.ConfigFilesFiltering()
+        log.DefaultAutoLogConfig()
 
     obj: Any = pyproject.toml_contents
     filters: List[log.Filter] = []
@@ -27,7 +27,7 @@ def read_robocorp_log_config(
         if isinstance(obj, dict):
             filters = _load_filters(obj, context, pyproject.pyproject)
 
-    return log.ConfigFilesFiltering(filters=filters)
+    return log.DefaultAutoLogConfig(filters=filters)
 
 
 def _load_filters(
@@ -105,7 +105,7 @@ def _log_after_task_run(task: ITask):
 
 
 @contextmanager
-def setup_cli_auto_logging(config: Optional[log.BaseConfig]):
+def setup_cli_auto_logging(config: Optional[log.AutoLogConfigBase]):
     # This needs to be called before importing code which needs to show in the log
     # (user or library).
 

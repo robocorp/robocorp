@@ -20,7 +20,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
 
     from robocorp import log
     from robocorp.log import (
-        ConfigFilesFiltering,
+        DefaultAutoLogConfig,
         Filter,
         FilterKind,
         verify_log_messages_from_log_html,
@@ -31,7 +31,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
     log_target = Path(tmpdir.join("log.html"))
 
     with log.setup_auto_logging(
-        ConfigFilesFiltering(
+        DefaultAutoLogConfig(
             filters=[
                 Filter("difflib", FilterKind.log_on_project_call),
             ]

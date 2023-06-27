@@ -144,11 +144,11 @@ def run(
         task_name = ", ".join(str(x) for x in task_names)
         task_or_tasks = "task" if len(task_names) == 1 else "tasks"
 
-    config: log.BaseConfig
+    config: log.AutoLogConfigBase
     pyproject_path_and_contents = read_pyproject_toml(p)
     pyproject_toml_contents: dict
     if pyproject_path_and_contents is None:
-        config = log.ConfigFilesFiltering()
+        config = log.DefaultAutoLogConfig()
         pyproject_toml_contents = {}
     else:
         config = read_robocorp_log_config(context, pyproject_path_and_contents)

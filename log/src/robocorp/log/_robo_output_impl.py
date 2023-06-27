@@ -650,6 +650,8 @@ class _RoboOutputImpl:
             ),
 
     def process_snapshot(self, hide_vars: bool) -> None:
+        from robocorp import log
+
         self._rotate_if_needed()
 
         entry_id = f"ps_{self._next_int()}"
@@ -665,71 +667,75 @@ class _RoboOutputImpl:
         )
 
         try:
-            try:
-                import psutil
-                from psutil import AccessDenied, NoSuchProcess, ZombieProcess
-            except ImportError:
-                pass
-            else:
-                curr_process = psutil.Process()
+            with log.suppress():
+                # We don't want to see calls from psutil in case it's
+                # being tracked.
 
-                def log_info(message):
-                    self.log_message(
-                        "I", message, False, "", "", "", 0, self.get_time_delta()
-                    )
-
-                memory_info = "<unknown>"
                 try:
-                    memory_info = format_memory_info(psutil.virtual_memory())
-                    memory_info = format_memory_info(psutil.virtual_memory())
-                except:
+                    import psutil
+                    from psutil import AccessDenied, NoSuchProcess, ZombieProcess
+                except ImportError:
                     pass
+                else:
+                    curr_process = psutil.Process()
 
-                log_info(
-                    f"""System information:
-Memory: {memory_info}
-CPUs: {os.cpu_count()}"""
-                )
+                    def log_info(message):
+                        self.log_message(
+                            "I", message, False, "", "", "", 0, self.get_time_delta()
+                        )
 
-                for child_i, child in enumerate(
-                    itertools.chain(
-                        [curr_process], curr_process.children(recursive=True)
-                    )
-                ):
-                    name = "<unknown>"
-                    status = "<unknown>"
-                    create_time = "<unknown>"
-                    ppid = "<unknown>"
-                    cmdline = "<unknown>"
-                    rss = "<unknown>"
-                    vms = "<unknown>"
-
+                    memory_info = "<unknown>"
                     try:
-                        with child.oneshot():
-                            try:
-                                name = child.name()
-                                status = child.status()
-                                try:
-                                    create_time = _pprint_secs(child.create_time())
-                                except:
-                                    pass
-                                ppid = str(child.ppid())
-                                cmdline = " ".join(child.cmdline())
-                                proc_memory_info = child.memory_info()
-                                rss = bytes2human(proc_memory_info.rss)
-                                vms = bytes2human(proc_memory_info.vms)
-                            except ZombieProcess:
-                                status = "zombie"
-                            except NoSuchProcess:
-                                status = "terminated"
-                            except AccessDenied:
-                                pass
-                            except Exception:
-                                pass
+                        memory_info = format_memory_info(psutil.virtual_memory())
+                        memory_info = format_memory_info(psutil.virtual_memory())
                     except:
                         pass
 
-                    message = f"""{"Subprocess" if child_i > 0 else "Current Process"}: {name} (pid: {child.pid}, status: {status})
+                    log_info(
+                        f"""System information:
+Memory: {memory_info}
+CPUs: {os.cpu_count()}"""
+                    )
+
+                    for child_i, child in enumerate(
+                        itertools.chain(
+                            [curr_process], curr_process.children(recursive=True)
+                        )
+                    ):
+                        name = "<unknown>"
+                        status = "<unknown>"
+                        create_time = "<unknown>"
+                        ppid = "<unknown>"
+                        cmdline = "<unknown>"
+                        rss = "<unknown>"
+                        vms = "<unknown>"
+
+                        try:
+                            with child.oneshot():
+                                try:
+                                    name = child.name()
+                                    status = child.status()
+                                    try:
+                                        create_time = _pprint_secs(child.create_time())
+                                    except:
+                                        pass
+                                    ppid = str(child.ppid())
+                                    cmdline = " ".join(child.cmdline())
+                                    proc_memory_info = child.memory_info()
+                                    rss = bytes2human(proc_memory_info.rss)
+                                    vms = bytes2human(proc_memory_info.vms)
+                                except ZombieProcess:
+                                    status = "zombie"
+                                except NoSuchProcess:
+                                    status = "terminated"
+                                except AccessDenied:
+                                    pass
+                                except Exception:
+                                    pass
+                        except:
+                            pass
+
+                        message = f"""{"Subprocess" if child_i > 0 else "Current Process"}: {name} (pid: {child.pid}, status: {status})
 Command Line: {cmdline}
 Started: {create_time}
 Parent pid: {ppid}

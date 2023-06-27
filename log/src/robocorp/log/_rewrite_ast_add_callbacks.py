@@ -3,7 +3,7 @@ import types
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Literal
 
 from ._ast_utils import ASTRewriter
-from ._config import BaseConfig, FilterKind
+from ._config import AutoLogConfigBase, FilterKind
 from .protocols import LogElementType
 
 DEBUG = False
@@ -167,75 +167,6 @@ def _create_method_with_stmt(
     return with_stmt
 
 
-def _create_except_handler_ast(
-    rewrite_ctx: ASTRewriter,
-    factory,
-    class_name: str,
-    function: ast.FunctionDef,
-    last_body_lineno,
-    filter_kind: FilterKind,
-    log_method_type: LogElementType = "METHOD",
-    name: Optional[ast.Str] = None,
-    except_callback_name="method_except",
-) -> ast.ExceptHandler:
-    # Target code:
-    #     import sys as @py_sys
-    #     method_except(@py_sys.exc_info())
-    #     raise
-    #
-    # ExceptHandler
-    #   Import
-    #   Expr
-    #     Call
-    #       Name
-    #         Load
-    #       Call
-    #         Attribute
-    #           Name
-    #             Load
-    #           Load
-    #   Raise
-    aliases = [
-        ast.alias("sys", "@py_sys", lineno=last_body_lineno, col_offset=0),
-    ]
-
-    imports = [
-        ast.Import([alias], lineno=last_body_lineno, col_offset=0) for alias in aliases
-    ]
-
-    except_handler = factory.ExceptHandler()
-
-    if filter_kind == FilterKind.log_on_project_call:
-        if_stmt = factory.If(factory.NameLoad("@caller_in_proj"))
-        add_to_body = if_stmt.body = []
-        if_stmt.orelse = []
-        except_handler.body.append(if_stmt)
-    else:
-        add_to_body = except_handler.body
-
-    call_exc_info = factory.Call(
-        factory.Attribute(factory.NameLoad("@py_sys"), "exc_info")
-    )
-
-    call_method_except = factory.Call(
-        factory.NameLoadRewriteCallback(except_callback_name)
-    )
-    call_method_except.args.append(factory.Str(log_method_type))
-    call_method_except.args.append(factory.NameLoad("__name__"))
-    call_method_except.args.append(factory.NameLoad("__file__"))
-    call_method_except.args.append(
-        name if name is not None else factory.Str(f"{class_name}{function.name}")
-    )
-    call_method_except.args.append(factory.LineConstant())
-    call_method_except.args.append(call_exc_info)
-
-    add_to_body.extend(imports)
-    add_to_body.append(factory.Expr(call_method_except))
-
-    except_handler.body.append(factory.Raise())
-    return except_handler
-
-
 AcceptedCases = Literal[
     # Only when full logging is available for a function.
     "full_log",
@@ -353,7 +284,7 @@ def rewrite_ast_add_callbacks(
     filter_kind: FilterKind,
     source: bytes,
     module_path: str,
-    config: BaseConfig,
+    config: AutoLogConfigBase,
 ) -> None:
     """Rewrite the module as needed so that the logging is done automatically."""
 
@@ -508,7 +439,14 @@ def _handle_return(
         else:
             call.args.append(factory.NoneConstant())
 
-        result.append(factory.Expr(call))
+        if filter_kind == FilterKind.log_on_project_call:
+            result.append(
+                factory.AndExpr(
+                    factory.Attribute(factory.NameLoad("@ctx"), "_accept"), call
+                )
+            )
+        else:
+            result.append(factory.Expr(call))
         result.append(node)
         return result
     except Exception:
@@ -582,7 +520,12 @@ def _handle_if(
 
 
 def _handle_assign(
-    rewrite_ctx: ASTRewriter, config: BaseConfig, module_path, stack, filter_kind, node
+    rewrite_ctx: ASTRewriter,
+    config: AutoLogConfigBase,
+    module_path,
+    stack,
+    filter_kind,
+    node,
 ):
     if filter_kind != FilterKind.full_log or not config.get_rewrite_assigns():
         return None
@@ -1051,12 +994,16 @@ def _handle_yield(
 
 _dispatch_before: Dict[
     type,
-    Callable[[ASTRewriter, BaseConfig, str, list, FilterKind, Any], Optional[list]],
+    Callable[
+        [ASTRewriter, AutoLogConfigBase, str, list, FilterKind, Any], Optional[list]
+    ],
 ] = {}
 
 _dispatch_after: Dict[
     type,
-    Callable[[ASTRewriter, BaseConfig, str, list, FilterKind, Any], Optional[list]],
+    Callable[
+        [ASTRewriter, AutoLogConfigBase, str, list, FilterKind, Any], Optional[list]
+    ],
 ] = {}
 
 _dispatch_after[ast.Return] = _handle_return

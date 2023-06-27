@@ -1,3 +1,18 @@
+2.0.0 (unreleased)
+-----------------------------
+
+- Fixed handling `return` statement: when `log_on_project_call` matches for a module it'll only
+  show the return value if the function was called from user code.
+
+Backward incompatible changes:
+
+- Log API changed: `robocorp.log.BaseConfig` was renamed to `robocorp.log.AutoLogConfigBase`.
+- Log API changed: `robocorp.log.ConfigFilesFiltering` was renamed to `robocorp.log.DefaultAutoLogConfig`.
+- The log configuration now has a setting specifying the default filter kind for modules not listed which is now `log_on_project_call`.
+    Note that previously it excluded from the logs anything that wasn't user code that didn't
+    match a filter, now it should log those when directly called from user code.
+
+
 1.2.0 (2023-06-23)
 -----------------------------
 

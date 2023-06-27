@@ -37,7 +37,7 @@ class GeneralLogConfig:
 _general_log_config = GeneralLogConfig()
 
 
-class BaseConfig:
+class AutoLogConfigBase:
     def __init__(
         self,
         rewrite_assigns=True,
@@ -100,15 +100,10 @@ class BaseConfig:
         """
 
 
-class ConfigFilesFiltering(BaseConfig):
+class DefaultAutoLogConfig(AutoLogConfigBase):
     """
-    A configuration in which modules are rewritten if they are considered "project" modules.
-
-    If no arguments are passed, python is queried for the paths that are "library" paths
-    and "project" paths are all that aren't inside the "library" paths.
-
-    If "project_roots" is passed, then any file inside one of those folders is considered
-    to be a file to be rewritten.
+    Configuration which provides information on which modules have to be rewritten
+    and how to rewrite them based on filters.
     """
 
     def __init__(
@@ -116,11 +111,13 @@ class ConfigFilesFiltering(BaseConfig):
         filters: Sequence[Filter] = (),
         rewrite_assigns=True,
         rewrite_yields=True,
+        default_filter_kind=FilterKind.exclude,
     ):
         super().__init__(rewrite_assigns=rewrite_assigns, rewrite_yields=rewrite_yields)
         self._filters = filters
         self._cache_modname_to_kind: Dict[str, Optional[FilterKind]] = {}
         self._cache_filename_to_kind: Dict[str, FilterKind] = {}
+        self._default_filter_kind = default_filter_kind
 
     def get_filter_kind_by_module_name(self, module_name: str) -> Optional[FilterKind]:
         if module_name.startswith(_ROBO_LOG_MODULE_NAME):
@@ -177,11 +174,11 @@ class ConfigFilesFiltering(BaseConfig):
         except KeyError:
             pass
 
-        exclude = not log._in_project_roots(absolute_filename)
-        if exclude:
-            filter_kind = FilterKind.exclude
-        else:
+        in_project_roots = log._in_project_roots(absolute_filename)
+        if in_project_roots:
             filter_kind = FilterKind.full_log
+        else:
+            filter_kind = self._default_filter_kind
 
         self._cache_filename_to_kind[cache_key] = filter_kind
         return filter_kind

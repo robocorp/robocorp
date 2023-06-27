@@ -3,7 +3,7 @@ from pathlib import Path
 
 from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
-    ConfigForTest,
+    AutoLogConfigForTest,
     basic_log_setup,
     pretty_format_logs_from_log_html,
 )
@@ -17,7 +17,7 @@ def test_log_with_yield_iterator(tmpdir, ui_regenerate):
         MESSAGE_TYPE_YIELD_SUSPEND,
     )
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).main()
 
@@ -55,7 +55,7 @@ def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
         MESSAGE_TYPE_YIELD_SUSPEND,
     )
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).main_yield_augassign()
 
@@ -118,7 +118,7 @@ def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
         MESSAGE_TYPE_YIELD_FROM_SUSPEND,
     )
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).main_yield_from()
 
@@ -145,7 +145,7 @@ def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
 
 
 def test_log_with_for_loop(tmpdir, ui_regenerate):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).for_iter()
 
@@ -174,7 +174,7 @@ def test_log_with_for_loop(tmpdir, ui_regenerate):
 
 
 def test_log_with_for_loop_and_exception(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         try:
             reload(check_iterators).for_iter_exc()
@@ -192,7 +192,7 @@ def test_log_with_for_loop_and_exception(tmpdir, ui_regenerate, str_regression):
 
 
 def test_log_with_for_loop_and_early_return(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).for_early_return()
 
@@ -205,7 +205,7 @@ def test_log_with_for_loop_and_early_return(tmpdir, ui_regenerate, str_regressio
 
 
 def test_log_with_for_loop_multiple_targets(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).for_iter_multiple_targets()
 
@@ -218,7 +218,7 @@ def test_log_with_for_loop_multiple_targets(tmpdir, ui_regenerate, str_regressio
 
 
 def test_log_with_while_loop(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).while_loop_multiple_targets()
 
@@ -233,7 +233,7 @@ def test_log_with_while_loop(tmpdir, ui_regenerate, str_regression):
 def test_log_with_for_loop_and_exception_inside_for(
     tmpdir, ui_regenerate, str_regression
 ):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).for_with_exception()
 
@@ -247,7 +247,7 @@ def test_log_with_for_loop_and_exception_inside_for(
 
 def test_exception_suppress_variables(tmpdir, ui_regenerate, str_regression):
     __tracebackhide__ = 1
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         try:
             reload(check).check_suppress_exc_values()
@@ -267,7 +267,7 @@ def test_exception_suppress_variables(tmpdir, ui_regenerate, str_regression):
 
 
 def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check).check_multiline()
 
@@ -278,7 +278,7 @@ def test_log_multiline_str(tmpdir, ui_regenerate, str_regression):
 
 
 def test_log_if_stmt(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check).check_if()
 
@@ -289,7 +289,7 @@ def test_log_if_stmt(tmpdir, ui_regenerate, str_regression):
 
 
 def test_log_return(tmpdir, ui_regenerate, str_regression):
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check).check_return()
 
@@ -306,7 +306,7 @@ def test_limits_and_corner_cases(tmpdir, ui_regenerate, str_regression) -> None:
     be greater than the max log size).
     """
 
-    config = ConfigForTest(min_messages_per_file=10)
+    config = AutoLogConfigForTest(min_messages_per_file=10)
 
     with setup_log(max_value_repr_size="50kb"):
         with basic_log_setup(
@@ -331,7 +331,7 @@ def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
     This test checks the stack overflow case (disabled for now).
     """
 
-    config = ConfigForTest()
+    config = AutoLogConfigForTest()
     with basic_log_setup(
         tmpdir, config=config, max_file_size="100kb", max_files=2
     ) as setup_info:
@@ -346,7 +346,7 @@ def _test_stack_overflow_error(tmpdir, ui_regenerate, str_regression):
 def test_partial_logs(tmpdir, ui_regenerate, str_regression) -> None:
     """ """
 
-    config = ConfigForTest(min_messages_per_file=10)
+    config = AutoLogConfigForTest(min_messages_per_file=10)
 
     with setup_log(max_value_repr_size="100kb"):
         with basic_log_setup(
