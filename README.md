@@ -72,6 +72,7 @@ The framework includes Python libraries for configuring project entrypoints and 
 
 | Name | Release | Description |
 | --- | --- | --- |
+| [`robocorp`](./meta) | [![robocorp](https://img.shields.io/pypi/v/robocorp)](https://pypi.org/project/robocorp/) | Metapackage for core libraries. |
 | [`robocorp.tasks`](./tasks) | [![robocorp-tasks](https://img.shields.io/pypi/v/robocorp-tasks)](https://pypi.org/project/robocorp-tasks/) | Create entrypoints for your automation project. |
 | [`robocorp.log`](./log) | [![robocorp-log](https://img.shields.io/pypi/v/robocorp-log)](https://pypi.org/project/robocorp-log/) | Configure and control the execution log. |
 | [`robocorp.vault`](./vault) | [![robocorp-vault](https://img.shields.io/pypi/v/robocorp-vault)](https://pypi.org/project/robocorp-vault/) | Store secret values in Control Room and access them during the execution. |
