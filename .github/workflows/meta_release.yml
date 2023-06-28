@@ -3,7 +3,7 @@ name: Metapackage Release
 on:
   push:
     tags:
-      - "robocorp-*"
+      - "robocorp-[0-9]+.[0-9]+.[0-9]+"
 
 defaults:
   run:

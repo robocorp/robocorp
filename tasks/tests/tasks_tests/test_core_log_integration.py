@@ -56,6 +56,15 @@ def test_core_log_integration_error_in_import(datadir):
 
 
 def test_core_log_integration_config_log(datadir, str_regression):
+    import os
+
+    matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
+    if matrix_name:
+        if "devmode" not in matrix_name:
+            # i.e.: When testing with log in release mode we can't use
+            # the hack to import the tests.
+            pytest.skip(f"Disabled for matrix name: {matrix_name}")
+
     import sys
 
     from robocorp import log
@@ -101,8 +110,6 @@ def test_core_log_integration_config_log(datadir, str_regression):
 
 
 def test_core_log_integration_empty_pyproject(datadir) -> None:
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
-
     pyproject: Path = datadir / "pyproject.toml"
     pyproject.write_text(
         """

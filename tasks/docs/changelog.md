@@ -18,8 +18,6 @@ Backward incompatible changes:
         {name = "email", kind = "exclude"},
         {name = "urllib", kind = "exclude"},
     ]
-    
-    default_library_filter_kind = "exclude"
     ```
     
     
