@@ -69,8 +69,7 @@ just an implementation detail).
 2. The logging needs to be fully setup prior to importing any module that should 
 be automatically logged.
 
-3. `async` and `await` are not currently well supported (although it's already in
-the plans).
+3. Working with coroutines (`async`, `await` and `greenlet`) is not supported.
 
 
 ## Dealing with sensitive data in the logs

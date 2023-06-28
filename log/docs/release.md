@@ -2,9 +2,9 @@
 Steps to do a new release
 ---------------------------
 
-- Open a shell at the proper place (something as `X:/robocorpws/robo/log`)
+- Open a shell at the proper place (something as `D:/x/robocorpws/robo/log`)
 
-- Update version (`inv set-version 1.2.0`).
+- Update version (`inv set-version 2.0.0`) -- make sure not to be in `subst` drive.
 
 - Update docs version (`inv docs`).
 
@@ -12,9 +12,9 @@ Steps to do a new release
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
-- `mu acp robocorp-log release 1.2.0`
+- `mu acp robocorp-log release 2.0.0`
 
-- Create a tag (`git tag robocorp-log-1.2.0`) and push it.
+- Create a tag (`inv make-release`) and push it.
 
 - After published in PyPi, head over to the tasks module and run: `poetry lock` (then a new tasks release may be done).
 
