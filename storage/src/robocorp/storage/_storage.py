@@ -44,6 +44,25 @@ class AssetUploadFailed(RuntimeError):
 @lru_cache(maxsize=1)
 def get_assets_client():
     """Creates and returns an API client based on the injected env vars in CR."""
+    
+    # CR is using new env. variables that are not known by RCC so not set to the env.
+    # We need RC_API_URL_V1 and RC_API_KEY to be set
+
+    # RC_API_KEY we can set to a value that is in the environment already RC_API_SECRET_TOKEN
+    # - This is the same token
+
+    # For RC_API_URL_V1 we need to do some tricks to get the correct url
+    # We have RC_API_SECRET_HOST in the environment, but that needs some substring replacements:
+    
+    # OLD                  -> NEW
+    # api.eu1.robocloud.eu -> api.eu1.robocorp.com/v1
+    # api.ci.robocloud.dev -> api.ci.robocorp.dev/v1
+    # api.eu2.robocorp.com -> api.eu2.robocorp.com/v1
+    # api.us1.robocorp.com -> api.us1.robocorp.com/v1
+
+    # RC_API_URL_V1 = RC_API_SECRET_HOST + "replace part"
+    # RC_API_KEY = RC_API_SECRET_TOKEN
+
     requires_env = RequiresEnv(
         "Asset Storage feature can be used with Control Room only"
     )
