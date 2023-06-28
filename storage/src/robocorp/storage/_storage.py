@@ -47,8 +47,11 @@ def get_assets_client():
     
     # CR is using new env. variables that are not known by RCC so not set to the env.
     # We need RC_API_URL_V1 and RC_API_KEY to be set
+    #
+    # ...or rather than using these we need to compile the values from 
+    # RC_API_SECRET_HOST and RC_API_SECRET_TOKEN values which are available
 
-    # RC_API_KEY we can set to a value that is in the environment already RC_API_SECRET_TOKEN
+    # RC_API_KEY we can just replace with RC_API_SECRET_TOKEN
     # - This is the same token
 
     # For RC_API_URL_V1 we need to do some tricks to get the correct url
@@ -60,8 +63,11 @@ def get_assets_client():
     # api.eu2.robocorp.com -> api.eu2.robocorp.com/v1
     # api.us1.robocorp.com -> api.us1.robocorp.com/v1
 
-    # RC_API_URL_V1 = RC_API_SECRET_HOST + "replace part"
-    # RC_API_KEY = RC_API_SECRET_TOKEN
+    # so something like...
+    # `robocloud.eu > robocorp.com`
+    # `robocloud.dev > robocorp.dev`
+    # append `/v1` if not at the end already <- this covers eu2.robocorp.com and us1.robocorp.com
+
 
     requires_env = RequiresEnv(
         "Asset Storage feature can be used with Control Room only"
