@@ -289,6 +289,9 @@ def case_filter():
 #root1-0-0-0 Some info message
 #root1-0-0-1 Some warn message
 #root1-0-0-2 Some critical message
+#root1-0-2 print_in_another                                               
+#root1-0-2-0 Some message in stdout                                       
+#root1-0-2-1 Some message in stderr    
 """
     compare_strlist(
         found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]

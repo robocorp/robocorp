@@ -20,10 +20,11 @@ export interface RunInfo {
 
 export type LogContextType = {
   expandedEntries: Set<string>;
+  consoleEntries: Entry[];
   filteredEntries: FilteredEntries;
   toggleEntry: (id: string) => void;
-  activeIndex: null | number | 'information';
-  setActiveIndex: (index: null | number | 'information') => void;
+  activeIndex: null | number | 'information' | 'terminal';
+  setActiveIndex: (index: null | number | 'information' | 'terminal') => void;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
@@ -67,6 +68,7 @@ export const defaultLogState: LogContextType = {
     entries: [],
     entriesWithChildren: new Set<string>(),
   },
+  consoleEntries: [],
   toggleEntry: () => null,
   activeIndex: null,
   setActiveIndex: () => null,

@@ -9,7 +9,7 @@ import {
   BadgeVariant,
   Tooltip,
 } from '@robocorp/components';
-import { IconCloseSmall } from '@robocorp/icons';
+import { IconCloseSmall, IconTerminal } from '@robocorp/icons';
 import { IconInformation, IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
 import { RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
 import { CustomActions } from '~/lib/CustomActions';
@@ -91,6 +91,9 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
   const onClickInformation = useCallback(() => {
     setActiveIndex('information');
   }, []);
+  const onClickTerminal = useCallback(() => {
+    setActiveIndex('terminal');
+  }, []);
 
   return (
     <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary" id="base-header">
@@ -111,6 +114,15 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
               size="small"
               variant="secondary"
               onClick={onClickInformation}
+            ></Button>
+          </Tooltip>
+          <Tooltip text="Terminal Output">
+            <Button
+              icon={IconTerminal}
+              aria-label="Terminal"
+              size="small"
+              variant="secondary"
+              onClick={onClickTerminal}
             ></Button>
           </Tooltip>
         </BaseHeader.Title>

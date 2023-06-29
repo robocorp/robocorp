@@ -1,8 +1,13 @@
 import { RunInfo } from '~/lib';
-import { Entry } from '~/lib/types';
+import { Entry, EntryConsole } from '~/lib/types';
 
 let callsToSetAllEntries:
-  | { newEntries: Entry[]; newExpanded: string[]; updatedFromIndex: number }
+  | {
+      allEntries: Entry[];
+      newExpanded: string[];
+      consoleEntries: Entry[];
+      updatedFromIndex: number;
+    }
   | undefined;
 let reactSetAllEntriesCallback: any;
 
@@ -13,8 +18,9 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
   reactSetAllEntriesCallback = setAllentriesCallback;
   if (callsToSetAllEntries !== undefined) {
     setAllentriesCallback(
-      callsToSetAllEntries.newEntries,
+      callsToSetAllEntries.allEntries,
       callsToSetAllEntries.newExpanded,
+      callsToSetAllEntries.consoleEntries,
       callsToSetAllEntries.updatedFromIndex,
     );
     callsToSetAllEntries = undefined;
@@ -26,18 +32,19 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
  * done at a later time (when the callback is actually set).
  */
 export function setAllEntriesWhenPossible(
-  newEntries: Entry[], // all the entries which should be set
+  allEntries: Entry[], // all the entries which should be set
   newExpanded: string[], // new entry ids to be expanded
+  consoleEntries: EntryConsole[],
   updatedFromIndex = 0, // from which index onwards was there some change
 ) {
   if (reactSetAllEntriesCallback !== undefined) {
-    reactSetAllEntriesCallback(newEntries, newExpanded, updatedFromIndex);
+    reactSetAllEntriesCallback(allEntries, newExpanded, consoleEntries, updatedFromIndex);
   } else {
     if (callsToSetAllEntries !== undefined) {
       updatedFromIndex = Math.min(updatedFromIndex, callsToSetAllEntries.updatedFromIndex);
       newExpanded = callsToSetAllEntries.newExpanded.concat(newExpanded);
     }
-    callsToSetAllEntries = { newEntries, newExpanded, updatedFromIndex };
+    callsToSetAllEntries = { allEntries, newExpanded, consoleEntries, updatedFromIndex };
   }
 }
 

@@ -1,4 +1,12 @@
-2.0.0 (unreleased)
+NEXT
+-----------------------------
+
+- `log.html`: Show user messages written to stdout and stderr in the main tree.
+- `log.html`: Show general information (right now info on Python) (new button in UI).
+- `log.html`: Show console messages separately (new button in UI).
+
+
+2.0.0 (2023-06-28)
 -----------------------------
 
 - Fixed handling `return` statement: when `log_on_project_call` matches for a module it'll only

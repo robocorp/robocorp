@@ -9,7 +9,7 @@ import {
   RunInfo,
   createDefaultRunInfo,
 } from '~/lib';
-import { Entry, ViewSettings } from './lib/types';
+import { Entry, EntryConsole, ViewSettings } from './lib/types';
 import {
   reactCallSetAllEntriesCallback,
   reactCallSetRunInfoCallback,
@@ -26,10 +26,11 @@ const Main = styled.main`
 export const Log = () => {
   const [filter, setFilter] = useState('');
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
-  const [activeIndex, setActiveIndex] = useState<number | null | 'information'>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null | 'information' | 'terminal'>(null);
   const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
+  const [consoleEntries, setConsoleEntries] = useState<EntryConsole[]>([]); // Start empty. Entries will be added as they're found.
   const lastUpdatedIndex = useRef<number>(0);
 
   /**
@@ -37,7 +38,12 @@ export const Log = () => {
    */
   useEffect(() => {
     reactCallSetAllEntriesCallback(
-      (newEntries: Entry[], newExpanded: string[], updatedFromIndex = 0) => {
+      (
+        allEntries: Entry[],
+        newExpanded: string[],
+        consoleEntries: EntryConsole[],
+        updatedFromIndex = 0,
+      ) => {
         if (newExpanded.length > 0) {
           setExpandedEntries((curr) => {
             const set = new Set<string>(curr);
@@ -49,9 +55,13 @@ export const Log = () => {
         }
 
         setEntries(() => {
-          // console.log('Set entries to: ' + JSON.stringify(newEntries));
+          // console.log('Set entries to: ' + JSON.stringify(allEntries));
           lastUpdatedIndex.current = updatedFromIndex;
-          return [...newEntries];
+          return [...allEntries];
+        });
+
+        setConsoleEntries(() => {
+          return [...consoleEntries];
         });
 
         return undefined;
@@ -89,6 +99,7 @@ export const Log = () => {
   }, [entries, expandedEntries, filter]);
 
   const ctx: LogContextType = {
+    consoleEntries,
     expandedEntries,
     filteredEntries,
     toggleEntry,

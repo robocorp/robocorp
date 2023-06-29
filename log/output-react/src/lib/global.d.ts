@@ -1,4 +1,4 @@
-import type { Entry } from './types';
+import type { Entry, EntryConsole } from './types';
 
 declare global {
   interface Window {
@@ -9,8 +9,9 @@ declare global {
     getSampleContents: (t) => any;
 
     setAllEntriesWhenPossible: (
-      newEntries: Entry[],
+      allEntries: Entry[],
       newExpanded: string[],
+      consoleEntries: EntryConsole[],
       updatedFromIndex: number,
     ) => void;
   }
