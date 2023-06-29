@@ -3,7 +3,9 @@ import { styled } from '@robocorp/theme';
 import { FC } from 'react';
 
 import {
+  ConsoleMessageKind,
   Entry,
+  EntryConsole,
   EntryElse,
   EntryException,
   EntryIf,
@@ -101,6 +103,18 @@ const getTitle = (entry: Entry) => {
         return { title: logTitle, description: 'Logged HTML message' };
       }
       return { title: logTitle, description: 'Logged message' };
+    case Type.console:
+      const entryConsole = entry as EntryConsole;
+      let consoleDesc = '';
+      switch (entryConsole.kind) {
+        case ConsoleMessageKind.stdout:
+          consoleDesc = 'Message sent to STDOUT.';
+          break;
+        case ConsoleMessageKind.stderr:
+          consoleDesc = 'Message sent to STDERR.';
+          break;
+      }
+      return { title: 'Console message', description: consoleDesc };
     default:
       return {
         title: 'TODO: Provide title for ' + entry.type,

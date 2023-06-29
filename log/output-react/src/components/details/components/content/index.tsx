@@ -37,6 +37,7 @@ const getContentComponent = (type: Type) => {
     case Type.task:
       return TaskComponent;
     case Type.log:
+    case Type.console:
       return LogComponent;
     case Type.processSnapshot:
       return Empty;

@@ -30,6 +30,23 @@ export interface IOpts {
   appendedContents: string[];
 }
 
+export type ConsoleMessagKind =
+  | 'regular'
+  | 'task_name'
+  | 'stdout'
+  | 'stderr'
+  | 'important'
+  | 'error'
+  | 'traceback';
+
+export interface IConsoleMessage {
+  kind: ConsoleMessagKind;
+  message: string;
+  time_delta_in_seconds: number;
+  source: string;
+  lineno: number;
+}
+
 export interface ITracebackEntry {
   source: string;
   lineno: number;

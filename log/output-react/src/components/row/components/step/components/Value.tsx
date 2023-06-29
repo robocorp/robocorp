@@ -4,6 +4,7 @@ import { styled } from '@robocorp/theme';
 
 import {
   Entry,
+  EntryConsole,
   EntryException,
   EntryGenerator,
   EntryLog,
@@ -78,6 +79,9 @@ export const getValue = (entry: Entry): ReactNode | string => {
       } else {
         return entryLog.message; // We resize this one (so, don't remove new lines)
       }
+    case Type.console:
+      const entryConsole = entry as EntryConsole;
+      return entryConsole.message; // We resize this one (so, don't remove new lines)
     case Type.variable:
       const entryVariable = entry as EntryVariable;
       return replaceNewLineChars(`${entryVariable.value} (${entryVariable.varType})`);

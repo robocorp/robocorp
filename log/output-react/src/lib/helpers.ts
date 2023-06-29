@@ -1,6 +1,7 @@
 import { FilteredEntries } from './logContext';
 import {
   Entry,
+  EntryConsole,
   EntryException,
   EntryGenerator,
   EntryLog,
@@ -179,6 +180,11 @@ export const getLogEntryHeight = (entry: Entry): number => {
       return HTML_HEIGHT_SMALL;
     }
     return 32 + Math.min((logEntry.message.split(/\r\n|\r|\n/).length - 1) * 16, 32);
+  }
+  if (entry.type === Type.console) {
+    const entryConsole = entry as EntryConsole;
+    // Console entry height is dependent of the message line count
+    return 32 + Math.min((entryConsole.message.split(/\r\n|\r|\n/).length - 1) * 16, 32);
   }
 
   return 32;

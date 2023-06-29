@@ -53,6 +53,8 @@ export const getTitle = (entry: Entry): string => {
       return `Return`;
     case Type.log:
       return ''; // the log type is added in the icon.
+    case Type.console:
+      return ''; // Not much to add...
     case Type.variable:
       return (entry as EntryVariable).name;
     case Type.exception:

@@ -13,11 +13,14 @@ import {
   IconStatusError,
   IconStatusIdle,
   IconTable,
+  IconTerminal,
 } from '@robocorp/icons';
 import { Badge, Box } from '@robocorp/components';
 
 import {
+  ConsoleMessageKind,
   Entry,
+  EntryConsole,
   EntryException,
   EntryLog,
   EntryMethodBase,
@@ -148,6 +151,15 @@ export const getIcon = (entry: Entry): ReactNode => {
             />
           );
       }
+    case Type.console:
+      const console: EntryConsole = entry as EntryConsole;
+      switch (console.kind) {
+        case ConsoleMessageKind.error:
+        case ConsoleMessageKind.stderr:
+          return <IconTerminal color="background.error" size="small" />;
+        default:
+          return <IconTerminal color="invert10" size="small" />;
+      }
     case Type.exception:
       const exc: EntryException = entry as EntryException;
       return (
@@ -181,6 +193,7 @@ export const getIcon = (entry: Entry): ReactNode => {
     //   />
     // );
     default:
+      // TODO: Provide icon for missing element
       return <IconInformation color="blue60" />;
   }
 };

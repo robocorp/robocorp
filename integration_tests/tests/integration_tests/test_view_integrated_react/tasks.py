@@ -121,6 +121,10 @@ def collect_full_tree_contents(
 ):
     found = {}
     for i in range(100):
+        # Because the tree is a virtual tree, we need to scroll to find new
+        # elements added.
+        browser.page().mouse.wheel(0, 30)
+
         if parent_id:
             entry_id = f"{parent_id}-{i}"
         else:
@@ -204,6 +208,9 @@ def case_generators():
 #root1-0-10 call_generators_in_library (generator lifecycle untracked)
 #root1-0-11 found_var
 #root1-0-12 found_var
+#root1-0-13 found_var                                                                                                                           
+#root1-0-14 found_var                                                                                                                           
+#root2 Teardown tasks    
 """
     compare_strlist(
         found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
@@ -243,6 +250,8 @@ def case_log():
 #root1-0-1-1 DIV
 #root1-0-1-2 DIV
 #root1-0-2 print_in_another
+#root1-0-2-0 Some message in stdout
+#root1-0-2-1 Some message in stderr                                       
 #root2 Teardown tasks
 """
     compare_strlist(

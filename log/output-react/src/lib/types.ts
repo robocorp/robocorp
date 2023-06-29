@@ -36,8 +36,9 @@ export enum Type {
   ifElement = 1 << 13,
   elseElement = 1 << 14,
   returnElement = 1 << 15, // 32768
+  console = 1 << 16,
 
-  unhandled = 1 << 16,
+  unhandled = 1 << 17,
 }
 
 export enum ConsoleMessageKind {
@@ -165,6 +166,12 @@ export interface EntryLog extends EntryWithLocationBase {
   message: string;
 }
 
+export interface EntryConsole extends EntryWithLocationBase {
+  type: Type.console;
+  kind: ConsoleMessageKind;
+  message: string;
+}
+
 export type Entry =
   | EntryTask
   | EntryMethod
@@ -181,4 +188,5 @@ export type Entry =
   | EntryIf
   | EntryElse
   | EntryReturn
+  | EntryConsole
   | EntryProcessSnapshot;
