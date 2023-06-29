@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from '@robocorp/components';
 import { IconCloseSmall } from '@robocorp/icons';
-import { IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
+import { IconInformation, IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
 import { RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
 import { CustomActions } from '~/lib/CustomActions';
 
@@ -21,7 +21,7 @@ type Props = {
 };
 
 export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
-  const { viewSettings, setViewSettings } = useLogContext();
+  const { viewSettings, setViewSettings, setActiveIndex } = useLogContext();
 
   const onFilterChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.target.value);
@@ -87,6 +87,11 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
       timeDescription += ' — took: ' + formatTimeInSeconds(timeDelta);
     }
   }
+
+  const onClickInformation = useCallback(() => {
+    setActiveIndex('information');
+  }, []);
+
   return (
     <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary" id="base-header">
       <BaseHeader size="medium">
@@ -99,6 +104,15 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
           ) : (
             <></>
           )}
+          <Tooltip text="General Information">
+            <Button
+              icon={IconInformation}
+              aria-label="Information"
+              size="small"
+              variant="secondary"
+              onClick={onClickInformation}
+            ></Button>
+          </Tooltip>
         </BaseHeader.Title>
         <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
         <CustomActions>

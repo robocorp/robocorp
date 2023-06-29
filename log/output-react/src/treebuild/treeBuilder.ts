@@ -625,6 +625,14 @@ export class TreeBuilder {
     this.runInfoChanged = true;
   }
 
+  appendInternalInfo(msg: IMessage) {
+    const message = msg.decoded;
+    if (!this.runInfo.infoMessages.has(message)) {
+      this.runInfo.infoMessages.add(message);
+      this.runInfoChanged = true;
+    }
+  }
+
   appendConsoleOutput(msg: IMessage) {
     this.flattened.pushConsole(msg);
   }
@@ -904,6 +912,9 @@ export class TreeBuilder {
         break;
       case 'C':
         this.appendConsoleOutput(msg);
+        break;
+      case 'I':
+        this.appendInternalInfo(msg);
         break;
     }
   }

@@ -15,14 +15,15 @@ export interface RunInfo {
   finishTimeDeltaInSeconds: number | undefined;
   firstPart: number;
   lastPart: number;
+  infoMessages: Set<string>;
 }
 
 export type LogContextType = {
   expandedEntries: Set<string>;
   filteredEntries: FilteredEntries;
   toggleEntry: (id: string) => void;
-  activeIndex: null | number;
-  setActiveIndex: (index: null | number) => void;
+  activeIndex: null | number | 'information';
+  setActiveIndex: (index: null | number | 'information') => void;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
@@ -57,6 +58,7 @@ export const createDefaultRunInfo = (): RunInfo => ({
   finishTimeDeltaInSeconds: undefined,
   firstPart: -1,
   lastPart: -1,
+  infoMessages: new Set<string>(),
 });
 
 export const defaultLogState: LogContextType = {
