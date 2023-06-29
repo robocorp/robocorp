@@ -70,8 +70,10 @@ def _get_endpoint() -> str:
 
     # Replace hostname to match correct API
     netloc = url.netloc
-    netloc = netloc.replace("robocloud.eu", "robocorp.com")
-    netloc = netloc.replace("robocloud.dev", "robocorp.dev")
+    if url.hostname and url.hostname.endswith("robocloud.eu"):
+        netloc = netloc.replace("robocloud.eu", "robocorp.com")
+    elif url.hostname and url.hostname.endswith("robocloud.dev"):
+        netloc = netloc.replace("robocloud.dev", "robocorp.dev")
     url = url._replace(netloc=netloc)
 
     # Append /v1/ to path if not already there
