@@ -1,9 +1,9 @@
 import logging
 import os
 import sys
-import urllib.parse as urlparse
 from functools import lru_cache
 from typing import Dict, Optional
+from urllib.parse import urljoin, urlsplit, urlunsplit
 
 from ._requests import Requests, RequestsHTTPError
 
@@ -43,10 +43,9 @@ class AssetUploadFailed(RuntimeError):
 
 
 def _url_join(*parts: str) -> str:
-    """Join parts into a URL and handle missing/duplicate slashes."""
     url = ""
     for part in parts:
-        url = urlparse.urljoin(url, part.strip("/") + "/")
+        url = urljoin(url, part.strip("/") + "/")
     return url
 
 
@@ -67,24 +66,27 @@ def _get_endpoint() -> str:
     if endpoint is None:
         raise RuntimeError("Missing environment variable 'RC_API_URL_V1'")
 
-    if "robocloud.eu" in endpoint:
-        endpoint = endpoint.replace("robocloud.eu", "robocorp.com")
-    elif "robocloud.dev" in endpoint:
-        endpoint = endpoint.replace("robocloud.dev", "robocorp.dev")
+    url = urlsplit(endpoint)
 
-    if not endpoint.endswith("v1"):
-        endpoint = _url_join(endpoint, "v1")
+    # Replace hostname to match correct API
+    netloc = url.netloc
+    netloc = netloc.replace("robocloud.eu", "robocorp.com")
+    netloc = netloc.replace("robocloud.dev", "robocorp.dev")
+    url = url._replace(netloc=netloc)
 
-    return endpoint
+    # Append /v1/ to path if not already there
+    if not url.path.rstrip("/").endswith("v1"):
+        path = _url_join(url.path, "v1")
+        url = url._replace(path=path)
+
+    result = urlunsplit(url)
+    LOGGER.info("Adapted endpoint: %s -> %s", endpoint, result)
+    return result
 
 
 def _get_token() -> str:
     if token := os.getenv("RC_API_TOKEN_V1"):
-        return f"Bearer {token}"
-
-    # Should we support this?
-    if token := os.getenv("RC_API_KEY"):
-        return f"RC-WSKEY {token}"
+        return token
 
     # Note (2023-06-28):
     # While Control Room does set RC_API_TOKEN_V1, this is not currently
@@ -92,7 +94,7 @@ def _get_token() -> str:
     # which is identical.
     LOGGER.info("Missing environment variable 'RC_API_TOKEN_V1', attempting fallback")
     if token := os.getenv("RC_API_SECRET_TOKEN"):
-        return f"Bearer {token}"
+        return token
 
     raise RuntimeError("Missing environment variable 'RC_API_TOKEN_V1'")
 
@@ -101,18 +103,18 @@ def _get_token() -> str:
 def get_assets_client():
     """
     Creates and returns an Asset Storage API client based on the injected
-    environemnt variables from Control Room (or RCC).
+    environment variables from Control Room (or RCC).
     """
     try:
         workspace_id = os.environ["RC_WORKSPACE_ID"]
     except KeyError as err:
         raise RuntimeError("Missing environment variable 'RC_WORKSPACE_ID'") from err
 
-    api_endpoint = _get_endpoint()
     api_token = _get_token()
+    api_endpoint = _get_endpoint()
 
     default_headers = {
-        "Authorization": api_token,
+        "Authorization": f"Bearer {api_token}",
         "Content-Type": "application/json",
     }
 
