@@ -23,6 +23,7 @@ def update(ctx):
     contents = tomlkit.loads(pyproject.read_text())
     dependencies = contents["tool"]["poetry"]["dependencies"]
 
+    changes = []
     for name, version in list(dependencies.items()):
         if name.startswith("robocorp-"):
             dep_name = name[len("robocorp-") :]
@@ -32,8 +33,18 @@ def update(ctx):
             if version != dep_version:
                 print(f"Updating {name}: {version} -> {dep_version}")
                 dependencies[name] = dep_version
+                changes.append((version, dep_version))
+
+    if not changes:
+        print("Nothing to update")
+        return
 
     pyproject.write_text(tomlkit.dumps(contents))
+
+    meta_version = contents["tool"]["poetry"]["version"]
+    meta_version = _bump_by_changes(meta_version, changes)
+    print(f"New metapackage version: {meta_version}")
+    set_version(ctx, meta_version)
 
 
 @task
@@ -65,18 +76,37 @@ def outdated(ctx):
 def _fetch_version(name):
     import json
     import urllib.request
+    import semver
 
     with urllib.request.urlopen(f"https://pypi.org/pypi/{name}/json") as response:
         metadata = json.loads(response.read())
 
-    latest = max(metadata["releases"].keys(), key=_to_semver)
+    latest = max(metadata["releases"].keys(), key=semver.Version.parse)
     return latest
 
 
-def _to_semver(version):
-    import re
+def _bump_by_changes(version, changes):
+    import semver
 
-    match = re.search(r"(\d+)\.(\d+)\.(\d+)", version)
-    assert match is not None, f"Not a valid version: {version}"
-    major, minor, micro = match.groups()
-    return int(major), int(minor), int(micro)
+    version = semver.Version.parse(version)
+    major, minor, patch = False, False, False
+
+    for before, after in changes:
+        before = semver.Version.parse(before)
+        after = semver.Version.parse(after)
+
+        if after.major > before.major:
+            major = True
+        elif after.minor > before.minor:
+            minor = True
+        elif after.patch > before.patch:
+            patch = True
+
+    if major:
+        return str(version.bump_major())
+    elif minor:
+        return str(version.bump_minor())
+    elif patch:
+        return str(version.bump_patch())
+
+    raise RuntimeError("No version changes found")
