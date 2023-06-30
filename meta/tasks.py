@@ -13,6 +13,15 @@ globals().update(
     )
 )
 
+if False:
+    # Forward declarations from invoke_utils so that static
+    # analyzers understand it.
+    def poetry(ctx, *cmd):
+        raise RuntimeError("Defined in invoke_utils.")
+
+    def set_version(ctx, version):
+        raise RuntimeError("Defined in invoke_utils.")
+
 
 @task
 def update(ctx):
@@ -45,6 +54,8 @@ def update(ctx):
     meta_version = _bump_by_changes(meta_version, changes)
     print(f"New metapackage version: {meta_version}")
     set_version(ctx, meta_version)
+
+    poetry(ctx, "lock")
 
 
 @task
