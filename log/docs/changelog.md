@@ -1,4 +1,4 @@
-NEXT
+2.1.0 (2023-06-30)
 -----------------------------
 
 - `log.html`: Show user messages written to stdout and stderr in the main tree.

@@ -4,7 +4,7 @@ Steps to do a new release
 
 - Open a shell at the proper place (something as `D:/x/robocorpws/robo/log`)
 
-- Update version (`inv set-version 2.0.0`).
+- Update version (`inv set-version 2.1.0`).
 
 - Update docs version (`inv docs`)  -- make sure not to be in `subst` drive.
 
@@ -12,7 +12,7 @@ Steps to do a new release
 
 - Update changelog.md to add notes on features/fixes and set release date.
 
-- `mu acp robocorp-log release 2.0.0`
+- `mu acp robocorp-log release 2.1.0`
 
 - Create a tag (`inv make-release`) and push it.
 
