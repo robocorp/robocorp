@@ -57,10 +57,10 @@ def compare_strlist(lines_obtained, lines_expected):
                 ),
                 file=stream,
             )
-        obtained = "\\n".join(lines_obtained)
+        obtained = "\n".join(lines_obtained)
         raise AssertionError(
-            "Strings don't match. Obtained:\\n\\n"
-            f"{obtained}\\n\\nComparison:\\n{stream.getvalue()}"
+            "Strings don't match. Obtained:\n\n"
+            f"{obtained}\n\nComparison:\n{stream.getvalue()}"
         )
 
 

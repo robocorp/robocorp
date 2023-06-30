@@ -5,7 +5,7 @@ import { Counter } from '~/lib';
 import styled from 'styled-components';
 
 import { Entry, EntryException, EntryThreadDump } from '~/lib/types';
-import { Bold } from './Common';
+import { Bold, FormatHeaderActions, VariableValue } from './Common';
 import { PythonTraceback } from '~/treebuild/protocols';
 import { IconTextAlignJustified, IconTextAlignLeft } from '@robocorp/icons/iconic';
 
@@ -68,32 +68,14 @@ function tracebackComponent(tb: PythonTraceback, title: string) {
 
   const contents = [];
 
-  const [isWrapped, setIsWrapped] = useState(false);
-
-  const toggleTextWrap = () => {
-    setIsWrapped(!isWrapped);
-  };
-
   if (tb.stack === undefined || tb.stack.length === 0) {
     return <>No stack found</>;
   }
 
   contents.push(
     <div style={{ marginBottom: '2em' }} key={counter.next()}>
-      <Title style={{ float: 'left' }} key={counter.next()}>
-        {title}
-      </Title>
-      <Box
-        style={{ float: 'right', cursor: 'pointer' }}
-        onClick={toggleTextWrap}
-        title={isWrapped ? 'Click to unwrap text' : 'Click to wrap text'}
-      >
-        {isWrapped ? (
-          <IconTextAlignLeft color="blue60" />
-        ) : (
-          <IconTextAlignJustified color="blue60" />
-        )}
-      </Box>
+      <FormatHeaderActions />
+      <Title key={counter.next()}>{title}</Title>
     </div>,
   );
   for (const [index, tbe] of enumerate(reversed(tb.stack))) {
@@ -111,12 +93,13 @@ function tracebackComponent(tb: PythonTraceback, title: string) {
     for (const [varName, varTypeAndVal] of tbe.variables) {
       const [varType, varValue] = varTypeAndVal;
       variablesContent.push(
-        <LineVar key={counter.next()} style={{ whiteSpace: isWrapped ? 'normal' : 'nowrap' }}>
+        <LineVar key={counter.next()} style={{ whiteSpace: 'normal' }}>
           <Bold>
             <Bold color="blue50">❖</Bold> {varName}
           </Bold>{' '}
-          ({varType}) = {varValue}
+          ({varType})
         </LineVar>,
+        <VariableValue value={varValue}></VariableValue>,
       );
     }
 

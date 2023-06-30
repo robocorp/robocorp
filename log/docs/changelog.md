@@ -4,6 +4,7 @@ NEXT
 - `log.html`: Show user messages written to stdout and stderr in the main tree.
 - `log.html`: Show general information (right now info on Python) (new button in UI).
 - `log.html`: Show console messages separately (new button in UI).
+- `log.html`: Improved how variables are shown in exception tracebacks.
 
 
 2.0.0 (2023-06-28)

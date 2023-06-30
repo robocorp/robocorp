@@ -11,7 +11,6 @@ import {
   EntryIf,
   EntryLog,
   EntryMethodBase,
-  EntryProcessSnapshot,
   EntryReturn,
   EntryTask,
   EntryThreadDump,
@@ -24,6 +23,7 @@ const PreBox = styled(Box)`
   white-space: pre-wrap;
   word-break: break-word;
   display: inline;
+  font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
 type Props = {
