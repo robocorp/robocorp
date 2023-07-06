@@ -469,13 +469,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.1.0"
+version = "2.2.0"
 description = "Automatic trace logging for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_log-2.1.0-py3-none-any.whl", hash = "sha256:8be87da45f7df5c5a1c0dfc89f09e7b5a2e36499a45be5d272adb3b23692b17e"},
-    {file = "robocorp_log-2.1.0.tar.gz", hash = "sha256:9e24ac34caa2a7a98b1a6edaabdb5df5006aa0e0b71346c8d2b2781850a66ae1"},
+    {file = "robocorp_log-2.2.0-py3-none-any.whl", hash = "sha256:982775e11a1fe87970078f6fbef680475d5ed9b4e89ef3b985ce45ebcb161b15"},
+    {file = "robocorp_log-2.2.0.tar.gz", hash = "sha256:985b6d091e16d347318b5bc1397f244ffe3d779a88cc485174e3b81fc55392d6"},
 ]
 
 [package.dependencies]
@@ -609,4 +609,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "e82c906f804c2bbfff1aefa3b595d1b2e94caa67a6a01c3077b111f5cef42a4f"
+content-hash = "ae2eca809d03b7900bf44bd7c039c84769b672321f488c5236c01ca989d6c9bc"
