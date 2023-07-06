@@ -1,4 +1,4 @@
-NEXT
+2.1.0 (2023-07-06)
 -----------------------------
 
 - If a `ROBOCORP_TASKS_LOG_LISTENER_PORT` is set, it'll connect to that port

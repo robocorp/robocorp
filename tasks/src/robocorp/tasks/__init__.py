@@ -36,7 +36,7 @@ from typing import Optional
 
 from ._protocols import ITask
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
