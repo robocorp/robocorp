@@ -102,27 +102,20 @@ class FileSecrets(BaseSecretManager):
 
     def _load(self):
         """Load secrets file."""
-        try:
-            with open(self.path, encoding="utf-8") as fd:
-                data = self._loader(fd)
+        with open(self.path, encoding="utf-8") as fd:
+            data = self._loader(fd)
 
-            if not isinstance(data, dict):
-                raise ValueError("Invalid content format")
+        if not isinstance(data, dict):
+            raise ValueError("Invalid content format")
 
-            return data
-        except (IOError, ValueError) as err:
-            self.logger.error("Failed to load secrets file: %s", err)
-            return {}
+        return data
 
     def _save(self, data):
         """Save the secrets content to disk."""
-        try:
-            with open(self.path, "w", encoding="utf-8") as f:
-                if not isinstance(data, dict):
-                    raise ValueError("Invalid content format")
-                self._dumper(data, f, indent=4)
-        except (IOError, ValueError) as err:
-            self.logger.error("Failed to _save secrets file: %s", err)
+        with open(self.path, "w", encoding="utf-8") as f:
+            if not isinstance(data, dict):
+                raise ValueError("Invalid content format")
+            self._dumper(data, f, indent=4)
 
     def get_secret(self, secret_name: str) -> SecretContainer:
         """Get secret defined with given name from file.
