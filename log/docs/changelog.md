@@ -1,4 +1,4 @@
-NEXT
+2.2.0 (2023-07-06)
 -----------------------------
 
 - Initial `VSCode` integration for `log.html`:
