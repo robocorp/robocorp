@@ -64,11 +64,12 @@ def modifying_secrets():
 """  # noqa: E501
 
 
+from contextlib import nullcontext
 from functools import lru_cache
 
 from ._secrets import SecretContainer
 
-__version__ = "0.4.0"
+__version__ = "1.0.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
@@ -89,27 +90,38 @@ def get_secret(secret_name: str) -> SecretContainer:
         The returned secret is not cached, so, calling this function again
         may do a new network roundtrip.
 
+    Note:
+        When used, if `robocorp.log` is in the environment, all the values
+        gotten will be automatically hidden from the logs.
+        i.e.: For each value, `log.hide_from_output(value)` will be called.
+
     Returns:
         The container for the secret (which has key-value pairs).
 
     Raises:
         RobocorpVaultError: Error with API request or response payload.
     """
-    vault = _get_vault()
-
-    # Note: secrets are always gotten from the backend when requested
-    # (so any updates will be gotten in a new `get_secret` call).
-    secret = vault.get_secret(secret_name)
-
     try:
         from robocorp import log  # type: ignore [attr-defined]
+
+        ctx = log.suppress_variables()
+        has_log = True
     except ImportError:
         pass  # If robocorp.log is not being used that's OK.
-    else:
-        # There's no caching in place, so, on any new call it's possible
-        # that values changed, so, call this every time.
-        for value in secret.values():
-            log.hide_from_output(str(value))
+        ctx = nullcontext()
+        has_log = False
+
+    with ctx:
+        vault = _get_vault()
+
+        # Note: secrets are always gotten from the backend when requested
+        # (so any updates will be gotten in a new `get_secret` call).
+        secret = vault.get_secret(secret_name)
+
+        if has_log:
+            # There's no caching in place, so, on any new call it's possible
+            # that values changed, so, call this every time.
+            _ignore_secret_values(secret)
 
     return secret
 
@@ -121,23 +133,52 @@ def set_secret(secret: SecretContainer) -> None:
         Only allows modifying existing secrets, and replaces
           all values contained within it.
 
+    Note:
+        When used, if `robocorp.log` is in the environment, all the values
+        set will be automatically hidden from the logs.
+        i.e.: For each value, `log.hide_from_output(value)` will be called.
+
     Args:
         secret: the secret object which was mutated.
     """
-    vault = _get_vault()
-    vault.set_secret(secret)
-
     try:
         from robocorp import log  # type: ignore [attr-defined]
+
+        ctx = log.suppress_variables()
+        has_log = True
     except ImportError:
         pass  # If robocorp.log is not being used that's OK.
-    else:
-        # When it's set it's expected that some value was changed, so,
-        # start hiding it from the logs.
-        # Note: users should've actually done that already, but doing
-        # it again is harmless.
-        for value in secret.values():
-            log.hide_from_output(str(value))
+        ctx = nullcontext()
+        has_log = False
+
+    with ctx:
+        vault = _get_vault()
+        vault.set_secret(secret)
+
+        if has_log:
+            # When it's set it's expected that some value was changed, so,
+            # start hiding it from the logs.
+            # Note: users should've actually done that already, but doing
+            # it again is harmless.
+            _ignore_secret_values(secret)
+
+
+def _ignore_secret_values(secret):
+    from robocorp import log
+
+    for value in secret.values():
+        s = str(value)
+        log.hide_from_output(s)
+
+        # Now, also take care of the case where the user does a repr(value)
+        # and not just str(value) as in some places it's the repr(value)
+        # that'll appear in the logs.
+        r = repr(value)
+        if r.startswith("'") and r.endswith("'"):
+            r = r[1:-1]
+        if r != s:
+            log.hide_from_output(r)
+            log.hide_from_output(r.replace("\\", "\\\\"))
 
 
 __all__ = ["get_secret", "set_secret"]

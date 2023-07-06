@@ -70,7 +70,7 @@ def modifying_secrets():
 
 ---
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\vault\src\robocorp\vault\__init__.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_secret`
 
@@ -93,6 +93,11 @@ Get secret defined with given name.
 > The returned secret is not cached, so, calling this function again may do a new network roundtrip. 
 >
 
+**Note:**
+
+> When used, if `robocorp.log` is in the environment, all the values gotten will be automatically hidden from the logs. i.e.: For each value, `log.hide_from_output(value)` will be called. 
+>
+
 **Returns:**
  The container for the secret (which has key-value pairs). 
 
@@ -105,7 +110,7 @@ Get secret defined with given name.
 
 ---
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\vault\src\robocorp\vault\__init__.py#L129"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_secret`
 
@@ -120,6 +125,11 @@ Overwrite an existing secret with new values.
 **Note:**
 
 > Only allows modifying existing secrets, and replaces all values contained within it. 
+>
+
+**Note:**
+
+> When used, if `robocorp.log` is in the environment, all the values set will be automatically hidden from the logs. i.e.: For each value, `log.hide_from_output(value)` will be called. 
 >
 
 **Args:**

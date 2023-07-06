@@ -224,7 +224,8 @@ def test_adapter_filesecrets_invalid_file(monkeypatch, datadir):
 
     # Should not raise
     adapter = FileSecrets()
-    assert adapter._load() == {}
+    with pytest.raises(FileNotFoundError):
+        adapter._load()
 
 
 def test_adapter_filesecrets_invalid_file_extension(monkeypatch, datadir):
