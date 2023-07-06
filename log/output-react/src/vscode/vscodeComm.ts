@@ -1,4 +1,7 @@
-import { IFilterLevel, IState } from './protocols';
+import { isWindowDefined } from '../lib';
+import { IState } from '../treebuild/protocols';
+
+const DEBUG: boolean = false;
 
 interface IVSCode {
   postMessage(message: any): void;
@@ -9,6 +12,7 @@ interface IVSCode {
 declare global {
   interface Window {
     setVSCodeAPI: (api: IVSCode) => void;
+    acquireVsCodeApi: () => IVSCode;
   }
 }
 
@@ -27,7 +31,10 @@ try {
 windowPlaceholder.setVSCodeAPI = setVSCodeAPI;
 
 export function isInVSCode() {
-  return vscode !== undefined;
+  if (isWindowDefined()) {
+    return window.acquireVsCodeApi !== undefined;
+  }
+  return false;
 }
 
 // Note how request/response/event follows the same patterns from the
@@ -78,6 +85,9 @@ export interface IUpdateLabelRequest {
 const msgIdToSeq: any = {};
 
 export function sendRequestToClient(message: IRequestMessage): Promise<any> {
+  if (DEBUG) {
+    console.log('vscodeComm: sendRequestToClient: ' + JSON.stringify(message));
+  }
   let vscodeRef: IVSCode | undefined;
   try {
     vscodeRef = vscode;
@@ -107,7 +117,9 @@ export function sendRequestToClient(message: IRequestMessage): Promise<any> {
 }
 
 export function sendEventToClient(message: IEventMessage): void {
-  // console.log("send event", message);
+  if (DEBUG) {
+    console.log('vscodeComm: send event', message);
+  }
   let vscodeRef: IVSCode | undefined;
   try {
     vscodeRef = vscode;
@@ -138,6 +150,9 @@ if (addEventListener === undefined) {
 
 addEventListener('message', (event: any) => {
   const msg = event.data;
+  if (DEBUG) {
+    console.log('vscodeComm: Received message: ' + JSON.stringify(msg));
+  }
   if (msg) {
     switch (msg.type) {
       case 'response':
@@ -200,15 +215,21 @@ export function getState(): IState {
     if (!ret.runIdLRU === undefined) {
       ret.runIdLRU = [];
     }
-    // console.log("getState", JSON.stringify(ret));
+    if (DEBUG) {
+      console.log('vscodeComm: getState', JSON.stringify(ret));
+    }
     return ret;
   }
-  // console.log("getState - empty");
+  if (DEBUG) {
+    console.log('vscodeComm: getState - empty');
+  }
   return _globalState;
 }
 
 export function setState(state: IState) {
-  // console.log("setState", JSON.stringify(state));
+  if (DEBUG) {
+    console.log('vscodeComm: setState', JSON.stringify(state));
+  }
   let vscodeRef: IVSCode | undefined;
   try {
     vscodeRef = vscode;
@@ -220,3 +241,13 @@ export function setState(state: IState) {
     _globalState = state;
   }
 }
+
+export const onChangeCurrentRunId = (runId: string) => {
+  let ev: IEventMessage = {
+    type: 'event',
+    seq: nextMessageSeq(),
+    event: 'onSetCurrentRunId',
+  };
+  ev['data'] = { runId: runId };
+  sendEventToClient(ev);
+};

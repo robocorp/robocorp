@@ -220,7 +220,7 @@ def setup_stdout_logging(
                                         original_stdout.write(f"{decoded}\n")
                                     # Flush (so, clients don't need to execute as unbuffered).
                                     original_stdout.flush()
-                        except:
+                        except Exception:
                             traceback.print_exc(file=sys.stderr)
 
                 # Note: not daemon, we want all messages to be sent prior to exiting.

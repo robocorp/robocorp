@@ -10,7 +10,7 @@ type Props = {
 };
 
 const Button = styled.button`
-  padding: 0 ${({ theme }) => theme.space.$4} 0 ${({ theme }) => theme.space.$8};
+  padding: 0 ${({ theme }) => theme.space.$4} 0 ${({ theme }) => theme.space.$4};
   background: none;
 
   svg path {
@@ -39,7 +39,7 @@ export const Toggle: FC<Props> = ({ entry }) => {
 
   // Add the expand/collapse if we have a parent or no icon if it cannot be expanded.
   if (!filteredEntries.entriesWithChildren.has(entry.id)) {
-    return <Box className="noExpand" width="$24" height="100%" flexShrink={0} />;
+    return <Box className="noExpand" width="$20" height="100%" flexShrink={0} />;
   }
 
   return (

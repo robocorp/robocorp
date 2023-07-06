@@ -113,7 +113,7 @@ def run(
         before_task_run,
     )
     from ._log_auto_setup import read_robocorp_log_config, setup_cli_auto_logging
-    from ._log_output_setup import setup_log_output
+    from ._log_output_setup import setup_log_output, setup_log_output_to_port
     from ._protocols import ITask, Status
     from ._task import Context, set_current_task
 
@@ -174,7 +174,7 @@ def run(
         output_dir=Path(output_dir),
         max_files=max_log_files,
         max_file_size=max_log_file_size,
-    ), context.register_lifecycle_prints():
+    ), setup_log_output_to_port(), context.register_lifecycle_prints():
         run_status = "PASS"
         setup_message = ""
 
@@ -254,7 +254,7 @@ def run(
             var_name = "RC_DUMP_THREADS_AFTER_RUN_TIMEOUT"
             try:
                 timeout = float(os.environ.get(var_name, "40"))
-            except:
+            except Exception:
                 sys.stderr.write(
                     f"Invalid value for: {var_name} environment value. Cannot convert to float."
                 )
@@ -278,7 +278,7 @@ def _dump_threads(stream=None, message="Threads found"):
     try:
         for t in threading.enumerate():
             thread_id_to_name[t.ident] = "%s  (daemon: %s)" % (t.name, t.daemon)
-    except:
+    except Exception:
         pass
 
     stack_trace = [

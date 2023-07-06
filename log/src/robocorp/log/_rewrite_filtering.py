@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 def normcase(s, NORMCASE_CACHE={}):
     try:
         return NORMCASE_CACHE[s]
-    except:
+    except Exception:
         normalized = NORMCASE_CACHE[s] = s.lower()
         return normalized
 

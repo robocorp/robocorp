@@ -193,7 +193,7 @@ class _RotateHandler:
             p: Path = self._found_files.pop(0)
             try:
                 os.remove(p)
-            except:
+            except Exception:
                 traceback.print_exc()
 
     def iter_found_files(self):
@@ -688,7 +688,7 @@ class _RoboOutputImpl:
                     try:
                         memory_info = format_memory_info(psutil.virtual_memory())
                         memory_info = format_memory_info(psutil.virtual_memory())
-                    except:
+                    except Exception:
                         pass
 
                     log_info(
@@ -717,7 +717,7 @@ CPUs: {os.cpu_count()}"""
                                     status = child.status()
                                     try:
                                         create_time = _pprint_secs(child.create_time())
-                                    except:
+                                    except Exception:
                                         pass
                                     ppid = str(child.ppid())
                                     cmdline = " ".join(child.cmdline())
@@ -732,7 +732,7 @@ CPUs: {os.cpu_count()}"""
                                     pass
                                 except Exception:
                                     pass
-                        except:
+                        except Exception:
                             pass
 
                         message = f"""{"Subprocess" if child_i > 0 else "Current Process"}: {name} (pid: {child.pid}, status: {status})
@@ -881,7 +881,7 @@ Virtual Memory Size: {vms}"""
             code_filename = code.co_filename
             try:
                 line_content = linecache.getline(code_filename, tb_lineno).strip()
-            except:
+            except Exception:
                 line_content = ""  # Unable to get contents.
 
             self._write_with_separator(

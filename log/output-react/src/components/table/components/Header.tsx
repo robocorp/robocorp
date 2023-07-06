@@ -1,15 +1,21 @@
 import type { FC, ReactNode } from 'react';
 import { Box, componentWithRef, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
+import { useLogContext } from '~/lib';
 
 type Props = {
   children?: ReactNode;
   flex?: string;
 };
 
-const Container = styled.div`
-  padding: 0 calc(${({ theme }) => theme.space.$12} + var(--scrollbar-width)) 0
-    ${({ theme }) => theme.space.$24};
+// This is the element that contains the column titles.
+const ColumnsTitleContainer = styled.div<{ mode: 'compact' | 'sparse' }>`
+  padding: 0
+    calc(
+      ${({ theme, mode }) => (mode === 'compact' ? theme.space.$0 : theme.space.$12)} +
+        var(--scrollbar-width)
+    )
+    0 ${({ theme, mode }) => (mode === 'compact' ? theme.space.$0 : theme.space.$24)};
   height: ${({ theme }) => theme.sizes.$48};
   display: flex;
   align-items: center;
@@ -17,6 +23,8 @@ const Container = styled.div`
 `;
 
 const Column: FC<Props> = ({ children, flex }) => {
+  const { viewSettings } = useLogContext();
+  const px = viewSettings.mode === 'compact' ? '$4' : '$8';
   return (
     <Box flex={flex}>
       <Typography
@@ -25,7 +33,7 @@ const Column: FC<Props> = ({ children, flex }) => {
         color="content.subtle"
         role="columnheader"
         as="div"
-        px="$8"
+        px={px}
       >
         {children}
       </Typography>
@@ -39,10 +47,16 @@ const compoundComponents = {
 
 export const Header = componentWithRef<Props, HTMLDivElement, typeof compoundComponents>(
   ({ children, ...rest }, forwardedRef) => {
+    const { viewSettings } = useLogContext();
     return (
-      <Container ref={forwardedRef} {...rest}>
+      <ColumnsTitleContainer
+        className="columnTitles"
+        mode={viewSettings.mode}
+        ref={forwardedRef}
+        {...rest}
+      >
         {children}
-      </Container>
+      </ColumnsTitleContainer>
     );
   },
   compoundComponents,

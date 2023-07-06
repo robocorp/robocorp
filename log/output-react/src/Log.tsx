@@ -8,10 +8,13 @@ import {
   LogContextType,
   RunInfo,
   createDefaultRunInfo,
+  RunIdsAndLabel,
+  createDefaultRunIdsAndLabel,
 } from '~/lib';
 import { Entry, EntryConsole, ViewSettings } from './lib/types';
 import {
   reactCallSetAllEntriesCallback,
+  reactCallSetRunIdsAndLabelCallback,
   reactCallSetRunInfoCallback,
 } from './treebuild/effectCallbacks';
 import { leaveOnlyFilteredExpandedEntries } from './lib/filteringHelpers';
@@ -28,6 +31,9 @@ export const Log = () => {
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
   const [activeIndex, setActiveIndex] = useState<number | null | 'information' | 'terminal'>(null);
   const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
+  const [runIdsAndLabel, setRunIdsAndLabel] = useState<RunIdsAndLabel>(
+    createDefaultRunIdsAndLabel(),
+  );
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
   const [consoleEntries, setConsoleEntries] = useState<EntryConsole[]>([]); // Start empty. Entries will be added as they're found.
@@ -73,6 +79,12 @@ export const Log = () => {
         return runInfo;
       });
     });
+
+    reactCallSetRunIdsAndLabelCallback((runIdsAndLabel: RunIdsAndLabel) => {
+      setRunIdsAndLabel(() => {
+        return runIdsAndLabel;
+      });
+    });
   }, []);
 
   // Toggle the expanded state.
@@ -113,14 +125,19 @@ export const Log = () => {
 
   const logContextValue = useMemo(
     () => ctx,
-    [activeIndex, expandedEntries, filteredEntries, viewSettings],
+    [consoleEntries, activeIndex, expandedEntries, filteredEntries, viewSettings, runInfo],
   );
 
   return (
     <ThemeProvider name={viewSettings.theme}>
       <Main>
         <LogContext.Provider value={logContextValue}>
-          <Header filter={filter} setFilter={setFilter} runInfo={runInfo} />
+          <Header
+            filter={filter}
+            setFilter={setFilter}
+            runInfo={runInfo}
+            runIdsAndLabel={runIdsAndLabel}
+          />
           <Table />
           <Details />
         </LogContext.Provider>

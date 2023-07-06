@@ -2,6 +2,8 @@ from pathlib import Path
 
 import pytest
 from devutils.fixtures import robocorp_tasks_run
+from typing import Dict
+import io
 
 
 def test_core_log_integration_error_in_import(datadir):
@@ -204,4 +206,81 @@ def test_no_status_rc(datadir, no_error_rc) -> None:
     verify_log_messages_from_log_html(
         log_target,
         [{"message_type": "ER", "status": "ERROR"}],
+    )
+
+
+@pytest.fixture
+def server_socket():
+    import socket
+
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_address = (
+        "localhost",
+        0,
+    )
+    server_socket.bind(server_address)
+    server_socket.listen(1)
+
+    class _ServerSocketFacade:
+        def __init__(self):
+            self.sockname = server_socket.getsockname()
+            self.received_data = []
+
+        @property
+        def port(self) -> int:
+            return self.sockname[1]
+
+    facade = _ServerSocketFacade()
+
+    def server_on_thread():
+        client_socket, _client_address = server_socket.accept()
+
+        while True:
+            # Receive data from the client
+            data = client_socket.recv(1024)  # Receive up to 1024 bytes of data
+            if not data:
+                break
+            facade.received_data.append(data.decode("utf-8"))
+
+    import threading
+
+    t = threading.Thread(target=server_on_thread)
+    t.start()
+
+    yield facade
+
+
+def test_receive_at_socket(datadir, server_socket) -> None:
+    from robocorp.log import verify_log_messages_from_stream
+
+    pyproject: Path = datadir / "pyproject.toml"
+    pyproject.write_text("")
+
+    port = server_socket.port
+
+    additional_env: Dict[str, str] = {"ROBOCORP_TASKS_LOG_LISTENER_PORT": str(port)}
+    result = robocorp_tasks_run(
+        ["run", "--console-color=plain", "simple.py"],
+        returncode=0,
+        cwd=str(datadir),
+        additional_env=additional_env,
+    )
+
+    data = "".join(server_socket.received_data)
+
+    s = io.StringIO(data)
+    msgs = verify_log_messages_from_stream(
+        s,
+        [
+            {
+                "message_type": "C",
+                "message": "\nCollecting tasks from: simple.py\n",
+                "kind": "regular",
+            },
+            {
+                "message_type": "C",
+                "kind": "stdout",
+                "message": "  aaaa  bbb- ccc+ eee  ddd",
+            },
+        ],
     )

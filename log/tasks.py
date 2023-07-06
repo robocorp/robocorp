@@ -144,6 +144,8 @@ def build_output_view_react(ctx, dev=False):
     """
     Builds the react-based output view in prod mode in `dist`.
     """
+    import shutil
+
     src_webview_react = os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
@@ -172,13 +174,31 @@ def build_output_view_react(ctx, dev=False):
     shell = sys.platform == "win32"
     vtag = "_v3"
     subprocess.check_call(
-        ["npm", "run", "build"],
+        ["npm", "run"] + (["build:debug"] if dev else ["build"]),
         cwd=src_webview_react,
         shell=shell,
     )
 
     index_in_dist = os.path.join(src_webview_react, f"dist{vtag}", "index.html")
     assert os.path.exists(index_in_dist)
+
+    robocorp_code_folder = (
+        Path(index_in_dist).parent.parent.parent.parent.parent
+        / "robotframework-lsp"
+        / "robocorp-code"
+    )
+    if robocorp_code_folder.exists():
+        # i.e.: The language server sources are checked out right next
+        # to the robo sources. Copy the contents to the output.html expected
+        # by Robocorp Code.
+        target = robocorp_code_folder / "vscode-client" / "templates" / "output.html"
+        print(f"Copying output-react to: {target}")
+        shutil.copyfile(index_in_dist, str(target))
+
+        # Note: to have it automatically built, it's possible to go to the folder:
+        # /robo/log
+        # and then (with "pip install watchfiles") run:
+        # watchfiles "inv build-output-view-react --dev" ./output-react/src
 
     # Now, let's embed the contents of the index.html into a python
     # module where it can be saved accordingly.

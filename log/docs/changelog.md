@@ -1,3 +1,12 @@
+NEXT
+-----------------------------
+
+- Initial `VSCode` integration for `log.html`:
+    - A `compact` layout is now available (default on VSCode).
+    - Select for different runs available when inside of VSCode.
+    - Default theme based on VSCode theme.
+
+
 2.1.0 (2023-06-30)
 -----------------------------
 

@@ -64,7 +64,7 @@ def test_sensitive_data_in_traceback():
         with robolog.add_in_memory_log_output(write):
             try:
                 check_sensitive_data.run_with_exc()
-            except:
+            except Exception:
                 robolog.exception()
 
     assert "my_pass" not in s.getvalue()

@@ -244,7 +244,7 @@ def console_message(
     """
     try:
         writing = _ConsoleMessagesLock.tlocal._writing
-    except:
+    except Exception:
         writing = _ConsoleMessagesLock.tlocal._writing = False
 
     if writing:

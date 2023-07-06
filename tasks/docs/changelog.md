@@ -1,3 +1,11 @@
+NEXT
+-----------------------------
+
+- If a `ROBOCORP_TASKS_LOG_LISTENER_PORT` is set, it'll connect to that port
+  and send details on what's happening in the logging (runs using `Robocorp Code`
+  will automatically set it and show the details in the `ROBO TASKS OUTPUT` view).
+
+
 2.0.0
 -----------------------------
 

@@ -1,7 +1,7 @@
 import { Box, Drawer } from '@robocorp/components';
 import { useCallback } from 'react';
 
-import { Counter, useLogContext } from '~/lib';
+import { Counter, formatTimeInSeconds, useLogContext } from '~/lib';
 import { Content, Title } from './components';
 import { PreBox } from './components/content/components/Common';
 import { ConsoleMessageKind, EntryConsole, Type } from '~/lib/types';
@@ -21,6 +21,19 @@ export const Details = () => {
 
   if (activeIndex == 'information') {
     const msgs: string[] = [];
+
+    const time: string = runInfo.time;
+    const timeDelta: number | undefined = runInfo.finishTimeDeltaInSeconds;
+    let timeDescription = '';
+    if (time && time.length > 0) {
+      timeDescription = time;
+      msgs.push('Start time: ' + timeDescription);
+
+      if (timeDelta !== undefined) {
+        msgs.push('Time to run: ' + formatTimeInSeconds(timeDelta));
+      }
+    }
+
     for (const msg of runInfo.infoMessages) {
       msgs.push(msg);
     }

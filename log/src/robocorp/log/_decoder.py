@@ -122,7 +122,7 @@ def _decode(message_definition: str) -> Callable[[Decoder, str], Any]:
                 if dec_func == "loc_id":
                     try:
                         info = decoder.location_memo[s]
-                    except:
+                    except Exception:
                         _LOGGER.critical(f"Could not find memo: {s}")
                         raise
                     ret["name"] = info[0]
@@ -133,7 +133,7 @@ def _decode(message_definition: str) -> Callable[[Decoder, str], Any]:
                 elif dec_func == "loc_and_doc_id":
                     try:
                         info = decoder.location_memo[s]
-                    except:
+                    except Exception:
                         _LOGGER.critical(f"Could not find location_memo: {s}")
                         raise
                     ret["name"] = info[0]
@@ -144,7 +144,7 @@ def _decode(message_definition: str) -> Callable[[Decoder, str], Any]:
 
                 else:
                     ret[name] = dec_func(decoder, s)
-            except:
+            except Exception:
                 ret[name] = None
         return ret
 
@@ -234,7 +234,7 @@ def iter_decoded_log_format(stream: IReadLines) -> Iterator[dict]:
         if line:
             try:
                 message_type, message = line.split(" ", 1)
-            except:
+            except Exception:
                 raise RuntimeError(f"Error decoding line: {line}")
             decoded = decoder.decode_message_type(message_type, message)
             if decoded:

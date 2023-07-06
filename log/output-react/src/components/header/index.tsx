@@ -8,19 +8,23 @@ import {
   Menu,
   BadgeVariant,
   Tooltip,
+  Select,
+  SelectItem,
 } from '@robocorp/components';
 import { IconCloseSmall, IconTerminal } from '@robocorp/icons';
 import { IconInformation, IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
-import { RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
+import { RunIdsAndLabel, RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
 import { CustomActions } from '~/lib/CustomActions';
+import { isInVSCode, onChangeCurrentRunId } from '~/vscode/vscodeComm';
 
 type Props = {
   filter: string;
   setFilter: (filter: string) => void;
   runInfo: RunInfo;
+  runIdsAndLabel: RunIdsAndLabel;
 };
 
-export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
+export const Header: FC<Props> = ({ filter, setFilter, runInfo, runIdsAndLabel }) => {
   const { viewSettings, setViewSettings, setActiveIndex } = useLogContext();
 
   const onFilterChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +53,13 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
     setViewSettings((curr) => ({
       ...curr,
       theme: curr.theme === 'dark' ? 'light' : 'dark',
+    }));
+  }, []);
+
+  const onToggleMode = useCallback(() => {
+    setViewSettings((curr) => ({
+      ...curr,
+      mode: curr.mode === 'compact' ? 'sparse' : 'compact',
     }));
   }, []);
 
@@ -95,9 +106,22 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
     setActiveIndex('terminal');
   }, []);
 
+  let px = '$24';
+  let pt = '$32';
+  if (viewSettings.mode === 'compact') {
+    px = '$4';
+    pt = '$0';
+  }
+
+  let runItems: SelectItem[] = [];
+  let currSelectValue: string | undefined = runIdsAndLabel.currentRunId;
+  for (const [runId, label] of runIdsAndLabel.allRunIdsToLabel.entries()) {
+    runItems.push({ value: runId, label: label });
+  }
+
   return (
-    <Box px="$24" pt="$32" pb="0" backgroundColor="background.primary" id="base-header">
-      <BaseHeader size="medium">
+    <Box px={px} pt={pt} pb="0" backgroundColor="background.primary" id="base-header">
+      <BaseHeader className="base-header-container" size="medium">
         <BaseHeader.Title title={runInfo.description}>
           <Badge variant={variant} label={label} size="small" id="runStatusBadge" />
           {partLabel !== undefined ? (
@@ -126,7 +150,11 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
             ></Button>
           </Tooltip>
         </BaseHeader.Title>
-        <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
+        {viewSettings.mode === 'compact' ? (
+          <></>
+        ) : (
+          <BaseHeader.Description>{timeDescription}</BaseHeader.Description>
+        )}
         <CustomActions>
           <Menu
             trigger={
@@ -140,6 +168,13 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
             </Menu.Checkbox>
             <Menu.Checkbox checked={viewSettings.theme === 'light'} onClick={onToggleTheme}>
               Light
+            </Menu.Checkbox>
+            <Menu.Title>Layout</Menu.Title>
+            <Menu.Checkbox checked={viewSettings.mode === 'compact'} onClick={onToggleMode}>
+              Compact
+            </Menu.Checkbox>
+            <Menu.Checkbox checked={viewSettings.mode === 'sparse'} onClick={onToggleMode}>
+              Sparse
             </Menu.Checkbox>
             <Menu.Title>Columns</Menu.Title>
             <Menu.Checkbox checked={viewSettings.columns.location} onClick={onToggleLocation}>
@@ -159,6 +194,17 @@ export const Header: FC<Props> = ({ filter, setFilter, runInfo }) => {
             onIconRightClick={onFilterReset}
             iconRightLabel="Reset filter"
           />
+          {isInVSCode() ? (
+            <Select
+              value={currSelectValue}
+              items={runItems}
+              onChange={onChangeCurrentRunId}
+              noItemsFound="No runs available"
+              aria-label="Select Run"
+            ></Select>
+          ) : (
+            <></>
+          )}
         </CustomActions>
       </BaseHeader>
     </Box>

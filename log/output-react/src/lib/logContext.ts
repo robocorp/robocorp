@@ -1,6 +1,8 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
 import { Entry, ViewSettings } from './types';
-import { logError } from './helpers';
+import { isDocumentDefined, isWindowDefined, logError } from './helpers';
+import { detectVSCodeTheme } from '../vscode/themeDetector';
+import { isInVSCode } from '../vscode/vscodeComm';
 
 export interface FilteredEntries {
   entries: Entry[];
@@ -16,6 +18,11 @@ export interface RunInfo {
   firstPart: number;
   lastPart: number;
   infoMessages: Set<string>;
+}
+
+export interface RunIdsAndLabel {
+  allRunIdsToLabel: Map<string, string>;
+  currentRunId: string | undefined;
 }
 
 export type LogContextType = {
@@ -34,17 +41,29 @@ export type LogContextType = {
 let defaultTheme: 'light' | 'dark' = 'light';
 try {
   // User can specify log.html?theme=dark|light in url.
-  const params = new URLSearchParams(document.location.search);
-  const s = params.get('theme');
+  let s: string | null = '';
+  if (isDocumentDefined()) {
+    let params = new URLSearchParams(document?.location?.search);
+    s = params.get('theme');
+  }
   if (s === 'light' || s === 'dark') {
     defaultTheme = s;
   } else {
-    // if not specified through url, use from color scheme match.
-    if (window.matchMedia) {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        defaultTheme = 'dark';
-      } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-        defaultTheme = 'light';
+    // See if we can get it from VSCode:
+    let vscodeTheme = detectVSCodeTheme();
+
+    if (vscodeTheme === 'vscode-light') {
+      defaultTheme = 'light';
+    } else if (vscodeTheme === 'vscode-dark' || vscodeTheme === 'vscode-hc') {
+      defaultTheme = 'dark';
+    } else {
+      // if not specified through url nor vscode, use from color scheme match.
+      if (isWindowDefined() && window?.matchMedia) {
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          defaultTheme = 'dark';
+        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          defaultTheme = 'light';
+        }
       }
     }
   }
@@ -60,6 +79,11 @@ export const createDefaultRunInfo = (): RunInfo => ({
   firstPart: -1,
   lastPart: -1,
   infoMessages: new Set<string>(),
+});
+
+export const createDefaultRunIdsAndLabel = (): RunIdsAndLabel => ({
+  allRunIdsToLabel: new Map(),
+  currentRunId: undefined,
 });
 
 export const defaultLogState: LogContextType = {
@@ -79,6 +103,7 @@ export const defaultLogState: LogContextType = {
       location: true,
     },
     format: 'auto' as const,
+    mode: isInVSCode() ? 'compact' : 'sparse',
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),

@@ -3,7 +3,7 @@ import subprocess
 import sys
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Sequence, Optional, Dict
 
 import pytest
 
@@ -176,8 +176,7 @@ class StrRegression:
 
         ``basename`` and ``fullpath`` are exclusive.
         """
-        from pytest_regressions.common import \
-            perform_regression_check  # type: ignore
+        from pytest_regressions.common import perform_regression_check  # type: ignore
 
         __tracebackhide__ = True
 
@@ -257,7 +256,9 @@ def str_regression(datadir, original_datadir, request):
     return StrRegression(datadir, original_datadir, request)
 
 
-def robocorp_tasks_run(cmdline, returncode, cwd=None, additional_env=None):
+def robocorp_tasks_run(
+    cmdline, returncode, cwd=None, additional_env: Optional[Dict[str, str]] = None
+):
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
     if additional_env:

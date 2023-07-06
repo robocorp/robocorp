@@ -526,7 +526,7 @@ def a():
         for a in range(10):
             try:
                 x = a
-            except:
+            except Exception:
                 pass
         return 1
 """

@@ -36,7 +36,7 @@ def _log_error(func):
                 robot_output_impl: _RoboLogger = self
                 robot_output_impl.log_method_except(sys.exc_info(), True)
             finally:
-                _LogErrorLock.tlocal._writing = True
+                _LogErrorLock.tlocal._writing = False
 
     return new_func
 

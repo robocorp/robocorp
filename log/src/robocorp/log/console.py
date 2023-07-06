@@ -182,7 +182,7 @@ try:
         raise RuntimeError("Force ansi usage.")
 
 
-except:
+except Exception:
     # If anything fails there, use the version that prints ansi chars.
     pass
 

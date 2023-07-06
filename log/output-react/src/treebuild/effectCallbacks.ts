@@ -1,4 +1,4 @@
-import { RunInfo } from '~/lib';
+import { RunIdsAndLabel, RunInfo } from '~/lib';
 import { Entry, EntryConsole } from '~/lib/types';
 
 let callsToSetAllEntries:
@@ -48,6 +48,8 @@ export function setAllEntriesWhenPossible(
   }
 }
 
+// Set the run info (react bridge).
+
 let callsToSetRunInfo: { runInfo: RunInfo } | undefined;
 let reactSetRunInfoCallback: any;
 
@@ -64,5 +66,26 @@ export function setRunInfoWhenPossible(runInfo: RunInfo) {
     reactSetRunInfoCallback(runInfo);
   } else {
     callsToSetRunInfo = { runInfo };
+  }
+}
+
+// Set the ids and labels in the select (react bridge).
+
+let callsToSetRunIdsAndLabel: { runIdsAndLabel: RunIdsAndLabel } | undefined;
+let reactSetRunIdsAndLabelCallback: any;
+
+export function reactCallSetRunIdsAndLabelCallback(setRunIdsAndLabelCallback: any) {
+  reactSetRunIdsAndLabelCallback = setRunIdsAndLabelCallback;
+  if (callsToSetRunIdsAndLabel !== undefined) {
+    setRunIdsAndLabelCallback(callsToSetRunIdsAndLabel.runIdsAndLabel);
+    callsToSetRunIdsAndLabel = undefined;
+  }
+}
+
+export function setRunIdsAndLabelWhenPossible(runIdsAndLabel: RunIdsAndLabel) {
+  if (reactSetRunIdsAndLabelCallback !== undefined) {
+    reactSetRunIdsAndLabelCallback(runIdsAndLabel);
+  } else {
+    callsToSetRunIdsAndLabel = { runIdsAndLabel };
   }
 }

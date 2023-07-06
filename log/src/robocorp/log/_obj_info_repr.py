@@ -9,15 +9,17 @@ def get_obj_type_and_repr(obj: Any) -> Tuple[str, str]:
         # Anything called during a repr must be suppressed.
         try:
             val_type = obj.__class__.__name__
-        except:
+        except Exception:
             try:
                 val_type = str(type(obj))
-            except:
+            except Exception:
                 val_type = "<type unavailable>"
+            except RecursionError:
+                val_type = "<recursion error getting type>"
 
         try:
             r = repr(obj)
-        except Exception as e:
+        except (Exception, RecursionError) as e:
             r = f"<error getting repr: {e}>"
 
         max_size = _config._general_log_config.get_max_value_repr_size()

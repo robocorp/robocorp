@@ -9,6 +9,7 @@ export type ViewSettings = {
   };
   theme: 'dark' | 'light';
   format: FormatType;
+  mode: 'compact' | 'sparse';
 };
 
 export enum StatusLevel {

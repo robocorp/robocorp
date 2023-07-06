@@ -1,7 +1,7 @@
 import { debounce } from './debounce';
 import { getOpts } from './options';
 import { IState } from './protocols';
-import { getState, setState } from './vscodeComm';
+import { getState, setState } from '../vscode/vscodeComm';
 
 export function collectTreeState(state: IState, runId: string): void {
   let stateForRun = { openNodes: {} };

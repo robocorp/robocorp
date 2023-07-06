@@ -330,7 +330,7 @@ def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
             pattern = r"at 0x[0-9A-Fa-f]+>"
             formatted = re.sub(pattern, "at 0xXXXXXXXXX>", formatted)
             out.append(f"{indent}{formatted}\n")
-        except:
+        except Exception:
             raise RuntimeError(f"Error handling message: {msg}")
 
         is_restart = msg_type in ("RR", "RT", "RE")

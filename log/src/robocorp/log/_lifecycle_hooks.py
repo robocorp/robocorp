@@ -43,7 +43,7 @@ class Callback(object):
         for c in self._callbacks:
             try:
                 c(*args, **kwargs)
-            except:
+            except Exception:
                 logger.exception(f"Error calling: {c} with: {args} {kwargs}.")
                 if self.raise_exceptions:
                     raise

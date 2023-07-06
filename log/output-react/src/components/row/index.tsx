@@ -10,11 +10,13 @@ type Props = {
   style: CSSProperties;
 };
 
-const Container = styled.div`
+const Container = styled.div<{ mode: 'compact' | 'sparse' }>`
   cursor: pointer;
   display: flex;
-  margin: 0 ${({ theme }) => theme.space.$24};
-  width: calc(100% - ${({ theme }) => theme.space.$48}) !important;
+  margin: 0 ${({ theme, mode }) => (mode === 'compact' ? theme.space.$0 : theme.space.$24)};
+  width: calc(
+    100% - ${({ theme, mode }) => (mode === 'compact' ? theme.space.$0 : theme.space.$48)}
+  ) !important;
   white-space: nowrap;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.subtle.color};
 
@@ -32,7 +34,15 @@ export const Row: FC<Props> = ({ index, ...rest }) => {
   }, [index]);
 
   return (
-    <Container role="button" onClick={onToggle} onKeyPress={onToggle} {...rest} tabIndex={0}>
+    <Container
+      className="oneRow"
+      role="button"
+      onClick={onToggle}
+      onKeyPress={onToggle}
+      {...rest}
+      tabIndex={0}
+      mode={viewSettings.mode}
+    >
       <Step entry={entry} />
       {viewSettings.columns.location && (
         <Cell minWidth={180} cellClass="colLocation">

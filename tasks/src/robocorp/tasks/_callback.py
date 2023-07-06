@@ -46,7 +46,7 @@ class Callback(object):
         for c in iter_in:
             try:
                 c(*args, **kwargs)
-            except:
+            except Exception:
                 logger.exception(f"Error calling: {c}.")
                 if self.raise_exceptions:
                     raise

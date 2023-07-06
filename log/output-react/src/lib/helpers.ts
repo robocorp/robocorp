@@ -227,3 +227,21 @@ export class Counter {
     return this.count++;
   }
 }
+
+export const isWindowDefined = () => {
+  try {
+    let x = window;
+  } catch (error) {
+    return false;
+  }
+  return true;
+};
+
+export const isDocumentDefined = () => {
+  try {
+    let x = document;
+  } catch (error) {
+    return false;
+  }
+  return true;
+};

@@ -1,5 +1,5 @@
 import { IOpts } from './protocols';
-import { getState } from './vscodeComm';
+import { getState } from '../vscode/vscodeComm';
 
 export function createOpts(): IOpts {
   return {

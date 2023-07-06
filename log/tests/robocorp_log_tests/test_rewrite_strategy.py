@@ -20,15 +20,15 @@ def func():
         try:
           report_for_step_start()
           print(a)
-        except:
+        except Exception:
           report_for_step_error()
         finally:
           report_for_step_exit()
-    except:
+    except Exception:
       report_for_error()
     finally:
       report_for_exit()
-  except:
+  except Exception:
     report_method_exception()
   finally:
     report_method_exit()
@@ -159,7 +159,7 @@ def test_rewrite_strategy_for_iter_exception_and_try(in_memory_log, str_regressi
                     raise RuntimeError("err")
                     ctx.report_for_step_end(2)
                 ctx.report_for_end(1)
-            except:
+            except Exception:
                 ctx.report_exception((1, 2))
 
     user_method()

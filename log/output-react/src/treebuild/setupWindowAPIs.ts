@@ -1,4 +1,4 @@
-import { setAllEntriesWhenPossible } from './effectCallbacks';
+import { setAllEntriesWhenPossible, setRunIdsAndLabelWhenPossible } from './effectCallbacks';
 import { getOpts } from './options';
 import { saveTreeState } from './persistTree';
 import { getSampleContents } from './sample';
@@ -12,7 +12,8 @@ import {
   IAppendContentsRequest,
   IUpdateLabelRequest,
   isInVSCode,
-} from './vscodeComm';
+} from '../vscode/vscodeComm';
+import { RunIdsAndLabel, createDefaultRunIdsAndLabel } from '~/lib';
 
 let treeBuilder: TreeBuilder | undefined;
 
@@ -47,8 +48,7 @@ export function setContents(msg: ISetContentsRequest): void {
   opts.appendedContents = [];
   opts.allRunIdsToLabel = msg.allRunIdsToLabel;
 
-  // TODO: Implement this.
-  // rebuildRunSelection(opts.allRunIdsToLabel, opts.runId);
+  rebuildRunSelection(opts.allRunIdsToLabel, opts.runId);
   rebuildTreeAndStatusesFromOpts();
 }
 
@@ -62,11 +62,25 @@ export function appendContents(msg: IAppendContentsRequest): void {
   }
 }
 
+function rebuildRunSelection(allRunIdsToLabel: object | undefined, runId: string | undefined) {
+  const runIdsAndLabel = createDefaultRunIdsAndLabel();
+  runIdsAndLabel.currentRunId = runId;
+  if (allRunIdsToLabel) {
+    for (const [key, value] of Object.entries(allRunIdsToLabel)) {
+      runIdsAndLabel.allRunIdsToLabel.set(key, value);
+    }
+  }
+
+  setRunIdsAndLabelWhenPossible(runIdsAndLabel);
+}
+
 export function updateLabel(msg: IUpdateLabelRequest): void {
   const opts = getOpts();
-  // TODO: Implement this.
-  //   opts.allRunIdsToLabel[msg.runId] = msg.label;
-  //   rebuildRunSelection(opts.allRunIdsToLabel, opts.runId);
+  if (opts.allRunIdsToLabel !== undefined) {
+    const all: any = opts.allRunIdsToLabel;
+    all[msg.runId] = msg.label;
+    rebuildRunSelection(opts.allRunIdsToLabel, opts.runId);
+  }
 }
 
 function onChangedRun(selectedRun: any) {

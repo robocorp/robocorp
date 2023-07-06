@@ -31,6 +31,7 @@ import {
   Type,
 } from '~/lib/types';
 import { Color } from '@robocorp/theme/types';
+import { useLogContext } from '~/lib';
 
 type Props = {
   entry: Entry;
@@ -158,7 +159,10 @@ export const getIcon = (entry: Entry): ReactNode => {
         case ConsoleMessageKind.stderr:
           return <IconTerminal color="background.error" size="small" />;
         default:
-          return <IconTerminal color="invert10" size="small" />;
+          const { viewSettings } = useLogContext();
+          const color: 'invert90' | 'invert10' =
+            viewSettings.theme === 'dark' ? 'invert90' : 'invert10';
+          return <IconTerminal color={color} size="small" />;
       }
     case Type.exception:
       const exc: EntryException = entry as EntryException;
