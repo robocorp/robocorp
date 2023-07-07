@@ -20,7 +20,7 @@ def ci_endpoint() -> str:
 def ci_credentials() -> str:
     ci_credentials = os.environ.get("CI_CREDENTIALS")
     if ci_credentials is None:
-        raise AssertionError("ci_credentials env variable must be specified for tests.")
+        raise AssertionError("CI_CREDENTIALS env variable must be specified for tests.")
     return ci_credentials
 
 

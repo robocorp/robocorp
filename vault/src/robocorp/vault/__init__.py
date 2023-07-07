@@ -37,7 +37,6 @@ Example content of local secrets file:
 }
 ```
 
-
 OR
 
 ```yaml
