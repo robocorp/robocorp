@@ -98,7 +98,7 @@ export const getValue = (entry: Entry): ReactNode | string => {
   }
 };
 
-export const Value: FC<Props> = ({ entry }) => {
+export const StepValue: FC<Props> = ({ entry }) => {
   const value = getValue(entry);
   const isString = typeof value === 'string';
   return (

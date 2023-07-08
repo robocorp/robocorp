@@ -17,6 +17,20 @@ export function entryDepth(entry: Entry) {
   return entry.id.split('-').length - 1;
 }
 
+/**
+ * In the tree some console entries should not appear.
+ */
+export const acceptConsoleEntryInTree = (kind: ConsoleMessageKind, message: string) => {
+  if (kind !== ConsoleMessageKind.stdout && kind !== ConsoleMessageKind.stderr) {
+    return false;
+  }
+  // Also remove empty messages from the tree.
+  if (message.trim().length === 0) {
+    return false;
+  }
+  return true;
+};
+
 export const leaveOnlyExpandedEntries = (
   data: Entry[],
   expandedItems: Set<string>,
@@ -41,14 +55,7 @@ export const leaveOnlyExpandedEntries = (
     if (entry.type === Type.console) {
       // We just want to show stdout and stderr entries.
       const entryConsole = entry as EntryConsole;
-      if (
-        entryConsole.kind !== ConsoleMessageKind.stdout &&
-        entryConsole.kind !== ConsoleMessageKind.stderr
-      ) {
-        continue;
-      }
-      // Also remove empty messages from the tree.
-      if (entryConsole.message.trim().length === 0) {
+      if (!acceptConsoleEntryInTree(entryConsole.kind, entryConsole.message)) {
         continue;
       }
     }

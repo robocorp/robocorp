@@ -213,7 +213,7 @@ export const getIcon = (entry: Entry): ReactNode => {
   }
 };
 
-export const Icon: FC<Props> = ({ entry }) => {
+export const StepIcon: FC<Props> = ({ entry }) => {
   return (
     <Box display="flex" alignItems="center" height="$32" mr="$8">
       {getIcon(entry)}

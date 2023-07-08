@@ -99,14 +99,14 @@ function tracebackComponent(tb: PythonTraceback, title: string) {
           </Bold>{' '}
           ({varType})
         </LineVar>,
-        <VariableValue value={varValue}></VariableValue>,
+        <VariableValue key={counter.next()} value={varValue}></VariableValue>,
       );
     }
 
     contents.push(
       <details key={counter.next()} open={isLast}>
-        <summary>{lineContent}</summary>
-        <div>
+        <summary key={counter.next()}>{lineContent}</summary>
+        <div key={counter.next()}>
           {locationContent} {variablesContent}
         </div>
       </details>,

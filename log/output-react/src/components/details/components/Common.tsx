@@ -8,7 +8,7 @@ import { useLogContext } from '~/lib';
 import { IconChevronDown, IconCopy } from '@robocorp/icons';
 import { IconCheck2 } from '@robocorp/icons/iconic';
 import { FormatType } from '~/lib/types';
-import { CustomActions } from '../../../../../lib/CustomActions';
+import { CustomActions } from '../../../lib/CustomActions';
 
 export const Bold = styled(Box)`
   font-weight: bold;

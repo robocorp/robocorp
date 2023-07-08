@@ -2,10 +2,11 @@ import { Box, Drawer } from '@robocorp/components';
 import { useCallback } from 'react';
 
 import { Counter, formatTimeInSeconds, useLogContext } from '~/lib';
-import { Content, Title } from './components';
-import { PreBox } from './components/content/components/Common';
+import { PreBox } from './components/Common';
 import { ConsoleMessageKind, EntryConsole, Type } from '~/lib/types';
 import { styled } from '@robocorp/theme';
+import { DetailsTitle } from './DetailsTitle';
+import { DetailsContent } from './DetailsContent';
 
 export const BoxOutput = styled(Box)`
   display: inline;
@@ -134,8 +135,8 @@ export const Details = () => {
       <Drawer passive onClose={onClose} width={1024} open={!!entry}>
         {entry && (
           <>
-            <Title entry={entry} />
-            <Content entry={entry} />
+            <DetailsTitle entry={entry} />
+            <DetailsContent entry={entry} />
           </>
         )}
       </Drawer>

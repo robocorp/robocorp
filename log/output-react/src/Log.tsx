@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
-import { Header, Details, Table } from './components';
 import {
   LogContext,
   leaveOnlyExpandedEntries,
@@ -11,13 +10,16 @@ import {
   RunIdsAndLabel,
   createDefaultRunIdsAndLabel,
 } from '~/lib';
-import { Entry, EntryConsole, ViewSettings } from './lib/types';
+import { Entry, ViewSettings } from './lib/types';
 import {
   reactCallSetAllEntriesCallback,
   reactCallSetRunIdsAndLabelCallback,
   reactCallSetRunInfoCallback,
 } from './treebuild/effectCallbacks';
 import { leaveOnlyFilteredExpandedEntries } from './lib/filteringHelpers';
+import { Details } from './components/details/Details';
+import { HeaderAndMenu } from './components/header/HeaderAndMenu';
+import { ListHeaderAndContents } from './components/list/ListHeaderAndContents';
 
 const Main = styled.main`
   display: grid;
@@ -123,13 +125,13 @@ export const Log = () => {
     <ThemeProvider name={viewSettings.theme}>
       <Main>
         <LogContext.Provider value={logContextValue}>
-          <Header
+          <HeaderAndMenu
             filter={filter}
             setFilter={setFilter}
             runInfo={runInfo}
             runIdsAndLabel={runIdsAndLabel}
           />
-          <Table />
+          <ListHeaderAndContents />
           <Details />
         </LogContext.Provider>
       </Main>

@@ -16,8 +16,8 @@ import {
   EntryThreadDump,
   EntryVariable,
   Type,
-} from '../../../lib/types';
-import { getIcon } from '../../../components/row/components/step/components';
+} from '../../lib/types';
+import { getIcon } from '../row/components/step/StepIcon';
 
 const PreBox = styled(Box)`
   white-space: pre-wrap;
@@ -30,7 +30,7 @@ type Props = {
   entry: Entry;
 };
 
-const getTitle = (entry: Entry) => {
+const getDetailsTitle = (entry: Entry) => {
   let prefix = undefined;
   switch (entry.type) {
     case Type.exception:
@@ -123,8 +123,8 @@ const getTitle = (entry: Entry) => {
   }
 };
 
-export const Title: FC<Props> = ({ entry }) => {
-  const { title, description } = getTitle(entry);
+export const DetailsTitle: FC<Props> = ({ entry }) => {
+  const { title, description } = getDetailsTitle(entry);
 
   return (
     <Drawer.Header>

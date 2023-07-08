@@ -2,8 +2,11 @@ import { FC } from 'react';
 import { styled } from '@robocorp/theme';
 
 import { Entry } from '~/lib/types';
-import { Icon, Title, Toggle, Value } from './components';
 import { useLogContext } from '~/lib';
+import { StepToggle } from './StepToggle';
+import { StepIcon } from './StepIcon';
+import { StepTitle } from './StepTitle';
+import { StepValue } from './StepValue';
 
 type Props = {
   entry: Entry;
@@ -19,7 +22,7 @@ const Container = styled.div<{ depth: number; mode: 'compact' | 'sparse' }>`
   overflow: hidden;
 `;
 
-export const Step: FC<Props> = ({ entry }) => {
+export const StepCell: FC<Props> = ({ entry }) => {
   let depth = entry.id.split('-').length - 1;
   if (depth > 20) {
     // Flatten after it's 20 levels deep.
@@ -31,10 +34,10 @@ export const Step: FC<Props> = ({ entry }) => {
 
   return (
     <Container depth={depth} id={entry.id} mode={viewSettings.mode} className="rowEntryStep">
-      <Toggle entry={entry} />
-      <Icon entry={entry} />
-      <Title entry={entry} />
-      <Value entry={entry} />
+      <StepToggle entry={entry} />
+      <StepIcon entry={entry} />
+      <StepTitle entry={entry} />
+      <StepValue entry={entry} />
     </Container>
   );
 };

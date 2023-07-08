@@ -65,7 +65,7 @@ export const getTitle = (entry: Entry): string => {
   }
 };
 
-export const Title: FC<Props> = ({ entry }) => {
+export const StepTitle: FC<Props> = ({ entry }) => {
   const title = getTitle(entry);
   if (!title) {
     return <></>;

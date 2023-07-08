@@ -28,7 +28,13 @@ import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallb
 import { Decoder, iter_decoded_log_format, IMessage, splitInChar, SPEC_RESTARTS } from './decoder';
 import { IConsoleMessage, IOpts, ITracebackEntry, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
-import { Counter, RunInfo, RunInfoStatus, createDefaultRunInfo, logError } from '../lib';
+import {
+  RunInfo,
+  RunInfoStatus,
+  acceptConsoleEntryInTree,
+  createDefaultRunInfo,
+  logError,
+} from '../lib';
 
 /**
  * Helpers to make sure that we only have 1 active tree builder.
@@ -94,6 +100,23 @@ class TBHandler {
   }
 }
 
+export class TreeCounter {
+  private count: number;
+  private countNotInTree: number;
+
+  constructor() {
+    this.count = 0;
+    this.countNotInTree = 0;
+  }
+
+  public next(): any {
+    return this.count++;
+  }
+  public nextNotInTree(): any {
+    return `hide(${this.countNotInTree++})`;
+  }
+}
+
 class FlattenedTree {
   // All entries we're viewing.
   // Note: when an entry is changed a copy should be done and the entry
@@ -109,7 +132,7 @@ class FlattenedTree {
   public stack: Entry[] = [];
 
   // A stack helper just to provide ids for entries.
-  public stackCounter: Counter[] = [new Counter()];
+  public stackCounter: TreeCounter[] = [new TreeCounter()];
 
   // The target for the arguments being set (may not be the stack top as some
   // entries which have arguments may not create a new scope).
@@ -118,17 +141,25 @@ class FlattenedTree {
   // The current parentId.
   private parentId = '';
 
-  newScopeId(addToStack = true): string {
+  newScopeId(addToStack = true, inTreeByDefault = true): string {
     let counter = this.stackCounter.at(-1);
     if (counter === undefined) {
       throw new Error('Error stack counter must always have at least 1 entry.');
     }
-    const newId =
-      this.parentId.length === 0 ? `root${counter.next()}` : `${this.parentId}-${counter.next()}`;
+    let newId: string;
+    if (inTreeByDefault) {
+      newId =
+        this.parentId.length === 0 ? `root${counter.next()}` : `${this.parentId}-${counter.next()}`;
+    } else {
+      newId =
+        this.parentId.length === 0
+          ? `root${counter.nextNotInTree()}`
+          : `${this.parentId}-${counter.nextNotInTree()}`;
+    }
 
     if (addToStack) {
       this.parentId = newId;
-      this.stackCounter.push(new Counter());
+      this.stackCounter.push(new TreeCounter());
     }
 
     return newId;
@@ -216,7 +247,7 @@ class FlattenedTree {
 
     // We have to do a new one because this message is trimmed (for the tree).
     const entry: EntryConsole = {
-      id: this.newScopeId(false),
+      id: this.newScopeId(false, acceptConsoleEntryInTree(internalLogKind, consoleOutput.message)),
       type: Type.console,
       kind: internalLogKind,
       message: consoleOutput.message,

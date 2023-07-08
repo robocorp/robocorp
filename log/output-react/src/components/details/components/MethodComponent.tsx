@@ -29,7 +29,7 @@ const ArgumentType = styled(Box)`
   font-family: consolas, inconsolata, monaco, menlo, Droid Sans Mono, monospace;
 `;
 
-export const Method: FC<{ entry: Entry }> = (props) => {
+export const MethodComponent: FC<{ entry: Entry }> = (props) => {
   const entryMethod: EntryMethodBase | EntryReturn = props.entry as EntryMethodBase | EntryReturn;
   const argumentsList = [];
   let argumentsHeader = <></>;

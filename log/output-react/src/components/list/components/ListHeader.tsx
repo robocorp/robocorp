@@ -45,7 +45,7 @@ const compoundComponents = {
   Column,
 };
 
-export const Header = componentWithRef<Props, HTMLDivElement, typeof compoundComponents>(
+export const ListHeader = componentWithRef<Props, HTMLDivElement, typeof compoundComponents>(
   ({ children, ...rest }, forwardedRef) => {
     const { viewSettings } = useLogContext();
     return (

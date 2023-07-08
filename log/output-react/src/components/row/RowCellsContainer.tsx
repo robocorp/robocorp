@@ -3,7 +3,8 @@ import { styled } from '@robocorp/theme';
 import { Tooltip } from '@robocorp/components';
 
 import { formatDuration, formatLocation, useLogContext } from '~/lib';
-import { Cell, Step } from './components';
+import { Cell } from './components/Cell';
+import { StepCell } from './components/step/StepCell';
 
 type Props = {
   index: number;
@@ -25,7 +26,7 @@ const Container = styled.div<{ mode: 'compact' | 'sparse' }>`
   }
 `;
 
-export const Row: FC<Props> = ({ index, ...rest }) => {
+export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
   const { filteredEntries, setActiveIndex, viewSettings } = useLogContext();
   const entry = filteredEntries.entries[index];
 
@@ -43,7 +44,7 @@ export const Row: FC<Props> = ({ index, ...rest }) => {
       tabIndex={0}
       mode={viewSettings.mode}
     >
-      <Step entry={entry} />
+      <StepCell entry={entry} />
       {viewSettings.columns.location && (
         <Cell minWidth={180} cellClass="colLocation">
           <Tooltip text={formatLocation(entry)}>

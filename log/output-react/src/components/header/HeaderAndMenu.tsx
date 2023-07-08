@@ -24,7 +24,7 @@ type Props = {
   runIdsAndLabel: RunIdsAndLabel;
 };
 
-export const Header: FC<Props> = ({ filter, setFilter, runInfo, runIdsAndLabel }) => {
+export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAndLabel }) => {
   const { viewSettings, setViewSettings, setActiveIndex } = useLogContext();
 
   const onFilterChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {

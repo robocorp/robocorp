@@ -24,7 +24,7 @@ const Button = styled.button`
   }
 `;
 
-export const Toggle: FC<Props> = ({ entry }) => {
+export const StepToggle: FC<Props> = ({ entry }) => {
   const { filteredEntries, expandedEntries, toggleEntry } = useLogContext();
 
   const expanded = expandedEntries.has(entry.id);

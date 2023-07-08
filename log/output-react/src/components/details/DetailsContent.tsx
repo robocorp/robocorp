@@ -3,10 +3,10 @@ import { Box } from '@robocorp/components';
 
 import { Entry, Type } from '~/lib/types';
 import { ExceptionComponent, ThreadDumpComponent } from './components/ExceptionComponent';
-import { Method } from './components/Method';
-import { VariableComponent } from './components/VariableComponent';
-import { TaskComponent } from './components/TaskComponent';
 import { LogComponent } from './components/LogComponent';
+import { MethodComponent } from './components/MethodComponent';
+import { TaskComponent } from './components/TaskComponent';
+import { VariableComponent } from './components/VariableComponent';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
   return <>Todo: provide details for {props.entry.type}</>;
@@ -27,7 +27,7 @@ const getContentComponent = (type: Type) => {
     case Type.ifElement:
     case Type.elseElement:
     case Type.returnElement:
-      return Method;
+      return MethodComponent;
     case Type.exception:
       return ExceptionComponent;
     case Type.threadDump:
@@ -46,7 +46,7 @@ const getContentComponent = (type: Type) => {
   }
 };
 
-export const Content: FC<{ entry: Entry }> = ({ entry }) => {
+export const DetailsContent: FC<{ entry: Entry }> = ({ entry }) => {
   const Component = getContentComponent(entry.type);
 
   return (

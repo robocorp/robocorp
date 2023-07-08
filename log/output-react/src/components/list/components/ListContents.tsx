@@ -3,7 +3,7 @@ import { VariableSizeList } from 'react-window';
 import { Box, useSize } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
-import { Row } from '../../../components/row';
+import { RowCellsContainer } from '../../row/RowCellsContainer';
 import { getLogEntryHeight, useLogContext } from '~/lib';
 
 type Props = HTMLProps<HTMLDivElement>;
@@ -14,7 +14,7 @@ const Container = styled(Box)`
   overflow: hidden;
 `;
 
-export const Body: FC<Props> = () => {
+export const ListContents: FC<Props> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VariableSizeList>(null);
   const { height } = useSize(containerRef);
@@ -46,7 +46,7 @@ export const Body: FC<Props> = () => {
         itemSize={itemSize}
         estimatedItemSize={32}
       >
-        {Row}
+        {RowCellsContainer}
       </VariableSizeList>
     </Container>
   );

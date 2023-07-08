@@ -1,7 +1,8 @@
-import { getTitle, getValue } from '../components/row/components/step/components';
+import { getTitle } from '~/components/row/components/step/StepTitle';
 import { entryDepth, leaveOnlyExpandedEntries } from './helpers';
 import { FilteredEntries } from './logContext';
 import { Entry, Type, EntryLog, StatusLevel, EntryConsole, ConsoleMessageKind } from './types';
+import { getValue } from '~/components/row/components/step/StepValue';
 
 interface EntryAdded {
   entry: Entry;
