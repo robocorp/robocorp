@@ -1,5 +1,6 @@
 import { FilteredEntries } from './logContext';
 import {
+  ConsoleMessageKind,
   Entry,
   EntryConsole,
   EntryException,
@@ -37,6 +38,20 @@ export const leaveOnlyExpandedEntries = (
   let hideChildrenOnDepth: number = 0;
 
   for (const entry of data) {
+    if (entry.type === Type.console) {
+      // We just want to show stdout and stderr entries.
+      const entryConsole = entry as EntryConsole;
+      if (
+        entryConsole.kind !== ConsoleMessageKind.stdout &&
+        entryConsole.kind !== ConsoleMessageKind.stderr
+      ) {
+        continue;
+      }
+      // Also remove empty messages from the tree.
+      if (entryConsole.message.trim().length === 0) {
+        continue;
+      }
+    }
     const depth = entryDepth(entry);
     const i = entry.id.lastIndexOf('-');
     if (i > 0) {

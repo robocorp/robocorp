@@ -1,0 +1,142 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: main
+            SE: FOR: for entry in iterate_entries_in_project(5)
+                SE: GENERATOR: iterate_entries_in_project
+                    EA: int: steps: 5
+                    AS: internal_value: 0
+                    SE: METHOD: call_in_iterator
+                        EA: int: value: 0
+                        AS: x: 0
+                    EE: METHOD: PASS
+                    SE: UNTRACKED_GENERATOR: iterator_in_library
+                    EA: int: steps: 0
+                EE: UNTRACKED_GENERATOR: PASS
+                AS: internal_value: 1
+                SE: METHOD: call_in_iterator
+                    EA: int: value: 1
+                    AS: x: 1
+                EE: METHOD: PASS
+                SE: UNTRACKED_GENERATOR: iterator_in_library
+                EA: int: steps: 1
+            YS: iterate_entries_in_project: 0 (robocorp_log_tests._resources.check_iterators)
+            SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+                EA: int: entry: 0
+                SE: METHOD: call_in_main
+                    EA: int: value: 0
+                    AS: y: 0
+                EE: METHOD: PASS
+            EE: FOR_STEP: PASS
+            YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+            EE: UNTRACKED_GENERATOR: PASS
+            AS: internal_value: 2
+            SE: METHOD: call_in_iterator
+                EA: int: value: 2
+                AS: x: 2
+            EE: METHOD: PASS
+            SE: UNTRACKED_GENERATOR: iterator_in_library
+            EA: int: steps: 2
+        YS: iterate_entries_in_project: 0 (robocorp_log_tests._resources.check_iterators)
+        SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+            EA: int: entry: 0
+            SE: METHOD: call_in_main
+                EA: int: value: 0
+                AS: y: 0
+            EE: METHOD: PASS
+        EE: FOR_STEP: PASS
+        YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+        YS: iterate_entries_in_project: 1 (robocorp_log_tests._resources.check_iterators)
+        SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+            EA: int: entry: 1
+            SE: METHOD: call_in_main
+                EA: int: value: 1
+                AS: y: 1
+            EE: METHOD: PASS
+        EE: FOR_STEP: PASS
+        YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+        EE: UNTRACKED_GENERATOR: PASS
+        AS: internal_value: 3
+        SE: METHOD: call_in_iterator
+            EA: int: value: 3
+            AS: x: 3
+        EE: METHOD: PASS
+        SE: UNTRACKED_GENERATOR: iterator_in_library
+        EA: int: steps: 3
+    YS: iterate_entries_in_project: 0 (robocorp_log_tests._resources.check_iterators)
+    SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+        EA: int: entry: 0
+        SE: METHOD: call_in_main
+            EA: int: value: 0
+            AS: y: 0
+        EE: METHOD: PASS
+    EE: FOR_STEP: PASS
+    YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+    YS: iterate_entries_in_project: 1 (robocorp_log_tests._resources.check_iterators)
+    SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+        EA: int: entry: 1
+        SE: METHOD: call_in_main
+            EA: int: value: 1
+            AS: y: 1
+        EE: METHOD: PASS
+    EE: FOR_STEP: PASS
+    YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+    YS: iterate_entries_in_project: 2 (robocorp_log_tests._resources.check_iterators)
+    SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+        EA: int: entry: 2
+        SE: METHOD: call_in_main
+            EA: int: value: 2
+            AS: y: 2
+        EE: METHOD: PASS
+    EE: FOR_STEP: PASS
+    YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+    EE: UNTRACKED_GENERATOR: PASS
+    AS: internal_value: 4
+    SE: METHOD: call_in_iterator
+        EA: int: value: 4
+        AS: x: 4
+    EE: METHOD: PASS
+    SE: UNTRACKED_GENERATOR: iterator_in_library
+    EA: int: steps: 4
+YS: iterate_entries_in_project: 0 (robocorp_log_tests._resources.check_iterators)
+SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+    EA: int: entry: 0
+    SE: METHOD: call_in_main
+        EA: int: value: 0
+        AS: y: 0
+    EE: METHOD: PASS
+EE: FOR_STEP: PASS
+YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+YS: iterate_entries_in_project: 1 (robocorp_log_tests._resources.check_iterators)
+SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+    EA: int: entry: 1
+    SE: METHOD: call_in_main
+        EA: int: value: 1
+        AS: y: 1
+    EE: METHOD: PASS
+EE: FOR_STEP: PASS
+YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+YS: iterate_entries_in_project: 2 (robocorp_log_tests._resources.check_iterators)
+SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+    EA: int: entry: 2
+    SE: METHOD: call_in_main
+        EA: int: value: 2
+        AS: y: 2
+    EE: METHOD: PASS
+EE: FOR_STEP: PASS
+YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+YS: iterate_entries_in_project: 3 (robocorp_log_tests._resources.check_iterators)
+SE: FOR_STEP: for entry in iterate_entries_in_project(5)
+    EA: int: entry: 3
+    SE: METHOD: call_in_main
+        EA: int: value: 3
+        AS: y: 3
+    EE: METHOD: PASS
+EE: FOR_STEP: PASS
+YR: iterate_entries_in_project (robocorp_log_tests._resources.check_iterators)
+EE: UNTRACKED_GENERATOR: PASS
+EE: GENERATOR: PASS
+EE: FOR: PASS
+EE: METHOD: PASS
+ET: PASS
+ER: PASS

@@ -10,6 +10,7 @@ import {
   IconPlayCircle,
   IconQuestionCircle,
   IconStatusCompleted,
+  IconStatusDisabled,
   IconStatusError,
   IconStatusIdle,
   IconTable,
@@ -139,6 +140,16 @@ export const getIcon = (entry: Entry): ReactNode => {
               label={'WARN'}
               size="small"
               iconColor="background.notification"
+            />
+          );
+        case StatusLevel.debug:
+          return (
+            <Badge
+              icon={IconStatusDisabled}
+              variant="green"
+              label={'DEBUG'}
+              size="small"
+              iconColor="blue60"
             />
           );
         default:

@@ -1,0 +1,19 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: main_yield_augassign
+            AS: s: ''
+            AS: iter_in: <generator object yield_augassign at 0xXXXXXXXXX>
+            SE: GENERATOR: yield_augassign
+                AS: v: 0
+            YS: yield_augassign: 'aug1' (robocorp_log_tests._resources.check_iterators)
+            YR: yield_augassign (robocorp_log_tests._resources.check_iterators)
+            YS: yield_augassign: ' aug2' (robocorp_log_tests._resources.check_iterators)
+            YR: yield_augassign (robocorp_log_tests._resources.check_iterators)
+            YS: yield_augassign: ' aug3' (robocorp_log_tests._resources.check_iterators)
+            YR: yield_augassign (robocorp_log_tests._resources.check_iterators)
+                R: str: ' finish'
+            EE: GENERATOR: PASS
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

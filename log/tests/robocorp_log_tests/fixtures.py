@@ -246,7 +246,9 @@ def _build_and_copy_robo(location: str, force: bool = False) -> None:
 
 _format_msg: dict = {}
 _format_msg["SE"] = lambda msg: f"SE: {msg['type']}: {msg['name']}"
+_format_msg["YR"] = lambda msg: f"YR: {msg['name']} ({msg['libname']})"
 _format_msg["EE"] = lambda msg: f"EE: {msg['type']}: {msg['status']}"
+_format_msg["YS"] = lambda msg: f"YS: {msg['name']}: {msg['value']} ({msg['libname']})"
 _format_msg["EA"] = lambda msg: f"EA: {msg['type']}: {msg['name']}: {msg['value']}"
 _format_msg["STB"] = lambda msg: f"STB: {msg['message']}"
 _format_msg["AS"] = lambda msg: f"AS: {msg['target']}: {msg['value']}"
@@ -278,36 +280,43 @@ _ignore = {
 }
 
 
-def pretty_format_logs_from_log_html(log_html: Path, show_exception_vars=False):
+def pretty_format_logs_from_log_html(log_html: Path, **kwargs):
     from robocorp.log import iter_decoded_log_format_from_log_html
 
     iter_in = iter_decoded_log_format_from_log_html(log_html)
-    return pretty_format_logs_from_iter(
-        iter_in, show_exception_vars=show_exception_vars
-    )
+    return pretty_format_logs_from_iter(iter_in, **kwargs)
 
 
-def pretty_format_logs_from_stream(stream: IReadLines, show_exception_vars=False):
+def pretty_format_logs_from_stream(stream: IReadLines, **kwargs):
     from robocorp.log import iter_decoded_log_format_from_stream
 
     iter_in = iter_decoded_log_format_from_stream(stream)
-    return pretty_format_logs_from_iter(
-        iter_in, show_exception_vars=show_exception_vars
-    )
+    return pretty_format_logs_from_iter(iter_in, **kwargs)
 
 
-def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
+def pretty_format_logs_from_iter(
+    iter_in,
+    show_exception_vars=False,
+    show_console_messages=False,
+    show_log_messages=False,
+):
     import re
 
-    format_msg = _format_msg
-    ignore = _ignore
+    format_msg = _format_msg.copy()
+    ignore = _ignore.copy()
     if show_exception_vars:
-        ignore = _ignore.copy()
         ignore.remove("TBV")
         ignore.remove("TBE")
-        format_msg = _format_msg.copy()
         format_msg["TBE"] = lambda msg: f"TBE --- {msg['method']} ---"
         format_msg["TBV"] = lambda msg: f"TBV: {msg['name']}: {msg['value']}"
+
+    if show_console_messages:
+        ignore.remove("C")
+        format_msg["C"] = lambda msg: f"C: {msg['kind']}: {msg['message']!r}"
+
+    if show_log_messages:
+        ignore.remove("L")
+        format_msg["L"] = lambda msg: f"L: {msg['level']}: {msg['message']!r}"
 
     level = 0
     indent = ""
@@ -321,7 +330,8 @@ def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
             print("Check: ", msg)
             continue
 
-        if msg_type in ("EE", "ET", "ER"):
+        # Messages that end scope
+        if msg_type in ("EE", "ET", "ER", "YS"):
             level -= 1
             indent = "    " * level
 
@@ -333,15 +343,18 @@ def pretty_format_logs_from_iter(iter_in, show_exception_vars=False):
         except Exception:
             raise RuntimeError(f"Error handling message: {msg}")
 
-        is_restart = msg_type in ("RR", "RT", "RE")
+        # Messages that restart scope
+        is_restart = msg_type in ("RR", "RT", "RE", "RYR")
         if is_restart and regular_start_found:
             continue
 
         if not regular_start_found:
-            if msg_type in ("SE", "ST", "SR"):
+            if msg_type in ("SE", "ST", "SR", "YR"):
                 regular_start_found = True
 
-        if msg_type in ("SE", "ST", "SR") or is_restart:
+        # Messages that create scope
+        if msg_type in ("SE", "ST", "SR", "YR") or is_restart:
+            # Exceptions which won't create scope for SE.
             if msg_type == "SE" and msg["type"] in (
                 "UNTRACKED_GENERATOR",
                 "IF",

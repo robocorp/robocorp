@@ -5,7 +5,6 @@ let callsToSetAllEntries:
   | {
       allEntries: Entry[];
       newExpanded: string[];
-      consoleEntries: Entry[];
       updatedFromIndex: number;
     }
   | undefined;
@@ -20,7 +19,6 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
     setAllentriesCallback(
       callsToSetAllEntries.allEntries,
       callsToSetAllEntries.newExpanded,
-      callsToSetAllEntries.consoleEntries,
       callsToSetAllEntries.updatedFromIndex,
     );
     callsToSetAllEntries = undefined;
@@ -34,17 +32,16 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
 export function setAllEntriesWhenPossible(
   allEntries: Entry[], // all the entries which should be set
   newExpanded: string[], // new entry ids to be expanded
-  consoleEntries: EntryConsole[],
   updatedFromIndex = 0, // from which index onwards was there some change
 ) {
   if (reactSetAllEntriesCallback !== undefined) {
-    reactSetAllEntriesCallback(allEntries, newExpanded, consoleEntries, updatedFromIndex);
+    reactSetAllEntriesCallback(allEntries, newExpanded, updatedFromIndex);
   } else {
     if (callsToSetAllEntries !== undefined) {
       updatedFromIndex = Math.min(updatedFromIndex, callsToSetAllEntries.updatedFromIndex);
       newExpanded = callsToSetAllEntries.newExpanded.concat(newExpanded);
     }
-    callsToSetAllEntries = { allEntries, newExpanded, consoleEntries, updatedFromIndex };
+    callsToSetAllEntries = { allEntries, newExpanded, updatedFromIndex };
   }
 }
 

@@ -11,7 +11,6 @@ declare global {
     setAllEntriesWhenPossible: (
       allEntries: Entry[],
       newExpanded: string[],
-      consoleEntries: EntryConsole[],
       updatedFromIndex: number,
     ) => void;
   }

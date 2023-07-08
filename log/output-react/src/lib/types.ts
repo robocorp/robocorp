@@ -13,9 +13,10 @@ export type ViewSettings = {
 };
 
 export enum StatusLevel {
-  error = 3,
-  warn = 2,
-  info = 1,
+  error = 4,
+  warn = 3,
+  info = 2,
+  debug = 1,
   success = 0,
   unset = -1,
 }

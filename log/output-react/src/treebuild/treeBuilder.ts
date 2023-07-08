@@ -100,9 +100,6 @@ class FlattenedTree {
   // in this object should be replace.
   public entries: Entry[] = [];
 
-  // The entries just specific to the console.
-  public consoleEntries: EntryConsole[] = [];
-
   // New entry ids which should be automatically expanded.
   public newExpanded: string[] = [];
 
@@ -217,41 +214,15 @@ class FlattenedTree {
         break;
     }
 
-    const isStdoutOrStderr = consoleOutput.kind === 'stdout' || consoleOutput.kind === 'stderr';
-
-    // Just stdout and stderr are in the entries (the consoleEntries has all).
-    const entriesIndex = isStdoutOrStderr ? this.entries.length : -1;
-    const entryConsole: EntryConsole = {
-      id: 'consoleDummyId', // this is a dummy, not in entries, so, don't put id in it.
-      type: Type.console,
-      kind: internalLogKind,
-      message: consoleOutput.message,
-      source: consoleOutput.source,
-      lineno: consoleOutput.lineno,
-      entriesIndex: entriesIndex,
-    };
-    this.consoleEntries.push(entryConsole);
-
-    // In the tree don't show the ones created by the framework, just
-    // stdout and stderr.
-    if (!isStdoutOrStderr) {
-      return;
-    }
-
-    let message = consoleOutput.message.trim();
-    if (message.length == 0) {
-      return;
-    }
-
     // We have to do a new one because this message is trimmed (for the tree).
     const entry: EntryConsole = {
       id: this.newScopeId(false),
       type: Type.console,
       kind: internalLogKind,
-      message: message,
+      message: consoleOutput.message,
       source: consoleOutput.source,
       lineno: consoleOutput.lineno,
-      entriesIndex: entriesIndex,
+      entriesIndex: this.entries.length,
     };
     this.entries.push(entry);
   }
@@ -269,6 +240,9 @@ class FlattenedTree {
         break;
       case 'I':
         level = StatusLevel.info;
+        break;
+      case 'D':
+        level = StatusLevel.debug;
         break;
     }
 
@@ -743,12 +717,7 @@ export class TreeBuilder {
       // Don't add the same ones again.
       this.flattened.newExpanded = [];
     }
-    setAllEntriesWhenPossible(
-      this.flattened.entries,
-      newExpanded,
-      this.flattened.consoleEntries,
-      updateFromIndex,
-    );
+    setAllEntriesWhenPossible(this.flattened.entries, newExpanded, updateFromIndex);
     if (this.runInfoChanged) {
       this.runInfoChanged = false;
       setRunInfoWhenPossible(this.runInfo);

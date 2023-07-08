@@ -13,7 +13,7 @@ export const BoxOutput = styled(Box)`
 `;
 
 export const Details = () => {
-  const { filteredEntries, activeIndex, setActiveIndex, runInfo, consoleEntries, viewSettings } =
+  const { filteredEntries, activeIndex, setActiveIndex, runInfo, allEntries, viewSettings } =
     useLogContext();
   const onClose = useCallback(() => {
     setActiveIndex(null);
@@ -90,7 +90,7 @@ export const Details = () => {
       msgs.push(<br key={counter.next()} />);
     };
 
-    for (let entry of consoleEntries) {
+    for (let entry of allEntries) {
       if (entry.type == Type.console) {
         const c = entry as EntryConsole;
 

@@ -1,3 +1,25 @@
+NEXT
+-----------------------------
+
+- Added `robocorp.log.debug` to have one more level when logging.
+
+- It's possible to filter log levels by using `robocorp.log.setup_log`.
+
+    i.e.: `setup_log(log_level='warn')` will only show **warn** and **critical**
+    entries in the log (**info** and **debug** won't be added to the logs).
+
+- It's possible to also redirect to `sys.stdout` and `sys.stderr` the messages
+  added with **log.debug**, **log.info**, **log.warn** and **log.critical**.
+    
+    **Note**: the default is only redirecting `log.critical` calls to `stderr`.
+    To redirect all, it's possible to customize the `output_log_level`.
+    i.e.: `setup_log(output_log_level='debug')`.
+    
+    **Note**: it's possible to customize for each log level to which stream it's 
+    redirected with `setup_log(output_stream={'debug': 'stderr'})`. By default
+    **warn** and **critical** go to **stderr** and **debug** and **info** go to **stdout**.
+
+
 2.2.0 (2023-07-06)
 -----------------------------
 

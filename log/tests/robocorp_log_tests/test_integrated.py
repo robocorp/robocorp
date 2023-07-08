@@ -11,105 +11,24 @@ from robocorp_log_tests.fixtures import (
 from robocorp.log import setup_log, verify_log_messages_from_log_html
 
 
-def test_log_with_yield_iterator(tmpdir, ui_regenerate):
-    from robocorp.log._decoder import (
-        MESSAGE_TYPE_YIELD_RESUME,
-        MESSAGE_TYPE_YIELD_SUSPEND,
-    )
-
+def test_log_with_yield_iterator(tmpdir, ui_regenerate, str_regression):
     config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).main()
 
     log_target = setup_info.log_target
     assert log_target.exists()
-    msgs = verify_log_messages_from_log_html(
-        log_target,
-        [
-            {
-                "message_type": MESSAGE_TYPE_YIELD_RESUME,
-                "name": "iterate_entries_in_project",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-            },
-            {
-                "message_type": MESSAGE_TYPE_YIELD_SUSPEND,
-                "type": "int",
-                "value": "2",
-            },
-            {
-                "message_type": "SE",
-                "name": "iterator_in_library",
-                "libname": "robocorp_log_tests._resources.check_iterators_lib",
-                "type": "UNTRACKED_GENERATOR",
-            },
-        ],
-    )
-    # for m in msgs:
-    #     print(m)
-    # setup_info.open_log_target()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
 
 
-def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate):
-    from robocorp.log._decoder import (
-        MESSAGE_TYPE_YIELD_RESUME,
-        MESSAGE_TYPE_YIELD_SUSPEND,
-    )
-
+def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate, str_regression):
     config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
         reload(check_iterators).main_yield_augassign()
 
     log_target = setup_info.log_target
     assert log_target.exists()
-    msgs = verify_log_messages_from_log_html(
-        log_target,
-        [
-            {
-                "message_type": MESSAGE_TYPE_YIELD_SUSPEND,
-                "name": "yield_augassign",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-                "type": "str",
-                "value": "'aug1'",
-            },
-            {
-                "message_type": MESSAGE_TYPE_YIELD_RESUME,
-                "name": "yield_augassign",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-            },
-            {
-                "message_type": MESSAGE_TYPE_YIELD_SUSPEND,
-                "name": "yield_augassign",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-                "type": "str",
-                "value": "' aug2'",
-            },
-            {
-                "message_type": MESSAGE_TYPE_YIELD_RESUME,
-                "name": "yield_augassign",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-            },
-            {
-                "message_type": MESSAGE_TYPE_YIELD_SUSPEND,
-                "name": "yield_augassign",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-                "type": "str",
-                "value": "' aug3'",
-            },
-            {
-                "message_type": MESSAGE_TYPE_YIELD_RESUME,
-                "name": "yield_augassign",
-                "libname": "robocorp_log_tests._resources.check_iterators",
-            },
-            {
-                "message_type": "EE",
-                "type": "GENERATOR",
-                "status": "PASS",
-            },
-        ],
-    )
-    # for m in msgs:
-    #     print(m)
-    # setup_info.open_log_target()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
 
 
 def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):

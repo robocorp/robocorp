@@ -1,7 +1,7 @@
 import { getTitle, getValue } from '../components/row/components/step/components';
 import { entryDepth, leaveOnlyExpandedEntries } from './helpers';
 import { FilteredEntries } from './logContext';
-import { Entry, Type, EntryLog, StatusLevel } from './types';
+import { Entry, Type, EntryLog, StatusLevel, EntryConsole, ConsoleMessageKind } from './types';
 
 interface EntryAdded {
   entry: Entry;
@@ -73,6 +73,9 @@ export const leaveOnlyFilteredExpandedEntries = (
             break;
           case StatusLevel.info:
             value = 'info';
+            break;
+          case StatusLevel.debug:
+            value = 'debug';
             break;
         }
         if (value.length === 0) {

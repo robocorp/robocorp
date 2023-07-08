@@ -33,7 +33,9 @@ class _AnsiConsole(object):
 
     def _escape(self, code):
         sys.stdout.flush()
-        sys.stdout.buffer.write(b"\033[" + code)
+        buffer = getattr(sys.stdout, "buffer", None)
+        if buffer is not None:
+            sys.stdout.buffer.write(b"\033[" + code)
 
     def set_color(self, foreground_color: str) -> _OnExitContextManager:
         self._escape(b"%dm" % self.color_map[foreground_color])

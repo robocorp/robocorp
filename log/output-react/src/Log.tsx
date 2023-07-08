@@ -36,7 +36,6 @@ export const Log = () => {
   );
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
-  const [consoleEntries, setConsoleEntries] = useState<EntryConsole[]>([]); // Start empty. Entries will be added as they're found.
   const lastUpdatedIndex = useRef<number>(0);
 
   /**
@@ -44,12 +43,7 @@ export const Log = () => {
    */
   useEffect(() => {
     reactCallSetAllEntriesCallback(
-      (
-        allEntries: Entry[],
-        newExpanded: string[],
-        consoleEntries: EntryConsole[],
-        updatedFromIndex = 0,
-      ) => {
+      (allEntries: Entry[], newExpanded: string[], updatedFromIndex = 0) => {
         if (newExpanded.length > 0) {
           setExpandedEntries((curr) => {
             const set = new Set<string>(curr);
@@ -64,10 +58,6 @@ export const Log = () => {
           // console.log('Set entries to: ' + JSON.stringify(allEntries));
           lastUpdatedIndex.current = updatedFromIndex;
           return [...allEntries];
-        });
-
-        setConsoleEntries(() => {
-          return [...consoleEntries];
         });
 
         return undefined;
@@ -105,13 +95,14 @@ export const Log = () => {
   // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
     if (filter !== undefined && filter.length > 0) {
+      // Note: this also calls 'leaveOnlyExpandedEntries' internally.
       return leaveOnlyFilteredExpandedEntries(entries, expandedEntries, filter);
     }
     return leaveOnlyExpandedEntries(entries, expandedEntries);
   }, [entries, expandedEntries, filter]);
 
   const ctx: LogContextType = {
-    consoleEntries,
+    allEntries: entries,
     expandedEntries,
     filteredEntries,
     toggleEntry,
@@ -125,7 +116,7 @@ export const Log = () => {
 
   const logContextValue = useMemo(
     () => ctx,
-    [consoleEntries, activeIndex, expandedEntries, filteredEntries, viewSettings, runInfo],
+    [entries, activeIndex, expandedEntries, filteredEntries, viewSettings, runInfo],
   );
 
   return (

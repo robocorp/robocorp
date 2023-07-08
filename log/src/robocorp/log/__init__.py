@@ -29,6 +29,8 @@ from typing import (
 from ._logger_instances import _get_logger_instances
 from ._suppress_helper import SuppressHelper as _SuppressHelper
 from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
+import enum
+from types import TracebackType
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
@@ -57,20 +59,48 @@ DefaultAutoLogConfig = _config.DefaultAutoLogConfig
 
 
 def _log(level, message: Sequence[Any], html: bool = False) -> None:
-    back_frame = sys._getframe(2)
-    f_code = back_frame.f_code
-    source = f_code.co_filename
-    name = f_code.co_name
-    lineno = back_frame.f_lineno
-    libname = str(back_frame.f_globals.get("__package__", ""))
-
-    name, libname, source, lineno
+    accept_in_log = _config._general_log_config.accept_log_level(level)
+    accept_in_output = _config._general_log_config.accept_output_log_level(level)
+    if not accept_in_log and not accept_in_output:
+        return
 
     m = " ".join(str(x) for x in message)
-    robo_logger: _RoboLogger
-    with _get_logger_instances() as logger_instances:
-        for robo_logger in logger_instances:
-            robo_logger.log_message(level, m, html, name, libname, source, lineno)
+
+    if accept_in_log:
+        back_frame = sys._getframe(2)
+        f_code = back_frame.f_code
+        source = f_code.co_filename
+        name = f_code.co_name
+        lineno = back_frame.f_lineno
+        libname = str(back_frame.f_globals.get("__package__", ""))
+
+        name, libname, source, lineno
+
+        robo_logger: _RoboLogger
+        with _get_logger_instances() as logger_instances:
+            for robo_logger in logger_instances:
+                robo_logger.log_message(level, m, html, name, libname, source, lineno)
+
+    if not html:  # html messages are never put in the output.
+        if accept_in_output:
+            s = _config._general_log_config.get_output_stream_name(level)
+            try:
+                writing = _ConsoleMessagesLock.tlocal._writing
+            except Exception:
+                writing = _ConsoleMessagesLock.tlocal._writing = False
+
+            if writing:
+                return
+            _ConsoleMessagesLock.tlocal._writing = True
+            try:
+                if s == "stdout":
+                    print(m)
+                elif s == "stderr":
+                    print(m, file=sys.stderr)
+                else:
+                    raise RuntimeError(f"Unexpected output stream name: {s}")
+            finally:
+                _ConsoleMessagesLock.tlocal._writing = False
 
 
 def critical(*message: Any) -> None:
@@ -88,6 +118,13 @@ def critical(*message: Any) -> None:
         formatting please pre-format the string.
         i.e.:
         critical(f'Failed because {obj!r} is not {expected!r}.')
+
+    Note:
+        A new line is automatically added at the end of the message.
+
+    Note:
+        See: `setup_log()` for configurations which may filter out the logged
+        calls and also print it to a stream (such stdout/stderr).
     """
     _log(Status.ERROR, message)
 
@@ -107,6 +144,13 @@ def warn(*message: Any) -> None:
         formatting please pre-format the string.
         i.e.:
         warn(f'Did not expect {obj!r}.')
+
+    Note:
+        A new line is automatically added at the end of the message.
+
+    Note:
+        See: `setup_log()` for configurations which may filter out the logged
+        calls and also print it to a stream (such stdout/stderr).
     """
     _log(Status.WARN, message)
 
@@ -128,8 +172,41 @@ def info(*message: Any) -> None:
         i.e.:
         info(f'Received value {obj!r}.')
 
+    Note:
+        A new line is automatically added at the end of the message.
+
+    Note:
+        See: `setup_log()` for configurations which may filter out the logged
+        calls and also print it to a stream (such stdout/stderr).
     """
     _log(Status.INFO, message)
+
+
+def debug(*message: Any) -> None:
+    """
+    Adds a new logging message with an debug level.
+
+    Args:
+        message: The message which should be logged.
+
+
+    Example:
+        debug('Received value', obj)
+
+    Note:
+        Formatting converts all objects given to `str`. If you need custom
+        formatting please pre-format the string.
+        i.e.:
+        debug(f'Received value {obj!r}.')
+
+    Note:
+        A new line is automatically added at the end of the message.
+
+    Note:
+        See: `setup_log()` for configurations which may filter out the logged
+        calls and also print it to a stream (such stdout/stderr).
+    """
+    _log(Status.DEBUG, message)
 
 
 def exception(*message: Any):
@@ -138,6 +215,14 @@ def exception(*message: Any):
 
     Args:
         message: If given an additional error message to be shown.
+
+    Note:
+        In general this method does NOT need to be called as exceptions
+        found are automatically tracked by the framework.
+
+    Note:
+        A new line is automatically added at the end of the message
+        (if a message was given for logging).
     """
     if message:
         _log(Status.ERROR, message)
@@ -827,7 +912,52 @@ def verify_log_messages_from_stream(
 # --- APIs to setup the logging
 
 
-def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
+class FilterLogLevel(enum.Enum):
+    DEBUG = "debug"
+    WARN = "warn"
+    INFO = "info"
+    CRITICAL = "critical"
+    NONE = "none"
+
+
+FilterLogLevelLiterals = Literal["debug", "warn", "info", "critical", "none"]
+
+
+class IContextManager(Protocol):
+    """
+    Typing for a "generic" context manager.
+    """
+
+    def __enter__(self) -> None:
+        pass
+
+    def __exit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        pass
+
+
+OutStreamName = Literal["stdout", "stderr"]
+
+
+def setup_log(
+    *,
+    max_value_repr_size: Optional[Union[str, int]] = None,
+    log_level: Optional[Union[FilterLogLevel, FilterLogLevelLiterals]] = None,
+    output_log_level: Optional[Union[FilterLogLevel, FilterLogLevelLiterals]] = None,
+    output_stream: Optional[
+        Union[
+            OutStreamName,
+            Dict[
+                Union[FilterLogLevel, FilterLogLevelLiterals],
+                Union[OutStreamName],
+            ],
+        ]
+    ] = None,
+) -> IContextManager:
     """
     Setups the log "general" settings.
 
@@ -842,16 +972,70 @@ def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
 
             The default value for this setting is "200k".
 
+        log_level: Messages with a level higher or equal to the one specified will
+            be logged in the `log.html`.
+
+            The default value for this setting is "FilterLogLevel.DEBUG", so,
+            any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical`
+            will be shown.
+
+        output_log_level: Messages with a level higher or equal to the one specified will
+            be printed to the output_stream configured.
+
+            The default value for this setting is "FilterLogLevel.NONE", so,
+            any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical`
+            is not shown in the output.
+
+        output_stream: It's possible to specify the stream to output contents to
+            be printed in the `log.debug`, `log.info`, `log.warn` and `log.critical`
+            calls.
+            If all messages should be streamed to the same place it can be the output
+            stream (or its name) or it can be a dict mapping each level to a different
+            stream (or its name).
+            Note: if sys.stdout/sys.stderr are used it's preferred to pass it as
+            a literal (`"stdout"` or `"stderr"`) as if the stream is redirected it'll
+            still print to the current `sys.stdout` / `sys.stderr`.
+
+    Returns:
+        A context manager, so, it's possible to use this method with a `with statement`
+        so that the configuration is reverted to a previous configuration when
+        the context manager exits (if not called with a `with statement` then
+        the values won't be reverted).
+
     Example:
 
-    ```python
-    from robocorp import log
-    # If a repr(obj) returns a string bigger than 100000 chars it'll
-    # be clipped to 100000 chars.
-    log.setup_log(max_value_repr_size=100_000)
-    ```
+        Setting the max repr size:
+
+        ```python
+        from robocorp import log
+        # If a repr(obj) returns a string bigger than 100000 chars it'll
+        # be clipped to 100000 chars.
+        log.setup_log(max_value_repr_size=100_000)
+        ```
+
+    Example:
+
+        Configuring to log only `log.critical`:
+
+        ```python
+        from robocorp import log
+        log.setup_log(log_level=log.FilterLogLevel.CRITICAL)
+        ```
+
+    Example:
+
+        Configuring to print log.warn messages to sys.stdout and log.critical
+        messages to sys.stderr:
+
+        ```python
+        from robocorp import log
+        log.setup_log(
+            output_log_level='warn',
+            output_stream={'warn': 'stdout', 'critical': 'stderr'}
+        )
+        ```
     """
-    prev_values = {}
+    prev_values: dict = {}
 
     if max_value_repr_size:
         from ._convert_units import _convert_to_bytes
@@ -863,6 +1047,26 @@ def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
         _config._general_log_config.max_value_repr_size = _convert_to_bytes(
             max_value_repr_size
         )
+
+    if log_level:
+        prev_values["log_level"] = _config._general_log_config.log_level
+        if not isinstance(log_level, str):
+            log_level = log_level.value  # Received enum.
+        _config._general_log_config.log_level = typing.cast(
+            FilterLogLevelLiterals, log_level
+        )
+
+    if output_log_level:
+        prev_values["output_log_level"] = _config._general_log_config.output_log_level
+        if not isinstance(output_log_level, str):
+            output_log_level = output_log_level.value  # Received enum.
+        _config._general_log_config.output_log_level = typing.cast(
+            FilterLogLevelLiterals, output_log_level
+        )
+
+    if output_stream:
+        prev_values["output_stream"] = _config._general_log_config.output_stream
+        _config._general_log_config.output_stream = output_stream
 
     from ._on_exit_context_manager import OnExitContextManager
 

@@ -2,49 +2,62 @@
 This module should provide a basic example on the usage of the logging.
 """
 import threading
+import contextlib
 
 
-def test_log_api(tmpdir) -> None:
+def test_log_api(tmpdir, str_regression) -> None:
     from imp import reload
 
     from robocorp_log_tests._resources import check
     from robocorp_log_tests.fixtures import basic_log_setup
 
     from robocorp import log
-    from robocorp.log import verify_log_messages_from_log_html
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    import io
 
+    stdout = io.StringIO()
+    stderr = io.StringIO()
     with basic_log_setup(tmpdir, max_file_size="30kb", max_files=1) as setup_info:
-        check = reload(check)
-        check.some_method()
+        with contextlib.redirect_stderr(stderr), contextlib.redirect_stdout(stdout):
+            check = reload(check)
+            check.some_method()
 
-        log.info("Some message")
-        log.critical("Some e message")
-        log.warn("Some w message")
+            log.info("Some message")
+            log.critical("Some e message")
+            log.warn("Some w message")
+            log.debug("Some d message")
 
-        # Calls from thread won't appear in the auto-logging right now.
-        t = threading.Thread(target=check.some_method, args=())
-        t.start()
-        t.join(10)
+            with log.setup_log(log_level="warn"):
+                log.debug("Hide d message")
+                log.warn("Some w2 message")
 
-        t = threading.Thread(target=log.info, args=("SHOULD NOT APPEAR",))
-        t.start()
-        t.join(10)
+                with log.setup_log(
+                    output_log_level=log.FilterLogLevel.DEBUG, output_stream="stdout"
+                ):
+                    # This one will appear in the output but not as log message.
+                    log.debug("msg-debug")
+
+                    # This one will appear in both
+                    log.critical("msg-critical")
+
+            # Calls from thread won't appear in the auto-logging right now.
+            t = threading.Thread(target=check.some_method, args=())
+            t.start()
+            t.join(10)
+
+            t = threading.Thread(target=log.info, args=("SHOULD NOT APPEAR",))
+            t.start()
+            t.join(10)
+
+    assert stderr.getvalue() == "Some e message\n"
+    assert stdout.getvalue() == "msg-debug\nmsg-critical\n"
 
     assert setup_info.log_target.exists()
-    messages = verify_log_messages_from_log_html(
-        setup_info.log_target,
-        [
-            dict(message_type="SE", name="some_method"),
-            dict(message_type="SE", name="call_another_method"),
-            dict(message_type="L", level="I", message="Some message"),
-            dict(message_type="L", level="E", message="Some e message"),
-            dict(message_type="L", level="W", message="Some w message"),
-        ],
-        [],
+    str_regression.check(
+        pretty_format_logs_from_log_html(
+            setup_info.log_target, show_console_messages=True, show_log_messages=True
+        )
     )
-    # Calls in thread not logged.
-    assert str(messages).count("call_another_method") == 1
-    assert str(messages).count("SHOULD NOT APPEAR") == 0
 
 
 def test_log_api_without_with_statments(tmpdir) -> None:

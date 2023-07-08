@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import List, Literal, Protocol, Union
+from typing import Literal, Protocol, Union, Sequence
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
@@ -8,17 +8,21 @@ LogHTMLStyle = Literal["standalone", "vscode"]
 
 
 class IReadLines(Protocol):
-    def readlines(self) -> List[str]:
+    def readlines(self) -> Sequence[str]:
         pass
 
 
+# Note: this is a bit messy as we're mixing task states with log levels.
+# Note2: This is for the log.html and not really for user APIs.
 class Status:
     NOT_RUN = "NOT_RUN"  # Initial status for a task which is not run.
-    PASS = "PASS"
-    ERROR = "ERROR"
-    FAIL = "FAIL"
-    INFO = "INFO"
-    WARN = "WARN"
+    PASS = "PASS"  # Used for task pass
+    FAIL = "FAIL"  # Used for task failure
+
+    ERROR = "ERROR"  # log.critical
+    INFO = "INFO"  # log.info
+    WARN = "WARN"  # log.warn
+    DEBUG = "DEBUG"  # log.debug
 
 
 # 'METHOD': means that we entered a regular method which should be added to the stack.

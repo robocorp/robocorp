@@ -1,0 +1,20 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: some_method
+            SE: METHOD: call_another_method
+                EA: int: param0: 1
+                EA: str: param1: 'arg'
+                EA: tuple: args: (['a', 'b'],)
+                EA: dict: kwargs: {'c': 3}
+            EE: METHOD: PASS
+            R: int: 22
+        EE: METHOD: PASS
+        L: I: 'Some message'
+        L: E: 'Some e message'
+        L: W: 'Some w message'
+        L: D: 'Some d message'
+        L: W: 'Some w2 message'
+        L: E: 'msg-critical'
+    ET: PASS
+ER: PASS

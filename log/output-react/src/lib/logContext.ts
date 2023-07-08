@@ -27,7 +27,7 @@ export interface RunIdsAndLabel {
 
 export type LogContextType = {
   expandedEntries: Set<string>;
-  consoleEntries: Entry[];
+  allEntries: Entry[];
   filteredEntries: FilteredEntries;
   toggleEntry: (id: string) => void;
   activeIndex: null | number | 'information' | 'terminal';
@@ -87,12 +87,12 @@ export const createDefaultRunIdsAndLabel = (): RunIdsAndLabel => ({
 });
 
 export const defaultLogState: LogContextType = {
+  allEntries: [],
   expandedEntries: new Set<string>(),
   filteredEntries: {
     entries: [],
     entriesWithChildren: new Set<string>(),
   },
-  consoleEntries: [],
   toggleEntry: () => null,
   activeIndex: null,
   setActiveIndex: () => null,

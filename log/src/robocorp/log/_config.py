@@ -1,11 +1,12 @@
 import enum
-from typing import Dict, Optional, Sequence, Callable
+from typing import Dict, Optional, Sequence, Callable, Union
 
 from robocorp import log
 from functools import partial
 from fnmatch import fnmatch
 import itertools
 from dataclasses import dataclass
+import typing
 
 # Examples:
 # Filter("mymodule.ignore", kind=FilterKind.exclude)
@@ -27,7 +28,17 @@ class Filter:
 
 
 class GeneralLogConfig:
-    __slots__ = ["max_value_repr_size"]
+    __slots__ = [
+        "max_value_repr_size",
+        "_log_level",
+        "_accept",
+        "_output_log_level",
+        "_accept_output",
+        "_output_stream",
+    ]
+
+    _accept: Dict[str, Sequence[str]]
+    _accept_output: Dict[str, Sequence[str]]
 
     def __init__(self) -> None:
         from ._convert_units import _convert_to_bytes
@@ -35,8 +46,126 @@ class GeneralLogConfig:
         # Setup defaults.
         self.max_value_repr_size: int = _convert_to_bytes("200k")
 
-    def get_max_value_repr_size(self) -> int:
-        return self.max_value_repr_size
+        # Show log.debug/log.info/log.warn/log.critical by default.
+        self._log_level: log.FilterLogLevelLiterals = "debug"
+        self.log_level: log.FilterLogLevelLiterals = "debug"
+
+        # Print only critical by default.
+        self._output_log_level: log.FilterLogLevelLiterals = "critical"
+        self.output_log_level: log.FilterLogLevelLiterals = "critical"
+
+        self._output_stream: Dict[log.FilterLogLevelLiterals, log.OutStreamName] = {
+            "debug": "stdout",
+            "info": "stdout",
+            "warn": "stderr",
+            "critical": "stderr",
+        }
+
+    def _convert_from_internal_log_level(
+        self, level: str
+    ) -> "log.FilterLogLevelLiterals":
+        conversion: Dict[str, log.FilterLogLevelLiterals] = {
+            log.Status.DEBUG: "debug",
+            log.Status.WARN: "warn",
+            log.Status.INFO: "info",
+            log.Status.ERROR: "critical",
+        }
+        return conversion[level]
+
+    def get_output_stream_name(self, level) -> "log.OutStreamName":
+        return self._output_stream[self._convert_from_internal_log_level(level)]
+
+    @property
+    def output_stream(self):
+        return self._output_stream
+
+    @output_stream.setter
+    def output_stream(
+        self,
+        output_stream: Union[
+            "log.OutStreamName",
+            Dict[
+                Union["log.FilterLogLevel", "log.FilterLogLevelLiterals"],
+                Union["log.OutStreamName"],
+            ],
+        ],
+    ):
+        if isinstance(output_stream, str):
+            assert output_stream in ["stdout", "stderr"]
+            new_dict: Dict[log.FilterLogLevelLiterals, log.OutStreamName] = {}
+            for k in self._output_stream:
+                new_dict[k] = output_stream
+            self._output_stream = new_dict
+            return
+
+        if isinstance(output_stream, dict):
+            for key, v in output_stream.items():
+                assert v in ["stdout", "stderr"]
+                if not isinstance(key, str):
+                    key = key.value
+                key = typing.cast(log.FilterLogLevelLiterals, key)
+                self._output_stream[key] = v
+            return
+
+        raise AssertionError(f"Expecting str or dict. Found: {type(output_stream)}.")
+
+    @property
+    def output_log_level(self):
+        return self._output_log_level
+
+    @output_log_level.setter
+    def output_log_level(self, output_log_level: "log.FilterLogLevelLiterals"):
+        accept_log_levels = self._compute_accepted_log_levels(output_log_level)
+
+        self._output_log_level = output_log_level
+        self._accept_output = accept_log_levels
+
+    @property
+    def log_level(self):
+        return self._log_level
+
+    @log_level.setter
+    def log_level(self, log_level: "log.FilterLogLevelLiterals"):
+        accept_log_levels = self._compute_accepted_log_levels(log_level)
+
+        self._log_level = log_level
+        self._accept = accept_log_levels
+
+    def _compute_accepted_log_levels(self, log_level: "log.FilterLogLevelLiterals"):
+        # The accepted log levels are internal
+        accept_log_levels = [
+            log.Status.DEBUG,
+            log.Status.INFO,
+            log.Status.WARN,
+            log.Status.ERROR,
+        ]
+        if log_level == "debug":
+            return accept_log_levels
+        accept_log_levels.remove(log.Status.DEBUG)
+
+        if log_level == "info":
+            return accept_log_levels
+        accept_log_levels.remove(log.Status.INFO)
+
+        if log_level == "warn":
+            return accept_log_levels
+        accept_log_levels.remove(log.Status.WARN)
+
+        if log_level == "critical":
+            return accept_log_levels
+        accept_log_levels.remove(log.Status.ERROR)
+
+        if log_level == "none":
+            return accept_log_levels
+        raise RuntimeError(f"Unexpected log level: {log_level}")
+
+    def accept_log_level(self, level: str):
+        # Note: level from log.Status.
+        return level in self._accept
+
+    def accept_output_log_level(self, level: str):
+        # Note: level from log.Status.
+        return level in self._accept_output
 
 
 # Default instance. Not exposed to clients.
