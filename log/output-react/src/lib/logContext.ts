@@ -1,5 +1,5 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
-import { Entry, ViewSettings } from './types';
+import { Entry, StatusLevel, ViewSettings } from './types';
 import { isDocumentDefined, isWindowDefined, logError } from './helpers';
 import { detectVSCodeTheme } from '../vscode/themeDetector';
 import { isInVSCode } from '../vscode/vscodeComm';
@@ -104,6 +104,7 @@ export const defaultLogState: LogContextType = {
     },
     format: 'auto' as const,
     mode: isInVSCode() ? 'compact' : 'sparse',
+    showInTerminal: StatusLevel.error,
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),

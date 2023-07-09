@@ -10,15 +10,16 @@ export type ViewSettings = {
   theme: 'dark' | 'light';
   format: FormatType;
   mode: 'compact' | 'sparse';
+  showInTerminal: StatusLevel; // Actually an or(StatusLevel)
 };
 
 export enum StatusLevel {
-  error = 4,
-  warn = 3,
-  info = 2,
-  debug = 1,
-  success = 0,
-  unset = -1,
+  error = 1 << 4, // 16
+  warn = 1 << 3, // 8
+  info = 1 << 2, // 4
+  debug = 1 << 1, // 2
+  success = 1,
+  unset = 0,
 }
 
 export enum Type {

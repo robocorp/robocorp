@@ -1,4 +1,4 @@
-import { Box, Button, Code, Header, Menu, Tooltip, useClipboard } from '@robocorp/components';
+import { Box, Button, Code, Menu, Tooltip, useClipboard } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 import { FC, useCallback, useMemo } from 'react';
 

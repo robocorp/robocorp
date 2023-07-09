@@ -19,6 +19,9 @@ NEXT
     redirected with `setup_log(output_stream={'debug': 'stderr'})`. By default
     **warn** and **critical** go to **stderr** and **debug** and **info** go to **stdout**.
 
+- In the `log.html`, it's possible to view log messages along with the terminal
+  output.
+
 
 2.2.0 (2023-07-06)
 -----------------------------
