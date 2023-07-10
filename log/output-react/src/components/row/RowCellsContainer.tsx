@@ -5,6 +5,8 @@ import { Tooltip } from '@robocorp/components';
 import { formatDuration, formatLocation, useLogContext } from '~/lib';
 import { Cell } from './components/Cell';
 import { StepCell } from './components/step/StepCell';
+import { isInVSCode } from '~/vscode/vscodeComm';
+import { getOpts } from '~/treebuild/options';
 
 type Props = {
   index: number;
@@ -34,6 +36,27 @@ export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
     setActiveIndex(index);
   }, [index]);
 
+  let data: any = undefined;
+  if (isInVSCode()) {
+    const anyEntry = entry as any;
+    if (anyEntry?.source && anyEntry?.lineno) {
+      data = {
+        source: anyEntry.source,
+        lineno: anyEntry.lineno,
+      };
+    }
+  }
+
+  const onClickLocation = useCallback((data: any) => {
+    if (data === undefined) {
+      return;
+    }
+    const opts = getOpts();
+    if (opts !== undefined && opts.onClickReference !== undefined) {
+      opts.onClickReference(data);
+    }
+  }, []);
+
   return (
     <Container
       className="oneRow"
@@ -47,9 +70,17 @@ export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
       <StepCell entry={entry} />
       {viewSettings.columns.location && (
         <Cell minWidth={180} cellClass="colLocation">
-          <Tooltip text={formatLocation(entry)}>
-            <span>{formatLocation(entry)}</span>
-          </Tooltip>
+          <span
+            className={data !== undefined ? 'locationLink' : undefined}
+            onClick={(ev) => {
+              if (data !== undefined) {
+                onClickLocation(data);
+                ev.stopPropagation();
+              }
+            }}
+          >
+            {formatLocation(entry)}
+          </span>
         </Cell>
       )}
       {viewSettings.columns.duration && (
