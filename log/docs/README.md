@@ -12,6 +12,8 @@
 ## Classes
 
 - [`log.ConsoleMessageKind`](./robocorp.log.md#class-consolemessagekind)
+- [`log.FilterLogLevel`](./robocorp.log.md#class-filterloglevel): An enumeration.
+- [`log.IContextManager`](./robocorp.log.md#class-icontextmanager): Typing for a "generic" context manager.
 - [`protocols.IReadLines`](./robocorp.log.protocols.md#class-ireadlines)
 - [`protocols.Status`](./robocorp.log.protocols.md#class-status)
 
@@ -24,6 +26,7 @@
 - [`log.close_log_outputs`](./robocorp.log.md#function-close_log_outputs): This method must be called to close loggers.
 - [`log.console_message`](./robocorp.log.md#function-console_message):     Shows a message in the console and also adds it to the log output.
 - [`log.critical`](./robocorp.log.md#function-critical): Adds a new logging message with a critical (error) level.
+- [`log.debug`](./robocorp.log.md#function-debug): Adds a new logging message with an debug level.
 - [`log.end_run`](./robocorp.log.md#function-end_run): Finishes a run session (adds the related event to the log).
 - [`log.end_task`](./robocorp.log.md#function-end_task): Ends a task (adds the related event to the log).
 - [`log.exception`](./robocorp.log.md#function-exception): Adds to the logging the exceptions that's currently raised.

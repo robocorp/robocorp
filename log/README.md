@@ -4,7 +4,7 @@
 a focus on python automation, where detailed information on what happened and why a
 failure occurs is of vital importance.
 
-> Note: The current version (1.0.0) is now in beta. Semantic versioning is used in the project.
+> Note: Semantic versioning is used in the project.
 > Note: Please note that the format of the log is not a part of the API and should 
 > not be relied upon as it can change even among minor versions.
 
@@ -45,7 +45,7 @@ See `robocorp-tasks` for more information.
 Although the setup is done through `robocorp-tasks`, there are still
 some APIs in `robocorp.log` which are interesting to use such as:
 
-- Utility methods to add a log message as `critical`, `warn`, `info`, `exception`
+- Utility methods to add a log message as `critical`, `warn`, `info`, `debug`, `exception`
   (note that it's possible to embed html by passing `html=True` in those methods,
   so, things as screenshots can be directly embedded into the log).
   

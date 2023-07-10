@@ -28,7 +28,7 @@
 ### <kbd>method</kbd> `readlines`
 
 ```python
-readlines() → List[str]
+readlines() → Sequence[str]
 ```
 
 
@@ -38,7 +38,7 @@ readlines() → List[str]
 
 ---
 
-<a href="..\..\log\src\robocorp\log\protocols.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="..\..\log\src\robocorp\log\protocols.py#L17"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `Status`
 
