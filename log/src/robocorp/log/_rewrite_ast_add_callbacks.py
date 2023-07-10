@@ -64,7 +64,7 @@ def _make_func_with_args(factory, func_name, *args):
     return call
 
 
-def _make_after_yield_expr(factory, function, class_name) -> ast.Expr:
+def _make_after_yield_expr(factory, function, class_name, node_lineno) -> ast.Expr:
     return factory.Expr(
         _make_func_with_args(
             factory,
@@ -72,12 +72,14 @@ def _make_after_yield_expr(factory, function, class_name) -> ast.Expr:
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
             factory.Str(f"{class_name}{function.name}"),
-            factory.LineConstant(),
+            factory.LineConstantAt(node_lineno),
         )
     )
 
 
-def _make_before_yield_from_exprs(factory, function, class_name) -> ast.Expr:
+def _make_before_yield_from_exprs(
+    factory, function, class_name, node_lineno
+) -> ast.Expr:
     return factory.Expr(
         _make_func_with_args(
             factory,
@@ -85,12 +87,12 @@ def _make_before_yield_from_exprs(factory, function, class_name) -> ast.Expr:
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
             factory.Str(f"{class_name}{function.name}"),
-            factory.LineConstant(),
+            factory.LineConstantAt(node_lineno),
         )
     )
 
 
-def _make_after_yield_from_expr(factory, function, class_name) -> ast.Expr:
+def _make_after_yield_from_expr(factory, function, class_name, node_lineno) -> ast.Expr:
     return factory.Expr(
         _make_func_with_args(
             factory,
@@ -98,7 +100,7 @@ def _make_after_yield_from_expr(factory, function, class_name) -> ast.Expr:
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
             factory.Str(f"{class_name}{function.name}"),
-            factory.LineConstant(),
+            factory.LineConstantAt(node_lineno),
         )
     )
 
@@ -131,7 +133,7 @@ def _create_method_with_stmt(
         factory.NameLoad("__name__"),
         factory.NameLoad("__file__"),
         factory.Str(f"{class_name}{function.name}"),
-        factory.LineConstant(),
+        factory.LineConstantAt(function.lineno),
     ]
 
     dct = factory.Dict()
@@ -424,7 +426,7 @@ def _handle_return(
         call.args.append(factory.NameLoad("__name__"))
         call.args.append(factory.NameLoad("__file__"))
         call.args.append(factory.Str(f"{class_name}{function.name}"))
-        call.args.append(factory.LineConstant())
+        call.args.append(factory.LineConstantAt(node.lineno))
 
         if node.value:
             assign = factory.Assign()
@@ -492,7 +494,7 @@ def _handle_if(
             call.args.append(factory.NameLoad("__name__"))
             call.args.append(factory.NameLoad("__file__"))
             call.args.append(factory.Str(f"{stmt_name} {ast.unparse(node.test)}"))
-            call.args.append(factory.LineConstant())
+            call.args.append(factory.LineConstantAt(node.lineno))
 
             targets = _collect_names_used_as_node_or_none(factory, node.test)
             call.args.append(targets)
@@ -508,7 +510,7 @@ def _handle_if(
             call.args.append(factory.NameLoad("__name__"))
             call.args.append(factory.NameLoad("__file__"))
             call.args.append(factory.Str(f"else (to if {ast.unparse(node.test)})"))
-            call.args.append(factory.LineConstant())
+            call.args.append(factory.LineConstantAt(node.orelse[0].lineno))
             targets = _collect_names_used_as_node_or_none(factory, node.test)
             call.args.append(targets)
             node.orelse.insert(0, factory.Expr(call))
@@ -553,7 +555,7 @@ def _handle_assign(
                     factory.NameLoad("__name__"),
                     factory.NameLoad("__file__"),
                     factory.Str(f"{class_name}{function.name}"),
-                    factory.LineConstant(),
+                    factory.LineConstantAt(node.lineno),
                     factory.Str(target.id),
                     factory.NameLoad(target.id),
                 )
@@ -739,7 +741,7 @@ def _handle_for_or_while(
                 factory.NameLoad("__name__"),
                 factory.NameLoad("__file__"),
                 name_str,
-                factory.LineConstant(),
+                factory.LineConstantAt(node.lineno),
             )
         )
         stmts_cursor.before_append(factory.Expr(call))
@@ -768,7 +770,7 @@ def _handle_for_or_while(
                     factory_first.NameLoad("__name__"),
                     factory_first.NameLoad("__file__"),
                     name_str,
-                    factory_first.LineConstant(),
+                    factory_first.LineConstantAt(node.lineno),
                     targets,
                 )
             )
@@ -907,14 +909,14 @@ def _handle_yield(
                             factory.NameLoad("__name__"),
                             factory.NameLoad("__file__"),
                             factory.Str(f"{class_name}{function.name}"),
-                            factory.LineConstant(),
+                            factory.LineConstantAt(node.lineno),
                             value_yielded,
                         )
                     )
                 )
 
                 stmts_cursor.after_prepend(
-                    _make_after_yield_expr(factory, function, class_name)
+                    _make_after_yield_expr(factory, function, class_name, node.lineno)
                 )
             else:
                 # This is a case which is more complex. We do it in a way
@@ -954,7 +956,7 @@ def _handle_yield(
                             factory.NameLoad("__name__"),
                             factory.NameLoad("__file__"),
                             factory.Str(f"{class_name}{function.name}"),
-                            factory.LineConstant(),
+                            factory.LineConstantAt(node.lineno),
                             value_yielded,
                         )
                     )
@@ -967,7 +969,7 @@ def _handle_yield(
 
                 temp_funcdef.body.append(assign)
                 temp_funcdef.body.append(
-                    _make_after_yield_expr(factory, function, class_name)
+                    _make_after_yield_expr(factory, function, class_name, node.lineno)
                 )
                 temp_funcdef.body.append(
                     factory.Return(factory.NameLoad(store_name.id))
@@ -981,10 +983,12 @@ def _handle_yield(
 
         else:
             stmts_cursor.before_append(
-                _make_before_yield_from_exprs(factory, function, class_name)
+                _make_before_yield_from_exprs(
+                    factory, function, class_name, node.lineno
+                )
             )
             stmts_cursor.after_prepend(
-                _make_after_yield_from_expr(factory, function, class_name)
+                _make_after_yield_from_expr(factory, function, class_name, node.lineno)
             )
     except Exception:
         raise RuntimeError(

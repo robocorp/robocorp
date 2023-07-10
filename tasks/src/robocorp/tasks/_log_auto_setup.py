@@ -115,7 +115,7 @@ def _log_before_task_run(task: ITask):
         task.name,
         task.module_name,
         task.filename,
-        task.method.__code__.co_firstlineno,
+        task.method.__code__.co_firstlineno + 1,
         getattr(task.method, "__doc__", ""),
     )
 

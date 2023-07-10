@@ -294,11 +294,35 @@ def pretty_format_logs_from_stream(stream: IReadLines, **kwargs):
     return pretty_format_logs_from_iter(iter_in, **kwargs)
 
 
+def add_line(original_lambda):
+    def new_func(msg):
+        ret = original_lambda(msg)
+        try:
+            ret += f" (line: {msg['lineno']})"
+        except KeyError:
+            # Ok, no lineno in msg
+            pass
+        return ret
+
+    return new_func
+
+
+def format_log(msg):
+    ret = f"L: {msg['level']}: {msg['message']!r}"
+    # Fix messages that always change.
+    if ret.startswith("L: I: 'System information:\\nMemory:"):
+        ret = ret[: len("L: I: 'System information:\\nMemory:")]
+    elif ret.startswith("L: I: 'Current Process:"):
+        ret = ret[: len("L: I: 'Current Process:")]
+    return ret
+
+
 def pretty_format_logs_from_iter(
     iter_in,
     show_exception_vars=False,
     show_console_messages=False,
     show_log_messages=False,
+    show_lines=False,
 ):
     import re
 
@@ -316,7 +340,11 @@ def pretty_format_logs_from_iter(
 
     if show_log_messages:
         ignore.remove("L")
-        format_msg["L"] = lambda msg: f"L: {msg['level']}: {msg['message']!r}"
+        format_msg["L"] = format_log
+
+    if show_lines:
+        for key in tuple(format_msg.keys()):
+            format_msg[key] = add_line(format_msg[key])
 
     level = 0
     indent = ""

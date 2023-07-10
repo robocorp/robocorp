@@ -1,0 +1,49 @@
+
+SR: main_check_lines.py
+    ST: Collect tasks (line: 0)
+    ET: PASS
+    ST: entry_at_line_10 (line: 10)
+        SE: METHOD: entry_at_line_10 (line: 10)
+            L: D: 'debug at line 11' (line: 11)
+            AS: a: 'at line 12' (line: 12)
+            L: I: 'info at line 13' (line: 13)
+            SE: METHOD: another_method_at_line_5 (line: 5)
+                EA: str: a: 'at line 12'
+            EE: METHOD: PASS
+            AS: v: 'at_16' (line: 16)
+            SE: FOR: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: 'a'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: 't'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: '_'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: 'l'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: 'i'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: 'n'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: 'e'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: '2'
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                    EA: str: c: '0'
+                EE: FOR_STEP: PASS
+            EE: FOR: PASS
+        EE: METHOD: PASS
+    ET: PASS
+    ST: Teardown tasks (line: 0)
+        L: I: 'System information:\nMemory: (line: 0)
+        L: I: 'Current Process: (line: 0)
+    ET: PASS
+ER: PASS

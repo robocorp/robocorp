@@ -138,6 +138,27 @@ default_library_filter_kind = "exclude"
     )
 
 
+def test_core_log_integration_lines(datadir, str_regression) -> None:
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+
+    result = robocorp_tasks_run(
+        ["run", "main_check_lines.py"], returncode=0, cwd=str(datadir)
+    )
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "Robocorp Log (html)" in decoded
+
+    log_target = datadir / "output" / "log.html"
+    assert log_target.exists()
+
+    str_regression.check(
+        pretty_format_logs_from_log_html(
+            log_target, show_log_messages=True, show_lines=True
+        )
+    )
+
+
 @pytest.mark.parametrize(
     "mode",
     [

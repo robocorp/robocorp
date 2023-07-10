@@ -535,8 +535,8 @@ class NodeFactory:
     def Dict(self) -> ast.Dict:
         return self._set_line_col(ast.Dict())
 
-    def LineConstant(self) -> ast.Constant:
-        return self._set_line_col(ast.Constant(self.lineno))
+    def LineConstantAt(self, lineno) -> ast.Constant:
+        return self._set_line_col(ast.Constant(lineno))
 
     def IntConstant(self, value: int) -> ast.Constant:
         return self._set_line_col(ast.Constant(value))

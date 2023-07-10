@@ -24,6 +24,8 @@ NEXT
 
 - Inside of VSCode, places showing the file/line of messages are now clickable and
   can be used to open the file location inside of VSCode.
+  
+- Fixed issue where some lines wouldn't map to the proper location in the file.
 
 
 2.2.0 (2023-07-06)
