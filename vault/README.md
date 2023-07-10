@@ -3,9 +3,7 @@
 `robocorp-vault` is a library which provides read and write access to the
 `Vault` at `Robocorp Control Room`.
 
-
 ## Usage
-
 
 ```python    
 from robocorp import vault
