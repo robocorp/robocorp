@@ -1,3 +1,9 @@
+2.1.2 (2023-07-10)
+-----------------------------
+
+- Fixed issue where the line number logged for the task had an off by 1 error.
+
+
 2.1.1 (2023-07-06)
 -----------------------------
 
