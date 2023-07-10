@@ -1,6 +1,8 @@
 import parseISO from 'date-fns/parseISO';
 import { logError } from '../lib/helpers';
 
+export const SUPPORTED_VERSION = '0.0.2';
+
 let parseDate = parseISO;
 if (parseDate === undefined) {
   // Note (fabioz): when running npm test the import is returning an undefined,

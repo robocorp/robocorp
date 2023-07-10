@@ -1,7 +1,7 @@
 import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
 
 def method():
-    with @robo_lifecycle_hooks.MethodLifecycleContext(('GENERATOR', __name__, __file__, 'method', 3, {})) as @ctx:
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('GENERATOR', __name__, __file__, 'method', 2, {})) as @ctx:
         @robo_lifecycle_hooks.before_yield_from(__name__, __file__, 'method', 3)
         x = (yield from foo())
         @robo_lifecycle_hooks.after_yield_from(__name__, __file__, 'method', 3)

@@ -100,6 +100,8 @@ jobs:
     - name: Test
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
+        # We need to access robocorp_log_tests.fixtures in tasks tests.
+        PYTHONPATH: '../log/tests'
       run: |
         poetry run pytest -rfE -vv tests/tasks_tests
 

@@ -5,5 +5,5 @@ def method():
     """
     just docstring
     """
-    with @robo_lifecycle_hooks.MethodLifecycleContextCallerInProject(('METHOD', __name__, __file__, 'method', 6, {})) as @ctx:
+    with @robo_lifecycle_hooks.MethodLifecycleContextCallerInProject(('METHOD', __name__, __file__, 'method', 2, {})) as @ctx:
         a = 1

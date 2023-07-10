@@ -139,11 +139,11 @@ def test_rewrite_hook_except():
                 ("before", "main", {}),
                 ("before", "another_method", {}),
                 ("before", "sub_method", {"arg_name": ("arg", "name", 1)}),
-                ("except", "sub_method", 2),
+                ("except", "sub_method", 1),
                 ("after", "sub_method"),
-                ("except", "another_method", 6),
+                ("except", "another_method", 5),
                 ("after", "another_method"),
-                ("except", "main", 10),
+                ("except", "main", 9),
                 ("after", "main"),
             ]
     finally:

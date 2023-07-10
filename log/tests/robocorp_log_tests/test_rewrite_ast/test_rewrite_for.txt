@@ -1,10 +1,10 @@
 import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
 
 def foo():
-    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 3, {})) as @ctx:
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 2, {})) as @ctx:
         @ctx.report_for_start(1, ('FOR', __name__, __file__, 'for a in [1, 2]', 3))
         for a in [1, 2]:
-            @ctx.report_for_step_start(2, ('FOR_STEP', __name__, __file__, 'for a in [1, 2]', 4, (('a', a),)))
+            @ctx.report_for_step_start(2, ('FOR_STEP', __name__, __file__, 'for a in [1, 2]', 3, (('a', a),)))
             call(a)
             @ctx.report_for_step_end(2)
         @ctx.report_for_end(1)

@@ -11,6 +11,8 @@ export interface FilteredEntries {
 
 export type RunInfoStatus = 'ERROR' | 'PASS' | 'UNSET';
 export interface RunInfo {
+  versionTooNew: boolean;
+  version: string;
   description: string;
   time: string;
   status: RunInfoStatus;
@@ -72,6 +74,8 @@ try {
 }
 
 export const createDefaultRunInfo = (): RunInfo => ({
+  version: '',
+  versionTooNew: false,
   description: 'Wating for run to start ...',
   time: '',
   status: 'UNSET',

@@ -1,7 +1,7 @@
 import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
 
 def foo():
-    with @robo_lifecycle_hooks.MethodLifecycleContext(('GENERATOR', __name__, __file__, 'foo', 3, {})) as @ctx:
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('GENERATOR', __name__, __file__, 'foo', 2, {})) as @ctx:
 
         def @tmp_0():
             @tmp_1 = call()

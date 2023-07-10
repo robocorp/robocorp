@@ -25,7 +25,14 @@ import {
   EntryConsole,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
-import { Decoder, iter_decoded_log_format, IMessage, splitInChar, SPEC_RESTARTS } from './decoder';
+import {
+  Decoder,
+  iter_decoded_log_format,
+  IMessage,
+  splitInChar,
+  SPEC_RESTARTS,
+  SUPPORTED_VERSION,
+} from './decoder';
 import { IConsoleMessage, IOpts, ITracebackEntry, PythonTraceback } from './protocols';
 import { getIntLevelFromStatus } from './status';
 import {
@@ -654,6 +661,36 @@ export class TreeBuilder {
     }
   }
 
+  appendVersion(msg: IMessage) {
+    const version = msg.decoded['version'];
+    const expectedVersion = SUPPORTED_VERSION;
+    const cmp = version.localeCompare(expectedVersion, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
+
+    if (this.runInfo.version !== version) {
+      this.runInfo.version = version;
+      this.runInfoChanged = true;
+    }
+
+    if (cmp === 0) {
+      // ok, it's the version we expect.
+    } else if (cmp < 0) {
+      // The version of the doc we're seeing is an earlier version. In general this is
+      // Ok (if at some time we couldn't load a previous version, this would need to be worked on).
+    } else {
+      // cmp > 0 -- this isn't good, we may be backward compatible, but we aren't
+      // forward compatible (we don't know what may happen in the future), so, let
+      // the user know about it (we'll still load what we can, but it may not be perfect).
+      const versionTooNew = true;
+      if (this.runInfo.versionTooNew != versionTooNew) {
+        this.runInfo.versionTooNew = versionTooNew;
+        this.runInfoChanged = true;
+      }
+    }
+  }
+
   appendConsoleOutput(msg: IMessage) {
     this.flattened.pushConsole(msg);
   }
@@ -936,6 +973,9 @@ export class TreeBuilder {
         break;
       case 'I':
         this.appendInternalInfo(msg);
+        break;
+      case 'V':
+        this.appendVersion(msg);
         break;
     }
   }

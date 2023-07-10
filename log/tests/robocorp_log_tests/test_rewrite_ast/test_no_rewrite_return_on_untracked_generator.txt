@@ -2,6 +2,6 @@ import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
 import robocorp.log as @robolog
 
 def method():
-    with @robo_lifecycle_hooks.MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR', __name__, __file__, 'method', 3, {})) as @ctx:
+    with @robo_lifecycle_hooks.MethodLifecycleContextCallerInProject(('UNTRACKED_GENERATOR', __name__, __file__, 'method', 2, {})) as @ctx:
         yield 1
         return 2

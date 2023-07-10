@@ -67,48 +67,33 @@ def test_core_log_integration_config_log(datadir, str_regression):
             # the hack to import the tests.
             pytest.skip(f"Disabled for matrix name: {matrix_name}")
 
-    import sys
+    from robocorp.log import verify_log_messages_from_log_html
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
 
-    from robocorp import log
+    result = robocorp_tasks_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
 
-    f = Path(log.__file__)
-    tests = f.parent.parent.parent.parent / "tests"
-    assert tests.exists()
-    # Hack to be able to use robocorp_log_tests.fixtures in the ci
-    # without actually exporting it in pyproject.toml.
-    sys.path.append(str(tests))
-    try:
-        from robocorp.log import verify_log_messages_from_log_html
-        from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    decoded = result.stderr.decode("utf-8", "replace")
+    assert not decoded.strip()
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "Robocorp Log (html)" in decoded
 
-        result = robocorp_tasks_run(
-            ["run", "simple.py"], returncode=0, cwd=str(datadir)
-        )
+    log_target = datadir / "output" / "log.html"
+    assert log_target.exists()
 
-        decoded = result.stderr.decode("utf-8", "replace")
-        assert not decoded.strip()
-        decoded = result.stdout.decode("utf-8", "replace")
-        assert "Robocorp Log (html)" in decoded
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    msgs = verify_log_messages_from_log_html(
+        log_target,
+        [{"message_type": "SE", "name": "ndiff"}],
+    )
+    assert "SequenceMatcher.__init__" not in str(msgs)
 
-        log_target = datadir / "output" / "log.html"
-        assert log_target.exists()
+    if False:  # Manually debugging
+        for m in msgs:
+            print(m)
 
-        str_regression.check(pretty_format_logs_from_log_html(log_target))
-        msgs = verify_log_messages_from_log_html(
-            log_target,
-            [{"message_type": "SE", "name": "ndiff"}],
-        )
-        assert "SequenceMatcher.__init__" not in str(msgs)
+        import webbrowser
 
-        if False:  # Manually debugging
-            for m in msgs:
-                print(m)
-
-            import webbrowser
-
-            webbrowser.open(log_target.as_uri())
-    finally:
-        sys.path.remove(str(tests))
+        webbrowser.open(log_target.as_uri())
 
 
 def test_core_log_integration_empty_pyproject(datadir) -> None:

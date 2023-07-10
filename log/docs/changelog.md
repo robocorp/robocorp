@@ -27,6 +27,8 @@ NEXT
   
 - Fixed issue where some lines wouldn't map to the proper location in the file.
 
+- If the log format is newer than the one expected by the log.html the UI will show a message.
+
 
 2.2.0 (2023-07-06)
 -----------------------------

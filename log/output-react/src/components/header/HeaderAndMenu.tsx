@@ -16,6 +16,7 @@ import { IconInformation, IconSearch, IconSettingsSliders } from '@robocorp/icon
 import { RunIdsAndLabel, RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
 import { CustomActions } from '~/lib/CustomActions';
 import { isInVSCode, onChangeCurrentRunId } from '~/vscode/vscodeComm';
+import { SUPPORTED_VERSION } from '~/treebuild/decoder';
 
 type Props = {
   filter: string;
@@ -127,6 +128,24 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
           {partLabel !== undefined ? (
             <Tooltip text={partTooltipText}>
               <Badge variant={'magenta'} label={partLabel} size="small" id="runPartBadge" />
+            </Tooltip>
+          ) : (
+            <></>
+          )}
+          {runInfo.versionTooNew ? (
+            <Tooltip
+              text={`The log format version found is ${runInfo.version}.
+                
+                 The max version expected by the log (HTML) viewer is: ${SUPPORTED_VERSION}.
+                
+                 Note: the viewer will still attempt to load the values, but the visualization may break or may show wrong information.`}
+            >
+              <Badge
+                variant={'danger'}
+                label={'Log version too new. Please upgrade the log (HTML) viewer!'}
+                size="small"
+                id="versionTooNew"
+              />
             </Tooltip>
           ) : (
             <></>
