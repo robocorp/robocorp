@@ -13,7 +13,7 @@ import {
   IUpdateLabelRequest,
   isInVSCode,
 } from '../vscode/vscodeComm';
-import { RunIdsAndLabel, createDefaultRunIdsAndLabel } from '~/lib';
+import { createDefaultRunIdsAndLabel } from '~/lib';
 
 let treeBuilder: TreeBuilder | undefined;
 

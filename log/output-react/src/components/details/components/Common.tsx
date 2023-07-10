@@ -1,4 +1,4 @@
-import { Box, Button, Code, Menu, Tooltip, useClipboard } from '@robocorp/components';
+import { Box, Button, Code, Header, Menu, Tooltip, useClipboard } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 import { FC, useCallback, useMemo } from 'react';
 
@@ -9,6 +9,8 @@ import { IconChevronDown, IconCopy } from '@robocorp/icons';
 import { IconCheck2 } from '@robocorp/icons/iconic';
 import { FormatType } from '~/lib/types';
 import { CustomActions } from '../../../lib/CustomActions';
+import { isInVSCode } from '~/vscode/vscodeComm';
+import { getOpts } from '~/treebuild/options';
 
 export const Bold = styled(Box)`
   font-weight: bold;
@@ -31,6 +33,59 @@ export const PreBox = styled(Box)`
 export const VariableContent = styled(Box)`
   margin-top: ${({ theme }) => theme.space.$8};
 `;
+
+export const SourceAndLine: FC<{ source: string; lineno: number }> = (props) => {
+  let data: any = undefined;
+  if (isInVSCode()) {
+    if (props.source && props.lineno) {
+      data = {
+        source: props.source,
+        lineno: props.lineno,
+      };
+    }
+  }
+
+  const onClick = useCallback((data: any) => {
+    if (data === undefined) {
+      return;
+    }
+    const opts = getOpts();
+    if (opts !== undefined && opts.onClickReference !== undefined) {
+      opts.onClickReference(data);
+    }
+  }, []);
+
+  return (
+    <>
+      {props.source && props.lineno ? (
+        <>
+          <Header size="medium">
+            <Header.Title title="Location" />
+          </Header>
+
+          <LocationContent
+            className={data !== undefined ? 'locationLink' : undefined}
+            onClick={() => {
+              onClick(data);
+            }}
+          >
+            <Bold>File:</Bold> {props.source}
+          </LocationContent>
+          <LocationContent
+            className={data !== undefined ? 'locationLink' : undefined}
+            onClick={() => {
+              onClick(data);
+            }}
+          >
+            <Bold>Line:</Bold> {props.lineno}
+          </LocationContent>
+        </>
+      ) : (
+        <></>
+      )}
+    </>
+  );
+};
 
 export const VariableValue: FC<{ value: string }> = (props) => {
   const extensions = useMemo(() => {

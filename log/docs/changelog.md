@@ -22,6 +22,9 @@ NEXT
 - In the `log.html`, it's possible to view log messages along with the terminal
   output.
 
+- Inside of VSCode, places showing the file/line of messages are now clickable and
+  can be used to open the file location inside of VSCode.
+
 
 2.2.0 (2023-07-06)
 -----------------------------

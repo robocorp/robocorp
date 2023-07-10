@@ -1,5 +1,5 @@
 import { Box } from '@robocorp/components';
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { Counter } from '~/lib';
 
 import styled from 'styled-components';
@@ -8,6 +8,8 @@ import { Entry, EntryException, EntryThreadDump } from '~/lib/types';
 import { Bold, FormatHeaderActions, VariableValue } from './Common';
 import { PythonTraceback } from '~/treebuild/protocols';
 import { IconTextAlignJustified, IconTextAlignLeft } from '@robocorp/icons/iconic';
+import { isInVSCode } from '~/vscode/vscodeComm';
+import { getOpts } from '~/treebuild/options';
 
 const LocationContent = styled(Box)`
   margin-bottom: ${({ theme }) => theme.space.$8};
@@ -64,6 +66,16 @@ function* enumerate(it: any) {
 }
 
 function tracebackComponent(tb: PythonTraceback, title: string) {
+  const onClick = useCallback((data: any) => {
+    if (data === undefined) {
+      return;
+    }
+    const opts = getOpts();
+    if (opts !== undefined && opts.onClickReference !== undefined) {
+      opts.onClickReference(data);
+    }
+  }, []);
+
   const counter = new Counter();
 
   const contents = [];
@@ -79,9 +91,25 @@ function tracebackComponent(tb: PythonTraceback, title: string) {
     </div>,
   );
   for (const [index, tbe] of enumerate(reversed(tb.stack))) {
+    let data: any = undefined;
+    if (isInVSCode()) {
+      if (tbe.source && tbe.lineno) {
+        data = {
+          source: tbe.source,
+          lineno: tbe.lineno,
+        };
+      }
+    }
+
     const isLast = index == tb.stack.length - 1;
     const locationContent = (
-      <LocationContent key={counter.next()}>
+      <LocationContent
+        key={counter.next()}
+        className={data !== undefined ? 'locationLink' : undefined}
+        onClick={() => {
+          onClick(data);
+        }}
+      >
         File "<Bold key={counter.next()}>{tbe.source}</Bold>", line{' '}
         <Bold key={counter.next()}>{tbe.lineno}</Bold>, in{' '}
         <Bold key={counter.next()}>{tbe.method}</Bold>

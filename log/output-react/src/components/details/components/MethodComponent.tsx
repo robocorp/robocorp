@@ -3,7 +3,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 
 import { Entry, EntryMethodBase, EntryReturn, EntrySuspendYield, Type } from '~/lib/types';
-import { Bold, FormatHeaderActions, LocationContent, VariableValue } from './Common';
+import { FormatHeaderActions, LocationContent, SourceAndLine, VariableValue } from './Common';
 import { Counter } from '~/lib';
 
 const Content = styled(Box)`
@@ -91,15 +91,7 @@ export const MethodComponent: FC<{ entry: Entry }> = (props) => {
     <Content>
       {argumentsHeader}
       {argumentsList}
-      <Header size="medium">
-        <Header.Title title="Location" />
-      </Header>
-      <LocationContent>
-        <Bold>File:</Bold> {entryMethod.source}
-      </LocationContent>
-      <LocationContent>
-        <Bold>Line:</Bold> {entryMethod.lineno}
-      </LocationContent>
+      <SourceAndLine source={entryMethod.source} lineno={entryMethod.lineno}></SourceAndLine>
     </Content>
   );
 };

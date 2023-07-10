@@ -3,7 +3,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 
 import { Entry, EntryTask } from '~/lib/types';
-import { Bold, LocationContent } from './Common';
+import { SourceAndLine } from './Common';
 
 const Content = styled(Box)`
   position: relative;
@@ -14,15 +14,7 @@ export const TaskComponent: FC<{ entry: Entry }> = (props) => {
 
   return (
     <Content>
-      <Header size="medium">
-        <Header.Title title="Location" />
-      </Header>
-      <LocationContent>
-        <Bold>File:</Bold> {entryTask.source}
-      </LocationContent>
-      <LocationContent>
-        <Bold>Line:</Bold> {entryTask.lineno}
-      </LocationContent>
+      <SourceAndLine source={entryTask.source} lineno={entryTask.lineno}></SourceAndLine>
     </Content>
   );
 };

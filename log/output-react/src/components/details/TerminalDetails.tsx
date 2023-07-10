@@ -1,5 +1,6 @@
 import { Drawer, Box, Button, Menu } from '@robocorp/components';
 import { Counter, useLogContext } from '~/lib';
+import '../details/components/Common.css';
 import {
   EntryConsole,
   ConsoleMessageKind,
@@ -7,11 +8,14 @@ import {
   StatusLevel,
   EntryLog,
   ViewSettings,
+  Entry,
 } from '~/lib/types';
 import { BoxOutput } from './Details';
 import { IconChevronDown } from '@robocorp/icons';
 import { CustomActions } from '~/lib/CustomActions';
-import { useCallback } from 'react';
+import { FC, useCallback } from 'react';
+import { isInVSCode } from '~/vscode/vscodeComm';
+import { getOpts } from '~/treebuild/options';
 
 type TerminalColors = 'background.error' | 'blue50' | 'blue90' | 'purple70' | 'purple50';
 
@@ -51,32 +55,85 @@ const getLogColor = (entry: EntryLog, viewSettings: ViewSettings): undefined | T
   }
 };
 
-class AddMessages {
+const Message: FC<{
+  entry: Entry;
+  color: TerminalColors | undefined;
+  text: string;
+  counter: Counter;
+}> = ({ entry, color, text, counter }) => {
+  let data: any = undefined;
+  if (entry.type === Type.log && isInVSCode()) {
+    const c = entry as EntryLog;
+    if (c.source && c.lineno) {
+      data = {
+        source: c.source,
+        lineno: c.lineno,
+      };
+    }
+  }
+
+  const onClick = useCallback((entryId: any, data: any) => {
+    if (data === undefined) {
+      return;
+    }
+    const opts = getOpts();
+    if (opts !== undefined && opts.onClickReference !== undefined) {
+      opts.onClickReference(data);
+    }
+  }, []);
+
+  return (
+    <BoxOutput
+      className={data !== undefined ? 'locationLink' : undefined}
+      color={color}
+      key={counter.next()}
+      onClick={() => {
+        onClick(entry.id, data);
+      }}
+    >
+      {text}
+    </BoxOutput>
+  );
+};
+
+class Messages {
   buf: string[] = [];
   msgs: any[] = [];
   counter = new Counter();
 
   constructor() {}
 
-  addNewLine(color: TerminalColors | undefined) {
-    this.addBufferContents(color);
+  addNewLine(entry: Entry, color: TerminalColors | undefined) {
+    this.addBufferContents(entry, color);
     this.msgs.push(<br key={this.counter.next()} />);
   }
 
-  addBufferContents(color: TerminalColors | undefined) {
+  addBufferContents(entry: Entry, color: TerminalColors | undefined): boolean {
     if (this.buf.length > 0) {
       this.msgs.push(
-        <BoxOutput color={color} key={this.counter.next()}>
-          {this.buf.join('')}
-        </BoxOutput>,
+        <Message
+          entry={entry}
+          color={color}
+          text={this.buf.join('')}
+          key={this.counter.next()}
+          counter={this.counter}
+        ></Message>,
       );
+      this.buf.length = 0;
+      return true;
     }
-    this.buf.length = 0;
+    return false;
   }
 
-  addMessage(color: TerminalColors | undefined, message: string) {
+  addMessage(
+    entry: Entry,
+    color: TerminalColors | undefined,
+    message: string,
+    requireNewLine: boolean,
+  ) {
     let i: number = 0;
     let skipNextNewLine = false;
+    let lastNewLine = false;
     for (let char of message) {
       i += 1;
       if (char === '\n') {
@@ -84,27 +141,35 @@ class AddMessages {
           skipNextNewLine = false;
           continue;
         }
-        this.addNewLine(color);
+        this.addNewLine(entry, color);
+        lastNewLine = true;
         continue;
       }
       if (char === '\r') {
         skipNextNewLine = true;
-        this.addNewLine(color);
+        this.addNewLine(entry, color);
+        lastNewLine = true;
         continue;
       }
       this.buf.push(char);
     }
-    this.addBufferContents(color);
+    if (this.addBufferContents(entry, color)) {
+      lastNewLine = false;
+    }
+    if (requireNewLine && !lastNewLine) {
+      this.addNewLine(entry, color);
+    }
   }
 }
 
 export const TerminalDetails = () => {
   const { allEntries, viewSettings, setViewSettings, setActiveIndex } = useLogContext();
+
   const onClose = useCallback(() => {
     setActiveIndex(null);
   }, []);
 
-  const addMessages = new AddMessages();
+  const messages = new Messages();
 
   const showInTerminal = viewSettings.showInTerminal;
 
@@ -114,13 +179,13 @@ export const TerminalDetails = () => {
       if (!c.isHtml) {
         if ((c.status & showInTerminal) !== 0) {
           const color = getLogColor(c, viewSettings);
-          addMessages.addMessage(color, c.message);
+          messages.addMessage(entry, color, c.message, true);
         }
       }
     } else if (entry.type == Type.console) {
       const c = entry as EntryConsole;
       const color = getConsoleColor(c, viewSettings);
-      addMessages.addMessage(color, c.message);
+      messages.addMessage(entry, color, c.message, false);
     }
   }
   const onClickDebug = useCallback(() => {
@@ -189,7 +254,7 @@ export const TerminalDetails = () => {
         </Menu>
       </CustomActions>
       <Box p="$16" margin="$8">
-        {addMessages.msgs}
+        {messages.msgs}
       </Box>
     </Drawer>
   );

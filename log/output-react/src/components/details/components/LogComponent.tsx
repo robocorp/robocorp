@@ -2,7 +2,8 @@ import { FC } from 'react';
 import { extractDataFromImg, sanitizeHTML } from '~/lib';
 
 import { Entry, EntryConsole, EntryLog, Type } from '~/lib/types';
-import { PreBox } from './Common';
+import { PreBox, SourceAndLine } from './Common';
+import { Header } from '@robocorp/components';
 
 export const LogComponent: FC<{ entry: Entry }> = (props) => {
   let message = '';
@@ -24,9 +25,16 @@ export const LogComponent: FC<{ entry: Entry }> = (props) => {
     }
 
     message = entryLog.message;
+    return (
+      <>
+        <PreBox>{message}</PreBox>
+        <SourceAndLine source={entryLog.source} lineno={entryLog.lineno}></SourceAndLine>
+      </>
+    );
   } else if (props.entry.type == Type.console) {
     const entryConsole = props.entry as EntryConsole;
     message = entryConsole.message;
+    return <PreBox>{message}</PreBox>;
   }
-  return <PreBox>{message}</PreBox>;
+  return <></>;
 };
