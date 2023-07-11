@@ -115,7 +115,7 @@ def get_json(name: str, **kwargs) -> JSON:
         **kwargs: Additional parameters for `json.loads`
 
     Returns:
-        Asset content as a Python object (dict, list, etc.)
+        Asset content as a Python object (dict, list etc.)
 
     Raises:
         AssetNotFound: No asset defined with given name
