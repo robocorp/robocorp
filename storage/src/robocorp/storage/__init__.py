@@ -87,7 +87,7 @@ def _get_asset(name: str) -> "Response":
     else:
         # Note (2023-07-04):
         # The 'data' payload type should only be used when uploading,
-        # and it should never be the the response for getting an asset
+        # and it should never be in the response when getting an asset.
         raise RuntimeError(f"Unsupported payload type: {payload['type']}")
 
 
