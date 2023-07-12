@@ -147,7 +147,6 @@ def get_file(name: str, path: Union[os.PathLike, str], exist_ok=False) -> Path:
         raise FileExistsError(f"File already exists: {path}")
 
     path.write_bytes(response.content)
-
     return path
 
 
@@ -235,8 +234,7 @@ def set_file(
             content_type = "application/octet-stream"
             LOGGER.info("Unable to detect content type, using %r", content_type)
 
-    content = path.read_bytes()
-
+    content = Path(path).read_bytes()
     _set_asset(name, content, content_type, wait)
 
 
