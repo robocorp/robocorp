@@ -235,8 +235,7 @@ def set_file(
             content_type = "application/octet-stream"
             LOGGER.info("Unable to detect content type, using %r", content_type)
 
-    with open(path, "rb") as fd:
-        content = fd.read()
+    content = path.read_bytes()
 
     _set_asset(name, content, content_type, wait)
 
