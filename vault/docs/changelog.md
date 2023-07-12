@@ -1,3 +1,9 @@
+1.1.0 (2023-07-12)
+-----------------------------
+
+- Automatic API retries for higher robustness
+- Improved error messages
+
 1.0.0
 -----------------------------
 
