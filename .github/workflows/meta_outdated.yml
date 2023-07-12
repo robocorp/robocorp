@@ -9,7 +9,7 @@ defaults:
     working-directory: './meta'
 
 jobs:
-  deploy:
+  check:
     runs-on: ubuntu-latest
 
     strategy:
