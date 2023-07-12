@@ -265,9 +265,9 @@ def test_adapter_filesecrets_saving(monkeypatch, tmp_path, secrets_file, datadir
     assert secret_dict["credentials"]["sap"]["password"] == "my-different-secret"
 
 
-@mock.patch("robocorp.vault._vault.requests")
+@mock.patch("robocorp.vault._adapters.Requests")
 def test_adapter_vault_request(mock_requests, mock_env_default, mock_env_vault):
-    mock_requests.get.return_value.json.return_value = {
+    mock_requests.return_value.get.return_value.json.return_value = {
         "name": "mock-name",
         "description": "mock-desc",
         "value": {"mock-key": "mock-value"},
@@ -288,9 +288,8 @@ def test_adapter_vault_request(mock_requests, mock_env_default, mock_env_vault):
     assert secret.description == "mock-desc"
     assert secret["mock-key"] == "mock-value"
 
-    mock_requests.get.assert_called_once_with(
-        "mock-url/secrets-v1/workspaces/mock-workspace/secrets/mock-name",
-        headers={"Authorization": "Bearer mock-token"},
+    mock_requests.return_value.get.assert_called_once_with(
+        "mock-name",
         params={
             "encryptionScheme": "robocloud-vault-transit-v2",
             "publicKey": adapter._public_bytes,
@@ -298,9 +297,9 @@ def test_adapter_vault_request(mock_requests, mock_env_default, mock_env_vault):
     )
 
 
-@mock.patch("robocorp.vault._vault.requests")
+@mock.patch("robocorp.vault._adapters.Requests")
 def test_adapter_vault_error(mock_requests, mock_env_vault):
-    mock_requests.get.side_effect = RuntimeError("Some request error")
+    mock_requests.return_value.get.side_effect = RuntimeError("Some request error")
 
     adapter = RobocorpVault()
     with pytest.raises(RobocorpVaultError):

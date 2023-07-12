@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../vault/src/robocorp/vault/__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.vault`
 `robocorp.vault` is a library for interacting with secrets stored in the ``Robocorp Control Room Vault``. 
@@ -35,8 +35,6 @@ Example content of local secrets file:
 }
 ``` 
 
-
-
 OR 
 
 ```yaml
@@ -70,7 +68,7 @@ def modifying_secrets():
 
 ---
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../vault/src/robocorp/vault/__init__.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_secret`
 
@@ -110,7 +108,7 @@ Get secret defined with given name.
 
 ---
 
-<a href="..\..\vault\src\robocorp\vault\__init__.py#L129"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../vault/src/robocorp/vault/__init__.py#L128"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_secret`
 
