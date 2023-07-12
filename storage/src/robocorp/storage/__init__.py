@@ -146,8 +146,7 @@ def get_file(name: str, path: Union[os.PathLike, str], exist_ok=False) -> Path:
     if path.exists() and not exist_ok:
         raise FileExistsError(f"File already exists: {path}")
 
-    with open(path, "wb") as fd:
-        fd.write(response.content)
+    path.write_bytes(response.content)
 
     return path
 
