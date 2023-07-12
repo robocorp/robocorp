@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._client import AssetsClient
     from ._requests import Response
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 JSON = Union[dict[str, "JSON"], list["JSON"], str, int, float, bool, None]

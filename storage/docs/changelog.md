@@ -1,3 +1,19 @@
+0.3.0 (2023-07-12)
+-----------------------------
+
+- Removed methods `set_asset`, `get_asset`
+- Added new methods for dealing with different asset types:
+    - `set_text`, `get_text`
+    - `set_json`, `get_json`
+    - `set_file`, `get_file`
+    - `set_bytes`, `get_bytes`
+
+
+0.2.0 (2023-06-29)
+-----------------------------
+
+- Support for using Asset Storage in VSCode
+
 0.1.2 (2023-06-22)
 -----------------------------
 

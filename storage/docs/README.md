@@ -13,9 +13,15 @@
 ## Functions
 
 - [`storage.delete_asset`](./robocorp.storage.md#function-delete_asset): Delete an asset by providing its `name`.
-- [`storage.get_asset`](./robocorp.storage.md#function-get_asset): Get an asset's value by providing its `name`.
+- [`storage.get_bytes`](./robocorp.storage.md#function-get_bytes): Return the given asset as bytes.
+- [`storage.get_file`](./robocorp.storage.md#function-get_file): Fetch the given asset and store it in a file.
+- [`storage.get_json`](./robocorp.storage.md#function-get_json): Return the given asset as a deserialized JSON object.
+- [`storage.get_text`](./robocorp.storage.md#function-get_text): Return the given asset as text.
 - [`storage.list_assets`](./robocorp.storage.md#function-list_assets): List all the existing assets.
-- [`storage.set_asset`](./robocorp.storage.md#function-set_asset): Creates or updates an asset named `name` with the provided `value`.
+- [`storage.set_bytes`](./robocorp.storage.md#function-set_bytes): Create or update an asset to contain the given bytes.
+- [`storage.set_file`](./robocorp.storage.md#function-set_file): Create or update an asset to contain the contents of the given file.
+- [`storage.set_json`](./robocorp.storage.md#function-set_json): Create or update an asset to contain the given object, serialized as JSON.
+- [`storage.set_text`](./robocorp.storage.md#function-set_text): Create or update an asset to contain the given string.
 
 
 ---
