@@ -103,7 +103,6 @@ class AssetsClient:
         if _estimate_base64_size(len(content)) < DATA_LIMIT:
             LOGGER.info("Content size under data limit, uploading directly")
             data_content = base64.b64encode(content).decode("ascii")
-            assert len(data_content) < DATA_LIMIT, "Unexpected data size"
             response = self._create_upload(
                 asset_id,
                 content_type=content_type,
