@@ -96,8 +96,8 @@ class AssetsClient:
         asset_id: str,
         content: bytes,
         content_type: Optional[ContentType] = None,
-        wait=True,
-        poll_interval=0.5,
+        wait: bool = True,
+        poll_interval: float = 0.5,
     ):
         """Upload an asset payload, and optionally wait for it to finish."""
         if _estimate_base64_size(len(content)) < DATA_LIMIT:
