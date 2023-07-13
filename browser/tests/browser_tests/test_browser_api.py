@@ -1,5 +1,17 @@
 import os
+import sys
 from pathlib import Path
+
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def clear_session_caches():
+    from robocorp.tasks._hooks import after_all_tasks_run
+
+    after_all_tasks_run([])
+    yield lambda: after_all_tasks_run([])
+    after_all_tasks_run([])
 
 
 def _check_page_query(page_prefix):
@@ -68,3 +80,38 @@ def test_screenshot_on_failure(datadir):
 
         raise AssertionError(msg)
     verify_log_messages_from_log_html(log_html, [{"message_type": "LH"}])
+
+
+def test_browser_type_launch_args(clear_session_caches, monkeypatch):
+    from robocorp import browser
+    from robocorp.browser._browser_context import browser_type_launch_args
+
+    default_headless = not os.environ.get(
+        "GITHUB_ACTIONS_MATRIX_NAME"
+    ) and sys.platform.startswith("linux")
+
+    assert browser_type_launch_args()["headless"] is default_headless
+
+    clear_session_caches()
+    monkeypatch.setenv("RPA_HEADLESS_MODE", "1")
+    assert browser_type_launch_args()["headless"] is True
+
+    clear_session_caches()
+    monkeypatch.setenv("RPA_HEADLESS_MODE", "0")
+    assert browser_type_launch_args()["headless"] is False
+
+    clear_session_caches()
+    monkeypatch.delenv("RPA_HEADLESS_MODE")
+    assert browser_type_launch_args()["headless"] is default_headless
+
+    clear_session_caches()
+    browser.configure(headless=True)
+    assert browser_type_launch_args()["headless"] is True
+
+    clear_session_caches()
+    browser.configure(headless=False)
+    assert browser_type_launch_args()["headless"] is False
+
+    clear_session_caches()
+    browser.configure(headless=None)
+    assert browser_type_launch_args()["headless"] is default_headless

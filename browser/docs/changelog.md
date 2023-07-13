@@ -1,3 +1,11 @@
+2.0.0
+-----------------------------
+
+- Backward-compatability change: behaviour of `headless` changed to the following:
+    - If the `RPA_HEADLESS_MODE` environment variable is set to `1` or `0`, it overrides any headless setting.
+    - If the `headless` setting is unset (or set to `None`), the headless is automatically computed so that
+      the UI is shown (i.e.: headless=False) unless running in a Linux VM where the `DISPLAY` or `WAYLAND_DISPLAY` is not set.
+
 1.0.2
 -----------------------------
 

@@ -122,24 +122,30 @@ def _browser_config() -> _BrowserConfig:
     return _BrowserConfig()
 
 
-def _is_debugger_attached() -> bool:
-    pydevd = sys.modules.get("pydevd")
-    if not pydevd or not hasattr(pydevd, "get_global_debugger"):
-        return False
-    debugger = pydevd.get_global_debugger()
-    if not debugger or not hasattr(debugger, "is_attached"):
-        return False
-    return debugger.is_attached()
+def _get_auto_headless_state() -> bool:
+    # If in Linux and with no valid display, we can assume we are in a
+    # container which doesn't support UI.
+    return sys.platform.startswith("linux") and not (
+        os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
+    )
 
 
 @session_cache
 def browser_type_launch_args() -> Dict:
     launch_options = {}
-    headless = _browser_config().headless
-    if headless is None:
-        launch_options["headless"] = not _is_debugger_attached()
+
+    # RPA_HEADLESS_MODE can be used to force whether running headless.
+    rpa_headless_mode = os.environ.get("RPA_HEADLESS_MODE")
+    if rpa_headless_mode is not None:
+        launch_options["headless"] = bool(int(os.environ["RPA_HEADLESS_MODE"]))
     else:
-        launch_options["headless"] = headless
+        headless = _browser_config().headless
+        if headless is None:
+            # Heuristic is now: run showing UI (headless=False) by default
+            # and run headless when in a VM without a display.
+            launch_options["headless"] = _get_auto_headless_state()
+        else:
+            launch_options["headless"] = headless
 
     slowmo_option = _browser_config().slowmo
     if slowmo_option:
