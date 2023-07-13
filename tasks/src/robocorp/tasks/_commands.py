@@ -130,6 +130,12 @@ def run(
         context.show_error(f"Path: {path} does not exist")
         return 1
 
+    # Enable faulthandler (writing to sys.stderr) early on in the
+    # task execution process.
+    import faulthandler
+
+    faulthandler.enable()
+
     from robocorp import log
 
     task_names: Sequence[str]
