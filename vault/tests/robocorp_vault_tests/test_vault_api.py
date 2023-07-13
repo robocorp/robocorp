@@ -37,6 +37,24 @@ def test_vault_api(monkeypatch, datadir, clear_cached_vault):
     assert "10" in secret_container
     assert secret_container[10] == 10
 
+    vault.create_secret(
+        "generated",
+        {"a-key": "a-value"},
+        description="Some sort of secret",
+    )
+
+    secret_container = vault.get_secret("generated")
+    assert secret_container.name == "generated"
+    assert len(secret_container) == 1
+    assert secret_container["a-key"] == "a-value"
+
+    with pytest.raises(vault.RobocorpVaultError):
+        vault.create_secret("generated", {})
+
+    vault.create_secret("generated", {"a-key": "another-value"}, exist_ok=True)
+    secret_container = vault.get_secret("generated")
+    assert secret_container["a-key"] == "another-value"
+
 
 @pytest.fixture
 def log_to_stderr():

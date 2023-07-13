@@ -3,64 +3,9 @@
 <a href="../../vault/src/robocorp/vault/__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 # <kbd>module</kbd> `robocorp.vault`
-`robocorp.vault` is a library for interacting with secrets stored in the ``Robocorp Control Room Vault``. 
-
-Uses ``Robocorp Control Room Vault`` (by default) or file-based secrets, which can be taken into use by setting some environment variables. 
-
-Robocorp Vault relies on environment variables, which are normally set automatically by the Robocorp Work Agent or Assistant when a run is initialized by the Robocorp Control Room. When developing robots locally in VSCode, you can use the `Robocorp Code Extension`_ to set these variables automatically as well. 
-
-Alternatively, you may set these environment variable manually using `rcc`_ or directly in some other fashion. The specific variables which must exist are: 
-
-
-- ``RC_API_SECRET_HOST``: URL to Robocorp Vault API 
-- ``RC_API_SECRET_TOKEN``: API Token for Robocorp Vault API 
-- ``RC_WORKSPACE_ID``: Control Room Workspace ID 
-
-.. _Robocorp Control Room Vault: https://robocorp.com/docs/development-guide/variables-and-secrets/vault .. _Robocorp Code Extension: https://robocorp.com/docs/developer-tools/visual-studio-code/extension-features#connecting-to-control-room-vault .. _rcc: https://robocorp.com/docs/rcc/workflow 
-
-File-based secrets can be set by defining two environment variables. 
-
-
-- ``RC_VAULT_SECRET_MANAGER``: FileSecrets 
-- ``RC_VAULT_SECRET_FILE``: Absolute path to the secrets database file 
-
-Example content of local secrets file: 
-
-```json
-{
-     "swaglabs": {
-         "username": "standard_user",
-         "password": "secret_sauce"
-     }
-}
-``` 
-
-OR 
-
-```yaml
-
-swaglabs:
-     username: standard_user
-     password: secret_sauce
-``` 
 
 
 
-**Example:**
- 
-
-```python    
-from robocorp import vault
-
-def reading_secrets():
-     secrets_container = vault.get_secret('swaglabs')
-     print(f"My secrets: {secrets_container}")
-     
-def modifying_secrets():
-     secret = vault.get_secret("swaglabs")
-     secret["username"] = "nobody"
-     vault.set_secret(secret)
-``` 
 
 **Global Variables**
 ---------------
@@ -68,36 +13,32 @@ def modifying_secrets():
 
 ---
 
-<a href="../../vault/src/robocorp/vault/__init__.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../vault/src/robocorp/vault/__init__.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `get_secret`
 
 ```python
-get_secret(secret_name: str) → SecretContainer
+get_secret(name: str, hide: bool = True) → SecretContainer
 ```
 
-Get secret defined with given name. 
+Get a secret with the given name. 
 
 
 
 **Args:**
  
- - <b>`secret_name`</b>:  Name of secret to fetch. 
+ - <b>`name`</b>:  Name of secret to fetch 
+ - <b>`hide`</b>:  Hide secret values from log output 
 
 
 
 **Note:**
 
-> The returned secret is not cached, so, calling this function again may do a new network roundtrip. 
->
-
-**Note:**
-
-> When used, if `robocorp.log` is in the environment, all the values gotten will be automatically hidden from the logs. i.e.: For each value, `log.hide_from_output(value)` will be called. 
+> If `robocorp.log` is available in the environment, the `hide` argument controls if the given values are automatically hidden in the log output. 
 >
 
 **Returns:**
- The container for the secret (which has key-value pairs). 
+ Secret container of name, description, and key-value pairs 
 
 
 
@@ -108,31 +49,80 @@ Get secret defined with given name.
 
 ---
 
-<a href="../../vault/src/robocorp/vault/__init__.py#L128"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../vault/src/robocorp/vault/__init__.py#L47"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `set_secret`
 
 ```python
-set_secret(secret: SecretContainer) → None
+set_secret(secret: SecretContainer, hide: bool = True) → None
 ```
 
-Overwrite an existing secret with new values. 
+Set a secret value using an existing container. 
+
+**Note:** If the secret already exists, all contents are replaced. 
 
 
-
-**Note:**
-
-> Only allows modifying existing secrets, and replaces all values contained within it. 
->
-
-**Note:**
-
-> When used, if `robocorp.log` is in the environment, all the values set will be automatically hidden from the logs. i.e.: For each value, `log.hide_from_output(value)` will be called. 
->
 
 **Args:**
  
- - <b>`secret`</b>:  the secret object which was mutated. 
+ - <b>`secret`</b>:  Secret container, created manually or returned by `get_secret` 
+ - <b>`hide`</b>:  Hide secret values from log output 
+
+
+
+**Note:**
+
+> If `robocorp.log` is available in the environment, the `hide` argument controls if the given values are automatically hidden in the log output. 
+>
+
+**Raises:**
+ 
+ - <b>`RobocorpVaultError`</b>:  Error with API request or response payload 
+
+
+---
+
+<a href="../../vault/src/robocorp/vault/__init__.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+
+## <kbd>function</kbd> `create_secret`
+
+```python
+create_secret(
+    name: str,
+    values: dict[str, Any],
+    description: str = '',
+    exist_ok: bool = False,
+    hide: bool = True
+) → SecretContainer
+```
+
+Create a new secret, or overwrite an existing one. 
+
+
+
+**Args:**
+ 
+ - <b>`name`</b>:  Name of secret 
+ - <b>`values`</b>:  Mapping of secret keys and values 
+ - <b>`description`</b>:  Optional description for secret 
+ - <b>`exist_ok`</b>:  Overwrite existing secret 
+ - <b>`hide`</b>:  Hide secret values from log output 
+
+
+
+**Note:**
+
+> If `robocorp.log` is available in the environment, the `hide` argument controls if the given values are automatically hidden in the log output. 
+>
+
+**Returns:**
+ Secret container of name, description, and key-value pairs 
+
+
+
+**Raises:**
+ 
+ - <b>`RobocorpVaultError`</b>:  Error with API request or response payload 
 
 
 

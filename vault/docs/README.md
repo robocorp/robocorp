@@ -4,7 +4,7 @@
 
 ## Modules
 
-- [`robocorp.vault`](./robocorp.vault.md#module-robocorpvault): `robocorp.vault` is a library for interacting with secrets stored in the ``Robocorp Control Room Vault``.
+- [`robocorp.vault`](./robocorp.vault.md#module-robocorpvault)
 
 ## Classes
 
@@ -12,8 +12,9 @@
 
 ## Functions
 
-- [`vault.get_secret`](./robocorp.vault.md#function-get_secret): Get secret defined with given name.
-- [`vault.set_secret`](./robocorp.vault.md#function-set_secret): Overwrite an existing secret with new values.
+- [`vault.create_secret`](./robocorp.vault.md#function-create_secret): Create a new secret, or overwrite an existing one.
+- [`vault.get_secret`](./robocorp.vault.md#function-get_secret): Get a secret with the given name.
+- [`vault.set_secret`](./robocorp.vault.md#function-set_secret): Set a secret value using an existing container.
 
 
 ---
