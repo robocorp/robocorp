@@ -1,4 +1,4 @@
-1.2.0 (unreleased)
+1.2.0 (2023-07-14)
 -----------------------------
 
 - Add method `create_secret` for creating new secrets in Vault
