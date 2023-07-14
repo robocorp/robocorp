@@ -22,9 +22,14 @@ def browser_automate():
         # If the browser_automate() function finishes with an exception it will
         # make a screenshot and embed it into the logs.
         screenshot="only-on-failure",
-        # If headless is not passed, it'll show the browser screen only if a
-        # debugger is attached.
-        headless=True,
+        
+        # By default headless is False unless running in a Linux container
+        # without a DISPLAY/WAYLAND_DISPLAY environment variable, but it
+        # can also be manually specified.
+        # headless=True|False,
+        
+        # Interactions may be run in slow-motion (given in milliseconds).
+        # slowmo=100,
     )
 
     # browser.goto() may be used as a shortcut to get the current page and

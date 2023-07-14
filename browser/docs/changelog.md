@@ -1,3 +1,8 @@
+2.0.1
+-----------------------------
+
+- Fixes in the README with comments on the new `headless` behavior.
+
 2.0.0
 -----------------------------
 
