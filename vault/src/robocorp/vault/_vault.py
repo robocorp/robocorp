@@ -78,11 +78,7 @@ class Vault:
         return self.adapter.get_secret(secret_name)
 
     def set_secret(self, secret: SecretContainer) -> None:
-        """Overwrite an existing secret with new values.
-
-        Note:
-            Only allows modifying existing secrets, and replaces
-              all values contained within it.
+        """Create secret or overwrite existing.
 
         Args:
             secret: `SecretContainer` object, from e.g. `get_secret`.
