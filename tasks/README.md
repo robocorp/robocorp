@@ -64,28 +64,37 @@ is found an error will be given and no tasks will be run.
 
 
 Following the initial steps outlined above should be sufficient to get comprehensive 
-logging for all user code executed. However, note that it won't log calls from 
-libraries by default, as it may be difficult to separate the libraries that are 
-important for a project from those that are just noise.
+logging for all user code executed and calls into libraries in site-packges and python libs (which by default are
+configured to show just when called from user code and will not show internal calls
+inside the library itself).
 
-To add custom logging for libraries like `rpaframework`, `Selenium` and others, create a 
-`pyproject.toml` file and place it in the root of your project. 
-Then, customize the `[tool.robocorp.log]` section to add `log_filter_rules`.
+It's possible to change how libraries or user code is logged by customizing `log_filter_rules`
+by creating a `[tool.robocorp.log]` in `pyproject.toml`.
 
 
-`log_filter_rules` is a list of dictionaries where entries may be added to specify
-how to handle logging for a particular module.
+There are three different logging configurations that may be applied for each module:
 
-There are three different logging configurations that may be applied:
-
-- `exclude`: skips logging a module.
+- `exclude`: excludes a module from logging.
 - `full_log` (default for user code): logs a module with full information, such as method calls, arguments, yields, local assigns, and more.
-- `log_on_project_call` (default for library code -- since 2.0): logs only method calls, arguments, return values and exceptions, but only when a library method is called from user code. This configuration is meant to be used for library logging.
+- `log_on_project_call` (default for library code -- since 2.0): logs only method calls, arguments, return values and exceptions, but only when a library method is called from user code. This configuration is meant to be used for libraries (modules in site-packages or python lib) logging.
 
-Note that the default for the library code may be configured through `default_library_filter_kind`.
+
+Example showing how to exclude from logging any user module which ends with `producer`:
+
+
+```
+[tool.robocorp.log]
+
+log_filter_rules = [
+    {name = "*producer", kind = "exclude"},
+]
+```
+
+By default libraries in site-packages and python lib will be configured as `log_on_project_call`, but
+it's possible to change its default through `default_library_filter_kind`.
 
 Example of `pyproject.toml` where the `rpaframework` and `selenium` 
-libraries are configured to be logged and all other libraries are
+libraries are configured to be logged and all other libraries in site-packages/python lib are
 excluded by default:
 
 
@@ -108,7 +117,8 @@ name followed by a dot.
 This means that, for example, `RPA` would match `RPA.Browser`,
 but not `RPAmodule` nor `another.RPA`.
 
-Also, as of `robocorp-tasks 2.0`, it's also possible to use `fnmatch` style names.
+As of `robocorp-tasks 2.0`, it's also possible to use `fnmatch` style names
+(where `*` matches anything and `?` matches any single char -- see: https://docs.python.org/3/library/fnmatch.html for more information).
 
 i.e.:
 
