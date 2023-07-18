@@ -1,3 +1,8 @@
+0.3.1 (2023-07-18)
+-----------------------------
+
+- Fix INFO logging when uploading the asset (name & content type) 
+
 0.3.0 (2023-07-12)
 -----------------------------
 
