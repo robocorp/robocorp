@@ -29,3 +29,4 @@ dist/
 
 # Removed old files
 /examples/
+/**/output/

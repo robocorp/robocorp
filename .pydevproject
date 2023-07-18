@@ -20,6 +20,8 @@
         <path>/${PROJECT_DIR_NAME}/integration_tests/tests</path>
         <path>/${PROJECT_DIR_NAME}</path>
         <path>/${PROJECT_DIR_NAME}/integration_tests/tests/integration_tests/test_view_integrated_react</path>
+        <path>/${PROJECT_DIR_NAME}/log_pytest/src</path>
+        <path>/${PROJECT_DIR_NAME}/log_pytest/tests</path>
     </pydev_pathproperty>
     
 </pydev_project>

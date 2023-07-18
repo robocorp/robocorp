@@ -1,12 +1,12 @@
 import json
 import os
 import sys
+import threading
 import traceback
 from pathlib import Path
 from typing import List, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
-import threading
 
 
 # Note: the args must match the 'dest' on the configured argparser.
@@ -101,8 +101,6 @@ def run(
     """
     from robocorp.log import console, redirect
 
-    from robocorp.tasks._toml_settings import read_pyproject_toml
-
     from ._collect_tasks import collect_tasks
     from ._config import RunConfig, set_config
     from ._exceptions import RobocorpTasksCollectError
@@ -112,10 +110,12 @@ def run(
         before_all_tasks_run,
         before_task_run,
     )
-    from ._log_auto_setup import read_robocorp_log_config, setup_cli_auto_logging
+    from ._log_auto_setup import setup_cli_auto_logging
     from ._log_output_setup import setup_log_output, setup_log_output_to_port
     from ._protocols import ITask, Status
     from ._task import Context, set_current_task
+    from robocorp.log.pyproject_config import read_pyproject_toml
+    from robocorp.log.pyproject_config import read_robocorp_auto_log_config
 
     console.set_mode(console_colors)
 
@@ -157,7 +157,7 @@ def run(
         config = log.DefaultAutoLogConfig()
         pyproject_toml_contents = {}
     else:
-        config = read_robocorp_log_config(context, pyproject_path_and_contents)
+        config = read_robocorp_auto_log_config(context, pyproject_path_and_contents)
         pyproject_toml_contents = pyproject_path_and_contents.toml_contents
 
     run_config = RunConfig(

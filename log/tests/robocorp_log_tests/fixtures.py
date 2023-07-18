@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
-
 from robocorp.log import AutoLogConfigBase, FilterKind
 from robocorp.log.protocols import IReadLines, LogHTMLStyle
 
@@ -323,6 +322,7 @@ def pretty_format_logs_from_iter(
     show_console_messages=False,
     show_log_messages=False,
     show_lines=False,
+    show_restarts=True,
 ):
     import re
 
@@ -363,16 +363,18 @@ def pretty_format_logs_from_iter(
             level -= 1
             indent = "    " * level
 
+        is_restart = msg_type in ("RR", "RT", "RE", "RYR")
+
         try:
             formatted = format_msg[msg_type](msg)
             pattern = r"at 0x[0-9A-Fa-f]+>"
             formatted = re.sub(pattern, "at 0xXXXXXXXXX>", formatted)
-            out.append(f"{indent}{formatted}\n")
+            if (show_restarts and is_restart) or not is_restart:
+                out.append(f"{indent}{formatted}\n")
         except Exception:
             raise RuntimeError(f"Error handling message: {msg}")
 
         # Messages that restart scope
-        is_restart = msg_type in ("RR", "RT", "RE", "RYR")
         if is_restart and regular_start_found:
             continue
 
