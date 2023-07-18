@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._client import AssetsClient
     from ._requests import Response
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 version_info = [int(x) for x in __version__.split(".")]
 
 JSON = Union[dict[str, "JSON"], list["JSON"], str, int, float, bool, None]
@@ -177,7 +177,7 @@ def _set_asset(name: str, content: bytes, content_type: str, wait: bool):
         details = client.create_asset(name=name)
         LOGGER.debug("Created new asset with id: %s", details["id"])
 
-    LOGGER.info("Uploading asset (content-type: %s)", name, content_type)
+    LOGGER.info("Uploading asset %r (content-type: %s)", name, content_type)
     client.upload_asset(details["id"], content, content_type, wait)
 
 
