@@ -1,3 +1,10 @@
+NEXT
+-----------------------------
+
+- Moved some internal APIs to load the `robocorp.log` auto log configuration to the
+  `robocorp.log` project public API.
+
+
 2.1.2 (2023-07-10)
 -----------------------------
 

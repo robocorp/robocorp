@@ -1,3 +1,14 @@
+NEXT
+-----------------------------
+
+- New APIs which allow loading `pyproject.toml` files to configure the auto log
+  configuration:
+  - `robocorp.log.pyproject_config.PyProjectInfo`
+  - `robocorp.log.pyproject_config.read_pyproject_toml`
+  - `robocorp.log.pyproject_config.read_section_from_toml`
+  - `robocorp.log.pyproject_config.read_robocorp_auto_log_config`
+
+
 2.3.0 (2023-07-10)
 -----------------------------
 

@@ -1,10 +1,9 @@
 from pathlib import Path
 
-from robocorp.tasks._protocols import PyProjectInfo
-
 
 def test_read_toml_settings():
-    from robocorp.tasks._toml_settings import read_section_from_toml
+    from robocorp.log.pyproject_config import PyProjectInfo
+    from robocorp.log.pyproject_config import read_section_from_toml
 
     errors_shown = []
 
