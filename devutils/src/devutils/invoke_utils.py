@@ -5,6 +5,8 @@ from typing import Iterator, List, Optional
 
 from invoke import run, task
 
+ROOT = Path(__file__).parent.parent.parent
+
 
 class RoundtripPyProject:
     def __init__(self, pyproject: Path):
@@ -141,11 +143,13 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
                 roundtrip.restore()
 
     @task
-    def lint(ctx):
+    def lint(ctx, strict: bool = False):
         """Run static analysis and formatting checks"""
         poetry(ctx, f"run ruff src tests")
         poetry(ctx, f"run black --check src tests")
         poetry(ctx, f"run isort --check src tests")
+        if strict:
+            poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
 
     @task
     def typecheck(ctx):
