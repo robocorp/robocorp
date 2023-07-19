@@ -1,4 +1,4 @@
-NEXT
+2.4.0 (2023-07-19)
 -----------------------------
 
 - New APIs which allow loading `pyproject.toml` files to configure the auto log

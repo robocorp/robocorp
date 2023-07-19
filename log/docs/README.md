@@ -7,6 +7,7 @@
 - [`robocorp.log`](./robocorp.log.md#module-robocorplog)
 - [`robocorp.log.console`](./robocorp.log.console.md#module-robocorplogconsole)
 - [`robocorp.log.protocols`](./robocorp.log.protocols.md#module-robocorplogprotocols)
+- [`robocorp.log.pyproject_config`](./robocorp.log.pyproject_config.md#module-robocorplogpyproject_config): This module contains functions to read a pyproject.toml file and 
 - [`robocorp.log.redirect`](./robocorp.log.redirect.md#module-robocorplogredirect)
 
 ## Classes
@@ -14,8 +15,10 @@
 - [`log.ConsoleMessageKind`](./robocorp.log.md#class-consolemessagekind)
 - [`log.FilterLogLevel`](./robocorp.log.md#class-filterloglevel): An enumeration.
 - [`log.IContextManager`](./robocorp.log.md#class-icontextmanager): Typing for a "generic" context manager.
+- [`protocols.IContextErrorReport`](./robocorp.log.protocols.md#class-icontexterrorreport)
 - [`protocols.IReadLines`](./robocorp.log.protocols.md#class-ireadlines)
 - [`protocols.Status`](./robocorp.log.protocols.md#class-status)
+- [`pyproject_config.PyProjectInfo`](./robocorp.log.pyproject_config.md#class-pyprojectinfo): PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict)
 
 ## Functions
 
@@ -51,6 +54,10 @@
 - [`log.warn`](./robocorp.log.md#function-warn): Adds a new logging message with a warn level.
 - [`console.set_color`](./robocorp.log.console.md#function-set_color): To be used as:
 - [`console.set_mode`](./robocorp.log.console.md#function-set_mode): Can be used to set the mode of the console.
+- [`pyproject_config.PyProjectInfo.__init__`](./robocorp.log.pyproject_config.md#function-__init__)
+- [`pyproject_config.read_pyproject_toml`](./robocorp.log.pyproject_config.md#function-read_pyproject_toml): Args:
+- [`pyproject_config.read_robocorp_auto_log_config`](./robocorp.log.pyproject_config.md#function-read_robocorp_auto_log_config): Args:
+- [`pyproject_config.read_section_from_toml`](./robocorp.log.pyproject_config.md#function-read_section_from_toml): Args:
 - [`redirect.setup_stdout_logging`](./robocorp.log.redirect.md#function-setup_stdout_logging): This function is responsible for setting up the needed stdout/stderr
 
 
