@@ -1,8 +1,9 @@
-NEXT
+2.1.3 (2023-07-19)
 -----------------------------
 
 - Moved some internal APIs to load the `robocorp.log` auto log configuration to the
   `robocorp.log` project public API.
+- Now requires `robocorp-log = ">=2.4,<3"`
 
 
 2.1.2 (2023-07-10)

@@ -6,7 +6,7 @@ Steps to do a new release
 
 - Update version, poetry, docs -- make sure not to be in `subst` drive:
 ```
-inv set-version 2.1.2
+inv set-version 2.1.3
 poetry lock
 poetry install
 inv docs
@@ -17,7 +17,7 @@ inv docs
 - Update changelog.md to add notes on features/fixes and set release date.
 
 - Push contents, and check if tests passed in https://github.com/robocorp/robo/actions.
-  - `mu acp robocorp-tasks release 2.1.2`
+  - `mu acp robocorp-tasks release 2.1.3`
 
 - Create a tag and push it (`inv make-release`).
 
