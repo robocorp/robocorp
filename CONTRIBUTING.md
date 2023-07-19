@@ -7,10 +7,10 @@ This is a contribution guide for the `robo` project and associated libraries.
 ### Prerequisites
 
 The tool used for Python dependency management is `poetry`. Both Python (>=3.9) and
-poetry should be available in either the global environment or in an activated
+Poetry should be available in either the global environment or in an activated
 Conda environment.
 
-It can installed via pip:
+It can be installed via pip:
 
 ```
 pip install poetry
@@ -84,5 +84,5 @@ invoke update
 ```
 
 The update task also automatically bumps the version of the metapackage based
-on the changed versions of the dependencies. Releasing it is done similarly
+on the changed versions of the dependencies. Releasing it, is done similarly
 to other libraries with `invoke make-release`.
