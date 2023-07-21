@@ -42,8 +42,10 @@ class _BrowserConfig:
         """
         Args:
             browser_engine:
-                help="Browser engine which should be used",
-                choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"]
+                Browser engine which should be used
+                default="chromium"
+                choices=["chromium", "chrome", "chrome-beta", "msedge",
+                         "msedge-beta", "msedge-dev", "firefox", "webkit"]
 
             install:
                 Install browser or not. If not defined, download is only
@@ -56,9 +58,9 @@ class _BrowserConfig:
                 Run interactions in slow motion (number in millis).
 
             screenshot:
-                default="only-on-failure",
-                choices=["on", "off", "only-on-failure"],
-                help="Whether to automatically capture a screenshot after each task.",
+                Whether to automatically capture a screenshot after each task.
+                default="only-on-failure"
+                choices=["on", "off", "only-on-failure"]
         """  # noqa
         self.browser_engine = browser_engine
         self.install = install
@@ -218,12 +220,28 @@ def browser(**kwargs) -> Iterator[Browser]:
     browser.close()
 
 
+@session_cache
+def browser_context_kwargs() -> dict:
+    """
+    The returned dict may be edited to change the arguments passed to
+    `playwright.Browser.new_context`.
+
+    Note:
+        This is a (robocorp.tasks) session cache, so, the same dict will be
+        returned over and over again.
+    """
+    return {}
+
+
 @task_cache
-def context(**browser_context_kwargs) -> Iterator[BrowserContext]:
+def context(**kwargs) -> Iterator[BrowserContext]:
     from robocorp.tasks import get_current_task
 
     pages: List[Page] = []
-    ctx = browser().new_context(**browser_context_kwargs)
+    all_kwargs: dict = {}
+    all_kwargs.update(**browser_context_kwargs())
+    all_kwargs.update(**kwargs)
+    ctx = browser().new_context(**all_kwargs)
     ctx.on("page", lambda page: pages.append(page))
 
     yield ctx

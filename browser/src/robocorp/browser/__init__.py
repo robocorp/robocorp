@@ -25,8 +25,10 @@ def configure(**kwargs) -> None:
 
     Args:
         browser_engine:
-            help="Browser engine which should be used",
-            choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"]
+            Browser engine which should be used
+            default="chromium"
+            choices=["chromium", "chrome", "chrome-beta", "msedge",
+                     "msedge-beta", "msedge-dev", "firefox", "webkit"]
 
         headless: If set to False the browser UI will be shown. If set to True
             the browser UI will be kept hidden. If unset or set to None it'll
@@ -36,18 +38,58 @@ def configure(**kwargs) -> None:
             Run interactions in slow motion.
 
         screenshot:
-            default="only-on-failure",
-            choices=["on", "off", "only-on-failure"],
-            help="Whether to automatically capture a screenshot after each task.",
+            Whether to automatically capture a screenshot after each task.
+            default="only-on-failure"
+            choices=["on", "off", "only-on-failure"]
+
+        viewport_size:
+            Size to be set for the viewport. Specified as tuple(width, height).
+
+    Note:
+        See also: `robocorp.browser.configure_context` to change other
+        arguments related to the browser context creation.
     """  # noqa
     from ._browser_context import _browser_config
 
     config = _browser_config()
 
     for key, value in kwargs.items():
+        if key == "viewport_size":
+            width, height = value
+            configure_context(viewport={"width": width, "height": height})
+            continue
+
         if not hasattr(config, key):
             raise ValueError(f"Invalid configuration: {key}.")
         setattr(config, key, value)
+
+
+def configure_context(**kwargs) -> None:
+    """
+    While the most common configurations may be configured through `configure`,
+    not all arguments passed to `playwright.Browser.new_context` are covered.
+
+    For cases where different context keyword arguments are needed it's possible
+    to use this method to customize the keyword arguments passed to
+    `playwright.Browser.new_context`.
+
+    Example:
+        ```python
+        from robocorp import browser
+        browser.configure_context(ignore_https_errors = True)
+        ```
+
+    Note:
+        The changes done persist through the full session, so, new tasks which
+        create a browser context will also get the configuration changes.
+        If the change should not be used across tasks it's possible
+        to call `robocorp.browser.context(...)` with the required arguments
+        directly.
+    """
+    from . import _browser_context
+
+    browser_context_kwargs = _browser_context.browser_context_kwargs()
+    browser_context_kwargs.update(kwargs)
 
 
 def page() -> Page:
@@ -62,8 +104,10 @@ def page() -> Page:
 
         If a new page is required without closing the current page use:
 
+        ```python
         from robocorp import browser
         page = browser.context.new_page()
+        ```
     """
     from . import _browser_context
 
@@ -112,7 +156,7 @@ def playwright() -> Playwright:
     return _browser_context.playwright()
 
 
-def context() -> BrowserContext:
+def context(**kwargs) -> BrowserContext:
     """
     Provides a managed instance of the browser context to interact with.
 
@@ -122,15 +166,20 @@ def context() -> BrowserContext:
         If no browser context instance is created yet one is created and the
         same one is returned on new invocations.
 
-        To customize it use the `configure` method (prior
-        to calling this method).
-
         Note that the returned instance must not be closed. It will be
         automatically closed when the task run session finishes.
+
+    Note:
+        If the context is not created it's possible to customize the context
+        arguments through the kwargs provided, by using the `configure(...)`
+        method or by editing the `configure_context(...)` returned dict.
+
+        If the context was already previously created the **kwargs passed will
+        be ignored.
     """
     from . import _browser_context
 
-    return _browser_context.context()
+    return _browser_context.context(**kwargs)
 
 
 def goto(url: str) -> Page:
