@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- It's now possible to configure the keyword arguments used to create the playwright browser context with:
+    `robocorp.browser.configure_context(**kwargs)` 
+    or when creating the context with:
+    `robocorp.browser.context(**kwargs)`
+  
 ## 2.0.1 - 2023-07-14
 
 - Fixes in the README with comments on the new `headless` behavior.

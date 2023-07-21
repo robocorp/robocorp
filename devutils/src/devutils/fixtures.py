@@ -3,7 +3,7 @@ import subprocess
 import sys
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Any, Sequence, Optional, Dict
+from typing import Any, Dict, Optional, Sequence
 
 import pytest
 
@@ -285,3 +285,81 @@ def robocorp_tasks_run(
 """
         )
     return result
+
+
+@pytest.fixture
+def pyfile(request, datadir):
+    """
+    Based on debugpy pyfile fixture.
+
+    A fixture providing a factory function that generates .py files.
+
+    The returned factory takes a single function with an empty argument list,
+    generates a temporary file that contains the code corresponding to the
+    function body, and returns the full path to the generated file. Idiomatic
+    use is as a decorator, e.g.:
+
+        @pyfile
+        def script_file():
+            print('fizz')
+            print('buzz')
+
+    will produce a temporary file named script_file.py containing:
+
+        print('fizz')
+        print('buzz')
+
+    and the variable script_file will contain the path to that file.
+
+    In order for the factory to be able to extract the function body properly,
+    function header ("def") must all be on a single line, with nothing after
+    the colon but whitespace.
+
+    Note that because the code is physically in a separate file when it runs,
+    it cannot reuse top-level module imports - it must import all the modules
+    that it uses locally. When linter complains, use #noqa.
+
+    Returns a string to the generated file written to disk.
+    """
+    import types
+    import inspect
+
+    def factory(source) -> str:
+        assert isinstance(source, types.FunctionType)
+        name = source.__name__
+        source, _ = inspect.getsourcelines(source)
+
+        # First, find the "def" line.
+        def_lineno = 0
+        for line in source:
+            line = line.strip()
+            if line.startswith("def") and line.endswith(":"):
+                break
+            def_lineno += 1
+        else:
+            raise ValueError("Failed to locate function header.")
+
+        # Remove everything up to and including "def".
+        source = source[def_lineno + 1 :]
+        assert source
+
+        # Now we need to adjust indentation. Compute how much the first line of
+        # the body is indented by, then dedent all lines by that amount. Blank
+        # lines don't matter indentation-wise, and might not be indented to begin
+        # with, so just replace them with a simple newline.
+        for line in source:
+            if line.strip():
+                break  # i.e.: use first non-empty line
+        indent = len(line) - len(line.lstrip())
+        source = [line[indent:] if line.strip() else "\n" for line in source]
+        source = "".join(source)
+
+        # Write it to file.
+        tmpfile = os.path.join(str(datadir), name + ".py")
+        assert not os.path.exists(tmpfile), "%s already exists." % (tmpfile,)
+        with open(tmpfile, "w") as stream:
+            stream.write(source)
+
+        return tmpfile
+
+    return factory

@@ -73,7 +73,8 @@ def task(func):
 
 def session_cache(func):
     """
-    Provides decorator which caches return and clears automatically when all tasks have been run.
+    Provides decorator which caches return and clears automatically when all
+    tasks have been run.
 
     A decorator which automatically cache the result of the given function and
     will return it on any new invocation until robocorp-tasks finishes running
@@ -94,7 +95,8 @@ def session_cache(func):
 
 def task_cache(func):
     """
-    Provides decorator which caches return and clears it automatically when the current task has been run.
+    Provides decorator which caches return and clears it automatically when the
+    current task has been run.
 
     A decorator which automatically cache the result of the given function and
     will return it on any new invocation until robocorp-tasks finishes running
@@ -115,7 +117,8 @@ def task_cache(func):
 
 def get_output_dir() -> Optional[Path]:
     """
-    Provide the output directory being used for the run or None if there's no output dir configured.
+    Provide the output directory being used for the run or None if there's no
+    output dir configured.
     """
     from ._config import get_config
 
@@ -127,7 +130,8 @@ def get_output_dir() -> Optional[Path]:
 
 def get_current_task() -> Optional[ITask]:
     """
-    Provides the task which is being currently run or None if not currently running a task.
+    Provides the task which is being currently run or None if not currently
+    running a task.
     """
     from . import _task
 

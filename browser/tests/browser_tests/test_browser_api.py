@@ -1,6 +1,4 @@
-import os
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -14,47 +12,100 @@ def clear_session_caches():
     after_all_tasks_run([])
 
 
-def _check_page_query(page_prefix):
-    from robocorp import browser
+def test_browser_api(datadir, pyfile) -> None:
+    """
+    Note: because we mess with the session/task caches in tests for tests which
+    actually spawn a new page a subprocess should be used.
 
-    found = set(
-        str(selector.text_content()).strip()
-        for selector in browser.page().query_selector_all(".label")
+    The code below will create a temporary file with the method contents
+    and then it'll use robocorp.tasks to run it.
+    """
+    from robocorp.log import verify_log_messages_from_log_html
+
+    @pyfile
+    def task_pyfile_run_tasks():
+        from robocorp import tasks
+
+        def _check_page_query(page_prefix):
+            from robocorp import browser
+
+            found = set(
+                str(selector.text_content()).strip()
+                for selector in browser.page().query_selector_all(".label")
+            )
+            assert found == {
+                f"{page_prefix}:Div1 label contents",
+                f"{page_prefix}:Div2 label contents",
+            }
+
+        @tasks.task
+        def check_browser_api() -> None:
+            from pathlib import Path
+
+            from robocorp.browser import context, goto, page
+
+            initial_page = page()
+            page1_html: Path = Path("page1.html").absolute()
+            page2_html: Path = Path("page2.html").absolute()
+
+            initial_page.goto(page1_html.as_uri())
+            _check_page_query("Page1")
+
+            assert page() is initial_page
+
+            new_page = context().new_page()
+            assert new_page is not initial_page
+            new_page.close()
+
+            # If the current page is closed another one is automatically provided.
+            page().close()
+
+            another_page = goto(page2_html.as_uri())
+            assert another_page is not initial_page
+            assert initial_page.is_closed()
+
+            _check_page_query("Page2")
+            assert page() is another_page
+
+        @tasks.task
+        def check_browser_viewport() -> None:
+            import os
+            from pathlib import Path
+
+            from robocorp.browser import configure, configure_context, page
+            from robocorp.browser._browser_context import browser_context_kwargs
+
+            assert "viewport" not in browser_context_kwargs()
+            configure(viewport_size=(755, 600))
+            configure_context(ignore_https_errors=True)
+
+            assert browser_context_kwargs()["viewport"] == {"width": 755, "height": 600}
+            assert browser_context_kwargs()["ignore_https_errors"]
+
+            p = page()
+
+            p.goto((Path(os.path.abspath("page3.html"))).as_uri())
+            assert p.viewport_size == {"width": 755, "height": 600}
+
+    from devutils.fixtures import robocorp_tasks_run
+
+    robocorp_tasks_run(["run", task_pyfile_run_tasks], returncode=0, cwd=datadir)
+    log_html = datadir / "output" / "log.html"
+    assert log_html.exists()
+    verify_log_messages_from_log_html(
+        log_html,
+        [
+            {"message_type": "ST", "name": "check_browser_viewport"},
+            {"message_type": "ST", "name": "check_browser_api"},
+            {"message_type": "ET", "status": "PASS"},
+            {"message_type": "ET", "status": "PASS"},
+        ],
     )
-    assert found == {
-        f"{page_prefix}:Div1 label contents",
-        f"{page_prefix}:Div2 label contents",
-    }
-
-
-def test_browser_api(datadir) -> None:
-    from robocorp.browser import context, goto, page
-
-    initial_page = page()
-    page1_html: Path = datadir / "page1.html"
-    page2_html: Path = datadir / "page2.html"
-
-    initial_page.goto(page1_html.as_uri())
-    _check_page_query("Page1")
-
-    assert page() is initial_page
-
-    new_page = context().new_page()
-    assert new_page is not initial_page
-    new_page.close()
-
-    # If the current page is closed another one is automatically provided.
-    page().close()
-
-    another_page = goto(page2_html.as_uri())
-    assert another_page is not initial_page
-    assert initial_page.is_closed()
-
-    _check_page_query("Page2")
-    assert page() is another_page
 
 
 def test_screenshot_on_failure(datadir):
+    import os
+
     from devutils.fixtures import robocorp_tasks_run
     from robocorp.log import verify_log_messages_from_log_html
 
@@ -83,6 +134,8 @@ def test_screenshot_on_failure(datadir):
 
 
 def test_browser_type_launch_args(clear_session_caches, monkeypatch):
+    import os
+
     from robocorp import browser
     from robocorp.browser._browser_context import browser_type_launch_args
 
