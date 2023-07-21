@@ -1,21 +1,17 @@
-import datetime
-import functools
+import enum
 import json
 import sys
 import threading
-import traceback
 import typing
-import weakref
 from contextlib import contextmanager, nullcontext
 from io import StringIO
 from pathlib import Path
+from types import TracebackType
 from typing import (
     IO,
     Any,
     Callable,
-    ContextManager,
     Dict,
-    Iterable,
     Iterator,
     List,
     Literal,
@@ -26,11 +22,15 @@ from typing import (
     overload,
 )
 
+from . import _config
 from ._logger_instances import _get_logger_instances
+
+# Not part of the API, used to determine whether a file is a project file
+# or a library file when running with the FilterKind.log_on_project_call kind.
+from ._rewrite_filtering import FilesFiltering as _FilesFiltering
+from ._sensitive_variable_names import SensitiveVariableNames as _SensitiveVariableNames
 from ._suppress_helper import SuppressHelper as _SuppressHelper
-from .protocols import IReadLines, LogHTMLStyle, OptExcInfo, Status
-import enum
-from types import TracebackType
+from .protocols import IReadLines, LogHTMLStyle, Status
 
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
@@ -38,7 +38,6 @@ if typing.TYPE_CHECKING:
 __version__ = "2.4.0"
 version_info = [int(x) for x in __version__.split(".")]
 
-from . import _config
 
 # --- Export parts of the public API below (imports above aren't part of
 # the public API).
@@ -503,8 +502,6 @@ def suppress(*args, **kwargs):
     """
     return _suppress_helper.handle(*args, **kwargs)
 
-
-from ._sensitive_variable_names import SensitiveVariableNames as _SensitiveVariableNames
 
 _sensitive_names = _SensitiveVariableNames(("password", "passwd"))
 
@@ -1221,11 +1218,8 @@ def add_in_memory_log_output(write: Callable[[str], Any]):
 
 # --- Private APIs
 
-# Not part of the API, used to determine whether a file is a project file
-# or a library file when running with the FilterKind.log_on_project_call kind.
-from ._rewrite_filtering import FilesFiltering
 
-_files_filtering = FilesFiltering()
+_files_filtering = _FilesFiltering()
 _in_project_roots = _files_filtering.in_project_roots
 
 

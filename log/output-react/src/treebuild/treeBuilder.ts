@@ -23,6 +23,7 @@ import {
   EntryElse,
   EntryReturn,
   EntryConsole,
+  EntryAssertFailed,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import {
@@ -343,6 +344,24 @@ class FlattenedTree {
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entriesIndex: this.entries.length,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  pushAssertFailed(msg: IMessage) {
+    const entry: EntryAssertFailed = {
+      id: this.newScopeId(false),
+      type: Type.assertFailed,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.error,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entriesIndex: this.entries.length,
       arguments: undefined,
@@ -887,6 +906,8 @@ export class TreeBuilder {
           this.flattened.pushIf(msg);
         } else if (msg.decoded['type'] === 'ELSE') {
           this.flattened.pushElse(msg);
+        } else if (msg.decoded['type'] === 'ASSERT_FAILED') {
+          this.flattened.pushAssertFailed(msg);
         } else {
           this.flattened.pushMethodScope(msg);
         }

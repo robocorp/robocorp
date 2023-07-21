@@ -1,10 +1,10 @@
 from contextlib import contextmanager
 
 import pytest
-from robocorp_log_tests.fixtures import AutoLogConfigForTest
-
 from robocorp.log._config import DefaultAutoLogConfig
 from robocorp.log.protocols import LogElementType
+
+from robocorp_log_tests.fixtures import AutoLogConfigForTest
 
 
 class _SetupCallback:
@@ -73,17 +73,15 @@ def _setup_test_callbacks():
 
 @pytest.mark.parametrize("config", [AutoLogConfigForTest(), DefaultAutoLogConfig()])
 def test_rewrite_hook_basic(config):
-    import sys
     from imp import reload
 
     from robocorp_log_tests._resources import check
 
     from robocorp.log._rewrite_importhook import RewriteHook
+    from robocorp.log._auto_logging_setup import add_import_hook
 
     hook = RewriteHook(config)
-    sys.meta_path.insert(0, hook)
-
-    try:
+    with add_import_hook(hook):
         check = reload(check)
         assert "call_another_method" in check.call_another_method.__doc__
         with _setup_test_callbacks() as setup_callback:
@@ -108,24 +106,20 @@ def test_rewrite_hook_basic(config):
                 ("before", "SomeClass.__init__", {"arg1": 1, "arg2": 2}),
                 ("after", "SomeClass.__init__"),
             ]
-    finally:
-        sys.meta_path.remove(hook)
 
 
 def test_rewrite_hook_except():
-    import sys
     from imp import reload
 
     from robocorp_log_tests._resources import check_traceback
 
     from robocorp.log._rewrite_importhook import RewriteHook
+    from robocorp.log._auto_logging_setup import add_import_hook
 
     config = AutoLogConfigForTest()
 
     hook = RewriteHook(config)
-    sys.meta_path.insert(0, hook)
-
-    try:
+    with add_import_hook(hook):
         check = reload(check_traceback)
         with _setup_test_callbacks() as setup_callback:
             setup_callback.check = check
@@ -146,12 +140,9 @@ def test_rewrite_hook_except():
                 ("except", "main", 9),
                 ("after", "main"),
             ]
-    finally:
-        sys.meta_path.remove(hook)
 
 
 def test_rewrite_hook_log_on_project_call():
-    import sys
     from imp import reload
     from unittest import mock
 
@@ -159,13 +150,12 @@ def test_rewrite_hook_log_on_project_call():
 
     from robocorp import log as robolog
     from robocorp.log._rewrite_importhook import RewriteHook
+    from robocorp.log._auto_logging_setup import add_import_hook
 
     config = AutoLogConfigForTest()
 
     hook = RewriteHook(config)
-    sys.meta_path.insert(0, hook)
-
-    try:
+    with add_import_hook(hook):
         check_lib_lib = reload(check_lib_lib)
         check_lib_main = reload(check_lib_main)
 
@@ -184,5 +174,3 @@ def test_rewrite_hook_log_on_project_call():
                     ("after", "in_lib"),
                     ("after", "main"),
                 ]
-    finally:
-        sys.meta_path.remove(hook)

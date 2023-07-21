@@ -7,14 +7,14 @@
 
 
 
-**Global Variables**
+**Variables**
 ---------------
 - **protocols**
 - **version_info**
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L106"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L105"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `critical`
 
@@ -22,18 +22,18 @@
 critical(*message: Any) → None
 ```
 
-Adds a new logging message with a critical (error) level.
+Adds a new logging message with a critical (error) level. 
 
 
 
 **Args:**
 
- - <b>`message`</b>:  The message which should be logged.
+ - <b>`message`</b>:  The message which should be logged. 
 
 
 
 **Example:**
-critical('Failed because', obj, 'is not', expected)
+critical('Failed because', obj, 'is not', expected) 
 
 
 
@@ -54,7 +54,7 @@ critical('Failed because', obj, 'is not', expected)
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L132"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L131"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `warn`
 
@@ -62,18 +62,18 @@ critical('Failed because', obj, 'is not', expected)
 warn(*message: Any) → None
 ```
 
-Adds a new logging message with a warn level.
+Adds a new logging message with a warn level. 
 
 
 
 **Args:**
 
- - <b>`message`</b>:  The message which should be logged.
+ - <b>`message`</b>:  The message which should be logged. 
 
 
 
 **Example:**
-warn('Did not expect', obj)
+warn('Did not expect', obj) 
 
 
 
@@ -94,7 +94,7 @@ warn('Did not expect', obj)
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L158"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L157"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `info`
 
@@ -102,20 +102,20 @@ warn('Did not expect', obj)
 info(*message: Any) → None
 ```
 
-Adds a new logging message with an info level.
+Adds a new logging message with an info level. 
 
 
 
 **Args:**
 
- - <b>`message`</b>:  The message which should be logged.
+ - <b>`message`</b>:  The message which should be logged. 
 
 
 
 
 
 **Example:**
-info('Received value', obj)
+info('Received value', obj) 
 
 
 
@@ -136,7 +136,7 @@ info('Received value', obj)
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L185"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L184"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `debug`
 
@@ -144,20 +144,20 @@ info('Received value', obj)
 debug(*message: Any) → None
 ```
 
-Adds a new logging message with an debug level.
+Adds a new logging message with an debug level. 
 
 
 
 **Args:**
 
- - <b>`message`</b>:  The message which should be logged.
+ - <b>`message`</b>:  The message which should be logged. 
 
 
 
 
 
 **Example:**
-debug('Received value', obj)
+debug('Received value', obj) 
 
 
 
@@ -178,7 +178,7 @@ debug('Received value', obj)
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L212"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L211"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `exception`
 
@@ -186,13 +186,13 @@ debug('Received value', obj)
 exception(*message: Any)
 ```
 
-Adds to the logging the exceptions that's currently raised.
+Adds to the logging the exceptions that's currently raised. 
 
 
 
 **Args:**
 
- - <b>`message`</b>:  If given an additional error message to be shown.
+ - <b>`message`</b>:  If given an additional error message to be shown. 
 
 
 
@@ -208,7 +208,7 @@ Adds to the logging the exceptions that's currently raised.
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L236"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L235"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `html`
 
@@ -216,24 +216,24 @@ Adds to the logging the exceptions that's currently raised.
 html(html: str, level: str = 'INFO')
 ```
 
-Adds html contents to the log.
+Adds html contents to the log. 
 
 
 
 **Args:**
 
- - <b>`html`</b>:  The html content to be embedded in the page.
- - <b>`level`</b>:  The level of the message ("INFO", "WARN" or "ERROR")
+ - <b>`html`</b>:  The html content to be embedded in the page. 
+ - <b>`level`</b>:  The level of the message ("INFO", "WARN" or "ERROR") 
 
-Example adding an image:
+Example adding an image: 
 
-html(
- - <b>`'<img src="data`</b>: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="/>')
+html( 
+ - <b>`'<img src="data`</b>: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="/>' ) 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L255"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L254"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `process_snapshot`
 
@@ -241,14 +241,14 @@ html(
 process_snapshot() → None
 ```
 
-Makes a process snapshot and adds it to the logs.
+Makes a process snapshot and adds it to the logs. 
 
-A process snapshot can include details on the python process and subprocessesand should add a thread dump with the stack of all running threads.
+A process snapshot can include details on the python process and subprocesses and should add a thread dump with the stack of all running threads. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L298"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L297"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `console_message`
 
@@ -256,39 +256,39 @@ A process snapshot can include details on the python process and subprocessesand
 console_message(
     message: str,
     kind: str,
-    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x1039b18b0>,
+    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x000001CE7CC4BFD0>,
     flush: Optional[bool] = None
 ) → None
 ```
 
-Shows a message in the console and also adds it to the log output.
+Shows a message in the console and also adds it to the log output. 
 
 
 
 **Args:**
 
-     - <b>`message`</b>:  The message to be added to the log.kind:
-     - <b>`User messages (note`</b>:  the redirect feature which would add these automatically -- if that's the case, the 'stream' would need to be None so that it's not written again):
-     - <b>`"stdout"`</b>:  Some user message which was being sent to the stdout.
-     - <b>`"stderr"`</b>:  Some user message which was being sent to the stderr.
+     - <b>`message`</b>:  The message to be added to the log. kind: 
+     - <b>`User messages (note`</b>:  the redirect feature which would add these  automatically -- if that's the case, the 'stream' would need  to be None so that it's not written again): 
+     - <b>`"stdout"`</b>:  Some user message which was being sent to the stdout. 
+     - <b>`"stderr"`</b>:  Some user message which was being sent to the stderr. 
 
-Messages from the framework:
-     - <b>`"regular"`</b>:  Some regular message.
-     - <b>`"important"`</b>:  Some message which deserves a bit more attention.
-     - <b>`"task_name"`</b>:  The task name is being written.
-     - <b>`"error"`</b>:  Some error message.
-     - <b>`"traceback"`</b>:  Some traceback message.
-     - <b>`stream`</b>:  If specified this is the stream where the message should also be written.
-            - if not specified (_SentinelUseStdout) it's written to sys.stdout by default.
-            - if None it's not written.
-     - <b>`flush`</b>:  Whether we should flush after sending the message (if None it's flushed if the end char ends with '').
+Messages from the framework: 
+     - <b>`"regular"`</b>:  Some regular message. 
+     - <b>`"important"`</b>:  Some message which deserves a bit more attention. 
+     - <b>`"task_name"`</b>:  The task name is being written. 
+     - <b>`"error"`</b>:  Some error message. 
+     - <b>`"traceback"`</b>:  Some traceback message. 
+     - <b>`stream`</b>:  If specified this is the stream where the message should  also be written. 
+            - if not specified (_SentinelUseStdout) it's written to sys.stdout by default. 
+            - if None it's not written. 
+     - <b>`flush`</b>:  Whether we should flush after sending the message (if None  it's flushed if the end char ends with ' '). 
 
 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L405"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L404"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `suppress_methods`
 
@@ -296,18 +296,18 @@ Messages from the framework:
 suppress_methods()
 ```
 
-Can be used as a context manager or decorator so that methods are not logged.
+Can be used as a context manager or decorator so that methods are not logged. 
 
-i.e.:@suppress_methodsdef method():...
+i.e.: @suppress_methods def method(): ... 
 
-or
+or 
 
-with suppress_methods():...
+with suppress_methods(): ... 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L422"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L421"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `suppress_variables`
 
@@ -315,18 +315,18 @@ with suppress_methods():...
 suppress_variables()
 ```
 
-Can be used as a context manager or decorator so that variables are not logged.
+Can be used as a context manager or decorator so that variables are not logged. 
 
-i.e.:@suppress_variablesdef method():...
+i.e.: @suppress_variables def method(): ... 
 
-or
+or 
 
-with suppress_variables():...
+with suppress_variables(): ... 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L467"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L466"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `suppress`
 
@@ -334,43 +334,43 @@ with suppress_variables():...
 suppress(*args, **kwargs)
 ```
 
-API to suppress logging to be used as a context manager or decorator.
+API to suppress logging to be used as a context manager or decorator. 
 
-By default suppresses everything and its actual API is something as:
+By default suppresses everything and its actual API is something as: 
 
-def suppress(variables:bool = True, methods:bool = True):...
+def suppress(variables:bool = True, methods:bool = True): ... 
 
 
 
 **Args:**
 
- - <b>`variables`</b>:  Whether variables should be suppressed in the scope.
+ - <b>`variables`</b>:  Whether variables should be suppressed in the scope. 
 
 
- - <b>`methods`</b>:  Whether method calls should be suppressed in the scope.
+ - <b>`methods`</b>:  Whether method calls should be suppressed in the scope. 
 
-Usage as a decorator:
+Usage as a decorator: 
 
-from robocorp import log
+from robocorp import log 
 
-@log.suppressdef func(): ....
+@log.suppress def func():  .... 
 
-Usage as a decorator suppressing only variables:
+Usage as a decorator suppressing only variables: 
 
-from robocorp import log
+from robocorp import log 
 
-@log.suppress(methods=False)def func(): ....
+@log.suppress(methods=False) def func():  .... 
 
-Usage as a context manager:
+Usage as a context manager: 
 
-from robocorp import log
+from robocorp import log 
 
-with log.suppress(methods=False): ....
+with log.suppress(methods=False):  .... 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L512"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L509"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `is_sensitive_variable_name`
 
@@ -378,23 +378,23 @@ with log.suppress(methods=False): ....
 is_sensitive_variable_name(variable_name: str) → bool
 ```
 
-Returns true if the given variable name should be considered sensitive.
+Returns true if the given variable name should be considered sensitive. 
 
 
 
 **Args:**
 
- - <b>`variable_name`</b>:  The variable name to be checked.
+ - <b>`variable_name`</b>:  The variable name to be checked. 
 
 
 
 **Returns:**
-True if the given variable name is considered to be sensitive (in whichcase its value should be redacted) and False otherwise.
+True if the given variable name is considered to be sensitive (in which case its value should be redacted) and False otherwise. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L526"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L523"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_sensitive_variable_name`
 
@@ -402,22 +402,22 @@ True if the given variable name is considered to be sensitive (in whichcase its 
 add_sensitive_variable_name(variable_name: str) → None
 ```
 
-Marks a given variable name as sensitive
+Marks a given variable name as sensitive 
 
-(in this case any variable containing the given `variable_name` will beredacted).
+(in this case any variable containing the given `variable_name` will be redacted). 
 
-Note that this will add a patterns where any variable containing the givenvariable name even as a substring will be considered sensitive.
+Note that this will add a patterns where any variable containing the given variable name even as a substring will be considered sensitive. 
 
 
 
 **Args:**
 
- - <b>`variable_name`</b>:  The variable name to be considered sensitive.
+ - <b>`variable_name`</b>:  The variable name to be considered sensitive. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L542"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L539"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_sensitive_variable_name_pattern`
 
@@ -425,20 +425,20 @@ Note that this will add a patterns where any variable containing the givenvariab
 add_sensitive_variable_name_pattern(variable_name_pattern: str) → None
 ```
 
-Adds a given pattern to consider a variable name as sensitive.
+Adds a given pattern to consider a variable name as sensitive. 
 
-Any variable name matching the given pattern will have its value redacted.
+Any variable name matching the given pattern will have its value redacted. 
 
 
 
 **Args:**
 
- - <b>`variable_name_pattern`</b>:  The variable name pattern to be consideredsensitive.
+ - <b>`variable_name_pattern`</b>:  The variable name pattern to be considered sensitive. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L555"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L552"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `hide_from_output`
 
@@ -446,24 +446,24 @@ Any variable name matching the given pattern will have its value redacted.
 hide_from_output(string_to_hide: str) → None
 ```
 
-Should be called to hide sensitive information from appearing in the output.
+Should be called to hide sensitive information from appearing in the output. 
 
-Note that any variable assign or argument which is set to a name containingthe string:
+Note that any variable assign or argument which is set to a name containing the string: 
 
-'password' or 'passwd'
+'password' or 'passwd' 
 
-Will be automatically hidden and it's also possible to add new names tobe automatically redacted withe the methods: `add_sensitive_variable_name`and `add_sensitive_variable_name_pattern`.
+Will be automatically hidden and it's also possible to add new names to be automatically redacted withe the methods: `add_sensitive_variable_name` and `add_sensitive_variable_name_pattern`. 
 
 
 
 **Args:**
 
- - <b>`string_to_hide`</b>:  The string that should be hidden from the output.
+ - <b>`string_to_hide`</b>:  The string that should be hidden from the output. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L579"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L576"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `start_run`
 
@@ -471,20 +471,20 @@ Will be automatically hidden and it's also possible to add new names tobe automa
 start_run(name: str) → None
 ```
 
-Starts a run session (adds the related event to the log).
+Starts a run session (adds the related event to the log). 
 
 
 
 **Args:**
 
- - <b>`name`</b>:  The name of the run.
+ - <b>`name`</b>:  The name of the run. 
 
-Note: robocorp-tasks calls this method automatically.
+Note: robocorp-tasks calls this method automatically. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L593"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L590"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `end_run`
 
@@ -492,21 +492,21 @@ Note: robocorp-tasks calls this method automatically.
 end_run(name: str, status: str) → None
 ```
 
-Finishes a run session (adds the related event to the log).
+Finishes a run session (adds the related event to the log). 
 
 
 
 **Args:**
 
- - <b>`name`</b>:  The name of the run.
- - <b>`status`</b>:  The run status.
+ - <b>`name`</b>:  The name of the run. 
+ - <b>`status`</b>:  The run status. 
 
-Note: robocorp-tasks calls this method automatically.
+Note: robocorp-tasks calls this method automatically. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L608"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L605"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `start_task`
 
@@ -520,24 +520,24 @@ start_task(
 ) → None
 ```
 
-Starts a task (adds the related event to the log).
+Starts a task (adds the related event to the log). 
 
 
 
 **Args:**
 
- - <b>`name`</b>:  The name of the task.
- - <b>`libname`</b>:  The library (module name) where the task is defined.
- - <b>`source`</b>:  The source of the task.
- - <b>`lineno`</b>:  The line number of the task in the given source.
- - <b>`doc`</b>:  The documentation for the task.
+ - <b>`name`</b>:  The name of the task. 
+ - <b>`libname`</b>:  The library (module name) where the task is defined. 
+ - <b>`source`</b>:  The source of the task. 
+ - <b>`lineno`</b>:  The line number of the task in the given source. 
+ - <b>`doc`</b>:  The documentation for the task. 
 
-Note: robocorp-tasks calls this method automatically.
+Note: robocorp-tasks calls this method automatically. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L628"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L625"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `end_task`
 
@@ -545,23 +545,23 @@ Note: robocorp-tasks calls this method automatically.
 end_task(name: str, libname: str, status: str, message: str) → None
 ```
 
-Ends a task (adds the related event to the log).
+Ends a task (adds the related event to the log). 
 
 
 
 **Args:**
 
- - <b>`name`</b>:  The name of the task.
- - <b>`libname`</b>:  The library (module name) where the task is defined.
- - <b>`status`</b>:  The source of the task.
- - <b>`message`</b>:  The line number of the task in the given source.
+ - <b>`name`</b>:  The name of the task. 
+ - <b>`libname`</b>:  The library (module name) where the task is defined. 
+ - <b>`status`</b>:  The source of the task. 
+ - <b>`message`</b>:  The line number of the task in the given source. 
 
-Note: robocorp-tasks calls this method automatically.
+Note: robocorp-tasks calls this method automatically. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L648"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L645"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `iter_decoded_log_format_from_stream`
 
@@ -569,34 +569,34 @@ Note: robocorp-tasks calls this method automatically.
 iter_decoded_log_format_from_stream(stream: IReadLines) → Iterator[dict]
 ```
 
-Iterates stream contents and decodes those as dicts.
+Iterates stream contents and decodes those as dicts. 
 
 
 
 **Args:**
 
- - <b>`stream`</b>:  The stream which should be iterated in (anything with a `readlines()` method which should provide the messages encoded in the internal format).
+ - <b>`stream`</b>:  The stream which should be iterated in (anything with a  `readlines()` method which should provide the messages encoded  in the internal format). 
 
 
 
 **Returns:**
-An iterator which will decode the messages and provides a dictionary foreach message found.
+An iterator which will decode the messages and provides a dictionary for each message found. 
 
-Example of messages provided:
-
-
- - <b>`{'message_type'`</b>:  'V', 'version': '1'}
- - <b>`{'message_type'`</b>:  'T', 'time': '2022-10-31T07:45:57.116'}
- - <b>`{'message_type'`</b>:  'ID', 'part': 1, 'id': 'gen-from-output-xml'}
- - <b>`{'message_type'`</b>:  'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}...
+Example of messages provided: 
 
 
- - <b>`Note`</b>:  the exact format of the messages provided is not stable acrossreleases.
+ - <b>`{'message_type'`</b>:  'V', 'version': '1'} 
+ - <b>`{'message_type'`</b>:  'T', 'time': '2022-10-31T07:45:57.116'} 
+ - <b>`{'message_type'`</b>:  'ID', 'part': 1, 'id': 'gen-from-output-xml'} 
+ - <b>`{'message_type'`</b>:  'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3} ... 
+
+
+ - <b>`Note`</b>:  the exact format of the messages provided is not stable across releases. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L677"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L674"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `iter_decoded_log_format_from_log_html`
 
@@ -604,28 +604,28 @@ Example of messages provided:
 iter_decoded_log_format_from_log_html(log_html: Path) → Iterator[dict]
 ```
 
-Reads the data saved in the log html and provides decoded messages (dicts).
+Reads the data saved in the log html and provides decoded messages (dicts). 
 
 
 
 **Returns:**
- An iterator which will decode the messages and provides a dictionary for each message found.
+ An iterator which will decode the messages and provides a dictionary for  each message found. 
 
- Example of messages provided:
-
-
- - <b>`{'message_type'`</b>:  'V', 'version': '1'}
- - <b>`{'message_type'`</b>:  'T', 'time': '2022-10-31T07:45:57.116'}
- - <b>`{'message_type'`</b>:  'ID', 'part': 1, 'id': 'gen-from-output-xml'}
- - <b>`{'message_type'`</b>:  'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}...
+ Example of messages provided: 
 
 
- - <b>`Note`</b>:  the exact format of the messages provided is not stable acrossreleases.
+ - <b>`{'message_type'`</b>:  'V', 'version': '1'} 
+ - <b>`{'message_type'`</b>:  'T', 'time': '2022-10-31T07:45:57.116'} 
+ - <b>`{'message_type'`</b>:  'ID', 'part': 1, 'id': 'gen-from-output-xml'} 
+ - <b>`{'message_type'`</b>:  'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3} ... 
+
+
+ - <b>`Note`</b>:  the exact format of the messages provided is not stable across releases. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L735"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L732"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_messages_iterator`
 
@@ -637,34 +637,34 @@ verify_log_messages_from_messages_iterator(
 ) → List[dict]
 ```
 
-Helper for checking that the expected messages are found in the given messages iterator.
+Helper for checking that the expected messages are found in the given messages iterator. 
 
-Can also check if a message is not found.
+Can also check if a message is not found. 
 
 
 
 **Args:**
 
- - <b>`messages_iterator`</b>:  An iterator over the messages found.
- - <b>`expected`</b>:  The messages which are expected to be found. If some message expected to be found is not found an AssertionError will be raised.
- - <b>`not_expected`</b>:  The messages that should not appear.
+ - <b>`messages_iterator`</b>:  An iterator over the messages found. 
+ - <b>`expected`</b>:  The messages which are expected to be found. If some message  expected to be found is not found an AssertionError will be raised. 
+ - <b>`not_expected`</b>:  The messages that should not appear. 
 
 
 
 **Example:**
-verify_log_messages_from_messages_iterator(messages_iterator,[{'message_type': 'V', 'version': '1'}{'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}]
+verify_log_messages_from_messages_iterator( messages_iterator, [ {'message_type': 'V', 'version': '1'} {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'} ] 
 
-Note: if one of the key entries is `__check__` the value will be considereda callable which should return `True` or `False` to determine if a match wasmade.
+Note: if one of the key entries is `__check__` the value will be considered a callable which should return `True` or `False` to determine if a match was made. 
 
 
 
 **Example:**
-verify_log_messages_from_messages_iterator(messages_iterator,[{"message_type": "T",# i.e.: check for the utc timezone (+00:00) in the time."__check__": lambda msg: msg["time"].endswith("+00:00"),},]
+verify_log_messages_from_messages_iterator( messages_iterator, [ { "message_type": "T", # i.e.: check for the utc timezone (+00:00) in the time. "__check__": lambda msg: msg["time"].endswith("+00:00"), }, ] 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L812"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L809"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_decoded_str`
 
@@ -676,22 +676,22 @@ verify_log_messages_from_decoded_str(
 ) → List[dict]
 ```
 
-Verifies whether the given messages are available or not in the decoded messages.
+Verifies whether the given messages are available or not in the decoded messages. 
 
 
 
 **Args:**
 
- - <b>`s`</b>:  A string with the messages already decoded (where messages areseparated by lines and each message is a json string to be decoded).
- - <b>`expected`</b>:  The messages expected.
- - <b>`not_expected`</b>:  The messages that should not appear.
+ - <b>`s`</b>:  A string with the messages already decoded (where messages are separated by lines and each message is a json string to be decoded). 
+ - <b>`expected`</b>:  The messages expected. 
+ - <b>`not_expected`</b>:  The messages that should not appear. 
 
-See: `verify_log_messages_from_messages_iterator` for more details on thematching of messages.
+See: `verify_log_messages_from_messages_iterator` for more details on the matching of messages. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L870"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L867"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_log_html`
 
@@ -703,22 +703,22 @@ verify_log_messages_from_log_html(
 ) → List[dict]
 ```
 
-Verifies whether the given messages are available or not in the decoded messages.
+Verifies whether the given messages are available or not in the decoded messages. 
 
 
 
 **Args:**
 
- - <b>`log_html`</b>:  The path to the log_html where messages were embedded.
- - <b>`expected`</b>:  The messages expected.
- - <b>`not_expected`</b>:  The messages that should not appear.
+ - <b>`log_html`</b>:  The path to the log_html where messages were embedded. 
+ - <b>`expected`</b>:  The messages expected. 
+ - <b>`not_expected`</b>:  The messages that should not appear. 
 
-See: `verify_log_messages_from_messages_iterator` for more details on thematching of messages.
+See: `verify_log_messages_from_messages_iterator` for more details on the matching of messages. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L890"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L887"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `verify_log_messages_from_stream`
 
@@ -730,22 +730,22 @@ verify_log_messages_from_stream(
 ) → Sequence[dict]
 ```
 
-Verifies whether the given messages are available or not in the decoded messages.
+Verifies whether the given messages are available or not in the decoded messages. 
 
 
 
 **Args:**
 
- - <b>`stream`</b>:  A stream from where the encoded messages are expected to be read from.
- - <b>`expected`</b>:  The messages expected.
- - <b>`not_expected`</b>:  The messages that should not appear.
+ - <b>`stream`</b>:  A stream from where the encoded messages are expected to be read  from. 
+ - <b>`expected`</b>:  The messages expected. 
+ - <b>`not_expected`</b>:  The messages that should not appear. 
 
-See: `verify_log_messages_from_messages_iterator` for more details on thematching of messages.
+See: `verify_log_messages_from_messages_iterator` for more details on the matching of messages. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L946"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L943"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `setup_log`
 
@@ -758,69 +758,69 @@ setup_log(
 ) → IContextManager
 ```
 
-Setups the log "general" settings.
+Setups the log "general" settings. 
 
 
 
 **Args:**
 
- - <b>`max_value_repr_size`</b>:  This is the maximum number of chars which may be used for a repr (values are clipped if a `repr(obj)` would return a bigger representation). May be passed directly as the value as an int or a string with the value and associated unit.
- - <b>`Accepted units are`</b>:  `k`, `m`.
- - <b>`Example`</b>:  `"1000k"`, `"1m"`.
+ - <b>`max_value_repr_size`</b>:  This is the maximum number of chars which  may be used for a repr (values are clipped if a `repr(obj)` would  return a bigger representation).  May be passed directly as the value as an int or a string with the  value and associated unit. 
+ - <b>`Accepted units are`</b>:  `k`, `m`. 
+ - <b>`Example`</b>:  `"1000k"`, `"1m"`. 
 
-The default value for this setting is "200k".
-
-
- - <b>`log_level`</b>:  Messages with a level higher or equal to the one specified will be logged in the `log.html`.
-
- The default value for this setting is "FilterLogLevel.DEBUG", so, any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical` will be shown.
+The default value for this setting is "200k". 
 
 
- - <b>`output_log_level`</b>:  Messages with a level higher or equal to the one specified will be printed to the output_stream configured.
+ - <b>`log_level`</b>:  Messages with a level higher or equal to the one specified will  be logged in the `log.html`. 
 
- The default value for this setting is "FilterLogLevel.NONE", so, any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical` is not shown in the output.
+ The default value for this setting is "FilterLogLevel.DEBUG", so,  any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical`  will be shown. 
 
 
- - <b>`output_stream`</b>:  It's possible to specify the stream to output contents to be printed in the `log.debug`, `log.info`, `log.warn` and `log.critical` calls. If all messages should be streamed to the same place it can be the output stream (or its name) or it can be a dict mapping each level to a different stream (or its name).
- - <b>`Note`</b>:  if sys.stdout/sys.stderr are used it's preferred to pass it asa literal (`"stdout"` or `"stderr"`) as if the stream is redirected it'llstill print to the current `sys.stdout` / `sys.stderr`.
+ - <b>`output_log_level`</b>:  Messages with a level higher or equal to the one specified will  be printed to the output_stream configured. 
+
+ The default value for this setting is "FilterLogLevel.NONE", so,  any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical`  is not shown in the output. 
+
+
+ - <b>`output_stream`</b>:  It's possible to specify the stream to output contents to  be printed in the `log.debug`, `log.info`, `log.warn` and `log.critical`  calls.  If all messages should be streamed to the same place it can be the output  stream (or its name) or it can be a dict mapping each level to a different  stream (or its name). 
+ - <b>`Note`</b>:  if sys.stdout/sys.stderr are used it's preferred to pass it as a literal (`"stdout"` or `"stderr"`) as if the stream is redirected it'll still print to the current `sys.stdout` / `sys.stderr`. 
 
 
 
 **Returns:**
-A context manager, so, it's possible to use this method with a `with statement`so that the configuration is reverted to a previous configuration whenthe context manager exits (if not called with a `with statement` thenthe values won't be reverted).
+A context manager, so, it's possible to use this method with a `with statement` so that the configuration is reverted to a previous configuration when the context manager exits (if not called with a `with statement` then the values won't be reverted). 
 
 
 
 **Example:**
 
 
-Setting the max repr size:
+Setting the max repr size: 
 
 ```python
 from robocorp import log
 # If a repr(obj) returns a string bigger than 100000 chars it'll
 # be clipped to 100000 chars.
 log.setup_log(max_value_repr_size=100_000)
-```
+``` 
 
 
 
 **Example:**
 
 
-Configuring to log only `log.critical`:
+Configuring to log only `log.critical`: 
 
 ```python
 from robocorp import log
 log.setup_log(log_level=log.FilterLogLevel.CRITICAL)
-```
+``` 
 
 
 
 **Example:**
 
 
-Configuring to print log.warn messages to sys.stdout and log.criticalmessages to sys.stderr:
+Configuring to print log.warn messages to sys.stdout and log.critical messages to sys.stderr: 
 
 ```python
 from robocorp import log
@@ -828,12 +828,12 @@ log.setup_log(
     output_log_level='warn',
     output_stream={'warn': 'stdout', 'critical': 'stderr'}
 )
-```
+``` 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L1080"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L1077"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `setup_auto_logging`
 
@@ -844,24 +844,24 @@ setup_auto_logging(
 )
 ```
 
-Sets up automatic logging.
+Sets up automatic logging. 
 
-This must be called prior to actually importing the modules which shouldbe automatically logged.
+This must be called prior to actually importing the modules which should be automatically logged. 
 
 
 
 **Args:**
 
- - <b>`config`</b>:  The configuration specifying how modules should be automatically logged.
+ - <b>`config`</b>:  The configuration specifying how modules should be automatically  logged. 
 
- If not passed, by default all files which are library files (i.e.: in the python `Lib` or `site-packages`) won't be logged and all files which are not library files will be fully logged.
+ If not passed, by default all files which are library files (i.e.:  in the python `Lib` or `site-packages`) won't be logged and all files  which are not library files will be fully logged. 
 
-Returns a context manager which will stop applying the auto-logging to newloaded modules. Note that modules which are already being tracked won'tstop being tracked.
+Returns a context manager which will stop applying the auto-logging to new loaded modules. Note that modules which are already being tracked won't stop being tracked. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L1113"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L1110"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_log_output`
 
@@ -876,21 +876,21 @@ add_log_output(
 )
 ```
 
-Adds a log output which will write the contents to the given output directory.
+Adds a log output which will write the contents to the given output directory. 
 
-Optionally it's possible to collect all the output when the run is finishedand put it into a log.html file.
+Optionally it's possible to collect all the output when the run is finished and put it into a log.html file. 
 
 
 
 **Args:**
 
- - <b>`output_dir`</b>:  The output directory where the log contents should be saved.
- - <b>`max_file_size`</b>:  The maximum file size for one log file (as a string with
- - <b>`the value and the unit -- accepted units are`</b>:  `b`, `kb`, `mb`, `gb`if no unit is passed it's considered `b` (bytes)).Note that the max size is not a hard guarantee, rather it's aguideline that the logging tries to follow (usually it's very close,although on degenerate cases it can be considerably different).
- - <b>`max_files`</b>:  The maximum amount of files which can be added (if more would be needed the oldest one is erased).
- - <b>`log_html`</b>:  If given this is the path (file) where the log.html contents should be written (the log.html will include all the logs from the run along with a viewer for such logs).
- - <b>`log_html_style`</b>:  The style to be used for the log.html.
- - <b>`min_messages_per_file`</b>:  This is the minimum number of messages that need to be added to a file for it to be rotated (if messages are too big this may make the max_file_size be surpassed). This is needed to prevent a case where a whole new file could be created after just a single message if the message was too big for the max file size.
+ - <b>`output_dir`</b>:  The output directory where the log contents should be saved. 
+ - <b>`max_file_size`</b>:  The maximum file size for one log file (as a string with 
+ - <b>`the value and the unit -- accepted units are`</b>:  `b`, `kb`, `mb`, `gb` if no unit is passed it's considered `b` (bytes)). Note that the max size is not a hard guarantee, rather it's a guideline that the logging tries to follow (usually it's very close, although on degenerate cases it can be considerably different). 
+ - <b>`max_files`</b>:  The maximum amount of files which can be added (if more would  be needed the oldest one is erased). 
+ - <b>`log_html`</b>:  If given this is the path (file) where the log.html contents  should be written (the log.html will include all the logs from the  run along with a viewer for such logs). 
+ - <b>`log_html_style`</b>:  The style to be used for the log.html. 
+ - <b>`min_messages_per_file`</b>:  This is the minimum number of messages that need  to be added to a file for it to be rotated (if messages are too big  this may make the max_file_size be surpassed). This is needed to  prevent a case where a whole new file could be created after just  a single message if the message was too big for the max file size. 
 
 
 
@@ -901,7 +901,7 @@ Optionally it's possible to collect all the output when the run is finishedand p
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L1177"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L1174"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `close_log_outputs`
 
@@ -909,14 +909,14 @@ Optionally it's possible to collect all the output when the run is finishedand p
 close_log_outputs()
 ```
 
-This method must be called to close loggers.
+This method must be called to close loggers. 
 
-Note that some loggers such as the one which outputs html needs to bo closedto actually write the output.
+Note that some loggers such as the one which outputs html needs to bo closed to actually write the output. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L1194"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L1191"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>function</kbd> `add_in_memory_log_output`
 
@@ -924,23 +924,23 @@ Note that some loggers such as the one which outputs html needs to bo closedto a
 add_in_memory_log_output(write: Callable[[str], Any])
 ```
 
-Adds a log output which is in-memory (receives a callable).
+Adds a log output which is in-memory (receives a callable). 
 
 
 
 **Args:**
 
- - <b>`write`</b>:  A callable which will be called as `write(msg)` whenevera message is sent from the logging.
+ - <b>`write`</b>:  A callable which will be called as `write(msg)` whenever a message is sent from the logging. 
 
 
 
 **Returns:**
-A context manager which can be used to automatically remove andclose the related logger.
+A context manager which can be used to automatically remove and close the related logger. 
 
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L267"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L266"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `ConsoleMessageKind`
 
@@ -953,10 +953,10 @@ A context manager which can be used to automatically remove andclose the related
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L915"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L912"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
-## <kbd>class</kbd> `FilterLogLevel`
-An enumeration.
+## <kbd>enum</kbd> `FilterLogLevel`
+An enumeration. 
 
 
 ---
@@ -971,10 +971,10 @@ An enumeration.
 
 ---
 
-<a href="../../log/src/robocorp/log/__init__.py#L926"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="../../log/src/robocorp/log/__init__.py#L923"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `IContextManager`
-Typing for a "generic" context manager.
+Typing for a "generic" context manager. 
 
 
 

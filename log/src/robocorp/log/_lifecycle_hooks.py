@@ -62,6 +62,10 @@ method_return = Callback()
 # tp, e, tb = exc_info
 method_except = Callback()
 
+# Called as: assert_failed(__name__, filename, name, lineno, variables)
+# variables is a tuple(tuple(variable_name, variable_value))
+assert_failed = Callback()
+
 # Called as: method_if(__name__, filename, name, lineno, variables)
 # variables is a tuple(tuple(variable_name, variable_value))
 method_if = Callback()

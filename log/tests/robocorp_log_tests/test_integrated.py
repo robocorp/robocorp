@@ -1,14 +1,14 @@
 from imp import reload
 from pathlib import Path
 
+from robocorp.log import setup_log, verify_log_messages_from_log_html
+
 from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
     AutoLogConfigForTest,
     basic_log_setup,
     pretty_format_logs_from_log_html,
 )
-
-from robocorp.log import setup_log, verify_log_messages_from_log_html
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate, str_regression):
@@ -280,3 +280,21 @@ def test_partial_logs(tmpdir, ui_regenerate, str_regression) -> None:
     assert len(files) == 2
 
     # setup_info.open_log_target()
+
+
+def test_assertion_failed_error(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        try:
+            reload(check).check_failed_exception()
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("Expected AssertionError")
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(
+        pretty_format_logs_from_log_html(log_target, show_exception_vars=True)
+    )

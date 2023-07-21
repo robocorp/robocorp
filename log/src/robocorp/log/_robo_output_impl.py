@@ -72,7 +72,7 @@ SYMBOLS = {
 }
 
 
-def bytes2human(n, format="%(value).1f %(symbol)s", symbols="customary"):
+def bytes2human(n, fmt="%(value).1f %(symbol)s", symbols="customary"):
     """
     Bytes-to-human / human-to-bytes converter.
     Based on: http://goo.gl/kTQMs
@@ -128,12 +128,15 @@ def bytes2human(n, format="%(value).1f %(symbol)s", symbols="customary"):
     for symbol in reversed(symbols[1:]):
         if n >= prefix[symbol]:
             value = float(n) / prefix[symbol]
-            return format % locals()
-    return format % dict(symbol=symbols[0], value=n)
+            return fmt % locals()
+    return fmt % dict(symbol=symbols[0], value=n)
 
 
 def format_memory_info(memory_info):
-    return f"Total: {bytes2human(memory_info.total)}, Available: {bytes2human(memory_info.available)}, Used: {memory_info.percent} %"
+    return (
+        f"Total: {bytes2human(memory_info.total)}, Available:"
+        f" {bytes2human(memory_info.available)}, Used: {memory_info.percent} %"
+    )
 
 
 class _Config:
@@ -216,7 +219,10 @@ class _StackEntry:
         self.write_it(robot_output_impl, self.replay_msg_type)
 
     def __str__(self):
-        return f"StackEntry({self.entry_type}, {self.entry_id}, {self.msg_type}, hide: {self.hide_from_logs})"
+        return (
+            f"StackEntry({self.entry_type}, {self.entry_id}, {self.msg_type}, hide:"
+            f" {self.hide_from_logs})"
+        )
 
     __repr__ = __str__
 
@@ -246,7 +252,8 @@ class _StackHandler:
             impl = self._robot_output_impl()
             if impl is not None:
                 impl.show_error_message(
-                    f"Robocorp Log Warning: unable to pop {entry_type} - {entry_id} (empty queue).\n"
+                    f"Robocorp Log Warning: unable to pop {entry_type} -"
+                    f" {entry_id} (empty queue).\n"
                 )
         else:
             stack_entry = self._queue[-1]
@@ -267,7 +274,9 @@ class _StackHandler:
                             impl = self._robot_output_impl()
                             if impl is not None:
                                 impl.show_error_message(
-                                    f"Robocorp Log Warning: {stack_entry.entry_type} - {stack_entry.entry_id} did not have a corresponding pop.\n"
+                                    f"Robocorp Log Warning: {stack_entry.entry_type} -"
+                                    f" {stack_entry.entry_id} did not have a"
+                                    " corresponding pop.\n"
                                 )
 
                         # The current one (which is a match).
@@ -281,7 +290,10 @@ class _StackHandler:
                                 impl = self._robot_output_impl()
                                 if impl is not None:
                                     impl.show_error_message(
-                                        f"Robocorp Log Warning: {stack_entry.entry_type} - {stack_entry.entry_id} did not have a corresponding pop.\n"
+                                        "Robocorp Log Warning:"
+                                        f" {stack_entry.entry_type} -"
+                                        f" {stack_entry.entry_id} did not have a"
+                                        " corresponding pop.\n"
                                     )
 
                             # The current one (which is a partial match).
@@ -289,14 +301,18 @@ class _StackHandler:
                             impl = self._robot_output_impl()
                             if impl is not None:
                                 impl.show_error_message(
-                                    f"Robocorp Log Warning: {stack_entry.entry_type} - {stack_entry.entry_id} pop just by type. Actual request: {entry_type} - {entry_id}\n"
+                                    f"Robocorp Log Warning: {stack_entry.entry_type} -"
+                                    f" {stack_entry.entry_id} pop just by type. Actual"
+                                    f" request: {entry_type} - {entry_id}\n"
                                 )
                             return stack_entry
 
                 impl = self._robot_output_impl()
                 if impl is not None:
                     impl.show_error_message(
-                        f"Robocorp Log Warning: unable to pop {entry_type} - {entry_id} because it does not match the current top: {stack_entry.entry_type} - {stack_entry.entry_id}\n"
+                        f"Robocorp Log Warning: unable to pop {entry_type} -"
+                        f" {entry_id} because it does not match the current top:"
+                        f" {stack_entry.entry_type} - {stack_entry.entry_id}\n"
                     )
 
         return None
@@ -746,13 +762,16 @@ Virtual Memory Size: {vms}"""
             self._dump_threads(hide_vars)
         finally:
             self._stack_handler.pop(entry_type, entry_id)
-            self._write_with_separator(f"EPS ", [self._number(self.get_time_delta())])
+            self._write_with_separator("EPS ", [self._number(self.get_time_delta())])
 
     def _dump_threads(self, hide_vars: bool) -> None:
         for thread_id, frame in sys._current_frames().items():
             try:
                 thread = threading._active[thread_id]  # type: ignore [attr-defined] # @UndefinedVariable
-                title = f"{thread.name}|Thread ID: {thread_id} ({'daemon' if thread.daemon else 'non daemon'})"
+                title = (
+                    f"{thread.name}|Thread ID:"
+                    f" {thread_id} ({'daemon' if thread.daemon else 'non daemon'})"
+                )
             except KeyError:
                 title = f"{thread_id}|(not active)"
 
@@ -960,12 +979,8 @@ Virtual Memory Size: {vms}"""
     ) -> None:
         self._rotate_if_needed()
 
-        from ._null import NULL
-
         oid = self._obtain_id
         element_id = f"{libname}.{name}"
-
-        ctx: Any = NULL
 
         if hide_from_logs:
             # I.e.: add to internal stack but don't write it.
@@ -975,7 +990,7 @@ Virtual Memory Size: {vms}"""
                 name, libname, source, lineno, doc, element_type, start_time_delta
             )
 
-        if element_type not in ("UNTRACKED_GENERATOR", "IF", "ELSE"):
+        if element_type not in ("UNTRACKED_GENERATOR", "IF", "ELSE", "ASSERT_FAILED"):
             # We don't change the scope for untracked generators as
             # we have no idea when it'll pause/resume.
             self._stack_handler.push_record(
@@ -1363,6 +1378,8 @@ Virtual Memory Size: {vms}"""
 
     def _write_index_updating_sample(self, target, contents):
         with open(target, "wb") as stream:
+            # Note: the version here only needs to be changed if the
+            # version is changed in the sample.ts.
             string_start = contents.index("String.raw`V 0.0.2")
             string_end = contents.index("`", string_start + 18)
             string_end = contents.index("}", string_end)

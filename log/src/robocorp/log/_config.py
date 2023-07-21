@@ -1,17 +1,14 @@
 import enum
-from typing import Dict, Optional, Sequence, Callable, Union
+import itertools
+import typing
+from dataclasses import dataclass
+from fnmatch import fnmatch
+from functools import partial
+from typing import Callable, Dict, Optional, Sequence, Union
 
 from robocorp import log
-from functools import partial
-from fnmatch import fnmatch
-import itertools
-from dataclasses import dataclass
-import typing
 
-# Examples:
-# Filter("mymodule.ignore", kind=FilterKind.exclude)
-# Filter("mymodule.rpa", kind=FilterKind.full_log)
-# Filter("RPA", kind=FilterKind.log_on_project_call)
+from .protocols import Status
 
 
 class FilterKind(enum.Enum):
@@ -21,6 +18,10 @@ class FilterKind(enum.Enum):
     exclude = "exc"
 
 
+# Examples:
+# Filter("mymodule.ignore", kind=FilterKind.exclude)
+# Filter("mymodule.rpa", kind=FilterKind.full_log)
+# Filter("RPA", kind=FilterKind.log_on_project_call)
 @dataclass
 class Filter:
     name: str
@@ -47,14 +48,14 @@ class GeneralLogConfig:
         self.max_value_repr_size: int = _convert_to_bytes("200k")
 
         # Show log.debug/log.info/log.warn/log.critical by default.
-        self._log_level: log.FilterLogLevelLiterals = "debug"
-        self.log_level: log.FilterLogLevelLiterals = "debug"
+        self._log_level: "log.FilterLogLevelLiterals" = "debug"
+        self.log_level: "log.FilterLogLevelLiterals" = "debug"
 
         # Print only critical by default.
-        self._output_log_level: log.FilterLogLevelLiterals = "critical"
-        self.output_log_level: log.FilterLogLevelLiterals = "critical"
+        self._output_log_level: "log.FilterLogLevelLiterals" = "critical"
+        self.output_log_level: "log.FilterLogLevelLiterals" = "critical"
 
-        self._output_stream: Dict[log.FilterLogLevelLiterals, log.OutStreamName] = {
+        self._output_stream: Dict["log.FilterLogLevelLiterals", "log.OutStreamName"] = {
             "debug": "stdout",
             "info": "stdout",
             "warn": "stderr",
@@ -65,10 +66,10 @@ class GeneralLogConfig:
         self, level: str
     ) -> "log.FilterLogLevelLiterals":
         conversion: Dict[str, log.FilterLogLevelLiterals] = {
-            log.Status.DEBUG: "debug",
-            log.Status.WARN: "warn",
-            log.Status.INFO: "info",
-            log.Status.ERROR: "critical",
+            Status.DEBUG: "debug",
+            Status.WARN: "warn",
+            Status.INFO: "info",
+            Status.ERROR: "critical",
         }
         return conversion[level]
 
@@ -134,37 +135,37 @@ class GeneralLogConfig:
     def _compute_accepted_log_levels(self, log_level: "log.FilterLogLevelLiterals"):
         # The accepted log levels are internal
         accept_log_levels = [
-            log.Status.DEBUG,
-            log.Status.INFO,
-            log.Status.WARN,
-            log.Status.ERROR,
+            Status.DEBUG,
+            Status.INFO,
+            Status.WARN,
+            Status.ERROR,
         ]
         if log_level == "debug":
             return accept_log_levels
-        accept_log_levels.remove(log.Status.DEBUG)
+        accept_log_levels.remove(Status.DEBUG)
 
         if log_level == "info":
             return accept_log_levels
-        accept_log_levels.remove(log.Status.INFO)
+        accept_log_levels.remove(Status.INFO)
 
         if log_level == "warn":
             return accept_log_levels
-        accept_log_levels.remove(log.Status.WARN)
+        accept_log_levels.remove(Status.WARN)
 
         if log_level == "critical":
             return accept_log_levels
-        accept_log_levels.remove(log.Status.ERROR)
+        accept_log_levels.remove(Status.ERROR)
 
         if log_level == "none":
             return accept_log_levels
         raise RuntimeError(f"Unexpected log level: {log_level}")
 
     def accept_log_level(self, level: str):
-        # Note: level from log.Status.
+        # Note: level from Status.
         return level in self._accept
 
     def accept_output_log_level(self, level: str):
-        # Note: level from log.Status.
+        # Note: level from Status.
         return level in self._accept_output
 
 

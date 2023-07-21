@@ -4,6 +4,7 @@ import { styled } from '@robocorp/theme';
 
 import {
   Entry,
+  EntryAssertFailed,
   EntryConsole,
   EntryException,
   EntryGenerator,
@@ -48,7 +49,10 @@ export const getValue = (entry: Entry): ReactNode | string => {
     case Type.resumeYieldFrom:
     case Type.ifElement:
     case Type.elseElement:
-      return formatArguments(entry as EntryMethodBase | EntryGenerator | EntryUntrackedGenerator);
+    case Type.assertFailed:
+      return formatArguments(
+        entry as EntryMethodBase | EntryGenerator | EntryUntrackedGenerator | EntryAssertFailed,
+      );
     case Type.task:
       return '';
     case Type.suspendYieldFrom:

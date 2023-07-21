@@ -27,6 +27,7 @@ const getContentComponent = (type: Type) => {
     case Type.ifElement:
     case Type.elseElement:
     case Type.returnElement:
+    case Type.assertFailed:
       return MethodComponent;
     case Type.exception:
       return ExceptionComponent;

@@ -389,6 +389,7 @@ def pretty_format_logs_from_iter(
                 "UNTRACKED_GENERATOR",
                 "IF",
                 "ELSE",
+                "ASSERT_FAILED",
             ):
                 continue
 

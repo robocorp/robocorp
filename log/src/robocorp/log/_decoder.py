@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
 from .protocols import IReadLines
 
 # Whenever the decoding changes we should bump up this version.
-DOC_VERSION = "0.0.2"
+DOC_VERSION = "0.0.3"
 
 # name, libname, source, docstring, lineno
 Location = Tuple[str, str, str, str, int]

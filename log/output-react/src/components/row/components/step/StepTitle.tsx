@@ -17,6 +17,7 @@ import {
   EntryThreadDump,
   EntryIf,
   EntryElse,
+  EntryAssertFailed,
 } from '~/lib/types';
 
 type Props = {
@@ -45,6 +46,8 @@ export const getTitle = (entry: Entry): string => {
       return `${(entry as EntrySuspendYieldFrom).name} (suspend generator)`;
     case Type.method:
       return (entry as EntryMethod).name;
+    case Type.assertFailed:
+      return (entry as EntryAssertFailed).name;
     case Type.ifElement:
       return `Entered "${(entry as EntryIf).name}"`;
     case Type.elseElement:
