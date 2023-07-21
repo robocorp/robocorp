@@ -92,13 +92,13 @@ files = [
 
 [[package]]
 name = "dill"
-version = "0.3.6"
-description = "serialize all of python"
+version = "0.3.7"
+description = "serialize all of Python"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "dill-0.3.6-py3-none-any.whl", hash = "sha256:a07ffd2351b8c678dfc4a856a3005f8067aea51d6ba6c700796a4d9e280f39f0"},
-    {file = "dill-0.3.6.tar.gz", hash = "sha256:e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373"},
+    {file = "dill-0.3.7-py3-none-any.whl", hash = "sha256:76b122c08ef4ce2eedcd4d1abd8e641114bfc6c2867f49f3c41facf65bf19f5e"},
+    {file = "dill-0.3.7.tar.gz", hash = "sha256:cc1c8b182eb3013e24bd475ff2e9295af86c1a38eb1aff128dac8962a9ce3c03"},
 ]
 
 [package.extras]
@@ -235,7 +235,7 @@ dev = ["black", "flake8", "isort", "mypy", "pydocstyle", "pytest", "pytest-cov",
 type = "git"
 url = "https://github.com/robocorp/lazydocs.git"
 reference = "HEAD"
-resolved_reference = "aa058a9d382a96f75dfd1d836eddbbe30a7adacf"
+resolved_reference = "23cfe8d1f184c36911d7221cd8537b18017e5cb8"
 
 [[package]]
 name = "mccabe"
@@ -702,13 +702,13 @@ test = ["black (>=22.3.0,<23.0.0)", "coverage (>=6.2,<7.0)", "isort (>=5.0.6,<6.
 
 [[package]]
 name = "types-invoke"
-version = "2.0.0.8"
+version = "2.0.0.9"
 description = "Typing stubs for invoke"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-invoke-2.0.0.8.tar.gz", hash = "sha256:2d6e59f7501a463c4ff5a6658fefa4898e0e6c058e4f1c547837a2591c0eb1b2"},
-    {file = "types_invoke-2.0.0.8-py3-none-any.whl", hash = "sha256:a0340198f62ec072dcaae0e69ee61fb12c334c8a658cc075946cdd16f3f88dc5"},
+    {file = "types-invoke-2.0.0.9.tar.gz", hash = "sha256:e65fb19dfdd9233b69c21a0f2bb9a79b51705a08157dceced9316728642c6ddb"},
+    {file = "types_invoke-2.0.0.9-py3-none-any.whl", hash = "sha256:3f2a857c1274d92543dc75655ddd85b163366fc3ece10cd1c757a3a96d26485d"},
 ]
 
 [[package]]

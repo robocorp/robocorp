@@ -1,22 +1,40 @@
-<!-- markdownlint-disable -->
+# robocorp-vault
 
-# API Overview
+`robocorp-vault` is a library that provides read and write access to the
+[Vault](https://robocorp.com/docs/development-guide/variables-and-secrets/vault)
+in Robocorp Control Room, which can be used to store and retrieve secret values such as passwords.
 
-## Modules
+## Getting started
 
-- [`robocorp.vault`](./robocorp.vault.md#module-robocorpvault)
+A secret consists of a name, an optional description, and a map of
+keys and values. For instance, one secret can be login credentials for a website,
+which includes both a username and a password:
 
-## Classes
+```python
+from robocorp.tasks import task
+from robocorp import vault
 
-- No classes
+@task
+def inspect_secret():
+    secret = vault.get_secret("login_credentials")
+    print("Secret name:", secret.name)
+    print("Secret description:", secret.description)
+    print("Secret keys:", secret.keys())
+    print("Secret value:", secret["username"])
+```
 
-## Functions
+## Guides
 
-- [`vault.create_secret`](./robocorp.vault.md#function-create_secret): Create a new secret, or overwrite an existing one.
-- [`vault.get_secret`](./robocorp.vault.md#function-get_secret): Get a secret with the given name.
-- [`vault.set_secret`](./robocorp.vault.md#function-set_secret): Set a secret value using an existing container.
+- [Modifying secrets](./guides/modifying-secrets.md)
+- [Hiding values](./guides/hiding-values.md)
+- [Local development](./guides/local-development.md)
 
+Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
----
+## API Reference
 
-_This file was automatically generated via [lazydocs](https://github.com/ml-tooling/lazydocs)._
+Information on specific functions or classes: [robocorp.vault](./api/robocorp.vault.md)
+
+## Changelog
+
+A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
