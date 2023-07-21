@@ -56,7 +56,8 @@ from ._config import AutoLogConfigBase, FilterKind
 # 0.0.18: Fixes in generation based on scoping (generator/untracked_generator,full_log,log_on_project_call).
 # 0.0.19: Fixed return with log_on_project_call.
 # 0.0.20: Fixed line numbers
-version = "0.0.20"
+# 0.0.21: Assertion rewriting
+version = "0.0.21"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT

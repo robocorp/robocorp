@@ -5,6 +5,7 @@ import { FC } from 'react';
 import {
   ConsoleMessageKind,
   Entry,
+  EntryAssertFailed,
   EntryConsole,
   EntryElse,
   EntryException,
@@ -85,6 +86,11 @@ const getDetailsTitle = (entry: Entry) => {
       return {
         title: `Entered if statement: ${(entry as EntryIf).name}`,
         description: `Module: ${(entry as EntryIf).libname}`,
+      };
+    case Type.assertFailed:
+      return {
+        title: `Assert Failed: ${(entry as EntryAssertFailed).name}`,
+        description: `Module: ${(entry as EntryAssertFailed).libname}`,
       };
     case Type.elseElement:
       return {

@@ -3,10 +3,10 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
-from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
-
 from robocorp.log._config import FilterKind
 from robocorp.log._rewrite_importhook import _rewrite
+
+from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
 
 
 def test_ast_utils() -> None:
@@ -554,6 +554,34 @@ def foo():
         pass
     else:
         pass
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+
+
+def test_rewrite_assert(tmpdir, str_regression):
+    config = AutoLogConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def call():
+    return 1
+    
+def foo():
+    a = 10
+    assert a > 10
+    assert a != 'some string'
+    assert call1(1, 2) == call2(call3()), 'The calls do not match'
+    assert call1(22) + call1(22) * call3()
+    assert a.call1(call2()) + a.b.call2(call4()) * a.b.c.call3()
+    assert a.b.c and f.g
 """
     )
 

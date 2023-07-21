@@ -34,6 +34,13 @@ mypy_path = "src:tests"
 [tool.isort]
 profile = "black"
 
+[tool.ruff]
+ignore = [
+    "E501", # Line-len.
+    "F541", # f-string without placeholders. 
+    "E731", # Use 'def' instead of lambda.
+]
+
 [[tool.mypy.overrides]]
 module = "setuptools.*"
 ignore_missing_imports = true

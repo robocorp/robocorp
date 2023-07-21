@@ -40,8 +40,9 @@ export enum Type {
   elseElement = 1 << 14,
   returnElement = 1 << 15, // 32768
   console = 1 << 16,
+  assertFailed = 1 << 17,
 
-  unhandled = 1 << 17,
+  unhandled = 1 << 18,
 }
 
 export enum ConsoleMessageKind {
@@ -125,6 +126,10 @@ export interface EntryElse extends EntryMethodBase {
   type: Type.elseElement;
 }
 
+export interface EntryAssertFailed extends EntryMethodBase {
+  type: Type.assertFailed;
+}
+
 export interface EntrySuspendYield extends EntryMethodBase {
   type: Type.suspendYield;
   value: string; // the yielded value
@@ -192,4 +197,5 @@ export type Entry =
   | EntryElse
   | EntryReturn
   | EntryConsole
-  | EntryProcessSnapshot;
+  | EntryProcessSnapshot
+  | EntryAssertFailed;

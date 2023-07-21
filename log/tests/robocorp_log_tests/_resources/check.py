@@ -116,3 +116,8 @@ def some_call_with_exc():
 def check_suppress_exc_values():
     with log.suppress_variables():
         some_call_with_exc()
+
+
+def check_failed_exception():
+    a = 10
+    assert a > 10

@@ -7,7 +7,7 @@
 
 
 
-**Global Variables**
+**Variables**
 ---------------
 - **COLOR_BLACK**
 - **COLOR_BLUE**
@@ -28,14 +28,14 @@
 set_color(foreground_color: str) → _OnExitContextManager
 ```
 
-To be used as:
+To be used as: 
 
-with set_color(COLOR_BLACK):...
+with set_color(COLOR_BLACK): ... 
 
 
 
 **Args:**
- foreground_color: The foreground color to be set (see COLOR_XXX constants).
+ foreground_color:  The foreground color to be set (see COLOR_XXX constants). 
 
 
 ---
@@ -48,7 +48,7 @@ with set_color(COLOR_BLACK):...
 set_mode(mode: str) → None
 ```
 
-Can be used to set the mode of the console.Options:"auto": uses the default console"plain": disables colors"ansi": forces ansi color mode
+Can be used to set the mode of the console. Options: "auto": uses the default console "plain": disables colors "ansi": forces ansi color mode 
 
 
 

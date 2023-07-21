@@ -43,6 +43,8 @@ LogElementType = Literal[
     "FOR",
     "FOR_STEP",
     "WHILE",
-    "WHILE_STEP" "IF",
+    "WHILE_STEP",
+    "IF",
     "ELSE",
+    "ASSERT_FAILED",
 ]
