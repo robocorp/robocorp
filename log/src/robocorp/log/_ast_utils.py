@@ -525,6 +525,15 @@ class NodeFactory:
     def Str(self, s) -> ast.Str:
         return self._set_line_col(ast.Str(s))
 
+    def Constant(self, s) -> ast.Constant:
+        return self._set_line_col(ast.Constant(s))
+
+    def FormattedValue(self, s) -> ast.FormattedValue:
+        v = ast.FormattedValue(value=s)
+        v.conversion = -1
+        v.format_spec = None
+        return self._set_line_col(v)
+
     def If(self, cond: ast.expr) -> ast.If:
         return self._set_line_col(ast.If(cond))
 
@@ -582,3 +591,6 @@ class NodeFactory:
 
     def Raise(self) -> ast.Raise:
         return self._set_line_col(ast.Raise())
+
+    def JoinedStr(self) -> ast.JoinedStr:
+        return self._set_line_col(ast.JoinedStr())

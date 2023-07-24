@@ -5,7 +5,9 @@ SR: Root Suite
             AS: a: 10
             SE: ASSERT_FAILED: a > 10
             EA: int: a: 10
-            STB: AssertionError: 
+            STB: AssertionError: Failed: assert a > 10
+Variables:
+  a = 10
             TBE --- check_failed_exception ---
             TBV: a: 10
         EE: METHOD: ERROR

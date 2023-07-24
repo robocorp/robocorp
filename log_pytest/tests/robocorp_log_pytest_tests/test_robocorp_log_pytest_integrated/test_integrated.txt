@@ -213,6 +213,8 @@ SR: pytest
         SE: METHOD: test_fail
             SE: ASSERT_FAILED: False
             STB: AssertionError: Something failed...
+Failed: assert False
+
         EE: METHOD: ERROR
     ET: FAIL
     ST: run finished (print results)

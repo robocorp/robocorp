@@ -576,8 +576,6 @@ def _handle_before_assert(
 
             func = factory.NameLoad("AssertionError")
             exc = factory.Call(func)
-            if node.msg:
-                exc.args.append(node.msg)
             raise_stmt = factory.Raise()
             raise_stmt.exc = exc
 
@@ -592,6 +590,31 @@ def _handle_before_assert(
                 factory, node.test, dispatch_table.recorded_name_to_new_name
             )
             call.args.append(targets)
+
+            if node.msg:
+                factory_msg = rewrite_ctx.NodeFactory(
+                    node.msg.lineno, node.msg.col_offset
+                )
+                joined_str = factory_msg.JoinedStr()
+                joined_str.values = [node.msg, factory_msg.Constant("\n")]
+                exc.args.append(joined_str)
+            else:
+                factory_msg = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
+                joined_str = factory_msg.JoinedStr()
+                joined_str.values = []
+                exc.args.append(joined_str)
+
+            joined_str.values.append(factory.Constant(f"Failed: assert {unparsed}\n"))
+            if isinstance(targets, ast.Tuple) and targets.elts:
+                joined_str.values.append(factory.Constant(f"Variables:"))
+                for tup in targets.elts:
+                    if isinstance(tup, ast.Tuple):
+                        name = typing.cast(ast.Constant, tup.elts[0]).value
+                        name_load = typing.cast(ast.Name, tup.elts[1]).id
+                        joined_str.values.append(factory_msg.Constant(f"\n  {name} = "))
+                        v = factory_msg.FormattedValue(factory_msg.NameLoad(name_load))
+                        v.conversion = 114
+                        joined_str.values.append(v)
 
             new_if_node.body = [factory.Expr(call), raise_stmt]
             new_if_node.orelse = []
