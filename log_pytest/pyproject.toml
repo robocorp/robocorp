@@ -21,7 +21,8 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-log = ">=2.2,<3"
+robocorp-log = ">=2.5,<3"
+pytest = ">=7"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}

@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 import pytest
+from robocorp import log
 from robocorp.log.protocols import Status
 from robocorp.log.pyproject_config import (
     PyProjectInfo,
@@ -12,7 +13,8 @@ from robocorp.log.pyproject_config import (
 )
 from robocorp.log.redirect import setup_stdout_logging
 
-from robocorp import log
+__version__ = "0.0.1"
+version_info = [int(x) for x in __version__.split(".")]
 
 
 def _setup_log_output(
