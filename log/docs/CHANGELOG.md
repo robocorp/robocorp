@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.5.0 - 2023-07-24
 
 - Spec version changed from `0.0.2` to `0.0.3`.
 - `assert` statements are now rewritten so that on failures more information is provided.
