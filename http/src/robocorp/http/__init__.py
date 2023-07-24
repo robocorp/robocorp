@@ -1,4 +1,4 @@
-from robocorp.http.http import download
+from robocorp.http._http import download
 
 __version__ = "0.4.0"
 __all__ = [
