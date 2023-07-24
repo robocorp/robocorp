@@ -1,26 +1,66 @@
-<!-- markdownlint-disable -->
+# robocorp-tasks
 
-# API Overview
+`robocorp-tasks` is a Python framework designed to simplify the development 
+of Python automations.
 
-## Modules
+> Note: The current version (2.0.0) is now in beta. Semantic versioning is used in the project.
 
-- [`robocorp.tasks`](./robocorp.tasks.md#module-robocorptasks): Robocorp tasks helps in creating entry points for your automation project.
-- [`robocorp.tasks.cli`](./robocorp.tasks.cli.md#module-robocorptaskscli): Main entry point for running tasks from robocorp-tasks.
+## Why
 
-## Classes
+While Python is widely used in the automation world, many solutions end up being 
+ad-hoc, making it difficult to navigate different projects and keep up with the
+features required for analysing the results of such automations afterwards.
 
-- No classes
+## How
 
-## Functions
+`robocorp-tasks` provides a runner for running tasks that offers logging 
+out of the box for Python code (showing method calls, arguments, assigns, etc)
+by leveraging `robocorp-log`, and managing the lifecycle for running such tasks.
 
-- [`tasks.get_current_task`](./robocorp.tasks.md#function-get_current_task): Provides the task which is being currently run or None if not currently running a task.
-- [`tasks.get_output_dir`](./robocorp.tasks.md#function-get_output_dir): Provide the output directory being used for the run or None if there's no output dir configured.
-- [`tasks.session_cache`](./robocorp.tasks.md#function-session_cache): Provides decorator which caches return and clears automatically when all tasks have been run.
-- [`tasks.task`](./robocorp.tasks.md#function-task): Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
-- [`tasks.task_cache`](./robocorp.tasks.md#function-task_cache): Provides decorator which caches return and clears it automatically when the current task has been run.
-- [`cli.main`](./robocorp.tasks.cli.md#function-main): Entry point for running tasks from robocorp-tasks.
+## Getting started
+
+Replace the code in your `__main__` with a method that has the name of your task
+(which should not have parameters) and decorate it with the `@task` decorator, like this:
+
+i.e.:
 
 
----
+```
+from robocorp.tasks import task
 
-_This file was automatically generated via [lazydocs](https://github.com/ml-tooling/lazydocs)._
+@task
+def my_task():
+    ...
+    
+```
+
+2. Call your task using the command line below, customizing the directory and task name as needed:
+
+
+```
+python -m robocorp.tasks run <path/to/file.py or directory> -t <task_name>
+```
+
+Note: if you have only one defined task in your target, the `-t <task_name>` option is not needed. 
+
+Note: the task name is the name of the method decorated with `@task`.
+
+Note: if a directory is given, only files named `*task*.py` will be used for collection.
+
+Note: in the current version only one task can be run per invocation. If more than one task 
+is found an error will be given and no tasks will be run.
+
+3. View the log results in `output/log.html`.
+
+## Guides
+
+- [Logging customization](./guides/logging-customization.md)
+- [Output customization](./guides/output-customization.md)
+
+## API Reference
+
+Information on specific functions or classes: [robocorp.tasks](./api/robocorp.tasks.md)
+
+## Changelog
+
+A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).

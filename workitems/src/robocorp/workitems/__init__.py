@@ -175,16 +175,18 @@ inputs = Inputs()
 outputs = Outputs()
 
 __all__ = [
-    "BaseAdapter",
-    "FileAdapter",
-    "RobocorpAdapter",
+    "inputs",
+    "outputs",
+    "Inputs",
+    "Outputs",
+    "Input",
+    "Output",
+    "State",
+    "ExceptionType",
     "EmptyQueue",
     "BusinessException",
     "ApplicationException",
-    "State",
-    "ExceptionType",
-    "Input",
-    "Output",
-    "inputs",
-    "outputs",
+    "RobocorpAdapter",
+    "FileAdapter",
+    "BaseAdapter",
 ]

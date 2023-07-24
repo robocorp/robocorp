@@ -1,34 +1,30 @@
-<!-- markdownlint-disable -->
+# robocorp-excel
 
-# API Overview
+This library provides a simple way to deal with both legacy `.xls` files
+and newer `.xlsx` files directly. It can be used to read and edit them
+directly without having Microsoft Excel installed.
 
-## Modules
+## Getting started
 
-- [`robocorp.excel.excel`](./robocorp.excel.excel.md#module-robocorpexcelexcel)
-- [`robocorp.excel.tables`](./robocorp.excel.tables.md#module-robocorpexceltables)
-- [`robocorp.excel.workbook`](./robocorp.excel.workbook.md#module-robocorpexcelworkbook)
-- [`robocorp.excel.worksheet`](./robocorp.excel.worksheet.md#module-robocorpexcelworksheet)
+```python
+from robocorp import excel
+from robocorp.tasks import task
 
-## Classes
+@task
+def inspect_workbook():
+    workbook = excel.open_workbook("orders.xlsx")
+    worksheet = workbook.worksheet("Sheet1")
 
-- [`tables.Dialect`](./robocorp.excel.tables.md#class-dialect): CSV dialect.
-- [`tables.Table`](./robocorp.excel.tables.md#class-table): Container class for tabular data.
-- [`tables.Tables`](./robocorp.excel.tables.md#class-tables): ``Tables`` is a library for manipulating tabular data.
-- [`workbook.Workbook`](./robocorp.excel.workbook.md#class-workbook): Manager class for both .xls and .xlsx Excel files.
-- [`worksheet.Worksheet`](./robocorp.excel.worksheet.md#class-worksheet): Common class for worksheets to manage the worksheet's content.
+    for row in worksheet.as_table(header=True):
+    	print(row)
+```
 
-## Functions
+Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
-- [`excel.create_workbook`](./robocorp.excel.excel.md#function-create_workbook): Create and open a new Excel workbook in memory.
-- [`excel.open_workbook`](./robocorp.excel.excel.md#function-open_workbook): Open an existing Excel workbook.
-- [`tables.if_none`](./robocorp.excel.tables.md#function-if_none): Return default if value is None.
-- [`tables.return_table_as_raw_list`](./robocorp.excel.tables.md#function-return_table_as_raw_list)
-- [`tables.to_condition`](./robocorp.excel.tables.md#function-to_condition): Convert string operator into callable condition function.
-- [`tables.to_identifier`](./robocorp.excel.tables.md#function-to_identifier): Convert string to valid identifier.
-- [`tables.to_list`](./robocorp.excel.tables.md#function-to_list): Convert (possibly scalar) value to list of `size`.
-- [`tables.uniq`](./robocorp.excel.tables.md#function-uniq): Return list of unique values while preserving order.
+## API Reference
 
+Information on specific functions or classes: [robocorp.excel](./api/robocorp.excel.md)
 
----
+## Changelog
 
-_This file was automatically generated via [lazydocs](https://github.com/ml-tooling/lazydocs)._
+A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).

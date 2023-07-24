@@ -1,20 +1,25 @@
-<!-- markdownlint-disable -->
+# robocorp-http
 
-# API Overview
+This HTTP library is meant as a simple utility library for downloading
+files over HTTP, and (later) making robust HTTP requests (GET/POST/etc.)
 
-## Modules
+## Getting started
 
-- [`robocorp.http.http`](./robocorp.http.http.md#module-robocorphttphttp)
+Currently the library exposes one method:
 
-## Classes
+```python
+from robocorp.http import download
+from robocorp.tasks import task
 
-- No classes
+def fetch_workbook():
+	path = download("https://example.com/orders.xlsx")
+	print(f"Downloaded file to: {path}")
+```
 
-## Functions
+## API Reference
 
-- [`http.download`](./robocorp.http.http.md#function-download)
+Information on specific functions or classes: [robocorp.http](./api/robocorp.http.md)
 
+## Changelog
 
----
-
-_This file was automatically generated via [lazydocs](https://github.com/ml-tooling/lazydocs)._
+A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).

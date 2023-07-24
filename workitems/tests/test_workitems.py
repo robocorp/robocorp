@@ -307,3 +307,20 @@ def test_iter_after_release(inputs):
     assert len(rest) == 2
     assert len(inputs.released) == 3
     assert rest[0] != first
+
+
+def test_collect_inputs(inputs, outputs):
+    adapter = inputs.current._adapter
+
+    output = outputs.create(save=False)
+    assert output.id is None
+    assert adapter.releases == []
+
+    summary = []
+    for item in inputs:
+        summary.append(item.payload)
+    assert len(summary) == 3
+
+    output.payload = summary
+    output.save()
+    assert adapter.DATA[output.id] == summary

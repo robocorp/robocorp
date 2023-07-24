@@ -1,29 +1,64 @@
-<!-- markdownlint-disable -->
+# robocorp-browser
 
-# API Overview
+The `robocorp-browser` is a wrapper for the [Playwright](https://playwright.dev/python/)
+project, with quality-of-life improvements such as automatic lifecycle management
+for Playwright objects.
 
-## Modules
+## Getting started
 
-- [`robocorp.browser`](./robocorp.browser.md#module-robocorpbrowser)
-- [`robocorp.browser.cli`](./robocorp.browser.cli.md#module-robocorpbrowsercli)
-
-## Classes
-
-- No classes
-
-## Functions
-
-- [`browser.browser`](./robocorp.browser.md#function-browser): Provides a managed instance of the browser to interact with.
-- [`browser.configure`](./robocorp.browser.md#function-configure): May be called before any other method to configure the browser settings.
-- [`browser.context`](./robocorp.browser.md#function-context): Provides a managed instance of the browser context to interact with.
-- [`browser.goto`](./robocorp.browser.md#function-goto): Changes the url of the current page (creating a page if needed).
-- [`browser.install`](./robocorp.browser.md#function-install): Downloads and installs the given browser engine.
-- [`browser.page`](./robocorp.browser.md#function-page): Provides a managed instance of the browser page to interact with.
-- [`browser.playwright`](./robocorp.browser.md#function-playwright): Provides a managed instance of playwright to interact with.
-- [`browser.screenshot`](./robocorp.browser.md#function-screenshot): Takes a screenshot of the given page/element/locator and saves it to the
-- [`cli.main`](./robocorp.browser.cli.md#function-main)
+```python
+from robocorp.tasks import task
+from robocorp import browser
+from robocorp import vault
 
 
----
+@task
+def browser_automate():
+    # Configure may be used to set the basic robocorp.browser settings.
+    # It must be called prior to calling APIs which create playwright objects.
+    browser.configure(
+        # Note: screenshot="only-on-failure" is actually the default.
+        # If the browser_automate() function finishes with an exception it will
+        # make a screenshot and embed it into the logs.
+        screenshot="only-on-failure",
+        
+        # By default headless is False unless running in a Linux container
+        # without a DISPLAY/WAYLAND_DISPLAY environment variable, but it
+        # can also be manually specified.
+        headless=True,
+        
+        # Interactions may be run in slow-motion (given in milliseconds).
+        slowmo=100,
+    )
 
-_This file was automatically generated via [lazydocs](https://github.com/ml-tooling/lazydocs)._
+    # browser.goto() may be used as a shortcut to get the current page and
+    # go to some url (it may create the browser if still not created).
+    browser.goto("https://example.com>")
+
+    login()
+
+
+def login():
+    # APIs in robocorp.browser return the same browser instance, which is
+    # automatically closed when the task finishes.
+    page = browser.page()
+
+    # robocorp.vault is recommended for managing secrets.
+    account = vault.get_secret("default-account")
+
+    # Use the playwright Browser api as usual.
+    page.fill('//input[@ng-reflect-name="password"]', account["password"])
+    page.click("input:text('Submit')")
+```
+
+## Guides
+
+- [Browser configuration](./guides/configuration.md)
+
+## API Reference
+
+Information on specific functions or classes: [robocorp.browser](./api/robocorp.browser.md)
+
+## Changelog
+
+A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
