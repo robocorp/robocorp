@@ -564,6 +564,29 @@ def foo():
     str_regression.check(unparsed)
 
 
+def test_rewrite_assert_simple(tmpdir, str_regression):
+    config = AutoLogConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def call():
+    return 1
+    
+def foo():
+    a = 10
+    assert a > 10
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+
+
 def test_rewrite_assert(tmpdir, str_regression):
     config = AutoLogConfigForTest()
 
