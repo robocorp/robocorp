@@ -1,9 +1,9 @@
 from tempfile import TemporaryDirectory
 from unittest import mock
-from pathlib import Path
 
 import pytest
 import responses
+
 from robocorp.http import download
 
 
