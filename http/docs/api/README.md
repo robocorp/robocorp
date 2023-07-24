@@ -5,7 +5,6 @@
 ## Modules
 
 - [`robocorp.http`](./robocorp.http.md#module-robocorphttp)
-- [`robocorp.http.http`](./robocorp.http.http.md#module-robocorphttphttp)
 
 ## Classes
 
@@ -13,5 +12,4 @@
 
 ## Functions
 
-- [`http.download`](./robocorp.http.http.md#function-download)
-- [`http.download`](./robocorp.http.http.md#function-download)
+- [`_http.download`](./robocorp.http._http.md#function-download): Download a file from the given URL.
