@@ -1,5 +1,5 @@
 import { RunIdsAndLabel, RunInfo } from '~/lib';
-import { Entry, EntryConsole } from '~/lib/types';
+import { Entry } from '~/lib/types';
 
 let callsToSetAllEntries:
   | {

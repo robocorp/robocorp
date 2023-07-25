@@ -13,6 +13,12 @@ export type ViewSettings = {
   showInTerminal: StatusLevel; // Actually an or(StatusLevel)
 };
 
+export interface ExpandInfo {
+  lastExpandedId: string;
+  idDepth: number;
+  childrenIndexes: Set<number>;
+}
+
 export enum StatusLevel {
   error = 1 << 4, // 16
   warn = 1 << 3, // 8

@@ -1,3 +1,4 @@
+import { MutableRefObject } from 'react';
 import { FilteredEntries } from './logContext';
 import {
   ConsoleMessageKind,
@@ -9,12 +10,17 @@ import {
   EntryMethodBase,
   EntryUntrackedGenerator,
   EntryWithLocationBase,
+  ExpandInfo,
   Type,
 } from './types';
 import * as DOMPurify from 'dompurify';
 
 export function entryDepth(entry: Entry) {
   return entry.id.split('-').length - 1;
+}
+
+export function entryIdDepth(id: string) {
+  return id.split('-').length - 1;
 }
 
 /**
@@ -34,6 +40,7 @@ export const acceptConsoleEntryInTree = (kind: ConsoleMessageKind, message: stri
 export const leaveOnlyExpandedEntries = (
   data: Entry[],
   expandedItems: Set<string>,
+  lastExpandInfo: MutableRefObject<ExpandInfo>,
 ): FilteredEntries => {
   // console.log('All: ', JSON.stringify(data));
 
@@ -61,8 +68,9 @@ export const leaveOnlyExpandedEntries = (
     }
     const depth = entryDepth(entry);
     const i = entry.id.lastIndexOf('-');
+    let parentId: string | undefined = undefined;
     if (i > 0) {
-      const parentId = entry.id.substring(0, i);
+      parentId = entry.id.substring(0, i);
       entriesWithChildren.add(parentId);
     }
 
@@ -72,6 +80,17 @@ export const leaveOnlyExpandedEntries = (
         continue;
       }
       hideChildren = false;
+    }
+
+    if (
+      lastExpandInfo.current.lastExpandedId.length > 0 &&
+      depth - 1 >= lastExpandInfo.current.idDepth &&
+      parentId !== undefined &&
+      parentId.startsWith(lastExpandInfo.current.lastExpandedId)
+    ) {
+      // Note that the index is related to the compressed array, not
+      // original array with all entries.
+      lastExpandInfo.current.childrenIndexes.add(ret.length);
     }
 
     ret.push(entry);

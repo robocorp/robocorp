@@ -1,5 +1,5 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
-import { Entry, StatusLevel, ViewSettings } from './types';
+import { Entry, ExpandInfo, StatusLevel, ViewSettings } from './types';
 import { isDocumentDefined, isWindowDefined, logError } from './helpers';
 import { detectVSCodeTheme } from '../vscode/themeDetector';
 import { isInVSCode } from '../vscode/vscodeComm';
@@ -38,6 +38,7 @@ export type LogContextType = {
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
   lastUpdatedIndex: MutableRefObject<number>;
+  lastExpandInfo: MutableRefObject<ExpandInfo>;
 };
 
 let defaultTheme: 'light' | 'dark' = 'light';
@@ -113,6 +114,13 @@ export const defaultLogState: LogContextType = {
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),
   lastUpdatedIndex: { current: 0 },
+  lastExpandInfo: {
+    current: {
+      lastExpandedId: '',
+      idDepth: -1,
+      childrenIndexes: new Set(),
+    },
+  },
 };
 
 export const LogContext = createContext<LogContextType>(defaultLogState);

@@ -1,8 +1,9 @@
 import { getTitle } from '~/components/row/components/step/StepTitle';
 import { entryDepth, leaveOnlyExpandedEntries } from './helpers';
 import { FilteredEntries } from './logContext';
-import { Entry, Type, EntryLog, StatusLevel, EntryConsole, ConsoleMessageKind } from './types';
+import { Entry, Type, EntryLog, StatusLevel, ExpandInfo } from './types';
 import { getValue } from '~/components/row/components/step/StepValue';
+import { MutableRefObject } from 'react';
 
 interface EntryAdded {
   entry: Entry;
@@ -14,6 +15,7 @@ export const leaveOnlyFilteredExpandedEntries = (
   data: Entry[],
   expandedItems: Set<string>,
   filter: string,
+  lastExpandInfo: MutableRefObject<ExpandInfo>,
 ): FilteredEntries => {
   // When we have a filter we have to visit up to leafs to
   // determine if an entry is valid (because if a leaf
@@ -103,5 +105,5 @@ export const leaveOnlyFilteredExpandedEntries = (
   }
 
   // console.log('Filtered: ', JSON.stringify(ret));
-  return leaveOnlyExpandedEntries(filtered, expandedItems);
+  return leaveOnlyExpandedEntries(filtered, expandedItems, lastExpandInfo);
 };
