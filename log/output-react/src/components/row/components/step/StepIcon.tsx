@@ -21,7 +21,6 @@ import { Badge, Box } from '@robocorp/components';
 import {
   ConsoleMessageKind,
   Entry,
-  EntryAssertFailed,
   EntryConsole,
   EntryException,
   EntryLog,

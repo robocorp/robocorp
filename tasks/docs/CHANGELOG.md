@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Improved UI when logs are rotated out.
+
 ## 2.1.3 - 2023-07-19
 
 - Moved some internal APIs to load the `robocorp.log` auto log configuration to the

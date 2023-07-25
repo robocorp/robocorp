@@ -718,6 +718,17 @@ export class TreeBuilder {
     const part = id.decoded['part'];
     if (this.runInfo.firstPart === -1) {
       this.runInfo.firstPart = part;
+
+      if (this.runInfo.firstPart > 1) {
+        const msg = `Note that the log contents being shown do not have contents from the start of the run. 
+The logged contents prior to part ${this.runInfo.firstPart} were rotated out.
+It's possible to customize the size of the logs with "--max-log-file-size" and "--max-log-files".`;
+
+        this.flattened.pushLog({
+          message_type: 'L',
+          decoded: { level: 'W', message: msg, source: '', lineno: -1 },
+        });
+      }
     }
     this.runInfo.lastPart = part;
     this.runInfoChanged = true;
