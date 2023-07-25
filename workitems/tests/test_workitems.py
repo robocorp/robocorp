@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from robocorp.workitems import version_info
 from robocorp.workitems._exceptions import BusinessException
 from robocorp.workitems._types import ExceptionType, State
 from robocorp.workitems._workitem import Input, Output
@@ -62,7 +63,7 @@ def test_inputs_iter(inputs):
         assert isinstance(item, Input)
         items.append(item)
 
-    assert len(items) == 3
+    assert len(items) == 2
     assert all(item.released for item in items)
 
 
@@ -70,7 +71,7 @@ def test_inputs_released(inputs):
     # Exhaust all items
     _ = list(inputs)
 
-    assert len(inputs.released) == 3
+    assert len(inputs.released) == 2
 
 
 def test_outputs_create(outputs, adapter):
@@ -111,28 +112,28 @@ def test_outputs_magic_methods(outputs):
     assert list(reversed(outputs)) == [k, j, i]
 
 
-def test_input_pass(inputs):
+def test_input_pass(inputs, adapter):
     item = inputs.current
     assert item.state is None
-    assert len(item._adapter.releases) == 0
+    assert len(adapter.releases) == 0
 
     item.done()
     assert item.state is State.DONE
 
-    _, state, exc = item._adapter.releases[-1]
+    _, state, exc = adapter.releases[-1]
     assert state is State.DONE
     assert exc is None
 
 
-def test_input_fail(inputs):
+def test_input_fail(inputs, adapter):
     item = inputs.current
     assert item.state is None
-    assert len(item._adapter.releases) == 0
+    assert len(adapter.releases) == 0
 
     item.fail(ExceptionType.BUSINESS, "MY_ERR_CODE", "Something went oopsy")
     assert item.state is State.FAILED
 
-    _, state, exc = item._adapter.releases[-1]
+    _, state, exc = adapter.releases[-1]
     assert state is State.FAILED
     assert exc["type"] == "BUSINESS"
     assert exc["code"] == "MY_ERR_CODE"
@@ -152,7 +153,17 @@ def test_input_list_files(inputs):
     assert inputs.current.files == ["file1.txt", "file2.txt", "file3.png"]
 
 
-def test_input_download_file(inputs):
+def test_input_get_file(inputs):
+    item = inputs.current
+
+    with temp_filename() as path:
+        result = item.get_file("file2.txt", path)
+        assert is_same_path(result, path)
+        assert result.read_text() == "data2"
+
+
+def test_input_download_file_deprecated(inputs):
+    assert version_info[0] < 2, "Should be removed"
     item = inputs.current
 
     with temp_filename() as path:
@@ -161,14 +172,22 @@ def test_input_download_file(inputs):
         assert result.read_text() == "data2"
 
 
-def test_input_download_file_missing(inputs):
+def test_input_get_files(inputs):
     item = inputs.current
 
-    with pytest.raises(KeyError):
-        item.download_file("file5.txt")
+    with tempfile.TemporaryDirectory() as outdir:
+        file1 = os.path.join(outdir, "file1.txt")
+        file2 = os.path.join(outdir, "file2.txt")
+
+        paths = item.get_files("*.txt", outdir)
+        assert is_same_path(paths[0], file1)
+        assert is_same_path(paths[1], file2)
+        assert os.path.exists(file1)
+        assert os.path.exists(file2)
 
 
-def test_input_download_files(inputs):
+def test_input_download_files_deprecated(inputs):
+    assert version_info[0] < 2, "Should be removed"
     item = inputs.current
 
     with tempfile.TemporaryDirectory() as outdir:
@@ -182,12 +201,60 @@ def test_input_download_files(inputs):
         assert os.path.exists(file2)
 
 
-def test_input_download_files_missing(inputs):
+def test_input_get_file_missing(inputs):
+    item = inputs.current
+
+    with pytest.raises(FileNotFoundError):
+        item.get_file("file5.txt")
+
+
+def test_input_get_files_missing(inputs):
     item = inputs.current
 
     with tempfile.TemporaryDirectory() as outdir:
-        paths = item.download_files("*.pdf", outdir)
+        paths = item.get_files("*.pdf", outdir)
         assert len(paths) == 0
+
+
+def test_input_remove_file(inputs):
+    item = inputs.current
+    assert "file1.txt" in item.files
+
+    item.remove_file("file1.txt")
+    assert "file1.txt" in item.files
+
+    item.save()
+    assert "file1.txt" not in item.files
+
+
+def test_input_remove_file_notexist(inputs):
+    item = inputs.current
+    with pytest.raises(FileNotFoundError):
+        item.remove_file("not-exist")
+
+
+def test_input_remove_files(inputs):
+    item = inputs.current
+
+    paths = item.remove_files("*.txt")
+    assert paths == ["file1.txt", "file2.txt"]
+    assert not item.saved
+
+    item.save()
+    assert item.files == ["file3.png"]
+    assert item.saved
+
+
+def test_input_modify_payload(inputs, adapter):
+    item = inputs.current
+    assert item.saved
+
+    item.payload = {"modified": 123}
+    assert not item.saved
+
+    item.save()
+    assert item.saved
+    adapter.validate(item, "modified", 123)
 
 
 def test_outputs_create_files(outputs, adapter):
@@ -197,8 +264,8 @@ def test_outputs_create_files(outputs, adapter):
     ):
         path1, path2 = Path(path1), Path(path2)
         item = outputs.create(files=[path1, path2])
-        assert adapter.FILES[item.id][path1.name] == b"file-content-1"
-        assert adapter.FILES[item.id][path2.name] == b"file-content-2"
+        assert adapter.files[item.id][path1.name] == b"file-content-1"
+        assert adapter.files[item.id][path2.name] == b"file-content-2"
 
 
 @pytest.mark.parametrize(
@@ -236,7 +303,7 @@ def test_outputs_create_files(outputs, adapter):
         },
     ],
 )
-def test_release_work_item_failed(inputs, fail_kwargs):
+def test_release_work_item_failed(inputs, adapter, fail_kwargs):
     item = inputs.current
     item.fail(**fail_kwargs)
 
@@ -252,7 +319,7 @@ def test_release_work_item_failed(inputs, fail_kwargs):
     }
 
     assert item.state == State.FAILED
-    assert item._adapter.releases == [("workitem-id-first", State.FAILED, exception)]
+    assert adapter.releases == [("workitem-id-first", State.FAILED, exception)]
 
 
 def test_duplicate_reserve(inputs):
@@ -272,27 +339,27 @@ def test_inputs_iter_explicit_release(inputs):
         item.done()
 
 
-def test_inputs_throw_business_exception(inputs):
+def test_inputs_throw_business_exception(inputs, adapter):
     inputs.current.done()
 
     with inputs.reserve():
         raise BusinessException(message="My message", code="SOME_CODE")
 
-    _, state, exception = inputs.current._adapter.releases[-1]
+    _, state, exception = adapter.releases[-1]
     assert state is State.FAILED
     assert exception["type"] == "BUSINESS"
     assert exception["code"] == "SOME_CODE"
     assert exception["message"] == "My message"
 
 
-def test_inputs_throw_unknown_exception(inputs):
+def test_inputs_throw_unknown_exception(inputs, adapter):
     inputs.current.done()
 
     with pytest.raises(ValueError):
         with inputs.reserve():
             raise ValueError("Some value")
 
-    _, state, exception = inputs.current._adapter.releases[-1]
+    _, state, exception = adapter.releases[-1]
     assert state is State.FAILED
     assert exception["type"] == "APPLICATION"
     assert exception["code"] is None
@@ -304,8 +371,8 @@ def test_iter_after_release(inputs):
     first.done()
 
     rest = list(inputs)
-    assert len(rest) == 2
-    assert len(inputs.released) == 3
+    assert len(rest) == 1
+    assert len(inputs.released) == 2
     assert rest[0] != first
 
 
@@ -328,9 +395,7 @@ def test_allow_multiple_saves(outputs, adapter):
     adapter.validate(item, "key", "value2")
 
 
-def test_collect_inputs(inputs, outputs):
-    adapter = inputs.current._adapter
-
+def test_collect_inputs(inputs, outputs, adapter):
     output = outputs.create()
     assert adapter.releases == []
 
@@ -343,4 +408,4 @@ def test_collect_inputs(inputs, outputs):
 
     output.payload = summary
     output.save()
-    assert adapter.DATA[output.id] == summary
+    assert adapter.data[output.id] == summary

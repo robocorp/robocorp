@@ -21,17 +21,17 @@ class TestFileAdapter:
     """Tests the local dev env `FileAdapter` on Work Items."""
 
     @contextmanager
-    def _input_work_items(self):
+    def _mock_work_items(self):
         with tempfile.TemporaryDirectory() as datadir:
-            items_in = os.path.join(datadir, "items.json")
+            datadir = Path(datadir)
+
+            items_in = datadir / "items.json"
+            items_out = datadir / "items.out.json"
+
             with open(items_in, "w") as fd:
                 json.dump(ITEMS_JSON, fd)
             with open(os.path.join(datadir, "file.txt"), "w") as fd:
                 fd.write("some mock content")
-
-            output_dir = os.path.join(datadir, "output_dir")
-            os.makedirs(output_dir)
-            items_out = os.path.join(output_dir, "items-out.json")
 
             yield items_in, items_out
 
@@ -42,16 +42,10 @@ class TestFileAdapter:
         ]
     )
     def adapter(self, monkeypatch, request):
-        with self._input_work_items() as (items_in, items_out):
-            monkeypatch.setenv(request.param[0], items_in)
-            monkeypatch.setenv(request.param[1], items_out)
+        with self._mock_work_items() as (items_in, items_out):
+            monkeypatch.setenv(request.param[0], str(items_in))
+            monkeypatch.setenv(request.param[1], str(items_out))
             yield FileAdapter()
-
-    @staticmethod
-    @pytest.fixture
-    def empty_adapter():
-        # No work items i/o files nor envs set.
-        return FileAdapter()
 
     def test_load_data(self, adapter):
         item_id = adapter.reserve_input()
@@ -69,20 +63,19 @@ class TestFileAdapter:
         assert content == b"some mock content"
 
     def test_add_file(self, adapter):
-        item_id = adapter.reserve_input()
+        item_id = adapter.create_output("not-used")
         adapter.add_file(
             item_id,
             "secondfile.txt",
-            original_name="secondfile2.txt",
             content=b"somedata",
         )
-        assert adapter._inputs[0]["files"]["secondfile.txt"] == "secondfile2.txt"
-        assert os.path.isfile(Path(adapter.input_path).parent / "secondfile2.txt")
+        assert adapter._outputs[0]["files"]["secondfile.txt"] == "secondfile.txt"
+        assert os.path.isfile(Path(adapter._output_path).parent / "secondfile.txt")
 
     def test_save_data_input(self, adapter):
         item_id = adapter.reserve_input()
         adapter.save_payload(item_id, {"key": "value"})
-        with open(adapter.input_path) as fd:
+        with open(adapter._input_path) as fd:
             data = json.load(fd)
             assert data == [
                 {"payload": {"key": "value"}, "files": {"a-file": "file.txt"}}
@@ -92,16 +85,16 @@ class TestFileAdapter:
         item_id = adapter.create_output("0", {})
         adapter.save_payload(item_id, {"key": "value"})
 
-        output = adapter.output_path
+        output = adapter._output_path
         assert os.path.isfile(output)
         with open(output) as fd:
             data = json.load(fd)
             assert data == [{"payload": {"key": "value"}, "files": {}}]
 
     def test_missing_file(self, monkeypatch):
-        monkeypatch.setenv("RPA_WORKITEMS_PATH", "not-exist.json")
-        adapter = FileAdapter()
-        assert adapter._inputs == [{"payload": {}}]
+        monkeypatch.setenv("RC_WORKITEM_INPUT_PATH", "not-exist.json")
+        with pytest.raises(ValueError):
+            FileAdapter()
 
     def test_empty_queue(self, monkeypatch):
         with tempfile.TemporaryDirectory() as datadir:
@@ -109,9 +102,9 @@ class TestFileAdapter:
             with open(items, "w") as fd:
                 json.dump([], fd)
 
-            monkeypatch.setenv("RPA_WORKITEMS_PATH", items)
-            adapter = FileAdapter()
-            assert adapter._inputs == [{"payload": {}}]
+            monkeypatch.setenv("RC_WORKITEM_INPUT_PATH", items)
+            with pytest.raises(ValueError):
+                FileAdapter()
 
     def test_malformed_queue(self, monkeypatch):
         with tempfile.TemporaryDirectory() as datadir:
@@ -119,20 +112,9 @@ class TestFileAdapter:
             with open(items, "w") as fd:
                 json.dump(["not-an-item"], fd)
 
-            monkeypatch.setenv("RPA_WORKITEMS_PATH", items)
-            adapter = FileAdapter()
-            assert adapter._inputs == [{"payload": {}}]
-
-    def test_without_items_paths(self, empty_adapter):
-        assert empty_adapter._inputs == [{"payload": {}}]
-
-        # Can't save inputs nor outputs since there's no path defined for them.
-        with pytest.raises(RuntimeError):
-            empty_adapter.save_payload("0", {"input": "value"})
-        with pytest.raises(RuntimeError):
-            _ = empty_adapter.output_path
-        with pytest.raises(RuntimeError):
-            empty_adapter.create_output("1", {"var": "some-value"})
+            monkeypatch.setenv("RC_WORKITEM_INPUT_PATH", items)
+            with pytest.raises(ValueError):
+                FileAdapter()
 
 
 class TestRobocorpAdapter:
@@ -422,7 +404,6 @@ class TestRobocorpAdapter:
         adapter.add_file(
             item_id,
             file_name,
-            original_name="not-used.txt",
             content=file_content,
         )
         files = self.mock_post.call_args_list[-1][1]["files"]

@@ -211,7 +211,7 @@ def test_email_failed_parses(inputs):
 def test_html_attachment(inputs, adapter):
     inputs.current._payload = EMAIL_VALID
 
-    adapter.FILES[inputs.current.id][HTML_FILENAME] = HTML_CONTENT
+    adapter.files[inputs.current.id][HTML_FILENAME] = HTML_CONTENT
     inputs.current._files = [HTML_FILENAME]
 
     email = inputs.current.email()
@@ -222,7 +222,7 @@ def test_html_attachment(inputs, adapter):
 def test_html_attachment_skip(inputs, adapter):
     inputs.current._payload = EMAIL_VALID
 
-    adapter.FILES[inputs.current.id][HTML_FILENAME] = HTML_CONTENT
+    adapter.files[inputs.current.id][HTML_FILENAME] = HTML_CONTENT
     inputs.current._files = [HTML_FILENAME]
 
     email = inputs.current.email(html=False)

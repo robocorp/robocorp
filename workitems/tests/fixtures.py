@@ -11,13 +11,14 @@ from .mocks import MockAdapter
 
 @pytest.fixture
 def adapter():
-    MockAdapter.reset()
-    yield MockAdapter
+    adapter = MockAdapter()
+    adapter.reset()
+    yield adapter
 
 
 @pytest.fixture
 def context(adapter):
-    ctx = Context(default_adapter=adapter)
+    ctx = Context(adapter=adapter)
     ctx.reserve_input()
 
     def _getter():
