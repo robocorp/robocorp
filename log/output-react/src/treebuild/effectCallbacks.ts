@@ -32,13 +32,17 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
 export function setAllEntriesWhenPossible(
   allEntries: Entry[], // all the entries which should be set
   newExpanded: string[], // new entry ids to be expanded
-  updatedFromIndex = 0, // from which index onwards was there some change
+  updatedFromIndex = -1, // from which index onwards was there some change
 ) {
   if (reactSetAllEntriesCallback !== undefined) {
     reactSetAllEntriesCallback(allEntries, newExpanded, updatedFromIndex);
   } else {
     if (callsToSetAllEntries !== undefined) {
-      updatedFromIndex = Math.min(updatedFromIndex, callsToSetAllEntries.updatedFromIndex);
+      if (updatedFromIndex === -1) {
+        updatedFromIndex = callsToSetAllEntries.updatedFromIndex;
+      } else if (callsToSetAllEntries.updatedFromIndex === -1) {
+        updatedFromIndex = callsToSetAllEntries.updatedFromIndex;
+      }
       newExpanded = callsToSetAllEntries.newExpanded.concat(newExpanded);
     }
     callsToSetAllEntries = { allEntries, newExpanded, updatedFromIndex };

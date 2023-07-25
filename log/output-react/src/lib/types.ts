@@ -66,7 +66,11 @@ export enum ConsoleMessageKind {
 export interface EntryBase {
   id: string;
   type: Type;
-  entriesIndex: number;
+  entryIndexAll: number; // this is the index in the full array.
+
+  // This is the index is the compressed array (where collapsed or filtered out entries are not shown).
+  // It's not fixed and changes whenever the tree structure changes.
+  entryIndexCompressed: number;
 }
 
 export interface EntryWithLocationBase extends EntryBase {

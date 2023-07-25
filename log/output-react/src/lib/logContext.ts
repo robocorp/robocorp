@@ -27,8 +27,12 @@ export interface RunIdsAndLabel {
   currentRunId: string | undefined;
 }
 
+export interface IsExpanded {
+  (id: string): boolean;
+}
+
 export type LogContextType = {
-  expandedEntries: Set<string>;
+  isExpanded: IsExpanded;
   allEntries: Entry[];
   filteredEntries: FilteredEntries;
   toggleEntry: (id: string) => void;
@@ -93,7 +97,9 @@ export const createDefaultRunIdsAndLabel = (): RunIdsAndLabel => ({
 
 export const defaultLogState: LogContextType = {
   allEntries: [],
-  expandedEntries: new Set<string>(),
+  isExpanded: (id: string) => {
+    return false;
+  },
   filteredEntries: {
     entries: [],
     entriesWithChildren: new Set<string>(),

@@ -21,8 +21,16 @@ export const ListContents: FC<Props> = () => {
   const { filteredEntries, lastUpdatedIndex, lastExpandInfo } = useLogContext();
 
   useEffect(() => {
-    // Per the docs, this isn't needed unless the item size changes (which shouldn't happen for us).
-    // listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
+    // This is needed when an item size changes. Note that in general when
+    // we just append items, this isn't really needed, but if we change the
+    // structure of the tree (when expanding or applying some filter)
+    // it's needed because we change which item is appearing at a given
+    // index.
+    if (lastUpdatedIndex.current !== -1) {
+      listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
+      lastUpdatedIndex.current = -1;
+    }
+
     if (lastExpandInfo.current.lastExpandedId.length > 0) {
       const childrenIndexes = lastExpandInfo.current.childrenIndexes;
       if (childrenIndexes.size > 0) {

@@ -10,6 +10,7 @@ import {
   RunIdsAndLabel,
   createDefaultRunIdsAndLabel,
   entryIdDepth,
+  IsExpanded,
 } from '~/lib';
 import { Entry, ExpandInfo, ViewSettings } from './lib/types';
 import {
@@ -31,6 +32,8 @@ const Main = styled.main`
 
 export const Log = () => {
   const [filter, setFilter] = useState('');
+
+  // Regular usage: user expands entries
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
   const [activeIndex, setActiveIndex] = useState<number | null | 'information' | 'terminal'>(null);
   const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
@@ -40,6 +43,8 @@ export const Log = () => {
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
   const lastUpdatedIndex = useRef<number>(0);
+
+  const idToEntry = useRef<Map<string, Entry>>(new Map());
 
   // This works in the following way: whenever the item clicks an item to be expanded
   // the lastExpandedId is marked, then when filtering the children of the expanded
@@ -55,7 +60,10 @@ export const Log = () => {
    */
   useEffect(() => {
     reactCallSetAllEntriesCallback(
-      (allEntries: Entry[], newExpanded: string[], updatedFromIndex = 0) => {
+      (allEntries: Entry[], newExpanded: string[], updatedFromIndex = -1) => {
+        // Note: the updatedFromIndex is not used right now (it'd need to be)
+        // translated to the compressed value, but we don't have the use case
+        // for now, so, just ignore it.
         if (newExpanded.length > 0) {
           setExpandedEntries((curr) => {
             const set = new Set<string>(curr);
@@ -68,7 +76,9 @@ export const Log = () => {
 
         setEntries(() => {
           // console.log('Set entries to: ' + JSON.stringify(allEntries));
-          lastUpdatedIndex.current = updatedFromIndex;
+          for (const entry of allEntries) {
+            idToEntry.current.set(entry.id, entry);
+          }
           return [...allEntries];
         });
 
@@ -89,11 +99,23 @@ export const Log = () => {
     });
   }, []);
 
+  const hasFilter = filter !== undefined && filter.length > 0;
+
+  if (hasFilter) {
+    // When a filter is applied just say that the whole tree changed.
+    lastUpdatedIndex.current = 0;
+  }
+
+  let isExpanded: IsExpanded;
+
   // Toggle the expanded state.
   const toggleEntry = useCallback((id: string) => {
-    lastUpdatedIndex.current = 0;
     setExpandedEntries((curr) => {
       const cp = new Set<string>(curr);
+      const entry = idToEntry.current.get(id);
+      if (entry !== undefined) {
+        lastUpdatedIndex.current = entry.entryIndexCompressed;
+      }
 
       if (curr.has(id)) {
         cp.delete(id);
@@ -110,18 +132,25 @@ export const Log = () => {
     });
   }, []);
 
+  isExpanded = useCallback(
+    (id: string) => {
+      return expandedEntries.has(id);
+    },
+    [expandedEntries],
+  );
+
   // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
-    if (filter !== undefined && filter.length > 0) {
+    if (hasFilter) {
       // Note: this also calls 'leaveOnlyExpandedEntries' internally.
-      return leaveOnlyFilteredExpandedEntries(entries, expandedEntries, filter, lastExpandInfo);
+      return leaveOnlyFilteredExpandedEntries(entries, isExpanded, filter, lastExpandInfo);
     }
-    return leaveOnlyExpandedEntries(entries, expandedEntries, lastExpandInfo);
-  }, [entries, expandedEntries, filter, lastExpandInfo]);
+    return leaveOnlyExpandedEntries(entries, isExpanded, lastExpandInfo);
+  }, [entries, expandedEntries, filter, isExpanded, lastExpandInfo]);
 
   const ctx: LogContextType = {
     allEntries: entries,
-    expandedEntries,
+    isExpanded,
     filteredEntries,
     toggleEntry,
     activeIndex,
@@ -135,7 +164,7 @@ export const Log = () => {
 
   const logContextValue = useMemo(
     () => ctx,
-    [entries, activeIndex, expandedEntries, filteredEntries, viewSettings, runInfo],
+    [entries, activeIndex, isExpanded, expandedEntries, filteredEntries, viewSettings, runInfo],
   );
 
   return (

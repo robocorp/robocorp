@@ -25,9 +25,9 @@ const Button = styled.button`
 `;
 
 export const StepToggle: FC<Props> = ({ entry }) => {
-  const { filteredEntries, expandedEntries, toggleEntry } = useLogContext();
+  const { filteredEntries, isExpanded, toggleEntry } = useLogContext();
 
-  const expanded = expandedEntries.has(entry.id);
+  const expanded = isExpanded(entry.id);
 
   const onToggle = useCallback(
     (e: MouseEvent) => {

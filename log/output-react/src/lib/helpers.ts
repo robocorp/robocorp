@@ -1,5 +1,5 @@
 import { MutableRefObject } from 'react';
-import { FilteredEntries } from './logContext';
+import { FilteredEntries, IsExpanded } from './logContext';
 import {
   ConsoleMessageKind,
   Entry,
@@ -39,7 +39,7 @@ export const acceptConsoleEntryInTree = (kind: ConsoleMessageKind, message: stri
 
 export const leaveOnlyExpandedEntries = (
   data: Entry[],
-  expandedItems: Set<string>,
+  isExpanded: IsExpanded,
   lastExpandInfo: MutableRefObject<ExpandInfo>,
 ): FilteredEntries => {
   // console.log('All: ', JSON.stringify(data));
@@ -93,9 +93,10 @@ export const leaveOnlyExpandedEntries = (
       lastExpandInfo.current.childrenIndexes.add(ret.length);
     }
 
+    entry.entryIndexCompressed = ret.length;
     ret.push(entry);
 
-    if (!expandedItems.has(entry.id)) {
+    if (!isExpanded(entry.id)) {
       // i.e.: the current item is hidden: hide it and all its children
       // until we get to the next sibling.
       // Note that the item itself is still shown, just children are hidden.

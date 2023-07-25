@@ -1,6 +1,6 @@
 import { getTitle } from '~/components/row/components/step/StepTitle';
 import { entryDepth, leaveOnlyExpandedEntries } from './helpers';
-import { FilteredEntries } from './logContext';
+import { FilteredEntries, IsExpanded } from './logContext';
 import { Entry, Type, EntryLog, StatusLevel, ExpandInfo } from './types';
 import { getValue } from '~/components/row/components/step/StepValue';
 import { MutableRefObject } from 'react';
@@ -13,7 +13,7 @@ interface EntryAdded {
 
 export const leaveOnlyFilteredExpandedEntries = (
   data: Entry[],
-  expandedItems: Set<string>,
+  isExpanded: IsExpanded,
   filter: string,
   lastExpandInfo: MutableRefObject<ExpandInfo>,
 ): FilteredEntries => {
@@ -105,5 +105,5 @@ export const leaveOnlyFilteredExpandedEntries = (
   }
 
   // console.log('Filtered: ', JSON.stringify(ret));
-  return leaveOnlyExpandedEntries(filtered, expandedItems, lastExpandInfo);
+  return leaveOnlyExpandedEntries(filtered, isExpanded, lastExpandInfo);
 };
