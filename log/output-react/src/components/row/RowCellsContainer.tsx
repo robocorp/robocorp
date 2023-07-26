@@ -1,8 +1,17 @@
-import { CSSProperties, FC, useCallback } from 'react';
+import {
+  CSSProperties,
+  FC,
+  useCallback,
+  KeyboardEvent,
+  useEffect,
+  useRef,
+  MouseEvent,
+  FocusEvent,
+  useState,
+} from 'react';
 import { styled } from '@robocorp/theme';
-import { Tooltip } from '@robocorp/components';
 
-import { formatDuration, formatLocation, useLogContext } from '~/lib';
+import { activeIndexAsKindAndSelected, formatDuration, formatLocation, useLogContext } from '~/lib';
 import { Cell } from './components/Cell';
 import { StepCell } from './components/step/StepCell';
 import { isInVSCode } from '~/vscode/vscodeComm';
@@ -14,7 +23,6 @@ type Props = {
 };
 
 const Container = styled.div<{ mode: 'compact' | 'sparse' }>`
-  cursor: pointer;
   display: flex;
   margin: 0 ${({ theme, mode }) => (mode === 'compact' ? theme.space.$0 : theme.space.$24)};
   width: calc(
@@ -29,12 +37,45 @@ const Container = styled.div<{ mode: 'compact' | 'sparse' }>`
 `;
 
 export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
-  const { filteredEntries, setActiveIndex, viewSettings } = useLogContext();
+  const { filteredEntries, setActiveIndex, viewSettings, activeIndex, toggleEntryExpandState } =
+    useLogContext();
   const entry = filteredEntries.entries[index];
 
-  const onToggle = useCallback(() => {
-    setActiveIndex(index);
-  }, [index]);
+  const [focused, setFocus] = useState<boolean>(false);
+
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      // When 'Enter' is used the details are shown and when
+      // space is used the expanded state is toggled.
+      if (event.key === 'Enter') {
+        setFocus(true);
+        setActiveIndex({ kind: 'details', indexAll: entry.entryIndexAll });
+        event.stopPropagation();
+      } else if (event.key === ' ') {
+        event.stopPropagation();
+        event.preventDefault(); // default would do a page down (scroll tree down).
+        toggleEntryExpandState(entry.id);
+      }
+    },
+    [index, entry],
+  );
+
+  const onBlur = useCallback(
+    (event: FocusEvent) => {
+      // When loosing focus make sure we remove the focus-related classes
+      // (otherwise they can stick around).
+      setFocus(false);
+    },
+    [entry],
+  );
+
+  const onClickRow = useCallback(
+    (event: MouseEvent) => {
+      setFocus(true);
+      event.stopPropagation();
+    },
+    [index],
+  );
 
   let data: any = undefined;
   if (isInVSCode()) {
@@ -57,15 +98,39 @@ export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
     }
   }, []);
 
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const curr: any = containerRef.current;
+    if (curr !== undefined) {
+      const kindAndSelected = activeIndexAsKindAndSelected(activeIndex);
+      if (kindAndSelected !== undefined && kindAndSelected.indexAll == entry.entryIndexAll) {
+        setFocus(true);
+        curr.focus();
+      }
+    }
+  }, [containerRef, entry, activeIndex]);
+
+  let className: string = 'oneRow';
+  if (focused) {
+    className += ' focus-visible';
+  }
+
   return (
     <Container
-      className="oneRow"
+      className={className}
+      ref={containerRef}
       role="button"
-      onClick={onToggle}
-      onKeyPress={onToggle}
+      onClick={onClickRow}
+      onKeyDown={onKeyDown}
       {...rest}
       tabIndex={0}
       mode={viewSettings.mode}
+      onBlur={onBlur}
+      // When tabbing 'focus-visible' and 'data-focus-visible-added'
+      // are automatically set (by someone), so, we try to replicate
+      // the same when doing it ourselves through the 'focused' state.
+      {...(focused ? { 'data-focus-visible-added': '' } : {})}
     >
       <StepCell entry={entry} />
       {viewSettings.columns.location && (

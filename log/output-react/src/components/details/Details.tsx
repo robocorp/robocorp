@@ -1,6 +1,6 @@
 import { Box, Drawer } from '@robocorp/components';
 import { useCallback } from 'react';
-import { useLogContext } from '~/lib';
+import { KindAndIndexSelected, useLogContext } from '~/lib';
 import { styled } from '@robocorp/theme';
 import { DetailsTitle } from './DetailsTitle';
 import { DetailsContent } from './DetailsContent';
@@ -13,17 +13,26 @@ export const BoxOutput = styled(Box)`
 `;
 
 export const Details = () => {
-  const { filteredEntries, activeIndex, setActiveIndex } = useLogContext();
+  const { filteredEntries, activeIndex, setActiveIndex, allEntries } = useLogContext();
+  const onClose = useCallback(() => {
+    setActiveIndex(null);
+  }, []);
+
+  if (!activeIndex) {
+    return <></>;
+  }
 
   if (activeIndex == 'information') {
     return <InformationDetails></InformationDetails>;
   } else if (activeIndex == 'terminal') {
     return <TerminalDetails></TerminalDetails>;
   } else {
-    const entry = typeof activeIndex === 'number' && filteredEntries.entries[activeIndex];
-    const onClose = useCallback(() => {
-      setActiveIndex(null);
-    }, []);
+    const idx = activeIndex as KindAndIndexSelected;
+    if (idx.kind !== 'details') {
+      return <></>;
+    }
+
+    const entry = allEntries[idx.indexAll];
 
     return (
       <Drawer passive onClose={onClose} width={1024} open={!!entry}>

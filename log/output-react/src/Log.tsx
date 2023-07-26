@@ -11,6 +11,7 @@ import {
   createDefaultRunIdsAndLabel,
   entryIdDepth,
   IsExpanded,
+  ActiveIndexType,
 } from '~/lib';
 import { Entry, ExpandInfo, ViewSettings } from './lib/types';
 import {
@@ -35,14 +36,14 @@ export const Log = () => {
 
   // Regular usage: user expands entries
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
-  const [activeIndex, setActiveIndex] = useState<number | null | 'information' | 'terminal'>(null);
+  const [activeIndex, setActiveIndex] = useState<ActiveIndexType>(null);
   const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
   const [runIdsAndLabel, setRunIdsAndLabel] = useState<RunIdsAndLabel>(
     createDefaultRunIdsAndLabel(),
   );
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
-  const lastUpdatedIndex = useRef<number>(0);
+  const lastUpdatedIndexFiltered = useRef<number>(0);
 
   const idToEntry = useRef<Map<string, Entry>>(new Map());
 
@@ -54,6 +55,12 @@ export const Log = () => {
     idDepth: -1,
     childrenIndexes: new Set(),
   });
+
+  useEffect(() => {
+    // When the filter is changed, just say that the whole tree changed
+    // (i.e.: heights of the filtered items may have changed).
+    lastUpdatedIndexFiltered.current = 0;
+  }, [filter]);
 
   /**
    * Register callback which should be used to set entries.
@@ -99,22 +106,15 @@ export const Log = () => {
     });
   }, []);
 
-  const hasFilter = filter !== undefined && filter.length > 0;
-
-  if (hasFilter) {
-    // When a filter is applied just say that the whole tree changed.
-    lastUpdatedIndex.current = 0;
-  }
-
   let isExpanded: IsExpanded;
 
   // Toggle the expanded state.
-  const toggleEntry = useCallback((id: string) => {
+  const toggleEntryExpandState = useCallback((id: string) => {
     setExpandedEntries((curr) => {
       const cp = new Set<string>(curr);
       const entry = idToEntry.current.get(id);
       if (entry !== undefined) {
-        lastUpdatedIndex.current = entry.entryIndexCompressed;
+        lastUpdatedIndexFiltered.current = entry.entryIndexFiltered;
       }
 
       if (curr.has(id)) {
@@ -141,7 +141,7 @@ export const Log = () => {
 
   // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
-    if (hasFilter) {
+    if (filter !== undefined && filter.length > 0) {
       // Note: this also calls 'leaveOnlyExpandedEntries' internally.
       return leaveOnlyFilteredExpandedEntries(entries, isExpanded, filter, lastExpandInfo);
     }
@@ -152,13 +152,13 @@ export const Log = () => {
     allEntries: entries,
     isExpanded,
     filteredEntries,
-    toggleEntry,
+    toggleEntryExpandState,
     activeIndex,
     setActiveIndex,
     viewSettings,
     setViewSettings,
     runInfo,
-    lastUpdatedIndex,
+    lastUpdatedIndexFiltered,
     lastExpandInfo,
   };
 

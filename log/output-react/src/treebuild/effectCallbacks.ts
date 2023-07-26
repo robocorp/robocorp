@@ -42,6 +42,8 @@ export function setAllEntriesWhenPossible(
         updatedFromIndex = callsToSetAllEntries.updatedFromIndex;
       } else if (callsToSetAllEntries.updatedFromIndex === -1) {
         updatedFromIndex = callsToSetAllEntries.updatedFromIndex;
+      } else {
+        updatedFromIndex = Math.min(updatedFromIndex, callsToSetAllEntries.updatedFromIndex);
       }
       newExpanded = callsToSetAllEntries.newExpanded.concat(newExpanded);
     }

@@ -18,7 +18,7 @@ export const ListContents: FC<Props> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VariableSizeList>(null);
   const { height } = useSize(containerRef);
-  const { filteredEntries, lastUpdatedIndex, lastExpandInfo } = useLogContext();
+  const { filteredEntries, lastUpdatedIndexFiltered, lastExpandInfo } = useLogContext();
 
   useEffect(() => {
     // This is needed when an item size changes. Note that in general when
@@ -26,9 +26,9 @@ export const ListContents: FC<Props> = () => {
     // structure of the tree (when expanding or applying some filter)
     // it's needed because we change which item is appearing at a given
     // index.
-    if (lastUpdatedIndex.current !== -1) {
-      listRef.current?.resetAfterIndex(lastUpdatedIndex.current);
-      lastUpdatedIndex.current = -1;
+    if (lastUpdatedIndexFiltered.current !== -1) {
+      listRef.current?.resetAfterIndex(lastUpdatedIndexFiltered.current);
+      lastUpdatedIndexFiltered.current = -1;
     }
 
     if (lastExpandInfo.current.lastExpandedId.length > 0) {

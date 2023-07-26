@@ -1,11 +1,10 @@
-import { FC, ReactNode } from 'react';
+import { FC, MouseEvent, useCallback } from 'react';
 import { Box, Typography } from '@robocorp/components';
 
 import {
   Entry,
   EntryMethod,
   EntryTask,
-  EntryException,
   Type,
   EntryVariable,
   EntryGenerator,
@@ -19,6 +18,7 @@ import {
   EntryElse,
   EntryAssertFailed,
 } from '~/lib/types';
+import { useLogContext } from '~/lib';
 
 type Props = {
   entry: Entry;
@@ -74,8 +74,23 @@ export const StepTitle: FC<Props> = ({ entry }) => {
     return <></>;
   }
 
+  const { setActiveIndex } = useLogContext();
+
+  const onClickShowDetails = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      setActiveIndex({ kind: 'details', indexAll: entry.entryIndexAll });
+    },
+    [entry],
+  );
+
   return (
-    <Box minWidth={0} className="entryName">
+    <Box
+      minWidth={0}
+      className="entryName"
+      onClick={onClickShowDetails}
+      style={{ cursor: 'pointer' }}
+    >
       <Typography mr="$24" lineHeight="$32" variant="body.small" fontWeight="medium" truncate={1}>
         {title}
       </Typography>

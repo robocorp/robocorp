@@ -68,9 +68,11 @@ export interface EntryBase {
   type: Type;
   entryIndexAll: number; // this is the index in the full array.
 
-  // This is the index is the compressed array (where collapsed or filtered out entries are not shown).
+  // This is the index is the filtered array (where collapsed or filtered out entries are not shown).
   // It's not fixed and changes whenever the tree structure changes.
-  entryIndexCompressed: number;
+  // In general it should be used as seldomly as possible (entryIndexAll is preferred), but
+  // if dealing with the filtered array it may be needed.
+  entryIndexFiltered: number;
 }
 
 export interface EntryWithLocationBase extends EntryBase {

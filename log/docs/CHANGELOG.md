@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- `log.html`:
+    - Tree usability improvements:
+        - When an item is expanded its children are scrolled into the tree.
+        - When row is focused, `Enter` can be used to open item details and `Space` to expand and collapse.
+        - When expand button is focused both `Enter` and `Space' can be used to expand and collapse.
+        - Clicking on row will show row focused.
+        - Clicking on row title will open item details.
+
 ## 2.5.0 - 2023-07-24
 
 - Spec version changed from `0.0.2` to `0.0.3`.

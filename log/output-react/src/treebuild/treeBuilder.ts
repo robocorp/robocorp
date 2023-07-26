@@ -194,7 +194,7 @@ class FlattenedTree {
       excType: excType,
       excMsg: excMsg.trim(),
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -220,7 +220,7 @@ class FlattenedTree {
       threadName,
       threadDetails: threadDetails.trim(),
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -264,7 +264,7 @@ class FlattenedTree {
       source: consoleOutput.source,
       lineno: consoleOutput.lineno,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -297,7 +297,7 @@ class FlattenedTree {
       lineno: msg.decoded['lineno'],
       isHtml: msg.message_type === 'LH',
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -314,7 +314,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -333,7 +333,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -352,7 +352,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -371,7 +371,7 @@ class FlattenedTree {
       status: StatusLevel.error,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -393,7 +393,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
       varType: msg.decoded['type'], // Note: not really used for EntrySuspendYieldFrom.
       value: msg.decoded['value'], // Note: not really used for EntrySuspendYieldFrom.
@@ -415,7 +415,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.stack.push(entry);
@@ -436,7 +436,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.stack.push(entry);
@@ -481,7 +481,7 @@ class FlattenedTree {
       value: msg.decoded['value'],
       varType: msg.decoded['type'],
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
     // Tooltip:
@@ -499,7 +499,7 @@ class FlattenedTree {
       value: msg.decoded['value'],
       varType: msg.decoded['type'],
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -517,7 +517,7 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.stack.push(entry);
     this.entries.push(entry);
@@ -531,7 +531,7 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexCompressed: -1,
+      entryIndexFiltered: -1,
     };
     this.stack.push(entry);
     this.entries.push(entry);

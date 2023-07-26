@@ -31,17 +31,36 @@ export interface IsExpanded {
   (id: string): boolean;
 }
 
+export interface KindAndIndexSelected {
+  kind: 'details' | 'focus';
+  indexAll: number;
+}
+
+export type ActiveIndexType = null | 'information' | 'terminal' | KindAndIndexSelected;
+
+export const activeIndexAsKindAndSelected = (
+  activeIndex: ActiveIndexType,
+): undefined | KindAndIndexSelected => {
+  if (activeIndex) {
+    if (activeIndex === 'information' || activeIndex === 'terminal') {
+      return undefined;
+    }
+    return activeIndex as KindAndIndexSelected;
+  }
+  return undefined;
+};
+
 export type LogContextType = {
   isExpanded: IsExpanded;
   allEntries: Entry[];
   filteredEntries: FilteredEntries;
-  toggleEntry: (id: string) => void;
-  activeIndex: null | number | 'information' | 'terminal';
-  setActiveIndex: (index: null | number | 'information' | 'terminal') => void;
+  toggleEntryExpandState: (id: string) => void;
+  activeIndex: ActiveIndexType;
+  setActiveIndex: (index: ActiveIndexType) => void;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
-  lastUpdatedIndex: MutableRefObject<number>;
+  lastUpdatedIndexFiltered: MutableRefObject<number>;
   lastExpandInfo: MutableRefObject<ExpandInfo>;
 };
 
@@ -104,7 +123,7 @@ export const defaultLogState: LogContextType = {
     entries: [],
     entriesWithChildren: new Set<string>(),
   },
-  toggleEntry: () => null,
+  toggleEntryExpandState: () => null,
   activeIndex: null,
   setActiveIndex: () => null,
   viewSettings: {
@@ -119,7 +138,7 @@ export const defaultLogState: LogContextType = {
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),
-  lastUpdatedIndex: { current: 0 },
+  lastUpdatedIndexFiltered: { current: 0 },
   lastExpandInfo: {
     current: {
       lastExpandedId: '',

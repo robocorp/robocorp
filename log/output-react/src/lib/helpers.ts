@@ -93,7 +93,7 @@ export const leaveOnlyExpandedEntries = (
       lastExpandInfo.current.childrenIndexes.add(ret.length);
     }
 
-    entry.entryIndexCompressed = ret.length;
+    entry.entryIndexFiltered = ret.length;
     ret.push(entry);
 
     if (!isExpanded(entry.id)) {
