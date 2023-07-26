@@ -309,17 +309,37 @@ def test_iter_after_release(inputs):
     assert rest[0] != first
 
 
+def test_allow_multiple_saves(outputs, adapter):
+    item = outputs.create(save=False)
+    assert item.saved is False
+
+    item.payload = {"key": "value"}
+    assert item.saved is False
+
+    item.save()
+    assert item.saved is True
+    adapter.validate(item, "key", "value")
+
+    item.payload = {"key": "value2"}
+    assert item.saved is False
+
+    item.save()
+    assert item.saved is True
+    adapter.validate(item, "key", "value2")
+
+
 def test_collect_inputs(inputs, outputs):
     adapter = inputs.current._adapter
 
-    output = outputs.create(save=False)
-    assert output.id is None
+    output = outputs.create()
     assert adapter.releases == []
 
     summary = []
     for item in inputs:
         summary.append(item.payload)
+
     assert len(summary) == 3
+    assert len(adapter.releases) == 3
 
     output.payload = summary
     output.save()
