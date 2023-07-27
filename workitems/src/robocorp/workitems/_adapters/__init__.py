@@ -22,7 +22,7 @@ Access to work items is only available from inside Control Room.
 To test different inputs and outputs, use the VSCode extension `Robocorp Code`.
 
 To learn more, see this guide: https://robocorp.com/docs/development-guide/control-room/work-items#developing-with-work-items-locally
-"""
+"""  # noqa
 
 
 def create_adapter() -> BaseAdapter:
