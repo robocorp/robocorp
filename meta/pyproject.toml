@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp"
-version = "0.8.1"
+version = "0.8.2"
 description = "Robocorp core libraries for Python automation"
 authors = [
 	"Ossi Rajuvaara <ossi@robocorp.com>",
@@ -12,11 +12,11 @@ packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-tasks = "2.1.2"
-robocorp-log = "2.3.0"
+robocorp-tasks = "2.1.3"
+robocorp-log = "2.5.0"
 robocorp-workitems = "1.2.1"
 robocorp-vault = "1.2.0"
-robocorp-storage = "0.3.1"
+robocorp-storage = "0.3.2"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
