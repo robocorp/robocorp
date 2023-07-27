@@ -13,6 +13,12 @@ export type ViewSettings = {
   showInTerminal: StatusLevel; // Actually an or(StatusLevel)
 };
 
+export interface ExpandInfo {
+  lastExpandedId: string;
+  idDepth: number;
+  childrenIndexes: Set<number>;
+}
+
 export enum StatusLevel {
   error = 1 << 4, // 16
   warn = 1 << 3, // 8
@@ -40,8 +46,9 @@ export enum Type {
   elseElement = 1 << 14,
   returnElement = 1 << 15, // 32768
   console = 1 << 16,
+  assertFailed = 1 << 17,
 
-  unhandled = 1 << 17,
+  unhandled = 1 << 18,
 }
 
 export enum ConsoleMessageKind {
@@ -59,7 +66,13 @@ export enum ConsoleMessageKind {
 export interface EntryBase {
   id: string;
   type: Type;
-  entriesIndex: number;
+  entryIndexAll: number; // this is the index in the full array.
+
+  // This is the index is the filtered array (where collapsed or filtered out entries are not shown).
+  // It's not fixed and changes whenever the tree structure changes.
+  // In general it should be used as seldomly as possible (entryIndexAll is preferred), but
+  // if dealing with the filtered array it may be needed.
+  entryIndexFiltered: number;
 }
 
 export interface EntryWithLocationBase extends EntryBase {
@@ -123,6 +136,10 @@ export interface EntryIf extends EntryMethodBase {
 
 export interface EntryElse extends EntryMethodBase {
   type: Type.elseElement;
+}
+
+export interface EntryAssertFailed extends EntryMethodBase {
+  type: Type.assertFailed;
 }
 
 export interface EntrySuspendYield extends EntryMethodBase {
@@ -192,4 +209,5 @@ export type Entry =
   | EntryElse
   | EntryReturn
   | EntryConsole
-  | EntryProcessSnapshot;
+  | EntryProcessSnapshot
+  | EntryAssertFailed;

@@ -1,0 +1,40 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def call():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'call', 2, {})) as @ctx:
+        @tmp_0 = 1
+        @robo_lifecycle_hooks.method_return(__name__, __file__, 'call', 3, @tmp_0)
+        return @tmp_0
+
+def foo():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 5, {})) as @ctx:
+        a = 10
+        @robo_lifecycle_hooks.after_assign(__name__, __file__, 'foo', 6, 'a', a)
+        if not a > 10:
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, 'a > 10', 7, (('a', a),))
+            raise AssertionError(f'Failed: assert a > 10\nVariables:\n  a = {a!r}')
+        if not a != 'some string':
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, "a != 'some string'", 8, (('a', a),))
+            raise AssertionError(f"Failed: assert a != 'some string'\nVariables:\n  a = {a!r}")
+        @tmp_1 = call1(1, 2)
+        @tmp_2 = call2(call3())
+        if not @tmp_1 == @tmp_2:
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, 'call1(1, 2) == call2(call3())', 9, (('call1(1, 2)', @tmp_1), ('call2(call3())', @tmp_2)))
+            raise AssertionError(f'The calls do not match\nFailed: assert call1(1, 2) == call2(call3())\nVariables:\n  call1(1, 2) = {@tmp_1!r}\n  call2(call3()) = {@tmp_2!r}')
+        @tmp_3 = call1(22)
+        @tmp_4 = call1(22)
+        @tmp_5 = call3()
+        if not @tmp_3 + @tmp_4 * @tmp_5:
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, 'call1(22) + call1(22) * call3()', 10, (('call1(...)', @tmp_3), ('call1(...)', @tmp_4), ('call3()', @tmp_5)))
+            raise AssertionError(f'Failed: assert call1(22) + call1(22) * call3()\nVariables:\n  call1(...) = {@tmp_3!r}\n  call1(...) = {@tmp_4!r}\n  call3() = {@tmp_5!r}')
+        @tmp_6 = a.call1(call2())
+        @tmp_7 = a.b.call2(call4())
+        @tmp_8 = a.b.c.call3()
+        if not @tmp_6 + @tmp_7 * @tmp_8:
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, 'a.call1(call2()) + a.b.call2(call4()) * a.b.c.call3()', 11, (('a.call1(...)', @tmp_6), ('a.b.call2(...)', @tmp_7), ('a.b.c.call3()', @tmp_8)))
+            raise AssertionError(f'Failed: assert a.call1(call2()) + a.b.call2(call4()) * a.b.c.call3()\nVariables:\n  a.call1(...) = {@tmp_6!r}\n  a.b.call2(...) = {@tmp_7!r}\n  a.b.c.call3() = {@tmp_8!r}')
+        @tmp_9 = a.b.c
+        @tmp_10 = f.g
+        if not (@tmp_9 and @tmp_10):
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, 'a.b.c and f.g', 12, (('a.b.c', @tmp_9), ('f.g', @tmp_10)))
+            raise AssertionError(f'Failed: assert a.b.c and f.g\nVariables:\n  a.b.c = {@tmp_9!r}\n  f.g = {@tmp_10!r}')

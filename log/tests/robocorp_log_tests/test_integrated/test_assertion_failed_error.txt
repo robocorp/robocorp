@@ -1,0 +1,15 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_failed_exception
+            AS: a: 10
+            SE: ASSERT_FAILED: a > 10
+            EA: int: a: 10
+            STB: AssertionError: Failed: assert a > 10
+Variables:
+  a = 10
+            TBE --- check_failed_exception ---
+            TBV: a: 10
+        EE: METHOD: ERROR
+    ET: PASS
+ER: PASS

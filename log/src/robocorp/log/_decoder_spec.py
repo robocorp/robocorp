@@ -122,6 +122,8 @@ ET: status:oid, message:oid, time_delta_in_seconds:float
 #
 # ELSE (note: doesn't add to the stack, just notifies that an if statement was entered)
 #
+# ASSERT_FAILED (note: doesn't add to the stack, just notifies that an assert statement failed)
+#
 SE: loc:loc_and_doc_id, type:oid, time_delta_in_seconds:float
 
 # Yield Resume (coming back to a suspended frame).

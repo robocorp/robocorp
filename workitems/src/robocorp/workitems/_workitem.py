@@ -5,7 +5,7 @@ import logging
 import os
 from glob import glob
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from ._adapters import BaseAdapter
 from ._exceptions import ApplicationException, BusinessException, to_exception_type
@@ -20,7 +20,7 @@ class Input:
         self._adapter = adapter
         self._id = item_id
         self._payload: JSONType = self._adapter.load_payload(self.id)
-        self._files: List[str] = self._adapter.list_files(self.id)
+        self._files: list[str] = self._adapter.list_files(self.id)
         self._state: Optional[State] = None
         self._outputs: list[Output] = []
 
@@ -157,7 +157,7 @@ class Input:
 
         return path.absolute()
 
-    def download_files(self, pattern: str, path: Optional[Path] = None) -> List[Path]:
+    def download_files(self, pattern: str, path: Optional[Path] = None) -> list[Path]:
         if path is None:
             root = os.getenv("ROBOT_ROOT", "")
             path = Path(root)
@@ -225,7 +225,8 @@ class Output:
         self._parent_id = parent_id
         self._id: Optional[str] = None
         self._payload: JSONType = {}
-        self._files: Dict[str, Path] = {}
+        self._files: dict[str, Path] = {}
+        self._saved = False
 
     def __repr__(self):
         payload = truncate(str(self.payload), 64)
@@ -258,6 +259,7 @@ class Output:
 
     @payload.setter
     def payload(self, value):
+        self._saved = False
         self._payload = value
 
     @property
@@ -266,13 +268,16 @@ class Output:
 
     @property
     def saved(self):
-        return self._id is not None
+        return self._saved
 
     def save(self):
-        if self.saved:
-            raise RuntimeError("Output already saved")
-
-        self._id = self._adapter.create_output(self.parent_id, payload=self.payload)
+        if not self._id:
+            self._id = self._adapter.create_output(
+                self.parent_id,
+                payload=self.payload,
+            )
+        else:
+            self._adapter.save_payload(self._id, payload=self.payload)
 
         for name, path in self._files.items():
             with open(path, "rb") as fd:
@@ -282,6 +287,8 @@ class Output:
                     original_name=path.name,
                     content=fd.read(),
                 )
+
+        self._saved = True
 
     def add_file(self, path: Union[Path, str], name: Optional[str] = None) -> Path:
         path = Path(path).resolve()
@@ -293,6 +300,7 @@ class Output:
         if name in self._files:
             LOGGER.warning('File with name "%s" already exists', name)
 
+        self._saved = False
         self._files[name] = path
         return path
 

@@ -1,11 +1,10 @@
-import { FC, ReactNode } from 'react';
+import { FC, MouseEvent, useCallback } from 'react';
 import { Box, Typography } from '@robocorp/components';
 
 import {
   Entry,
   EntryMethod,
   EntryTask,
-  EntryException,
   Type,
   EntryVariable,
   EntryGenerator,
@@ -17,7 +16,9 @@ import {
   EntryThreadDump,
   EntryIf,
   EntryElse,
+  EntryAssertFailed,
 } from '~/lib/types';
+import { useLogContext } from '~/lib';
 
 type Props = {
   entry: Entry;
@@ -45,6 +46,8 @@ export const getTitle = (entry: Entry): string => {
       return `${(entry as EntrySuspendYieldFrom).name} (suspend generator)`;
     case Type.method:
       return (entry as EntryMethod).name;
+    case Type.assertFailed:
+      return (entry as EntryAssertFailed).name;
     case Type.ifElement:
       return `Entered "${(entry as EntryIf).name}"`;
     case Type.elseElement:
@@ -71,8 +74,23 @@ export const StepTitle: FC<Props> = ({ entry }) => {
     return <></>;
   }
 
+  const { setActiveIndex } = useLogContext();
+
+  const onClickShowDetails = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      setActiveIndex({ kind: 'details', indexAll: entry.entryIndexAll });
+    },
+    [entry],
+  );
+
   return (
-    <Box minWidth={0} className="entryName">
+    <Box
+      minWidth={0}
+      className="entryName"
+      onClick={onClickShowDetails}
+      style={{ cursor: 'pointer' }}
+    >
       <Typography mr="$24" lineHeight="$32" variant="body.small" fontWeight="medium" truncate={1}>
         {title}
       </Typography>

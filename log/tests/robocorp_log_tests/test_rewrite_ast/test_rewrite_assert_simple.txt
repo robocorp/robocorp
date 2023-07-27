@@ -1,0 +1,15 @@
+import robocorp.log._lifecycle_hooks as @robo_lifecycle_hooks
+
+def call():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'call', 2, {})) as @ctx:
+        @tmp_0 = 1
+        @robo_lifecycle_hooks.method_return(__name__, __file__, 'call', 3, @tmp_0)
+        return @tmp_0
+
+def foo():
+    with @robo_lifecycle_hooks.MethodLifecycleContext(('METHOD', __name__, __file__, 'foo', 5, {})) as @ctx:
+        a = 10
+        @robo_lifecycle_hooks.after_assign(__name__, __file__, 'foo', 6, 'a', a)
+        if not a > 10:
+            @robo_lifecycle_hooks.assert_failed(__name__, __file__, 'a > 10', 7, (('a', a),))
+            raise AssertionError(f'Failed: assert a > 10\nVariables:\n  a = {a!r}')

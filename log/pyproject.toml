@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-log"
-version = "2.3.0"
+version = "2.5.0"
 description = "Automatic trace logging for Python"
 authors = [
     "Fabio Zadrozny <fabio@robocorp.com>",
@@ -33,6 +33,13 @@ mypy_path = "src:tests"
 
 [tool.isort]
 profile = "black"
+
+[tool.ruff]
+ignore = [
+    "E501", # Line-len.
+    "F541", # f-string without placeholders. 
+    "E731", # Use 'def' instead of lambda.
+]
 
 [[tool.mypy.overrides]]
 module = "setuptools.*"

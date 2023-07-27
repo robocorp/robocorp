@@ -21,7 +21,7 @@ def _log_error(func):
         except Exception:
             try:
                 writing = _LogErrorLock.tlocal._writing
-            except:
+            except Exception:
                 writing = _LogErrorLock.tlocal._writing = False
 
             if writing:
@@ -55,7 +55,8 @@ class _RoboLogger:
         from ._convert_units import _convert_to_bytes
         from ._robo_output_impl import _Config, _RoboOutputImpl
 
-        # Note: expected to be used just when used in-memory (not part of the public API).
+        # Note: expected to be used just when used in-memory (not part of the
+        # public API).
         config = _Config(kwargs.get("__uuid__"))
         if log_html_style == "standalone":
             config.log_html_style = 2
@@ -85,12 +86,12 @@ class _RoboLogger:
 
         if config.max_file_size_in_bytes < _convert_to_bytes("10kb"):
             raise ValueError(
-                f"Cannot generate logs where the max file size in bytes is less than 10kb."
-                f" Found: {config.max_file_size_in_bytes}."
-                f" Arg: {max_file_size}."
+                "Cannot generate logs where the max file size in bytes is less than"
+                f" 10kb. Found: {config.max_file_size_in_bytes}. Arg: {max_file_size}."
             )
 
-        # Note: expected to be used just when used in-memory (not part of the public API).
+        # Note: expected to be used just when used in-memory (not part of the
+        # public API).
         config.write = kwargs.get("__write__")
         config.initial_time = kwargs.get("__initial_time__")
         config.additional_info = kwargs.get("__additional_info__")
@@ -117,7 +118,11 @@ class _RoboLogger:
         if self._skip_log_methods <= 0:
             self._robot_output_impl.log_message(
                 "ERROR",
-                f"_RoboLogger error: start_logging_methods() called before stop_logging_methods() (call is ignored as logging is already on).",
+                (
+                    "_RoboLogger error: start_logging_methods() called before"
+                    " stop_logging_methods() (call is ignored as logging is already"
+                    " on)."
+                ),
                 False,
                 __file__,
                 sys._getframe().f_lineno,
@@ -134,7 +139,11 @@ class _RoboLogger:
         if self._skip_log_variables <= 0:
             self._robot_output_impl.log_message(
                 "ERROR",
-                f"_RoboLogger error: start_logging_variables() called before stop_logging_variables() (call is ignored as logging is already on).",
+                (
+                    "_RoboLogger error: start_logging_variables() called before"
+                    " stop_logging_variables() (call is ignored as logging is already"
+                    " on)."
+                ),
                 False,
                 __file__,
                 sys._getframe().f_lineno,

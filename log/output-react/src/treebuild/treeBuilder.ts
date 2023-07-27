@@ -23,6 +23,7 @@ import {
   EntryElse,
   EntryReturn,
   EntryConsole,
+  EntryAssertFailed,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import {
@@ -192,7 +193,8 @@ class FlattenedTree {
       tb: tb,
       excType: excType,
       excMsg: excMsg.trim(),
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -217,7 +219,8 @@ class FlattenedTree {
       tb: tb,
       threadName,
       threadDetails: threadDetails.trim(),
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -260,7 +263,8 @@ class FlattenedTree {
       message: consoleOutput.message,
       source: consoleOutput.source,
       lineno: consoleOutput.lineno,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -292,7 +296,8 @@ class FlattenedTree {
       source: msg.decoded['source'],
       lineno: msg.decoded['lineno'],
       isHtml: msg.message_type === 'LH',
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -308,7 +313,8 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -326,7 +332,8 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -344,7 +351,27 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.argsTarget = entry;
+  }
+
+  pushAssertFailed(msg: IMessage) {
+    const entry: EntryAssertFailed = {
+      id: this.newScopeId(false),
+      type: Type.assertFailed,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.error,
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
@@ -365,7 +392,8 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
       arguments: undefined,
       varType: msg.decoded['type'], // Note: not really used for EntrySuspendYieldFrom.
       value: msg.decoded['value'], // Note: not really used for EntrySuspendYieldFrom.
@@ -386,7 +414,8 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.stack.push(entry);
@@ -406,7 +435,8 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.stack.push(entry);
@@ -429,11 +459,11 @@ class FlattenedTree {
       }
 
       // Update the references to the new object to avoid mutability.
-      this.entries[targetCp.entriesIndex] = targetCp;
+      this.entries[targetCp.entryIndexAll] = targetCp;
       this.argsTarget = targetCp;
       for (let index = this.stack.length - 1; index >= 0; index--) {
         const element = this.stack[index];
-        if (element.entriesIndex === targetCp.entriesIndex) {
+        if (element.entryIndexAll === targetCp.entryIndexAll) {
           this.stack[index] = targetCp;
           break;
         }
@@ -450,7 +480,8 @@ class FlattenedTree {
       name: msg.decoded['target'],
       value: msg.decoded['value'],
       varType: msg.decoded['type'],
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
     // Tooltip:
@@ -467,7 +498,8 @@ class FlattenedTree {
       lineno: msg.decoded['lineno'],
       value: msg.decoded['value'],
       varType: msg.decoded['type'],
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
   }
@@ -484,7 +516,8 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.stack.push(entry);
     this.entries.push(entry);
@@ -497,7 +530,8 @@ class FlattenedTree {
       type: Type.processSnapshot,
       endDeltaInSeconds: -1,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
-      entriesIndex: this.entries.length,
+      entryIndexAll: this.entries.length,
+      entryIndexFiltered: -1,
     };
     this.stack.push(entry);
     this.entries.push(entry);
@@ -548,7 +582,7 @@ class FlattenedTree {
     entry.status = getIntLevelFromStatus(status);
     entry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
 
-    this.entries[entry.entriesIndex] = entry;
+    this.entries[entry.entryIndexAll] = entry;
     if (entry.status >= StatusLevel.error) {
       this.newExpanded.push(entry.id);
     }
@@ -596,7 +630,7 @@ class FlattenedTree {
     // entry that's being used in react).
     const processSnapshotEntry: EntryProcessSnapshot = <EntryProcessSnapshot>{ ...entry };
     processSnapshotEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
-    this.entries[processSnapshotEntry.entriesIndex] = processSnapshotEntry;
+    this.entries[processSnapshotEntry.entryIndexAll] = processSnapshotEntry;
   }
 }
 
@@ -699,6 +733,17 @@ export class TreeBuilder {
     const part = id.decoded['part'];
     if (this.runInfo.firstPart === -1) {
       this.runInfo.firstPart = part;
+
+      if (this.runInfo.firstPart > 1) {
+        const msg = `Note that the log contents being shown do not have contents from the start of the run. 
+The logged contents prior to part ${this.runInfo.firstPart} were rotated out.
+It's possible to customize the size of the logs with "--max-log-file-size" and "--max-log-files".`;
+
+        this.flattened.pushLog({
+          message_type: 'L',
+          decoded: { level: 'W', message: msg, source: '', lineno: -1 },
+        });
+      }
     }
     this.runInfo.lastPart = part;
     this.runInfoChanged = true;
@@ -776,10 +821,10 @@ export class TreeBuilder {
       }
     }
 
-    // TODO: properly compute from where we should update (we have to
-    // check what was the first item which was updated as we could be
-    // changing previous entries when the element is being closed).
-    const updateFromIndex = 0;
+    // Note that this is only needed if we mutate some item and
+    // as a result of that the item changes its size.
+    const updateFromIndex = -1;
+
     let newExpanded = this.flattened.newExpanded;
     if (newExpanded.length > 0) {
       // Don't add the same ones again.
@@ -887,6 +932,8 @@ export class TreeBuilder {
           this.flattened.pushIf(msg);
         } else if (msg.decoded['type'] === 'ELSE') {
           this.flattened.pushElse(msg);
+        } else if (msg.decoded['type'] === 'ASSERT_FAILED') {
+          this.flattened.pushAssertFailed(msg);
         } else {
           this.flattened.pushMethodScope(msg);
         }

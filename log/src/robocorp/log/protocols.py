@@ -1,5 +1,5 @@
 from types import TracebackType
-from typing import Literal, Protocol, Union, Sequence
+from typing import Literal, Protocol, Sequence, Union
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
@@ -9,6 +9,11 @@ LogHTMLStyle = Literal["standalone", "vscode"]
 
 class IReadLines(Protocol):
     def readlines(self) -> Sequence[str]:
+        pass
+
+
+class IContextErrorReport(Protocol):
+    def show_error(self, message: str):
         pass
 
 
@@ -38,6 +43,8 @@ LogElementType = Literal[
     "FOR",
     "FOR_STEP",
     "WHILE",
-    "WHILE_STEP" "IF",
+    "WHILE_STEP",
+    "IF",
     "ELSE",
+    "ASSERT_FAILED",
 ]

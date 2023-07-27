@@ -1,5 +1,4 @@
 import typing
-from dataclasses import dataclass
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Callable, Optional, Sequence, Set, TypeVar, Union
@@ -40,12 +39,6 @@ class Status:
     INFO = "INFO"  # log.info
     WARN = "WARN"  # log.warn
     DEBUG = "DEBUG"  # log.debug
-
-
-@dataclass
-class PyProjectInfo:
-    pyproject: Path
-    toml_contents: dict
 
 
 class ITask(typing.Protocol):

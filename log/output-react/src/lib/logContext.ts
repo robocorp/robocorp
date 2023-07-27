@@ -1,5 +1,5 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
-import { Entry, StatusLevel, ViewSettings } from './types';
+import { Entry, ExpandInfo, StatusLevel, ViewSettings } from './types';
 import { isDocumentDefined, isWindowDefined, logError } from './helpers';
 import { detectVSCodeTheme } from '../vscode/themeDetector';
 import { isInVSCode } from '../vscode/vscodeComm';
@@ -27,17 +27,41 @@ export interface RunIdsAndLabel {
   currentRunId: string | undefined;
 }
 
+export interface IsExpanded {
+  (id: string): boolean;
+}
+
+export interface KindAndIndexSelected {
+  kind: 'details' | 'focus';
+  indexAll: number;
+}
+
+export type ActiveIndexType = null | 'information' | 'terminal' | KindAndIndexSelected;
+
+export const activeIndexAsKindAndSelected = (
+  activeIndex: ActiveIndexType,
+): undefined | KindAndIndexSelected => {
+  if (activeIndex) {
+    if (activeIndex === 'information' || activeIndex === 'terminal') {
+      return undefined;
+    }
+    return activeIndex as KindAndIndexSelected;
+  }
+  return undefined;
+};
+
 export type LogContextType = {
-  expandedEntries: Set<string>;
+  isExpanded: IsExpanded;
   allEntries: Entry[];
   filteredEntries: FilteredEntries;
-  toggleEntry: (id: string) => void;
-  activeIndex: null | number | 'information' | 'terminal';
-  setActiveIndex: (index: null | number | 'information' | 'terminal') => void;
+  toggleEntryExpandState: (id: string) => void;
+  activeIndex: ActiveIndexType;
+  setActiveIndex: (index: ActiveIndexType) => void;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
-  lastUpdatedIndex: MutableRefObject<number>;
+  lastUpdatedIndexFiltered: MutableRefObject<number>;
+  lastExpandInfo: MutableRefObject<ExpandInfo>;
 };
 
 let defaultTheme: 'light' | 'dark' = 'light';
@@ -92,12 +116,14 @@ export const createDefaultRunIdsAndLabel = (): RunIdsAndLabel => ({
 
 export const defaultLogState: LogContextType = {
   allEntries: [],
-  expandedEntries: new Set<string>(),
+  isExpanded: (id: string) => {
+    return false;
+  },
   filteredEntries: {
     entries: [],
     entriesWithChildren: new Set<string>(),
   },
-  toggleEntry: () => null,
+  toggleEntryExpandState: () => null,
   activeIndex: null,
   setActiveIndex: () => null,
   viewSettings: {
@@ -112,7 +138,14 @@ export const defaultLogState: LogContextType = {
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),
-  lastUpdatedIndex: { current: 0 },
+  lastUpdatedIndexFiltered: { current: 0 },
+  lastExpandInfo: {
+    current: {
+      lastExpandedId: '',
+      idDepth: -1,
+      childrenIndexes: new Set(),
+    },
+  },
 };
 
 export const LogContext = createContext<LogContextType>(defaultLogState);

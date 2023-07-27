@@ -119,6 +119,16 @@ export const getIcon = (entry: Entry): ReactNode => {
       return getSuspendYieldIcon();
     case Type.variable:
       return <IconBox color="blue60" size="small" />;
+    case Type.assertFailed:
+      return (
+        <Badge
+          icon={IconStatusError}
+          variant="danger"
+          iconColor="background.error"
+          label={'FAILED assert'}
+          size="small"
+        />
+      );
     case Type.log:
       const log: EntryLog = entry as EntryLog;
       switch (log.status) {

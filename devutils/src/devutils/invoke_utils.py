@@ -3,9 +3,10 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Iterator, List, Optional
 
-from invoke import run, task
+from invoke import task
 
 ROOT = Path(__file__).parent.parent.parent
+REPOSITORY_URL = "https://github.com/robocorp/robo/tree/master/"
 
 
 class RoundtripPyProject:
@@ -188,11 +189,20 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     @task
     def docs(ctx):
         """Build API documentation"""
+        output_path = root / "docs" / "api"
+        output_path.mkdir(exist_ok=True)
+        for path in output_path.iterdir():
+            path.unlink()
+
         poetry(
             ctx,
             "run lazydocs",
-            "--overview-file README.md",
+            "--validate",
+            "--no-watermark",
             "--remove-package-prefix",
+            f"--src-base-url {REPOSITORY_URL}",
+            "--overview-file README.md",
+            f"--output-path {output_path}",
             package_name,
         )
 

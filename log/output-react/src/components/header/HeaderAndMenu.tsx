@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useCallback } from 'react';
+import { ChangeEvent, FC, KeyboardEvent, useCallback } from 'react';
 import {
   Badge,
   Box,
@@ -34,6 +34,18 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
 
   const onFilterReset = useCallback(() => {
     setFilter('');
+  }, []);
+
+  const onKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key == 'Escape') {
+      setFilter('');
+    } else if (e.key == 'Enter') {
+      if (e.shiftKey) {
+        // console.log('TODO: search prev');
+      } else {
+        // console.log('TODO: search next');
+      }
+    }
   }, []);
 
   const onToggleLocation = useCallback(() => {
@@ -206,6 +218,7 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
           <Input
             value={filter}
             onChange={onFilterChange}
+            onKeyDown={onKeyDown}
             aria-label="Search logs"
             placeholder="Search logs"
             iconLeft={IconSearch}

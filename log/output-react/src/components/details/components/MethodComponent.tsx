@@ -52,7 +52,11 @@ export const MethodComponent: FC<{ entry: Entry }> = (props) => {
     );
   } else {
     let title = 'Arguments';
-    if (entryMethod.type === Type.elseElement || entryMethod.type === Type.ifElement) {
+    if (
+      entryMethod.type === Type.elseElement ||
+      entryMethod.type === Type.ifElement ||
+      entryMethod.type === Type.assertFailed
+    ) {
       title = 'Variables';
     }
 

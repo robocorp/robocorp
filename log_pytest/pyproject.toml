@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "robocorp-log-pytest"
+version = "0.0.1"
+description = "PyTest plugin for auto-logging of pytest tests with robocorp-log."
+authors = [
+    "Fabio Zadrozny <fabio@robocorp.com>",
+]
+readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
+packages = [{include = "robocorp/log_pytest", from = "src"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Logging",
+    "Framework :: Pytest",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+robocorp-log = ">=2.5,<3"
+pytest = ">=7"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+
+[tool.poetry.plugins]
+pytest11 = { robocorp_log_pytest = "robocorp.log_pytest" }
+
+[tool.mypy]
+mypy_path = "src:tests"
+
+[tool.isort]
+profile = "black"
+
+[[tool.mypy.overrides]]
+module = "setuptools.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytest_timeout.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytest_timeout.*"
+ignore_missing_imports = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

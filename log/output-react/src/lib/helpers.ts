@@ -1,4 +1,5 @@
-import { FilteredEntries } from './logContext';
+import { MutableRefObject } from 'react';
+import { FilteredEntries, IsExpanded } from './logContext';
 import {
   ConsoleMessageKind,
   Entry,
@@ -9,12 +10,17 @@ import {
   EntryMethodBase,
   EntryUntrackedGenerator,
   EntryWithLocationBase,
+  ExpandInfo,
   Type,
 } from './types';
 import * as DOMPurify from 'dompurify';
 
 export function entryDepth(entry: Entry) {
   return entry.id.split('-').length - 1;
+}
+
+export function entryIdDepth(id: string) {
+  return id.split('-').length - 1;
 }
 
 /**
@@ -33,7 +39,8 @@ export const acceptConsoleEntryInTree = (kind: ConsoleMessageKind, message: stri
 
 export const leaveOnlyExpandedEntries = (
   data: Entry[],
-  expandedItems: Set<string>,
+  isExpanded: IsExpanded,
+  lastExpandInfo: MutableRefObject<ExpandInfo>,
 ): FilteredEntries => {
   // console.log('All: ', JSON.stringify(data));
 
@@ -61,8 +68,9 @@ export const leaveOnlyExpandedEntries = (
     }
     const depth = entryDepth(entry);
     const i = entry.id.lastIndexOf('-');
+    let parentId: string | undefined = undefined;
     if (i > 0) {
-      const parentId = entry.id.substring(0, i);
+      parentId = entry.id.substring(0, i);
       entriesWithChildren.add(parentId);
     }
 
@@ -74,9 +82,21 @@ export const leaveOnlyExpandedEntries = (
       hideChildren = false;
     }
 
+    if (
+      lastExpandInfo.current.lastExpandedId.length > 0 &&
+      depth - 1 >= lastExpandInfo.current.idDepth &&
+      parentId !== undefined &&
+      parentId.startsWith(lastExpandInfo.current.lastExpandedId)
+    ) {
+      // Note that the index is related to the compressed array, not
+      // original array with all entries.
+      lastExpandInfo.current.childrenIndexes.add(ret.length);
+    }
+
+    entry.entryIndexFiltered = ret.length;
     ret.push(entry);
 
-    if (!expandedItems.has(entry.id)) {
+    if (!isExpanded(entry.id)) {
       // i.e.: the current item is hidden: hide it and all its children
       // until we get to the next sibling.
       // Note that the item itself is still shown, just children are hidden.
