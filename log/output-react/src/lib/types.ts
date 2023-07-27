@@ -2,6 +2,10 @@ import { PythonTraceback } from '~/treebuild/protocols';
 
 export type FormatType = 'auto' | 'raw' | 'pretty';
 
+export interface TreeFilterInfo {
+  showInTree: StatusLevel; // Actually an or(StatusLevel)
+}
+
 export type ViewSettings = {
   columns: {
     duration: boolean;
@@ -11,6 +15,7 @@ export type ViewSettings = {
   format: FormatType;
   mode: 'compact' | 'sparse';
   showInTerminal: StatusLevel; // Actually an or(StatusLevel)
+  treeFilterInfo: TreeFilterInfo;
 };
 
 export interface ExpandInfo {

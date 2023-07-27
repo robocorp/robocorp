@@ -174,8 +174,8 @@ export const getIcon = (entry: Entry): ReactNode => {
           );
       }
     case Type.console:
-      const console: EntryConsole = entry as EntryConsole;
-      switch (console.kind) {
+      const c: EntryConsole = entry as EntryConsole;
+      switch (c.kind) {
         case ConsoleMessageKind.error:
         case ConsoleMessageKind.stderr:
           return <IconTerminal color="background.error" size="small" />;
@@ -219,6 +219,7 @@ export const getIcon = (entry: Entry): ReactNode => {
     // );
     default:
       // TODO: Provide icon for missing element
+      console.log('TODO: Provide icon  for', entry);
       return <IconInformation color="blue60" />;
   }
 };

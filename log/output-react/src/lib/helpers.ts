@@ -4,13 +4,22 @@ import {
   ConsoleMessageKind,
   Entry,
   EntryConsole,
+  EntryElse,
   EntryException,
   EntryGenerator,
+  EntryIf,
   EntryLog,
+  EntryMethod,
   EntryMethodBase,
+  EntryResumeYield,
+  EntryResumeYieldFrom,
+  EntrySuspendYield,
+  EntrySuspendYieldFrom,
+  EntryTask,
   EntryUntrackedGenerator,
   EntryWithLocationBase,
   ExpandInfo,
+  StatusLevel,
   Type,
 } from './types';
 import * as DOMPurify from 'dompurify';
@@ -35,6 +44,64 @@ export const acceptConsoleEntryInTree = (kind: ConsoleMessageKind, message: stri
     return false;
   }
   return true;
+};
+
+/**
+ * Provides the status level to be considered for some entry.
+ */
+export const getStatusLevel = (entry: Entry): StatusLevel => {
+  switch (entry.type) {
+    case Type.task:
+      const entryTask: EntryTask = entry as EntryTask;
+      return entryTask.status;
+    case Type.method:
+      return (entry as EntryMethod).status;
+    case Type.ifElement:
+      return (entry as EntryIf).status;
+    case Type.elseElement:
+      return (entry as EntryElse).status;
+    case Type.generator:
+      return (entry as EntryGenerator).status;
+    case Type.untrackedGenerator:
+      return (entry as EntryUntrackedGenerator).status;
+    case Type.resumeYield:
+      return (entry as EntryResumeYield).status;
+    case Type.resumeYieldFrom:
+      return (entry as EntryResumeYieldFrom).status;
+    case Type.suspendYield:
+      return (entry as EntrySuspendYield).status;
+    case Type.suspendYieldFrom:
+      return (entry as EntrySuspendYieldFrom).status;
+    case Type.returnElement:
+      return StatusLevel.info;
+    case Type.variable:
+      return StatusLevel.info;
+    case Type.assertFailed:
+      return StatusLevel.error;
+    case Type.log:
+      const log: EntryLog = entry as EntryLog;
+      return log.status;
+    case Type.console:
+      const c: EntryConsole = entry as EntryConsole;
+      switch (c.kind) {
+        case ConsoleMessageKind.error:
+        case ConsoleMessageKind.stderr:
+        case ConsoleMessageKind.traceback:
+          return StatusLevel.error;
+        default:
+          return StatusLevel.info;
+      }
+    case Type.exception:
+      return StatusLevel.error;
+    case Type.processSnapshot:
+      return StatusLevel.info;
+    case Type.threadDump:
+      return StatusLevel.info;
+    default:
+      // TODO: Provide status level for missing element
+      console.log('TODO: Provide status level for', entry);
+      return StatusLevel.unset;
+  }
 };
 
 export const leaveOnlyExpandedEntries = (

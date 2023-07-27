@@ -60,7 +60,7 @@ export const Log = () => {
     // When the filter is changed, just say that the whole tree changed
     // (i.e.: heights of the filtered items may have changed).
     lastUpdatedIndexFiltered.current = 0;
-  }, [filter]);
+  }, [viewSettings.treeFilterInfo]);
 
   /**
    * Register callback which should be used to set entries.
@@ -141,12 +141,13 @@ export const Log = () => {
 
   // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
-    if (filter !== undefined && filter.length > 0) {
-      // Note: this also calls 'leaveOnlyExpandedEntries' internally.
-      return leaveOnlyFilteredExpandedEntries(entries, isExpanded, filter, lastExpandInfo);
-    }
-    return leaveOnlyExpandedEntries(entries, isExpanded, lastExpandInfo);
-  }, [entries, expandedEntries, filter, isExpanded, lastExpandInfo]);
+    return leaveOnlyFilteredExpandedEntries(
+      entries,
+      isExpanded,
+      lastExpandInfo,
+      viewSettings.treeFilterInfo,
+    );
+  }, [entries, expandedEntries, isExpanded, lastExpandInfo, viewSettings.treeFilterInfo]);
 
   const ctx: LogContextType = {
     allEntries: entries,

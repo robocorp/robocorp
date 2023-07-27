@@ -64,6 +64,7 @@ export const getTitle = (entry: Entry): string => {
       return ''; // the type is added in the icon.
     // return (entry as EntryException).excType;
     default:
+      console.log('TODO: Provide getTitle for', entry);
       return 'TODO: provide getTitle';
   }
 };

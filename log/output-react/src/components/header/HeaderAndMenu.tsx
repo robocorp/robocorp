@@ -11,12 +11,13 @@ import {
   Select,
   SelectItem,
 } from '@robocorp/components';
-import { IconCloseSmall, IconTerminal } from '@robocorp/icons';
-import { IconInformation, IconSearch, IconSettingsSliders } from '@robocorp/icons/iconic';
+import { IconCloseSmall, IconFilter, IconSettings, IconTerminal } from '@robocorp/icons';
+import { IconInformation, IconSearch } from '@robocorp/icons/iconic';
 import { RunIdsAndLabel, RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
 import { CustomActions } from '~/lib/CustomActions';
 import { isInVSCode, onChangeCurrentRunId } from '~/vscode/vscodeComm';
 import { SUPPORTED_VERSION } from '~/treebuild/decoder';
+import { StatusLevel } from '~/lib/types';
 
 type Props = {
   filter: string;
@@ -73,6 +74,35 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
     setViewSettings((curr) => ({
       ...curr,
       mode: curr.mode === 'compact' ? 'sparse' : 'compact',
+    }));
+  }, []);
+
+  const onToggleDebugLevel = useCallback(() => {
+    console.log('toggle debug');
+    setViewSettings((curr) => ({
+      ...curr,
+      treeFilterInfo: { showInTree: curr.treeFilterInfo.showInTree ^ StatusLevel.debug },
+    }));
+  }, []);
+
+  const onToggleInfoLevel = useCallback(() => {
+    setViewSettings((curr) => ({
+      ...curr,
+      treeFilterInfo: { showInTree: curr.treeFilterInfo.showInTree ^ StatusLevel.info },
+    }));
+  }, []);
+
+  const onToggleWarnLevel = useCallback(() => {
+    setViewSettings((curr) => ({
+      ...curr,
+      treeFilterInfo: { showInTree: curr.treeFilterInfo.showInTree ^ StatusLevel.warn },
+    }));
+  }, []);
+
+  const onToggleErrorLevel = useCallback(() => {
+    setViewSettings((curr) => ({
+      ...curr,
+      treeFilterInfo: { showInTree: curr.treeFilterInfo.showInTree ^ StatusLevel.error },
     }));
   }, []);
 
@@ -189,7 +219,12 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
         <CustomActions>
           <Menu
             trigger={
-              <Button icon={IconSettingsSliders} variant="secondary" aria-label="Toggle option" />
+              <Button
+                icon={IconSettings}
+                variant="secondary"
+                aria-label="Settings"
+                title="Settings (theme, layout, columns)"
+              />
             }
             leaveMenuOpenOnItemSelect
           >
@@ -213,6 +248,43 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
             </Menu.Checkbox>
             <Menu.Checkbox checked={viewSettings.columns.duration} onClick={onToggleDuration}>
               Duration
+            </Menu.Checkbox>
+          </Menu>
+          <Menu
+            trigger={
+              <Button
+                icon={IconFilter}
+                variant="secondary"
+                aria-label="Filters"
+                title="Apply filters to show only the accepted items in the tree."
+              />
+            }
+            leaveMenuOpenOnItemSelect
+          >
+            <Menu.Title>Filter</Menu.Title>
+            <Menu.Checkbox
+              checked={(viewSettings.treeFilterInfo.showInTree & StatusLevel.debug) !== 0}
+              onClick={onToggleDebugLevel}
+            >
+              Debug
+            </Menu.Checkbox>
+            <Menu.Checkbox
+              checked={(viewSettings.treeFilterInfo.showInTree & StatusLevel.info) !== 0}
+              onClick={onToggleInfoLevel}
+            >
+              Information
+            </Menu.Checkbox>
+            <Menu.Checkbox
+              checked={(viewSettings.treeFilterInfo.showInTree & StatusLevel.warn) !== 0}
+              onClick={onToggleWarnLevel}
+            >
+              Warning
+            </Menu.Checkbox>
+            <Menu.Checkbox
+              checked={(viewSettings.treeFilterInfo.showInTree & StatusLevel.error) !== 0}
+              onClick={onToggleErrorLevel}
+            >
+              Error
             </Menu.Checkbox>
           </Menu>
           <Input

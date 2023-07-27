@@ -135,6 +135,9 @@ export const defaultLogState: LogContextType = {
     format: 'auto' as const,
     mode: isInVSCode() ? 'compact' : 'sparse',
     showInTerminal: StatusLevel.error,
+    treeFilterInfo: {
+      showInTree: StatusLevel.debug | StatusLevel.info | StatusLevel.warn | StatusLevel.error,
+    },
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),
