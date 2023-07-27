@@ -163,10 +163,10 @@ class Messages {
 }
 
 export const TerminalDetails = () => {
-  const { allEntries, viewSettings, setViewSettings, setActiveIndex } = useLogContext();
+  const { allEntries, viewSettings, setViewSettings, setDetailsIndex } = useLogContext();
 
   const onClose = useCallback(() => {
-    setActiveIndex(null);
+    setDetailsIndex(null);
   }, []);
 
   const messages = new Messages();

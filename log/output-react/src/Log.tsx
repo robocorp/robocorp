@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 import {
   LogContext,
-  leaveOnlyExpandedEntries,
   defaultLogState,
   LogContextType,
   RunInfo,
@@ -11,7 +10,12 @@ import {
   createDefaultRunIdsAndLabel,
   entryIdDepth,
   IsExpanded,
-  ActiveIndexType,
+  DetailsIndexType,
+  SearchInfoRequest,
+  createDefaultSearchInfoRequest,
+  leaveOnlyExpandedEntries,
+  FocusIndexType,
+  LastUpdatedIndex,
 } from '~/lib';
 import { Entry, ExpandInfo, ViewSettings } from './lib/types';
 import {
@@ -19,10 +23,11 @@ import {
   reactCallSetRunIdsAndLabelCallback,
   reactCallSetRunInfoCallback,
 } from './treebuild/effectCallbacks';
-import { leaveOnlyFilteredExpandedEntries } from './lib/filteringHelpers';
+import { leaveOnlyFilteredEntries } from './lib/filteringHelpers';
 import { Details } from './components/details/Details';
 import { HeaderAndMenu } from './components/header/HeaderAndMenu';
 import { ListHeaderAndContents } from './components/list/ListHeaderAndContents';
+import { getNextMtime, updateMtime, wasMtimeHandled } from './lib/mtime';
 
 const Main = styled.main`
   display: grid;
@@ -32,18 +37,24 @@ const Main = styled.main`
 `;
 
 export const Log = () => {
-  const [filter, setFilter] = useState('');
+  const [searchInfoRequest, setSearchInfoRequest] = useState<SearchInfoRequest>(
+    createDefaultSearchInfoRequest(),
+  );
 
   // Regular usage: user expands entries
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
-  const [activeIndex, setActiveIndex] = useState<ActiveIndexType>(null);
+  const [detailsIndex, setDetailsIndex] = useState<DetailsIndexType>(null);
+  const [focusIndex, setFocusIndex] = useState<FocusIndexType>(null);
   const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
   const [runIdsAndLabel, setRunIdsAndLabel] = useState<RunIdsAndLabel>(
     createDefaultRunIdsAndLabel(),
   );
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
   const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
-  const lastUpdatedIndexFiltered = useRef<number>(0);
+  const [lastUpdatedIndexFiltered, setLastUpdatedIndexFiltered] = useState<LastUpdatedIndex>({
+    filteredIndex: -1,
+    mtime: -1,
+  });
 
   const idToEntry = useRef<Map<string, Entry>>(new Map());
 
@@ -53,14 +64,14 @@ export const Log = () => {
   const lastExpandInfo = useRef<ExpandInfo>({
     lastExpandedId: '',
     idDepth: -1,
-    childrenIndexes: new Set(),
+    childrenIndexesFiltered: new Set(),
   });
 
   useEffect(() => {
     // When the filter is changed, just say that the whole tree changed
     // (i.e.: heights of the filtered items may have changed).
-    lastUpdatedIndexFiltered.current = 0;
-  }, [viewSettings.treeFilterInfo]);
+    setLastUpdatedIndexFiltered({ mtime: getNextMtime(), filteredIndex: 0 });
+  }, [viewSettings.treeFilterInfo.showInTree]);
 
   /**
    * Register callback which should be used to set entries.
@@ -114,19 +125,31 @@ export const Log = () => {
       const cp = new Set<string>(curr);
       const entry = idToEntry.current.get(id);
       if (entry !== undefined) {
-        lastUpdatedIndexFiltered.current = entry.entryIndexFiltered;
+        setLastUpdatedIndexFiltered((prev) => {
+          const curr = prev.filteredIndex;
+          if (curr < 0) {
+            return { filteredIndex: entry.entryIndexFiltered, mtime: getNextMtime() };
+          }
+          if (!wasMtimeHandled('lastUpdatedIndex', prev.mtime)) {
+            // The last one wasn't handled, we need to keep the lower value
+            // -- the mtime can be kept though.
+            return { filteredIndex: Math.min(entry.entryIndexFiltered, curr), mtime: prev.mtime };
+          } else {
+            return { filteredIndex: entry.entryIndexFiltered, mtime: getNextMtime() };
+          }
+        });
       }
 
       if (curr.has(id)) {
         cp.delete(id);
         lastExpandInfo.current.lastExpandedId = '';
         lastExpandInfo.current.idDepth = -1;
-        lastExpandInfo.current.childrenIndexes = new Set();
+        lastExpandInfo.current.childrenIndexesFiltered = new Set();
       } else {
         cp.add(id);
         lastExpandInfo.current.lastExpandedId = id;
         lastExpandInfo.current.idDepth = entryIdDepth(id);
-        lastExpandInfo.current.childrenIndexes = new Set();
+        lastExpandInfo.current.childrenIndexesFiltered = new Set();
       }
       return cp;
     });
@@ -141,31 +164,53 @@ export const Log = () => {
 
   // Leave only items which are actually expanded.
   const filteredEntries = useMemo(() => {
-    return leaveOnlyFilteredExpandedEntries(
-      entries,
-      isExpanded,
-      lastExpandInfo,
-      viewSettings.treeFilterInfo,
-    );
-  }, [entries, expandedEntries, isExpanded, lastExpandInfo, viewSettings.treeFilterInfo]);
+    const filtered = leaveOnlyFilteredEntries(entries, viewSettings.treeFilterInfo);
+
+    // After we've filtered the entries we must do the search to auto-expand and focus the
+    // given entry (if we haven't handled the request yet).
+    if (updateMtime('searchApplied', searchInfoRequest.requestMTime)) {
+      console.log('Do search');
+    }
+
+    return leaveOnlyExpandedEntries(filtered, isExpanded, lastExpandInfo);
+  }, [
+    entries,
+    expandedEntries,
+    isExpanded,
+    lastExpandInfo,
+    viewSettings.treeFilterInfo,
+    searchInfoRequest,
+  ]);
 
   const ctx: LogContextType = {
     allEntries: entries,
     isExpanded,
     filteredEntries,
     toggleEntryExpandState,
-    activeIndex,
-    setActiveIndex,
+    detailsIndex,
+    setDetailsIndex,
+    focusIndex,
+    setFocusIndex,
     viewSettings,
     setViewSettings,
     runInfo,
     lastUpdatedIndexFiltered,
+    setLastUpdatedIndexFiltered,
     lastExpandInfo,
   };
 
   const logContextValue = useMemo(
     () => ctx,
-    [entries, activeIndex, isExpanded, expandedEntries, filteredEntries, viewSettings, runInfo],
+    [
+      entries,
+      detailsIndex,
+      isExpanded,
+      expandedEntries,
+      filteredEntries,
+      viewSettings,
+      runInfo,
+      lastUpdatedIndexFiltered,
+    ],
   );
 
   return (
@@ -173,8 +218,8 @@ export const Log = () => {
       <Main>
         <LogContext.Provider value={logContextValue}>
           <HeaderAndMenu
-            filter={filter}
-            setFilter={setFilter}
+            searchInfoRequest={searchInfoRequest}
+            setSearchInfoRequest={setSearchInfoRequest}
             runInfo={runInfo}
             runIdsAndLabel={runIdsAndLabel}
           />

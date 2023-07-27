@@ -11,11 +11,12 @@ import {
 } from 'react';
 import { styled } from '@robocorp/theme';
 
-import { activeIndexAsKindAndSelected, formatDuration, formatLocation, useLogContext } from '~/lib';
+import { formatDuration, formatLocation, useLogContext } from '~/lib';
 import { Cell } from './components/Cell';
 import { StepCell } from './components/step/StepCell';
 import { isInVSCode } from '~/vscode/vscodeComm';
 import { getOpts } from '~/treebuild/options';
+import { getNextMtime } from '~/lib/mtime';
 
 type Props = {
   index: number;
@@ -37,19 +38,27 @@ const Container = styled.div<{ mode: 'compact' | 'sparse' }>`
 `;
 
 export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
-  const { filteredEntries, setActiveIndex, viewSettings, activeIndex, toggleEntryExpandState } =
-    useLogContext();
+  const {
+    filteredEntries,
+    setDetailsIndex,
+    viewSettings,
+    focusIndex,
+    setFocusIndex,
+    toggleEntryExpandState,
+  } = useLogContext();
   const entry = filteredEntries.entries[index];
 
   const [focused, setFocus] = useState<boolean>(false);
+  const lastFocusMtime = useRef<number>(-1);
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent) => {
       // When 'Enter' is used the details are shown and when
       // space is used the expanded state is toggled.
       if (event.key === 'Enter') {
-        setFocus(true);
-        setActiveIndex({ kind: 'details', indexAll: entry.entryIndexAll });
+        // setFocus(true);
+        setFocusIndex({ indexAll: entry.entryIndexAll, mtime: getNextMtime() });
+        setDetailsIndex({ indexAll: entry.entryIndexAll });
         event.stopPropagation();
       } else if (event.key === ' ') {
         event.stopPropagation();
@@ -103,13 +112,17 @@ export const RowCellsContainer: FC<Props> = ({ index, ...rest }) => {
   useEffect(() => {
     const curr: any = containerRef.current;
     if (curr !== undefined) {
-      const kindAndSelected = activeIndexAsKindAndSelected(activeIndex);
-      if (kindAndSelected !== undefined && kindAndSelected.indexAll == entry.entryIndexAll) {
+      if (
+        focusIndex &&
+        lastFocusMtime.current !== focusIndex.mtime &&
+        focusIndex.indexAll === entry.entryIndexAll
+      ) {
+        lastFocusMtime.current = focusIndex.mtime;
         setFocus(true);
         curr.focus();
       }
     }
-  }, [containerRef, entry, activeIndex]);
+  }, [containerRef, entry, focusIndex]);
 
   let className: string = 'oneRow';
   if (focused) {

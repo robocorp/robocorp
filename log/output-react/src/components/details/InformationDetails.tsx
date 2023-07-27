@@ -4,9 +4,9 @@ import { PreBox } from './components/Common';
 import { useCallback } from 'react';
 
 export const InformationDetails = () => {
-  const { runInfo, setActiveIndex } = useLogContext();
+  const { runInfo, setDetailsIndex } = useLogContext();
   const onClose = useCallback(() => {
-    setActiveIndex(null);
+    setDetailsIndex(null);
   }, []);
 
   const msgs: string[] = [];

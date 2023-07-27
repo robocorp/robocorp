@@ -104,6 +104,12 @@ export const getStatusLevel = (entry: Entry): StatusLevel => {
   }
 };
 
+/**
+ * @param lastExpandInfo When this has information on the last
+ *   expanded element (i.e.: lastExpandedId/idDepth are set), it's
+ *   filled with `childrenIndexesFiltered` inside of this method
+ *   (so that such indexes can be scrolled into the view).
+ */
 export const leaveOnlyExpandedEntries = (
   data: Entry[],
   isExpanded: IsExpanded,
@@ -157,7 +163,7 @@ export const leaveOnlyExpandedEntries = (
     ) {
       // Note that the index is related to the compressed array, not
       // original array with all entries.
-      lastExpandInfo.current.childrenIndexes.add(ret.length);
+      lastExpandInfo.current.childrenIndexesFiltered.add(ret.length);
     }
 
     entry.entryIndexFiltered = ret.length;
@@ -328,8 +334,8 @@ export function logError(err: any | Error | undefined) {
 export class Counter {
   private count: number;
 
-  constructor() {
-    this.count = 0;
+  constructor(initial = 0) {
+    this.count = initial;
   }
 
   public next(): number {

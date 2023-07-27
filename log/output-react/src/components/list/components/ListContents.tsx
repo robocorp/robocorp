@@ -5,6 +5,7 @@ import { styled } from '@robocorp/theme';
 
 import { RowCellsContainer } from '../../row/RowCellsContainer';
 import { getLogEntryHeight, useLogContext } from '~/lib';
+import { updateMtime } from '~/lib/mtime';
 
 type Props = HTMLProps<HTMLDivElement>;
 
@@ -26,17 +27,15 @@ export const ListContents: FC<Props> = () => {
     // structure of the tree (when expanding or applying some filter)
     // it's needed because we change which item is appearing at a given
     // index.
-    if (lastUpdatedIndexFiltered.current !== -1) {
-      listRef.current?.resetAfterIndex(lastUpdatedIndexFiltered.current);
-      lastUpdatedIndexFiltered.current = -1;
+    if (updateMtime('lastUpdatedIndex', lastUpdatedIndexFiltered.mtime)) {
+      listRef.current?.resetAfterIndex(lastUpdatedIndexFiltered.filteredIndex);
     }
-
     if (lastExpandInfo.current.lastExpandedId.length > 0) {
-      const childrenIndexes = lastExpandInfo.current.childrenIndexes;
-      if (childrenIndexes.size > 0) {
+      const childrenIndexesFiltered = lastExpandInfo.current.childrenIndexesFiltered;
+      if (childrenIndexesFiltered.size > 0) {
         let minIndex = -1;
         let maxIndex = -1;
-        for (const entryIndex of childrenIndexes) {
+        for (const entryIndex of childrenIndexesFiltered) {
           if (minIndex === -1) {
             minIndex = entryIndex;
             maxIndex = entryIndex;
@@ -57,9 +56,9 @@ export const ListContents: FC<Props> = () => {
         }
       }
       lastExpandInfo.current.lastExpandedId = '';
-      lastExpandInfo.current.childrenIndexes = new Set();
+      lastExpandInfo.current.childrenIndexesFiltered = new Set();
     }
-  });
+  }, [lastUpdatedIndexFiltered, lastExpandInfo.current.lastExpandedId]);
 
   const itemCount = useMemo(() => {
     return filteredEntries.entries.length;

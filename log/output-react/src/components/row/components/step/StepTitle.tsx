@@ -75,12 +75,12 @@ export const StepTitle: FC<Props> = ({ entry }) => {
     return <></>;
   }
 
-  const { setActiveIndex } = useLogContext();
+  const { setDetailsIndex } = useLogContext();
 
   const onClickShowDetails = useCallback(
     (e: MouseEvent) => {
       e.stopPropagation();
-      setActiveIndex({ kind: 'details', indexAll: entry.entryIndexAll });
+      setDetailsIndex({ indexAll: entry.entryIndexAll });
     },
     [entry],
   );

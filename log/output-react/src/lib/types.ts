@@ -21,7 +21,7 @@ export type ViewSettings = {
 export interface ExpandInfo {
   lastExpandedId: string;
   idDepth: number;
-  childrenIndexes: Set<number>;
+  childrenIndexesFiltered: Set<number>;
 }
 
 export enum StatusLevel {

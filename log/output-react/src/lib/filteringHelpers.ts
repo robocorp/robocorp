@@ -80,12 +80,10 @@ export const matchFilterName = (entry: Entry, filter: string): boolean => {
   return value.length > 0 && value.toLowerCase().indexOf(filterLower) >= 0;
 };
 
-export const leaveOnlyFilteredExpandedEntries = (
+export const leaveOnlyFilteredEntries = (
   data: Entry[],
-  isExpanded: IsExpanded,
-  lastExpandInfo: MutableRefObject<ExpandInfo>,
   treeFilterInfo: TreeFilterInfo,
-): FilteredEntries => {
+): Entry[] => {
   let filtered: Entry[] = [];
   if (
     treeFilterInfo.showInTree ===
@@ -136,6 +134,5 @@ export const leaveOnlyFilteredExpandedEntries = (
     }
   }
 
-  // console.log('Filtered: ', JSON.stringify(ret));
-  return leaveOnlyExpandedEntries(filtered, isExpanded, lastExpandInfo);
+  return filtered;
 };

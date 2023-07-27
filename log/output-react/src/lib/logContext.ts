@@ -1,6 +1,6 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
 import { Entry, ExpandInfo, StatusLevel, ViewSettings } from './types';
-import { isDocumentDefined, isWindowDefined, logError } from './helpers';
+import { Counter, isDocumentDefined, isWindowDefined, logError } from './helpers';
 import { detectVSCodeTheme } from '../vscode/themeDetector';
 import { isInVSCode } from '../vscode/vscodeComm';
 
@@ -22,6 +22,37 @@ export interface RunInfo {
   infoMessages: Set<string>;
 }
 
+export interface SearchInfoRequest {
+  searchValue: string;
+  requestMTime: number;
+  direction: 'forward' | 'backward';
+
+  /**
+   * In incremental mode it may keep on matching the same entry again
+   * (used when changing the searchValue)
+   */
+  incremental: boolean;
+  // isRegexp: boolean;
+  // isWholeWord: boolean;
+  // isCaseSensitive: boolean;
+  lastFound: Entry | undefined;
+}
+
+export interface LastUpdatedIndex {
+  filteredIndex: number;
+  mtime: number;
+}
+
+export const createDefaultSearchInfoRequest = (): SearchInfoRequest => {
+  return {
+    searchValue: '',
+    requestMTime: -1,
+    direction: 'forward',
+    incremental: true,
+    lastFound: undefined,
+  };
+};
+
 export interface RunIdsAndLabel {
   allRunIdsToLabel: Map<string, string>;
   currentRunId: string | undefined;
@@ -31,36 +62,32 @@ export interface IsExpanded {
   (id: string): boolean;
 }
 
-export interface KindAndIndexSelected {
-  kind: 'details' | 'focus';
+export interface DetailsIndexSelected {
   indexAll: number;
 }
 
-export type ActiveIndexType = null | 'information' | 'terminal' | KindAndIndexSelected;
+export interface FocusIndexSelected {
+  indexAll: number;
+  mtime: number;
+}
 
-export const activeIndexAsKindAndSelected = (
-  activeIndex: ActiveIndexType,
-): undefined | KindAndIndexSelected => {
-  if (activeIndex) {
-    if (activeIndex === 'information' || activeIndex === 'terminal') {
-      return undefined;
-    }
-    return activeIndex as KindAndIndexSelected;
-  }
-  return undefined;
-};
+export type DetailsIndexType = null | 'information' | 'terminal' | DetailsIndexSelected;
+export type FocusIndexType = null | FocusIndexSelected;
 
 export type LogContextType = {
   isExpanded: IsExpanded;
   allEntries: Entry[];
   filteredEntries: FilteredEntries;
   toggleEntryExpandState: (id: string) => void;
-  activeIndex: ActiveIndexType;
-  setActiveIndex: (index: ActiveIndexType) => void;
+  detailsIndex: DetailsIndexType;
+  setDetailsIndex: Dispatch<SetStateAction<DetailsIndexType>>;
+  focusIndex: FocusIndexType;
+  setFocusIndex: Dispatch<SetStateAction<FocusIndexType>>;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
-  lastUpdatedIndexFiltered: MutableRefObject<number>;
+  lastUpdatedIndexFiltered: LastUpdatedIndex;
+  setLastUpdatedIndexFiltered: Dispatch<SetStateAction<LastUpdatedIndex>>;
   lastExpandInfo: MutableRefObject<ExpandInfo>;
 };
 
@@ -124,8 +151,10 @@ export const defaultLogState: LogContextType = {
     entriesWithChildren: new Set<string>(),
   },
   toggleEntryExpandState: () => null,
-  activeIndex: null,
-  setActiveIndex: () => null,
+  detailsIndex: null,
+  setDetailsIndex: () => null,
+  focusIndex: null,
+  setFocusIndex: () => null,
   viewSettings: {
     theme: defaultTheme,
     columns: {
@@ -141,12 +170,13 @@ export const defaultLogState: LogContextType = {
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),
-  lastUpdatedIndexFiltered: { current: 0 },
+  setLastUpdatedIndexFiltered: () => null,
+  lastUpdatedIndexFiltered: { filteredIndex: -1, mtime: -1 },
   lastExpandInfo: {
     current: {
       lastExpandedId: '',
       idDepth: -1,
-      childrenIndexes: new Set(),
+      childrenIndexesFiltered: new Set(),
     },
   },
 };

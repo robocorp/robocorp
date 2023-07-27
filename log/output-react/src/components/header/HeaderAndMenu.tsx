@@ -13,38 +13,82 @@ import {
 } from '@robocorp/components';
 import { IconCloseSmall, IconFilter, IconSettings, IconTerminal } from '@robocorp/icons';
 import { IconInformation, IconSearch } from '@robocorp/icons/iconic';
-import { RunIdsAndLabel, RunInfo, formatTimeInSeconds, useLogContext } from '~/lib';
+import {
+  RunIdsAndLabel,
+  RunInfo,
+  SearchInfoRequest,
+  createDefaultSearchInfoRequest,
+  formatTimeInSeconds,
+  useLogContext,
+} from '~/lib';
 import { CustomActions } from '~/lib/CustomActions';
 import { isInVSCode, onChangeCurrentRunId } from '~/vscode/vscodeComm';
 import { SUPPORTED_VERSION } from '~/treebuild/decoder';
 import { StatusLevel } from '~/lib/types';
+import { getNextMtime } from '~/lib/mtime';
 
 type Props = {
-  filter: string;
-  setFilter: (filter: string) => void;
+  searchInfoRequest: SearchInfoRequest;
+  setSearchInfoRequest: (
+    searchInfoRequest:
+      | SearchInfoRequest
+      | ((searchInfoRequest: SearchInfoRequest) => SearchInfoRequest),
+  ) => void;
   runInfo: RunInfo;
   runIdsAndLabel: RunIdsAndLabel;
 };
 
-export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAndLabel }) => {
-  const { viewSettings, setViewSettings, setActiveIndex } = useLogContext();
+export const HeaderAndMenu: FC<Props> = ({
+  searchInfoRequest,
+  setSearchInfoRequest,
+  runInfo,
+  runIdsAndLabel,
+}) => {
+  const { viewSettings, setViewSettings, setDetailsIndex } = useLogContext();
 
   const onFilterChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setFilter(e.target.value);
+    setSearchInfoRequest((curr: SearchInfoRequest): SearchInfoRequest => {
+      return {
+        ...curr,
+        searchValue: e.target.value,
+        requestMTime: getNextMtime(),
+        direction: 'forward',
+        incremental: true,
+        // lastFound: undefined,
+      };
+    });
   }, []);
 
   const onFilterReset = useCallback(() => {
-    setFilter('');
+    setSearchInfoRequest(createDefaultSearchInfoRequest());
   }, []);
 
   const onKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key == 'Escape') {
-      setFilter('');
+      setSearchInfoRequest(createDefaultSearchInfoRequest());
     } else if (e.key == 'Enter') {
       if (e.shiftKey) {
-        // console.log('TODO: search prev');
+        setSearchInfoRequest((curr: SearchInfoRequest): SearchInfoRequest => {
+          return {
+            ...curr,
+            // searchValue: e.target.value,
+            requestMTime: getNextMtime(),
+            direction: 'backward',
+            incremental: false,
+            // lastFound: undefined,
+          };
+        });
       } else {
-        // console.log('TODO: search next');
+        setSearchInfoRequest((curr: SearchInfoRequest): SearchInfoRequest => {
+          return {
+            ...curr,
+            // searchValue: e.target.value,
+            requestMTime: getNextMtime(),
+            direction: 'forward',
+            incremental: false,
+            // lastFound: undefined,
+          };
+        });
       }
     }
   }, []);
@@ -143,10 +187,10 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
   }
 
   const onClickInformation = useCallback(() => {
-    setActiveIndex('information');
+    setDetailsIndex('information');
   }, []);
   const onClickTerminal = useCallback(() => {
-    setActiveIndex('terminal');
+    setDetailsIndex('terminal');
   }, []);
 
   let px = '$24';
@@ -288,13 +332,13 @@ export const HeaderAndMenu: FC<Props> = ({ filter, setFilter, runInfo, runIdsAnd
             </Menu.Checkbox>
           </Menu>
           <Input
-            value={filter}
+            value={searchInfoRequest.searchValue}
             onChange={onFilterChange}
             onKeyDown={onKeyDown}
             aria-label="Search logs"
             placeholder="Search logs"
             iconLeft={IconSearch}
-            iconRight={filter.length > 0 ? IconCloseSmall : undefined}
+            iconRight={searchInfoRequest.searchValue.length > 0 ? IconCloseSmall : undefined}
             onIconRightClick={onFilterReset}
             iconRightLabel="Reset filter"
           />
