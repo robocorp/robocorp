@@ -3,7 +3,7 @@ import logging
 import math
 import time
 from typing import Optional, cast
-from urllib.parse import quote_plus as sanitize_id
+from urllib.parse import quote as sanitize_id
 
 from ._requests import HTTPError, Requests, Response
 from ._types import (

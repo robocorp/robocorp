@@ -52,8 +52,25 @@ class TestLibrary:
         assert obtained_text == text
 
     def test_bytes_asset(self, cleanup_assets):
-        name = "cosmin - bytes"
+        name = "cosmin-bytes space"
         data = b"cosmin@robocorp.com"
         storage.set_bytes(name, data)
         obtained_data = storage.get_bytes(name)
         assert obtained_data == data
+
+    def test_json_asset(self, cleanup_assets):
+        name = "cosmin-json"
+        value = {"email": "cosmin@robocorp.com"}
+        storage.set_json(name, value)
+        obtained_value = storage.get_json(name)
+        assert obtained_value == value
+
+    def test_file_asset(self, cleanup_assets, tmp_path):
+        path = tmp_path / "cosmin.txt"
+        content = "cosmin@robocorp.com"
+        path.write_text(content)
+        name = "cosmin-file"
+        storage.set_file(name, path)
+        obtained_path = tmp_path / "obtained_cosmin.txt"
+        obtained_path = storage.get_file(name, obtained_path)
+        assert obtained_path.read_text() == content
