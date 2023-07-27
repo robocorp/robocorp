@@ -117,7 +117,7 @@ Creating an output item requires an input to be currently reserved.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L207"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L206"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `Input`
 Container for an input work item. 
@@ -128,7 +128,7 @@ Each step run of a process in Control Room has at least one input work item asso
 
 There can only be one input work item reserved at a time. To reserve the next item, the current item needs to be released as either passed or failed. 
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L222"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L221"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -169,7 +169,7 @@ Current parent work item ID (output only).
 
 #### <kbd>property</kbd> payload
 
-Copy of current JSON payload. 
+Current JSON payload. 
 
 ---
 
@@ -193,7 +193,7 @@ Current release state.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L118"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `add_file`
 
@@ -219,7 +219,7 @@ Resolved path to added file
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L144"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `add_files`
 
@@ -244,7 +244,7 @@ List of added paths
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L420"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L430"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `create_output`
 
@@ -256,7 +256,7 @@ Create an output work item that is a child of this item.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L428"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L438"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `done`
 
@@ -268,7 +268,7 @@ Mark this work item as done, and release it.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L274"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L284"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `email`
 
@@ -299,7 +299,7 @@ An email container with metadata and content
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L439"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L449"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `fail`
 
@@ -323,7 +323,7 @@ Mark this work item as failed, and release it.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L352"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L362"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `get_file`
 
@@ -349,7 +349,7 @@ Path to created file
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L382"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L392"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `get_files`
 
@@ -375,7 +375,7 @@ List of created file paths
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `load`
 
@@ -387,7 +387,7 @@ Load work item payload and file listing from Control Room.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L166"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `remove_file`
 
@@ -408,7 +408,7 @@ Note: Files are not removed from Control Room until the item is saved.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L185"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `remove_files`
 
@@ -433,7 +433,7 @@ List of matched names
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L273"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `save`
 
@@ -441,14 +441,16 @@ List of matched names
 save()
 ```
 
-Save the current work item. 
+Save the current input work item. 
 
 Updates the work item payload and adds/removes all pending files. 
+
+**Note:** Modifying input work items is not recommended, as it will make traceability after execution difficult, and potentially make the process behave in unexpected ways. 
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L497"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L507"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `Output`
 Container for an output work item. 
@@ -457,7 +459,7 @@ Created output items are added to an output queue, and released to the next step
 
 Note: An output item always has an input item as a parent, which is used for traceability in a work item's history. 
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L507"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L517"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -492,7 +494,7 @@ Current parent work item ID (output only).
 
 #### <kbd>property</kbd> payload
 
-Copy of current JSON payload. 
+Current JSON payload. 
 
 ---
 
@@ -504,7 +506,7 @@ Is the current item saved.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L118"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `add_file`
 
@@ -530,7 +532,7 @@ Resolved path to added file
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L144"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `add_files`
 
@@ -555,7 +557,7 @@ List of added paths
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L73"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `load`
 
@@ -567,7 +569,7 @@ Load work item payload and file listing from Control Room.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L166"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `remove_file`
 
@@ -588,7 +590,7 @@ Note: Files are not removed from Control Room until the item is saved.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L185"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `remove_files`
 
@@ -613,7 +615,7 @@ List of matched names
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L82"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L81"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `save`
 
