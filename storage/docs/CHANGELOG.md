@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.3.2 - 2023-07-27
+
+- Fix bug with managing assets containing spaces in their name
+
 ## 0.3.1 - 2023-07-18
 
 - Fix INFO logging when uploading the asset (name & content type) 
@@ -14,7 +18,6 @@
     - `set_json`, `get_json`
     - `set_file`, `get_file`
     - `set_bytes`, `get_bytes`
-
 
 ## 0.2.0 - 2023-06-29
 

@@ -3,7 +3,7 @@ import logging
 import math
 import time
 from typing import Optional, cast
-from urllib.parse import quote_plus
+from urllib.parse import quote as sanitize_id
 
 from ._requests import HTTPError, Requests, Response
 from ._types import (
@@ -80,14 +80,14 @@ class AssetsClient:
 
     def get_asset(self, asset_id: str) -> AssetDetails:
         """Returns the details of a single asset, including its payload."""
-        path = quote_plus(asset_id)
+        path = sanitize_id(asset_id)
         handler = self._handle_asset_not_found(asset_id)
         response = self._client.get(path, _handle_error=handler)
         return cast(AssetDetails, response.json())
 
     def delete_asset(self, asset_id: str):
         """Delete the given asset."""
-        path = quote_plus(asset_id)
+        path = sanitize_id(asset_id)
         handler = self._handle_asset_not_found(asset_id)
         self._client.delete(path, _handle_error=handler)
 
@@ -101,7 +101,7 @@ class AssetsClient:
     ):
         """Upload an asset payload, and optionally wait for it to finish."""
         if _estimate_base64_size(len(content)) < DATA_LIMIT:
-            LOGGER.info("Content size under data limit, uploading directly")
+            LOGGER.debug("Content size under data limit, uploading directly")
             data_content = base64.b64encode(content).decode("ascii")
             response = self._create_upload(
                 asset_id,
@@ -123,7 +123,7 @@ class AssetsClient:
         if not wait:
             return
 
-        LOGGER.info("Waiting for asset upload to complete")
+        LOGGER.info("Waiting for the asset upload to complete")
         while True:
             state = self._get_upload(asset_id, response["id"])
             status = state["status"]
@@ -157,13 +157,13 @@ class AssetsClient:
         if data is not None:
             payload["data"] = data
 
-        path = url_join(quote_plus(asset_id), "upload")
+        path = url_join(sanitize_id(asset_id), "upload")
         handler = self._handle_asset_not_found(asset_id)
         response = self._client.post(path, json=payload, _handle_error=handler)
         return cast(AssetUploadResponse, response.json())
 
     def _get_upload(self, asset_id: str, upload_id: str) -> AssetUploadState:
         """Return the details of a single asset upload."""
-        path = url_join(quote_plus(asset_id), "uploads", upload_id)
+        path = url_join(sanitize_id(asset_id), "uploads", upload_id)
         response = self._client.get(path)
         return cast(AssetUploadState, response.json())
