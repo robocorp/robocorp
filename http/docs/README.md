@@ -18,8 +18,9 @@ def fetch_workbook():
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.http](./api/robocorp.http.md)
+Information on specific functions or classes: [robocorp.http](https://github.com/robocorp/robo/blob/master/http/docs/api/robocorp.http.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
+A list of releases and corresponding changes can be found in the
+[changelog](https://github.com/robocorp/robo/blob/master/http/docs/CHANGELOG.md).

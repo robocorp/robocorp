@@ -53,12 +53,12 @@ def login():
 
 ## Guides
 
-- [Browser configuration](./guides/configuration.md)
+- [Browser configuration](https://github.com/robocorp/robo/blob/master/browser/docs/guides/configuration.md)
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.browser](./api/robocorp.browser.md)
+Information on specific functions or classes: [robocorp.browser](https://github.com/robocorp/robo/blob/master/browser/docs/api/robocorp.browser.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/browser/docs/CHANGELOG.md).

@@ -25,16 +25,16 @@ def inspect_secret():
 
 ## Guides
 
-- [Modifying secrets](./guides/modifying-secrets.md)
-- [Hiding values](./guides/hiding-values.md)
-- [Local development](./guides/local-development.md)
+- [Modifying secrets](https://github.com/robocorp/robo/blob/master/vault/docs/guides/modifying-secrets.md)
+- [Hiding values](https://github.com/robocorp/robo/blob/master/vault/docs/guides/hiding-values.md)
+- [Local development](https://github.com/robocorp/robo/blob/master/vault/docs/guides/local-development.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.vault](./api/robocorp.vault.md)
+Information on specific functions or classes: [robocorp.vault](https://github.com/robocorp/robo/blob/master/vault/docs/api/robocorp.vault.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/vault/docs/CHANGELOG.md).

@@ -54,13 +54,13 @@ is found an error will be given and no tasks will be run.
 
 ## Guides
 
-- [Logging customization](./guides/logging-customization.md)
-- [Output customization](./guides/output-customization.md)
+- [Logging customization](https://github.com/robocorp/robo/blob/master/tasks/docs/guides/logging-customization.md)
+- [Output customization](https://github.com/robocorp/robo/blob/master/tasks/docs/guides/output-customization.md)
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.tasks](./api/robocorp.tasks.md)
+Information on specific functions or classes: [robocorp.tasks](https://github.com/robocorp/robo/blob/master/tasks/docs/api/robocorp.tasks.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/tasks/docs/CHANGELOG.md).

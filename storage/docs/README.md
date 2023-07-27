@@ -16,14 +16,14 @@ def store_email():
 
 ## Guides
 
-- [Handling different asset types](./guides/asset-types.md)
+- [Handling different asset types](https://github.com/robocorp/robo/blob/master/storage/docs/guides/asset-types.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.storage](./api/robocorp.storage.md)
+Information on specific functions or classes: [robocorp.storage](https://github.com/robocorp/robo/blob/master/storage/docs/api/robocorp.storage.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](./CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/storage/docs/CHANGELOG.md).
