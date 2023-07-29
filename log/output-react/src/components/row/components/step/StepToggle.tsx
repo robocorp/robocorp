@@ -25,14 +25,14 @@ const Button = styled.button`
 `;
 
 export const StepToggle: FC<Props> = ({ entry }) => {
-  const { filteredEntries, isExpanded, toggleEntryExpandState } = useLogContext();
+  const { entriesInfo, isExpanded, updateExpandState } = useLogContext();
 
   const expanded = isExpanded(entry.id);
 
   const onClickToggleExpand = useCallback(
     (e: MouseEvent) => {
       e.stopPropagation();
-      toggleEntryExpandState(entry.id);
+      updateExpandState(entry.id, 'toggle', true);
     },
     [entry.id],
   );
@@ -51,7 +51,7 @@ export const StepToggle: FC<Props> = ({ entry }) => {
   );
 
   // Add the expand/collapse if we have a parent or no icon if it cannot be expanded.
-  if (!filteredEntries.entriesWithChildren.has(entry.id)) {
+  if (!entriesInfo.treeEntries.entriesWithChildren.has(entry.id)) {
     return <Box className="noExpand" width="$20" height="100%" flexShrink={0} />;
   }
 
@@ -61,6 +61,7 @@ export const StepToggle: FC<Props> = ({ entry }) => {
       onKeyDown={onKeyDownIgnore}
       aria-label="Toggle item"
       className="toggleExpand"
+      tabIndex={-1}
     >
       {expanded ? (
         <svg width="12" height="12" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, KeyboardEvent, useCallback } from 'react';
+import { ChangeEvent, FC, KeyboardEvent, useCallback, useEffect, useState } from 'react';
 import {
   Badge,
   Box,
@@ -25,36 +25,64 @@ import { CustomActions } from '~/lib/CustomActions';
 import { isInVSCode, onChangeCurrentRunId } from '~/vscode/vscodeComm';
 import { SUPPORTED_VERSION } from '~/treebuild/decoder';
 import { StatusLevel } from '~/lib/types';
-import { getNextMtime } from '~/lib/mtime';
+import { getNextMtime, updateMtime } from '~/lib/mtime';
+import { clearSelection } from '~/lib/selections';
+import { setScrollToItem } from '~/lib/scroll';
+import { makeSearch } from '~/lib/search';
 
 type Props = {
-  searchInfoRequest: SearchInfoRequest;
-  setSearchInfoRequest: (
-    searchInfoRequest:
-      | SearchInfoRequest
-      | ((searchInfoRequest: SearchInfoRequest) => SearchInfoRequest),
-  ) => void;
   runInfo: RunInfo;
   runIdsAndLabel: RunIdsAndLabel;
 };
 
-export const HeaderAndMenu: FC<Props> = ({
-  searchInfoRequest,
-  setSearchInfoRequest,
-  runInfo,
-  runIdsAndLabel,
-}) => {
-  const { viewSettings, setViewSettings, setDetailsIndex } = useLogContext();
+export const HeaderAndMenu: FC<Props> = ({ runInfo, runIdsAndLabel }) => {
+  const [searchInfoRequest, setSearchInfoRequest] = useState<SearchInfoRequest>(
+    createDefaultSearchInfoRequest(),
+  );
+  const {
+    viewSettings,
+    setSelectionIndex,
+    setViewSettings,
+    setDetailsIndex,
+    entriesInfo,
+    selectionIndex,
+    focusIndex,
+    updateExpandState,
+    scrollInfo,
+  } = useLogContext();
+
+  useEffect(() => {
+    if (!searchInfoRequest.searchValue) {
+      // If there's no search value, clear the selection.
+      clearSelection(selectionIndex, setSelectionIndex);
+      return;
+    }
+    if (updateMtime('searchApplied', searchInfoRequest.requestMTime)) {
+      const searchResult = makeSearch(entriesInfo, searchInfoRequest, selectionIndex, focusIndex);
+      if (searchResult) {
+        // The search must auto-expand parents and set the current selection.
+        const parentsToExpand = searchResult.expandParentIds;
+        updateExpandState(parentsToExpand, 'expand', false);
+        const selected = searchResult.selectedEntry;
+        if (selected) {
+          setSelectionIndex({ indexAll: selected.entryIndexAll, mtime: getNextMtime() });
+          setScrollToItem(scrollInfo, entriesInfo, selected);
+          return;
+        }
+      }
+      // If it hasn't returned we need to clear the selection.
+      clearSelection(selectionIndex, setSelectionIndex);
+    }
+  }, [entriesInfo, selectionIndex, searchInfoRequest.requestMTime]);
 
   const onFilterChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setSearchInfoRequest((curr: SearchInfoRequest): SearchInfoRequest => {
       return {
         ...curr,
         searchValue: e.target.value,
-        requestMTime: getNextMtime(),
         direction: 'forward',
         incremental: true,
-        // lastFound: undefined,
+        requestMTime: getNextMtime(),
       };
     });
   }, []);
@@ -71,22 +99,18 @@ export const HeaderAndMenu: FC<Props> = ({
         setSearchInfoRequest((curr: SearchInfoRequest): SearchInfoRequest => {
           return {
             ...curr,
-            // searchValue: e.target.value,
-            requestMTime: getNextMtime(),
             direction: 'backward',
             incremental: false,
-            // lastFound: undefined,
+            requestMTime: getNextMtime(),
           };
         });
       } else {
         setSearchInfoRequest((curr: SearchInfoRequest): SearchInfoRequest => {
           return {
             ...curr,
-            // searchValue: e.target.value,
-            requestMTime: getNextMtime(),
             direction: 'forward',
             incremental: false,
-            // lastFound: undefined,
+            requestMTime: getNextMtime(),
           };
         });
       }
@@ -122,7 +146,6 @@ export const HeaderAndMenu: FC<Props> = ({
   }, []);
 
   const onToggleDebugLevel = useCallback(() => {
-    console.log('toggle debug');
     setViewSettings((curr) => ({
       ...curr,
       treeFilterInfo: { showInTree: curr.treeFilterInfo.showInTree ^ StatusLevel.debug },

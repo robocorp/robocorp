@@ -13,6 +13,7 @@ if (parseDate === undefined) {
 export interface IMessage {
   readonly message_type: string;
   readonly decoded: any;
+  readonly message: any;
 }
 
 function _decode_dateisoformat(decoder: Decoder, time: string) {
@@ -463,7 +464,7 @@ export function* iter_decoded_log_format(stream: string, decoder: Decoder) {
           decoded = decoder.decode_message_type(message_type, message);
 
           if (decoded) {
-            const m: IMessage = { message_type, decoded };
+            const m: IMessage = { message_type, decoded, message };
             yield m;
           }
         }

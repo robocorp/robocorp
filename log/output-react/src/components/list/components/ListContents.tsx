@@ -4,8 +4,11 @@ import { Box, useSize } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 
 import { RowCellsContainer } from '../../row/RowCellsContainer';
-import { getLogEntryHeight, useLogContext } from '~/lib';
+import { findMinAndMax, getLogEntryHeight, useLogContext } from '~/lib';
 import { updateMtime } from '~/lib/mtime';
+import { clearScrollToInfo } from '~/lib/scroll';
+import { getChildrenIndexesInTree } from '~/lib/selections';
+import { getIndexInTree } from '~/lib/types';
 
 type Props = HTMLProps<HTMLDivElement>;
 
@@ -19,7 +22,7 @@ export const ListContents: FC<Props> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<VariableSizeList>(null);
   const { height } = useSize(containerRef);
-  const { filteredEntries, lastUpdatedIndexFiltered, lastExpandInfo } = useLogContext();
+  const { entriesInfo, invalidateTree, scrollInfo } = useLogContext();
 
   useEffect(() => {
     // This is needed when an item size changes. Note that in general when
@@ -27,49 +30,52 @@ export const ListContents: FC<Props> = () => {
     // structure of the tree (when expanding or applying some filter)
     // it's needed because we change which item is appearing at a given
     // index.
-    if (updateMtime('lastUpdatedIndex', lastUpdatedIndexFiltered.mtime)) {
-      listRef.current?.resetAfterIndex(lastUpdatedIndexFiltered.filteredIndex);
+    if (updateMtime('invalidateTree', invalidateTree.mtime)) {
+      listRef.current?.resetAfterIndex(invalidateTree.indexInTreeEntries);
     }
-    if (lastExpandInfo.current.lastExpandedId.length > 0) {
-      const childrenIndexesFiltered = lastExpandInfo.current.childrenIndexesFiltered;
-      if (childrenIndexesFiltered.size > 0) {
-        let minIndex = -1;
-        let maxIndex = -1;
-        for (const entryIndex of childrenIndexesFiltered) {
-          if (minIndex === -1) {
-            minIndex = entryIndex;
-            maxIndex = entryIndex;
-          } else {
-            if (entryIndex < minIndex) {
-              minIndex = entryIndex;
-            }
-            if (entryIndex > maxIndex) {
-              maxIndex = entryIndex;
+    if (updateMtime('scroll', scrollInfo.current.mtime)) {
+      if (scrollInfo.current.mode === 'scrollToChildren') {
+        if (scrollInfo.current.scrollTargetId.length > 0) {
+          const childrenIndexesInTree = getChildrenIndexesInTree(
+            scrollInfo.current.entriesInfo,
+            scrollInfo.current.scrollTargetId,
+          );
+
+          if (childrenIndexesInTree.length > 0) {
+            const [minIndex, maxIndex] = findMinAndMax(childrenIndexesInTree);
+            const diff = maxIndex - minIndex;
+            if (diff > 5) {
+              listRef.current?.scrollToItem(minIndex + 5);
+            } else {
+              listRef.current?.scrollToItem(maxIndex);
             }
           }
+          clearScrollToInfo(scrollInfo);
         }
-        const diff = maxIndex - minIndex;
-        if (diff > 5) {
-          listRef.current?.scrollToItem(minIndex + 5);
-        } else {
-          listRef.current?.scrollToItem(maxIndex);
+      } else if (scrollInfo.current.mode === 'scrollToItem') {
+        const entriesInfo = scrollInfo.current.entriesInfo;
+        const entry = entriesInfo?.getEntryFromId(scrollInfo.current.scrollTargetId);
+        if (entriesInfo !== undefined && entry !== undefined) {
+          const index = getIndexInTree(entriesInfo, entry);
+          if (index !== undefined) {
+            listRef.current?.scrollToItem(index);
+          }
         }
+        clearScrollToInfo(scrollInfo);
       }
-      lastExpandInfo.current.lastExpandedId = '';
-      lastExpandInfo.current.childrenIndexesFiltered = new Set();
     }
-  }, [lastUpdatedIndexFiltered, lastExpandInfo.current.lastExpandedId]);
+  }, [invalidateTree, scrollInfo.current.scrollTargetId]);
 
   const itemCount = useMemo(() => {
-    return filteredEntries.entries.length;
-  }, [filteredEntries]);
+    return entriesInfo.treeEntries.entries.length;
+  }, [entriesInfo.treeEntries]);
 
   const itemSize = useCallback(
     (itemIndex: number) => {
-      const size = getLogEntryHeight(filteredEntries.entries[itemIndex]);
+      const size = getLogEntryHeight(entriesInfo.treeEntries.entries[itemIndex]);
       return size;
     },
-    [filteredEntries],
+    [entriesInfo.treeEntries],
   );
 
   return (

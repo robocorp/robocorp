@@ -5,29 +5,26 @@ import {
   defaultLogState,
   LogContextType,
   RunInfo,
-  createDefaultRunInfo,
   RunIdsAndLabel,
   createDefaultRunIdsAndLabel,
-  entryIdDepth,
   IsExpanded,
   DetailsIndexType,
-  SearchInfoRequest,
-  createDefaultSearchInfoRequest,
   leaveOnlyExpandedEntries,
   FocusIndexType,
-  LastUpdatedIndex,
+  InvalidateTree,
 } from '~/lib';
-import { Entry, ExpandInfo, ViewSettings } from './lib/types';
+import { EntriesAndIdToEntry, EntriesInfo, Entry, InfoForScroll, ViewSettings } from './lib/types';
 import {
   reactCallSetAllEntriesCallback,
   reactCallSetRunIdsAndLabelCallback,
   reactCallSetRunInfoCallback,
 } from './treebuild/effectCallbacks';
-import { leaveOnlyFilteredEntries } from './lib/filteringHelpers';
+import { applyEntriesFilters } from './lib/filtering';
 import { Details } from './components/details/Details';
 import { HeaderAndMenu } from './components/header/HeaderAndMenu';
 import { ListHeaderAndContents } from './components/list/ListHeaderAndContents';
-import { getNextMtime, updateMtime, wasMtimeHandled } from './lib/mtime';
+import { getNextMtime } from './lib/mtime';
+import { updateExpanded } from './lib/selections';
 
 const Main = styled.main`
   display: grid;
@@ -37,40 +34,45 @@ const Main = styled.main`
 `;
 
 export const Log = () => {
-  const [searchInfoRequest, setSearchInfoRequest] = useState<SearchInfoRequest>(
-    createDefaultSearchInfoRequest(),
-  );
-
-  // Regular usage: user expands entries
+  // The entries which should be shown expanded.
   const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set<string>());
+
   const [detailsIndex, setDetailsIndex] = useState<DetailsIndexType>(null);
   const [focusIndex, setFocusIndex] = useState<FocusIndexType>(null);
-  const [runInfo, setRunInfo] = useState<RunInfo>(createDefaultRunInfo());
+  const [selectionIndex, setSelectionIndex] = useState<FocusIndexType>(null);
+  const [runInfo, setRunInfo] = useState<RunInfo>(defaultLogState.runInfo);
   const [runIdsAndLabel, setRunIdsAndLabel] = useState<RunIdsAndLabel>(
     createDefaultRunIdsAndLabel(),
   );
   const [viewSettings, setViewSettings] = useState<ViewSettings>(defaultLogState.viewSettings);
-  const [entries, setEntries] = useState<Entry[]>([]); // Start empty. Entries will be added as they're found.
-  const [lastUpdatedIndexFiltered, setLastUpdatedIndexFiltered] = useState<LastUpdatedIndex>({
-    filteredIndex: -1,
+
+  // Start empty. Entries will be added as they're found.
+  // We receive all the entries and the idToEntry.
+  const [entriesInput, setEntriesInput] = useState<EntriesAndIdToEntry>({
+    allEntries: [],
+    idToEntry: new Map(),
+  });
+
+  // We have to set the index from which point onward the list must be updated.
+  const [invalidateTree, setInvalidateTree] = useState<InvalidateTree>({
+    indexInTreeEntries: -1,
     mtime: -1,
   });
 
-  const idToEntry = useRef<Map<string, Entry>>(new Map());
-
-  // This works in the following way: whenever the item clicks an item to be expanded
-  // the lastExpandedId is marked, then when filtering the children of the expanded
-  // id are collected and this is later used to scroll the children into view.
-  const lastExpandInfo = useRef<ExpandInfo>({
-    lastExpandedId: '',
+  // Use: setScrollToItem / setScrollToChildrenOf to update this information
+  // so that a scroll is done to the needed entry.
+  const scrollInfo = useRef<InfoForScroll>({
+    scrollTargetId: '',
     idDepth: -1,
-    childrenIndexesFiltered: new Set(),
+    mtime: -1,
+    entriesInfo: undefined,
+    mode: 'scrollToChildren',
   });
 
   useEffect(() => {
     // When the filter is changed, just say that the whole tree changed
     // (i.e.: heights of the filtered items may have changed).
-    setLastUpdatedIndexFiltered({ mtime: getNextMtime(), filteredIndex: 0 });
+    setInvalidateTree({ mtime: getNextMtime(), indexInTreeEntries: 0 });
   }, [viewSettings.treeFilterInfo.showInTree]);
 
   /**
@@ -78,7 +80,12 @@ export const Log = () => {
    */
   useEffect(() => {
     reactCallSetAllEntriesCallback(
-      (allEntries: Entry[], newExpanded: string[], updatedFromIndex = -1) => {
+      (
+        allEntries: Entry[],
+        idToEntry: Map<string, Entry>,
+        newExpanded: string[],
+        updatedFromIndex = -1,
+      ) => {
         // Note: the updatedFromIndex is not used right now (it'd need to be)
         // translated to the compressed value, but we don't have the use case
         // for now, so, just ignore it.
@@ -92,12 +99,16 @@ export const Log = () => {
           });
         }
 
-        setEntries(() => {
+        setEntriesInput(() => {
           // console.log('Set entries to: ' + JSON.stringify(allEntries));
-          for (const entry of allEntries) {
-            idToEntry.current.set(entry.id, entry);
-          }
-          return [...allEntries];
+
+          // Note: we don't even copy it, just reuse the same instance
+          // to be more efficient
+          // (note that it can change accross runs).
+          // We could create copies to be more "pure", but I couldn't find
+          // a use case where getting a newer copy would be catastrophic.
+          // Note that entries themselves are considered immutable.
+          return { allEntries, idToEntry };
         });
 
         return undefined;
@@ -117,116 +128,105 @@ export const Log = () => {
     });
   }, []);
 
-  let isExpanded: IsExpanded;
-
-  // Toggle the expanded state.
-  const toggleEntryExpandState = useCallback((id: string) => {
-    setExpandedEntries((curr) => {
-      const cp = new Set<string>(curr);
-      const entry = idToEntry.current.get(id);
-      if (entry !== undefined) {
-        setLastUpdatedIndexFiltered((prev) => {
-          const curr = prev.filteredIndex;
-          if (curr < 0) {
-            return { filteredIndex: entry.entryIndexFiltered, mtime: getNextMtime() };
-          }
-          if (!wasMtimeHandled('lastUpdatedIndex', prev.mtime)) {
-            // The last one wasn't handled, we need to keep the lower value
-            // -- the mtime can be kept though.
-            return { filteredIndex: Math.min(entry.entryIndexFiltered, curr), mtime: prev.mtime };
-          } else {
-            return { filteredIndex: entry.entryIndexFiltered, mtime: getNextMtime() };
-          }
-        });
+  const updateExpandState = useCallback(
+    (
+      ids: string | string[],
+      forceMode: 'expand' | 'collapse' | 'toggle',
+      scrollIntoView: boolean,
+    ) => {
+      if (typeof ids === 'string') {
+        ids = [ids];
       }
+      updateExpanded(
+        setExpandedEntries,
+        setInvalidateTree,
+        scrollInfo,
+        entriesInfo,
+        ids,
+        forceMode,
+        scrollIntoView,
+      );
+    },
+    [],
+  );
 
-      if (curr.has(id)) {
-        cp.delete(id);
-        lastExpandInfo.current.lastExpandedId = '';
-        lastExpandInfo.current.idDepth = -1;
-        lastExpandInfo.current.childrenIndexesFiltered = new Set();
-      } else {
-        cp.add(id);
-        lastExpandInfo.current.lastExpandedId = id;
-        lastExpandInfo.current.idDepth = entryIdDepth(id);
-        lastExpandInfo.current.childrenIndexesFiltered = new Set();
-      }
-      return cp;
-    });
-  }, []);
+  // Remove items filtered out.
+  const filtered: Entry[] = useMemo(() => {
+    return applyEntriesFilters(entriesInput.allEntries, viewSettings.treeFilterInfo);
+  }, [entriesInput, viewSettings.treeFilterInfo]);
 
-  isExpanded = useCallback(
+  const isExpanded: IsExpanded = useCallback(
     (id: string) => {
       return expandedEntries.has(id);
     },
     [expandedEntries],
   );
 
-  // Leave only items which are actually expanded.
-  const filteredEntries = useMemo(() => {
-    const filtered = leaveOnlyFilteredEntries(entries, viewSettings.treeFilterInfo);
-
-    // After we've filtered the entries we must do the search to auto-expand and focus the
-    // given entry (if we haven't handled the request yet).
-    if (updateMtime('searchApplied', searchInfoRequest.requestMTime)) {
-      console.log('Do search');
-    }
-
-    return leaveOnlyExpandedEntries(filtered, isExpanded, lastExpandInfo);
-  }, [
-    entries,
-    expandedEntries,
-    isExpanded,
-    lastExpandInfo,
-    viewSettings.treeFilterInfo,
-    searchInfoRequest,
-  ]);
+  const entriesInfo: EntriesInfo = useMemo(() => {
+    // Leave only items which are actually expanded.
+    const treeEntries = leaveOnlyExpandedEntries(filtered, isExpanded);
+    return {
+      allEntries: entriesInput.allEntries,
+      entriesWithFilterApplied: filtered,
+      treeEntries,
+      getEntryFromId: (id: string): Entry | undefined => {
+        return entriesInput.idToEntry.get(id);
+      },
+    };
+  }, [filtered, expandedEntries, scrollInfo]);
 
   const ctx: LogContextType = {
-    allEntries: entries,
+    entriesInfo,
     isExpanded,
-    filteredEntries,
-    toggleEntryExpandState,
+    updateExpandState,
     detailsIndex,
     setDetailsIndex,
     focusIndex,
     setFocusIndex,
+    selectionIndex,
+    setSelectionIndex,
     viewSettings,
     setViewSettings,
     runInfo,
-    lastUpdatedIndexFiltered,
-    setLastUpdatedIndexFiltered,
-    lastExpandInfo,
+    invalidateTree,
+    setInvalidateTree,
+    scrollInfo,
   };
+
+  scrollInfo.current.entriesInfo = entriesInfo;
 
   const logContextValue = useMemo(
     () => ctx,
     [
-      entries,
-      detailsIndex,
+      entriesInfo,
       isExpanded,
-      expandedEntries,
-      filteredEntries,
+      updateExpandState,
+      detailsIndex,
+      setDetailsIndex,
+      focusIndex,
+      setFocusIndex,
+      selectionIndex,
+      setSelectionIndex,
       viewSettings,
+      setViewSettings,
       runInfo,
-      lastUpdatedIndexFiltered,
+      invalidateTree,
+      setInvalidateTree,
+      scrollInfo,
     ],
   );
 
   return (
+    // <StrictMode>
     <ThemeProvider name={viewSettings.theme}>
       <Main>
         <LogContext.Provider value={logContextValue}>
-          <HeaderAndMenu
-            searchInfoRequest={searchInfoRequest}
-            setSearchInfoRequest={setSearchInfoRequest}
-            runInfo={runInfo}
-            runIdsAndLabel={runIdsAndLabel}
-          />
+          <HeaderAndMenu runInfo={runInfo} runIdsAndLabel={runIdsAndLabel} />
           <ListHeaderAndContents />
           <Details />
         </LogContext.Provider>
       </Main>
     </ThemeProvider>
+    // </StrictMode>
   );
 };

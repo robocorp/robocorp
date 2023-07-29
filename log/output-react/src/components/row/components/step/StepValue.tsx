@@ -1,6 +1,7 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useCallback, MouseEvent } from 'react';
 import { Box, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
+import './step.css';
 
 import {
   Entry,
@@ -25,6 +26,7 @@ import {
   replaceNewLineChars,
   sanitizeHTML,
 } from '~/lib/helpers';
+import { useLogContext } from '~/lib';
 
 type Props = {
   entry: Entry;
@@ -105,6 +107,21 @@ export const getValue = (entry: Entry): ReactNode | string => {
 export const StepValue: FC<Props> = ({ entry }) => {
   const value = getValue(entry);
   const isString = typeof value === 'string';
+  const { setDetailsIndex } = useLogContext();
+
+  const onClickShowDetails = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      setDetailsIndex({ indexAll: entry.entryIndexAll });
+    },
+    [entry],
+  );
+
+  // We use the dontStretchContents to set display: inline-block;
+  // if we don't do that, the value contents will stretch through
+  // much more than intended and it can be hard for the user to
+  // click a row in the list for selecting it (as most of it will
+  // be the target to open the details).
   return (
     <Container flex="1" className="entryValue">
       {isString ? (
@@ -117,11 +134,20 @@ export const StepValue: FC<Props> = ({ entry }) => {
           color="content.subtle.light"
           fontWeight="bold"
           truncate={1}
+          onClick={onClickShowDetails}
+          style={{ cursor: 'pointer' }}
+          className="dontStretchContents"
         >
           {value}
         </Typography>
       ) : (
-        value
+        <Box
+          onClick={onClickShowDetails}
+          className="dontStretchContents"
+          style={{ cursor: 'pointer' }}
+        >
+          {value}
+        </Box>
       )}
     </Container>
   );

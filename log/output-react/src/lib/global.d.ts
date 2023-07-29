@@ -10,6 +10,7 @@ declare global {
 
     setAllEntriesWhenPossible: (
       allEntries: Entry[],
+      idToEntry: Map<string, Entry>,
       newExpanded: string[],
       updatedFromIndex: number,
     ) => void;

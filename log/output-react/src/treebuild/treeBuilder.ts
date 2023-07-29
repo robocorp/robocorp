@@ -131,6 +131,8 @@ class FlattenedTree {
   // in this object should be replace.
   public entries: Entry[] = [];
 
+  public idToEntry: Map<string, Entry> = new Map();
+
   // New entry ids which should be automatically expanded.
   public newExpanded: string[] = [];
 
@@ -194,9 +196,9 @@ class FlattenedTree {
       excType: excType,
       excMsg: excMsg.trim(),
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   pushThreadDump(tb: PythonTraceback) {
@@ -220,9 +222,9 @@ class FlattenedTree {
       threadName,
       threadDetails: threadDetails.trim(),
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   pushConsole(msg: IMessage) {
@@ -264,9 +266,9 @@ class FlattenedTree {
       source: consoleOutput.source,
       lineno: consoleOutput.lineno,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   pushLog(msg: IMessage) {
@@ -297,9 +299,9 @@ class FlattenedTree {
       lineno: msg.decoded['lineno'],
       isHtml: msg.message_type === 'LH',
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   pushUntrackedGeneratorScope(msg: IMessage) {
@@ -311,13 +313,13 @@ class FlattenedTree {
       source: msg.decoded.source,
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
-      status: StatusLevel.unset,
+      status: StatusLevel.info, // As it doesn't really create a scope it can't be unset.
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -330,13 +332,13 @@ class FlattenedTree {
       source: msg.decoded.source,
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
-      status: StatusLevel.unset,
+      status: StatusLevel.info, // As it doesn't really create a scope it can't be unset.
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -349,13 +351,13 @@ class FlattenedTree {
       source: msg.decoded.source,
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
-      status: StatusLevel.unset,
+      status: StatusLevel.info, // As it doesn't really create a scope it can't be unset.
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -371,10 +373,10 @@ class FlattenedTree {
       status: StatusLevel.error,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -390,15 +392,15 @@ class FlattenedTree {
       source: msg.decoded.source,
       lineno: msg.decoded.lineno,
       endDeltaInSeconds: -1,
-      status: StatusLevel.unset,
+      status: StatusLevel.info, // As it doesn't really create a scope it can't be unset.
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
       varType: msg.decoded['type'], // Note: not really used for EntrySuspendYieldFrom.
       value: msg.decoded['value'], // Note: not really used for EntrySuspendYieldFrom.
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -415,11 +417,11 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.stack.push(entry);
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -436,11 +438,11 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
       arguments: undefined,
     };
     this.stack.push(entry);
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     this.argsTarget = entry;
   }
 
@@ -460,6 +462,7 @@ class FlattenedTree {
 
       // Update the references to the new object to avoid mutability.
       this.entries[targetCp.entryIndexAll] = targetCp;
+      this.idToEntry.set(targetCp.id, targetCp);
       this.argsTarget = targetCp;
       for (let index = this.stack.length - 1; index >= 0; index--) {
         const element = this.stack[index];
@@ -481,9 +484,9 @@ class FlattenedTree {
       value: msg.decoded['value'],
       varType: msg.decoded['type'],
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
     // Tooltip:
     // `Assign to name: ${msg.decoded['target']}\nAn object of type: ${msg.decoded['type']}\nWith representation:\n${msg.decoded['value']}`,
   }
@@ -499,9 +502,9 @@ class FlattenedTree {
       value: msg.decoded['value'],
       varType: msg.decoded['type'],
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   pushTaskScope(msg: IMessage) {
@@ -517,10 +520,10 @@ class FlattenedTree {
       status: StatusLevel.unset,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.stack.push(entry);
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   pushProcessSnapshotScope(msg: IMessage) {
@@ -531,10 +534,10 @@ class FlattenedTree {
       endDeltaInSeconds: -1,
       startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
       entryIndexAll: this.entries.length,
-      entryIndexFiltered: -1,
     };
     this.stack.push(entry);
     this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
   }
 
   popScope(msg: IMessage, type: Type): EntryBase | undefined {
@@ -583,6 +586,7 @@ class FlattenedTree {
     entry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
 
     this.entries[entry.entryIndexAll] = entry;
+    this.idToEntry.set(entry.id, entry);
     if (entry.status >= StatusLevel.error) {
       this.newExpanded.push(entry.id);
     }
@@ -600,8 +604,12 @@ class FlattenedTree {
     }
 
     if (msg.decoded.status === undefined) {
-      // No need to update if the status isn't set.
-      return;
+      if ((entry.type & (Type.resumeYield | Type.resumeYieldFrom | Type.generator)) !== 0) {
+        msg.decoded.status = 'PASS';
+      } else {
+        // console.log('no status for', entry.type, msg.decoded, entry, msg.message, msg.message_type);
+        return;
+      }
     }
     const methodScopeEntry: EntryMethod = <EntryMethod>{ ...entry };
     this.updateEntryStatus(methodScopeEntry, msg);
@@ -631,6 +639,7 @@ class FlattenedTree {
     const processSnapshotEntry: EntryProcessSnapshot = <EntryProcessSnapshot>{ ...entry };
     processSnapshotEntry.endDeltaInSeconds = msg.decoded.time_delta_in_seconds;
     this.entries[processSnapshotEntry.entryIndexAll] = processSnapshotEntry;
+    this.idToEntry.set(processSnapshotEntry.id, processSnapshotEntry);
   }
 }
 
@@ -742,6 +751,7 @@ It's possible to customize the size of the logs with "--max-log-file-size" and "
         this.flattened.pushLog({
           message_type: 'L',
           decoded: { level: 'W', message: msg, source: '', lineno: -1 },
+          message: '<dummy>',
         });
       }
     }
@@ -830,7 +840,12 @@ It's possible to customize the size of the logs with "--max-log-file-size" and "
       // Don't add the same ones again.
       this.flattened.newExpanded = [];
     }
-    setAllEntriesWhenPossible(this.flattened.entries, newExpanded, updateFromIndex);
+    setAllEntriesWhenPossible(
+      this.flattened.entries,
+      this.flattened.idToEntry,
+      newExpanded,
+      updateFromIndex,
+    );
     if (this.runInfoChanged) {
       this.runInfoChanged = false;
       setRunInfoWhenPossible(this.runInfo);

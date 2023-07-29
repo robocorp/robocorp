@@ -6,7 +6,7 @@ export const getNextMtime = (): number => {
   return globalCounter.next();
 };
 
-export type MTimeKind = 'lastUpdatedIndex' | 'searchApplied' | 'test';
+export type MTimeKind = 'invalidateTree' | 'searchApplied' | 'scroll' | 'focus' | 'test';
 
 const handled: Map<MTimeKind, number> = new Map();
 

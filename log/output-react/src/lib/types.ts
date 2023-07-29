@@ -18,11 +18,73 @@ export type ViewSettings = {
   treeFilterInfo: TreeFilterInfo;
 };
 
-export interface ExpandInfo {
-  lastExpandedId: string;
+export interface InfoForScroll {
+  mode: 'scrollToItem' | 'scrollToChildren';
+  scrollTargetId: string;
   idDepth: number;
-  childrenIndexesFiltered: Set<number>;
+  entriesInfo: undefined | EntriesInfo;
+  mtime: number;
 }
+
+export interface TreeEntries {
+  entries: Entry[];
+  entriesWithChildren: Set<string>;
+  idToEntryIndexInTreeArray: Map<string, number>;
+}
+
+export interface GetEntryFromId {
+  (id: string): Entry | undefined;
+}
+
+export interface EntriesAndIdToEntry {
+  allEntries: Entry[];
+  idToEntry: Map<string, Entry>;
+}
+
+/**
+ * Entries go through a bunch of filters and
+ * different places may need it in different
+ * representations, so, keep them all in this
+ * structure.
+ */
+export interface EntriesInfo {
+  // Easy: all the entries we have.
+  allEntries: Entry[];
+
+  // The first thing we do with the entries
+  // is apply any needed filter to remove items
+  // that the user doesn't want to see (i.e.:
+  // remove status == debug)
+  entriesWithFilterApplied: Entry[];
+
+  // The last thing is actually the entries which
+  // will actually be shown. These entries don't
+  // have elements which are collapsed.
+  treeEntries: TreeEntries;
+
+  // A map with all entries mapping from the
+  // entry id to the actual entry.
+  getEntryFromId: GetEntryFromId;
+}
+
+export const getIndexInTree = (entriesInfo: EntriesInfo, entry: Entry): number | undefined => {
+  return entriesInfo.treeEntries.idToEntryIndexInTreeArray.get(entry.id);
+};
+
+export const createDefaultEntriesInfo = (): EntriesInfo => {
+  return {
+    allEntries: [],
+    getEntryFromId: (id: string) => {
+      return undefined;
+    },
+    entriesWithFilterApplied: [],
+    treeEntries: {
+      entries: [],
+      entriesWithChildren: new Set(),
+      idToEntryIndexInTreeArray: new Map(),
+    },
+  };
+};
 
 export enum StatusLevel {
   error = 1 << 4, // 16
@@ -72,12 +134,6 @@ export interface EntryBase {
   id: string;
   type: Type;
   entryIndexAll: number; // this is the index in the full array.
-
-  // This is the index is the filtered array (where collapsed or filtered out entries are not shown).
-  // It's not fixed and changes whenever the tree structure changes.
-  // In general it should be used as seldomly as possible (entryIndexAll is preferred), but
-  // if dealing with the filtered array it may be needed.
-  entryIndexFiltered: number;
 }
 
 export interface EntryWithLocationBase extends EntryBase {

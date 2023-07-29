@@ -1,5 +1,4 @@
-import { MutableRefObject } from 'react';
-import { FilteredEntries, IsExpanded } from './logContext';
+import { IsExpanded } from './logContext';
 import {
   ConsoleMessageKind,
   Entry,
@@ -18,7 +17,7 @@ import {
   EntryTask,
   EntryUntrackedGenerator,
   EntryWithLocationBase,
-  ExpandInfo,
+  TreeEntries,
   StatusLevel,
   Type,
 } from './types';
@@ -30,6 +29,49 @@ export function entryDepth(entry: Entry) {
 
 export function entryIdDepth(id: string) {
   return id.split('-').length - 1;
+}
+
+export const findMinAndMax = (numbers: number[]): [number, number] => {
+  if (numbers.length === 0) {
+    throw new Error('Array is empty');
+  }
+  let min = numbers[0];
+  let max = numbers[0];
+
+  for (let i = 1; i < numbers.length; i++) {
+    if (numbers[i] < min) {
+      min = numbers[i];
+    }
+    if (numbers[i] > max) {
+      max = numbers[i];
+    }
+  }
+
+  return [min, max];
+};
+
+export class IDChecker {
+  private parentParts: string[];
+
+  constructor(parentId: string) {
+    this.parentParts = parentId.split('-');
+  }
+
+  isParentOf(childId: string): boolean {
+    const childParts = childId.split('-');
+
+    if (childParts.length < this.parentParts.length) {
+      return false;
+    }
+
+    for (let i = 0; i < this.parentParts.length; i++) {
+      if (this.parentParts[i] !== childParts[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 }
 
 /**
@@ -104,22 +146,14 @@ export const getStatusLevel = (entry: Entry): StatusLevel => {
   }
 };
 
-/**
- * @param lastExpandInfo When this has information on the last
- *   expanded element (i.e.: lastExpandedId/idDepth are set), it's
- *   filled with `childrenIndexesFiltered` inside of this method
- *   (so that such indexes can be scrolled into the view).
- */
-export const leaveOnlyExpandedEntries = (
-  data: Entry[],
-  isExpanded: IsExpanded,
-  lastExpandInfo: MutableRefObject<ExpandInfo>,
-): FilteredEntries => {
+export const leaveOnlyExpandedEntries = (data: Entry[], isExpanded: IsExpanded): TreeEntries => {
   // console.log('All: ', JSON.stringify(data));
 
   const entriesWithChildren: Set<string> = new Set();
 
   const ret: Entry[] = [];
+
+  const idToEntryIndexInTreeArray: Map<string, number> = new Map();
 
   // We have to remove all non-expanded objects with
   // as little work as possible. Given that we have
@@ -155,18 +189,7 @@ export const leaveOnlyExpandedEntries = (
       hideChildren = false;
     }
 
-    if (
-      lastExpandInfo.current.lastExpandedId.length > 0 &&
-      depth - 1 >= lastExpandInfo.current.idDepth &&
-      parentId !== undefined &&
-      parentId.startsWith(lastExpandInfo.current.lastExpandedId)
-    ) {
-      // Note that the index is related to the compressed array, not
-      // original array with all entries.
-      lastExpandInfo.current.childrenIndexesFiltered.add(ret.length);
-    }
-
-    entry.entryIndexFiltered = ret.length;
+    idToEntryIndexInTreeArray.set(entry.id, ret.length);
     ret.push(entry);
 
     if (!isExpanded(entry.id)) {
@@ -178,7 +201,7 @@ export const leaveOnlyExpandedEntries = (
     }
   }
   // console.log('Filtered: ', JSON.stringify(ret));
-  return { entries: ret, entriesWithChildren };
+  return { entries: ret, entriesWithChildren, idToEntryIndexInTreeArray };
 };
 
 export const formatLocation = (entry: Entry) => {

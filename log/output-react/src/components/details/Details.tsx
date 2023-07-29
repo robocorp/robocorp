@@ -13,7 +13,7 @@ export const BoxOutput = styled(Box)`
 `;
 
 export const Details = () => {
-  const { detailsIndex, setDetailsIndex, allEntries } = useLogContext();
+  const { detailsIndex, setDetailsIndex, entriesInfo } = useLogContext();
   const onClose = useCallback(() => {
     setDetailsIndex(null);
   }, []);
@@ -28,7 +28,7 @@ export const Details = () => {
     return <TerminalDetails></TerminalDetails>;
   } else {
     const idx = detailsIndex as DetailsIndexSelected;
-    const entry = allEntries[idx.indexAll];
+    const entry = entriesInfo.allEntries[idx.indexAll];
 
     return (
       <Drawer passive onClose={onClose} width={1024} open={!!entry}>

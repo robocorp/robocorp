@@ -1,0 +1,11 @@
+.dontStretchContents {
+  display: inline-block;
+}
+
+.selection-visible-dark {
+  background-color: black;
+}
+
+.selection-visible-light {
+  background-color: yellow;
+}

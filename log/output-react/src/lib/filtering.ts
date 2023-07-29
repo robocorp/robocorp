@@ -1,9 +1,5 @@
-import { getTitle } from '~/components/row/components/step/StepTitle';
-import { entryDepth, getStatusLevel, leaveOnlyExpandedEntries } from './helpers';
-import { FilteredEntries, IsExpanded } from './logContext';
-import { Entry, Type, EntryLog, StatusLevel, ExpandInfo, TreeFilterInfo } from './types';
-import { getValue } from '~/components/row/components/step/StepValue';
-import { MutableRefObject } from 'react';
+import { entryDepth, getStatusLevel } from './helpers';
+import { Entry, StatusLevel, TreeFilterInfo } from './types';
 
 interface EntryAdded {
   entry: Entry;
@@ -38,52 +34,7 @@ export const matchTreeFilterInfo = (entry: Entry, treeFilterInfo: TreeFilterInfo
   return accepted;
 };
 
-export const matchFilterName = (entry: Entry, filter: string): boolean => {
-  const filterLower = filter.toLocaleLowerCase();
-  let title = getTitle(entry);
-  if (title !== undefined && title.length > 0 && title.toLowerCase().indexOf(filterLower) >= 0) {
-    return true;
-  }
-
-  // Need to check value because title didn't match.
-  // Make an exception for random html (we can't really match it)
-  let value = '';
-  if (entry.type === Type.log) {
-    const entryLog = entry as EntryLog;
-    if (entryLog.isHtml) {
-      switch (entryLog.status) {
-        case StatusLevel.error:
-          value = 'error';
-          break;
-        case StatusLevel.warn:
-          value = 'warn';
-          break;
-        case StatusLevel.info:
-          value = 'info';
-          break;
-        case StatusLevel.debug:
-          value = 'debug';
-          break;
-      }
-      if (value.length === 0) {
-        return false;
-      }
-    }
-  }
-  if (value.length === 0) {
-    const queried = getValue(entry);
-    if (typeof queried === 'string') {
-      value = queried;
-    }
-  }
-
-  return value.length > 0 && value.toLowerCase().indexOf(filterLower) >= 0;
-};
-
-export const leaveOnlyFilteredEntries = (
-  data: Entry[],
-  treeFilterInfo: TreeFilterInfo,
-): Entry[] => {
+export const applyEntriesFilters = (data: Entry[], treeFilterInfo: TreeFilterInfo): Entry[] => {
   let filtered: Entry[] = [];
   if (
     treeFilterInfo.showInTree ===

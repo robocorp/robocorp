@@ -163,7 +163,7 @@ class Messages {
 }
 
 export const TerminalDetails = () => {
-  const { allEntries, viewSettings, setViewSettings, setDetailsIndex } = useLogContext();
+  const { entriesInfo, viewSettings, setViewSettings, setDetailsIndex } = useLogContext();
 
   const onClose = useCallback(() => {
     setDetailsIndex(null);
@@ -173,7 +173,7 @@ export const TerminalDetails = () => {
 
   const showInTerminal = viewSettings.showInTerminal;
 
-  for (let entry of allEntries) {
+  for (let entry of entriesInfo.allEntries) {
     if (entry.type == Type.log) {
       const c = entry as EntryLog;
       if (!c.isHtml) {

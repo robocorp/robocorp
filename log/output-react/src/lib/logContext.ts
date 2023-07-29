@@ -1,13 +1,16 @@
 import { Dispatch, MutableRefObject, SetStateAction, createContext, useContext } from 'react';
-import { Entry, ExpandInfo, StatusLevel, ViewSettings } from './types';
-import { Counter, isDocumentDefined, isWindowDefined, logError } from './helpers';
+import {
+  EntriesInfo,
+  Entry,
+  InfoForScroll,
+  TreeEntries,
+  StatusLevel,
+  ViewSettings,
+  createDefaultEntriesInfo,
+} from './types';
+import { isDocumentDefined, isWindowDefined, logError } from './helpers';
 import { detectVSCodeTheme } from '../vscode/themeDetector';
 import { isInVSCode } from '../vscode/vscodeComm';
-
-export interface FilteredEntries {
-  entries: Entry[];
-  entriesWithChildren: Set<string>;
-}
 
 export type RunInfoStatus = 'ERROR' | 'PASS' | 'UNSET';
 export interface RunInfo {
@@ -24,7 +27,6 @@ export interface RunInfo {
 
 export interface SearchInfoRequest {
   searchValue: string;
-  requestMTime: number;
   direction: 'forward' | 'backward';
 
   /**
@@ -35,21 +37,32 @@ export interface SearchInfoRequest {
   // isRegexp: boolean;
   // isWholeWord: boolean;
   // isCaseSensitive: boolean;
-  lastFound: Entry | undefined;
+  requestMTime: number;
 }
 
-export interface LastUpdatedIndex {
-  filteredIndex: number;
+export interface SearchInfoResult {
+  found: Entry | undefined;
+  resultMTime: number;
+}
+
+export interface InvalidateTree {
+  indexInTreeEntries: number;
   mtime: number;
 }
 
 export const createDefaultSearchInfoRequest = (): SearchInfoRequest => {
   return {
     searchValue: '',
-    requestMTime: -1,
     direction: 'forward',
     incremental: true,
-    lastFound: undefined,
+    requestMTime: -1,
+  };
+};
+
+export const createDefaultSearchInfoResult = (): SearchInfoResult => {
+  return {
+    found: undefined,
+    resultMTime: -1,
   };
 };
 
@@ -70,25 +83,37 @@ export interface FocusIndexSelected {
   indexAll: number;
   mtime: number;
 }
+export interface SelectionIndexSelected {
+  indexAll: number;
+  mtime: number;
+}
 
 export type DetailsIndexType = null | 'information' | 'terminal' | DetailsIndexSelected;
 export type FocusIndexType = null | FocusIndexSelected;
+export type SelectionIndexType = null | SelectionIndexSelected;
+
+export type AnyIndexType = null | SelectionIndexType | FocusIndexType;
 
 export type LogContextType = {
   isExpanded: IsExpanded;
-  allEntries: Entry[];
-  filteredEntries: FilteredEntries;
-  toggleEntryExpandState: (id: string) => void;
+  entriesInfo: EntriesInfo;
+  updateExpandState: (
+    id: string | string[],
+    forceMode: 'expand' | 'toggle' | 'collapse',
+    scrollIntoView: boolean,
+  ) => void;
   detailsIndex: DetailsIndexType;
   setDetailsIndex: Dispatch<SetStateAction<DetailsIndexType>>;
   focusIndex: FocusIndexType;
   setFocusIndex: Dispatch<SetStateAction<FocusIndexType>>;
+  selectionIndex: SelectionIndexType;
+  setSelectionIndex: Dispatch<SetStateAction<SelectionIndexType>>;
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   runInfo: RunInfo;
-  lastUpdatedIndexFiltered: LastUpdatedIndex;
-  setLastUpdatedIndexFiltered: Dispatch<SetStateAction<LastUpdatedIndex>>;
-  lastExpandInfo: MutableRefObject<ExpandInfo>;
+  invalidateTree: InvalidateTree;
+  setInvalidateTree: Dispatch<SetStateAction<InvalidateTree>>;
+  scrollInfo: MutableRefObject<InfoForScroll>;
 };
 
 let defaultTheme: 'light' | 'dark' = 'light';
@@ -142,19 +167,17 @@ export const createDefaultRunIdsAndLabel = (): RunIdsAndLabel => ({
 });
 
 export const defaultLogState: LogContextType = {
-  allEntries: [],
+  entriesInfo: createDefaultEntriesInfo(),
   isExpanded: (id: string) => {
     return false;
   },
-  filteredEntries: {
-    entries: [],
-    entriesWithChildren: new Set<string>(),
-  },
-  toggleEntryExpandState: () => null,
+  updateExpandState: () => null,
   detailsIndex: null,
   setDetailsIndex: () => null,
   focusIndex: null,
   setFocusIndex: () => null,
+  selectionIndex: null,
+  setSelectionIndex: () => null,
   viewSettings: {
     theme: defaultTheme,
     columns: {
@@ -170,13 +193,15 @@ export const defaultLogState: LogContextType = {
   },
   setViewSettings: () => null,
   runInfo: createDefaultRunInfo(),
-  setLastUpdatedIndexFiltered: () => null,
-  lastUpdatedIndexFiltered: { filteredIndex: -1, mtime: -1 },
-  lastExpandInfo: {
+  setInvalidateTree: () => null,
+  invalidateTree: { indexInTreeEntries: -1, mtime: -1 },
+  scrollInfo: {
     current: {
-      lastExpandedId: '',
+      mode: 'scrollToItem',
+      scrollTargetId: '',
       idDepth: -1,
-      childrenIndexesFiltered: new Set(),
+      entriesInfo: undefined,
+      mtime: -1,
     },
   },
 };

@@ -4,6 +4,7 @@ import { Entry } from '~/lib/types';
 let callsToSetAllEntries:
   | {
       allEntries: Entry[];
+      idToEntry: Map<string, Entry>;
       newExpanded: string[];
       updatedFromIndex: number;
     }
@@ -18,6 +19,7 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
   if (callsToSetAllEntries !== undefined) {
     setAllentriesCallback(
       callsToSetAllEntries.allEntries,
+      callsToSetAllEntries.idToEntry,
       callsToSetAllEntries.newExpanded,
       callsToSetAllEntries.updatedFromIndex,
     );
@@ -31,11 +33,12 @@ export function reactCallSetAllEntriesCallback(setAllentriesCallback: any) {
  */
 export function setAllEntriesWhenPossible(
   allEntries: Entry[], // all the entries which should be set
+  idToEntry: Map<string, Entry>, // a map of entry id -> entry
   newExpanded: string[], // new entry ids to be expanded
   updatedFromIndex = -1, // from which index onwards was there some change
 ) {
   if (reactSetAllEntriesCallback !== undefined) {
-    reactSetAllEntriesCallback(allEntries, newExpanded, updatedFromIndex);
+    reactSetAllEntriesCallback(allEntries, idToEntry, newExpanded, updatedFromIndex);
   } else {
     if (callsToSetAllEntries !== undefined) {
       if (updatedFromIndex === -1) {
@@ -47,7 +50,7 @@ export function setAllEntriesWhenPossible(
       }
       newExpanded = callsToSetAllEntries.newExpanded.concat(newExpanded);
     }
-    callsToSetAllEntries = { allEntries, newExpanded, updatedFromIndex };
+    callsToSetAllEntries = { allEntries, idToEntry, newExpanded, updatedFromIndex };
   }
 }
 
