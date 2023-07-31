@@ -1,8 +1,8 @@
-import copy
 import fnmatch
 import json
 import logging
 import os
+import warnings
 from glob import glob
 from pathlib import Path
 from typing import Any, Optional, Union
@@ -15,23 +15,224 @@ from ._utils import truncate
 LOGGER = logging.getLogger(__name__)
 
 
-class Input:
-    def __init__(self, item_id: str, adapter: BaseAdapter):
+class WorkItem:
+    def __init__(
+        self,
+        adapter: BaseAdapter,
+        item_id: Optional[str] = None,
+        parent_id: Optional[str] = None,
+    ):
+        #: API client adpater
         self._adapter = adapter
-        self._id = item_id
-        self._payload: JSONType = self._adapter.load_payload(self.id)
-        self._files: list[str] = self._adapter.list_files(self.id)
+        #: Current work item ID
+        self._id: Optional[str] = item_id
+        #: Parent work item ID (output only)
+        self._parent_id: Optional[str] = parent_id
+        #: Work item payload (JSON)
+        self._payload: JSONType = None
+        #: Current work item files
+        self._files: list[str] = []
+        #: Files queued for upload
+        self._files_to_add: dict[str, Path] = {}
+        #: Files queued for removal
+        self._files_to_remove: set[str] = set()
+        #: Flag for saved/dirty state
+        self._saved = False
+
+    @property
+    def id(self) -> Optional[str]:
+        """Current ID for work item."""
+        return self._id
+
+    @property
+    def parent_id(self) -> Optional[str]:
+        """Current parent work item ID (output only)."""
+        return self._parent_id
+
+    @property
+    def payload(self) -> JSONType:
+        """Current JSON payload."""
+        return self._payload
+
+    @payload.setter
+    def payload(self, value: JSONType):
+        self._saved = False
+        self._payload = value
+
+    @property
+    def files(self) -> list[str]:
+        """Names of attached files."""
+        return self._files
+
+    @property
+    def saved(self) -> bool:
+        """Is the current item saved."""
+        return self._saved
+
+    def load(self) -> None:
+        """Load work item payload and file listing from Control Room."""
+        if self.id is None:
+            raise RuntimeError("Unable to load unsaved item")
+
+        self._payload = self._adapter.load_payload(self.id)
+        self._files = self._adapter.list_files(self.id)
+        self._saved = True
+
+    def save(self):
+        """Save the current work item.
+
+        Updates the work item payload and adds/removes all pending files.
+        """
+        if self.id is not None:
+            self._adapter.save_payload(self.id, payload=self.payload)
+        elif self.parent_id is not None:
+            self._id = self._adapter.create_output(
+                self.parent_id,
+                payload=self.payload,
+            )
+        else:
+            raise RuntimeError("Invalid work item state (no id or parent_id)")
+
+        assert self.id is not None
+
+        for name, path in self._files_to_add.items():
+            with open(path, "rb") as fd:
+                self._adapter.add_file(
+                    item_id=self.id,
+                    name=name,
+                    content=fd.read(),
+                )
+
+        for name in self._files_to_remove:
+            self._adapter.remove_file(self.id, name)
+
+        self._files = list(
+            set(self._files) - set(self._files_to_remove) | set(self._files_to_add)
+        )
+        self._files_to_add = {}
+        self._files_to_remove = set()
+
+        self._saved = True
+
+    def add_file(self, path: Union[Path, str], name: Optional[str] = None) -> Path:
+        """Attach a file from the local machine to the work item.
+
+        Note: Files are not uploaded until the item is saved.
+
+        Args:
+            path: Path to attached file
+            name: Custom name for file in work item
+
+        Returns:
+            Resolved path to added file
+        """
+        path = Path(path).resolve()
+        name = name or path.name
+
+        if not path.is_file():
+            raise FileNotFoundError(f"Not a valid file: {path}")
+
+        if name in self._files:
+            LOGGER.warning('File with name "%s" already exists', name)
+
+        self._saved = False
+        self._files_to_add[name] = path
+        LOGGER.info("Added file: %s", name)
+
+        return path
+
+    def add_files(self, pattern: str) -> list[Path]:
+        """Attach files from the local machine to the work item that
+        match the given pattern.
+
+        Note: Files are not uploaded until the item is saved.
+
+        Args:
+            pattern: Glob pattern for attached file paths
+
+        Returns:
+            List of added paths
+        """
+        matches = glob(pattern, recursive=False)
+
+        paths = []
+        for match in matches:
+            path = self.add_file(match)
+            paths.append(path)
+
+        LOGGER.info("Added %d file(s)", len(paths))
+        return paths
+
+    def remove_file(self, name: str, missing_ok: bool = False):
+        """Remove attached file with given name.
+
+        Note: Files are not removed from Control Room until the item is saved.
+
+        Args:
+            name: Name of file
+            missing_ok: Do nothing if given file does not exist
+        """
+        if name not in self._files:
+            if missing_ok:
+                return
+            else:
+                raise FileNotFoundError(f"No such file in work item: {name}")
+
+        LOGGER.info("Removing file: %s", name)
+        self._files_to_remove.add(name)
+        self._saved = False
+
+    def remove_files(self, pattern: str) -> list[str]:
+        """Remove attached files that match the given pattern.
+
+        Note: Files are not removed from Control Room until the item is saved.
+
+        Args:
+            pattern: Glob pattern for file names
+
+        Returns:
+            List of matched names
+        """
+        names = []
+        for name in self._files:
+            if fnmatch.fnmatch(name, pattern):
+                self.remove_file(name)
+                names.append(name)
+
+        LOGGER.info("Removing %d file(s)", len(names))
+        return names
+
+
+class Input(WorkItem):
+    """Container for an input work item.
+
+    An input work item can contain arbitrary JSON data in the `payload` section,
+    and optionally attached files that are stored in Control Room.
+
+    Each step run of a process in Control Room has at least one input
+    work item associated with it, but the step's input queue can have
+    multiple input items in it.
+
+    There can only be one input work item reserved at a time. To reserve
+    the next item, the current item needs to be released as either
+    passed or failed.
+    """
+
+    def __init__(self, adapter: BaseAdapter, item_id: str):
+        super().__init__(adapter, item_id=item_id)
         self._state: Optional[State] = None
         self._outputs: list[Output] = []
+        self._saved = True
 
     def __repr__(self):
         payload = truncate(json.dumps(self._payload), 64)
         return (
             "Input["
-            + f"id={self._id},"
+            + f"id={self.id},"
             + f"payload={payload},"
-            + f"files={self._files},"
-            + f"state={self._state}]"
+            + f"files={self.files},"
+            + f"state={self.state},"
+            + f"saved={self.saved}]"
         )
 
     def __enter__(self):
@@ -55,28 +256,30 @@ class Input:
         return exc_type in (ApplicationException, BusinessException)
 
     @property
-    def id(self):
-        return self._id
-
-    @property
-    def payload(self):
-        return copy.deepcopy(self._payload)
-
-    @property
-    def files(self):
-        return list(self._files)
-
-    @property
-    def state(self):
+    def state(self) -> Optional[State]:
+        """Current release state."""
         return self._state
 
     @property
-    def released(self):
+    def released(self) -> bool:
+        """Is the current item released."""
         return self._state is not None
 
     @property
-    def outputs(self):
+    def outputs(self) -> list["Output"]:
+        """Child output work items."""
         return list(self._outputs)
+
+    def save(self):
+        """Save the current input work item.
+
+        Updates the work item payload and adds/removes all pending files.
+
+        **Note:** Modifying input work items is not recommended, as it will
+         make traceability after execution difficult, and potentially make
+         the process behave in unexpected ways.
+        """
+        super().save()
 
     def email(
         self,
@@ -84,6 +287,21 @@ class Input:
         encoding="utf-8",
         ignore_errors=False,
     ) -> Optional[Email]:
+        """Parse an email attachment from the work item.
+
+        Args:
+            html: Parse the HTML content into the `html` attribute
+            encoding: Text encoding of the email
+            ignore_errors: Ignore possible parsing errors from Control Room
+
+        Returns:
+            An email container with metadata and content
+
+        Raises:
+            ValueError: No email attached or content is malformed
+        """
+        assert self.id is not None
+
         email = self._parse_email()
 
         if email.errors and not ignore_errors:
@@ -141,9 +359,23 @@ class Input:
 
         return result
 
-    def download_file(self, name: str, path: Optional[PathType] = None) -> Path:
+    def get_file(self, name: str, path: Optional[PathType] = None) -> Path:
+        """Download file with given name.
+
+        If a `path` is not defined, uses the Robot root or current working
+        directory.
+
+        Args:
+            name: Name of file
+            path: Path to created file
+
+        Returns:
+            Path to created file
+        """
+        assert self.id is not None
+
         if name not in self.files:
-            raise KeyError(name)
+            raise FileNotFoundError(f"No file with name: {name}")
 
         if path is None:
             root = os.getenv("ROBOT_ROOT", "")
@@ -157,7 +389,22 @@ class Input:
 
         return path.absolute()
 
-    def download_files(self, pattern: str, path: Optional[Path] = None) -> list[Path]:
+    def get_files(self, pattern: str, path: Optional[Path] = None) -> list[Path]:
+        """Download all files attached to this work item that match
+        the given pattern.
+
+        If a `path` is not defined, uses the Robot root or current working
+        directory.
+
+        Args:
+            pattern: Glob pattern for file names
+            path: Directory to store files in
+
+        Returns:
+            List of created file paths
+        """
+        assert self.id is not None
+
         if path is None:
             root = os.getenv("ROBOT_ROOT", "")
             path = Path(root)
@@ -174,23 +421,29 @@ class Input:
             filepath = (path / name).absolute()
             paths.append(filepath)
 
-            content = self._adapter.get_file(self._id, name)
+            content = self._adapter.get_file(self.id, name)
             with open(filepath, "wb") as fd:
                 fd.write(content)
 
         return paths
 
     def create_output(self) -> "Output":
-        item = Output(parent_id=self.id, adapter=self._adapter)
+        """Create an output work item that is a child of this item."""
+        assert self.id is not None
+
+        item = Output(adapter=self._adapter, parent_id=self.id)
         self._outputs.append(item)
         return item
 
     def done(self):
-        if self._state is not None:
+        """Mark this work item as done, and release it."""
+        assert self.id is not None
+
+        if self.state is not None:
             raise RuntimeError("Work item already released")
 
         state = State.DONE
-        self._adapter.release_input(self._id, state, exception=None)
+        self._adapter.release_input(self.id, state, exception=None)
         self._state = state
 
     def fail(
@@ -199,7 +452,16 @@ class Input:
         code: Optional[str] = None,
         message: Optional[str] = None,
     ):
-        if self._state is not None:
+        """Mark this work item as failed, and release it.
+
+        Args:
+            exception_type: Type of failure (APPLICATION or BUSINESS)
+            code: Custom error code for the failure
+            message: Human-readable error message
+        """
+        assert self.id is not None
+
+        if self.state is not None:
             raise RuntimeError("Work item already released")
 
         type_ = (
@@ -215,24 +477,52 @@ class Input:
         }
 
         state = State.FAILED
-        self._adapter.release_input(self._id, state, exception=exception)
+        self._adapter.release_input(self.id, state, exception=exception)
         self._state = state
 
+    # Backwards compatibility
+    def download_file(self, name: str, path: Optional[PathType] = None) -> Path:
+        """Deprecated method, use `get_file` instead.
 
-class Output:
-    def __init__(self, parent_id: str, adapter: BaseAdapter):
-        self._adapter = adapter
-        self._parent_id = parent_id
-        self._id: Optional[str] = None
-        self._payload: JSONType = {}
-        self._files: dict[str, Path] = {}
-        self._saved = False
+        lazydocs: ignore
+        """
+        warnings.warn(
+            "download_file() will be removed in version 2.x, use get_file()",
+            DeprecationWarning,
+        )
+        return self.get_file(name, path)
+
+    def download_files(self, pattern: str, path: Optional[Path] = None) -> list[Path]:
+        """Deprecated method, use `get_files` instead.
+
+        lazydocs: ignore
+        """
+        warnings.warn(
+            "download_files() will be removed in version 2.x, use get_files()",
+            DeprecationWarning,
+        )
+        return self.get_files(pattern, path)
+
+
+class Output(WorkItem):
+    """Container for an output work item.
+
+    Created output items are added to an output queue, and released
+    to the next step of a process when the current run ends.
+
+    Note: An output item always has an input item as a parent,
+    which is used for traceability in a work item's history.
+    """
+
+    def __init__(self, adapter: BaseAdapter, parent_id: str):
+        super().__init__(adapter, parent_id=parent_id)
 
     def __repr__(self):
         payload = truncate(str(self.payload), 64)
         return (
             "Output["
-            + f"parent={self._parent_id},"
+            + f"id={self.id},"
+            + f"parent={self.parent_id},"
             + f"payload={payload},"
             + f"files={self.files},"
             + f"saved={self.saved}]"
@@ -244,73 +534,3 @@ class Output:
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is not None:
             self.save()
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def parent_id(self):
-        return self._parent_id
-
-    @property
-    def payload(self):
-        return self._payload
-
-    @payload.setter
-    def payload(self, value):
-        self._saved = False
-        self._payload = value
-
-    @property
-    def files(self):
-        return list(self._files.keys())
-
-    @property
-    def saved(self):
-        return self._saved
-
-    def save(self):
-        if not self._id:
-            self._id = self._adapter.create_output(
-                self.parent_id,
-                payload=self.payload,
-            )
-        else:
-            self._adapter.save_payload(self._id, payload=self.payload)
-
-        for name, path in self._files.items():
-            with open(path, "rb") as fd:
-                self._adapter.add_file(
-                    self._id,
-                    name,
-                    original_name=path.name,
-                    content=fd.read(),
-                )
-
-        self._saved = True
-
-    def add_file(self, path: Union[Path, str], name: Optional[str] = None) -> Path:
-        path = Path(path).resolve()
-        name = name or path.name
-
-        if not path.is_file():
-            raise FileNotFoundError(f"Not a valid file: {path}")
-
-        if name in self._files:
-            LOGGER.warning('File with name "%s" already exists', name)
-
-        self._saved = False
-        self._files[name] = path
-        return path
-
-    def add_files(self, pattern: str) -> list[Path]:
-        matches = glob(pattern, recursive=False)
-
-        paths = []
-        for match in matches:
-            path = self.add_file(match)
-            paths.append(path)
-
-        LOGGER.info("Added %d file(s)", len(paths))
-        return paths

@@ -20,7 +20,7 @@ from robocorp import workitems
 from robocorp.tasks import task
 
 @task
-def handle_input():
+def handle_item():
     item = workitems.inputs.current
     print("Received payload:", item.payload)
     workitems.outputs.create(payload={"key": "value"})
@@ -33,7 +33,7 @@ from robocorp import workitems
 from robocorp.tasks import task
 
 @task
-def handle_all_inputs():
+def handle_all_items():
     for item in workitems.inputs:
         print("Received payload:", item.payload)
         workitems.outputs.create(payload={"key": "value"})
@@ -53,6 +53,7 @@ requires no additional setup from the user.
 - [Reserving and releasing input items](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/reserving-inputs.md)
 - [Creating outputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/creating-outputs.md)
 - [Email triggering](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/email-triggering.md)
+- [Advanced patterns](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/advanced-patterns.md)
 - [Local development](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/local-development.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).

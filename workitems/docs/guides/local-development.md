@@ -22,7 +22,7 @@ library to use local files for simulating input and output queues for work
 items, in the form of JSON files.
 
 The environment variables `RC_WORKITEM_INPUT_PATH` and `RC_WORKITEM_OUTPUT_PATH`
-are also required, and should contain the paths to the input and output JSON
+should also be set, and should contain the paths to the input and output JSON
 files. The output file will be created by the library, but the input file
 should be created manually.
 
@@ -41,3 +41,7 @@ An example of an input file with one work item:
     }
 ]
 ```
+
+The format of the file is a list of objects, where each item in the list
+corresponds to one work item. The `payload` key can contain any arbitrary JSON,
+and the `files` key is pairs of names and paths to files.
