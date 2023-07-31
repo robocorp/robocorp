@@ -20,8 +20,10 @@ parent, but it's also possible to create an output explicitly from
 the input item:
 
 ```python
-with workitems.inputs.reserve() as input_item:
-    input_item.create_output(payload={"key": "value"})
+with workitems.inputs.reserve() as item:
+    out = item.create_output()
+    out.payload = {"key": "value"}
+    out.save()
 ```
 
 In some cases, it's also useful to create an output item and then modify it
