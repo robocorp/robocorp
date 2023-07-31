@@ -409,3 +409,18 @@ def test_collect_inputs(inputs, outputs, adapter):
     output.payload = summary
     output.save()
     assert adapter.data[output.id] == summary
+
+
+def test_add_files_input(inputs, adapter):
+    item = inputs.current
+    with temp_filename(b"some-bytes") as path:
+        item.add_file(path, name="name-of-file")
+        item.save()
+        assert adapter.files[item.id]["name-of-file"] == b"some-bytes"
+
+
+def test_remove_files_input(inputs, adapter):
+    item = inputs.current
+    item.remove_files("file1.txt")
+    item.save()
+    assert sorted(item.files) == ["file2.txt", "file3.png"]
