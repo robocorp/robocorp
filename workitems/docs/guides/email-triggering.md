@@ -74,7 +74,7 @@ from robocorp.tasks import task
 @task
 def parse_message_id():
     for item in workitems.inputs:
-        path = item.download_file("__raw_mail")
+        path = item.get_file("__raw_mail")
         with open(path) as fd:
             message = email.message_from_file(fd)
             message_id = message["Message-ID"]
