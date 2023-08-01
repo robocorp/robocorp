@@ -173,7 +173,7 @@ export const Log = () => {
         return entriesInput.idToEntry.get(id);
       },
     };
-  }, [filtered, expandedEntries, scrollInfo]);
+  }, [filtered, expandedEntries, entriesInput]);
 
   const ctx: LogContextType = {
     entriesInfo,
