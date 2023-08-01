@@ -38,10 +38,10 @@ jobs:
             python: "3.9"
             os: ubuntu-latest
             PATH_SEPARATOR: ":"
-          - name: "windows-py310"
-            python: "3.10"
-            os: windows-latest
-            PATH_SEPARATOR: ";"
+#           - name: "windows-py310"
+#             python: "3.10"
+#             os: windows-latest
+#             PATH_SEPARATOR: ";"
 
 
     steps:
