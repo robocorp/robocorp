@@ -3,107 +3,107 @@ RR: Root Suite
     RT: my_task
         RE: METHOD: check_big_for_in_for
             RE: FOR: for x in range(rows)
-                RE: FOR_STEP: for x in range(rows)
+                RE: FOR_STEP: Step: for x in range(rows)
                     RE: FOR: for y in range(cols)
-                        RE: FOR_STEP: for y in range(cols)
+                        RE: FOR_STEP: Step: for y in range(cols)
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 28
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 29
                         EE: FOR_STEP: PASS
                     EE: FOR: PASS
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for x in range(rows)
+                SE: FOR_STEP: Step: for x in range(rows)
                     EA: int: x: 28
                     AS: row: []
                     SE: FOR: for y in range(cols)
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 0
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 1
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 2
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 3
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 4
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 5
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 6
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 7
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 8
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 9
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 10
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 11
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 12
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 13
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 14
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 15
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 16
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 17
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 18
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 19
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 20
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 21
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 22
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 23
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 24
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 25
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 26
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 27
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 28
                             SE: IF: if x == 27 and y == 27 or (x == 28 and y == 28)
                             EA: int: x: 28
@@ -112,107 +112,107 @@ RR: Root Suite
                             RT: my_task
                             RE: METHOD: check_big_for_in_for
                             RE: FOR: for x in range(rows)
-                            RE: FOR_STEP: for x in range(rows)
+                            RE: FOR_STEP: Step: for x in range(rows)
                             RE: FOR: for y in range(cols)
-                            RE: FOR_STEP: for y in range(cols)
+                            RE: FOR_STEP: Step: for y in range(cols)
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 29
                         EE: FOR_STEP: PASS
                     EE: FOR: PASS
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for x in range(rows)
+                SE: FOR_STEP: Step: for x in range(rows)
                     EA: int: x: 29
                     AS: row: []
                     SE: FOR: for y in range(cols)
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 0
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 1
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 2
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 3
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 4
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 5
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 6
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 7
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 8
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 9
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 10
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 11
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 12
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 13
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 14
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 15
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 16
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 17
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 18
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 19
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 20
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 21
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 22
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 23
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 24
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 25
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 26
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 27
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 28
                         EE: FOR_STEP: PASS
-                        SE: FOR_STEP: for y in range(cols)
+                        SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 29
                         EE: FOR_STEP: PASS
                     EE: FOR: PASS

@@ -808,12 +808,14 @@ def _handle_for_or_while(
             collect_names_from_node = node.target
             target_desc = ast.unparse(node.target)
             name_str = factory.Str(f"for {target_desc} in {iter_desc}")
+            step_name_str = factory.Str(f"Step: for {target_desc} in {iter_desc}")
             stmt_name = "for"
 
         elif isinstance(node, ast.While):
             while_desc = ast.unparse(node.test)
             collect_names_from_node = node.test
             name_str = factory.Str(f"while {while_desc}")
+            step_name_str = factory.Str(f"Step: while {while_desc}")
             stmt_name = "while"
         else:
             raise RuntimeError(f"Unexpected node: {node}.")
@@ -863,13 +865,8 @@ def _handle_for_or_while(
 
         body = node.body
         if body:
-            first_stmt = body[0]
-            factory_first = rewrite_ctx.NodeFactory(
-                first_stmt.lineno, first_stmt.col_offset
-            )
-
             targets = _collect_names_used_as_node_or_none(
-                factory_first, collect_names_from_node
+                factory, collect_names_from_node
             )
 
             call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_step_start"))
@@ -878,10 +875,10 @@ def _handle_for_or_while(
             call.args.append(
                 factory.Tuple(
                     factory.Str(f"{stmt_name_upper}_STEP"),  # FOR_STEP / WHILE_STEP
-                    factory_first.NameLoad("__name__"),
-                    factory_first.NameLoad("__file__"),
-                    name_str,
-                    factory_first.LineConstantAt(node.lineno),
+                    factory.NameLoad("__name__"),
+                    factory.NameLoad("__file__"),
+                    step_name_str,
+                    factory.LineConstantAt(node.lineno),
                     targets,
                 )
             )

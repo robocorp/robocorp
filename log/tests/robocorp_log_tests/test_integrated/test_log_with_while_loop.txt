@@ -5,61 +5,61 @@ SR: Root Suite
             AS: i: 0
             AS: j: 0
             SE: WHILE: while i < 10 and j < 10
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 0
                     EA: int: j: 0
                     AS: a: 1
                     AS: b: 1
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 1
                     EA: int: j: 1
                     AS: a: 2
                     AS: b: 2
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 2
                     EA: int: j: 2
                     AS: a: 3
                     AS: b: 3
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 3
                     EA: int: j: 3
                     AS: a: 4
                     AS: b: 4
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 4
                     EA: int: j: 4
                     AS: a: 5
                     AS: b: 5
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 5
                     EA: int: j: 5
                     AS: a: 6
                     AS: b: 6
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 6
                     EA: int: j: 6
                     AS: a: 7
                     AS: b: 7
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 7
                     EA: int: j: 7
                     AS: a: 8
                     AS: b: 8
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 8
                     EA: int: j: 8
                     AS: a: 9
                     AS: b: 9
                 EE: WHILE_STEP: PASS
-                SE: WHILE_STEP: while i < 10 and j < 10
+                SE: WHILE_STEP: Step: while i < 10 and j < 10
                     EA: int: i: 9
                     EA: int: j: 9
                     AS: a: 10

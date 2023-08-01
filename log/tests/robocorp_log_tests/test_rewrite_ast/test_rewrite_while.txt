@@ -6,7 +6,7 @@ def foo():
         @robo_lifecycle_hooks.after_assign(__name__, __file__, 'foo', 3, 'a', a)
         @ctx.report_while_start(1, ('WHILE', __name__, __file__, 'while a < 3', 4))
         while a < 3:
-            @ctx.report_while_step_start(2, ('WHILE_STEP', __name__, __file__, 'while a < 3', 4, (('a', a),)))
+            @ctx.report_while_step_start(2, ('WHILE_STEP', __name__, __file__, 'Step: while a < 3', 4, (('a', a),)))
             a += 1
             @ctx.report_while_step_end(2)
         @ctx.report_while_end(1)

@@ -1,14 +1,14 @@
 from imp import reload
 from pathlib import Path
 
-from robocorp.log import setup_log, verify_log_messages_from_log_html
-
 from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
     AutoLogConfigForTest,
     basic_log_setup,
     pretty_format_logs_from_log_html,
 )
+
+from robocorp.log import setup_log, verify_log_messages_from_log_html
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate, str_regression):
@@ -75,7 +75,11 @@ def test_log_with_for_loop(tmpdir, ui_regenerate):
         [
             {"message_type": "SE", "name": "for i in range(5)", "type": "FOR"},
             {"message_type": "EE", "type": "FOR", "status": "PASS"},
-            {"message_type": "SE", "name": "for i in range(5)", "type": "FOR_STEP"},
+            {
+                "message_type": "SE",
+                "name": "Step: for i in range(5)",
+                "type": "FOR_STEP",
+            },
             {"message_type": "EA", "name": "i", "type": "int", "value": "2"},
             {
                 "message_type": "AS",

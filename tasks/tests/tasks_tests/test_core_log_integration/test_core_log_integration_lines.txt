@@ -12,31 +12,31 @@ SR: main_check_lines.py
             EE: METHOD: PASS
             AS: v: 'at_16' (line: 16)
             SE: FOR: for c in 'at_line20' (line: 20)
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: 'a'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: 't'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: '_'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: 'l'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: 'i'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: 'n'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: 'e'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: '2'
                 EE: FOR_STEP: PASS
-                SE: FOR_STEP: for c in 'at_line20' (line: 20)
+                SE: FOR_STEP: Step: for c in 'at_line20' (line: 20)
                     EA: str: c: '0'
                 EE: FOR_STEP: PASS
             EE: FOR: PASS
