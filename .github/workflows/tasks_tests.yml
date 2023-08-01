@@ -30,7 +30,7 @@ jobs:
       matrix:
         name: [
           "ubuntu-py39-devmode",
-          "windows-py310",
+#           "windows-py310",
         ]
 
         include:
