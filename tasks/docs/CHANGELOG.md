@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-- Improved UI when logs are rotated out.
-- `log.html`: items are scrolled into the view when parent item is expanded.
-
 ## 2.1.3 - 2023-07-19
 
 - Moved some internal APIs to load the `robocorp.log` auto log configuration to the

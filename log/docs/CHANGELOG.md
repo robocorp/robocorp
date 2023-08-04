@@ -10,6 +10,9 @@
         - Clicking on row will show row focused.
         - Clicking on row title will open item details.
 
+- Improved UI when logs are rotated out.
+- `log.html`: items are scrolled into the view when parent item is expanded.
+
 ## 2.5.0 - 2023-07-24
 
 - Spec version changed from `0.0.2` to `0.0.3`.
