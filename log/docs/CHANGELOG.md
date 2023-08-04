@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.6.0 - 2023-08-04
 
 - `log.html`:
     - Tree usability improvements:
