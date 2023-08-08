@@ -24,26 +24,14 @@ def configure(**kwargs) -> None:
     initialized will have no effect).
 
     Args:
-        browser_engine:
-            Browser engine which should be used
-            default="chromium"
-            choices=["chromium", "chrome", "chrome-beta", "msedge",
-                     "msedge-beta", "msedge-dev", "firefox", "webkit"]
-
+        browser_engine: Browser engine which should be used (default: Chromium)
         headless: If set to False the browser UI will be shown. If set to True
             the browser UI will be kept hidden. If unset or set to None it'll
             show the browser UI only if a debugger is detected.
-
-        slowmo:
-            Run interactions in slow motion.
-
-        screenshot:
-            Whether to automatically capture a screenshot after each task.
-            default="only-on-failure"
-            choices=["on", "off", "only-on-failure"]
-
-        viewport_size:
-            Size to be set for the viewport. Specified as tuple(width, height).
+        slowmo: Run interactions in slow motion.
+        screenshot: Whether to automatically capture a screenshot after each task.
+            Options are `on`, `off`, and `only-on-failure` (default).
+        viewport_size: Size to be set for the viewport. Specified as tuple(width, height).
 
     Note:
         See also: `robocorp.browser.configure_context` to change other
@@ -106,7 +94,7 @@ def page() -> Page:
 
         ```python
         from robocorp import browser
-        page = browser.context.new_page()
+        page = browser.context().new_page()
         ```
     """
     from . import _browser_context
@@ -250,20 +238,22 @@ def install(browser_engine: BrowserEngine):
     current browser installation.
 
     Args:
-        browser_engine:
-            help="Browser engine which should be installed",
-            choices=[chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"]
-    """  # noqa
+        browser_engine: Browser engine which should be installed
+    """
     from . import _browser_engines
 
     _browser_engines.install_browser(browser_engine, force=False)
 
 
 __all__ = [
-    "install",
     "configure",
+    "configure_context",
     "page",
     "browser",
     "playwright",
     "context",
+    "goto",
+    "screenshot",
+    "install",
+    "BrowserEngine",
 ]

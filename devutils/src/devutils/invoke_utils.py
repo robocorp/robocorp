@@ -1,5 +1,9 @@
+import re
 import sys
+import tempfile
+import textwrap
 from contextlib import contextmanager
+from itertools import chain
 from pathlib import Path
 from typing import Iterator, List, Optional
 
@@ -75,6 +79,12 @@ def get_all_tags(tag_prefix: str) -> List[str]:
 
     found = stdout.decode("utf-8").strip()
     return [x for x in found.splitlines() if x.startswith(tag_prefix)]
+
+
+def to_identifier(value: str) -> str:
+    value = re.sub(r'[^\w\s_]', '', value.lower())
+    value = re.sub(r'[_\s]+', '_', value).strip('_')
+    return value
 
 
 def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] = None):
@@ -175,6 +185,47 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     def test(ctx):
         """Run unittests"""
         poetry(ctx, f"run pytest")
+
+    @task
+    def doctest(ctx):
+        """Statically verify documentation examples."""
+        pattern = re.compile(r"^\s*```python([\s\S]*?)\s*```", re.MULTILINE)
+        files = [
+            (root / "src").rglob("*.py"),
+            (root / "docs" / "guides").rglob("*.md"),
+        ]
+
+        output = ""
+        for path in chain(*files):
+            dirname = to_identifier(path.parent.name)
+            filename = to_identifier(path.name)
+
+            content = path.read_text()
+            matches = re.findall(pattern, content)
+            if not matches:
+                continue
+
+            print(f"Found examples in: {path}")
+            output += f"\n# {path.name}\n"
+            for index, match in enumerate(matches):
+                code = textwrap.indent(textwrap.dedent(match), "    ")
+                output += f"\ndef codeblock_{dirname}_{filename}_{index}() -> None:"
+                output += code
+                output += "\n"
+
+        if not output:
+            print("No example blocks found")
+            return
+
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as tmp:
+            print(f"Validating project: {root.name}")
+            for lineno, line in enumerate(output.splitlines(), 1):
+                print(f"{lineno:3}: {line}")
+
+            tmp.write(output)
+            tmp.close()  # Fix for Windows
+            poetry(ctx, f"run mypy --strict {tmp.name}")
+
 
     @task(lint, typecheck, test)
     def check_all(ctx):

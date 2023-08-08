@@ -12,6 +12,7 @@ class InstallError(RuntimeError):
 
 
 class BrowserEngine(str, Enum):
+    """Valid browser engines for Playwright."""
     CHROMIUM = "chromium"
     CHROME = "chrome"
     CHROME_BETA = "chrome-beta"
