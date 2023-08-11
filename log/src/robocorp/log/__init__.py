@@ -110,7 +110,9 @@ def critical(*message: Any) -> None:
         message: The message which should be logged.
 
     Example:
+        ```python
         critical('Failed because', obj, 'is not', expected)
+        ```
 
     Note:
         Formatting converts all objects given to `str`. If you need custom
@@ -135,7 +137,9 @@ def warn(*message: Any) -> None:
         message: The message which should be logged.
 
     Example:
+        ```python
         warn('Did not expect', obj)
+        ```
 
     Note:
         Formatting converts all objects given to `str`. If you need custom
@@ -161,7 +165,9 @@ def info(*message: Any) -> None:
 
 
     Example:
+        ```python
         info('Received value', obj)
+        ```
 
     Note:
         Formatting converts all objects given to `str`. If you need custom
@@ -187,7 +193,9 @@ def debug(*message: Any) -> None:
 
 
     Example:
+        ```python
         debug('Received value', obj)
+        ```
 
     Note:
         Formatting converts all objects given to `str`. If you need custom
@@ -237,10 +245,11 @@ def html(html: str, level: str = "INFO"):
         level: The level of the message ("INFO", "WARN" or "ERROR")
 
     Example adding an image:
-
+        ```python
         html(
             '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="/>'
         )
+        ```
     """
 
     assert level in ("ERROR", "WARN", "INFO")
@@ -402,14 +411,18 @@ def suppress_methods():
     Can be used as a context manager or decorator so that methods are not logged.
 
     i.e.:
-        @suppress_methods
-        def method():
-            ...
+    ```python
+    @suppress_methods
+    def method():
+        ...
+    ```
 
-        or
+    or
 
-        with suppress_methods():
-            ...
+    ```python
+    with suppress_methods():
+        ...
+    ```
     """
     return suppress(variables=False, methods=True)
 
@@ -419,14 +432,18 @@ def suppress_variables():
     Can be used as a context manager or decorator so that variables are not logged.
 
     i.e.:
-        @suppress_variables
-        def method():
-            ...
+    ```python
+    @suppress_variables
+    def method():
+        ...
+    ```
 
-        or
+    or
 
-        with suppress_variables():
-            ...
+    ```python
+    with suppress_variables():
+        ...
+    ```
     """
     return suppress(variables=True, methods=False)
 
@@ -475,26 +492,32 @@ def suppress(*args, **kwargs):
 
     Usage as a decorator:
 
-        from robocorp import log
+    ```python
+    from robocorp import log
 
-        @log.suppress
-        def func():
-            ....
+    @log.suppress
+    def func():
+        ....
+    ```
 
     Usage as a decorator suppressing only variables:
 
-        from robocorp import log
+    ```python
+    from robocorp import log
 
-        @log.suppress(methods=False)
-        def func():
-            ....
+    @log.suppress(methods=False)
+    def func():
+        ....
+    ```
 
     Usage as a context manager:
 
-        from robocorp import log
+    ```python
+    from robocorp import log
 
-        with log.suppress(methods=False):
-            ....
+    with log.suppress(methods=False):
+        ....
+    ```
     """
     return _suppress_helper.handle(*args, **kwargs)
 
@@ -653,11 +676,13 @@ def iter_decoded_log_format_from_stream(stream: IReadLines) -> Iterator[dict]:
 
         Example of messages provided:
 
+        ```python
         {'message_type': 'V', 'version': '1'}
         {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
         {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
         ...
+        ```
 
         Note: the exact format of the messages provided is not stable across
         releases.
@@ -677,11 +702,13 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
 
         Example of messages provided:
 
+        ```python
         {'message_type': 'V', 'version': '1'}
         {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
         {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
         {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
         ...
+        ```
 
         Note: the exact format of the messages provided is not stable across
         releases.
@@ -742,18 +769,21 @@ def verify_log_messages_from_messages_iterator(
         not_expected: The messages that should not appear.
 
     Example:
+        ```python
         verify_log_messages_from_messages_iterator(
         messages_iterator,
         [
             {'message_type': 'V', 'version': '1'}
             {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
         ]
+        ```
 
     Note: if one of the key entries is `__check__` the value will be considered
     a callable which should return `True` or `False` to determine if a match was
     made.
 
     Example:
+        ```python
         verify_log_messages_from_messages_iterator(
         messages_iterator,
         [
@@ -763,6 +793,7 @@ def verify_log_messages_from_messages_iterator(
                 "__check__": lambda msg: msg["time"].endswith("+00:00"),
             },
         ]
+        ```
     """
     expected_lst: List[dict] = list(expected)
     log_messages = list(messages_iterator)
