@@ -91,7 +91,7 @@ PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict)
 
 <a href="https://github.com/robocorp/robo/tree/master/log/<string>"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
-### <kbd>function</kbd> `__init__`
+### <kbd>method</kbd> `__init__`
 
 ```python
 __init__(pyproject: Path, toml_contents: dict) → None

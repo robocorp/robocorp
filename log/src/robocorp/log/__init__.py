@@ -115,8 +115,7 @@ def critical(*message: Any) -> None:
     Note:
         Formatting converts all objects given to `str`. If you need custom
         formatting please pre-format the string.
-        i.e.:
-        critical(f'Failed because {obj!r} is not {expected!r}.')
+        i.e.: `critical(f'Failed because {obj!r} is not {expected!r}.')`
 
     Note:
         A new line is automatically added at the end of the message.
@@ -141,8 +140,7 @@ def warn(*message: Any) -> None:
     Note:
         Formatting converts all objects given to `str`. If you need custom
         formatting please pre-format the string.
-        i.e.:
-        warn(f'Did not expect {obj!r}.')
+        i.e.: `warn(f'Did not expect {obj!r}.')`
 
     Note:
         A new line is automatically added at the end of the message.
@@ -168,8 +166,7 @@ def info(*message: Any) -> None:
     Note:
         Formatting converts all objects given to `str`. If you need custom
         formatting please pre-format the string.
-        i.e.:
-        info(f'Received value {obj!r}.')
+        i.e.: `info(f'Received value {obj!r}.')`
 
     Note:
         A new line is automatically added at the end of the message.
@@ -195,8 +192,7 @@ def debug(*message: Any) -> None:
     Note:
         Formatting converts all objects given to `str`. If you need custom
         formatting please pre-format the string.
-        i.e.:
-        debug(f'Received value {obj!r}.')
+        i.e.: `debug(f'Received value {obj!r}.')`
 
     Note:
         A new line is automatically added at the end of the message.
