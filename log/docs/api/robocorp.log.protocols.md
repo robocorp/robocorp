@@ -1,8 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-# <kbd>module</kbd> `robocorp.log.protocols`
+# module `robocorp.log.protocols` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L0)
 
 
 
@@ -11,9 +9,7 @@
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-## <kbd>class</kbd> `IReadLines`
+## class `IReadLines` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L10)
 
 
 
@@ -23,9 +19,8 @@
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `readlines` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L11)
 
-### <kbd>method</kbd> `readlines`
 
 ```python
 readlines() → Sequence[str]
@@ -35,12 +30,9 @@ readlines() → Sequence[str]
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-## <kbd>class</kbd> `IContextErrorReport`
+## class `IContextErrorReport` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L15)
 
 
 
@@ -50,9 +42,8 @@ readlines() → Sequence[str]
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L16"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `show_error` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L16)
 
-### <kbd>method</kbd> `show_error`
 
 ```python
 show_error(message: str)
@@ -62,12 +53,9 @@ show_error(message: str)
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L22"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-## <kbd>class</kbd> `Status`
+## class `Status` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/protocols.py#L22)
 
 
 

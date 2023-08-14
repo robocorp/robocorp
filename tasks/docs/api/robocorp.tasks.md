@@ -1,13 +1,12 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# module `robocorp.tasks` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L0)
 
-# <kbd>module</kbd> `robocorp.tasks`
-Robocorp tasks helps in creating entry points for your automation project. 
+Robocorp tasks helps in creating entry points for your automation project.
 
-To use: 
+To use:
 
-Mark entry points with: 
+Mark entry points with:
 
 ```
 from robocorp.tasks import task
@@ -15,129 +14,124 @@ from robocorp.tasks import task
 @task
 def my_method():
     ...
-``` 
+```
 
-Running options: 
+Running options:
 
-Runs all the tasks in a .py file: 
+Runs all the tasks in a .py file:
 
-`python -m robocorp.tasks run <path_to_file>` 
+`python -m robocorp.tasks run <path_to_file>`
 
-Run all the tasks in files named *task*.py: 
+Run all the tasks in files named *task*.py:
 
-`python -m robocorp.tasks run <directory>` 
+`python -m robocorp.tasks run <directory>`
 
-Run only tasks with a given name: 
+Run only tasks with a given name:
 
-`python -m robocorp.tasks run <directory or file> -t <task_name>` 
+`python -m robocorp.tasks run <directory or file> -t <task_name>`
 
 
 
-Note: Using the `cli.main(args)` is possible to run tasks programmatically, but clients using this approach MUST make sure that any code which must be automatically logged is not imported prior the the `cli.main` call. 
+Note: Using the `cli.main(args)` is possible to run tasks programmatically, but clients using this approach MUST make sure that any code which must be automatically logged is not imported prior the the `cli.main` call.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L43"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `task` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L43)
 
-## <kbd>function</kbd> `task`
 
 ```python
 task(func)
 ```
 
-Decorator for tasks (entry points) which can be executed by `robocorp.tasks`. 
+Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
 
-i.e.: 
+i.e.:
 
-If a file such as tasks.py has the contents below: 
+If a file such as tasks.py has the contents below:
 
-.. from robocorp.tasks import task 
+.. from robocorp.tasks import task
 
-@task def enter_user(): ... 
+@taskdef enter_user():...
 
 
 
-It'll be executable by robocorp tasks as: 
+It'll be executable by robocorp tasks as:
 
-python -m robocorp.tasks run tasks.py -t enter_user 
+python -m robocorp.tasks run tasks.py -t enter_user
 
 
 
 **Args:**
 
- - <b>`func`</b>:  A function which is a task to `robocorp.tasks`. 
+ - <b>`func`</b>:  A function which is a task to `robocorp.tasks`.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L74"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `session_cache` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L74)
 
-## <kbd>function</kbd> `session_cache`
 
 ```python
 session_cache(func)
 ```
 
-Provides decorator which caches return and clears automatically when all tasks have been run. 
+Provides decorator which caches return and clears automatically when all tasks have been run.
 
-A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-tasks finishes running all tasks. 
+A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-tasks finishes running all tasks.
 
-The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value. 
+The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value.
 
 
 
 **Args:**
 
- - <b>`func`</b>:  wrapped function. 
+ - <b>`func`</b>:  wrapped function.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L95"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `task_cache` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L96)
 
-## <kbd>function</kbd> `task_cache`
 
 ```python
 task_cache(func)
 ```
 
-Provides decorator which caches return and clears it automatically when the current task has been run. 
+Provides decorator which caches return and clears it automatically when the current task has been run.
 
-A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-tasks finishes running the current task. 
+A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-tasks finishes running the current task.
 
-The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value. 
+The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value.
 
 
 
 **Args:**
 
- - <b>`func`</b>:  wrapped function. 
+ - <b>`func`</b>:  wrapped function.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L116"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `get_output_dir` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L118)
 
-## <kbd>function</kbd> `get_output_dir`
 
 ```python
 get_output_dir() → Optional[Path]
 ```
 
-Provide the output directory being used for the run or None if there's no output dir configured. 
+Provide the output directory being used for the run or None if there's no output dir configured.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L128"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `get_current_task` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L131)
 
-## <kbd>function</kbd> `get_current_task`
 
 ```python
 get_current_task() → Optional[ITask]
 ```
 
-Provides the task which is being currently run or None if not currently running a task. 
+Provides the task which is being currently run or None if not currently running a task.
 
 

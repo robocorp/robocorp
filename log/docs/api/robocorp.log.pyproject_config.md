@@ -1,16 +1,14 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# module `robocorp.log.pyproject_config` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L0)
 
-# <kbd>module</kbd> `robocorp.log.pyproject_config`
-This module contains functions to read a pyproject.toml file and  read the related tool.robocorp.log section. 
+This module contains functions to read a pyproject.toml file and  read the related tool.robocorp.log section.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L19"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `read_pyproject_toml` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L19)
 
-## <kbd>function</kbd> `read_pyproject_toml`
 
 ```python
 read_pyproject_toml(path: Path) → Optional[PyProjectInfo]
@@ -19,19 +17,18 @@ read_pyproject_toml(path: Path) → Optional[PyProjectInfo]
 
 
 **Args:**
- path:  This is the path where the `pyproject.toml` file should be found.  If it's not found directly in the given path, parent folders will  be searched for the `pyproject.toml`. 
+ path: This is the path where the `pyproject.toml` file should be found. If it's not found directly in the given path, parent folders will be searched for the `pyproject.toml`.
 
 
 
 **Returns:**
- The information on the pyproject file (the toml contents and the actual  path where the pyproject.toml was found). 
+ The information on the pyproject file (the toml contents and the actual path where the pyproject.toml was found).
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L63"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `read_section_from_toml` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L63)
 
-## <kbd>function</kbd> `read_section_from_toml`
 
 ```python
 read_section_from_toml(
@@ -45,22 +42,21 @@ read_section_from_toml(
 
 **Args:**
 
- - <b>`pyproject_info`</b>:  Information on the pyroject toml. 
- - <b>`section_name`</b>:  The name of the section to be read 
- - <b>`i.e.`</b>:  tool.robocorp.log 
- - <b>`context`</b>:  The context used to report errors. 
+ - <b>`pyproject_info`</b>:  Information on the pyroject toml.
+ - <b>`section_name`</b>:  The name of the section to be read
+ - <b>`i.e.`</b>:  tool.robocorp.log
+ - <b>`context`</b>:  The context used to report errors.
 
 
 
 **Returns:**
-The section which was read. 
+The section which was read.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L110"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `read_robocorp_auto_log_config` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L110)
 
-## <kbd>function</kbd> `read_robocorp_auto_log_config`
 
 ```python
 read_robocorp_auto_log_config(
@@ -73,30 +69,26 @@ read_robocorp_auto_log_config(
 
 **Args:**
 
- - <b>`context`</b>:  The context used to report errors. 
- - <b>`pyproject`</b>:  The pyproject information from where the configuration should  be loaded. 
+ - <b>`context`</b>:  The context used to report errors.
+ - <b>`pyproject`</b>:  The pyproject information from where the configuration should be loaded.
 
 
 
 **Returns:**
-The autolog configuration read from the given pyproject information. 
+The autolog configuration read from the given pyproject information.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L13"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## class `PyProjectInfo` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L13)
 
-## <kbd>class</kbd> `PyProjectInfo`
-PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict) 
+PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict)
 
-<a href="https://github.com/robocorp/robo/tree/master/log/<string>"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-### <kbd>method</kbd> `__init__`
+### method `__init__`
 
 ```python
 __init__(pyproject: Path, toml_contents: dict) → None
 ```
-
 
 
 

@@ -1,92 +1,86 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-# <kbd>module</kbd> `robocorp.workitems`
+# module `robocorp.workitems` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L0)
 
 
 
 
-**Variables**
----------------
+## Variables
 - **inputs**
 - **outputs**
 
 
----
-
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L65"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-## <kbd>class</kbd> `Inputs`
-Inputs represents the input queue of work items. 
-
-It can be used to reserve and release items from the queue, and iterate over them. 
-
 
 ---
 
-#### <kbd>property</kbd> current
+## class `Inputs` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L65)
 
-The current reserved input item. 
+Inputs represents the input queue of work items.
 
----
-
-#### <kbd>property</kbd> released
-
-A list of inputs reserved and released during the lifetime of the library. 
-
+It can be used to reserve and release items from the queue, and iterate over them.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L96"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+#### property current
 
-### <kbd>method</kbd> `reserve`
+The current reserved input item.
+
+---
+
+#### property released
+
+A list of inputs reserved and released during the lifetime of the library.
+
+
+
+---
+
+### method `reserve` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L96)
+
 
 ```python
 reserve() → Input
 ```
 
-Reserve a new input work item. 
+Reserve a new input work item.
 
-There can only be one item reserved at a time. 
+There can only be one item reserved at a time.
 
 
 
 **Returns:**
- Input work item 
+ Input work item
 
 
 
 **Raises:**
 
- - <b>`RuntimeError`</b>:  An input work item is already reserved 
- - <b>`workitems.EmptyQueue`</b>:  There are no further items in the queue 
+ - <b>`RuntimeError`</b>:  An input work item is already reserved
+ - <b>`workitems.EmptyQueue`</b>:  There are no further items in the queue
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L111"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## class `Outputs` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L111)
 
-## <kbd>class</kbd> `Outputs`
-Outputs represents the output queue of work items. 
+Outputs represents the output queue of work items.
 
-It can be used to create outputs and inspect the items created during the execution. 
-
-
----
-
-#### <kbd>property</kbd> last
-
-The most recently created output work item, or `None`. 
-
+It can be used to create outputs and inspect the items created during the execution.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L137"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+#### property last
 
-### <kbd>method</kbd> `create`
+The most recently created output work item, or `None`.
+
+
+
+---
+
+### method `create` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L137)
+
 
 ```python
 create(
@@ -96,41 +90,39 @@ create(
 ) → Output
 ```
 
-Create a new output work item, which can have both a JSON payload and attached files. 
+Create a new output work item, which can have both a JSON payload and attached files.
 
-Creating an output item requires an input to be currently reserved. 
+Creating an output item requires an input to be currently reserved.
 
 
 
 **Args:**
 
- - <b>`payload`</b>:  JSON serializable data (dict, list, scalar, etc.) 
- - <b>`files`</b>:  List of paths to files or glob pattern 
- - <b>`save`</b>:  Immediately save item after creation 
+ - <b>`payload`</b>:  JSON serializable data (dict, list, scalar, etc.)
+ - <b>`files`</b>:  List of paths to files or glob pattern
+ - <b>`save`</b>:  Immediately save item after creation
 
 
 
 **Raises:**
 
- - <b>`RuntimeError`</b>:  No input work item reserved 
+ - <b>`RuntimeError`</b>:  No input work item reserved
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L206"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## class `Input` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L206)
 
-## <kbd>class</kbd> `Input`
-Container for an input work item. 
+Container for an input work item.
 
-An input work item can contain arbitrary JSON data in the `payload` section, and optionally attached files that are stored in Control Room. 
+An input work item can contain arbitrary JSON data in the `payload` section, and optionally attached files that are stored in Control Room.
 
-Each step run of a process in Control Room has at least one input work item associated with it, but the step's input queue can have multiple input items in it. 
+Each step run of a process in Control Room has at least one input work item associated with it, but the step's input queue can have multiple input items in it.
 
-There can only be one input work item reserved at a time. To reserve the next item, the current item needs to be released as either passed or failed. 
+There can only be one input work item reserved at a time. To reserve the next item, the current item needs to be released as either passed or failed.
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L221"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L221)
 
-### <kbd>method</kbd> `__init__`
 
 ```python
 __init__(adapter: BaseAdapter, item_id: str)
@@ -140,168 +132,161 @@ __init__(adapter: BaseAdapter, item_id: str)
 
 
 
+---
+
+#### property files
+
+Names of attached files.
 
 ---
 
-#### <kbd>property</kbd> files
+#### property id
 
-Names of attached files. 
-
----
-
-#### <kbd>property</kbd> id
-
-Current ID for work item. 
+Current ID for work item.
 
 ---
 
-#### <kbd>property</kbd> outputs
+#### property outputs
 
-Child output work items. 
-
----
-
-#### <kbd>property</kbd> parent_id
-
-Current parent work item ID (output only). 
+Child output work items.
 
 ---
 
-#### <kbd>property</kbd> payload
+#### property parent_id
 
-Current JSON payload. 
-
----
-
-#### <kbd>property</kbd> released
-
-Is the current item released. 
+Current parent work item ID (output only).
 
 ---
 
-#### <kbd>property</kbd> saved
+#### property payload
 
-Is the current item saved. 
+Current JSON payload.
 
 ---
 
-#### <kbd>property</kbd> state
+#### property released
 
-Current release state. 
+Is the current item released.
+
+---
+
+#### property saved
+
+Is the current item saved.
+
+---
+
+#### property state
+
+Current release state.
 
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `add_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L117)
 
-### <kbd>method</kbd> `add_file`
 
 ```python
 add_file(path: Union[Path, str], name: Optional[str] = None) → Path
 ```
 
-Attach a file from the local machine to the work item. 
+Attach a file from the local machine to the work item.
 
-Note: Files are not uploaded until the item is saved. 
+Note: Files are not uploaded until the item is saved.
 
 
 
 **Args:**
 
- - <b>`path`</b>:  Path to attached file 
- - <b>`name`</b>:  Custom name for file in work item 
+ - <b>`path`</b>:  Path to attached file
+ - <b>`name`</b>:  Custom name for file in work item
 
 
 
 **Returns:**
-Resolved path to added file 
+Resolved path to added file
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L144"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `add_files` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L144)
 
-### <kbd>method</kbd> `add_files`
 
 ```python
 add_files(pattern: str) → list[Path]
 ```
 
-Attach files from the local machine to the work item that match the given pattern. 
+Attach files from the local machine to the work item that match the given pattern.
 
-Note: Files are not uploaded until the item is saved. 
+Note: Files are not uploaded until the item is saved.
 
 
 
 **Args:**
 
- - <b>`pattern`</b>:  Glob pattern for attached file paths 
+ - <b>`pattern`</b>:  Glob pattern for attached file paths
 
 
 
 **Returns:**
-List of added paths 
+List of added paths
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L430"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `create_output` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L430)
 
-### <kbd>method</kbd> `create_output`
 
 ```python
 create_output() → Output
 ```
 
-Create an output work item that is a child of this item. 
+Create an output work item that is a child of this item.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L438"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `done` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L438)
 
-### <kbd>method</kbd> `done`
 
 ```python
 done()
 ```
 
-Mark this work item as done, and release it. 
+Mark this work item as done, and release it.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L284"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `email` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L284)
 
-### <kbd>method</kbd> `email`
 
 ```python
 email(html=True, encoding='utf-8', ignore_errors=False) → Optional[Email]
 ```
 
-Parse an email attachment from the work item. 
+Parse an email attachment from the work item.
 
 
 
 **Args:**
 
- - <b>`html`</b>:  Parse the HTML content into the `html` attribute 
- - <b>`encoding`</b>:  Text encoding of the email 
- - <b>`ignore_errors`</b>:  Ignore possible parsing errors from Control Room 
+ - <b>`html`</b>:  Parse the HTML content into the `html` attribute
+ - <b>`encoding`</b>:  Text encoding of the email
+ - <b>`ignore_errors`</b>:  Ignore possible parsing errors from Control Room
 
 
 
 **Returns:**
-An email container with metadata and content 
+An email container with metadata and content
 
 
 
 **Raises:**
 
- - <b>`ValueError`</b>:  No email attached or content is malformed 
+ - <b>`ValueError`</b>:  No email attached or content is malformed
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L449"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `fail` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L449)
 
-### <kbd>method</kbd> `fail`
 
 ```python
 fail(
@@ -311,157 +296,149 @@ fail(
 )
 ```
 
-Mark this work item as failed, and release it. 
+Mark this work item as failed, and release it.
 
 
 
 **Args:**
 
- - <b>`exception_type`</b>:  Type of failure (APPLICATION or BUSINESS) 
- - <b>`code`</b>:  Custom error code for the failure 
- - <b>`message`</b>:  Human-readable error message 
+ - <b>`exception_type`</b>:  Type of failure (APPLICATION or BUSINESS)
+ - <b>`code`</b>:  Custom error code for the failure
+ - <b>`message`</b>:  Human-readable error message
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L362"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `get_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L362)
 
-### <kbd>method</kbd> `get_file`
 
 ```python
 get_file(name: str, path: Optional[Path, str] = None) → Path
 ```
 
-Download file with given name. 
+Download file with given name.
 
-If a `path` is not defined, uses the Robot root or current working directory. 
+If a `path` is not defined, uses the Robot root or current working directory.
 
 
 
 **Args:**
 
- - <b>`name`</b>:  Name of file 
- - <b>`path`</b>:  Path to created file 
+ - <b>`name`</b>:  Name of file
+ - <b>`path`</b>:  Path to created file
 
 
 
 **Returns:**
-Path to created file 
+Path to created file
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L392"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `get_files` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L392)
 
-### <kbd>method</kbd> `get_files`
 
 ```python
 get_files(pattern: str, path: Optional[Path] = None) → list[Path]
 ```
 
-Download all files attached to this work item that match the given pattern. 
+Download all files attached to this work item that match the given pattern.
 
-If a `path` is not defined, uses the Robot root or current working directory. 
+If a `path` is not defined, uses the Robot root or current working directory.
 
 
 
 **Args:**
 
- - <b>`pattern`</b>:  Glob pattern for file names 
- - <b>`path`</b>:  Directory to store files in 
+ - <b>`pattern`</b>:  Glob pattern for file names
+ - <b>`path`</b>:  Directory to store files in
 
 
 
 **Returns:**
-List of created file paths 
+List of created file paths
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `load` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72)
 
-### <kbd>method</kbd> `load`
 
 ```python
 load() → None
 ```
 
-Load work item payload and file listing from Control Room. 
+Load work item payload and file listing from Control Room.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L166"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `remove_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L166)
 
-### <kbd>method</kbd> `remove_file`
 
 ```python
 remove_file(name: str, missing_ok: bool = False)
 ```
 
-Remove attached file with given name. 
+Remove attached file with given name.
 
-Note: Files are not removed from Control Room until the item is saved. 
+Note: Files are not removed from Control Room until the item is saved.
 
 
 
 **Args:**
 
- - <b>`name`</b>:  Name of file 
- - <b>`missing_ok`</b>:  Do nothing if given file does not exist 
+ - <b>`name`</b>:  Name of file
+ - <b>`missing_ok`</b>:  Do nothing if given file does not exist
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L185"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `remove_files` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L185)
 
-### <kbd>method</kbd> `remove_files`
 
 ```python
 remove_files(pattern: str) → list[str]
 ```
 
-Remove attached files that match the given pattern. 
+Remove attached files that match the given pattern.
 
-Note: Files are not removed from Control Room until the item is saved. 
+Note: Files are not removed from Control Room until the item is saved.
 
 
 
 **Args:**
 
- - <b>`pattern`</b>:  Glob pattern for file names 
+ - <b>`pattern`</b>:  Glob pattern for file names
 
 
 
 **Returns:**
-List of matched names 
+List of matched names
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L273"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `save` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L273)
 
-### <kbd>method</kbd> `save`
 
 ```python
 save()
 ```
 
-Save the current input work item. 
+Save the current input work item.
 
-Updates the work item payload and adds/removes all pending files. 
+Updates the work item payload and adds/removes all pending files.
 
-**Note:** Modifying input work items is not recommended, as it will make traceability after execution difficult, and potentially make the process behave in unexpected ways. 
+**Note:** Modifying input work items is not recommended, as it will make traceability after execution difficult, and potentially makethe process behave in unexpected ways.
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L507"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## class `Output` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L507)
 
-## <kbd>class</kbd> `Output`
-Container for an output work item. 
+Container for an output work item.
 
-Created output items are added to an output queue, and released to the next step of a process when the current run ends. 
+Created output items are added to an output queue, and released to the next step of a process when the current run ends.
 
-Note: An output item always has an input item as a parent, which is used for traceability in a work item's history. 
+Note: An output item always has an input item as a parent, which is used for traceability in a work item's history.
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L517"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L517)
 
-### <kbd>method</kbd> `__init__`
 
 ```python
 __init__(adapter: BaseAdapter, parent_id: str)
@@ -471,173 +448,165 @@ __init__(adapter: BaseAdapter, parent_id: str)
 
 
 
+---
+
+#### property files
+
+Names of attached files.
 
 ---
 
-#### <kbd>property</kbd> files
+#### property id
 
-Names of attached files. 
-
----
-
-#### <kbd>property</kbd> id
-
-Current ID for work item. 
+Current ID for work item.
 
 ---
 
-#### <kbd>property</kbd> parent_id
+#### property parent_id
 
-Current parent work item ID (output only). 
-
----
-
-#### <kbd>property</kbd> payload
-
-Current JSON payload. 
+Current parent work item ID (output only).
 
 ---
 
-#### <kbd>property</kbd> saved
+#### property payload
 
-Is the current item saved. 
+Current JSON payload.
+
+---
+
+#### property saved
+
+Is the current item saved.
 
 
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L117"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `add_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L117)
 
-### <kbd>method</kbd> `add_file`
 
 ```python
 add_file(path: Union[Path, str], name: Optional[str] = None) → Path
 ```
 
-Attach a file from the local machine to the work item. 
+Attach a file from the local machine to the work item.
 
-Note: Files are not uploaded until the item is saved. 
+Note: Files are not uploaded until the item is saved.
 
 
 
 **Args:**
 
- - <b>`path`</b>:  Path to attached file 
- - <b>`name`</b>:  Custom name for file in work item 
+ - <b>`path`</b>:  Path to attached file
+ - <b>`name`</b>:  Custom name for file in work item
 
 
 
 **Returns:**
-Resolved path to added file 
+Resolved path to added file
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L144"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `add_files` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L144)
 
-### <kbd>method</kbd> `add_files`
 
 ```python
 add_files(pattern: str) → list[Path]
 ```
 
-Attach files from the local machine to the work item that match the given pattern. 
+Attach files from the local machine to the work item that match the given pattern.
 
-Note: Files are not uploaded until the item is saved. 
+Note: Files are not uploaded until the item is saved.
 
 
 
 **Args:**
 
- - <b>`pattern`</b>:  Glob pattern for attached file paths 
+ - <b>`pattern`</b>:  Glob pattern for attached file paths
 
 
 
 **Returns:**
-List of added paths 
+List of added paths
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `load` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72)
 
-### <kbd>method</kbd> `load`
 
 ```python
 load() → None
 ```
 
-Load work item payload and file listing from Control Room. 
+Load work item payload and file listing from Control Room.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L166"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `remove_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L166)
 
-### <kbd>method</kbd> `remove_file`
 
 ```python
 remove_file(name: str, missing_ok: bool = False)
 ```
 
-Remove attached file with given name. 
+Remove attached file with given name.
 
-Note: Files are not removed from Control Room until the item is saved. 
+Note: Files are not removed from Control Room until the item is saved.
 
 
 
 **Args:**
 
- - <b>`name`</b>:  Name of file 
- - <b>`missing_ok`</b>:  Do nothing if given file does not exist 
+ - <b>`name`</b>:  Name of file
+ - <b>`missing_ok`</b>:  Do nothing if given file does not exist
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L185"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `remove_files` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L185)
 
-### <kbd>method</kbd> `remove_files`
 
 ```python
 remove_files(pattern: str) → list[str]
 ```
 
-Remove attached files that match the given pattern. 
+Remove attached files that match the given pattern.
 
-Note: Files are not removed from Control Room until the item is saved. 
+Note: Files are not removed from Control Room until the item is saved.
 
 
 
 **Args:**
 
- - <b>`pattern`</b>:  Glob pattern for file names 
+ - <b>`pattern`</b>:  Glob pattern for file names
 
 
 
 **Returns:**
-List of matched names 
+List of matched names
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L81"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `save` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L81)
 
-### <kbd>method</kbd> `save`
 
 ```python
 save()
 ```
 
-Save the current work item. 
+Save the current work item.
 
-Updates the work item payload and adds/removes all pending files. 
-
-
----
-
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_types.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-## <kbd>enum</kbd> `State`
-Work item state, after release. 
+Updates the work item payload and adds/removes all pending files.
 
 
 ---
-### <kbd>values</kbd>
+
+## enum `State` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_types.py#L15)
+
+Work item state, after release.
+
+
+---
+### values
 - **DONE** = COMPLETED
 - **FAILED** = FAILED
 
@@ -645,14 +614,13 @@ Work item state, after release.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_types.py#L22"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## enum `ExceptionType` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_types.py#L22)
 
-## <kbd>enum</kbd> `ExceptionType`
-Failed work item error type. 
+Failed work item error type.
 
 
 ---
-### <kbd>values</kbd>
+### values
 - **BUSINESS** = BUSINESS
 - **APPLICATION** = APPLICATION
 
@@ -660,10 +628,9 @@ Failed work item error type.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L6"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## exception `EmptyQueue` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L6)
 
-## <kbd>exception</kbd> `EmptyQueue`
-Raised when trying to load an input item and none available. 
+Raised when trying to load an input item and none available.
 
 
 
@@ -671,14 +638,12 @@ Raised when trying to load an input item and none available.
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L16"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## exception `BusinessException` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L16)
 
-## <kbd>exception</kbd> `BusinessException`
-An exception that can be raised to release an input work item with a BUSINESS exception type. 
+An exception that can be raised to release an input work item with a BUSINESS exception type.
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11)
 
-### <kbd>method</kbd> `__init__`
 
 ```python
 __init__(message: Optional[str] = None, code: Optional[str] = None)
@@ -691,22 +656,18 @@ __init__(message: Optional[str] = None, code: Optional[str] = None)
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L23"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## exception `ApplicationException` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L23)
 
-## <kbd>exception</kbd> `ApplicationException`
-An exception that can be raised to release an input work item with a BUSINESS exception type. 
+An exception that can be raised to release an input work item with a BUSINESS exception type.
 
-<a href="https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11)
 
-### <kbd>method</kbd> `__init__`
 
 ```python
 __init__(message: Optional[str] = None, code: Optional[str] = None)
 ```
-
 
 
 

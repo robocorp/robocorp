@@ -1,8 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-# <kbd>module</kbd> `robocorp.excel.workbook`
+# module `robocorp.excel.workbook` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L0)
 
 
 
@@ -11,14 +9,12 @@
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## class `Workbook` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L10)
 
-## <kbd>class</kbd> `Workbook`
-Manager class for both .xls and .xlsx Excel files. 
+Manager class for both .xls and .xlsx Excel files.
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L13"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L13)
 
-### <kbd>method</kbd> `__init__`
 
 ```python
 __init__(excel: Union[XlsWorkbook, XlsxWorkbook])
@@ -30,12 +26,10 @@ __init__(excel: Union[XlsWorkbook, XlsxWorkbook])
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L25"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `close` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L25)
 
-### <kbd>method</kbd> `close`
 
 ```python
 close()
@@ -44,12 +38,10 @@ close()
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L40"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `create_worksheet` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L40)
 
-### <kbd>method</kbd> `create_worksheet`
 
 ```python
 create_worksheet(
@@ -63,12 +55,10 @@ create_worksheet(
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L61"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `list_worksheets` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L61)
 
-### <kbd>method</kbd> `list_worksheets`
 
 ```python
 list_worksheets() → List[str]
@@ -77,12 +67,10 @@ list_worksheets() → List[str]
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L71"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `remove_worksheet` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L71)
 
-### <kbd>method</kbd> `remove_worksheet`
 
 ```python
 remove_worksheet(sheet: Union[str, int])
@@ -91,12 +79,10 @@ remove_worksheet(sheet: Union[str, int])
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L17"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `save` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L17)
 
-### <kbd>method</kbd> `save`
 
 ```python
 save(name: Union[str, Path, BytesIO], overwrite=True)
@@ -105,29 +91,25 @@ save(name: Union[str, Path, BytesIO], overwrite=True)
 
 
 
-
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L30"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `worksheet` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L30)
 
-### <kbd>method</kbd> `worksheet`
 
 ```python
 worksheet(sheet: Union[str, int]) → Worksheet
 ```
 
-If name is not provided take the first worksheet? 
+If name is not provided take the first worksheet?
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L64"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### method `worksheet_exists` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L64)
 
-### <kbd>method</kbd> `worksheet_exists`
 
 ```python
 worksheet_exists(sheet: Union[str, int]) → bool
 ```
-
 
 
 

@@ -1,8 +1,6 @@
 <!-- markdownlint-disable -->
 
-<a href="https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/cli.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-# <kbd>module</kbd> `robocorp.browser.cli`
+# module `robocorp.browser.cli` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/cli.py#L0)
 
 
 
@@ -10,14 +8,12 @@
 
 ---
 
-<a href="https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/cli.py#L7"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## function `main` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/cli.py#L7)
 
-## <kbd>function</kbd> `main`
 
 ```python
 main()
 ```
-
 
 
 
