@@ -114,8 +114,10 @@ export enum Type {
   returnElement = 1 << 15, // 32768
   console = 1 << 16,
   assertFailed = 1 << 17,
+  continueElement = 1 << 18,
+  breakElement = 1 << 19,
 
-  unhandled = 1 << 18,
+  unhandled = 1 << 20,
 }
 
 export enum ConsoleMessageKind {
@@ -189,6 +191,14 @@ export interface EntryResumeYield extends EntryMethodBase {
 
 export interface EntryResumeYieldFrom extends EntryMethodBase {
   type: Type.resumeYieldFrom;
+}
+
+export interface EntryContinue extends EntryMethodBase {
+  type: Type.continueElement;
+}
+
+export interface EntryBreak extends EntryMethodBase {
+  type: Type.breakElement;
 }
 
 export interface EntryIf extends EntryMethodBase {
@@ -271,4 +281,6 @@ export type Entry =
   | EntryReturn
   | EntryConsole
   | EntryProcessSnapshot
+  | EntryBreak
+  | EntryContinue
   | EntryAssertFailed;

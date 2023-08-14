@@ -83,6 +83,12 @@ before_yield = Callback()
 # Called as: after_yield(__name__, filename, name, lineno)
 after_yield = Callback()
 
+# Called as: before_continue(__name__, filename, name, lineno)
+before_continue = Callback()
+
+# Called as: before_break(__name__, filename, name, lineno)
+before_break = Callback()
+
 # Called as: before_yield_from(__name__, filename, name, lineno)
 before_yield_from = Callback()
 
@@ -213,6 +219,14 @@ class MethodLifecycleContext:
     report_for_step_end = _report_end
     report_while_end = _report_end
     report_while_step_end = _report_end
+
+    def report_continue(self, tup):
+        # tup is (__name__, filename, name, lineno)
+        before_continue(*tup)
+
+    def report_break(self, tup):
+        # tup is (__name__, filename, name, lineno)
+        before_break(*tup)
 
     def report_exception(self, report_ids):
         if not self._accept:

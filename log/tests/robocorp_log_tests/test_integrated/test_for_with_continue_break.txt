@@ -1,0 +1,36 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_for_with_continue_break
+            SE: FOR: for i in range(6)
+                SE: FOR_STEP: Step: for i in range(6)
+                    EA: int: i: 0
+                    SE: IF: if i < 2
+                    EA: int: i: 0
+                    SE: CONTINUE: check_for_with_continue_break
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(6)
+                    EA: int: i: 1
+                    SE: IF: if i < 2
+                    EA: int: i: 1
+                    SE: CONTINUE: check_for_with_continue_break
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(6)
+                    EA: int: i: 2
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(6)
+                    EA: int: i: 3
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(6)
+                    EA: int: i: 4
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(6)
+                    EA: int: i: 5
+                    SE: IF: if i == 5
+                    EA: int: i: 5
+                    SE: BREAK: check_for_with_continue_break
+                EE: FOR_STEP: PASS
+            EE: FOR: PASS
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

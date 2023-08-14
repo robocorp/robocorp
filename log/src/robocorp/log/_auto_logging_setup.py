@@ -35,6 +35,7 @@ class _StackEntry:
 
 def add_import_hook(import_hook):
     from robocorp.log._lifecycle_hooks import _OnExitContextManager
+
     from ._rewrite_importhook import RewriteHook
 
     for curr in sys.meta_path:
@@ -301,6 +302,24 @@ class _AutoLogging:
         variables: Sequence[Tuple[str, Any]],
     ) -> None:
         self._call_with_variables("ELSE", mod_name, filename, name, lineno, variables)
+
+    def call_before_continue(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+    ) -> None:
+        self._call_with_variables("CONTINUE", mod_name, filename, name, lineno, [])
+
+    def call_before_break(
+        self,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+    ) -> None:
+        self._call_with_variables("BREAK", mod_name, filename, name, lineno, [])
 
     def call_assert_failed(
         self,

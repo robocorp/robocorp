@@ -54,6 +54,10 @@ export const getTitle = (entry: Entry): string => {
       return `Entered "${(entry as EntryElse).name}"`;
     case Type.returnElement:
       return `Return`;
+    case Type.continueElement:
+      return `Continue`;
+    case Type.breakElement:
+      return `Break`;
     case Type.log:
       return ''; // the log type is added in the icon.
     case Type.console:

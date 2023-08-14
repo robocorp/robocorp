@@ -7,7 +7,9 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
+
 from robocorp.log import AutoLogConfigBase, FilterKind
+from robocorp.log._constants import UNSCOPED_ELEMENTS
 from robocorp.log.protocols import IReadLines, LogHTMLStyle
 
 
@@ -385,12 +387,7 @@ def pretty_format_logs_from_iter(
         # Messages that create scope
         if msg_type in ("SE", "ST", "SR", "YR") or is_restart:
             # Exceptions which won't create scope for SE.
-            if msg_type == "SE" and msg["type"] in (
-                "UNTRACKED_GENERATOR",
-                "IF",
-                "ELSE",
-                "ASSERT_FAILED",
-            ):
+            if msg_type == "SE" and msg["type"] in UNSCOPED_ELEMENTS:
                 continue
 
             level += 1

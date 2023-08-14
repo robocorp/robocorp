@@ -6,7 +6,9 @@ import {
   ConsoleMessageKind,
   Entry,
   EntryAssertFailed,
+  EntryBreak,
   EntryConsole,
+  EntryContinue,
   EntryElse,
   EntryException,
   EntryIf,
@@ -101,6 +103,16 @@ const getDetailsTitle = (entry: Entry) => {
       return {
         title: `Return from "${(entry as EntryReturn).name}"`,
         description: `Module: ${(entry as EntryReturn).libname}`,
+      };
+    case Type.continueElement:
+      return {
+        title: `Continue statement`,
+        description: `Module: ${(entry as EntryContinue).libname}`,
+      };
+    case Type.breakElement:
+      return {
+        title: `Break statement`,
+        description: `Module: ${(entry as EntryBreak).libname}`,
       };
     case Type.log:
       const entryLog = entry as EntryLog;

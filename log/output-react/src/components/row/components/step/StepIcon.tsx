@@ -1,5 +1,12 @@
 import { FC, ReactNode } from 'react';
-import { IconBox, IconCircle, IconInformation, IconWarningTriangle } from '@robocorp/icons/iconic';
+import {
+  IconAlignArrowLeft,
+  IconAlignArrowRight,
+  IconBox,
+  IconCircle,
+  IconInformation,
+  IconWarningTriangle,
+} from '@robocorp/icons/iconic';
 import {
   IconAtSign,
   IconCpu,
@@ -107,6 +114,10 @@ export const getIcon = (entry: Entry): ReactNode => {
       return <IconCircle color="magenta60" size="medium" />;
     case Type.returnElement:
       return <IconLogOut color="magenta60" size="small" />;
+    case Type.continueElement:
+      return <IconAlignArrowLeft color="magenta60" size="small" />;
+    case Type.breakElement:
+      return <IconAlignArrowRight color="magenta60" size="small" />;
     case Type.generator:
       return getGeneratorIcon((entry as EntryMethodBase).status);
     case Type.untrackedGenerator:

@@ -55,10 +55,10 @@ export const getValue = (entry: Entry): ReactNode | string => {
       return formatArguments(
         entry as EntryMethodBase | EntryGenerator | EntryUntrackedGenerator | EntryAssertFailed,
       );
+    case Type.continueElement:
+    case Type.breakElement:
     case Type.task:
-      return '';
     case Type.suspendYieldFrom:
-      return '';
     case Type.processSnapshot:
       return '';
     case Type.exception:

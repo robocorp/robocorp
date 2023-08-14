@@ -174,7 +174,7 @@ export const HeaderAndMenu: FC<Props> = ({ runInfo, runIdsAndLabel }) => {
   }, []);
 
   let variant: BadgeVariant = 'magenta';
-  let label: string = 'TODO: set label for: ' + runInfo.status;
+  let label: string = '<INTERNAL MSG>: set label for: ' + runInfo.status;
 
   let partLabel: string | undefined = undefined;
   let partTooltipText: string | undefined = undefined;

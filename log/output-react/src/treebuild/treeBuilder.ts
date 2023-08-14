@@ -24,6 +24,8 @@ import {
   EntryReturn,
   EntryConsole,
   EntryAssertFailed,
+  EntryContinue,
+  EntryBreak,
 } from '../lib/types';
 import { setAllEntriesWhenPossible, setRunInfoWhenPossible } from './effectCallbacks';
 import {
@@ -327,6 +329,44 @@ class FlattenedTree {
     const entry: EntryIf = {
       id: this.newScopeId(false),
       type: Type.ifElement,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.info, // As it doesn't really create a scope it can't be unset.
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entryIndexAll: this.entries.length,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
+    this.argsTarget = entry;
+  }
+
+  pushContinue(msg: IMessage) {
+    const entry: EntryContinue = {
+      id: this.newScopeId(false),
+      type: Type.continueElement,
+      name: msg.decoded.name,
+      libname: msg.decoded.libname,
+      source: msg.decoded.source,
+      lineno: msg.decoded.lineno,
+      endDeltaInSeconds: -1,
+      status: StatusLevel.info, // As it doesn't really create a scope it can't be unset.
+      startDeltaInSeconds: msg.decoded.time_delta_in_seconds,
+      entryIndexAll: this.entries.length,
+      arguments: undefined,
+    };
+    this.entries.push(entry);
+    this.idToEntry.set(entry.id, entry);
+    this.argsTarget = entry;
+  }
+
+  pushBreak(msg: IMessage) {
+    const entry: EntryBreak = {
+      id: this.newScopeId(false),
+      type: Type.breakElement,
       name: msg.decoded.name,
       libname: msg.decoded.libname,
       source: msg.decoded.source,
@@ -945,6 +985,10 @@ It's possible to customize the size of the logs with "--max-log-file-size" and "
           this.flattened.pushUntrackedGeneratorScope(msg);
         } else if (msg.decoded['type'] === 'IF') {
           this.flattened.pushIf(msg);
+        } else if (msg.decoded['type'] === 'CONTINUE') {
+          this.flattened.pushContinue(msg);
+        } else if (msg.decoded['type'] === 'BREAK') {
+          this.flattened.pushBreak(msg);
         } else if (msg.decoded['type'] === 'ELSE') {
           this.flattened.pushElse(msg);
         } else if (msg.decoded['type'] === 'ASSERT_FAILED') {

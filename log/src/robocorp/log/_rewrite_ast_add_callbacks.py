@@ -60,7 +60,7 @@ def _get_function_and_class_name(stack) -> Optional[Tuple[ast.FunctionDef, str]]
     return function, class_name
 
 
-def _make_func_with_args(factory, func_name, *args):
+def _make_lifecycle_func_with_args(factory, func_name, *args):
     call = factory.Call(factory.NameLoadRewriteCallback(func_name))
     call.args.extend(args)
     return call
@@ -68,7 +68,7 @@ def _make_func_with_args(factory, func_name, *args):
 
 def _make_after_yield_expr(factory, function, class_name, node_lineno) -> ast.Expr:
     return factory.Expr(
-        _make_func_with_args(
+        _make_lifecycle_func_with_args(
             factory,
             "after_yield",
             factory.NameLoad("__name__"),
@@ -83,7 +83,7 @@ def _make_before_yield_from_exprs(
     factory, function, class_name, node_lineno
 ) -> ast.Expr:
     return factory.Expr(
-        _make_func_with_args(
+        _make_lifecycle_func_with_args(
             factory,
             "before_yield_from",
             factory.NameLoad("__name__"),
@@ -96,7 +96,7 @@ def _make_before_yield_from_exprs(
 
 def _make_after_yield_from_expr(factory, function, class_name, node_lineno) -> ast.Expr:
     return factory.Expr(
-        _make_func_with_args(
+        _make_lifecycle_func_with_args(
             factory,
             "after_yield_from",
             factory.NameLoad("__name__"),
@@ -466,6 +466,48 @@ def _handle_return(
         )
 
 
+def _handle_continue_break(
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path,
+    stack,
+    filter_kind,
+    node: Union[ast.Continue, ast.Break],
+):
+    func_and_class_name = _get_function_and_class_name(stack)
+    if not func_and_class_name:
+        return None
+
+    function, class_name = func_and_class_name
+    if not _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=("full_log", "generator"),
+    ):
+        return
+
+    try:
+        kind = "continue" if isinstance(node, ast.Continue) else "break"
+        factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
+        call = factory.Call(factory.NameLoadCtx(f"report_{kind}"))
+        call.args = [
+            factory.Tuple(
+                factory.NameLoad("__name__"),
+                factory.NameLoad("__file__"),
+                factory.Str(f"{class_name}{function.name}"),
+                factory.LineConstantAt(node.lineno),
+            )
+        ]
+
+        rewrite_ctx.stmts_cursor.before_append(factory.Expr(call))
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting node: {node.__class__.__name__} line: {node.lineno} "
+            f"at: {module_path}"
+        )
+
+
 def _handle_if(
     rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node: ast.If
 ):
@@ -655,7 +697,7 @@ def _handle_assign(
         factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
         for target in node.targets:
             if isinstance(target, ast.Name):
-                call = _make_func_with_args(
+                call = _make_lifecycle_func_with_args(
                     factory,
                     "after_assign",
                     factory.NameLoad("__name__"),
@@ -1014,7 +1056,7 @@ def _handle_yield(
 
                 stmts_cursor.before_append(
                     factory.Expr(
-                        _make_func_with_args(
+                        _make_lifecycle_func_with_args(
                             factory,
                             "before_yield",
                             factory.NameLoad("__name__"),
@@ -1061,7 +1103,7 @@ def _handle_yield(
 
                 temp_funcdef.body.append(
                     factory.Expr(
-                        _make_func_with_args(
+                        _make_lifecycle_func_with_args(
                             factory,
                             "before_yield",
                             factory.NameLoad("__name__"),
@@ -1133,6 +1175,8 @@ class _DispatchTable:
         _dispatch_after[ast.For] = _handle_for_or_while
         _dispatch_after[ast.While] = _handle_for_or_while
         _dispatch_after[ast.If] = _handle_if
+        _dispatch_after[ast.Continue] = _handle_continue_break
+        _dispatch_after[ast.Break] = _handle_continue_break
 
         # Note: returns generator which is called when it finishes (right before
         # _dispatch_after)

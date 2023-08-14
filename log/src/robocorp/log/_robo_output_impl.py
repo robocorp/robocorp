@@ -25,6 +25,8 @@ from typing import (
     Tuple,
 )
 
+from robocorp.log._constants import UNSCOPED_ELEMENTS
+
 from .protocols import LogElementType, OptExcInfo
 
 WRITE_CONTENTS_TO_STDERR: bool = False
@@ -990,7 +992,7 @@ Virtual Memory Size: {vms}"""
                 name, libname, source, lineno, doc, element_type, start_time_delta
             )
 
-        if element_type not in ("UNTRACKED_GENERATOR", "IF", "ELSE", "ASSERT_FAILED"):
+        if element_type not in UNSCOPED_ELEMENTS:
             # We don't change the scope for untracked generators as
             # we have no idea when it'll pause/resume.
             self._stack_handler.push_record(

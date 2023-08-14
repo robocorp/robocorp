@@ -115,6 +115,8 @@ export const getStatusLevel = (entry: Entry): StatusLevel => {
     case Type.suspendYieldFrom:
       return (entry as EntrySuspendYieldFrom).status;
     case Type.returnElement:
+    case Type.continueElement:
+    case Type.breakElement:
       return StatusLevel.info;
     case Type.variable:
       return StatusLevel.info;

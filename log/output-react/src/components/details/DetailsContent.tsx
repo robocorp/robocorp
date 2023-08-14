@@ -9,7 +9,7 @@ import { TaskComponent } from './components/TaskComponent';
 import { VariableComponent } from './components/VariableComponent';
 
 export const Todo: FC<{ entry: Entry }> = (props) => {
-  return <>Todo: provide details for {props.entry.type}</>;
+  return <>TODO: provide details for {props.entry.type}</>;
 };
 
 export const Empty: FC<{ entry: Entry }> = (props) => {
@@ -27,6 +27,8 @@ const getContentComponent = (type: Type) => {
     case Type.ifElement:
     case Type.elseElement:
     case Type.returnElement:
+    case Type.continueElement:
+    case Type.breakElement:
     case Type.assertFailed:
       return MethodComponent;
     case Type.exception:

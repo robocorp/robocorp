@@ -108,10 +108,13 @@ def check_big_for_in_for():
     final_matrix = matrix
 
 
-def check_for_with_continue():
-    for i in range(4):
-        if i < 3:
+def check_for_with_continue_break():
+    for i in range(6):
+        if i < 2:
             continue
+
+        if i == 5:
+            break
 
 
 def some_call_with_exc():
