@@ -108,6 +108,12 @@ def check_big_for_in_for():
     final_matrix = matrix
 
 
+def check_for_with_continue():
+    for i in range(4):
+        if i < 3:
+            continue
+
+
 def some_call_with_exc():
     v = 10
     raise RuntimeError("some_exc")

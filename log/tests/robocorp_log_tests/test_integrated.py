@@ -302,3 +302,16 @@ def test_assertion_failed_error(tmpdir, ui_regenerate, str_regression):
     str_regression.check(
         pretty_format_logs_from_log_html(log_target, show_exception_vars=True)
     )
+
+
+def test_for_with_continue(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check).check_for_with_continue()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(
+        pretty_format_logs_from_log_html(log_target, show_exception_vars=True)
+    )

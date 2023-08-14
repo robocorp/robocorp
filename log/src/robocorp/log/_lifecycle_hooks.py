@@ -185,6 +185,11 @@ class MethodLifecycleContext:
         if not self._accept:
             return
 
+        # If a continue was found it's possible that we have to finish scopes inside
+        # on a new start.
+        if self._stack and self._stack[-1][0] >= report_id:
+            self._report_end(report_id)
+
         # tup is (log_element_type, __name__, filename, name, lineno, targets)
         before_iterate_step(*tup)
         self._stack.append((report_id, "iterate_step", tup[:-1]))

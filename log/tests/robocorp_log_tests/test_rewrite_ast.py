@@ -3,10 +3,10 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
+from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
+
 from robocorp.log._config import FilterKind
 from robocorp.log._rewrite_importhook import _rewrite
-
-from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
 
 
 def test_ast_utils() -> None:
@@ -450,6 +450,27 @@ def foo():
         namespace["foo"]()
 
     assert found == ["before iterate", "after iterate"]
+
+
+def test_rewrite_for_continue(tmpdir, str_regression):
+    config = AutoLogConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    for a in [1, 2]:
+        if a == 1:
+            continue
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
 
 
 def test_rewrite_while(tmpdir, str_regression):
