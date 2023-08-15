@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The absolute output dir is saved before running tasks (so that changes to the `cwd` don't affect it).
+
 ## 2.1.3 - 2023-07-19
 
 - Moved some internal APIs to load the `robocorp.log` auto log configuration to the

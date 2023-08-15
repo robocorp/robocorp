@@ -100,6 +100,10 @@ def run(
         1 if there was some error running the task.
     """
     from robocorp.log import console, redirect
+    from robocorp.log.pyproject_config import (
+        read_pyproject_toml,
+        read_robocorp_auto_log_config,
+    )
 
     from ._collect_tasks import collect_tasks
     from ._config import RunConfig, set_config
@@ -114,8 +118,6 @@ def run(
     from ._log_output_setup import setup_log_output, setup_log_output_to_port
     from ._protocols import ITask, Status
     from ._task import Context, set_current_task
-    from robocorp.log.pyproject_config import read_pyproject_toml
-    from robocorp.log.pyproject_config import read_robocorp_auto_log_config
 
     console.set_mode(console_colors)
 
@@ -160,8 +162,11 @@ def run(
         config = read_robocorp_auto_log_config(context, pyproject_path_and_contents)
         pyproject_toml_contents = pyproject_path_and_contents.toml_contents
 
+    output_dir_path = Path(output_dir).absolute()
+    output_dir_path.mkdir(parents=True, exist_ok=True)
+
     run_config = RunConfig(
-        Path(output_dir),
+        output_dir_path,
         p,
         task_names,
         max_log_files,
@@ -177,7 +182,7 @@ def run(
         # the customizations are all based on module names.
         config
     ), redirect.setup_stdout_logging(log_output_to_stdout), setup_log_output(
-        output_dir=Path(output_dir),
+        output_dir=output_dir_path,
         max_files=max_log_files,
         max_file_size=max_log_file_size,
     ), setup_log_output_to_port(), context.register_lifecycle_prints():

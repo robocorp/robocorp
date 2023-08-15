@@ -1,9 +1,9 @@
+import io
 from pathlib import Path
+from typing import Dict
 
 import pytest
 from devutils.fixtures import robocorp_tasks_run
-from typing import Dict
-import io
 
 
 def test_core_log_integration_error_in_import(datadir):
@@ -290,3 +290,21 @@ def test_receive_at_socket(datadir, server_socket) -> None:
             },
         ],
     )
+
+
+def test_output_on_change_cwd(datadir) -> None:
+    pyproject: Path = datadir / "pyproject.toml"
+    pyproject.write_text("")
+
+    result = robocorp_tasks_run(
+        ["run", "--console-color=plain", "change_cwd.py"],
+        returncode=0,
+        cwd=str(datadir),
+    )
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    assert not decoded.strip(), f"Found stderr: {decoded}"
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "Robocorp Log (html)" in decoded
+
+    assert (datadir / "output" / "log.html").exists()

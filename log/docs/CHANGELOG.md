@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- `continue` and `break` inside a loop are properly handled.
+- `continue` and `break` are now shown in the logs.
+- Spec version changed from `0.0.3` to `0.0.4`.
+
 ## 2.6.0 - 2023-08-04
 
 - `log.html`:
