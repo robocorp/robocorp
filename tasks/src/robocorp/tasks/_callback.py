@@ -21,8 +21,8 @@ class Callback(object):
     same time in multiple threads.
     """
 
-    def __init__(self, reversed=False):
-        self.raise_exceptions = False
+    def __init__(self, reversed=False, raise_exceptions=False):
+        self.raise_exceptions = raise_exceptions
         self._reversed = reversed
         self._callbacks = ()
 

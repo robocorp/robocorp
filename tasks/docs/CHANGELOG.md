@@ -3,6 +3,7 @@
 ## Unreleased
 
 - The absolute output dir is saved before running tasks (so that changes to the `cwd` don't affect it).
+- If 2 tasks are found with the same name in the same module a proper error is raised.
 
 ## 2.1.3 - 2023-07-19
 

@@ -1,8 +1,8 @@
-from pathlib import Path
 import os
-from typing import Optional
-from contextlib import contextmanager
 import threading
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Iterator, Optional
 
 
 def setup_log_output(
@@ -28,7 +28,7 @@ class _LogErrorLock:
 
 
 @contextmanager
-def setup_log_output_to_port():
+def setup_log_output_to_port() -> Iterator[None]:
     port_in_env: Optional[str] = os.environ.get("ROBOCORP_TASKS_LOG_LISTENER_PORT")
     if not port_in_env:
         yield
@@ -63,7 +63,7 @@ def setup_log_output_to_port():
         except Exception:
             try:
                 writing = _LogErrorLock.tlocal._writing
-            except:
+            except Exception:
                 writing = _LogErrorLock.tlocal._writing = False
 
             if writing:

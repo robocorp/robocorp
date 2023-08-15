@@ -111,10 +111,22 @@ def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]
         return task.name in task_names
 
     methods_marked_as_tasks_found: List[Callable] = []
+    found_as_set = set()
 
-    _hooks.on_task_func_found.register(methods_marked_as_tasks_found.append)
+    def on_func_found(func):
+        from robocorp.tasks._exceptions import RobocorpTasksError
 
-    try:
+        key = (func.__code__.co_name, func.__code__.co_filename)
+        if key in found_as_set:
+            raise RobocorpTasksError(
+                f"Error: a task with the name '{func.__code__.co_name}' was "
+                + f"already found in: {func.__code__.co_filename}."
+            )
+        found_as_set.add(key)
+
+        methods_marked_as_tasks_found.append(func)
+
+    with _hooks.on_task_func_found.register(on_func_found):
         if path.is_dir():
             for path_with_task in path.rglob("*task*.py"):
                 module = import_path(path_with_task, root=path)
@@ -144,5 +156,3 @@ def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]
             raise RobocorpTasksCollectError(
                 f"Expected {path} to map to a directory or file."
             )
-    finally:
-        _hooks.on_task_func_found.unregister(methods_marked_as_tasks_found.append)

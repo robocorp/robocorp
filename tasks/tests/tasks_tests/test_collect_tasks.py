@@ -122,3 +122,14 @@ def test_error_in_stdout(datadir, tmpdir):
     )
 
     assert str(msgs).count("STB") == 1, "Only one Start Traceback message expected."
+
+
+def test_collect_duplicated_tasks(datadir, tmpdir):
+    result = robocorp_tasks_run(
+        ["run", str(datadir / "dupe" / "dupe.py")],
+        returncode=1,
+        additional_env={"RC_LOG_OUTPUT_STDOUT": "1"},
+    )
+    assert "a task with the name 'main' was already found" in str(
+        result.stdout.decode("utf-8")
+    )

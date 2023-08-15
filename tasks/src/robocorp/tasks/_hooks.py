@@ -9,7 +9,7 @@ from ._protocols import (
 )
 
 # Called as on_task_func_found(task: ITask)
-on_task_func_found: IOnTaskFuncFoundCallback = Callback()
+on_task_func_found: IOnTaskFuncFoundCallback = Callback(raise_exceptions=True)
 
 # Called as before_collect_tasks(path: Path, task_names: Set[str])
 before_collect_tasks: IBeforeCollectTasksCallback = Callback()
