@@ -1,3 +1,30 @@
+import pytest
+
+
+def test_sensitive_variable_names_pattern_empty():
+    from robocorp.log._sensitive_variable_names import SensitiveVariableNames
+
+    sensitive_variable_names = SensitiveVariableNames(())
+    assert not sensitive_variable_names.is_sensitive_variable_name("myab")
+
+    with pytest.raises(ValueError):
+        sensitive_variable_names.add_sensitive_variable_name_pattern("")
+    assert not sensitive_variable_names.is_sensitive_variable_name("myab")
+
+
+def test_sensitive_variable_names_pattern():
+    from robocorp.log._sensitive_variable_names import SensitiveVariableNames
+
+    sensitive_variable_names = SensitiveVariableNames(())
+    import re
+
+    sensitive_variable_names.add_sensitive_variable_name_pattern(
+        re.compile(".*AB", re.IGNORECASE)
+    )
+    assert sensitive_variable_names.is_sensitive_variable_name("myab")
+    assert not sensitive_variable_names.is_sensitive_variable_name("my")
+
+
 def test_sensitive_variable_names():
     from robocorp.log._sensitive_variable_names import SensitiveVariableNames
 

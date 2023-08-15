@@ -5,6 +5,7 @@
 - `continue` and `break` inside a loop are properly handled.
 - `continue` and `break` are now shown in the logs.
 - Spec version changed from `0.0.3` to `0.0.4`.
+- `re.Pattern` is now accepted at `add_sensitive_variable_name_pattern`.
 
 ## 2.6.0 - 2023-08-04
 
