@@ -1,6 +1,7 @@
 from imp import reload
 from pathlib import Path
 
+import pytest
 from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
     AutoLogConfigForTest,
@@ -313,3 +314,17 @@ def test_for_with_continue_break(tmpdir, ui_regenerate, str_regression):
     log_target = setup_info.log_target
     assert log_target.exists()
     str_regression.check(pretty_format_logs_from_log_html(log_target))
+
+
+def test_exception_with_cause(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        with pytest.raises(RuntimeError):
+            reload(check).check_exception_with_cause()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(
+        pretty_format_logs_from_log_html(log_target, show_exception_vars=True)
+    )

@@ -130,3 +130,12 @@ def check_suppress_exc_values():
 def check_failed_exception():
     a = 10
     assert a > 10
+
+
+def check_exception_with_cause():
+    try:
+        raise RuntimeError("foo")
+    except Exception as err:
+        raise err  # This error must be shown in the trecaback in the final error.
+    finally:
+        raise RuntimeError("final error")

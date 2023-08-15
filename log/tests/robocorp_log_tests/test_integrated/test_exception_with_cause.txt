@@ -1,0 +1,12 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_exception_with_cause
+            STB: RuntimeError: foo
+            TBE --- check_exception_with_cause ---
+            TBE --- check_exception_with_cause ---
+            STB: RuntimeError: final error (this exception occurred during handling of the previous exception)
+            TBE --- check_exception_with_cause ---
+        EE: METHOD: ERROR
+    ET: PASS
+ER: PASS

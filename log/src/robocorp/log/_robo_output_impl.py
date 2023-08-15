@@ -799,6 +799,7 @@ Virtual Memory Size: {vms}"""
         exc_info: OptExcInfo,
         unhandled: bool,
         hide_vars: bool,
+        memo: Optional[dict] = None,
     ) -> bool:
         """
         :param exc_info:
@@ -818,11 +819,20 @@ Virtual Memory Size: {vms}"""
             was already previously logged (see the `unhandled` parameter for
             details on the use-cases where it may be skipped).
         """
+        if memo is None:
+            memo = {}
+
         self._rotate_if_needed()
 
         exception_type, exception, tb = exc_info
         if exception is None or tb is None or exception_type is None:
             return False
+
+        # The traceback module does this, so, let's play safe here too...
+        if id(exception) in memo:
+            return True
+
+        memo[id(exception)] = True
 
         f = tb.tb_frame.f_back
         stack: List[tuple] = []
@@ -849,13 +859,47 @@ Virtual Memory Size: {vms}"""
             stack.append((frame, tb_lineno))
             tb = tb.tb_next
 
+        msg = ""
+        initial = exception
+        curr: Optional[BaseException]
+        try:
+            curr = getattr(initial, "__cause__", None)
+            if curr is not None:
+                msg = "the previous exception was the direct cause of this exception"
+        except Exception:
+            curr = None
+
+        if curr is None:
+            try:
+                curr = getattr(initial, "__context__", None)
+                if curr is not None:
+                    msg = "this exception occurred during handling of the previous exception"
+            except Exception:
+                curr = None
+
+        tb = getattr(curr, "__traceback__", None)
+        if tb is not None and curr is not None:
+            tup: OptExcInfo = (type(curr), curr, tb)
+            self.log_method_except(
+                tup,
+                unhandled,
+                hide_vars,
+                memo,
+            )
+
+        if msg:
+            title = f"{exception_type.__name__}: {exception} ({msg})"
+        else:
+            title = f"{exception_type.__name__}: {exception}"
+
         self._write_stack(
-            f"{exception_type.__name__}: {exception}",
+            title,
             stack,
             entry_type="traceback",
             start_message_types=("STB", "RTB", "ETB"),
             hide_vars=hide_vars,
         )
+
         return True
 
     class _WriteStack:

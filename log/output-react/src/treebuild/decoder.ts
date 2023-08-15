@@ -1,7 +1,7 @@
 import parseISO from 'date-fns/parseISO';
 import { logError } from '../lib/helpers';
 
-export const SUPPORTED_VERSION = '0.0.3';
+export const SUPPORTED_VERSION = '0.0.4';
 
 let parseDate = parseISO;
 if (parseDate === undefined) {
