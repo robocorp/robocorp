@@ -14,9 +14,10 @@ SR: Root Suite
                 SE: FOR_STEP: Step: for i in range(5)
                     EA: int: i: 2
                     AS: a: 2
-                    SE: IF: if i == 2
-                    EA: int: i: 2
-                    R: NoneType: None
+                    SE: IF_SCOPE: if i == 2
+                        EA: int: i: 2
+                        R: NoneType: None
+                    EE: IF_SCOPE: PASS
                 EE: FOR_STEP: PASS
             EE: FOR: PASS
         EE: METHOD: PASS

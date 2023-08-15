@@ -43,7 +43,6 @@ try..except as well as leveraging a main `with` statement in the method.
 """
 
 import pytest
-
 from robocorp.log._lifecycle_hooks import MethodLifecycleContext
 
 
@@ -89,6 +88,54 @@ def test_rewrite_strategy_simple_for_iter(in_memory_log, str_regression):
                     ),
                 )
                 pass
+                ctx.report_for_step_end(2)
+            ctx.report_for_end(1)
+
+    user_method()
+    in_memory_log.seek(0)
+    contents = pretty_format_logs_from_stream(in_memory_log)
+    # print(contents)
+    str_regression.check(contents)
+
+
+def test_rewrite_strategy_simple_for_iter_if_continue(in_memory_log, str_regression):
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_stream
+
+    def user_method():
+        with MethodLifecycleContext(
+            ("METHOD", __name__, "filename", "user_method", 1, {})
+        ) as ctx:
+            ctx.report_for_start(
+                1, ("FOR", __name__, "filename", "for a in range(2)", 2)
+            )
+            for a in range(2):
+                ctx.report_for_step_start(
+                    2,
+                    (
+                        "FOR_STEP",
+                        __name__,
+                        "filename",
+                        "for a in range(2)",
+                        3,
+                        [("a", a)],
+                    ),
+                )
+                if True:
+                    ctx.report_if_start(
+                        3,
+                        (
+                            "IF_SCOPE",
+                            __name__,
+                            "filename",
+                            "if True",
+                            4,
+                            [],
+                        ),
+                    )
+                    continue
+                    # The if end will never be reported...
+                    # ctx.report_for_if_end(3)
+
                 ctx.report_for_step_end(2)
             ctx.report_for_end(1)
 

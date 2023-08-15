@@ -1,0 +1,15 @@
+
+SE: METHOD: user_method
+    SE: FOR: for a in range(2)
+        SE: FOR_STEP: for a in range(2)
+            EA: int: a: 0
+            SE: IF_SCOPE: if True
+            EE: IF_SCOPE: PASS
+        EE: FOR_STEP: PASS
+        SE: FOR_STEP: for a in range(2)
+            EA: int: a: 1
+            SE: IF_SCOPE: if True
+            EE: IF_SCOPE: PASS
+        EE: FOR_STEP: PASS
+    EE: FOR: PASS
+EE: METHOD: PASS

@@ -1,0 +1,37 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_for_with_continue_break_2
+            SE: FOR: for i in range(2)
+                SE: FOR_STEP: Step: for i in range(2)
+                    EA: int: i: 0
+                    SE: FOR: for j in range(2)
+                        SE: FOR_STEP: Step: for j in range(2)
+                            EA: int: j: 0
+                            SE: IF_SCOPE: if j == 0
+                                EA: int: j: 0
+                                SE: BREAK: check_for_with_continue_break_2
+                            EE: IF_SCOPE: PASS
+                        EE: FOR_STEP: PASS
+                    EE: FOR: PASS
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(2)
+                    EA: int: i: 1
+                    SE: FOR: for j in range(2)
+                        SE: FOR_STEP: Step: for j in range(2)
+                            EA: int: j: 0
+                            SE: IF_SCOPE: if j == 0
+                                EA: int: j: 0
+                                SE: BREAK: check_for_with_continue_break_2
+                            EE: IF_SCOPE: PASS
+                        EE: FOR_STEP: PASS
+                    EE: FOR: PASS
+                    SE: IF_SCOPE: if i == 1
+                        EA: int: i: 1
+                        STB: RuntimeError: 
+                    EE: IF_SCOPE: ERROR
+                EE: FOR_STEP: ERROR
+            EE: FOR: ERROR
+        EE: METHOD: ERROR
+    ET: PASS
+ER: PASS

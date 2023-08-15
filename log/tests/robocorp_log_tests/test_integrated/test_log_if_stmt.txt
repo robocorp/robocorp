@@ -3,12 +3,14 @@ SR: Root Suite
     ST: my_task
         SE: METHOD: check_if
             AS: a: 10
-            SE: ELSE: else (to if a < 10)
-            EA: int: a: 10
-            AS: y: 20
-            SE: IF: if a == 10
-            EA: int: a: 10
-            AS: y: 30
+            SE: ELSE_SCOPE: else (to if a < 10)
+                EA: int: a: 10
+                AS: y: 20
+            EE: ELSE_SCOPE: PASS
+            SE: IF_SCOPE: if a == 10
+                EA: int: a: 10
+                AS: y: 30
+            EE: IF_SCOPE: PASS
         EE: METHOD: PASS
     ET: PASS
 ER: PASS

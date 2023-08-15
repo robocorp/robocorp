@@ -511,19 +511,154 @@ def _handle_continue_break(
 def _handle_if(
     rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node: ast.If
 ):
+    """
+    When handling an if we have 2 options: writing it unscoped (so, we just
+    notify that an if branch was taken, but we don't notify when it exits, which
+    is meant for generators) or scoped (regular case without generators).
+    """
     func_and_class_name = _get_function_and_class_name(stack)
     if not func_and_class_name:
+        yield
         return None
 
     function, _class_name = func_and_class_name
-    if not _accept_function_rewrite(
+    if _accept_function_rewrite(
         function,
         rewrite_ctx,
         filter_kind,
-        cases=("full_log", "generator"),
+        cases=("full_log",),
     ):
-        return
+        yield from _handle_full_log_if(
+            function, rewrite_ctx, config, module_path, stack, filter_kind, node
+        )
 
+    elif _accept_function_rewrite(
+        function,
+        rewrite_ctx,
+        filter_kind,
+        cases=(
+            "full_log",
+            "generator",
+        ),
+    ):
+        yield from _handle_generator_if(
+            function, rewrite_ctx, config, module_path, stack, filter_kind, node
+        )
+
+    else:
+        yield
+        return None
+
+
+def _handle_full_log_if(
+    function,
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path,
+    stack,
+    filter_kind,
+    node: ast.If,
+):
+    if_id = rewrite_ctx.next_context_id()
+    has_else = node.orelse and not (
+        len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)
+    )
+    if has_else:
+        else_id = rewrite_ctx.next_context_id()
+    yield
+    try:
+        stmt_name = "if"
+        parent_node = stack[-1]
+        iselif = False
+        if isinstance(parent_node, ast.If):
+            iselif = bool(
+                parent_node.orelse
+                and len(parent_node.orelse) == 1
+                and parent_node.orelse[0] is node
+            )
+            if iselif:
+                stmt_name = "elif"
+
+        if node.body:
+            factory = rewrite_ctx.NodeFactory(
+                node.body[0].lineno, node.body[0].col_offset
+            )
+            # With an IF we want to generate something as:
+            #
+            # if x:
+            #     @ctx.report_if_start(1,
+            #        ("IF_SCOPE", __name__, "filename", "for a in range(2)", 2))
+            #     @ctx.report_if_end(1)
+            targets = _collect_names_used_as_node_or_none(factory, node.test)
+
+            call = factory.Call(factory.NameLoadCtx(f"report_if_start"))
+            call.args.append(factory.IntConstant(if_id))
+            call.args.append(
+                factory.Tuple(
+                    factory.Str(f"IF_SCOPE"),
+                    factory.NameLoad("__name__"),
+                    factory.NameLoad("__file__"),
+                    factory.Str(f"{stmt_name} {ast.unparse(node.test)}"),
+                    factory.LineConstantAt(node.lineno),
+                    targets,
+                )
+            )
+            node.body.insert(0, factory.Expr(call))
+
+            last_stmt = node.body[-1]
+            factory_last = rewrite_ctx.NodeFactory(
+                last_stmt.lineno, last_stmt.col_offset
+            )
+            call = factory_last.Call(factory_last.NameLoadCtx(f"report_if_end"))
+            call.args.append(factory_last.IntConstant(if_id))
+            node.body.append(factory_last.Expr(call))
+
+        if has_else:
+            factory = rewrite_ctx.NodeFactory(
+                node.orelse[0].lineno, node.orelse[0].col_offset
+            )
+
+            targets = _collect_names_used_as_node_or_none(factory, node.test)
+
+            call = factory.Call(factory.NameLoadCtx(f"report_else_start"))
+            call.args.append(factory.IntConstant(else_id))
+            call.args.append(
+                factory.Tuple(
+                    factory.Str(f"ELSE_SCOPE"),
+                    factory.NameLoad("__name__"),
+                    factory.NameLoad("__file__"),
+                    factory.Str(f"else (to if {ast.unparse(node.test)})"),
+                    factory.LineConstantAt(node.lineno),
+                    targets,
+                )
+            )
+            node.orelse.insert(0, factory.Expr(call))
+
+            last_stmt = node.orelse[-1]
+            factory_last = rewrite_ctx.NodeFactory(
+                last_stmt.lineno, last_stmt.col_offset
+            )
+            call = factory_last.Call(factory_last.NameLoadCtx(f"report_else_end"))
+            call.args.append(factory_last.IntConstant(else_id))
+            node.orelse.append(factory_last.Expr(call))
+
+    except Exception:
+        raise RuntimeError(
+            f"Error when rewriting function (full) if statement in: {function.name} line: {node.lineno}"
+            f" at: {module_path}"
+        )
+
+
+def _handle_generator_if(
+    function,
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path,
+    stack,
+    filter_kind,
+    node: ast.If,
+):
+    yield
     try:
         stmt_name = "if"
         parent_node = stack[-1]
@@ -568,7 +703,7 @@ def _handle_if(
 
     except Exception:
         raise RuntimeError(
-            f"Error when rewriting function return: {function.name} line: {node.lineno}"
+            f"Error when rewriting function if statement in: {function.name} line: {node.lineno}"
             f" at: {module_path}"
         )
 
@@ -821,6 +956,7 @@ def _handle_for_or_while(
 ):
     func_and_class_name = _get_function_and_class_name(stack)
     if not func_and_class_name:
+        yield
         return None
 
     function, _class_name = func_and_class_name
@@ -830,6 +966,7 @@ def _handle_for_or_while(
         filter_kind,
         cases=("full_log",),
     ):
+        yield
         return None
 
     if rewrite_ctx.is_generator(function):
@@ -837,7 +974,13 @@ def _handle_for_or_while(
         # pausing and unpausing of generators would need to recreate the whole context
         # up to the inner statement (i.e.: it'd need to pop/push the for which we
         # can't really do right now).
+        yield
         return None
+
+    for_id = rewrite_ctx.next_context_id()
+    for_step_id = rewrite_ctx.next_context_id()
+
+    yield
 
     try:
         # Wrapping of before/after for 'for' statements and each step of its body.
@@ -888,7 +1031,6 @@ def _handle_for_or_while(
         # @ctx.report_while_end(1)
 
         call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_start"))
-        for_id = rewrite_ctx.next_context_id()
         call.args.append(factory.IntConstant(for_id))
         call.args.append(
             factory.Tuple(
@@ -912,7 +1054,6 @@ def _handle_for_or_while(
             )
 
             call = factory.Call(factory.NameLoadCtx(f"report_{stmt_name}_step_start"))
-            for_step_id = rewrite_ctx.next_context_id()
             call.args.append(factory.IntConstant(for_step_id))
             call.args.append(
                 factory.Tuple(
@@ -1172,11 +1313,14 @@ class _DispatchTable:
         _dispatch_after[ast.Return] = _handle_return
         _dispatch_after[ast.Assign] = _handle_assign
         _dispatch_after[ast.FunctionDef] = _handle_funcdef
-        _dispatch_after[ast.For] = _handle_for_or_while
-        _dispatch_after[ast.While] = _handle_for_or_while
-        _dispatch_after[ast.If] = _handle_if
         _dispatch_after[ast.Continue] = _handle_continue_break
         _dispatch_after[ast.Break] = _handle_continue_break
+
+        # We have to gather the ids for the contexts in order (so, do it
+        # in before / after generator).
+        _dispatch_before[ast.For] = _handle_for_or_while
+        _dispatch_before[ast.While] = _handle_for_or_while
+        _dispatch_before[ast.If] = _handle_if
 
         # Note: returns generator which is called when it finishes (right before
         # _dispatch_after)

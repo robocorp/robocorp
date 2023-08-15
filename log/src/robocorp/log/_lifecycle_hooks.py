@@ -68,11 +68,35 @@ assert_failed = Callback()
 
 # Called as: method_if(__name__, filename, name, lineno, variables)
 # variables is a tuple(tuple(variable_name, variable_value))
+# Does not create a scope (used in generators)
 method_if = Callback()
+
+# Called as: before_if(__name__, filename, name, lineno, variables)
+# variables is a tuple(tuple(variable_name, variable_value))
+before_if = Callback()
+
+# Called as: after_if(__name__, filename, name, lineno)
+after_if = Callback()
+
+# Called as: if_except(__name__, filename, name, lineno, exc_info)
+# tp, e, tb = exc_info
+if_except = Callback()
 
 # Called as: method_else(__name__, filename, name, lineno, variables)
 # variables is a tuple(tuple(variable_name, variable_value))
+# Does not create a scope (used in generators)
 method_else = Callback()
+
+# Called as: before_else(__name__, filename, name, lineno, variables)
+# variables is a tuple(tuple(variable_name, variable_value))
+before_else = Callback()
+
+# Called as: after_else(__name__, filename, name, lineno)
+after_else = Callback()
+
+# Called as: else_except(__name__, filename, name, lineno, exc_info)
+# tp, e, tb = exc_info
+else_except = Callback()
 
 # Called as: after_assign(__name__, filename, name, lineno, assign_name, assign_value)
 after_assign = Callback()
@@ -177,6 +201,22 @@ class MethodLifecycleContext:
             method = _name_to_callback[f"after_{method_name}"]
             method(*tup)
 
+    def report_if_start(self, report_id, tup):
+        if not self._accept:
+            return
+
+        # tup is (log_element_type, __name__, filename, name, lineno, targets)
+        before_if(*tup)
+        self._stack.append((report_id, "if", tup[:-1]))
+
+    def report_else_start(self, report_id, tup):
+        if not self._accept:
+            return
+
+        # tup is (log_element_type, __name__, filename, name, lineno, targets)
+        before_if(*tup)
+        self._stack.append((report_id, "else", tup[:-1]))
+
     def report_for_start(self, report_id, tup):
         if not self._accept:
             return
@@ -219,6 +259,8 @@ class MethodLifecycleContext:
     report_for_step_end = _report_end
     report_while_end = _report_end
     report_while_step_end = _report_end
+    report_if_end = _report_end
+    report_else_end = _report_end
 
     def report_continue(self, tup):
         # tup is (__name__, filename, name, lineno)

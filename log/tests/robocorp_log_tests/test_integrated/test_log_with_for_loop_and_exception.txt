@@ -14,9 +14,10 @@ SR: Root Suite
                 SE: FOR_STEP: Step: for i in range(5)
                     EA: int: i: 2
                     AS: a: 2
-                    SE: IF: if i == 2
-                    EA: int: i: 2
-                    STB: RuntimeError: some error
+                    SE: IF_SCOPE: if i == 2
+                        EA: int: i: 2
+                        STB: RuntimeError: some error
+                    EE: IF_SCOPE: ERROR
                 EE: FOR_STEP: ERROR
             EE: FOR: ERROR
         EE: METHOD: ERROR

@@ -1,0 +1,26 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_if_generator
+            SE: FOR: for a in if_generator()
+                SE: GENERATOR: if_generator
+                    AS: a: 10
+                    SE: ELSE: else (to if a < 10)
+                    EA: int: a: 10
+                YS: if_generator: 20 (robocorp_log_tests._resources.check)
+                SE: FOR_STEP: Step: for a in if_generator()
+                    EA: int: a: 20
+                EE: FOR_STEP: PASS
+                YR: if_generator (robocorp_log_tests._resources.check)
+                    SE: IF: if a == 10
+                    EA: int: a: 10
+                YS: if_generator: 30 (robocorp_log_tests._resources.check)
+                SE: FOR_STEP: Step: for a in if_generator()
+                    EA: int: a: 30
+                EE: FOR_STEP: PASS
+                YR: if_generator (robocorp_log_tests._resources.check)
+                EE: GENERATOR: PASS
+            EE: FOR: PASS
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

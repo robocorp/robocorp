@@ -41,6 +41,36 @@ def check_if():
         y = 30
 
 
+def check_if_exception():
+    for i in range(2):
+        if i == 1:
+            raise RuntimeError()
+
+
+def check_else_exception():
+    for i in range(2):
+        if i == 0:
+            pass
+        else:
+            raise RuntimeError()
+
+
+def check_if_generator():
+    for a in if_generator():
+        pass
+
+
+def if_generator():
+    a = 10
+    if a < 10:
+        yield 9
+    else:
+        yield 20
+
+    if a == 10:
+        yield 30
+
+
 def call1():
     return "ret 1"
 
@@ -115,6 +145,16 @@ def check_for_with_continue_break():
 
         if i == 5:
             break
+
+
+def check_for_with_continue_break_2():
+    for i in range(2):
+        for j in range(2):
+            if j == 0:
+                break
+
+        if i == 1:
+            raise RuntimeError()
 
 
 def some_call_with_exc():

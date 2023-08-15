@@ -3,10 +3,9 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
-from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
-
 from robocorp.log._config import FilterKind
 from robocorp.log._rewrite_importhook import _rewrite
+from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
 
 
 def test_ast_utils() -> None:
@@ -560,7 +559,7 @@ def a():
     str_regression.check(unparsed)
 
 
-def test_rewrite_if(tmpdir, str_regression):
+def test_rewrite_if_with_generator(tmpdir, str_regression):
     config = AutoLogConfigForTest()
 
     target = Path(tmpdir)
@@ -570,11 +569,43 @@ def test_rewrite_if(tmpdir, str_regression):
 def foo():
     a = 20
     if a > 10:
-        pass
+        yield 1
     elif b == 10:
-        pass
+        yield 2
     else:
-        pass
+        yield 3
+"""
+    )
+
+    co, mod = _rewrite(target, config, filter_kind=FilterKind.full_log)[1:3]
+    import ast
+
+    unparsed = ast.unparse(mod)
+    str_regression.check(unparsed)
+
+
+def test_rewrite_if(tmpdir, str_regression):
+    config = AutoLogConfigForTest()
+
+    target = Path(tmpdir)
+    target /= "check.py"
+    target.write_text(
+        """
+def foo():
+    for a in range(2):
+        a = 20
+        if a > 10:
+            if a > 2:
+                pass
+        elif b == 10:
+            pass
+        elif d == 10:
+            if True:
+                pass
+            else:
+                pass
+        else:
+            pass
 """
     )
 

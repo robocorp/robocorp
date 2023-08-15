@@ -1,0 +1,19 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_if_exception
+            SE: FOR: for i in range(2)
+                SE: FOR_STEP: Step: for i in range(2)
+                    EA: int: i: 0
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in range(2)
+                    EA: int: i: 1
+                    SE: IF_SCOPE: if i == 1
+                        EA: int: i: 1
+                        STB: RuntimeError: 
+                    EE: IF_SCOPE: ERROR
+                EE: FOR_STEP: ERROR
+            EE: FOR: ERROR
+        EE: METHOD: ERROR
+    ET: PASS
+ER: PASS

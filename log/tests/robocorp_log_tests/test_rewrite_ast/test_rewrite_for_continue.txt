@@ -6,8 +6,9 @@ def foo():
         for a in [1, 2]:
             @ctx.report_for_step_start(2, ('FOR_STEP', __name__, __file__, 'Step: for a in [1, 2]', 3, (('a', a),)))
             if a == 1:
-                @robo_lifecycle_hooks.method_if(__name__, __file__, 'if a == 1', 4, (('a', a),))
+                @ctx.report_if_start(3, ('IF_SCOPE', __name__, __file__, 'if a == 1', 4, (('a', a),)))
                 @ctx.report_continue((__name__, __file__, 'foo', 5))
                 continue
+                @ctx.report_if_end(3)
             @ctx.report_for_step_end(2)
         @ctx.report_for_end(1)

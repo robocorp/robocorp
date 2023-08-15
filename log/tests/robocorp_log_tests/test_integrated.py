@@ -2,14 +2,13 @@ from imp import reload
 from pathlib import Path
 
 import pytest
+from robocorp.log import setup_log, verify_log_messages_from_log_html
 from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
     AutoLogConfigForTest,
     basic_log_setup,
     pretty_format_logs_from_log_html,
 )
-
-from robocorp.log import setup_log, verify_log_messages_from_log_html
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate, str_regression):
@@ -212,6 +211,41 @@ def test_log_if_stmt(tmpdir, ui_regenerate, str_regression):
     # setup_info.open_log_target()
 
 
+def test_log_if_stmt_with_exception(tmpdir, ui_regenerate, str_regression):
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        with pytest.raises(RuntimeError):
+            reload(check).check_if_exception()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
+def test_log_else_stmt_with_exception(tmpdir, ui_regenerate, str_regression):
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        with pytest.raises(RuntimeError):
+            reload(check).check_else_exception()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
+def test_log_if_stmt_generator(tmpdir, ui_regenerate, str_regression):
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check).check_if_generator()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
 def test_log_return(tmpdir, ui_regenerate, str_regression):
     config = AutoLogConfigForTest()
     with basic_log_setup(tmpdir, config=config) as setup_info:
@@ -314,6 +348,20 @@ def test_for_with_continue_break(tmpdir, ui_regenerate, str_regression):
     log_target = setup_info.log_target
     assert log_target.exists()
     str_regression.check(pretty_format_logs_from_log_html(log_target))
+    # setup_info.open_log_target()
+
+
+def test_for_with_continue_break_2(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        with pytest.raises(RuntimeError):
+            reload(check).check_for_with_continue_break_2()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+    setup_info.open_log_target()
 
 
 def test_exception_with_cause(tmpdir, ui_regenerate, str_regression):

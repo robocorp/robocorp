@@ -313,7 +313,7 @@ class ASTRewriter:
                                     go_into = False
                             except StopIteration:
                                 raise AssertionError(
-                                    f"Expected generator {gen} to yield once!"
+                                    f"Expected generator {gen} to yield once. Handling: {ast.unparse(item)}"
                                 )
 
                         if go_into:

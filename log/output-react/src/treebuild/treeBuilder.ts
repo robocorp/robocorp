@@ -981,19 +981,29 @@ It's possible to customize the size of the logs with "--max-log-file-size" and "
         this.flattened.pushProcessSnapshotScope(msg);
         break;
       case 'SE': // start element
+        // Note that elements that don't create a scope have special treatment.
         if (msg.decoded['type'] === 'UNTRACKED_GENERATOR') {
           this.flattened.pushUntrackedGeneratorScope(msg);
         } else if (msg.decoded['type'] === 'IF') {
+          // Note: this if is unscoped (used in generators).
           this.flattened.pushIf(msg);
         } else if (msg.decoded['type'] === 'CONTINUE') {
           this.flattened.pushContinue(msg);
         } else if (msg.decoded['type'] === 'BREAK') {
           this.flattened.pushBreak(msg);
         } else if (msg.decoded['type'] === 'ELSE') {
+          // Note: this if is unscoped (used in generators).
           this.flattened.pushElse(msg);
         } else if (msg.decoded['type'] === 'ASSERT_FAILED') {
           this.flattened.pushAssertFailed(msg);
         } else {
+          // METHOD
+          // IF_SCOPE
+          // ELSE_SCOPE
+          // FOR
+          // FOR_STEP
+          // WHILE
+          // WHILE_STEP
           this.flattened.pushMethodScope(msg);
         }
 

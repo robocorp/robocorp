@@ -151,6 +151,42 @@ class _AutoLogging:
                 args.append((f"{key}", obj_type, obj_repr))
         self._call_before_element(method_type, mod_name, filename, name, lineno, args)
 
+    def call_before_if(
+        self,
+        method_type: LogElementType,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        targets: Sequence[Tuple[str, Any]],
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+        args: List[Tuple[str, str, str]] = []
+        if targets is not None:
+            for key, val in targets:
+                obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
+                args.append((f"{key}", obj_type, obj_repr))
+        self._call_before_element(method_type, mod_name, filename, name, lineno, args)
+
+    def call_before_else(
+        self,
+        method_type: LogElementType,
+        mod_name: str,
+        filename: str,
+        name: str,
+        lineno: int,
+        targets: Sequence[Tuple[str, Any]],
+    ) -> None:
+        if self.tid != threading.get_ident():
+            return
+        args: List[Tuple[str, str, str]] = []
+        if targets is not None:
+            for key, val in targets:
+                obj_type, obj_repr = _get_obj_type_and_repr_and_hide_if_needed(key, val)
+                args.append((f"{key}", obj_type, obj_repr))
+        self._call_before_element(method_type, mod_name, filename, name, lineno, args)
+
     def call_before_iterate(
         self,
         method_type: LogElementType,
@@ -197,6 +233,8 @@ class _AutoLogging:
     call_after_method = _call_after_element
     call_after_iterate = _call_after_element
     call_after_iterate_step = _call_after_element
+    call_after_if = _call_after_element
+    call_after_else = _call_after_element
 
     def call_before_yield(
         self,
@@ -483,6 +521,8 @@ class _AutoLogging:
                 robo_logger.log_method_except(exc_info, unhandled=False)
 
     call_iterate_except = call_method_except
+    call_if_except = call_method_except
+    call_else_except = call_method_except
     call_iterate_step_except = call_method_except
 
 

@@ -59,7 +59,8 @@ from ._config import AutoLogConfigBase, FilterKind
 # 0.0.21: Assertion rewriting
 # 0.0.22: Assertion message
 # 0.0.23: continue/break reported
-version = "0.0.23"
+# 0.0.24: if/elif/else can create a scope when not in generators
+version = "0.0.24"
 NAME_WITH_TAG = f"{sys.implementation.cache_tag}-log-{version}"
 PYC_EXT = ".py" + (__debug__ and "c" or "o")
 PYC_TAIL = "." + NAME_WITH_TAG + PYC_EXT

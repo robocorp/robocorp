@@ -118,9 +118,13 @@ ET: status:oid, message:oid, time_delta_in_seconds:float
 #
 # WHILE_STEP (start a step in a while loop)
 #
-# IF (note: doesn't add to the stack, just notifies that an if statement was entered)
+# IF (note: doesn't add to the stack, just notifies that an if statement was entered, to be used in generators)
 #
-# ELSE (note: doesn't add to the stack, just notifies that an if statement was entered)
+# ELSE (note: doesn't add to the stack, just notifies that an if statement was entered, to be used in generators)
+#
+# IF_SCOPE (unlike the plain 'IF' creates a scope)
+#
+# ELSE_SCOPE (unlike the plain 'ELSE' creates a scope)
 #
 # ASSERT_FAILED (note: doesn't add to the stack, just notifies that an assert statement failed)
 #

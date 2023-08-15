@@ -6,6 +6,8 @@ RR: Root Suite
                 RE: FOR_STEP: Step: for x in range(rows)
                     RE: FOR: for y in range(cols)
                         RE: FOR_STEP: Step: for y in range(cols)
+                            RE: IF_SCOPE: if x == 27 and y == 27 or (x == 28 and y == 28)
+                            EE: IF_SCOPE: PASS
                         EE: FOR_STEP: PASS
                         SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 28
@@ -105,16 +107,18 @@ RR: Root Suite
                         EE: FOR_STEP: PASS
                         SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 28
-                            SE: IF: if x == 27 and y == 27 or (x == 28 and y == 28)
-                            EA: int: x: 28
-                            EA: int: y: 28
-                            RR: Root Suite
-                            RT: my_task
-                            RE: METHOD: check_big_for_in_for
-                            RE: FOR: for x in range(rows)
-                            RE: FOR_STEP: Step: for x in range(rows)
-                            RE: FOR: for y in range(cols)
-                            RE: FOR_STEP: Step: for y in range(cols)
+                            SE: IF_SCOPE: if x == 27 and y == 27 or (x == 28 and y == 28)
+                                EA: int: x: 28
+                                EA: int: y: 28
+                                RR: Root Suite
+                                RT: my_task
+                                RE: METHOD: check_big_for_in_for
+                                RE: FOR: for x in range(rows)
+                                RE: FOR_STEP: Step: for x in range(rows)
+                                RE: FOR: for y in range(cols)
+                                RE: FOR_STEP: Step: for y in range(cols)
+                                RE: IF_SCOPE: if x == 27 and y == 27 or (x == 28 and y == 28)
+                            EE: IF_SCOPE: PASS
                         EE: FOR_STEP: PASS
                         SE: FOR_STEP: Step: for y in range(cols)
                             EA: int: y: 29
