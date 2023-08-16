@@ -15,7 +15,7 @@
 - [`tables.Table`](./robocorp.excel.tables.md#class-table): Container class for tabular data.
 - [`tables.Dialect`](./robocorp.excel.tables.md#class-dialect): CSV dialect.
 - [`tables.Table`](./robocorp.excel.tables.md#class-table): Container class for tabular data.
-- [`tables.Tables`](./robocorp.excel.tables.md#class-tables): ``Tables`` is a library for manipulating tabular data.
+- [`tables.Tables`](./robocorp.excel.tables.md#class-tables): `Tables` is a library for manipulating tabular data.
 - [`workbook.Workbook`](./robocorp.excel.workbook.md#class-workbook): Manager class for both .xls and .xlsx Excel files.
 - [`worksheet.Worksheet`](./robocorp.excel.worksheet.md#class-worksheet): Common class for worksheets to manage the worksheet's content.
 

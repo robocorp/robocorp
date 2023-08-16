@@ -7,7 +7,7 @@
 - [`robocorp.log`](./robocorp.log.md#module-robocorplog)
 - [`robocorp.log.console`](./robocorp.log.console.md#module-robocorplogconsole)
 - [`robocorp.log.protocols`](./robocorp.log.protocols.md#module-robocorplogprotocols)
-- [`robocorp.log.pyproject_config`](./robocorp.log.pyproject_config.md#module-robocorplogpyproject_config): This module contains functions to read a pyproject.toml file and 
+- [`robocorp.log.pyproject_config`](./robocorp.log.pyproject_config.md#module-robocorplogpyproject_config): This module contains functions to read a pyproject.toml file and
 - [`robocorp.log.redirect`](./robocorp.log.redirect.md#module-robocorplogredirect)
 
 ## Classes
