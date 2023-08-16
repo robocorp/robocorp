@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.storage` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L0)
-
+# module `robocorp.storage`
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L0)
 
 
 
 
 ---
 
-## function `list_assets` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L45)
-
+## function `list_assets`
+**Source:** [`__init__.py:45`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L45)
 
 ```python
 list_assets() → list[str]
@@ -25,8 +25,8 @@ List all the existing assets.
 
 ---
 
-## function `delete_asset` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L54)
-
+## function `delete_asset`
+**Source:** [`__init__.py:54`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L54)
 
 ```python
 delete_asset(name: str)
@@ -51,8 +51,8 @@ This operation cannot be undone.
 
 ---
 
-## function `get_text` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L94)
-
+## function `get_text`
+**Source:** [`__init__.py:94`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L94)
 
 ```python
 get_text(name: str) → str
@@ -80,8 +80,8 @@ Asset content as text
 
 ---
 
-## function `get_json` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L110)
-
+## function `get_json`
+**Source:** [`__init__.py:110`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L110)
 
 ```python
 get_json(
@@ -114,8 +114,8 @@ Asset content as a Python object (dict, list etc.)
 
 ---
 
-## function `get_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L128)
-
+## function `get_file`
+**Source:** [`__init__.py:128`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L128)
 
 ```python
 get_file(name: str, path: Union[PathLike, str], exist_ok=False) → Path
@@ -146,8 +146,8 @@ Path to created file
 
 ---
 
-## function `get_bytes` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L153)
-
+## function `get_bytes`
+**Source:** [`__init__.py:153`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L153)
 
 ```python
 get_bytes(name: str) → bytes
@@ -175,8 +175,8 @@ Asset content as bytes
 
 ---
 
-## function `set_text` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L184)
-
+## function `set_text`
+**Source:** [`__init__.py:184`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L184)
 
 ```python
 set_text(name: str, text: str, wait: bool = True)
@@ -195,8 +195,8 @@ Create or update an asset to contain the given string.
 
 ---
 
-## function `set_json` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L197)
-
+## function `set_json`
+**Source:** [`__init__.py:197`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L197)
 
 ```python
 set_json(
@@ -221,8 +221,8 @@ Create or update an asset to contain the given object, serialized as JSON.
 
 ---
 
-## function `set_file` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L211)
-
+## function `set_file`
+**Source:** [`__init__.py:211`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L211)
 
 ```python
 set_file(
@@ -247,8 +247,8 @@ Create or update an asset to contain the contents of the given file.
 
 ---
 
-## function `set_bytes` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L241)
-
+## function `set_bytes`
+**Source:** [`__init__.py:241`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L241)
 
 ```python
 set_bytes(
@@ -273,8 +273,8 @@ Create or update an asset to contain the given bytes.
 
 ---
 
-## exception `AssetNotFound` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/_client.py#L30)
-
+## exception `AssetNotFound`
+**Source:** [`_client.py:30`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/_client.py#L30)
 No asset with given name/id found.
 
 
@@ -283,8 +283,8 @@ No asset with given name/id found.
 
 ---
 
-## exception `AssetUploadFailed` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/_client.py#L34)
-
+## exception `AssetUploadFailed`
+**Source:** [`_client.py:34`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/_client.py#L34)
 There was an unexpected error while uploading an asset.
 
 

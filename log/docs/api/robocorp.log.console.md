@@ -1,7 +1,7 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.log.console` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L0)
-
+# module `robocorp.log.console`
+**Source:** [`console.py:0`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L0)
 
 
 
@@ -18,8 +18,8 @@
 
 ---
 
-## function `set_color` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L215)
-
+## function `set_color`
+**Source:** [`console.py:215`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L215)
 
 ```python
 set_color(foreground_color: str) → _OnExitContextManager
@@ -37,8 +37,8 @@ with set_color(COLOR_BLACK): ...
 
 ---
 
-## function `set_mode` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L229)
-
+## function `set_mode`
+**Source:** [`console.py:229`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L229)
 
 ```python
 set_mode(mode: str) → None

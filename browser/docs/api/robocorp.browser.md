@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.browser` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L0)
-
+# module `robocorp.browser`
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L0)
 
 
 
 
 ---
 
-## function `configure` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L18)
-
+## function `configure`
+**Source:** [`__init__.py:18`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L18)
 
 ```python
 configure(**kwargs) → None
@@ -38,8 +38,8 @@ Calling this method is optional (if not called a default configuration will be u
 
 ---
 
-## function `configure_context` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L55)
-
+## function `configure_context`
+**Source:** [`__init__.py:55`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L55)
 
 ```python
 configure_context(**kwargs) → None
@@ -66,8 +66,8 @@ browser.configure_context(ignore_https_errors = True)
 
 ---
 
-## function `page` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L83)
-
+## function `page`
+**Source:** [`__init__.py:83`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L83)
 
 ```python
 page() → Page
@@ -92,8 +92,8 @@ Provides a managed instance of the browser page to interact with.
 
 ---
 
-## function `browser` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L105)
-
+## function `browser`
+**Source:** [`__init__.py:105`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L105)
 
 ```python
 browser() → Browser
@@ -115,8 +115,8 @@ Provides a managed instance of the browser to interact with.
 
 ---
 
-## function `playwright` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L126)
-
+## function `playwright`
+**Source:** [`__init__.py:126`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L126)
 
 ```python
 playwright() → Playwright
@@ -138,8 +138,8 @@ Provides a managed instance of playwright to interact with.
 
 ---
 
-## function `context` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L147)
-
+## function `context`
+**Source:** [`__init__.py:147`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L147)
 
 ```python
 context(**kwargs) → BrowserContext
@@ -166,8 +166,8 @@ Provides a managed instance of the browser context to interact with.
 
 ---
 
-## function `goto` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L173)
-
+## function `goto`
+**Source:** [`__init__.py:173`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L173)
 
 ```python
 goto(url: str) → Page
@@ -189,8 +189,8 @@ The page instance managed by the robocorp.tasks framework(it will be automatical
 
 ---
 
-## function `screenshot` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L189)
-
+## function `screenshot`
+**Source:** [`__init__.py:189`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L189)
 
 ```python
 screenshot(
@@ -219,8 +219,8 @@ The bytes from the screenshot.
 
 ---
 
-## function `install` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L232)
-
+## function `install`
+**Source:** [`__init__.py:232`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L232)
 
 ```python
 install(browser_engine: BrowserEngine)
@@ -239,13 +239,11 @@ Note: Google Chrome or Microsoft Edge installations will be installed at the def
 
 ---
 
-## enum `BrowserEngine` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_browser_engines.py#L14)
-
+## enum `BrowserEngine`
+**Source:** [`_browser_engines.py:14`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_browser_engines.py#L14)
 Valid browser engines for Playwright.
 
-
----
-### values
+### Values
 - **CHROMIUM** = chromium
 - **CHROME** = chrome
 - **CHROME_BETA** = chrome-beta

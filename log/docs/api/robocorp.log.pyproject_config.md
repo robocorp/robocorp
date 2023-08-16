@@ -1,14 +1,14 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.log.pyproject_config` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L0)
-
+# module `robocorp.log.pyproject_config`
+**Source:** [`pyproject_config.py:0`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L0)
 This module contains functions to read a pyproject.toml file and  read the related tool.robocorp.log section.
 
 
 ---
 
-## function `read_pyproject_toml` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L19)
-
+## function `read_pyproject_toml`
+**Source:** [`pyproject_config.py:19`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L19)
 
 ```python
 read_pyproject_toml(path: Path) → Optional[PyProjectInfo]
@@ -27,8 +27,8 @@ read_pyproject_toml(path: Path) → Optional[PyProjectInfo]
 
 ---
 
-## function `read_section_from_toml` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L63)
-
+## function `read_section_from_toml`
+**Source:** [`pyproject_config.py:63`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L63)
 
 ```python
 read_section_from_toml(
@@ -55,8 +55,8 @@ The section which was read.
 
 ---
 
-## function `read_robocorp_auto_log_config` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L110)
-
+## function `read_robocorp_auto_log_config`
+**Source:** [`pyproject_config.py:110`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L110)
 
 ```python
 read_robocorp_auto_log_config(
@@ -80,11 +80,12 @@ The autolog configuration read from the given pyproject information.
 
 ---
 
-## class `PyProjectInfo` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L13)
-
+## class `PyProjectInfo`
+**Source:** [`pyproject_config.py:13`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/pyproject_config.py#L13)
 PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict)
 
-### method `__init__`
+### function `__init__`
+
 
 ```python
 __init__(pyproject: Path, toml_contents: dict) → None

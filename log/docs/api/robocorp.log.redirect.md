@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.log.redirect` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/redirect.py#L0)
-
+# module `robocorp.log.redirect`
+**Source:** [`redirect.py:0`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/redirect.py#L0)
 
 
 
 
 ---
 
-## function `setup_stdout_logging` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/log/robocorp/log/redirect/setup_stdout_logging#L136)
-
+## function `setup_stdout_logging`
+**Source:** [`setup_stdout_logging:136`](https://github.com/robocorp/robo/tree/master/log/robocorp/log/redirect/setup_stdout_logging#L136)
 
 ```python
 setup_stdout_logging(

@@ -28,7 +28,7 @@ def docs(ctx: invoke.Context) -> None:
         if project_dir.name in ignored:
             continue
 
-        # subprocess.check_call(["poetry", "lock"], cwd=project_dir)
+        subprocess.check_call(["poetry", "lock"], cwd=project_dir)
         subprocess.check_call(["poetry", "install"], cwd=project_dir)
         subprocess.check_call(["poetry", "run", "invoke", "docs"], cwd=project_dir)
 

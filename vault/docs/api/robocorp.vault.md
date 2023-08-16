@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.vault` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L0)
-
+# module `robocorp.vault`
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L0)
 
 
 
 
 ---
 
-## function `get_secret` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L19)
-
+## function `get_secret`
+**Source:** [`__init__.py:19`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L19)
 
 ```python
 get_secret(name: str, hide: bool = True) → SecretContainer
@@ -43,8 +43,8 @@ Secret container of name, description, and key-value pairs
 
 ---
 
-## function `set_secret` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L47)
-
+## function `set_secret`
+**Source:** [`__init__.py:47`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L47)
 
 ```python
 set_secret(secret: SecretContainer, hide: bool = True) → None
@@ -75,8 +75,8 @@ Set a secret value using an existing container.
 
 ---
 
-## function `create_secret` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L72)
-
+## function `create_secret`
+**Source:** [`__init__.py:72`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L72)
 
 ```python
 create_secret(
@@ -119,16 +119,16 @@ Secret container of name, description, and key-value pairs
 
 ---
 
-## class `SecretContainer` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L5)
-
+## class `SecretContainer`
+**Source:** [`_secrets.py:5`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L5)
 Container for a secret with name, description, and multiple key-value pairs.
 
 Avoids logging internal values when possible.
 
 Note that keys are always converted to str internally.
 
-### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L13)
-
+### method `__init__`
+**Source:** [`_secrets.py:13`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L13)
 
 ```python
 __init__(name: str, description: str, values: Dict[str, Any])
@@ -143,16 +143,12 @@ __init__(name: str, description: str, values: Dict[str, Any])
  - <b>`values`</b>:       Dictionary of key-value pairs stored in secret
 
 
----
-
-#### property description
+#### property `description`
 
 
 
 
----
-
-#### property name
+#### property `name`
 
 
 
@@ -161,8 +157,8 @@ __init__(name: str, description: str, values: Dict[str, Any])
 
 ---
 
-### method `update` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L32)
-
+### method `update`
+**Source:** [`_secrets.py:32`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L32)
 
 ```python
 update(kvpairs) → None
@@ -174,8 +170,8 @@ update(kvpairs) → None
 
 ---
 
-## exception `RobocorpVaultError` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_errors.py#L1)
-
+## exception `RobocorpVaultError`
+**Source:** [`_errors.py:1`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_errors.py#L1)
 Raised when there's problem with reading from Robocorp Vault.
 
 

@@ -1,7 +1,7 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.tasks` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L0)
-
+# module `robocorp.tasks`
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L0)
 Robocorp tasks helps in creating entry points for your automation project.
 
 To use:
@@ -37,8 +37,8 @@ Note: Using the `cli.main(args)` is possible to run tasks programmatically, but 
 
 ---
 
-## function `task` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L43)
-
+## function `task`
+**Source:** [`__init__.py:43`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L43)
 
 ```python
 task(func)
@@ -69,8 +69,8 @@ python -m robocorp.tasks run tasks.py -t enter_user
 
 ---
 
-## function `session_cache` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L74)
-
+## function `session_cache`
+**Source:** [`__init__.py:74`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L74)
 
 ```python
 session_cache(func)
@@ -91,8 +91,8 @@ The function may be either a generator with a single yield (so, the first yielde
 
 ---
 
-## function `task_cache` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L96)
-
+## function `task_cache`
+**Source:** [`__init__.py:96`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L96)
 
 ```python
 task_cache(func)
@@ -113,8 +113,8 @@ The function may be either a generator with a single yield (so, the first yielde
 
 ---
 
-## function `get_output_dir` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L118)
-
+## function `get_output_dir`
+**Source:** [`__init__.py:118`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L118)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -125,8 +125,8 @@ Provide the output directory being used for the run or None if there's no output
 
 ---
 
-## function `get_current_task` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L131)
-
+## function `get_current_task`
+**Source:** [`__init__.py:131`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L131)
 
 ```python
 get_current_task() → Optional[ITask]

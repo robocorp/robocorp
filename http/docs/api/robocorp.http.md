@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.http` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/http/src/robocorp/http/__init__.py#L0)
-
+# module `robocorp.http`
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/http/src/robocorp/http/__init__.py#L0)
 
 
 
 
 ---
 
-## function `download` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/http/src/robocorp/http/_http.py#L13)
-
+## function `download`
+**Source:** [`_http.py:13`](https://github.com/robocorp/robo/tree/master/http/src/robocorp/http/_http.py#L13)
 
 ```python
 download(

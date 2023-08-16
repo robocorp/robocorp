@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.excel.excel` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L0)
-
+# module `robocorp.excel.excel`
+**Source:** [`excel.py:0`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L0)
 
 
 
 
 ---
 
-## function `create_workbook` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L9)
-
+## function `create_workbook`
+**Source:** [`excel.py:9`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L9)
 
 ```python
 create_workbook(
@@ -47,8 +47,8 @@ workbook = create_workbook("xlsx", sheet_name="Sheet1")
 
 ---
 
-## function `open_workbook` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L50)
-
+## function `open_workbook`
+**Source:** [`excel.py:50`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L50)
 
 ```python
 open_workbook(

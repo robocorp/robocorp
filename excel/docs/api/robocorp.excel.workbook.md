@@ -1,7 +1,7 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.excel.workbook` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L0)
-
+# module `robocorp.excel.workbook`
+**Source:** [`workbook.py:0`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L0)
 
 
 
@@ -9,12 +9,12 @@
 
 ---
 
-## class `Workbook` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L10)
-
+## class `Workbook`
+**Source:** [`workbook.py:10`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L10)
 Manager class for both .xls and .xlsx Excel files.
 
-### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L13)
-
+### method `__init__`
+**Source:** [`workbook.py:13`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L13)
 
 ```python
 __init__(excel: Union[XlsWorkbook, XlsxWorkbook])
@@ -28,8 +28,8 @@ __init__(excel: Union[XlsWorkbook, XlsxWorkbook])
 
 ---
 
-### method `close` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L25)
-
+### method `close`
+**Source:** [`workbook.py:25`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L25)
 
 ```python
 close()
@@ -40,8 +40,8 @@ close()
 
 ---
 
-### method `create_worksheet` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L40)
-
+### method `create_worksheet`
+**Source:** [`workbook.py:40`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L40)
 
 ```python
 create_worksheet(
@@ -57,8 +57,8 @@ create_worksheet(
 
 ---
 
-### method `list_worksheets` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L61)
-
+### method `list_worksheets`
+**Source:** [`workbook.py:61`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L61)
 
 ```python
 list_worksheets() → List[str]
@@ -69,8 +69,8 @@ list_worksheets() → List[str]
 
 ---
 
-### method `remove_worksheet` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L71)
-
+### method `remove_worksheet`
+**Source:** [`workbook.py:71`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L71)
 
 ```python
 remove_worksheet(sheet: Union[str, int])
@@ -81,8 +81,8 @@ remove_worksheet(sheet: Union[str, int])
 
 ---
 
-### method `save` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L17)
-
+### method `save`
+**Source:** [`workbook.py:17`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L17)
 
 ```python
 save(name: Union[str, Path, BytesIO], overwrite=True)
@@ -93,8 +93,8 @@ save(name: Union[str, Path, BytesIO], overwrite=True)
 
 ---
 
-### method `worksheet` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L30)
-
+### method `worksheet`
+**Source:** [`workbook.py:30`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L30)
 
 ```python
 worksheet(sheet: Union[str, int]) → Worksheet
@@ -104,8 +104,8 @@ If name is not provided take the first worksheet?
 
 ---
 
-### method `worksheet_exists` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L64)
-
+### method `worksheet_exists`
+**Source:** [`workbook.py:64`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/workbook.py#L64)
 
 ```python
 worksheet_exists(sheet: Union[str, int]) → bool

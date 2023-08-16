@@ -1,15 +1,15 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.excel.tables` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L0)
-
+# module `robocorp.excel.tables`
+**Source:** [`tables.py:0`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L0)
 
 
 
 
 ---
 
-## function `return_table_as_raw_list` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L35)
-
+## function `return_table_as_raw_list`
+**Source:** [`tables.py:35`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L35)
 
 ```python
 return_table_as_raw_list(table, heading=False)
@@ -21,8 +21,8 @@ return_table_as_raw_list(table, heading=False)
 
 ---
 
-## function `to_list` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L47)
-
+## function `to_list`
+**Source:** [`tables.py:47`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L47)
 
 ```python
 to_list(obj: Any, size: int = 1)
@@ -33,8 +33,8 @@ Convert (possibly scalar) value to list of `size`.
 
 ---
 
-## function `to_identifier` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L55)
-
+## function `to_identifier`
+**Source:** [`tables.py:55`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L55)
 
 ```python
 to_identifier(val: Any)
@@ -45,8 +45,8 @@ Convert string to valid identifier.
 
 ---
 
-## function `to_condition` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L71)
-
+## function `to_condition`
+**Source:** [`tables.py:71`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L71)
 
 ```python
 to_condition(operator: str, value: Any) → Callable[[Any], bool]
@@ -57,8 +57,8 @@ Convert string operator into callable condition function.
 
 ---
 
-## function `if_none` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L95)
-
+## function `if_none`
+**Source:** [`tables.py:95`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L95)
 
 ```python
 if_none(value: Any, default: Any)
@@ -69,8 +69,8 @@ Return default if value is None.
 
 ---
 
-## function `uniq` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L100)
-
+## function `uniq`
+**Source:** [`tables.py:100`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L100)
 
 ```python
 uniq(seq: Iterable)
@@ -83,13 +83,11 @@ Values must be hashable.
 
 ---
 
-## enum `Dialect` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L114)
-
+## enum `Dialect`
+**Source:** [`tables.py:114`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L114)
 CSV dialect.
 
-
----
-### values
+### Values
 - **Excel** = excel
 - **ExcelTab** = excel-tab
 - **Unix** = unix
@@ -98,8 +96,8 @@ CSV dialect.
 
 ---
 
-## class `Table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L122)
-
+## class `Table`
+**Source:** [`tables.py:122`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L122)
 Container class for tabular data.
 
 
@@ -110,8 +108,8 @@ Container class for tabular data.
 >- empty: None values populated according to columns/index - list: list of data Rows - dict: Dictionary of columns as keys and Rows as values - table: An existing Table
 >Row: a namedtuple, dictionary, list or a tuple
 
-### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L137)
-
+### method `__init__`
+**Source:** [`tables.py:137`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L137)
 
 ```python
 __init__(
@@ -130,37 +128,27 @@ Creates a Table object.
  - <b>`columns`</b>:   Names for columns, should match data dimensions
 
 
----
-
-#### property columns
+#### property `columns`
 
 
 
 
----
-
-#### property data
+#### property `data`
 
 
 
 
----
-
-#### property dimensions
+#### property `dimensions`
 
 
 
 
----
-
-#### property index
+#### property `index`
 
 
 
 
----
-
-#### property size
+#### property `size`
 
 
 
@@ -169,8 +157,8 @@ Creates a Table object.
 
 ---
 
-### method `append_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L702)
-
+### method `append_column`
+**Source:** [`tables.py:702`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L702)
 
 ```python
 append_column(column=None, values=None)
@@ -181,8 +169,8 @@ append_column(column=None, values=None)
 
 ---
 
-### method `append_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L693)
-
+### method `append_row`
+**Source:** [`tables.py:693`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L693)
 
 ```python
 append_row(row=None)
@@ -192,8 +180,8 @@ Append new row to table.
 
 ---
 
-### method `append_rows` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L697)
-
+### method `append_rows`
+**Source:** [`tables.py:697`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L697)
 
 ```python
 append_rows(rows)
@@ -203,8 +191,8 @@ Append multiple rows to table.
 
 ---
 
-### method `append_table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L735)
-
+### method `append_table`
+**Source:** [`tables.py:735`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L735)
 
 ```python
 append_table(table)
@@ -214,8 +202,8 @@ Append data from table to current data.
 
 ---
 
-### method `clear` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L468)
-
+### method `clear`
+**Source:** [`tables.py:468`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L468)
 
 ```python
 clear()
@@ -225,8 +213,8 @@ Remove all rows from this table.
 
 ---
 
-### method `column_location` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L384)
-
+### method `column_location`
+**Source:** [`tables.py:384`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L384)
 
 ```python
 column_location(value)
@@ -236,8 +224,8 @@ Find location for column value.
 
 ---
 
-### method `copy` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L464)
-
+### method `copy`
+**Source:** [`tables.py:464`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L464)
 
 ```python
 copy()
@@ -247,8 +235,8 @@ Create a copy of this table.
 
 ---
 
-### method `delete_columns` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L720)
-
+### method `delete_columns`
+**Source:** [`tables.py:720`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L720)
 
 ```python
 delete_columns(columns)
@@ -258,8 +246,8 @@ Remove columns with matching names.
 
 ---
 
-### method `delete_rows` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L708)
-
+### method `delete_rows`
+**Source:** [`tables.py:708`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L708)
 
 ```python
 delete_rows(indexes: Union[int, str, List[Union[int, str]]])
@@ -269,8 +257,8 @@ Remove rows with matching indexes.
 
 ---
 
-### method `filter_all` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L806)
-
+### method `filter_all`
+**Source:** [`tables.py:806`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L806)
 
 ```python
 filter_all(
@@ -284,8 +272,8 @@ The filtering will be done in-place and all the rows evaluating as falsy through
 
 ---
 
-### method `filter_by_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L819)
-
+### method `filter_by_column`
+**Source:** [`tables.py:819`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L819)
 
 ```python
 filter_by_column(column: Union[int, str], condition: Callable[[Any], bool])
@@ -297,8 +285,8 @@ The filtering will be done in-place and all the rows where it evaluates to falsy
 
 ---
 
-### method `get` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L482)
-
+### method `get`
+**Source:** [`tables.py:482`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L482)
 
 ```python
 get(indexes=None, columns=None, as_list=False)
@@ -322,8 +310,8 @@ If both `indexes` and `columns` are lists: Returns a new Table instance with mat
 
 ---
 
-### method `get_cell` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L511)
-
+### method `get_cell`
+**Source:** [`tables.py:511`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L511)
 
 ```python
 get_cell(index, column)
@@ -333,8 +321,8 @@ Get single cell value.
 
 ---
 
-### method `get_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L542)
-
+### method `get_column`
+**Source:** [`tables.py:542`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L542)
 
 ```python
 get_column(column, indexes=None, as_list=False)
@@ -352,8 +340,8 @@ Get row values from column.
 
 ---
 
-### method `get_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L518)
-
+### method `get_row`
+**Source:** [`tables.py:518`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L518)
 
 ```python
 get_row(index: Union[int, str], columns=None, as_list=False)
@@ -371,8 +359,8 @@ Get column values from row.
 
 ---
 
-### method `get_slice` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L585)
-
+### method `get_slice`
+**Source:** [`tables.py:585`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L585)
 
 ```python
 get_slice(start: Optional[int, str] = None, end: Optional[int, str] = None)
@@ -382,8 +370,8 @@ Get a new table from rows between start and end index.
 
 ---
 
-### method `get_table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L566)
-
+### method `get_table`
+**Source:** [`tables.py:566`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L566)
 
 ```python
 get_table(
@@ -397,8 +385,8 @@ Get a new table from all cells matching indexes and columns.
 
 ---
 
-### method `group_by_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L785)
-
+### method `group_by_column`
+**Source:** [`tables.py:785`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L785)
 
 ```python
 group_by_column(column)
@@ -408,8 +396,8 @@ Group rows by column value and return as list of tables.
 
 ---
 
-### method `head` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L472)
-
+### method `head`
+**Source:** [`tables.py:472`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L472)
 
 ```python
 head(rows, as_list=False)
@@ -419,8 +407,8 @@ Return first n rows of table.
 
 ---
 
-### method `index_location` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L367)
-
+### method `index_location`
+**Source:** [`tables.py:367`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L367)
 
 ```python
 index_location(value: Union[int, str]) → int
@@ -431,8 +419,8 @@ index_location(value: Union[int, str]) → int
 
 ---
 
-### method `iter_dicts` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L840)
-
+### method `iter_dicts`
+**Source:** [`tables.py:840`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L840)
 
 ```python
 iter_dicts(
@@ -444,8 +432,8 @@ Iterate rows with values as dicts.
 
 ---
 
-### method `iter_lists` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L832)
-
+### method `iter_lists`
+**Source:** [`tables.py:832`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L832)
 
 ```python
 iter_lists(with_index=True)
@@ -455,8 +443,8 @@ Iterate rows with values as lists.
 
 ---
 
-### method `iter_tuples` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L848)
-
+### method `iter_tuples`
+**Source:** [`tables.py:848`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L848)
 
 ```python
 iter_tuples(with_index=True, name='Row')
@@ -468,8 +456,8 @@ Converts column names to valid Python identifiers, e.g. "First Name" -> "First_N
 
 ---
 
-### method `set` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L625)
-
+### method `set`
+**Source:** [`tables.py:625`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L625)
 
 ```python
 set(indexes=None, columns=None, values=None)
@@ -483,8 +471,8 @@ If ``values`` is scalar, all matching cells will be set to that value. Otherwise
 
 ---
 
-### method `set_cell` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L649)
-
+### method `set_cell`
+**Source:** [`tables.py:649`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L649)
 
 ```python
 set_cell(index, column, value)
@@ -496,8 +484,8 @@ If either index or column is missing, they are created.
 
 ---
 
-### method `set_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L678)
-
+### method `set_column`
+**Source:** [`tables.py:678`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L678)
 
 ```python
 set_column(column, values)
@@ -507,8 +495,8 @@ Set values in column. If column is missing, it is created.
 
 ---
 
-### method `set_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L666)
-
+### method `set_row`
+**Source:** [`tables.py:666`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L666)
 
 ```python
 set_row(index, values)
@@ -518,8 +506,8 @@ Set values in row. If index is missing, it is created.
 
 ---
 
-### method `sort_by_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L747)
-
+### method `sort_by_column`
+**Source:** [`tables.py:747`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L747)
 
 ```python
 sort_by_column(columns, ascending=False)
@@ -529,8 +517,8 @@ Sort table by columns.
 
 ---
 
-### method `tail` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L477)
-
+### method `tail`
+**Source:** [`tables.py:477`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L477)
 
 ```python
 tail(rows, as_list=False)
@@ -540,8 +528,8 @@ Return last n rows of table.
 
 ---
 
-### method `to_dict` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L878)
-
+### method `to_dict`
+**Source:** [`tables.py:878`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L878)
 
 ```python
 to_dict(with_index=True)
@@ -551,8 +539,8 @@ Convert table to dict representation.
 
 ---
 
-### method `to_list` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L864)
-
+### method `to_list`
+**Source:** [`tables.py:864`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L864)
 
 ```python
 to_list(with_index=True)
@@ -563,8 +551,8 @@ Convert table to list representation.
 
 ---
 
-## class `Tables` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L896)
-
+## class `Tables`
+**Source:** [`tables.py:896`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L896)
 ``Tables`` is a library for manipulating tabular data.
 
 It can import data from various sources and apply different operations to it. Common use-cases are reading and writing CSV files, inspecting files in directories, or running tasks using existing Excel data.
@@ -611,8 +599,8 @@ tables = Tables()orders = tables.read_table_from_csv("orders.csv", columns=["nam
 
 customers = tables.group_table_by_column(rows, "mail")for customer in customers:for order in customer:add_cart(order)make_order()
 
-### method `__init__` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L977)
-
+### method `__init__`
+**Source:** [`tables.py:977`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L977)
 
 ```python
 __init__()
@@ -626,8 +614,8 @@ __init__()
 
 ---
 
-### method `add_table_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1250)
-
+### method `add_table_column`
+**Source:** [`tables.py:1250`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1250)
 
 ```python
 add_table_column(table: Table, name: Optional[str] = None, values: Any = None)
@@ -660,8 +648,8 @@ The ``values`` can either be a list of values, one for each row, or one single v
 
 ---
 
-### method `add_table_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1283)
-
+### method `add_table_row`
+**Source:** [`tables.py:1283`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1283)
 
 ```python
 add_table_row(table: Table, values: Any = None)
@@ -693,8 +681,8 @@ It can also be a single value that is set for all columns, which is ``None`` by 
 
 ---
 
-### method `clear_table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1080)
-
+### method `clear_table`
+**Source:** [`tables.py:1080`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1080)
 
 ```python
 clear_table(table: Table)
@@ -717,8 +705,8 @@ tables = Tables()tables.clear_table(table)
 
 ---
 
-### method `copy_table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1067)
-
+### method `copy_table`
+**Source:** [`tables.py:1067`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1067)
 
 ```python
 copy_table(table: Table) → Table
@@ -740,8 +728,8 @@ Make a copy of a table object.
 
 ---
 
-### method `create_table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L985)
-
+### method `create_table`
+**Source:** [`tables.py:985`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L985)
 
 ```python
 create_table(
@@ -784,8 +772,8 @@ table_data_name = ["Mark", "John", "Amy"]table_data_age = [58, 22, 67]table_data
 
 ---
 
-### method `export_table` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1031)
-
+### method `export_table`
+**Source:** [`tables.py:1031`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1031)
 
 ```python
 export_table(
@@ -825,8 +813,8 @@ export = tables.export_table(table)
 
 ---
 
-### method `filter_empty_rows` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1840)
-
+### method `filter_empty_rows`
+**Source:** [`tables.py:1840`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1840)
 
 ```python
 filter_empty_rows(table: Table)
@@ -851,8 +839,8 @@ Filter empty rows    ${table}
 
 ---
 
-### method `filter_table_by_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1741)
-
+### method `filter_table_by_column`
+**Source:** [`tables.py:1741`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1741)
 
 ```python
 filter_table_by_column(
@@ -889,8 +877,8 @@ The filtering will be done in-place.
 
 ---
 
-### method `filter_table_with_function` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1778)
-
+### method `filter_table_with_function`
+**Source:** [`tables.py:1778`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1778)
 
 ```python
 filter_table_with_function(table: Table, func: Callable, *args)
@@ -914,8 +902,8 @@ The row object will be given as the first argument to the filtering keyword.
 
 ---
 
-### method `find_table_rows` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1632)
-
+### method `find_table_rows`
+**Source:** [`tables.py:1632`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1632)
 
 ```python
 find_table_rows(
@@ -960,8 +948,8 @@ Returns the matches as a new `Table` instance.
 
 ---
 
-### method `get_table_cell` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1574)
-
+### method `get_table_cell`
+**Source:** [`tables.py:1574`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1574)
 
 ```python
 get_table_cell(
@@ -1002,8 +990,8 @@ Get a cell value from a table.
 
 ---
 
-### method `get_table_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1341)
-
+### method `get_table_column`
+**Source:** [`tables.py:1341`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1341)
 
 ```python
 get_table_column(table: Table, column: Union[int, str]) → List
@@ -1033,8 +1021,8 @@ ${emails}=    Get table column    ${users}    E-Mail Address
 
 ---
 
-### method `get_table_dimensions` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1186)
-
+### method `get_table_dimensions`
+**Source:** [`tables.py:1186`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1186)
 
 ```python
 get_table_dimensions(table: Table) → Tuple[int, int]
@@ -1063,8 +1051,8 @@ ${rows}  ${columns}=    Get table dimensions    ${table}Log    Table has ${rows}
 
 ---
 
-### method `get_table_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1314)
-
+### method `get_table_row`
+**Source:** [`tables.py:1314`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1314)
 
 ```python
 get_table_row(
@@ -1101,8 +1089,8 @@ Get a single row from a table.
 
 ---
 
-### method `get_table_slice` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1480)
-
+### method `get_table_slice`
+**Source:** [`tables.py:1480`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1480)
 
 ```python
 get_table_slice(
@@ -1143,8 +1131,8 @@ If ``start`` is not defined, starts from the first row. If ``end`` is not define
 
 ---
 
-### method `group_table_by_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1713)
-
+### method `group_table_by_column`
+**Source:** [`tables.py:1713`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1713)
 
 ```python
 group_table_by_column(table: Table, column: Union[int, str]) → List[Table]
@@ -1174,8 +1162,8 @@ Group a table by ``column`` and return a list of grouped Tables.
 
 ---
 
-### method `map_column_values` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1804)
-
+### method `map_column_values`
+**Source:** [`tables.py:1804`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1804)
 
 ```python
 map_column_values(table: Table, column: Union[int, str], func: Callable, *args)
@@ -1209,8 +1197,8 @@ The cell value will be given as the first argument to the mapping keyword.
 
 ---
 
-### method `merge_tables` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1097)
-
+### method `merge_tables`
+**Source:** [`tables.py:1097`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1097)
 
 ```python
 merge_tables(*tables: Table, index: Optional[str] = None) → Table
@@ -1250,8 +1238,8 @@ products = tables.merge_tables(prices, stock, index="Name")for product in produc
 
 ---
 
-### method `pop_table_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1448)
-
+### method `pop_table_column`
+**Source:** [`tables.py:1448`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1448)
 
 ```python
 pop_table_column(
@@ -1286,8 +1274,8 @@ Remove column from table and return it.
 
 ---
 
-### method `pop_table_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1418)
-
+### method `pop_table_row`
+**Source:** [`tables.py:1418`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1418)
 
 ```python
 pop_table_row(
@@ -1324,8 +1312,8 @@ Remove row from table and return it.
 
 ---
 
-### method `read_table_from_csv` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1912)
-
+### method `read_table_from_csv`
+**Source:** [`tables.py:1912`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1912)
 
 ```python
 read_table_from_csv(
@@ -1376,8 +1364,8 @@ If the source data has a header and rows have more fields than the header define
 
 ---
 
-### method `rename_table_columns` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1205)
-
+### method `rename_table_columns`
+**Source:** [`tables.py:1205`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1205)
 
 ```python
 rename_table_columns(
@@ -1412,8 +1400,8 @@ The renaming will be done in-place.
 
 ---
 
-### method `set_row_as_column_names` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1512)
-
+### method `set_row_as_column_names`
+**Source:** [`tables.py:1512`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1512)
 
 ```python
 set_row_as_column_names(table: Table, row: Union[int, str])
@@ -1437,8 +1425,8 @@ Set existing row as names for columns.
 
 ---
 
-### method `set_table_cell` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1604)
-
+### method `set_table_cell`
+**Source:** [`tables.py:1604`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1604)
 
 ```python
 set_table_cell(
@@ -1475,8 +1463,8 @@ Set a cell value in a table.
 
 ---
 
-### method `set_table_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1393)
-
+### method `set_table_column`
+**Source:** [`tables.py:1393`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1393)
 
 ```python
 set_table_column(table: Table, column: Union[int, str], values: Any)
@@ -1505,8 +1493,8 @@ The ``values`` can either be a list of values, one for each row, or one single v
 
 ---
 
-### method `set_table_row` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1361)
-
+### method `set_table_row`
+**Source:** [`tables.py:1361`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1361)
 
 ```python
 set_table_row(table: Table, row: Union[int, str], values: Any)
@@ -1541,8 +1529,8 @@ Set table row    ${table}    2    ${NONE}
 
 ---
 
-### method `sort_table_by_column` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1690)
-
+### method `sort_table_by_column`
+**Source:** [`tables.py:1690`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1690)
 
 ```python
 sort_table_by_column(
@@ -1573,8 +1561,8 @@ Sort a table in-place according to ``column``.
 
 ---
 
-### method `table_head` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1529)
-
+### method `table_head`
+**Source:** [`tables.py:1529`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1529)
 
 ```python
 table_head(
@@ -1607,8 +1595,8 @@ Return first ``count`` rows from a table.
 
 ---
 
-### method `table_tail` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1551)
-
+### method `table_tail`
+**Source:** [`tables.py:1551`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1551)
 
 ```python
 table_tail(
@@ -1643,8 +1631,8 @@ Return last ``count`` rows from a table.
 
 ---
 
-### method `trim_column_names` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1888)
-
+### method `trim_column_names`
+**Source:** [`tables.py:1888`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1888)
 
 ```python
 trim_column_names(table: Table)
@@ -1669,8 +1657,8 @@ The filtering will be done in-place.
 
 ---
 
-### method `trim_empty_rows` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1863)
-
+### method `trim_empty_rows`
+**Source:** [`tables.py:1863`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1863)
 
 ```python
 trim_empty_rows(table: Table)
@@ -1695,8 +1683,8 @@ Trim empty rows    ${table}
 
 ---
 
-### method `write_table_to_csv` [![Source](https://img.shields.io/badge/-source-cccccc?style=flat-square)](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1999)
-
+### method `write_table_to_csv`
+**Source:** [`tables.py:1999`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L1999)
 
 ```python
 write_table_to_csv(
