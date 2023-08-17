@@ -125,7 +125,8 @@ export const updateExpanded = (
   ids: string[],
   forceMode: 'expand' | 'collapse' | 'toggle' | 'expandSubTree' | 'collapseSubTree',
   scrollIntoView: boolean,
-) => {
+): boolean => {
+  let changedSomething = false;
   setExpandedEntries((curr: Set<string>) => {
     let cp = undefined;
 
@@ -182,6 +183,7 @@ export const updateExpanded = (
     } else if (forceMode === 'collapseSubTree') {
       cp = updateSubtree(curr, ids, entriesInfo, forceMode);
     }
+    changedSomething = cp !== undefined;
 
     if (cp !== undefined) {
       if (scrollIntoView) {
@@ -233,4 +235,5 @@ export const updateExpanded = (
     }
     return curr;
   });
+  return changedSomething;
 };

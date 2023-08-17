@@ -12,7 +12,7 @@ import {
 import { styled } from '@robocorp/theme';
 import './components/step/step.css';
 
-import { formatDuration, formatLocation, useLogContext } from '~/lib';
+import { entryIdDepth, entryIdParent, formatDuration, formatLocation, useLogContext } from '~/lib';
 import { Cell } from './components/Cell';
 import { StepCell } from './components/step/StepCell';
 import { isInVSCode } from '~/vscode/vscodeComm';
@@ -143,7 +143,21 @@ export const RowCellsContainer: FC<Props> = ({ index, style, ...rest }) => {
       } else if (event.key === 'ArrowLeft') {
         event.stopPropagation();
         event.preventDefault();
-        updateExpandState(entry.id, 'collapse', true);
+        if (!updateExpandState(entry.id, 'collapse', true)) {
+          const parentId = entryIdParent(entry.id);
+          if (parentId !== undefined) {
+            const parentEntry = entriesInfo.getEntryFromId(parentId);
+            if (parentEntry !== undefined) {
+              setFocusIndexAndScroll(
+                setFocusIndex,
+                setScrollToItem,
+                scrollInfo,
+                entriesInfo,
+                parentEntry,
+              );
+            }
+          }
+        }
       } else if (event.key === ' ') {
         event.stopPropagation();
         event.preventDefault();

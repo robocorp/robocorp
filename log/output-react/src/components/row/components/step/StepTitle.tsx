@@ -1,4 +1,4 @@
-import { FC, MouseEvent, useCallback, useState } from 'react';
+import { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 import { Box, Tooltip, Typography } from '@robocorp/components';
 import './step.css';
 
@@ -19,7 +19,7 @@ import {
   EntryElse,
   EntryAssertFailed,
 } from '~/lib/types';
-import { useLogContext } from '~/lib';
+import { truncateString, useLogContext } from '~/lib';
 import { IconDoubleChevronDown, IconDoubleChevronUp } from '@robocorp/icons/iconic';
 
 type Props = {
@@ -76,10 +76,13 @@ export const getTitle = (entry: Entry): string => {
 };
 
 export const StepTitle: FC<Props> = ({ entry }) => {
-  const title = getTitle(entry);
-  if (!title) {
-    return <></>;
-  }
+  const title = useMemo(() => {
+    const ret = getTitle(entry);
+    if (!ret) {
+      return ret;
+    }
+    return truncateString(ret, 80);
+  }, [entry]);
 
   const { setDetailsIndex, updateExpandState, entriesInfo } = useLogContext();
   const [hover, setHover] = useState(false);
@@ -117,6 +120,10 @@ export const StepTitle: FC<Props> = ({ entry }) => {
     },
     [entry, updateExpandState],
   );
+
+  if (!title) {
+    return <></>;
+  }
 
   return (
     <Box

@@ -17,6 +17,8 @@ on:
     paths:
       - "integration_tests/**"
       - "browser/**"
+      - "tasks/**"
+      - "log/**"
       - ".github/workflows/integration_tests.yml"
 
 defaults:

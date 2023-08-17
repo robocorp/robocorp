@@ -6,6 +6,7 @@
 - `continue` and `break` inside a loop are properly handled.
 - `continue` and `break` are now shown in the logs.
 - It's now possible to expand / collapse recursively in `log.html`.
+- `log.html`: When navigating using left arrow, if the element is already collapsed the parent is focused.
 - Spec version changed from `0.0.3` to `0.0.4`.
 - `re.Pattern` is now accepted at `add_sensitive_variable_name_pattern`.
 

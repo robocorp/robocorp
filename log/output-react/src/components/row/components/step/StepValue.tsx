@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, MouseEvent } from 'react';
+import { FC, ReactNode, useCallback, MouseEvent, useMemo } from 'react';
 import { Box, Typography } from '@robocorp/components';
 import { styled } from '@robocorp/theme';
 import './step.css';
@@ -25,6 +25,7 @@ import {
   formatArguments,
   replaceNewLineChars,
   sanitizeHTML,
+  truncateString,
 } from '~/lib/helpers';
 import { useLogContext } from '~/lib';
 
@@ -105,7 +106,19 @@ export const getValue = (entry: Entry): ReactNode | string => {
 };
 
 export const StepValue: FC<Props> = ({ entry }) => {
-  const value = getValue(entry);
+  const value = useMemo(() => {
+    const ret = getValue(entry);
+    if (!ret) {
+      return ret;
+    }
+    if (typeof ret === 'string') {
+      // In Firefox providing a big string makes the layout engine
+      // work very slowly (not really an issue on Chrome).
+      return truncateString(ret, 300);
+    }
+    return ret;
+  }, [entry]);
+
   const isString = typeof value === 'string';
   const { setDetailsIndex } = useLogContext();
 

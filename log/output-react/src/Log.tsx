@@ -162,7 +162,7 @@ export const Log = () => {
       if (typeof ids === 'string') {
         ids = [ids];
       }
-      updateExpanded(
+      return updateExpanded(
         setExpandedEntries,
         setInvalidateTree,
         scrollInfo,

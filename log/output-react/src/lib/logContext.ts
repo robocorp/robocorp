@@ -101,7 +101,7 @@ export type LogContextType = {
     id: string | string[],
     forceMode: 'expand' | 'toggle' | 'collapse' | 'expandSubTree' | 'collapseSubTree',
     scrollIntoView: boolean,
-  ) => void;
+  ) => boolean;
   detailsIndex: DetailsIndexType;
   setDetailsIndex: Dispatch<SetStateAction<DetailsIndexType>>;
   focusIndex: FocusIndexType;
@@ -171,7 +171,7 @@ export const defaultLogState: LogContextType = {
   isExpanded: (id: string) => {
     return false;
   },
-  updateExpandState: () => null,
+  updateExpandState: () => true,
   detailsIndex: null,
   setDetailsIndex: () => null,
   focusIndex: null,

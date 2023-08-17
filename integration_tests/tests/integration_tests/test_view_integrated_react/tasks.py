@@ -117,20 +117,29 @@ def case_failure():
 
 
 def collect_full_tree_contents(
-    parent_id="", has_filter=False, force_name_and_value=False
+    parent_id="", has_filter=False, force_name_and_value=False, expand_tree=True
 ):
     found = {}
+    page = browser.page()
     for i in range(100):
         # Because the tree is a virtual tree, we need to scroll to find new
         # elements added.
-        browser.page().mouse.wheel(0, 30)
+        page.mouse.wheel(0, 30)
 
         if parent_id:
             entry_id = f"{parent_id}-{i}"
         else:
             entry_id = f"#root{i}"
-        element_name = browser.page().query_selector(f"{entry_id} > .entryName")
-        element_value = browser.page().query_selector(f"{entry_id} > .entryValue")
+            if expand_tree:
+                # If this is the root, let's expand it recursively.
+                toggle_expand = page.query_selector(f"{entry_id} > .toggleExpand")
+                if toggle_expand:
+                    page.hover(f"{entry_id} > .entryName")
+                    page.wait_for_selector(".expandButton")
+                    page.query_selector(".expandButton").click()
+
+        element_name = page.query_selector(f"{entry_id} > .entryName")
+        element_value = page.query_selector(f"{entry_id} > .entryValue")
 
         if element_name is not None or element_value is not None:
             if element_name is None:
@@ -155,11 +164,13 @@ def collect_full_tree_contents(
                 continue
             return found
 
-        expand = browser.page().query_selector(f"{entry_id} > .toggleExpand")
-        if expand:
-            expand.click()
+        toggle_expand = page.query_selector(f"{entry_id} > .toggleExpand")
+        if toggle_expand:
+            # toggle_expand.click()
             found.update(
-                collect_full_tree_contents(entry_id, has_filter, force_name_and_value)
+                collect_full_tree_contents(
+                    entry_id, has_filter, force_name_and_value, expand_tree=False
+                )
             )
 
     if not has_filter:
@@ -260,7 +271,7 @@ def case_log():
 
 
 @task
-def case_filter():
+def case_search():
     """
     Checks whether the output view works as expected for us.
 
@@ -276,26 +287,34 @@ def case_filter():
     locator = page.get_by_placeholder("Search logs")
     locator.type("some")
 
-    full_tree_contents = collect_full_tree_contents(has_filter=True)
+    # Note: we're not expanding the tree because we want to know what was auto-expanded
+    # (so, we only want what's already visible as the search will auto-expand
+    # up to the first match).
+    full_tree_contents = collect_full_tree_contents(has_filter=True, expand_tree=False)
 
     found = []
     for name, value in full_tree_contents.items():
         found.append(f"{name} {value}".strip())
 
     expected = """
+#root0 Collect tasks
 #root1 case_log
 #root1-0 case_log
 #root1-0-0 add_log_in_method
 #root1-0-0-0 Some info message
 #root1-0-0-1 Some warn message
 #root1-0-0-2 Some critical message
-#root1-0-2 print_in_another                                               
-#root1-0-2-0 Some message in stdout                                       
-#root1-0-2-1 Some message in stderr    
+#root1-0-1 add_html_log_in_method
+#root1-0-2 print_in_another
+#root2 Teardown tasks
 """
     compare_strlist(
         found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
     )
+
+    # Check tha the first message was selected.
+    selected_text = page.locator(".selection-visible-light").text_content()
+    assert selected_text == "  INFOSome info messagetasks:48"
 
 
 @task
@@ -376,7 +395,7 @@ def case_big_structures():
     for name, value in full_tree_contents.items():
         found.append(f"{name} {value}".strip())
 
-    expected = """
+    expected = r"""
 #root0 Simple Task -
 #root0-0 check -
 #root0-0-0 a - [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] (list)
@@ -384,11 +403,10 @@ def case_big_structures():
 #root0-0-2 dct2 - {1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'some key': 'some value', 'another': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}} (dict)
 #root0-0-3 date - {'beautiful output': datetime.datetime(2017, 12, 12, 0, 43, 4, 752094)} (dict)
 #root0-0-4 mydata - MyData(one='one', two='two') (MyData)
-#root0-0-5 bigmultiline - '\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n' (str)
-#root0-0-6 WrapAStr.__init__ - s='\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n'
-#root0-0-7 wrapped - WrapStr(\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n) (WrapAStr)
-#root0-0-8 callit - arg={1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'some key': 'some value', 'another': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}}, date={'beautiful output': datetime.datetime(2017, 12, 12, 0, 43, 4, 752094)}, mydata=MyData(one='one', two='two'), bigmultiline='\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n', wrapped=WrapStr(\\nThis is a big multiline\\nstring.\\n\\nThe text that is in this string\\ndoes span across multiple lines.\\n\\nIt should appear well in logs anyways!\\n)
-"""
+#root0-0-5 bigmultiline - '\nThis is a big multiline\nstring.\n\nThe text that is in this string\ndoes span across multiple lines.\n\nIt should appear well in logs anyways!\n' (str)
+#root0-0-6 WrapAStr.__init__ - s='\nThis is a big multiline\nstring.\n\nThe text that is in this string\ndoes span across multiple lines.\n\nIt should appear well in logs anyways!\n'
+#root0-0-7 wrapped - WrapStr(\nThis is a big multiline\nstring.\n\nThe text that is in this string\ndoes span across multiple lines.\n\nIt should appear well in logs anyways!\n) (WrapAStr)
+#root0-0-8 callit - arg={1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 'some key': 'some value', 'another': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 12, 13: 13, 14: 14, 15: 15, 16: 16, 17: 17, 18: 18, 19: 19}}, date={'beautiful output': datetime.da..."""
     compare_strlist(
         found, [x.strip() for x in expected.splitlines(keepends=False) if x.strip()]
     )

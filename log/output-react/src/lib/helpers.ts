@@ -24,11 +24,28 @@ import {
 import * as DOMPurify from 'dompurify';
 
 export function entryDepth(entry: Entry) {
-  return entry.id.split('-').length - 1;
+  return entryIdDepth(entry.id);
 }
 
 export function entryIdDepth(id: string) {
   return id.split('-').length - 1;
+}
+
+export function entryIdParent(id: string): string | undefined {
+  const i = id.lastIndexOf('-');
+  let parentId: string | undefined = undefined;
+  if (i > 0) {
+    parentId = id.substring(0, i);
+  }
+  return parentId;
+}
+
+export function truncateString(str: string, maxLength: number): string {
+  if (str.length <= maxLength) {
+    return str;
+  } else {
+    return str.substring(0, maxLength - 3) + '...';
+  }
 }
 
 export const findMinAndMax = (numbers: number[]): [number, number] => {
