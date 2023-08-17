@@ -99,7 +99,7 @@ export type LogContextType = {
   entriesInfo: EntriesInfo;
   updateExpandState: (
     id: string | string[],
-    forceMode: 'expand' | 'toggle' | 'collapse',
+    forceMode: 'expand' | 'toggle' | 'collapse' | 'expandSubTree' | 'collapseSubTree',
     scrollIntoView: boolean,
   ) => void;
   detailsIndex: DetailsIndexType;

@@ -5,6 +5,7 @@
 - `if` statements now create a scope in `log.html` (when the function is not a generator).
 - `continue` and `break` inside a loop are properly handled.
 - `continue` and `break` are now shown in the logs.
+- It's now possible to expand / collapse recursively in `log.html`.
 - Spec version changed from `0.0.3` to `0.0.4`.
 - `re.Pattern` is now accepted at `add_sensitive_variable_name_pattern`.
 

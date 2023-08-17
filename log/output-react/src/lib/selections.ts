@@ -3,7 +3,7 @@ import { AnyIndexType, InvalidateTree } from './logContext';
 import { getNextMtime, wasMtimeHandled } from './mtime';
 import { EntriesInfo, Entry, InfoForScroll, getIndexInTree } from './types';
 import { setScrollToChildrenOf, clearScrollToInfo } from './scroll';
-import { IDChecker } from './helpers';
+import { IDChecker, entryDepth } from './helpers';
 
 export const doesEntryMatchIndex = (entry: Entry, focusIndex: AnyIndexType): boolean => {
   if (focusIndex && focusIndex.indexAll === entry.entryIndexAll) {
@@ -57,6 +57,59 @@ export const getChildrenIndexesInTree = (
   return indexes;
 };
 
+const updateSubtree = (
+  curr: Set<string>,
+  ids: string[],
+  entriesInfo: EntriesInfo,
+  forceMode: 'expandSubTree' | 'collapseSubTree',
+): Set<string> | undefined => {
+  let cp: Set<string> | undefined = new Set<string>(curr);
+  let initialSize = cp.size;
+
+  const expand = forceMode === 'expandSubTree';
+
+  for (const id of ids) {
+    const entry = entriesInfo.getEntryFromId(id);
+    if (entry === undefined) {
+      continue;
+    }
+
+    let indexInArray = entry.entryIndexAll;
+    const allEntries = entriesInfo.allEntries;
+    const initialDepth = entryDepth(entry);
+
+    // Expand/collapse the initial one.
+    if (expand) {
+      cp.add(entry.id);
+    } else {
+      cp.delete(entry.id);
+    }
+    indexInArray++;
+
+    // Expand/collapse all children.
+    for (; indexInArray < allEntries.length; indexInArray++) {
+      const entry = allEntries[indexInArray];
+      const depth = entryDepth(entry);
+      if (depth > initialDepth) {
+        if (expand) {
+          cp.add(entry.id);
+        } else {
+          cp.delete(entry.id);
+        }
+      } else {
+        // We can stop as soon as we find an entry which is not a child
+        // as it's guaranteed to be ordered.
+        break;
+      }
+    }
+  }
+  if (cp.size === initialSize) {
+    // Nothing changed, so, nothing needs to be updated.
+    cp = undefined;
+  }
+  return cp;
+};
+
 /**
  * There are some restrictions in this function:
  *
@@ -70,7 +123,7 @@ export const updateExpanded = (
   scrollInfo: MutableRefObject<InfoForScroll>,
   entriesInfo: EntriesInfo,
   ids: string[],
-  forceMode: 'expand' | 'collapse' | 'toggle',
+  forceMode: 'expand' | 'collapse' | 'toggle' | 'expandSubTree' | 'collapseSubTree',
   scrollIntoView: boolean,
 ) => {
   setExpandedEntries((curr: Set<string>) => {
@@ -85,7 +138,7 @@ export const updateExpanded = (
       if (ids.length !== 1) {
         // It could be done, but let's keep it simple untill we have the use case
         // (i.e.: compute the entryWithLowestIndex).
-        throw new Error('To scroll into the view just one array is supported.');
+        throw new Error('To scroll into the view just one entry is supported.');
       }
     }
 
@@ -124,6 +177,10 @@ export const updateExpanded = (
           cp.add(id);
         }
       }
+    } else if (forceMode === 'expandSubTree') {
+      cp = updateSubtree(curr, ids, entriesInfo, forceMode);
+    } else if (forceMode === 'collapseSubTree') {
+      cp = updateSubtree(curr, ids, entriesInfo, forceMode);
     }
 
     if (cp !== undefined) {

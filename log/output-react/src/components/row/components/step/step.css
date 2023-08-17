@@ -9,3 +9,16 @@
 .selection-visible-light {
   background-color: yellow;
 }
+
+.expandButton {
+  position: absolute;
+  z-index: 10;
+  top: 3px;
+  margin-left: 1em;
+}
+
+.collapseButton {
+  position: absolute;
+  z-index: 10;
+  top: 3px;
+}

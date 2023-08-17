@@ -128,28 +128,6 @@ export const Log = () => {
     });
   }, []);
 
-  const updateExpandState = useCallback(
-    (
-      ids: string | string[],
-      forceMode: 'expand' | 'collapse' | 'toggle',
-      scrollIntoView: boolean,
-    ) => {
-      if (typeof ids === 'string') {
-        ids = [ids];
-      }
-      updateExpanded(
-        setExpandedEntries,
-        setInvalidateTree,
-        scrollInfo,
-        entriesInfo,
-        ids,
-        forceMode,
-        scrollIntoView,
-      );
-    },
-    [],
-  );
-
   // Remove items filtered out.
   const filtered: Entry[] = useMemo(() => {
     return applyEntriesFilters(entriesInput.allEntries, viewSettings.treeFilterInfo);
@@ -174,6 +152,28 @@ export const Log = () => {
       },
     };
   }, [filtered, expandedEntries, entriesInput]);
+
+  const updateExpandState = useCallback(
+    (
+      ids: string | string[],
+      forceMode: 'expand' | 'collapse' | 'toggle' | 'expandSubTree' | 'collapseSubTree',
+      scrollIntoView: boolean,
+    ) => {
+      if (typeof ids === 'string') {
+        ids = [ids];
+      }
+      updateExpanded(
+        setExpandedEntries,
+        setInvalidateTree,
+        scrollInfo,
+        entriesInfo,
+        ids,
+        forceMode,
+        scrollIntoView,
+      );
+    },
+    [entriesInfo],
+  );
 
   const ctx: LogContextType = {
     entriesInfo,

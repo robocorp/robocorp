@@ -1,5 +1,6 @@
-import { FC, MouseEvent, useCallback } from 'react';
-import { Box, Typography } from '@robocorp/components';
+import { FC, MouseEvent, useCallback, useState } from 'react';
+import { Box, Tooltip, Typography } from '@robocorp/components';
+import './step.css';
 
 import {
   Entry,
@@ -19,6 +20,7 @@ import {
   EntryAssertFailed,
 } from '~/lib/types';
 import { useLogContext } from '~/lib';
+import { IconDoubleChevronDown, IconDoubleChevronUp } from '@robocorp/icons/iconic';
 
 type Props = {
   entry: Entry;
@@ -79,14 +81,41 @@ export const StepTitle: FC<Props> = ({ entry }) => {
     return <></>;
   }
 
-  const { setDetailsIndex } = useLogContext();
+  const { setDetailsIndex, updateExpandState, entriesInfo } = useLogContext();
+  const [hover, setHover] = useState(false);
 
   const onClickShowDetails = useCallback(
     (e: MouseEvent) => {
       e.stopPropagation();
       setDetailsIndex({ indexAll: entry.entryIndexAll });
     },
-    [entry],
+    [entry, setDetailsIndex],
+  );
+
+  const onMouseEnter = useCallback((e: MouseEvent) => {
+    setHover(true);
+  }, []);
+
+  const onMouseLeave = useCallback((e: MouseEvent) => {
+    setHover(false);
+  }, []);
+
+  const onClickExpandSubtree = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      updateExpandState(entry.id, 'expandSubTree', true);
+    },
+    [entry, updateExpandState],
+  );
+
+  const onClickCollapseSubtree = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      updateExpandState(entry.id, 'collapseSubTree', false);
+    },
+    [entry, updateExpandState],
   );
 
   return (
@@ -94,10 +123,28 @@ export const StepTitle: FC<Props> = ({ entry }) => {
       minWidth={0}
       className="entryName"
       onClick={onClickShowDetails}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       style={{ cursor: 'pointer' }}
     >
-      <Typography mr="$24" lineHeight="$32" variant="body.small" fontWeight="medium" truncate={1}>
+      <Typography mr="$32" lineHeight="$32" variant="body.small" fontWeight="medium" truncate={1}>
         {title}
+        {hover && entriesInfo.treeEntries.entriesWithChildren.has(entry.id) ? (
+          <>
+            <Tooltip text="Collapse subtree">
+              <span onClick={onClickCollapseSubtree} className="collapseButton">
+                <IconDoubleChevronUp color="magenta60" size={'medium'} />
+              </span>
+            </Tooltip>
+            <Tooltip text="Expand subtree">
+              <span onClick={onClickExpandSubtree} className="expandButton">
+                <IconDoubleChevronDown color="magenta60" size={'medium'} />
+              </span>
+            </Tooltip>
+          </>
+        ) : (
+          <></>
+        )}
       </Typography>
     </Box>
   );
