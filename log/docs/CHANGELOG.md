@@ -3,6 +3,8 @@
 ## Unreleased
 
 - `if` statements now create a scope in `log.html` (when the function is not a generator).
+- If an exception has a cause or context the context/cause is now shown in the log 
+  - (i.e.: when an exception is raised from another exception or is raised while handling another exception all exceptions are shown).
 - `continue` and `break` inside a loop are properly handled.
 - `continue` and `break` are now shown in the logs.
 - It's now possible to expand / collapse recursively in `log.html`.
