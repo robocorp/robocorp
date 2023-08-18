@@ -1,5 +1,9 @@
 # Changelog
 
+## UNRELEASED
+
+- When browsers are installed with playwright additional logging is added.
+
 ## 2.1.0 - 2023-08-04
 
 - It's now possible to configure the keyword arguments used to create the playwright browser context with:
