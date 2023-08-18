@@ -94,7 +94,7 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
                     line: bytes = stream.readline()
                     if line.endswith(b"\r\n"):
                         line = line[:-2]
-                    elif line.endswith((b"\r", b"\r\n")):
+                    elif line.endswith((b"\r", b"\n")):
                         line = line[:-1]
                     if not line:
                         break
