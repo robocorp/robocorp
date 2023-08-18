@@ -20,7 +20,9 @@ def open_output_view_for_tests():
             'to be built with "npm run build:tests").'
         )
 
-    browser.configure(headless="pydevd" not in sys.modules)
+    # Note: set a big viewport height so that the virtual tree shows
+    # all the elements we expect.
+    browser.configure(headless="pydevd" not in sys.modules, viewport_size=(1024, 2000))
     page = browser.goto(filepath.as_uri())
 
     return page
@@ -122,10 +124,6 @@ def collect_full_tree_contents(
     found = {}
     page = browser.page()
     for i in range(100):
-        # Because the tree is a virtual tree, we need to scroll to find new
-        # elements added.
-        page.mouse.wheel(0, 30)
-
         if parent_id:
             entry_id = f"{parent_id}-{i}"
         else:
@@ -290,7 +288,7 @@ def case_search():
     # Note: we're not expanding the tree because we want to know what was auto-expanded
     # (so, we only want what's already visible as the search will auto-expand
     # up to the first match).
-    full_tree_contents = collect_full_tree_contents(has_filter=True, expand_tree=False)
+    full_tree_contents = collect_full_tree_contents(expand_tree=False)
 
     found = []
     for name, value in full_tree_contents.items():
