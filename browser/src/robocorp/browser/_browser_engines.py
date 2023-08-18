@@ -141,6 +141,10 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
 
         reported_from = 0
         returncode = None
+        log.info(
+            "Browser install (with playwright) in process "
+            "(see debug messages for more information)."
+        )
         while returncode is None:
             try:
                 returncode = future.result(10)
@@ -149,15 +153,11 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
 
             if stdout_lines:
                 with stdout_lines_lock:
-                    last = stdout_lines[-1].decode(encoding, "replace")
                     add_to_debug = stdout_lines[reported_from:]
                     reported_from = len(stdout_lines)
 
                 for line in add_to_debug:
                     log.debug(line.decode(encoding, "replace"))
-                log.info(f"Playwright browser install in process. Last output: {last}")
-            else:
-                log.info("Playwright browser install in process.")
 
         if returncode != 0:
             stdout = b"\n".join(stdout_lines).decode(encoding, "replace")

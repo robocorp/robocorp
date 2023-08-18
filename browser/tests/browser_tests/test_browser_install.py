@@ -32,9 +32,8 @@ def test_playwright_browser_install(datadir, robocorp_task_runner: RobocorpTaskR
             {
                 "message_type": "L",
                 "level": "I",
-                "__check__": lambda dct: dct["message"].startswith(
-                    "Playwright browser install in process. Last output:"
-                ),
+                "message": "Browser install (with playwright) in process "
+                "(see debug messages for more information).",
             },
             {
                 "message_type": "L",
