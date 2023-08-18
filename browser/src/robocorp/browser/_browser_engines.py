@@ -2,9 +2,13 @@ import os
 import platform
 import subprocess
 import sys
+import threading
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
+from typing import BinaryIO, List
+
+from robocorp import log
 
 
 class InstallError(RuntimeError):
@@ -46,6 +50,8 @@ def browsers_path() -> Path:
 
 
 def install_browser(engine: BrowserEngine, force=False, interactive=False):
+    from concurrent import futures
+
     cmd = [sys.executable, "-m", "playwright", "install"]
     if force:
         cmd.append("--force")
@@ -54,18 +60,86 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
     cmd.append(name)
 
     env = dict(os.environ)
-    env["PLAYWRIGHT_BROWSERS_PATH"] = str(browsers_path())
+    path = str(browsers_path())
+    env["PLAYWRIGHT_BROWSERS_PATH"] = path
+    log.info(f"Installing browsers at: {path} (interactive: {interactive}).")
 
-    result = subprocess.run(
-        cmd,
-        capture_output=not interactive,
-        start_new_session=not interactive,
-        text=True,
-        env=env,
-    )
+    if interactive:
+        # This can take a while, but the output should be seen in 'sys.stderr',
+        # so, no additional handling done.
+        result = subprocess.run(cmd, env=env)
 
-    if result.returncode != 0:
-        if not interactive:
-            raise InstallError(f"Failed to install {name}:\n{result.stdout}")
-        else:
+        if result.returncode != 0:
             raise InstallError(f"Failed to install {name}")
+    else:
+        # Note: this can take a while (especially with a slow network connection
+        # so, display some information if it's not interactive the user is not
+        # supposed to see the output in sys.stderr, but we can still log
+        # something).
+
+        def _stream_reader(stream: BinaryIO, lst: List[bytes]) -> None:
+            try:
+                while True:
+                    line: bytes = stream.readline()
+                    if not line:
+                        break
+                    lst.append(line)
+            except Exception:
+                pass
+
+        future: "futures.Future[int]" = futures.Future()
+        stdout_lines: List[bytes] = []
+
+        def install_in_thread():
+            try:
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    env=env,
+                    bufsize=0,
+                )
+
+                threading.Thread(
+                    target=_stream_reader,
+                    args=(process.stdout, stdout_lines),
+                    name="Playwright browser install stdout reader",
+                    daemon=True,
+                ).start()
+
+                returncode = process.wait()
+                future.set_result(returncode)
+            except BaseException as e:
+                future.set_exception(e)
+                raise
+
+        t = threading.Thread(
+            target=install_in_thread,
+            name="Playwright browser install thread",
+            daemon=True,
+        )
+        t.start()
+
+        import locale
+
+        encoding = locale.getpreferredencoding()
+
+        while True:
+            t.join(30)
+            if not t.is_alive():
+                break
+            if stdout_lines:
+                # The GIL is our friend (access stdout_lines without a lock).
+                last = stdout_lines[-1].decode(encoding, "replace")
+                log.info(f"Playwright browser install in process. Last output: {last}")
+            else:
+                log.info("Playwright browser install in process.")
+
+        returncode = future.result()
+        if returncode != 0:
+            stdout = b"".join(stdout_lines).decode(encoding, "replace")
+            raise InstallError(
+                f"Failed to install {name}\n"
+                + f"Return code: {returncode}\n"
+                + f"Output: {stdout}\n"
+            )
