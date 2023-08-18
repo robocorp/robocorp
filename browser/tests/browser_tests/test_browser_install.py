@@ -1,5 +1,4 @@
 from devutils.fixtures import RobocorpTaskRunner
-from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
 
 
 def test_playwright_browser_install(datadir, robocorp_task_runner: RobocorpTaskRunner):
@@ -9,7 +8,6 @@ def test_playwright_browser_install(datadir, robocorp_task_runner: RobocorpTaskR
         ["run", "-t", "check_browser_install"], returncode=1, cwd=datadir
     )
     assert robocorp_task_runner.log_html
-    print(pretty_format_logs_from_log_html(robocorp_task_runner.log_html))
     verify_log_messages_from_log_html(
         robocorp_task_runner.log_html,
         [
