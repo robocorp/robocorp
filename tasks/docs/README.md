@@ -54,8 +54,8 @@ is found an error will be given and no tasks will be run.
 
 ## Guides
 
-- [Logging customization](https://github.com/robocorp/robo/blob/master/tasks/docs/guides/logging-customization.md)
-- [Output customization](https://github.com/robocorp/robo/blob/master/tasks/docs/guides/output-customization.md)
+- [Logging customization](https://github.com/robocorp/robo/blob/master/tasks/docs/guides/00-logging-customization.md)
+- [Output customization](https://github.com/robocorp/robo/blob/master/tasks/docs/guides/01-output-customization.md)
 
 ## API Reference
 

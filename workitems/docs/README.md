@@ -50,11 +50,13 @@ requires no additional setup from the user.
 
 ## Guides
 
-- [Reserving and releasing input items](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/reserving-inputs.md)
-- [Creating outputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/creating-outputs.md)
-- [Email triggering](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/email-triggering.md)
-- [Advanced patterns](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/advanced-patterns.md)
-- [Local development](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/local-development.md)
+- [Reserving and releasing input items](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/00-reserving-inputs.md)
+- [Creating outputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/01-creating-outputs.md)
+- [Local development](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/02-local-development.md)
+- [Email triggering](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/03-email-triggering.md)
+- [Collecting all inputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/04-collecting-inputs.md)
+- [Flow control with exceptions](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/05-input-exceptions.md)
+- [Modifying inputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/06-modifying-inputs.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 

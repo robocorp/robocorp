@@ -53,7 +53,7 @@ def login():
 
 ## Guides
 
-- [Browser configuration](https://github.com/robocorp/robo/blob/master/browser/docs/guides/configuration.md)
+- [Browser configuration](https://github.com/robocorp/robo/blob/master/browser/docs/guides/00-configuration.md)
 
 ## API Reference
 

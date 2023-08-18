@@ -16,7 +16,7 @@ def store_email():
 
 ## Guides
 
-- [Handling different asset types](https://github.com/robocorp/robo/blob/master/storage/docs/guides/asset-types.md)
+- [Handling different asset types](https://github.com/robocorp/robo/blob/master/storage/docs/guides/00-asset-types.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 

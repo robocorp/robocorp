@@ -63,8 +63,8 @@ be automatically logged.
 
 ## Guides
 
-- [Dealing with sensitive data](https://github.com/robocorp/robo/blob/master/log/docs/guides/sensitive-data.md)
-- [The `.robolog` format](https://github.com/robocorp/robo/blob/master/log/docs/guides/robolog-format.md)
+- [Dealing with sensitive data](https://github.com/robocorp/robo/blob/master/log/docs/guides/00-sensitive-data.md)
+- [The `.robolog` format](https://github.com/robocorp/robo/blob/master/log/docs/guides/01-robolog-format.md)
 
 ## API Reference
 
