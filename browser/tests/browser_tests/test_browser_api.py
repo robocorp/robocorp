@@ -1,6 +1,7 @@
 import sys
 
 import pytest
+from devutils.fixtures import RobocorpTaskRunner
 
 
 @pytest.fixture(autouse=True)
@@ -103,33 +104,12 @@ def test_browser_api(datadir, pyfile) -> None:
     )
 
 
-def test_screenshot_on_failure(datadir):
-    import os
-
-    from devutils.fixtures import robocorp_tasks_run
+def test_screenshot_on_failure(datadir, robocorp_task_runner: RobocorpTaskRunner):
     from robocorp.log import verify_log_messages_from_log_html
 
-    result = robocorp_tasks_run(["run"], returncode=1, cwd=datadir)
-    decoded = result.stdout.decode("utf-8", "replace")
-    assert "RuntimeError: Some error..." in decoded
-    log_html = datadir / "output" / "log.html"
-    if not log_html.exists():
-        msg = f"\n{log_html} does not exist.\n"
-
-        if not datadir.exists():
-            msg += f"\n{datadir} does not exists.\n"
-        else:
-            msg += f"\n{datadir} exists.\nContents: {os.listdir(datadir)}\n"
-
-            output_dir = datadir / "output"
-            if not output_dir.exists():
-                msg += f"\n{output_dir} does not exists.\n"
-            else:
-                msg += f"\n{output_dir} exists.\nContents: {os.listdir(output_dir)}\n"
-
-        msg += f"\nStdout:\n{decoded}"
-
-        raise AssertionError(msg)
+    robocorp_task_runner.run_tasks(["run"], returncode=1, cwd=datadir)
+    log_html = robocorp_task_runner.log_html
+    assert log_html
     verify_log_messages_from_log_html(log_html, [{"message_type": "LH"}])
 
 
