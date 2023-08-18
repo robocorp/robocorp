@@ -339,7 +339,7 @@ def test_inputs_iter_explicit_release(inputs):
         item.done()
 
 
-def test_inputs_throw_business_exception(inputs, adapter):
+def test_inputs_context_raise(inputs, adapter):
     inputs.current.done()
 
     with inputs.reserve():
@@ -350,6 +350,19 @@ def test_inputs_throw_business_exception(inputs, adapter):
     assert exception["type"] == "BUSINESS"
     assert exception["code"] == "SOME_CODE"
     assert exception["message"] == "My message"
+
+
+def test_inputs_loop_raise(inputs, adapter):
+    for inp in inputs:
+        with inp:
+            raise BusinessException(message="My message", code="SOME_CODE")
+
+    assert len(adapter.releases) == 2
+    for _, state, exception in adapter.releases:
+        assert state is State.FAILED
+        assert exception["type"] == "BUSINESS"
+        assert exception["code"] == "SOME_CODE"
+        assert exception["message"] == "My message"
 
 
 def test_inputs_throw_unknown_exception(inputs, adapter):

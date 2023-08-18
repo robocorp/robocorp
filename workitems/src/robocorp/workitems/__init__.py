@@ -70,6 +70,8 @@ class Inputs:
     """
 
     def __iter__(self):
+        # NOTE: This iterator can't catch exceptions, so the
+        # context manager is mostly there to set the `completed` state
         if self.current and not self.current.released:
             with self.current as item:
                 yield item

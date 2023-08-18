@@ -12,6 +12,12 @@ class _BaseException(RuntimeError):
         self.message = message
         self.code = code
 
+    def __str__(self):
+        args = ", ".join(
+            f'"{arg}"' for arg in [self.message, self.code] if arg is not None
+        )
+        return f"{self.__class__.__name__}({args})"
+
 
 class BusinessException(_BaseException):
     """
@@ -23,7 +29,7 @@ class BusinessException(_BaseException):
 class ApplicationException(_BaseException):
     """
     An exception that can be raised to release an input work item with
-    a BUSINESS exception type.
+    an APPLICATION exception type.
     """
 
 
