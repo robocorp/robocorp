@@ -1,6 +1,7 @@
 import sys
 
 import pytest
+from devutils.fixtures import RobocorpTaskRunner
 
 
 @pytest.fixture(autouse=True)
@@ -103,7 +104,7 @@ def test_browser_api(datadir, pyfile) -> None:
     )
 
 
-def test_screenshot_on_failure(datadir):
+def test_screenshot_on_failure(robocorp_task_runner: RobocorpTaskRunner):
     import os
 
     from devutils.fixtures import robocorp_tasks_run

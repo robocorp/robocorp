@@ -49,15 +49,23 @@ def browsers_path() -> Path:
         return Path.home() / ".robocorp" / "playwright"
 
 
-def install_browser(engine: BrowserEngine, force=False, interactive=False):
-    from concurrent import futures
-
+def _build_install_command_line(engine, force):
+    """
+    Note: this function is mocked in tests.
+    """
     cmd = [sys.executable, "-m", "playwright", "install"]
     if force:
         cmd.append("--force")
-
     name = BrowserEngine(engine).value
     cmd.append(name)
+    return cmd
+
+
+def install_browser(engine: BrowserEngine, force=False, interactive=False):
+    from concurrent import futures
+
+    cmd = _build_install_command_line(engine, force)
+    name = BrowserEngine(engine).value
 
     env = dict(os.environ)
     path = str(browsers_path())
@@ -77,18 +85,25 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
         # supposed to see the output in sys.stderr, but we can still log
         # something).
 
+        stdout_lines_lock = threading.Lock()
+        stdout_lines: List[bytes] = []
+
         def _stream_reader(stream: BinaryIO, lst: List[bytes]) -> None:
             try:
                 while True:
                     line: bytes = stream.readline()
+                    if line.endswith(b"\r\n"):
+                        line = line[:-2]
+                    elif line.endswith((b"\r", b"\r\n")):
+                        line = line[:-1]
                     if not line:
                         break
-                    lst.append(line)
+                    with stdout_lines_lock:
+                        lst.append(line)
             except Exception:
                 pass
 
         future: "futures.Future[int]" = futures.Future()
-        stdout_lines: List[bytes] = []
 
         def install_in_thread():
             try:
@@ -124,20 +139,28 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
 
         encoding = locale.getpreferredencoding()
 
-        while True:
-            t.join(30)
-            if not t.is_alive():
-                break
+        reported_from = 0
+        returncode = None
+        while returncode is None:
+            try:
+                returncode = future.result(10)
+            except futures.TimeoutError:
+                pass
+
             if stdout_lines:
-                # The GIL is our friend (access stdout_lines without a lock).
-                last = stdout_lines[-1].decode(encoding, "replace")
+                with stdout_lines_lock:
+                    last = stdout_lines[-1].decode(encoding, "replace")
+                    add_to_debug = stdout_lines[reported_from:]
+                    reported_from = len(stdout_lines)
+
+                for line in add_to_debug:
+                    log.debug(line.decode(encoding, "replace"))
                 log.info(f"Playwright browser install in process. Last output: {last}")
             else:
                 log.info("Playwright browser install in process.")
 
-        returncode = future.result()
         if returncode != 0:
-            stdout = b"".join(stdout_lines).decode(encoding, "replace")
+            stdout = b"\n".join(stdout_lines).decode(encoding, "replace")
             raise InstallError(
                 f"Failed to install {name}\n"
                 + f"Return code: {returncode}\n"

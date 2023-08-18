@@ -3,6 +3,7 @@ import subprocess
 import sys
 from contextlib import nullcontext
 from pathlib import Path
+from subprocess import CompletedProcess
 from typing import Any, Dict, Optional, Sequence
 
 import pytest
@@ -258,7 +259,7 @@ def str_regression(datadir, original_datadir, request):
 
 def robocorp_tasks_run(
     cmdline, returncode, cwd=None, additional_env: Optional[Dict[str, str]] = None
-):
+) -> CompletedProcess:
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
     if additional_env:
@@ -285,6 +286,61 @@ def robocorp_tasks_run(
 """
         )
     return result
+
+
+class RobocorpTaskRunner:
+    def __init__(self) -> None:
+        self.log_html: Optional[Path] = None
+
+    def open_log_html(self):
+        if self.log_html is None:
+            raise AssertionError("Log target is still None.")
+
+        import webbrowser
+
+        webbrowser.open(self.log_html.as_uri())
+
+    def run_tasks(
+        self,
+        cmdline,
+        returncode,
+        cwd=None,
+        additional_env: Optional[Dict[str, str]] = None,
+    ) -> None:
+        result = robocorp_tasks_run(cmdline, returncode, cwd, additional_env)
+        decoded = result.stdout.decode("utf-8", "replace")
+
+        if not cwd:
+            cwd = "."
+
+        curr_dir = Path(cwd).absolute()
+
+        log_html = curr_dir / "output" / "log.html"
+        self.log_html = log_html
+        if not log_html.exists():
+            msg = f"\n{log_html} does not exist.\n"
+
+            if not curr_dir.exists():
+                msg += f"\n{curr_dir} does not exists.\n"
+            else:
+                msg += f"\n{curr_dir} exists.\nContents: {os.listdir(curr_dir)}\n"
+
+                output_dir = curr_dir / "output"
+                if not output_dir.exists():
+                    msg += f"\n{output_dir} does not exists.\n"
+                else:
+                    msg += (
+                        f"\n{output_dir} exists.\nContents: {os.listdir(output_dir)}\n"
+                    )
+
+            msg += f"\nStdout:\n{decoded}"
+
+            raise AssertionError(msg)
+
+
+@pytest.fixture
+def robocorp_task_runner():
+    return RobocorpTaskRunner()
 
 
 @pytest.fixture
@@ -321,8 +377,8 @@ def pyfile(request, datadir):
 
     Returns a string to the generated file written to disk.
     """
-    import types
     import inspect
+    import types
 
     def factory(source) -> str:
         assert isinstance(source, types.FunctionType)
