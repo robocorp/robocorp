@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.7.0 - 2023-08-21
 
 - `if` statements now create a scope in `log.html` (when the function is not a generator).
 - If an exception has a cause or context the context/cause is now shown in the log 
