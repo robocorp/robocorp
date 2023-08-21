@@ -4,21 +4,16 @@ from typing import Any, List, Optional, Union
 
 from robocorp.excel._types import PathType
 from robocorp.excel._workbooks import XlsWorkbook, XlsxWorkbook
-from robocorp.excel.worksheet import Worksheet
+from robocorp.excel._worksheet import Worksheet
 
 
-class Workbook:
-    """Manager class for both .xls and .xlsx Excel files."""
-
-    def __init__(self, excel: Union[XlsWorkbook, XlsxWorkbook]):
-        # Internal API, for users there is create_ and open_ workbook functions
-        self.excel = excel
 
     def save(self, name: Union[PathType, BytesIO], overwrite=True):
         # files.save_workbook()
         if not isinstance(name, BytesIO):
             if not overwrite and pathlib.Path(name).exists():
                 raise FileExistsError
+
         self.excel.validate_content()
         self.excel.save(name)
 

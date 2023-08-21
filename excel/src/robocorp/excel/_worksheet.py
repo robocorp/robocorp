@@ -4,10 +4,10 @@ from PIL import Image
 from typing_extensions import deprecated
 
 from robocorp.excel._types import PathType
-from robocorp.excel.tables import Table, Tables
+from robocorp.excel._tables import Table, Tables
 
 if TYPE_CHECKING:
-    from robocorp.excel.workbook import Workbook
+    from robocorp.excel._workbook import Workbook
 
 
 class Worksheet:
