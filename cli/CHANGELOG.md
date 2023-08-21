@@ -2,14 +2,17 @@
 
 ## Unreleased
 
-- Add to brew
-- Fix changelog link on downloads index page
+## 0.4.0 - 2023-08-21
+
+- Add `lock` command
+- Fix soft-lock when parsing long run output
 
 ## 0.3.0 - 2023-05-12
 
 - Better directory handling for `new` command
 - Better run output, working status codes
 - Updated templates
+- Add to brew
 
 ## 0.2.10 - 2023-05-11
 
