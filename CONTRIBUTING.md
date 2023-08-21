@@ -53,7 +53,7 @@ To make a new release from a library, ensure the following things are done:
 2. The version has been updated according to [semantic versioning](https://semver.org/).
    This can be done by running `invoke set-version <version>`, which modifies all related
    files with the new version number.
-3. A new changelog entry is added to `<library>/docs/changelog.md` that describes the changes.
+3. A new changelog entry is added to `<library>/docs/CHANGELOG.md` that describes the changes.
 4. All changed code is pushed to `master` and the test workflows in GitHub Actions are passing.
 
 To trigger a release, a commit should be tagged with the name and version of the library.

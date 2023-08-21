@@ -73,7 +73,7 @@ h3 a.subtle {
 <h1>Robocorp `robo` downloads</h1>
 <p>
 Machine readable version of this list is available <a href="index.json">here</a>.
-And change log can be found <a href="https://github.com/robocorp/robo/blob/master/cli/changelog.md">there</a>.
+And change log can be found <a href="https://github.com/robocorp/robo/blob/master/cli/CHANGELOG.md">there</a>.
 </p>
 '''.strip()
 
