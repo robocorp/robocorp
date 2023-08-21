@@ -1,12 +1,14 @@
 name: CLI Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "cli-[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
   release:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - name: Create GitHub release
@@ -20,6 +22,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
+    if: ${{ false }}
     needs:
       - release
     defaults:
@@ -59,6 +62,7 @@ jobs:
           overwrite: true
 
   sign-macos:
+    if: ${{ false }}
     needs:
       - release
       - build
@@ -110,6 +114,7 @@ jobs:
           overwrite: true
 
   sign-windows:
+    if: ${{ false }}
     needs:
       - release
       - build
@@ -153,6 +158,7 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
   deploy-s3:
+    if: ${{ false }}
     needs:
       - release
       - sign-macos
