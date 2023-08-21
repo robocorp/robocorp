@@ -11,7 +11,7 @@ import sys
 
 LIMIT = 20
 
-HEADER='''<!DOCTYPE html>
+HEADER = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -75,20 +75,19 @@ h3 a.subtle {
 Machine readable version of this list is available <a href="index.json">here</a>.
 And change log can be found <a href="https://github.com/robocorp/robo/blob/master/cli/CHANGELOG.md">there</a>.
 </p>
-'''.strip()
+""".strip()
 
-TESTED_HEADER='''
+TESTED_HEADER = """
 <h2>Tested versions</h2>
 <p>Consider these as more stable.</p>
-'''.strip()
+""".strip()
 
-LATEST_HEADER='''
+LATEST_HEADER = """
 <hr />
 <h2>Latest versions (max. %(limit)d)</h2>
-'''.strip()
+""".strip()
 
-
-ENTRY='''
+ENTRY = """
 <h3>%(version)s&nbsp;<a class="subtle" href="#%(version)s" name="%(version)s">^</a></h3>
 <p>Release date: %(when)s</p>
 <ul>
@@ -96,28 +95,32 @@ ENTRY='''
 <li>MacOS: <a href="%(macos)s">%(macos)s</a></li>
 <li>Linux: <a href="%(linux)s">%(linux)s</a></li>
 </ul>
-'''.strip()
+""".strip()
 
-FOOTER='''
+FOOTER = """
 <hr />
 </body>
 </html>
-'''.strip()
+""".strip()
 
-VERSION_PATTERN = re.compile(r'^##\s*([0-9.]+)\D+([0-9.]+)\D{1,5}$')
-TAG_PATTERN = re.compile(r'^(cli-[0-9.]+)\D*$')
+VERSION_PATTERN = re.compile(r"^##\s+([\d.]+)[\s-]+([\d-]+)")
+TAG_PATTERN = re.compile(r"^(cli-[0-9.]+)\D*$")
 
 DIRECTORY = pathlib.Path(__file__).parent.absolute()
-CHANGELOG = DIRECTORY.joinpath('changelog.md')
+CHANGELOG = DIRECTORY.joinpath("CHANGELOG.md")
 REPO_ROOT = DIRECTORY.parent.absolute()
 
 FETCH_TAGS = f"git -C {REPO_ROOT} fetch --tag"
 TAGLISTING = f"git -C {REPO_ROOT} tag --list --sort='-taggerdate'"
 
+
 def sh(command):
-    task = subprocess.Popen([command], shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+    task = subprocess.Popen(
+        [command], shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE
+    )
     out, _ = task.communicate()
     return task.returncode, out.decode()
+
 
 def gittags_top(count):
     sh(FETCH_TAGS)
@@ -127,8 +130,9 @@ def gittags_top(count):
             if count == 0:
                 break
             if found := TAG_PATTERN.match(line):
-                yield(found.group(1))
+                yield (found.group(1))
                 count -= 1
+
 
 def changelog_top(filename, count):
     with open(filename) as source:
@@ -136,11 +140,13 @@ def changelog_top(filename, count):
             if count == 0:
                 break
             if found := VERSION_PATTERN.match(line):
-                yield(found.groups())
+                yield (found.groups())
                 count -= 1
 
+
 def download(version, suffix):
-    return 'https://downloads.robocorp.com/robo/releases/%s/%s' % (version, suffix)
+    return "https://downloads.robocorp.com/robo/releases/%s/%s" % (version, suffix)
+
 
 def process_versions(options, sink):
     biglist = tuple(changelog_top(options.changelog, 10000))
@@ -171,29 +177,50 @@ def process_versions(options, sink):
     sink.write(LATEST_HEADER % dict(limit=LIMIT))
     for version, when in limited:
         details = dict(version=version, when=when)
-        details['windows'] = download(version, 'windows64/robo.exe')
-        details['linux'] = download(version, 'linux64/robo')
-        details['macos'] = download(version, 'macos64/robo')
+        details["windows"] = download(version, "windows64/robo.exe")
+        details["linux"] = download(version, "linux64/robo")
+        details["macos"] = download(version, "macos64/robo")
         sink.write(ENTRY % details)
         if version in seen:
             break
         edge.append(details)
     return result
 
+
 def process(options):
-    with open(options.page, 'w+') as sink:
+    with open(options.page, "w+") as sink:
         sink.write(HEADER % dict(limit=LIMIT))
         data = process_versions(options, sink)
         sink.write(FOOTER)
-    with open(options.json, 'w+') as sink:
+    with open(options.json, "w+") as sink:
         json.dump(data, sink, indent=1)
 
+
 def commandline(args):
-    parser = argparse.ArgumentParser(description='shim -- a simple tool shimming')
-    parser.add_argument('--changelog', '-c', type=str, default=CHANGELOG, help='Name for changelog file.')
-    parser.add_argument('--page', '-p', type=str, default='build/index.html', help='Name for "index.html" file.')
-    parser.add_argument('--json', '-j', type=str, default='build/index.json', help='Name for "index.json" file.')
+    parser = argparse.ArgumentParser(description="shim -- a simple tool shimming")
+    parser.add_argument(
+        "--changelog",
+        "-c",
+        type=str,
+        default=CHANGELOG,
+        help="Name for changelog file.",
+    )
+    parser.add_argument(
+        "--page",
+        "-p",
+        type=str,
+        default="build/index.html",
+        help='Name for "index.html" file.',
+    )
+    parser.add_argument(
+        "--json",
+        "-j",
+        type=str,
+        default="build/index.json",
+        help='Name for "index.json" file.',
+    )
     return parser.parse_args(args)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     process(commandline(sys.argv[1:]))
