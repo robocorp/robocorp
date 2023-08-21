@@ -1,3 +1,4 @@
+import itertools
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -30,7 +31,7 @@ def module_name_from_path(path: Path, root: Path) -> str:
 
 def insert_missing_modules(modules: Dict[str, ModuleType], module_name: str) -> None:
     """
-    Used by ``import_path`` to create intermediate modules when using mode=importlib.
+    Used by ``import_path`` to create intermediate modules.
     When we want to import a module as "src.tests.test_foo" for example, we need
     to create empty modules "src" and "src.tests" after inserting "src.tests.test_foo",
     otherwise "src.tests.test_foo" is not importable by ``__import__``.
@@ -53,7 +54,7 @@ def insert_missing_modules(modules: Dict[str, ModuleType], module_name: str) -> 
             except ModuleNotFoundError:
                 module = ModuleType(
                     module_name,
-                    doc="Empty module created by pytest's importmode=importlib.",
+                    doc="Empty module created by robocorp-tasks.",
                 )
                 modules[module_name] = module
         module_parts.pop(-1)
@@ -128,7 +129,12 @@ def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]
 
     with _hooks.on_task_func_found.register(on_func_found):
         if path.is_dir():
-            for path_with_task in path.rglob("*task*.py"):
+            package_init = path / "__init__.py"
+            lst = []
+            if package_init.exists():
+                lst.append(package_init)
+
+            for path_with_task in itertools.chain(lst, path.rglob("*task*.py")):
                 module = import_path(path_with_task, root=path)
 
                 for method in methods_marked_as_tasks_found:

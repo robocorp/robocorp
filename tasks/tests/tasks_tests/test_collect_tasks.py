@@ -24,6 +24,13 @@ def test_colect_tasks(datadir):
     assert len(tasks) == 0
 
 
+def test_colect_tasks_from_package(datadir):
+    from robocorp.tasks._collect_tasks import collect_tasks
+
+    tasks = tuple(collect_tasks(datadir / "in_init"))
+    assert len(tasks) == 1
+
+
 def test_collect_tasks_integrated_error(tmpdir):
     result = robocorp_tasks_run(
         ["run", "dir_not_there", "-t=main"], returncode=1, cwd=str(tmpdir)
