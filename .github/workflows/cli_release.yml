@@ -211,9 +211,6 @@ jobs:
       # if: ${{ false }}
       timeout-minutes: 10
       runs-on: ubuntu-20.04
-      needs:
-          # Only update index when deploy passes
-          - deploy-s3
       defaults:
         run:
           working-directory: ./cli
