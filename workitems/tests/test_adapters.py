@@ -22,15 +22,15 @@ class TestFileAdapter:
 
     @contextmanager
     def _mock_work_items(self):
-        with tempfile.TemporaryDirectory() as datadir:
-            datadir = Path(datadir)
+        with tempfile.TemporaryDirectory() as items_dir:
+            items_dir = Path(items_dir)
 
-            items_in = datadir / "items.json"
-            items_out = datadir / "items.out.json"
+            items_in = items_dir / "items.json"
+            items_out = items_dir / "items.out.json"
 
             with open(items_in, "w") as fd:
                 json.dump(ITEMS_JSON, fd)
-            with open(os.path.join(datadir, "file.txt"), "w") as fd:
+            with open(os.path.join(items_dir, "file.txt"), "w") as fd:
                 fd.write("some mock content")
 
             yield items_in, items_out
@@ -97,8 +97,8 @@ class TestFileAdapter:
             FileAdapter()
 
     def test_empty_queue(self, monkeypatch):
-        with tempfile.TemporaryDirectory() as datadir:
-            items = os.path.join(datadir, "items.json")
+        with tempfile.TemporaryDirectory() as items_dir:
+            items = os.path.join(items_dir, "items.json")
             with open(items, "w") as fd:
                 json.dump([], fd)
 
@@ -107,14 +107,23 @@ class TestFileAdapter:
                 FileAdapter()
 
     def test_malformed_queue(self, monkeypatch):
-        with tempfile.TemporaryDirectory() as datadir:
-            items = os.path.join(datadir, "items.json")
+        with tempfile.TemporaryDirectory() as items_dir:
+            items = os.path.join(items_dir, "items.json")
             with open(items, "w") as fd:
                 json.dump(["not-an-item"], fd)
 
             monkeypatch.setenv("RC_WORKITEM_INPUT_PATH", items)
             with pytest.raises(ValueError):
                 FileAdapter()
+
+    def test_missing_parent_directory(self, monkeypatch):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = os.path.join(temp_dir, "not-exist", "output.json")
+            monkeypatch.setenv("RC_WORKITEM_OUTPUT_PATH", output_dir)
+
+            # Should not raise
+            adapter = FileAdapter()
+            adapter.create_output("0", {"key": "value"})
 
 
 class TestRobocorpAdapter:

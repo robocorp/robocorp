@@ -121,6 +121,7 @@ class FileAdapter(BaseAdapter):
         return path
 
     def _save_inputs(self):
+        self.input_path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.input_path, "w", encoding=ENCODING) as fd:
             fd.write(json_dumps(self._inputs, indent=4))
 
@@ -142,6 +143,7 @@ class FileAdapter(BaseAdapter):
         return path
 
     def _save_outputs(self):
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.output_path, "w", encoding=ENCODING) as fd:
             fd.write(json_dumps(self._outputs, indent=4))
 
@@ -239,6 +241,7 @@ class FileAdapter(BaseAdapter):
         else:
             path = self.output_path.parent / name
 
+        path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as fd:
             fd.write(content)
 
