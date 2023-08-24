@@ -352,6 +352,21 @@ def test_inputs_context_raise(inputs, adapter):
     assert exception["message"] == "My message"
 
 
+def test_inputs_raise_derived_class(inputs, adapter):
+    class CustomException(BusinessException):
+        def __init__(self):
+            super().__init__(message="My Custom Exception!")
+
+    with inputs.current:
+        raise CustomException()
+
+    _, state, exception = adapter.releases[-1]
+    assert state is State.FAILED
+    assert exception["type"] == "BUSINESS"
+    assert exception["code"] is None
+    assert exception["message"] == "My Custom Exception!"
+
+
 def test_inputs_loop_raise(inputs, adapter):
     for inp in inputs:
         with inp:

@@ -34,9 +34,9 @@ class ApplicationException(_BaseException):
 
 
 def to_exception_type(exc_type: Type[BaseException]) -> ExceptionType:
-    if exc_type is BusinessException:
+    if issubclass(exc_type, BusinessException):
         return ExceptionType.BUSINESS
-    elif exc_type is ApplicationException:
+    elif issubclass(exc_type, ApplicationException):
         return ExceptionType.APPLICATION
     else:
         return ExceptionType.APPLICATION

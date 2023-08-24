@@ -76,6 +76,7 @@ class WorkItem:
 
         self._payload = self._adapter.load_payload(self.id)
         self._files = self._adapter.list_files(self.id)
+        self._files.sort()
         self._saved = True
 
     def save(self):
@@ -109,9 +110,9 @@ class WorkItem:
         self._files = list(
             set(self._files) - set(self._files_to_remove) | set(self._files_to_add)
         )
+        self._files.sort()
         self._files_to_add = {}
         self._files_to_remove = set()
-
         self._saved = True
 
     def add_file(self, path: Union[Path, str], name: Optional[str] = None) -> Path:
@@ -253,7 +254,10 @@ class Input(WorkItem):
         self.fail(exception_type=exception_type, code=code, message=message)
 
         # Do not propagate library-specific exceptions
-        return exc_type in (ApplicationException, BusinessException)
+        return any(
+            issubclass(exc_type, type_)
+            for type_ in (ApplicationException, BusinessException)
+        )
 
     @property
     def state(self) -> Optional[State]:
