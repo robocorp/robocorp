@@ -152,7 +152,7 @@ try {
 export const createDefaultRunInfo = (): RunInfo => ({
   version: '',
   versionTooNew: false,
-  description: 'Wating for run to start ...',
+  description: 'Waiting for run to start ...',
   time: '',
   status: 'UNSET',
   finishTimeDeltaInSeconds: undefined,
