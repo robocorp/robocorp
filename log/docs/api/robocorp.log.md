@@ -186,25 +186,24 @@ Adds html contents to the log.
 - <b>`html`</b>:  The html content to be embedded in the page.
 - <b>`level`</b>:  The level of the message ("INFO", "WARN" or "ERROR")
 
-Example adding an image: \`\`\`python
+Example adding an image:
+
+```python
 html(
 
-- <b>`    '<img src="data`</b>: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="/>'
-  )
+ - <b>`    '<img src="data`</b>: image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="/>'
+)
+```
 
-````
-
-
----
+______________________________________________________________________
 
 ## function `process_snapshot`
 
 **Source:** [`__init__.py:259`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/__init__.py#L259)
 
-
 ```python
 process_snapshot() → None
-````
+```
 
 Makes a process snapshot and adds it to the logs.
 
@@ -220,7 +219,7 @@ ______________________________________________________________________
 console_message(
     message: str,
     kind: str,
-    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x1024eff10>,
+    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x1019670d0>,
     flush: Optional[bool] = None
 ) → None
 ```
@@ -259,19 +258,20 @@ suppress_methods()
 
 Can be used as a context manager or decorator so that methods are not logged.
 
-i.e.: \`\`\`python
+i.e.:
+
+```python
 @suppress_methods
 def method():
-...
-
-````
+    ...
+```
 
 or
 
 ```python
 with suppress_methods():
     ...
-````
+```
 
 ______________________________________________________________________
 
@@ -285,19 +285,20 @@ suppress_variables()
 
 Can be used as a context manager or decorator so that variables are not logged.
 
-i.e.: \`\`\`python
+i.e.:
+
+```python
 @suppress_variables
 def method():
-...
-
-````
+    ...
+```
 
 or
 
 ```python
 with suppress_variables():
     ...
-````
+```
 
 ______________________________________________________________________
 

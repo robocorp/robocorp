@@ -75,7 +75,7 @@ ______________________________________________________________________
 
 PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict)
 
-### function `__init__`
+### method `__init__`
 
 ```python
 __init__(pyproject: Path, toml_contents: dict) → None
