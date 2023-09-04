@@ -308,3 +308,22 @@ def test_output_on_change_cwd(datadir) -> None:
     assert "Robocorp Log (html)" in decoded
 
     assert (datadir / "output" / "log.html").exists()
+
+
+def test_use_robot_artifacts_env_var_for_output(datadir, tmpdir) -> None:
+    pyproject: Path = datadir / "pyproject.toml"
+    pyproject.write_text("")
+
+    result = robocorp_tasks_run(
+        ["run", "--console-color=plain", "simple.py"],
+        returncode=0,
+        cwd=str(datadir),
+        additional_env={"ROBOT_ARTIFACTS": str(tmpdir / "output_check")},
+    )
+
+    decoded = result.stderr.decode("utf-8", "replace")
+    assert not decoded.strip(), f"Found stderr: {decoded}"
+    decoded = result.stdout.decode("utf-8", "replace")
+    assert "Robocorp Log (html)" in decoded
+
+    assert (tmpdir / "output_check" / "log.html").exists()

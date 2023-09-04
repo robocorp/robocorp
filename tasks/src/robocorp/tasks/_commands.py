@@ -119,6 +119,12 @@ def run(
     from ._protocols import ITask, Status
     from ._task import Context, set_current_task
 
+    if not output_dir:
+        output_dir = os.environ.get("ROBOT_ARTIFACTS", "")
+
+    if not output_dir:
+        output_dir = "./output"
+
     console.set_mode(console_colors)
 
     # Don't show internal machinery on tracebacks:

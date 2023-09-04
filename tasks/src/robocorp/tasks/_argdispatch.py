@@ -62,8 +62,11 @@ class _ArgDispatcher:
             "-o",
             "--output-dir",
             dest="output_dir",
-            help="The directory where the logging output files will be stored.",
-            default="./output",
+            help=(
+                "The directory where the logging output files will be stored "
+                "(default `ROBOT_ARTIFACTS` environment variable or `./output`)."
+            ),
+            default="",
         )
         run_parser.add_argument(
             "--max-log-files",
