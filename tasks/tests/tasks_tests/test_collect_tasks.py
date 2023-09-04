@@ -1,7 +1,25 @@
 import json
 import os
 
+import pytest
 from devutils.fixtures import robocorp_tasks_run
+
+
+@pytest.fixture(autouse=True)
+def _fix_pythonpath():
+    import sys
+
+    if "tasks" in sys.modules:
+        # We have tasks.py and tasks/__init__.py in different tests, so, proactively
+        # remove it.
+        del sys.modules["tasks"]
+
+    yield
+
+    if "tasks" in sys.modules:
+        # We have tasks.py and tasks/__init__.py in different tests, so, proactively
+        # remove it.
+        del sys.modules["tasks"]
 
 
 def test_colect_tasks(datadir):

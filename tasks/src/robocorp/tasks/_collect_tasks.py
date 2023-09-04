@@ -1,5 +1,7 @@
 import itertools
+import os
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 from types import ModuleType
 from typing import Callable, Dict, Iterator, List, Sequence
@@ -94,6 +96,22 @@ def import_path(
     return mod
 
 
+@contextmanager
+def _add_to_sys_path_0(root: Path):
+    """
+    This context manager may be used to raise priority for some folder so that
+    it imports the contents inside it with priority.
+    """
+    sys.path.insert(0, str(root))
+    try:
+        yield
+    finally:
+        try:
+            sys.path.remove(str(root))
+        except ValueError:
+            pass
+
+
 def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]:
     """
     Note: collecting tasks is not thread-safe.
@@ -129,29 +147,34 @@ def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]
 
     with _hooks.on_task_func_found.register(on_func_found):
         if path.is_dir():
-            package_init = path / "__init__.py"
-            lst = []
-            if package_init.exists():
-                lst.append(package_init)
+            root = _get_root(path, is_dir=True)
+            sys.path.insert(0, str(root))
+            with _add_to_sys_path_0(root):
+                package_init = path / "__init__.py"
+                lst = []
+                if package_init.exists():
+                    lst.append(package_init)
 
-            for path_with_task in itertools.chain(lst, path.rglob("*task*.py")):
-                module = import_path(path_with_task, root=path)
+                for path_with_task in itertools.chain(lst, path.rglob("*task*.py")):
+                    module = import_path(path_with_task, root=root)
 
+                    for method in methods_marked_as_tasks_found:
+                        task = Task(module, method)
+                        if accept_task(task):
+                            yield task
+
+                    del methods_marked_as_tasks_found[:]
+
+        elif path.is_file():
+            root = _get_root(path, is_dir=False)
+            with _add_to_sys_path_0(root):
+                module = import_path(path, root=root)
                 for method in methods_marked_as_tasks_found:
                     task = Task(module, method)
                     if accept_task(task):
                         yield task
 
                 del methods_marked_as_tasks_found[:]
-
-        elif path.is_file():
-            module = import_path(path, root=path.parent)
-            for method in methods_marked_as_tasks_found:
-                task = Task(module, method)
-                if accept_task(task):
-                    yield task
-
-            del methods_marked_as_tasks_found[:]
 
         else:
             from ._exceptions import RobocorpTasksCollectError
@@ -162,3 +185,25 @@ def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]
             raise RobocorpTasksCollectError(
                 f"Expected {path} to map to a directory or file."
             )
+
+
+def _get_root(path: Path, is_dir: bool) -> Path:
+    pythonpath_entries = tuple(Path(p) for p in sys.path)
+    initial = path
+    while True:
+        # Try to find a parent which is in the pythonpath
+        for p in pythonpath_entries:
+            try:
+                if os.path.samefile(p, path):
+                    return p
+            except OSError:
+                pass
+
+        new_path = path.parent
+        if not new_path or new_path == path:
+            if is_dir:
+                return initial
+            else:
+                return initial.parent
+
+        path = new_path
