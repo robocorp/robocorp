@@ -169,6 +169,9 @@ class MethodLifecycleContext:
     # Flag which subclasses can override.
     _accept = True
 
+    _method_is_generator = False
+    _in_generator = False
+
     def __init__(self, tup):
         if not self._accept:
             return
@@ -180,13 +183,21 @@ class MethodLifecycleContext:
 
         # The after doesn't have the args_dict.
         self._stack.append((-1, "method", tup[:-1]))
+        if tup[0] == "GENERATOR":
+            self._method_is_generator = True
 
     def __enter__(self):
+        if self._method_is_generator:
+            self._in_generator = True
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if not self._accept:
             return
+
+        if self._method_is_generator:
+            if not self._in_generator:
+                return
 
         while self._stack:
             _report_id, method_name, tup = self._stack.pop()
@@ -200,6 +211,22 @@ class MethodLifecycleContext:
             # Something as 'after_method' or 'after_iterate'
             method = _name_to_callback[f"after_{method_name}"]
             method(*tup)
+
+    def after_yield(self, *tup):
+        self._in_generator = True
+        after_yield(*tup)
+
+    def before_yield(self, *tup):
+        self._in_generator = False
+        before_yield(*tup)
+
+    def after_yield_from(self, *tup):
+        self._in_generator = True
+        after_yield_from(*tup)
+
+    def before_yield_from(self, *tup):
+        self._in_generator = False
+        before_yield_from(*tup)
 
     def report_if_start(self, report_id, tup):
         if not self._accept:

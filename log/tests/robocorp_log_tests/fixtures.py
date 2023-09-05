@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
-
 from robocorp.log import AutoLogConfigBase, FilterKind
 from robocorp.log._constants import UNSCOPED_ELEMENTS
 from robocorp.log.protocols import IReadLines, LogHTMLStyle
@@ -248,8 +247,10 @@ def _build_and_copy_robo(location: str, force: bool = False) -> None:
 _format_msg: dict = {}
 _format_msg["SE"] = lambda msg: f"SE: {msg['type']}: {msg['name']}"
 _format_msg["YR"] = lambda msg: f"YR: {msg['name']} ({msg['libname']})"
+_format_msg["YFR"] = lambda msg: f"YR: {msg['name']} ({msg['libname']})"
 _format_msg["EE"] = lambda msg: f"EE: {msg['type']}: {msg['status']}"
 _format_msg["YS"] = lambda msg: f"YS: {msg['name']}: {msg['value']} ({msg['libname']})"
+_format_msg["YFS"] = lambda msg: f"YS: {msg['name']}: ({msg['libname']})"
 _format_msg["EA"] = lambda msg: f"EA: {msg['type']}: {msg['name']}: {msg['value']}"
 _format_msg["STB"] = lambda msg: f"STB: {msg['message']}"
 _format_msg["AS"] = lambda msg: f"AS: {msg['target']}: {msg['value']}"
@@ -357,15 +358,15 @@ def pretty_format_logs_from_iter(
         if msg_type not in format_msg:
             if msg_type in ignore:
                 continue
-            print("Check: ", msg)
+            print("TODO: Handle: ", msg)
             continue
 
         # Messages that end scope
-        if msg_type in ("EE", "ET", "ER", "YS"):
+        if msg_type in ("EE", "ET", "ER", "YS", "YFS"):
             level -= 1
             indent = "    " * level
 
-        is_restart = msg_type in ("RR", "RT", "RE", "RYR")
+        is_restart = msg_type in ("RR", "RT", "RE", "RYR", "RYFR")
 
         try:
             formatted = format_msg[msg_type](msg)
@@ -381,11 +382,11 @@ def pretty_format_logs_from_iter(
             continue
 
         if not regular_start_found:
-            if msg_type in ("SE", "ST", "SR", "YR"):
+            if msg_type in ("SE", "ST", "SR", "YR", "YFR"):
                 regular_start_found = True
 
         # Messages that create scope
-        if msg_type in ("SE", "ST", "SR", "YR") or is_restart:
+        if msg_type in ("SE", "ST", "SR", "YR", "YFR") or is_restart:
             # Exceptions which won't create scope for SE.
             if msg_type == "SE" and msg["type"] in UNSCOPED_ELEMENTS:
                 continue

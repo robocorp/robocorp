@@ -31,6 +31,36 @@ def test_log_with_yield_iterator_augassign(tmpdir, ui_regenerate, str_regression
     str_regression.check(pretty_format_logs_from_log_html(log_target))
 
 
+def test_log_with_yield_and_for(tmpdir, ui_regenerate, str_regression):
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check_iterators).for_and_yield()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+
+
+def test_log_with_yield_and_for_1(tmpdir, ui_regenerate, str_regression):
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check_iterators).for_and_yield(1)
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+
+
+def test_log_with_yield_and_for_5(tmpdir, ui_regenerate, str_regression):
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check_iterators).for_and_yield(5)
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(pretty_format_logs_from_log_html(log_target))
+
+
 def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
     from robocorp.log._decoder import (
         MESSAGE_TYPE_YIELD_FROM_RESUME,
@@ -361,7 +391,7 @@ def test_for_with_continue_break_2(tmpdir, ui_regenerate, str_regression):
     log_target = setup_info.log_target
     assert log_target.exists()
     str_regression.check(pretty_format_logs_from_log_html(log_target))
-    setup_info.open_log_target()
+    # setup_info.open_log_target()
 
 
 def test_exception_with_cause(tmpdir, ui_regenerate, str_regression):

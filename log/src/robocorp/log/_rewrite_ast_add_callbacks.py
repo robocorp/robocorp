@@ -66,9 +66,15 @@ def _make_lifecycle_func_with_args(factory, func_name, *args):
     return call
 
 
+def _make_ctx_func_with_args(factory, func_name, *args):
+    call = factory.Call(factory.NameLoadCtx(func_name))
+    call.args.extend(args)
+    return call
+
+
 def _make_after_yield_expr(factory, function, class_name, node_lineno) -> ast.Expr:
     return factory.Expr(
-        _make_lifecycle_func_with_args(
+        _make_ctx_func_with_args(
             factory,
             "after_yield",
             factory.NameLoad("__name__"),
@@ -83,7 +89,7 @@ def _make_before_yield_from_exprs(
     factory, function, class_name, node_lineno
 ) -> ast.Expr:
     return factory.Expr(
-        _make_lifecycle_func_with_args(
+        _make_ctx_func_with_args(
             factory,
             "before_yield_from",
             factory.NameLoad("__name__"),
@@ -96,7 +102,7 @@ def _make_before_yield_from_exprs(
 
 def _make_after_yield_from_expr(factory, function, class_name, node_lineno) -> ast.Expr:
     return factory.Expr(
-        _make_lifecycle_func_with_args(
+        _make_ctx_func_with_args(
             factory,
             "after_yield_from",
             factory.NameLoad("__name__"),
@@ -1197,7 +1203,7 @@ def _handle_yield(
 
                 stmts_cursor.before_append(
                     factory.Expr(
-                        _make_lifecycle_func_with_args(
+                        _make_ctx_func_with_args(
                             factory,
                             "before_yield",
                             factory.NameLoad("__name__"),
@@ -1244,7 +1250,7 @@ def _handle_yield(
 
                 temp_funcdef.body.append(
                     factory.Expr(
-                        _make_lifecycle_func_with_args(
+                        _make_ctx_func_with_args(
                             factory,
                             "before_yield",
                             factory.NameLoad("__name__"),

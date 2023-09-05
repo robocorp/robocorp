@@ -1,0 +1,34 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: for_and_yield
+            EA: int: exit_at: 1
+            SE: FOR: for i in yield_from_range()
+                SE: GENERATOR: yield_from_range
+                YS: yield_from_range: (robocorp_log_tests._resources.check_iterators)
+                SE: FOR_STEP: Step: for i in yield_from_range()
+                    EA: int: i: 0
+                    SE: METHOD: is_inside
+                        EA: int: i: 0
+                        EA: int: exit_at: 1
+                        R: bool: False
+                    EE: METHOD: PASS
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for i in yield_from_range()
+                    EA: int: i: 1
+                    SE: METHOD: is_inside
+                        EA: int: i: 1
+                        EA: int: exit_at: 1
+                        R: bool: True
+                    EE: METHOD: PASS
+                    SE: IF_SCOPE: if is_inside(i, exit_at)
+                        EA: function: is_inside: <function is_inside at 0xXXXXXXXXX>
+                        EA: int: i: 1
+                        EA: int: exit_at: 1
+                        R: int: 1
+                    EE: IF_SCOPE: PASS
+                EE: FOR_STEP: PASS
+            EE: FOR: PASS
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

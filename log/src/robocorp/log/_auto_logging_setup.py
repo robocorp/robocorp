@@ -32,6 +32,11 @@ class _StackEntry:
         self.name = name
         self.status = status
 
+    def __str__(self):
+        return f"_StackEntry({self.name} - {self.status} ({self.mod_name}))"
+
+    __repr__ = __str__
+
 
 def add_import_hook(import_hook):
     from robocorp.log._lifecycle_hooks import _OnExitContextManager
@@ -98,6 +103,8 @@ class _AutoLogging:
     ) -> None:
         if self.tid != threading.get_ident():
             return
+
+        # print("before", method_type, name)
 
         if method_type != "UNTRACKED_GENERATOR":
             # We don't change the stack for untracked generators
@@ -208,6 +215,8 @@ class _AutoLogging:
         if self.tid != threading.get_ident():
             return
 
+        # print("after", method_type, name)
+
         status = "PASS"
         if method_type != "UNTRACKED_GENERATOR":
             try:
@@ -247,6 +256,7 @@ class _AutoLogging:
         if self.tid != threading.get_ident():
             return
 
+        # print("before YIELD", name)
         try:
             pop_stack_entry = self.status_stack.pop(-1)
         except IndexError:
@@ -284,6 +294,8 @@ class _AutoLogging:
     ) -> None:
         if self.tid != threading.get_ident():
             return
+
+        # print("after YIELD", name)
 
         self.status_stack.append(_StackEntry(mod_name, name, "PASS"))
 
@@ -384,6 +396,7 @@ class _AutoLogging:
         if self.tid != threading.get_ident():
             return
 
+        # print("before YIELD FROM", name)
         try:
             pop_stack_entry = self.status_stack.pop(-1)
         except IndexError:
@@ -412,6 +425,8 @@ class _AutoLogging:
     ) -> None:
         if self.tid != threading.get_ident():
             return
+
+        # print("after YIELD FROM", name)
 
         self.status_stack.append(_StackEntry(mod_name, name, "PASS"))
 

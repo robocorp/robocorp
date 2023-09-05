@@ -99,3 +99,18 @@ def for_with_exception():
             raise RuntimeError()
     except RuntimeError:
         pass
+
+
+def is_inside(i, exit_at):
+    return i == exit_at
+
+
+def yield_from_range():
+    yield from range(3)
+
+
+def for_and_yield(exit_at=0):
+    for i in yield_from_range():
+        if is_inside(i, exit_at):
+            return i
+    return None

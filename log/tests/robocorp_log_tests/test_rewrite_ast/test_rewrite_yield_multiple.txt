@@ -5,16 +5,16 @@ def foo():
 
         def @tmp_0():
             @tmp_1 = call()
-            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 3, @tmp_1)
+            @ctx.before_yield(__name__, __file__, 'foo', 3, @tmp_1)
             @tmp_2 = (yield @tmp_1)
-            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 3)
+            @ctx.after_yield(__name__, __file__, 'foo', 3)
             return @tmp_2
 
         def @tmp_3():
             @tmp_4 = 33
-            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 3, @tmp_4)
+            @ctx.before_yield(__name__, __file__, 'foo', 3, @tmp_4)
             @tmp_5 = (yield @tmp_4)
-            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 3)
+            @ctx.after_yield(__name__, __file__, 'foo', 3)
             return @tmp_5
         for a in [(b := (yield from @tmp_0())), (c := (yield from @tmp_3()))]:
             pass

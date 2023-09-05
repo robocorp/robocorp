@@ -7,18 +7,18 @@ def foo():
         if a > 10:
             @robo_lifecycle_hooks.method_if(__name__, __file__, 'if a > 10', 4, (('a', a),))
             @tmp_0 = 1
-            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 5, @tmp_0)
+            @ctx.before_yield(__name__, __file__, 'foo', 5, @tmp_0)
             yield @tmp_0
-            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 5)
+            @ctx.after_yield(__name__, __file__, 'foo', 5)
         elif b == 10:
             @robo_lifecycle_hooks.method_if(__name__, __file__, 'elif b == 10', 6, (('b', b),))
             @tmp_1 = 2
-            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 7, @tmp_1)
+            @ctx.before_yield(__name__, __file__, 'foo', 7, @tmp_1)
             yield @tmp_1
-            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 7)
+            @ctx.after_yield(__name__, __file__, 'foo', 7)
         else:
             @robo_lifecycle_hooks.method_else(__name__, __file__, 'else (to if b == 10)', 9, (('b', b),))
             @tmp_2 = 3
-            @robo_lifecycle_hooks.before_yield(__name__, __file__, 'foo', 9, @tmp_2)
+            @ctx.before_yield(__name__, __file__, 'foo', 9, @tmp_2)
             yield @tmp_2
-            @robo_lifecycle_hooks.after_yield(__name__, __file__, 'foo', 9)
+            @ctx.after_yield(__name__, __file__, 'foo', 9)
