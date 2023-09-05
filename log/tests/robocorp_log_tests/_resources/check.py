@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from robocorp import log
 
 
@@ -179,3 +181,21 @@ def check_exception_with_cause():
         raise err  # This error must be shown in the trecaback in the final error.
     finally:
         raise RuntimeError("final error")
+
+
+@contextmanager
+def ctx():
+    yield 22
+
+
+def check(name, version):
+    if name == 2 and version == 2:
+        raise RuntimeError("foobar")
+
+
+def check_with_and_for_and_yield():
+    with ctx():
+        for name in range(3):
+            versions = range(3)
+            for version in versions:
+                check(name, version)

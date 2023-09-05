@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- A case where the stack could become inconsistent when using yield was fixed.
+
 ## 2.7.0 - 2023-08-21
 
 - `if` statements now create a scope in `log.html` (when the function is not a generator).

@@ -5,6 +5,9 @@
 - The absolute output dir is saved before running tasks (so that changes to the `cwd` don't affect it).
 - If 2 tasks are found with the same name in the same module a proper error is raised.
 - Logging info sent to `ROBOCORP_TASKS_LOG_LISTENER_PORT` is written in a thread.
+- The `ROBOT_ARTIFACTS` environment variable is now used for the `log.html` output dir (if available and not specified in the command line).
+- Fixed issue where a module with a task with a relative import would not be imported. 
+- If a directory is specified to load tasks from it, the folder __init__.py is also loaded when collecting tasks.
 
 
 ## 2.1.3 - 2023-07-19

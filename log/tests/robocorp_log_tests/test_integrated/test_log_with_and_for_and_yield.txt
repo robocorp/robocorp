@@ -1,0 +1,97 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_with_and_for_and_yield
+            SE: GENERATOR: ctx
+            YS: ctx: 22 (robocorp_log_tests._resources.check)
+            SE: FOR: for name in range(3)
+                SE: FOR_STEP: Step: for name in range(3)
+                    EA: int: name: 0
+                    AS: versions: range(0, 3)
+                    SE: FOR: for version in versions
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 0
+                            SE: METHOD: check
+                                EA: int: name: 0
+                                EA: int: version: 0
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 1
+                            SE: METHOD: check
+                                EA: int: name: 0
+                                EA: int: version: 1
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 2
+                            SE: METHOD: check
+                                EA: int: name: 0
+                                EA: int: version: 2
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                    EE: FOR: PASS
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for name in range(3)
+                    EA: int: name: 1
+                    AS: versions: range(0, 3)
+                    SE: FOR: for version in versions
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 0
+                            SE: METHOD: check
+                                EA: int: name: 1
+                                EA: int: version: 0
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 1
+                            SE: METHOD: check
+                                EA: int: name: 1
+                                EA: int: version: 1
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 2
+                            SE: METHOD: check
+                                EA: int: name: 1
+                                EA: int: version: 2
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                    EE: FOR: PASS
+                EE: FOR_STEP: PASS
+                SE: FOR_STEP: Step: for name in range(3)
+                    EA: int: name: 2
+                    AS: versions: range(0, 3)
+                    SE: FOR: for version in versions
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 0
+                            SE: METHOD: check
+                                EA: int: name: 2
+                                EA: int: version: 0
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 1
+                            SE: METHOD: check
+                                EA: int: name: 2
+                                EA: int: version: 1
+                            EE: METHOD: PASS
+                        EE: FOR_STEP: PASS
+                        SE: FOR_STEP: Step: for version in versions
+                            EA: int: version: 2
+                            SE: METHOD: check
+                                EA: int: name: 2
+                                EA: int: version: 2
+                                SE: IF_SCOPE: if name == 2 and version == 2
+                                    EA: int: name: 2
+                                    EA: int: version: 2
+                                    STB: RuntimeError: foobar
+                                EE: IF_SCOPE: ERROR
+                            EE: METHOD: ERROR
+                        EE: FOR_STEP: ERROR
+                    EE: FOR: ERROR
+                EE: FOR_STEP: ERROR
+            EE: FOR: ERROR
+        EE: METHOD: ERROR
+    ET: PASS
+ER: PASS
