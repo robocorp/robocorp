@@ -18,11 +18,8 @@ def method():
         )
     )
     function1, function2 = functions
-    cache = {}
-    assert not _ast_utils._compute_is_generator(cache, function1)
-    assert _ast_utils._compute_is_generator(cache, function2)
-    assert not _ast_utils._compute_is_generator(cache, function1)
-    assert _ast_utils._compute_is_generator(cache, function2)
+    assert not _ast_utils._compute_is_generator(function1)
+    assert _ast_utils._compute_is_generator(function2)
 
 
 def test_ast_utils_iter_nodes():
@@ -39,6 +36,8 @@ def method():
     func_def = None
 
     def accept(node):
+        if not isinstance(node, ast.AST):
+            return False
         if not isinstance(node, ast.FunctionDef):
             return True
 

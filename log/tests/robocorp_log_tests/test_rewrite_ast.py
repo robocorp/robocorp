@@ -42,7 +42,7 @@ def method():
     )
 
     ast_rewriter = ASTRewriter(mod)
-    for ev, _stack, node in ast_rewriter.iter_and_replace_nodes():
+    for ev, node in ast_rewriter.iter_and_replace_nodes(mod):
         if ev != "after":
             continue
 
@@ -69,7 +69,7 @@ def method():
     ast_rewriter = ASTRewriter(mod)
 
     with pytest.raises(RuntimeError) as e:
-        for ev, _stack, node in ast_rewriter.iter_and_replace_nodes():
+        for ev, node in ast_rewriter.iter_and_replace_nodes(mod):
             if ev != "after":
                 continue
 
@@ -97,7 +97,7 @@ def method():
 
     ast_rewriter = ASTRewriter(mod)
 
-    for ev, _stack, node in ast_rewriter.iter_and_replace_nodes():
+    for ev, node in ast_rewriter.iter_and_replace_nodes(mod):
         if ev != "after":
             continue
         if isinstance(node, ast_module.Constant):

@@ -118,19 +118,67 @@ class NodeInfo(Generic[Y]):
     __repr__ = __str__
 
 
-def iter_nodes(node, accept=lambda _node: True) -> Iterator[ast.AST]:
-    for _field, value in ast.iter_fields(node):
+def iter_nodes(
+    node, accept=lambda node: isinstance(node, ast.AST)
+) -> Iterator[ast.AST]:
+    for field in node._fields:
+        value = getattr(node, field, None)
         if isinstance(value, list):
             for item in value:
-                if isinstance(item, ast.AST):
-                    if accept(item):
-                        yield item
-                        yield from iter_nodes(item, accept)
+                if accept(item):
+                    yield item
+                    yield from iter_nodes(item, accept)
 
-        elif isinstance(value, ast.AST):
-            if accept(value):
-                yield value
-                yield from iter_nodes(value, accept)
+        elif accept(value):
+            yield value  # type: ignore
+            yield from iter_nodes(value, accept)
+
+
+def iter_nodes_to_collect_names(node: ast.AST) -> Iterator[ast.AST]:
+    """
+    Same as iter_nodes but with the accept hardcoded (so that it's a bit faster).
+    """
+    for field in node._fields:
+        value = getattr(node, field, None)
+        if isinstance(value, list):
+            for item in value:
+                if isinstance(
+                    item,
+                    (
+                        ast.Name,
+                        ast.Tuple,
+                        ast.List,
+                        ast.Dict,
+                        ast.BinOp,
+                        ast.BoolOp,
+                        ast.Compare,
+                        ast.Set,
+                        ast.operator,
+                        ast.boolop,
+                        ast.cmpop,
+                    ),
+                ):
+                    yield item
+                    yield from iter_nodes_to_collect_names(item)
+
+        elif isinstance(
+            value,
+            (
+                ast.Name,
+                ast.Tuple,
+                ast.List,
+                ast.Dict,
+                ast.BinOp,
+                ast.BoolOp,
+                ast.Compare,
+                ast.Set,
+                ast.operator,
+                ast.boolop,
+                ast.cmpop,
+            ),
+        ):
+            yield value
+            yield from iter_nodes_to_collect_names(value)
 
 
 def print_ast(node, stream=None):
@@ -148,7 +196,7 @@ class _RewriteCursor:
 
     current: Optional[Union[AST, List[AST]]] = None
 
-    def __init__(self, parent, node):
+    def __init__(self, parent, node: AST):
         # The parent node.
         self.parent = parent
 
@@ -156,15 +204,15 @@ class _RewriteCursor:
         self._node = node
 
     @property
-    def node(self):  # read-only (to change, change 'current')
+    def node(self) -> AST:  # read-only (to change, change 'current')
         return self._node
 
     @property
-    def after(self):
+    def after(self) -> Optional[List[AST]]:
         return self._after
 
     @property
-    def before(self):
+    def before(self) -> Optional[List[AST]]:
         return self._before
 
     def before_append(self, node: AST):
@@ -207,28 +255,45 @@ class DontGoIntoNode:
     pass
 
 
+class _FuncDefMemoStackQueue:
+    __slots__ = ["_stack"]
+
+    def __init__(self) -> None:
+        # Note: start with none and fill with the actual instance
+        # only when needed.
+        self._stack: List[Optional[FuncdefMemoStack]] = [None]
+
+    def push(self) -> None:
+        self._stack.append(None)
+
+    def pop(self) -> None:
+        self._stack.pop(-1)
+
+    def peek(self) -> FuncdefMemoStack:
+        s = self._stack[-1]
+        if s is None:
+            # Lazily create it (so,
+            s = FuncdefMemoStack()
+            self._stack[-1] = s
+        return s
+
+
 class ASTRewriter:
     # In a before this may be yielded so that we don't go into a node.
     DONT_GO_INTO_NODE = DontGoIntoNode()
 
     def __init__(self, ast: AST) -> None:
         self._ast = ast
-        self._stack: List[AST] = []
         self._cursor_stack: List[_RewriteCursor] = []
         self._next_var_id: "partial[int]" = partial(next, itertools.count())
         self._is_generator_cache: dict = {}
-        self._funcdef_memo_stack: List[FuncdefMemoStack] = [FuncdefMemoStack()]
+        self._funcdef_memo_stack: _FuncDefMemoStackQueue = _FuncDefMemoStackQueue()
         self._on_context_id_generated = Callback()
 
         # Optional info (the user can fill it with any data).
         self.dispatch_data: Any = None
 
-    def iter_and_replace_nodes(
-        self,
-    ) -> Generator[
-        Tuple[ASTRewriteEv, List[AST], AST], Optional[types.GeneratorType], None
-    ]:
-        yield from self._iter_and_replace_nodes(self._ast)
+        self.stack: List[AST] = []
 
     def next_context_id(self) -> int:
         """
@@ -252,14 +317,14 @@ class ASTRewriter:
         except:
             handle_except((id, id2))
         """
-        stack = self._funcdef_memo_stack[-1]
+        stack = self._funcdef_memo_stack.peek()
         next_id = stack.next_context_id()
         self._on_context_id_generated(stack, next_id)
         return next_id
 
     @contextmanager
     def record_context_ids(self) -> Iterator[List[int]]:
-        curr = self._funcdef_memo_stack[-1]
+        curr: FuncdefMemoStack = self._funcdef_memo_stack.peek()
         ids = []
 
         def on_generated(stack, next_id):
@@ -269,47 +334,60 @@ class ASTRewriter:
         with self._on_context_id_generated.register(on_generated):
             yield ids
 
-    def current_funcdef_memo_stack(self) -> FuncdefMemoStack:
-        return self._funcdef_memo_stack[-1]
+    def get_function_and_class_name(
+        self,
+    ) -> Optional[Tuple[ast.FunctionDef, str]]:
+        if not self.stack:
+            return None
+        stack_it = reversed(self.stack)
+        for function in stack_it:
+            funcname = function.__class__.__name__
+            if funcname == "FunctionDef":
+                break
+            continue
+        else:
+            return None
 
-    def _iter_and_replace_nodes(
-        self, node
-    ) -> Generator[
-        Tuple[ASTRewriteEv, List[AST], AST], Optional[types.GeneratorType], None
-    ]:
-        if isinstance(node, ast.FunctionDef):
-            self._funcdef_memo_stack.append(FuncdefMemoStack())
+        class_name = ""
         try:
-            yield from self._inner_iter_and_replace_nodes(node)
-        finally:
-            if isinstance(node, ast.FunctionDef):
-                self._funcdef_memo_stack.pop(-1)
+            parent = next(stack_it)
+            if parent.__class__.__name__ == "ClassDef":
+                class_name = parent.name + "."  # type: ignore
+        except StopIteration:
+            pass
 
-    def _inner_iter_and_replace_nodes(
+        return function, class_name  # type: ignore
+
+    def iter_and_replace_nodes(
         self, node
-    ) -> Generator[
-        Tuple[ASTRewriteEv, List[AST], AST], Optional[types.GeneratorType], None
-    ]:
+    ) -> Generator[Tuple[ASTRewriteEv, AST], Optional[types.GeneratorType], None]:
         """
         :note: the yielded stack is actually always the same (mutable) list, so,
         clients that want to return it somewhere else should create a copy.
         """
-        stack: List[AST] = self._stack
+        is_func_def: bool = isinstance(node, ast.FunctionDef)
+        field: str
+        if is_func_def:
+            self._funcdef_memo_stack.push()
 
-        for field, value in ast.iter_fields(node):
+        DONT_GO_INTO_NODE = self.DONT_GO_INTO_NODE
+
+        stack: List[AST] = self.stack
+        for field in node._fields:
+            value = getattr(node, field, None)
             if isinstance(value, list):
                 new_value: List[AST] = []
-                changed = False
+                changed: bool = False
 
                 for item in value:
                     if isinstance(item, AST):
                         self._cursor_stack.append(_RewriteCursor(node, item))
 
-                        go_into = True
-                        gen = yield "before", stack, item
+                        go_into: bool = True
+                        gen = yield "before", item
                         if gen is not None:
                             try:
-                                if next(gen) is self.DONT_GO_INTO_NODE:
+                                if next(gen) is DONT_GO_INTO_NODE:
                                     go_into = False
                             except StopIteration:
                                 raise AssertionError(
@@ -318,7 +396,7 @@ class ASTRewriter:
 
                         if go_into:
                             stack.append(item)
-                            yield from self._iter_and_replace_nodes(item)
+                            yield from self.iter_and_replace_nodes(item)
                             stack.pop()
 
                         try:
@@ -326,33 +404,30 @@ class ASTRewriter:
                                 next(gen)
                         except StopIteration:
                             pass
-                        yield "after", stack, item
+                        yield "after", item
 
-                        last_cursor = self._cursor_stack.pop(-1)
-                        if last_cursor.before is not None:
-                            if isinstance(last_cursor.before, list):
-                                new_value.extend(last_cursor.before)
-                            else:
-                                assert isinstance(last_cursor.before, AST)
-                                new_value.append(last_cursor.before)
+                        last_cursor: _RewriteCursor = self._cursor_stack.pop(-1)
+                        last_cursor_before: Optional[List[AST]] = last_cursor._before
+                        if last_cursor_before is not None:
+                            new_value.extend(last_cursor_before)
                             changed = True
 
-                        if last_cursor.current is not None:
-                            if isinstance(last_cursor.current, list):
-                                new_value.extend(last_cursor.current)
+                        last_cursor_current: Optional[
+                            Union[AST, List[AST]]
+                        ] = last_cursor.current
+                        if last_cursor_current is not None:
+                            if isinstance(last_cursor_current, list):
+                                new_value.extend(last_cursor_current)
                             else:
-                                assert isinstance(last_cursor.current, AST)
-                                new_value.append(last_cursor.current)
+                                # assert isinstance(last_cursor_current, AST)
+                                new_value.append(last_cursor_current)
                             changed = True
                         else:
                             new_value.append(item)
 
-                        if last_cursor.after is not None:
-                            if isinstance(last_cursor.after, list):
-                                new_value.extend(last_cursor.after)
-                            else:
-                                assert isinstance(last_cursor.after, AST)
-                                new_value.append(last_cursor.after)
+                        last_cursor_after: Optional[List[AST]] = last_cursor._after
+                        if last_cursor_after is not None:
+                            new_value.extend(last_cursor_after)
                             changed = True
 
                 if changed:
@@ -361,37 +436,39 @@ class ASTRewriter:
             elif isinstance(value, AST):
                 self._cursor_stack.append(_RewriteCursor(node, value))
 
-                gen = yield "before", stack, value
+                gen = yield "before", value
                 go_into = True
                 if gen is not None:
                     try:
-                        if next(gen) is self.DONT_GO_INTO_NODE:
+                        if next(gen) is DONT_GO_INTO_NODE:
                             go_into = False
                     except StopIteration:
                         raise AssertionError(f"Expected generator {gen} to yield once!")
 
                 if go_into:
                     stack.append(value)
-                    yield from self._iter_and_replace_nodes(value)
+                    yield from self.iter_and_replace_nodes(value)
                     stack.pop()
-
                 try:
                     if gen is not None:
                         next(gen)
                 except StopIteration:
                     pass
-                yield "after", stack, value
+                yield "after", value
 
                 last_cursor = self._cursor_stack.pop(-1)
-                if last_cursor.before is not None or last_cursor.after is not None:
-                    stack_repr = "\n".join(str(x) for x in self._stack)
+                if last_cursor._before is not None or last_cursor._after is not None:
+                    stack_repr = "\n".join(str(x) for x in self.stack)
                     raise RuntimeError(
                         f"Cannot rewrite before/after in attribute, just in list.\nField: '{field}'\nStack:\n{stack_repr}"
                     )
 
                 if last_cursor.current is not None:
-                    assert isinstance(last_cursor.current, ast.AST)
+                    # assert isinstance(last_cursor.current, ast.AST)
                     setattr(node, field, last_cursor.current)
+
+        if is_func_def:
+            self._funcdef_memo_stack.pop()
 
     @property
     def cursor(self) -> _RewriteCursor:
@@ -412,20 +489,52 @@ class ASTRewriter:
     def is_generator(self, function: ast.FunctionDef):
         # Note: caching is important as it must be called once before the function
         # is changed.
-        return _compute_is_generator(self._is_generator_cache, function)
+        try:
+            return self._is_generator_cache[function]
+        except KeyError:
+            pass
+        is_generator = self._is_generator_cache[function] = _compute_is_generator(
+            function
+        )
+        return is_generator
 
 
-def _compute_is_generator(cache, function):
-    try:
-        return cache[function]
-    except KeyError:
-        pass
-    for node in iter_nodes(function, dont_accept_class_nor_funcdef):
-        if isinstance(node, (ast.Yield, ast.YieldFrom)):
-            cache[function] = True
-            return True
+def _compute_is_generator(function: ast.FunctionDef) -> bool:
+    stack: List[ast.AST] = [function]
+    field: str
+    current_node: ast.AST
 
-    cache[function] = False
+    while stack:
+        current_node = stack.pop()
+
+        for field in current_node._fields:
+            value = getattr(current_node, field, None)
+
+            if isinstance(value, list):
+                for item in value:
+                    if isinstance(
+                        item, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)
+                    ):
+                        continue
+
+                    if isinstance(item, (ast.Yield, ast.YieldFrom)):
+                        return True
+
+                    if isinstance(item, ast.AST):
+                        stack.append(item)
+
+            else:
+                if isinstance(
+                    value, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)
+                ):
+                    continue
+
+                if isinstance(value, (ast.Yield, ast.YieldFrom)):
+                    return True
+
+                if isinstance(value, ast.AST):
+                    stack.append(value)
+
     return False
 
 
@@ -439,16 +548,14 @@ def copy_line_and_col(from_node, to_node):
 
 
 class NodeFactory:
-    def __init__(
-        self, lineno: int, col_offset: int, next_var_id: Optional["partial[int]"] = None
-    ):
+    def __init__(self, lineno: int, col_offset: int, next_var_id=None):
         self.lineno = lineno
         self.col_offset = col_offset
         if next_var_id is None:
             next_var_id = partial(next, itertools.count())
         self.next_var_id = next_var_id
 
-    def _set_line_col(self, node):
+    def _set_line_col(self, node: ast.AST):
         node.lineno = self.lineno
         node.col_offset = self.col_offset
         return node

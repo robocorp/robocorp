@@ -1,5 +1,4 @@
 import ast
-import types
 import typing
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Union
@@ -15,7 +14,13 @@ def is_rewrite_disabled(docstring: str) -> bool:
     return "NO_LOG" in docstring
 
 
-def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
+FilterKindLiteral = Literal[1, 2, 3]
+FILTER_KIND_FULL: FilterKindLiteral = 1
+FILTER_KIND_PROJECT_CALL: FilterKindLiteral = 2
+FILTER_KIND_EXCLUDE: FilterKindLiteral = 3
+
+
+def _make_import_aliases_ast(lineno: int, filter_kind: FilterKindLiteral):
     aliases = [
         ast.alias(
             "robocorp.log._lifecycle_hooks",
@@ -25,7 +30,7 @@ def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
         ),
     ]
 
-    if filter_kind == FilterKind.log_on_project_call:
+    if filter_kind == FILTER_KIND_PROJECT_CALL:
         aliases.append(
             ast.alias("robocorp.log", "@robolog", lineno=lineno, col_offset=0)
         )
@@ -34,45 +39,21 @@ def _make_import_aliases_ast(lineno, filter_kind: FilterKind):
     return imports
 
 
-def _get_function_and_class_name(stack) -> Optional[Tuple[ast.FunctionDef, str]]:
-    if not stack:
-        return None
-    stack_it = reversed(stack)
-    for function in stack_it:
-        funcname = function.__class__.__name__
-        if funcname != "FunctionDef":
-            if funcname == "AsyncFunctionDef":
-                # We don't rewrite 'AsyncFunctionDef'
-                return None
-            continue
-        break
-    else:
-        return None
-
-    class_name = ""
-    try:
-        parent = next(stack_it)
-        if parent.__class__.__name__ == "ClassDef":
-            class_name = parent.name + "."
-    except StopIteration:
-        pass
-
-    return function, class_name
-
-
-def _make_lifecycle_func_with_args(factory, func_name, *args):
+def _make_lifecycle_func_with_args(factory, func_name: str, *args):
     call = factory.Call(factory.NameLoadRewriteCallback(func_name))
     call.args.extend(args)
     return call
 
 
-def _make_ctx_func_with_args(factory, func_name, *args):
+def _make_ctx_func_with_args(factory, func_name: str, *args):
     call = factory.Call(factory.NameLoadCtx(func_name))
     call.args.extend(args)
     return call
 
 
-def _make_after_yield_expr(factory, function, class_name, node_lineno) -> ast.Expr:
+def _make_after_yield_expr(
+    factory, function, class_name: str, node_lineno: int
+) -> ast.Expr:
     return factory.Expr(
         _make_ctx_func_with_args(
             factory,
@@ -100,7 +81,9 @@ def _make_before_yield_from_exprs(
     )
 
 
-def _make_after_yield_from_expr(factory, function, class_name, node_lineno) -> ast.Expr:
+def _make_after_yield_from_expr(
+    factory, function, class_name: str, node_lineno: int
+) -> ast.Expr:
     return factory.Expr(
         _make_ctx_func_with_args(
             factory,
@@ -119,9 +102,9 @@ _EMPTY_LIST: list = []
 def _create_method_with_stmt(
     rewrite_ctx: ASTRewriter,
     factory,
-    class_name,
+    class_name: str,
     function,
-    filter_kind,
+    filter_kind: FilterKindLiteral,
     log_method_type: LogElementType,
     function_body: List[ast.stmt],
 ) -> ast.With:
@@ -130,7 +113,7 @@ def _create_method_with_stmt(
     #     with MethodLifecycleContextCallerInProject(
     #         __name, __file__, "method_name", 11, {'a': a, 'b': b}) as ctx:
     #         ...
-    if filter_kind == FilterKind.log_on_project_call:
+    if filter_kind == FILTER_KIND_PROJECT_CALL:
         name = "MethodLifecycleContextCallerInProject"
     else:
         name = "MethodLifecycleContext"
@@ -196,7 +179,7 @@ AcceptedCases = Literal[
 def _accept_function_rewrite(
     function: ast.FunctionDef,
     rewrite_ctx,
-    filter_kind,
+    filter_kind: FilterKindLiteral,
     cases: Tuple[AcceptedCases, ...],
 ) -> bool:
     if function.name.startswith("_") and function.name != "__init__":
@@ -205,35 +188,40 @@ def _accept_function_rewrite(
     if not function.body:
         return False
 
-    if filter_kind == FilterKind.full_log:
+    if filter_kind == FILTER_KIND_FULL:
         if "full_log" not in cases:
             return False
 
-    elif filter_kind == FilterKind.log_on_project_call:
+    elif filter_kind == FILTER_KIND_PROJECT_CALL:
         if "log_on_project_call" not in cases:
             return False
+
+    generator_in_cases: bool = "generator" in cases
+
+    # rewrite_ctx.is_generator is slow, so, in the cases where we'd track
+    # it anyways we can skip the check.
+    if generator_in_cases:
+        return True
 
     is_generator = rewrite_ctx.is_generator(function)
 
     if is_generator:
-        if "generator" not in cases:
+        if not generator_in_cases:
             return False
-
-        if "untracked_generator" not in cases:
-            if filter_kind == FilterKind.log_on_project_call:
-                # Don't rewrite untracked generators.
-                return False
 
     return True
 
 
 def _rewrite_funcdef(
-    rewrite_ctx: ASTRewriter, stack, function: ast.FunctionDef, filter_kind
+    rewrite_ctx: ASTRewriter,
+    function: ast.FunctionDef,
+    filter_kind: FilterKindLiteral,
 ) -> None:
     parent: Any
     # Only rewrite functions which actually have some content.
 
     class_name = ""
+    stack = rewrite_ctx.stack
     if stack:
         parent = stack[-1]
         if parent.__class__.__name__ == "ClassDef":
@@ -252,7 +240,7 @@ def _rewrite_funcdef(
     # cached value (for is_generator) directly.
     log_method_type: LogElementType
     if rewrite_ctx.is_generator(function):
-        if filter_kind == FilterKind.log_on_project_call:
+        if filter_kind == FILTER_KIND_PROJECT_CALL:
             log_method_type = "UNTRACKED_GENERATOR"
         else:
             log_method_type = "GENERATOR"
@@ -294,7 +282,7 @@ def _rewrite_funcdef(
 
 def rewrite_ast_add_callbacks(
     mod: ast.Module,
-    filter_kind: FilterKind,
+    original_filter_kind: FilterKind,
     source: bytes,
     module_path: str,
     config: AutoLogConfigBase,
@@ -304,6 +292,17 @@ def rewrite_ast_add_callbacks(
     if not mod.body:
         # Nothing to do.
         return
+
+    # Convert to int for performance.
+    kind: FilterKindLiteral
+    if original_filter_kind == FilterKind.full_log:
+        kind = FILTER_KIND_FULL
+    elif original_filter_kind == FilterKind.log_on_project_call:
+        kind = FILTER_KIND_PROJECT_CALL
+    elif original_filter_kind == FilterKind.exclude:
+        kind = FILTER_KIND_EXCLUDE
+    else:
+        raise ValueError(f"Unexpected filter kind: {original_filter_kind}.")
 
     # We'll insert some special imports at the top of the module, but after any
     # docstrings and __future__ imports, so first figure out where that is.
@@ -339,7 +338,7 @@ def rewrite_ast_add_callbacks(
     else:
         lineno = item.lineno
     # Now actually insert the special imports.
-    imports = _make_import_aliases_ast(lineno, filter_kind)
+    imports = _make_import_aliases_ast(lineno, kind)
     mod.body[pos:pos] = imports
 
     dispatch_table = _DispatchTable()
@@ -348,38 +347,36 @@ def rewrite_ast_add_callbacks(
 
     node: ast.AST
 
-    iter_in = rewrite_ctx.iter_and_replace_nodes()
+    iter_in = rewrite_ctx.iter_and_replace_nodes(mod)
 
-    feed_generator: Optional[types.GeneratorType] = None
+    feed_generator: Optional[Any] = None
     while True:
         if feed_generator is not None:
             temp = feed_generator
             feed_generator = None
             try:
-                ev, stack, node = iter_in.send(temp)
+                ev, node = iter_in.send(temp)
             except StopIteration:
                 break
         else:
             try:
-                ev, stack, node = next(iter_in)
+                ev, node = next(iter_in)
             except StopIteration:
                 break
 
         if ev == "before":
             handler = dispatch_table.dispatch_before.get(node.__class__)
             if handler:
-                result = handler(
-                    rewrite_ctx, config, module_path, stack, filter_kind, node
-                )
-                if isinstance(result, types.GeneratorType):
+                result = handler(rewrite_ctx, config, module_path, kind, node)
+                if hasattr(
+                    result, "gi_frame"
+                ):  # I.e.: Check generator for python and cython
                     feed_generator = result
 
         else:
             handler = dispatch_table.dispatch_after.get(node.__class__)
             if handler:
-                result = handler(
-                    rewrite_ctx, config, module_path, stack, filter_kind, node
-                )
+                result = handler(rewrite_ctx, config, module_path, kind, node)
                 if result is not None:
                     rewrite_ctx.cursor.current = result
 
@@ -389,8 +386,22 @@ def rewrite_ast_add_callbacks(
         print(ast.unparse(mod))  # type: ignore
 
 
+def _handle_async_funcdef(
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
+    node,
+):
+    yield rewrite_ctx.DONT_GO_INTO_NODE
+
+
 def _handle_funcdef(
-    rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
+    node,
 ):
     try:
         function: ast.FunctionDef = node
@@ -401,13 +412,25 @@ def _handle_funcdef(
             cases=(
                 "full_log",
                 "log_on_project_call",
-                "untracked_generator",
                 "generator",
             ),
         ):
+            yield rewrite_ctx.DONT_GO_INTO_NODE
             return
 
-        _rewrite_funcdef(rewrite_ctx, stack, node, filter_kind)
+        if filter_kind == FILTER_KIND_PROJECT_CALL and rewrite_ctx.is_generator(
+            function
+        ):
+            # This is the case for 'untracked_generator'. In this situation,
+            # we should not go inside the function (so, we just do the
+            # function-level rewriting).
+            _rewrite_funcdef(rewrite_ctx, node, filter_kind)
+            yield rewrite_ctx.DONT_GO_INTO_NODE
+            return
+
+        yield
+        _rewrite_funcdef(rewrite_ctx, node, filter_kind)
+
     except Exception:
         raise RuntimeError(
             f"Error when rewriting function: {node.name} line: {node.lineno} "
@@ -416,9 +439,13 @@ def _handle_funcdef(
 
 
 def _handle_return(
-    rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
+    node,
 ):
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         return None
 
@@ -455,7 +482,7 @@ def _handle_return(
         else:
             call.args.append(factory.NoneConstant())
 
-        if filter_kind == FilterKind.log_on_project_call:
+        if filter_kind == FILTER_KIND_PROJECT_CALL:
             result.append(
                 factory.AndExpr(
                     factory.Attribute(factory.NameLoad("@ctx"), "_accept"), call
@@ -475,12 +502,11 @@ def _handle_return(
 def _handle_continue_break(
     rewrite_ctx: ASTRewriter,
     config,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: Union[ast.Continue, ast.Break],
 ):
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         return None
 
@@ -515,14 +541,18 @@ def _handle_continue_break(
 
 
 def _handle_if(
-    rewrite_ctx: ASTRewriter, config, module_path, stack, filter_kind, node: ast.If
+    rewrite_ctx: ASTRewriter,
+    config,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
+    node: ast.If,
 ):
     """
     When handling an if we have 2 options: writing it unscoped (so, we just
     notify that an if branch was taken, but we don't notify when it exits, which
     is meant for generators) or scoped (regular case without generators).
     """
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         yield
         return None
@@ -535,7 +565,7 @@ def _handle_if(
         cases=("full_log",),
     ):
         yield from _handle_full_log_if(
-            function, rewrite_ctx, config, module_path, stack, filter_kind, node
+            function, rewrite_ctx, config, module_path, filter_kind, node
         )
 
     elif _accept_function_rewrite(
@@ -548,7 +578,7 @@ def _handle_if(
         ),
     ):
         yield from _handle_generator_if(
-            function, rewrite_ctx, config, module_path, stack, filter_kind, node
+            function, rewrite_ctx, config, module_path, filter_kind, node
         )
 
     else:
@@ -560,9 +590,8 @@ def _handle_full_log_if(
     function,
     rewrite_ctx: ASTRewriter,
     config,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: ast.If,
 ):
     if_id = rewrite_ctx.next_context_id()
@@ -574,7 +603,7 @@ def _handle_full_log_if(
     yield
     try:
         stmt_name = "if"
-        parent_node = stack[-1]
+        parent_node = rewrite_ctx.stack[-1]
         iselif = False
         if isinstance(parent_node, ast.If):
             iselif = bool(
@@ -659,15 +688,14 @@ def _handle_generator_if(
     function,
     rewrite_ctx: ASTRewriter,
     config,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: ast.If,
 ):
     yield
     try:
         stmt_name = "if"
-        parent_node = stack[-1]
+        parent_node = rewrite_ctx.stack[-1]
         iselif = False
         if isinstance(parent_node, ast.If):
             iselif = bool(
@@ -717,16 +745,15 @@ def _handle_generator_if(
 def _handle_before_assert(
     rewrite_ctx: ASTRewriter,
     config: AutoLogConfigBase,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: ast.Assert,
 ):
-    if filter_kind != FilterKind.full_log:
+    if filter_kind != FILTER_KIND_FULL:
         yield
         return None
 
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         yield
         return None
@@ -813,15 +840,14 @@ def _handle_before_assert(
 def _handle_assign(
     rewrite_ctx: ASTRewriter,
     config: AutoLogConfigBase,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node,
 ):
-    if filter_kind != FilterKind.full_log or not config.get_rewrite_assigns():
+    if filter_kind != FILTER_KIND_FULL or not config.get_rewrite_assigns():
         return None
 
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         return None
 
@@ -860,7 +886,7 @@ def _handle_assign(
 def _filter_calls(node):
     # We can't go into calls or list comprehensions as we could end up loading
     # names which are just being created.
-    if isinstance(
+    return isinstance(
         node,
         (
             ast.Name,
@@ -875,30 +901,28 @@ def _filter_calls(node):
             ast.boolop,
             ast.cmpop,
         ),
-    ):
-        return True
-    return False
+    )
 
 
-def _collect_names(target):
+def _collect_names(target: ast.AST):
     from robocorp.log import _ast_utils
 
     if isinstance(target, ast.Name):
         yield target
 
-    for node in _ast_utils.iter_nodes(target, accept=_filter_calls):
+    for node in _ast_utils.iter_nodes_to_collect_names(target):
         if isinstance(node, ast.Name):
             yield node
 
 
 def _accept_generator_full_log(
-    rewrite_ctx: ASTRewriter, stack, filter_kind: FilterKind
+    rewrite_ctx: ASTRewriter, filter_kind: FilterKindLiteral
 ) -> Optional[Tuple[ast.FunctionDef, str]]:
     """
     If it's accepted returns the function and class name, otherwise
     returns None.
     """
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         return None
 
@@ -917,12 +941,11 @@ def _accept_generator_full_log(
 def _handle_before_try(
     rewrite_ctx: ASTRewriter,
     config,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: ast.Try,
 ):
-    func_and_class_name = _accept_generator_full_log(rewrite_ctx, stack, filter_kind)
+    func_and_class_name = _accept_generator_full_log(rewrite_ctx, filter_kind)
     if not func_and_class_name:
         yield
         return
@@ -955,12 +978,11 @@ def _handle_before_try(
 def _handle_for_or_while(
     rewrite_ctx: ASTRewriter,
     config,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: Union[ast.For, ast.While],
 ):
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         yield
         return None
@@ -1141,12 +1163,11 @@ def _collect_names_used_as_node_or_none(
 def _handle_yield(
     rewrite_ctx: ASTRewriter,
     config,
-    module_path,
-    stack,
-    filter_kind,
+    module_path: str,
+    filter_kind: FilterKindLiteral,
     node: Union[ast.Yield, ast.YieldFrom],
 ):
-    func_and_class_name = _get_function_and_class_name(stack)
+    func_and_class_name = rewrite_ctx.get_function_and_class_name()
     if not func_and_class_name:
         return None
 
@@ -1302,7 +1323,7 @@ class _DispatchTable:
         _dispatch_before: Dict[
             type,
             Callable[
-                [ASTRewriter, AutoLogConfigBase, str, list, FilterKind, Any],
+                [ASTRewriter, AutoLogConfigBase, str, FilterKindLiteral, Any],
                 Optional[list],
             ],
         ] = {}
@@ -1310,7 +1331,7 @@ class _DispatchTable:
         _dispatch_after: Dict[
             type,
             Callable[
-                [ASTRewriter, AutoLogConfigBase, str, list, FilterKind, Any],
+                [ASTRewriter, AutoLogConfigBase, str, FilterKindLiteral, Any],
                 Optional[list],
             ],
         ] = {}
@@ -1318,12 +1339,13 @@ class _DispatchTable:
         ### STATEMENTS
         _dispatch_after[ast.Return] = _handle_return
         _dispatch_after[ast.Assign] = _handle_assign
-        _dispatch_after[ast.FunctionDef] = _handle_funcdef
         _dispatch_after[ast.Continue] = _handle_continue_break
         _dispatch_after[ast.Break] = _handle_continue_break
 
         # We have to gather the ids for the contexts in order (so, do it
         # in before / after generator).
+        _dispatch_before[ast.FunctionDef] = _handle_funcdef
+        _dispatch_before[ast.AsyncFunctionDef] = _handle_async_funcdef
         _dispatch_before[ast.For] = _handle_for_or_while
         _dispatch_before[ast.While] = _handle_for_or_while
         _dispatch_before[ast.If] = _handle_if
@@ -1349,9 +1371,8 @@ class _DispatchTable:
         self,
         rewrite_ctx: ASTRewriter,
         config,
-        module_path,
-        stack,
-        filter_kind,
+        module_path: str,
+        filter_kind: FilterKindLiteral,
         node: ast.Compare,
     ):
         c = node.left
@@ -1386,9 +1407,8 @@ class _DispatchTable:
         self,
         rewrite_ctx: ASTRewriter,
         config,
-        module_path,
-        stack,
-        filter_kind,
+        module_path: str,
+        filter_kind: FilterKindLiteral,
         node: ast.Call,
     ):
         factory = rewrite_ctx.NodeFactory(node.func.lineno, node.func.col_offset)
@@ -1411,9 +1431,8 @@ class _DispatchTable:
         self,
         rewrite_ctx: ASTRewriter,
         config,
-        module_path,
-        stack,
-        filter_kind,
+        module_path: str,
+        filter_kind: FilterKindLiteral,
         node: ast.Attribute,
     ):
         factory = rewrite_ctx.NodeFactory(node.lineno, node.col_offset)
