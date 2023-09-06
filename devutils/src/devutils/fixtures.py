@@ -125,7 +125,11 @@ def _download_rcc(location: str, force: bool = False) -> None:
             url = prefix + relative_path
 
             # log.info(f"Downloading rcc from: {url} to: {location}.")
-            response = urllib.request.urlopen(url)
+            # Cloudflare seems to be blocking "User-Agent: Python-urllib/3.9".
+            # Use a different one as that must be sorted out.
+            response = urllib.request.urlopen(
+                urllib.request.Request(url, headers={"User-Agent": "Mozilla"})
+            )
 
             # Put it all in memory before writing (i.e. just write it if
             # we know we downloaded everything).

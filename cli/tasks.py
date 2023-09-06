@@ -1,9 +1,9 @@
-import urllib.request
 import os
 import platform
 import shutil
 import stat
 import sys
+import urllib.request
 from contextlib import contextmanager
 from itertools import chain
 from pathlib import Path
@@ -50,7 +50,16 @@ def download_rcc(system: Optional[str] = None) -> Path:
     rcc_path = BIN / "rcc.exe" if system == "Windows" else BIN / "rcc"
 
     print(f"Downloading '{rcc_url}' to '{rcc_path}'")
-    urllib.request.urlretrieve(rcc_url, rcc_path)
+
+    # Cloudflare seems to be blocking "User-Agent: Python-urllib/3.9".
+    # Use a different one as that must be sorted out.
+    response = urllib.request.urlopen(
+        urllib.request.Request(rcc_url, headers={"User-Agent": "Mozilla"})
+    )
+
+    with open(rcc_path, "wb") as stream:
+        stream.write(response.read())
+
     st = os.stat(rcc_path)
     os.chmod(rcc_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
@@ -63,7 +72,7 @@ def copy_templates():
     shutil.copytree(src, TEMPLATES, dirs_exist_ok=True)
 
 
-def go_build(ctx, output: Path, system: Optional[str] = None, arch = "amd64"):
+def go_build(ctx, output: Path, system: Optional[str] = None, arch="amd64"):
     if system is None:
         system = platform.system()
 
@@ -114,6 +123,7 @@ def clean(ctx):
         else:
             path.unlink()
 
+
 @task
 def lint(ctx):
     """Run static analysis"""
@@ -163,9 +173,9 @@ def crossbuild(ctx):
         ("amd64", "Linux", "linux64"),
         ("amd64", "Darwin", "macos64"),
     ):
-            rcc = download_rcc(system)
-            go_build(ctx, output=BUILD / dirname, system=system, arch=arch)
-            rcc.unlink()
+        rcc = download_rcc(system)
+        go_build(ctx, output=BUILD / dirname, system=system, arch=arch)
+        rcc.unlink()
 
 
 @task
