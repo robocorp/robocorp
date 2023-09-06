@@ -17,7 +17,7 @@ from tenacity import (
 )
 
 LOGGER = logging.getLogger(__name__)
-DEBUG = bool(os.getenv("RPA_DEBUG_API"))
+DEBUG = bool(os.getenv("RC_DEBUG_API") or os.getenv("RPA_DEBUG_API"))
 
 
 def _needs_retry(exc: BaseException) -> bool:
@@ -160,7 +160,7 @@ class Requests:
 
         log_url = url
         if _sensitive:
-            # Omit query from the URL since might contain sensitive info
+            # Omit query from the URL since might contain sensitive info.
             split = urllib.parse.urlsplit(log_url)
             split = split._replace(query="")
             log_url = urllib.parse.urlunsplit(split)
@@ -181,10 +181,3 @@ class Requests:
 
     def delete(self, *args, **kwargs) -> Response:
         return self._request(requests.delete, *args, **kwargs)
-
-
-__all__ = [
-    "Requests",
-    "Response",
-    "HTTPError",
-]
