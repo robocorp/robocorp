@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add support for `RC_DISABLE_SSL`
+
 ## 0.3.2 - 2023-07-27
 
 - Fix bug with managing assets containing spaces in their name
