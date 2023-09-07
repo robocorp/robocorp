@@ -8,10 +8,10 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-from requests import HTTPError
+from requests import HTTPError as _HTTPError
 
 from robocorp.workitems._adapters import FileAdapter, RobocorpAdapter
-from robocorp.workitems._requests import DEBUG, RequestsHTTPError
+from robocorp.workitems._requests import DEBUG, HTTPError
 from robocorp.workitems._types import State
 
 ITEMS_JSON = [{"payload": {"a-key": "a-value"}, "files": {"a-file": "file.txt"}}]
@@ -176,6 +176,11 @@ class TestRobocorpAdapter:
             self.mock_put.__name__ = "put"
             self.mock_delete.__name__ = "delete"
 
+            self.mock_get.return_value.status_code = 200
+            self.mock_post.return_value.status_code = 200
+            self.mock_put.return_value.status_code = 200
+            self.mock_delete.return_value.status_code = 200
+
             self.mock_sleep = mock_sleep
 
             yield RobocorpAdapter()
@@ -184,7 +189,10 @@ class TestRobocorpAdapter:
         initial_item_id = adapter.reserve_input()
         assert initial_item_id == self.ENV["RC_WORKITEM_ID"]
 
-        self.mock_post.return_value.json.return_value = {"workItemId": "44"}
+        response = self.mock_post.return_value
+        response.status_code = 200
+        response.json.return_value = {"workItemId": "44"}
+
         reserved_item_id = adapter.reserve_input()
         assert reserved_item_id == "44"
 
@@ -265,6 +273,7 @@ class TestRobocorpAdapter:
     def _failing_response(request):
         resp = mock.MagicMock()
         resp.ok = False
+        resp.text = json.dumps(request.param[0])
         resp.json.return_value = request.param[0]
         resp.raise_for_status.side_effect = request.param[1]
         return resp
@@ -273,7 +282,7 @@ class TestRobocorpAdapter:
         params=[
             # Requests response attribute values for: `.json()`, `.raise_for_status()`
             ({}, None),
-            (None, HTTPError()),
+            (None, _HTTPError()),
         ]
     )
     def failing_response(self, request):
@@ -305,7 +314,7 @@ class TestRobocorpAdapter:
         self.mock_get.return_value = failing_response
         failing_response.status_code = status_code
 
-        with pytest.raises(RequestsHTTPError) as exc_info:
+        with pytest.raises(HTTPError) as exc_info:
             adapter.list_files("4")
         assert exc_info.value.status_code == status_code
         assert self.mock_get.call_count == call_count  # tried once or 5 times in a row
@@ -316,7 +325,7 @@ class TestRobocorpAdapter:
             ({"error": {"code": "UNEXPECTED_ERROR"}}, None),  # normal response
             ('{"error": {"code": "UNEXPECTED_ERROR"}}', None),  # double serialized
             (r'"{\"error\": {\"code\": \"UNEXPECTED_ERROR\"}}"', None),  # triple
-            ('[{"some": "value"}]', HTTPError()),  # double serialized list
+            ('[{"some": "value"}]', _HTTPError()),  # double serialized list
         ]
     )
     def failing_deserializing_response(self, request):
@@ -326,19 +335,23 @@ class TestRobocorpAdapter:
         self.mock_get.return_value = failing_deserializing_response
         failing_deserializing_response.status_code = 429
 
-        with pytest.raises(RequestsHTTPError) as exc_info:
+        with pytest.raises(HTTPError) as exc_info:
             adapter.list_files("4")
 
-        err = "UNEXPECTED_ERROR"
-        call_count = 5
-        if err not in str(failing_deserializing_response.json.return_value):
-            err = "Error"  # default error message in the absence of it
         assert exc_info.value.status_code == 429
-        assert exc_info.value.status_message == err
-        assert self.mock_get.call_count == call_count
+        assert exc_info.value.message == failing_deserializing_response.text
+        assert self.mock_get.call_count == 5
 
-    def test_logging_and_sleeping(self, adapter, failing_response, caplog):
-        assert DEBUG, 'This test should be ran with "RC_WORKITEM_DEBUG" on'
+    def test_logging_and_sleeping(self, adapter, caplog):
+        assert DEBUG, 'This test should be ran with "RC_DEBUG" on'
+
+        def error_response(status_code):
+            mm = mock.MagicMock()
+            mm.ok = False
+            mm.status_code = status_code
+            mm.reason = "test reason"
+            mm.text = "test reason"
+            return mm
 
         # 1st call: raises 500 -> unexpected server crash, therefore needs retry
         #   (1 sleep)
@@ -346,11 +359,13 @@ class TestRobocorpAdapter:
         #   (2 sleeps)
         # 3rd call: raises 400 -> malformed request, doesn't retry anymore and raises
         #   with last error, no sleeps performed
-        status_code = mock.PropertyMock(side_effect=[500, 429, 400])
-        type(failing_response).status_code = status_code
-        failing_response.reason = "for no reason :)"
-        self.mock_post.return_value = failing_response
-        with pytest.raises(RequestsHTTPError) as exc_info:
+        self.mock_post.side_effect = [
+            error_response(500),
+            error_response(429),
+            error_response(400),
+        ]
+
+        with pytest.raises(HTTPError) as exc_info:
             with caplog.at_level(logging.DEBUG):
                 adapter.create_output("1")
 
@@ -358,15 +373,15 @@ class TestRobocorpAdapter:
         assert self.mock_sleep.call_count == 3  # 1 sleep (500) + 2 sleeps (429)
         expected_logs = [
             "POST 'https://api.process.com/process-v1/workspaces/1/processes/5/work-items/1/output'",
-            "API response: 500 'for no reason :)'",
-            "API response: 429 'for no reason :)'",
-            "API response: 400 'for no reason :)'",
+            "Server error: 500 'test reason'",
+            "Client error: 429 'test reason'",
+            "Client error: 400 'test reason'",
         ]
         captured_logs = set(record.message for record in caplog.records)
         for expected_log in expected_logs:
             assert expected_log in captured_logs
 
-    def test_add_get_file(self, adapter, success_response, caplog):
+    def test_add_get_file(self, adapter, caplog):
         """Uploads and retrieves files with AWS support.
 
         This way we check if sensitive information (like auth params) don't get
@@ -376,49 +391,57 @@ class TestRobocorpAdapter:
         file_name = "myfile.txt"
         file_content = b"some-data"
 
-        # Behaviour for: adding a file (2x POST), getting the file (3x GET).
-        #
-        # POST #1: 201 - default error handling
-        # POST #2: 201 - custom error handling -> status code retrieved
-        # GET #1: 200 - default error handling
-        # GET #2: 200 - default error handling
-        # GET #3: 200 - custom error handling -> status code retrieved
-        status_code = mock.PropertyMock(side_effect=[201, 200, 200])
-        type(success_response).status_code = status_code
-        # POST #1: JSON with file related data
-        # POST #2: ignored response content
-        # GET #1: JSON with all the file IDs
-        # GET #2: JSON with the file URL corresponding to ID
-        # GET #3: bytes response content (not ignored)
-        post_data = {
-            "url": "https://s3.eu-west-1.amazonaws.com/ci-4f23e-robocloud-td",
-            "fields": {
-                "dont": "care",
-            },
-        }
-        get_files_data = [
-            {
-                "fileName": file_name,
-                "fileId": "file-id",
-            }
-        ]
-        get_file_data = {
-            "url": "https://ci-4f23e-robocloud-td.s3.eu-west-1.amazonaws.com/files/ws_17/wi_0dd63f07-ba7b-414a-bf92-293080975d2f/file_eddfd9ac-143f-4eb9-888f-b9c378e67aec?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=secret-credentials",
-        }
-        success_response.json.side_effect = [post_data, get_files_data, get_file_data]
-        success_response.content = file_content
-        self.mock_post.return_value = self.mock_get.return_value = success_response
+        def success_response(status_code, json_value, content=None):
+            mm = mock.MagicMock()
+            mm.ok = True
+            mm.status_code = status_code
+            mm.json.return_value = json_value
+            mm.content = content
+            return mm
 
-        # 2x POST (CR file entry, AWS file content)
-        adapter.add_file(
-            item_id,
-            file_name,
-            content=file_content,
-        )
+        # Adding a file
+        # POST #1: Response: JSON with file related data
+        # POST #2: Response: Ignored
+        self.mock_post.side_effect = [
+            success_response(
+                201,
+                {
+                    "url": "https://s3.eu-west-1.amazonaws.com/ci-4f23e-robocloud-td",
+                    "fields": {
+                        "dont": "care",
+                    },
+                },
+            ),
+            success_response(201, {}),
+        ]
+
+        adapter.add_file(item_id, file_name, content=file_content)
         files = self.mock_post.call_args_list[-1][1]["files"]
         assert files == {"file": (file_name, file_content)}
 
-        # 3x GET (all files, specific file, file content)
+        # Reading a file
+        # GET #1: Response: JSON with all the file IDs
+        # GET #2: Response: JSON with the file URL corresponding to ID
+        # GET #3: Response: Bytes response content
+        self.mock_get.side_effect = [
+            success_response(
+                200,
+                [
+                    {
+                        "fileName": file_name,
+                        "fileId": "file-id",
+                    }
+                ],
+            ),
+            success_response(
+                200,
+                {
+                    "url": "https://ci-4f23e-robocloud-td.s3.eu-west-1.amazonaws.com/files/ws_17/wi_0dd63f07-ba7b-414a-bf92-293080975d2f/file_eddfd9ac-143f-4eb9-888f-b9c378e67aec?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=secret-credentials",
+                },
+            ),
+            success_response(200, {}, file_content),
+        ]
+
         content = adapter.get_file(item_id, file_name)
         assert content == file_content
 
@@ -427,3 +450,31 @@ class TestRobocorpAdapter:
             "secret-credentials" in record.message for record in caplog.records
         )
         assert not exposed, "secret got exposed"
+
+    def test_no_explicit_verify(self, adapter):
+        adapter.save_payload("some-id", {})
+        call = self.mock_put.call_args
+
+        assert "verify" not in call.kwargs
+
+    @pytest.mark.parametrize(
+        "value,disabled",
+        [
+            ("no", True),
+            ("off", True),
+            ("1", True),
+            ("0", True),
+            ("yes please I'd like to disable it", True),
+            (" ", True),
+            ("", False),
+        ],
+    )
+    def test_disable_ssl_verify(self, adapter, value, disabled):
+        with mock.patch.dict(os.environ, {"RC_DISABLE_SSL": value}):
+            adapter.save_payload("some-id", {})
+            call = self.mock_put.call_args
+
+            if disabled:
+                assert call.kwargs["verify"] is False
+            else:
+                assert "verify" not in call.kwargs
