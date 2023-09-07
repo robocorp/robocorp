@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add support for `RC_DISABLE_SSL`
+
 ## 1.3.2 - 2023-08-24
 
 - Handle exceptions derived from `BusinessException` or `ApplicationException`

@@ -17,7 +17,7 @@ from tenacity import (
 )
 
 LOGGER = logging.getLogger(__name__)
-DEBUG = bool(os.getenv("RPA_DEBUG_API"))
+DEBUG = bool(os.getenv("RC_DEBUG_API") or os.getenv("RPA_DEBUG_API"))
 
 
 def _needs_retry(exc: BaseException) -> bool:
@@ -82,7 +82,7 @@ class Requests:
         self._route_prefix = route_prefix
         self._default_headers = default_headers
 
-    def handle_error(self, response: requests.Response):
+    def handle_error(self, response: Response):
         http_status = f"{response.status_code} {response.reason!r}"
         if 500 <= response.status_code < 600:
             LOGGER.critical("Server error: %s", http_status)
@@ -104,8 +104,11 @@ class Requests:
 
             # For some reason we might still get a string from the deserialized
             # JSON payload, possible due to some double encoding bug in CR
-            while not isinstance(fields, dict):
+            while isinstance(fields, str):
                 fields = json.loads(fields)
+
+            if not isinstance(fields, dict):
+                raise ValueError(f"Expected 'dict', was '{type(fields).__name__}'")
 
             if "status" in fields:
                 status_code = int(fields["status"])
@@ -120,7 +123,7 @@ class Requests:
             elif "error" in fields and "message" in fields["error"]:
                 message = fields["error"]["message"]
         except Exception as exc:
-            LOGGER.critical("Failed to parse error response: %r", exc)
+            LOGGER.critical("Failed to parse error response: %s", exc)
 
         raise HTTPError(message, status_code=status_code, reason=reason)
 
@@ -144,14 +147,14 @@ class Requests:
     )
     def _request(
         self,
-        verb: Callable[..., requests.Response],
+        verb: Callable[..., Response],
         url: str,
         *args,
-        _handle_error: Optional[Callable[[requests.Response], None]] = None,
+        _handle_error: Optional[Callable[[Response], None]] = None,
         _sensitive: bool = False,
         headers: Optional[dict] = None,
         **kwargs,
-    ) -> requests.Response:
+    ) -> Response:
         # Absolute URLs override the prefix, so they are safe to be sent
         # as they'll be the same after joining.
         url = urllib.parse.urljoin(self._route_prefix, url)
@@ -165,19 +168,22 @@ class Requests:
             split = split._replace(query="")
             log_url = urllib.parse.urlunsplit(split)
 
+        if os.getenv("RC_DISABLE_SSL"):
+            kwargs["verify"] = False
+
         LOGGER.debug("%s %r", verb.__name__.upper(), log_url)
         response = verb(url, *args, headers=headers, **kwargs)
         handle_error(response)
         return response
 
-    def post(self, *args, **kwargs) -> requests.Response:
+    def post(self, *args, **kwargs) -> Response:
         return self._request(requests.post, *args, **kwargs)
 
-    def get(self, *args, **kwargs) -> requests.Response:
+    def get(self, *args, **kwargs) -> Response:
         return self._request(requests.get, *args, **kwargs)
 
-    def put(self, *args, **kwargs) -> requests.Response:
+    def put(self, *args, **kwargs) -> Response:
         return self._request(requests.put, *args, **kwargs)
 
-    def delete(self, *args, **kwargs) -> requests.Response:
+    def delete(self, *args, **kwargs) -> Response:
         return self._request(requests.delete, *args, **kwargs)

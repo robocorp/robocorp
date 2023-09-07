@@ -17,7 +17,7 @@ from tenacity import (
 )
 
 LOGGER = logging.getLogger(__name__)
-DEBUG = bool(os.getenv("RPA_DEBUG_API"))
+DEBUG = bool(os.getenv("RC_DEBUG_API") or os.getenv("RPA_DEBUG_API"))
 
 
 def _needs_retry(exc: BaseException) -> bool:
@@ -104,8 +104,11 @@ class Requests:
 
             # For some reason we might still get a string from the deserialized
             # JSON payload, possible due to some double encoding bug in CR
-            while not isinstance(fields, dict):
+            while isinstance(fields, str):
                 fields = json.loads(fields)
+
+            if not isinstance(fields, dict):
+                raise ValueError(f"Expected 'dict', was '{type(fields).__name__}'")
 
             if "status" in fields:
                 status_code = int(fields["status"])
@@ -120,7 +123,7 @@ class Requests:
             elif "error" in fields and "message" in fields["error"]:
                 message = fields["error"]["message"]
         except Exception as exc:
-            LOGGER.critical("Failed to parse error response: %r", exc)
+            LOGGER.critical("Failed to parse error response: %s", exc)
 
         raise HTTPError(message, status_code=status_code, reason=reason)
 
@@ -160,10 +163,13 @@ class Requests:
 
         log_url = url
         if _sensitive:
-            # Omit query from the URL since might contain sensitive info
+            # Omit query from the URL since might contain sensitive info.
             split = urllib.parse.urlsplit(log_url)
             split = split._replace(query="")
             log_url = urllib.parse.urlunsplit(split)
+
+        if os.getenv("RC_DISABLE_SSL"):
+            kwargs["verify"] = False
 
         LOGGER.debug("%s %r", verb.__name__.upper(), log_url)
         response = verb(url, *args, headers=headers, **kwargs)
@@ -181,10 +187,3 @@ class Requests:
 
     def delete(self, *args, **kwargs) -> Response:
         return self._request(requests.delete, *args, **kwargs)
-
-
-__all__ = [
-    "Requests",
-    "Response",
-    "HTTPError",
-]
