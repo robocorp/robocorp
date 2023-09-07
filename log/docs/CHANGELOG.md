@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 2.7.1 - 2023-09-07
 
 - A case where the stack could become inconsistent when using yield was fixed.
+- Performance improvements (it's now 20% faster to import modules).
 
 ## 2.7.0 - 2023-08-21
 
