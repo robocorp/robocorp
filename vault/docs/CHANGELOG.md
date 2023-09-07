@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.3.0 - 2023-09-07
+
 - Add support for `RC_DISABLE_SSL`
 
 ## 1.2.0 - 2023-07-14
