@@ -1,6 +1,15 @@
-import { Box, Button, Code, Header, Menu, Tooltip, useClipboard } from '@robocorp/components';
+import {
+  Box,
+  Button,
+  Code,
+  EditorView,
+  Header,
+  Menu,
+  Tooltip,
+  useClipboard,
+} from '@robocorp/components';
 import { styled } from '@robocorp/theme';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { prettyPrint } from '~/lib/prettyPrint';
 import { python } from '@codemirror/lang-python';
@@ -118,7 +127,7 @@ export const VariableValue: FC<{ value: string }> = (props) => {
         <Button
           aria-label="Copy to clipboard"
           variant="ghost"
-          round
+          className="copyVariableToClipboard"
           icon={copiedToClipboard ? IconCheck2 : IconCopy}
           onClick={onCopyToClipboard(value)}
           size="small"
@@ -130,16 +139,18 @@ export const VariableValue: FC<{ value: string }> = (props) => {
   let showLineNumbers = props.value.includes('\n');
 
   return (
-    <VariableContent>
-      <Code
-        value={value}
-        toolbar={toolbar}
-        extensions={extensions}
-        aria-label="Code editor"
-        lineNumbers={showLineNumbers}
-        readOnly={true}
-      />
-    </VariableContent>
+    <Box>
+      <VariableContent className="variableContent">
+        <Code
+          value={value}
+          extensions={extensions}
+          aria-label="Code editor"
+          lineNumbers={showLineNumbers}
+          readOnly={true}
+        />
+      </VariableContent>
+      {toolbar}
+    </Box>
   );
 };
 

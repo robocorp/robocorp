@@ -1,4 +1,5 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, MouseEvent, useCallback } from 'react';
+import './step.css';
 import {
   IconAlignArrowLeft,
   IconAlignArrowRight,
@@ -236,8 +237,26 @@ export const getIcon = (entry: Entry): ReactNode => {
 };
 
 export const StepIcon: FC<Props> = ({ entry }) => {
+  const { setDetailsIndex } = useLogContext();
+
+  const onClickShowDetails = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      setDetailsIndex({ indexAll: entry.entryIndexAll });
+    },
+    [entry, setDetailsIndex],
+  );
+
   return (
-    <Box display="flex" alignItems="center" height="$32" mr="$8">
+    <Box
+      className="entryIcon"
+      style={{ cursor: 'pointer' }}
+      display="flex"
+      alignItems="center"
+      height="$32"
+      mr="$8"
+      onClick={onClickShowDetails}
+    >
       {getIcon(entry)}
     </Box>
   );

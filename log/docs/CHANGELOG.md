@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- `log.html`: It's now possible to click icon to show details (so, items without a message are also clickable).
+- `log.html`: The copy to clipboard button for variables no longer hides variable content.
+
 ## 2.7.1 - 2023-09-07
 
 - A case where the stack could become inconsistent when using yield was fixed.

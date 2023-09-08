@@ -22,3 +22,13 @@
   z-index: 10;
   top: 3px;
 }
+
+.variableContent {
+  display: inline-block;
+  width: calc(100% - 2.5em);
+}
+
+.copyVariableToClipboard {
+  display: inline-block;
+  width: 2.3em;
+}
