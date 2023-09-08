@@ -1,13 +1,11 @@
 import ast
 import itertools
 import sys
-import types
 from ast import AST
 from contextlib import contextmanager
 from functools import partial
 from typing import (
     Any,
-    Generator,
     Generic,
     Iterator,
     List,
@@ -359,11 +357,20 @@ class ASTRewriter:
         return function, class_name  # type: ignore
 
     def iter_and_replace_nodes(
-        self, node
-    ) -> Generator[Tuple[ASTRewriteEv, AST], Optional[types.GeneratorType], None]:
+        self, node: ast.AST, before_node: Any, after_node: Any
+    ) -> None:
         """
-        :note: the yielded stack is actually always the same (mutable) list, so,
-        clients that want to return it somewhere else should create a copy.
+        Traverses all the nodes under the given node.
+
+        The `before_node` callback can return a generator which can be used to have
+        control in the callback of the start/end of the node being traversed.
+
+        If the generator yields `DONT_GO_INTO_NODE`, that node won't be traversed.
+
+        The `after_node` is called after the node is traversed (and is usually
+        the place where modifications should happen -- note that modifications
+        can still happen in the `before_node`, but in this case, the modified
+        node will be traversed and not the original one found in the AST).
         """
         is_func_def: bool = isinstance(node, ast.FunctionDef)
         field: str
@@ -384,7 +391,7 @@ class ASTRewriter:
                         self._cursor_stack.append(_RewriteCursor(node, item))
 
                         go_into: bool = True
-                        gen = yield "before", item
+                        gen = before_node(item)
                         if gen is not None:
                             try:
                                 if next(gen) is DONT_GO_INTO_NODE:
@@ -396,7 +403,7 @@ class ASTRewriter:
 
                         if go_into:
                             stack.append(item)
-                            yield from self.iter_and_replace_nodes(item)
+                            self.iter_and_replace_nodes(item, before_node, after_node)
                             stack.pop()
 
                         try:
@@ -404,7 +411,7 @@ class ASTRewriter:
                                 next(gen)
                         except StopIteration:
                             pass
-                        yield "after", item
+                        after_node(item)
 
                         last_cursor: _RewriteCursor = self._cursor_stack.pop(-1)
                         last_cursor_before: Optional[List[AST]] = last_cursor._before
@@ -436,7 +443,7 @@ class ASTRewriter:
             elif isinstance(value, AST):
                 self._cursor_stack.append(_RewriteCursor(node, value))
 
-                gen = yield "before", value
+                gen = before_node(value)
                 go_into = True
                 if gen is not None:
                     try:
@@ -447,14 +454,14 @@ class ASTRewriter:
 
                 if go_into:
                     stack.append(value)
-                    yield from self.iter_and_replace_nodes(value)
+                    self.iter_and_replace_nodes(value, before_node, after_node)
                     stack.pop()
                 try:
                     if gen is not None:
                         next(gen)
                 except StopIteration:
                     pass
-                yield "after", value
+                after_node(value)
 
                 last_cursor = self._cursor_stack.pop(-1)
                 if last_cursor._before is not None or last_cursor._after is not None:

@@ -42,14 +42,17 @@ def method():
     )
 
     ast_rewriter = ASTRewriter(mod)
-    for ev, node in ast_rewriter.iter_and_replace_nodes(mod):
-        if ev != "after":
-            continue
 
+    def on_before(node):
+        pass
+
+    def on_after(node):
         if isinstance(node, ast_module.Constant):
             factory = NodeFactory(node.lineno, node.col_offset)
             s = factory.Str("some str")
             ast_rewriter.cursor.current = s
+
+    ast_rewriter.iter_and_replace_nodes(mod, on_before, on_after)
 
     str_regression.check(ast.unparse(mod))
 
@@ -69,10 +72,11 @@ def method():
     ast_rewriter = ASTRewriter(mod)
 
     with pytest.raises(RuntimeError) as e:
-        for ev, node in ast_rewriter.iter_and_replace_nodes(mod):
-            if ev != "after":
-                continue
 
+        def on_before(node):
+            pass
+
+        def on_after(node):
             if isinstance(node, ast_module.Constant):
                 factory = NodeFactory(node.lineno, node.col_offset)
                 # This cannot be done because the current cursor points to a name
@@ -80,6 +84,9 @@ def method():
                 ast_rewriter.cursor.before_append(
                     factory.Expr(factory.Call(factory.NameLoad("some_name")))
                 )
+
+        ast_rewriter.iter_and_replace_nodes(mod, on_before, on_after)
+
     assert "Cannot rewrite before/after in attribute, just in list." in str(e)
 
 
@@ -97,9 +104,10 @@ def method():
 
     ast_rewriter = ASTRewriter(mod)
 
-    for ev, node in ast_rewriter.iter_and_replace_nodes(mod):
-        if ev != "after":
-            continue
+    def on_before(node):
+        pass
+
+    def on_after(node):
         if isinstance(node, ast_module.Constant):
             factory = NodeFactory(node.lineno, node.col_offset)
             # This cannot be done because the current cursor points to a name
@@ -107,6 +115,8 @@ def method():
             ast_rewriter.stmts_cursor.before_append(
                 factory.Expr(factory.Call(factory.NameLoad("some_name")))
             )
+
+    ast_rewriter.iter_and_replace_nodes(mod, on_before, on_after)
 
     str_regression.check(ast.unparse(mod))
 

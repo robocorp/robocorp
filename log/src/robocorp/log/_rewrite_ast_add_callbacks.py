@@ -100,7 +100,6 @@ _EMPTY_LIST: list = []
 
 
 def _create_method_with_stmt(
-    rewrite_ctx: ASTRewriter,
     factory,
     class_name: str,
     function,
@@ -268,7 +267,6 @@ def _rewrite_funcdef(
     )
 
     with_stmt = _create_method_with_stmt(
-        rewrite_ctx,
         factory,
         class_name,
         function,
@@ -342,43 +340,27 @@ def rewrite_ast_add_callbacks(
     mod.body[pos:pos] = imports
 
     dispatch_table = _DispatchTable()
+    get_before_handler = dispatch_table.dispatch_before.get
+    get_after_handler = dispatch_table.dispatch_after.get
+
     rewrite_ctx = ASTRewriter(mod)
     rewrite_ctx.dispatch_data = dispatch_table
 
-    node: ast.AST
+    def before_node(node: ast.AST):
+        # Can return a generator (which will be entered/resumed).
+        handler = get_before_handler(node.__class__)
+        if handler is not None:
+            return handler(rewrite_ctx, config, module_path, kind, node)
 
-    iter_in = rewrite_ctx.iter_and_replace_nodes(mod)
+    def after_node(node: ast.AST) -> None:
+        # Not expected to return anything.
+        handler = get_after_handler(node.__class__)
+        if handler:
+            result = handler(rewrite_ctx, config, module_path, kind, node)
+            if result is not None:
+                rewrite_ctx.cursor.current = result
 
-    feed_generator: Optional[Any] = None
-    while True:
-        if feed_generator is not None:
-            temp = feed_generator
-            feed_generator = None
-            try:
-                ev, node = iter_in.send(temp)
-            except StopIteration:
-                break
-        else:
-            try:
-                ev, node = next(iter_in)
-            except StopIteration:
-                break
-
-        if ev == "before":
-            handler = dispatch_table.dispatch_before.get(node.__class__)
-            if handler:
-                result = handler(rewrite_ctx, config, module_path, kind, node)
-                if hasattr(
-                    result, "gi_frame"
-                ):  # I.e.: Check generator for python and cython
-                    feed_generator = result
-
-        else:
-            handler = dispatch_table.dispatch_after.get(node.__class__)
-            if handler:
-                result = handler(rewrite_ctx, config, module_path, kind, node)
-                if result is not None:
-                    rewrite_ctx.cursor.current = result
+    rewrite_ctx.iter_and_replace_nodes(mod, before_node, after_node)
 
     if DEBUG:
         print("\n============ New AST (with hooks in place) ==============\n")
