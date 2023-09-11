@@ -4,17 +4,7 @@ import sys
 from ast import AST
 from contextlib import contextmanager
 from functools import partial
-from typing import (
-    Any,
-    Generic,
-    Iterator,
-    List,
-    Literal,
-    Optional,
-    Tuple,
-    TypeVar,
-    Union,
-)
+from typing import Any, Generic, Iterator, List, Optional, Tuple, TypeVar, Union
 
 from robocorp.log._lifecycle_hooks import Callback
 
@@ -246,9 +236,6 @@ class FuncdefMemoStack:
         return next(self._ctx_id)
 
 
-ASTRewriteEv = Literal["before", "after"]
-
-
 class DontGoIntoNode:
     pass
 
@@ -277,10 +264,22 @@ class _FuncDefMemoStackQueue:
 
 
 class ASTRewriter:
+    """
+    The `before handler` callback can return a generator which can be used to have
+    control in the callback of the start/end of the node being traversed.
+
+    If the generator yields `DONT_GO_INTO_NODE`, that node won't be traversed.
+
+    The `after handler` is called after the node is traversed (and is usually
+    the place where modifications should happen -- note that modifications
+    can still happen in the `before handler`, but in this case, the modified
+    node will be traversed and not the original one found in the AST).
+    """
+
     # In a before this may be yielded so that we don't go into a node.
     DONT_GO_INTO_NODE = DontGoIntoNode()
 
-    def __init__(self, ast: AST) -> None:
+    def __init__(self, ast: AST, dispatch_data: Any, config, module_path, kind) -> None:
         self._ast = ast
         self._cursor_stack: List[_RewriteCursor] = []
         self._next_var_id: "partial[int]" = partial(next, itertools.count())
@@ -289,9 +288,16 @@ class ASTRewriter:
         self._on_context_id_generated = Callback()
 
         # Optional info (the user can fill it with any data).
-        self.dispatch_data: Any = None
+        self.dispatch_data = dispatch_data
 
         self.stack: List[AST] = []
+
+        self._get_before_handler = dispatch_data.dispatch_before.get
+        self._get_after_handler = dispatch_data.dispatch_after.get
+
+        self._config = config
+        self._module_path = module_path
+        self._kind = kind
 
     def next_context_id(self) -> int:
         """
@@ -356,23 +362,11 @@ class ASTRewriter:
 
         return function, class_name  # type: ignore
 
-    def iter_and_replace_nodes(
-        self, node: ast.AST, before_node: Any, after_node: Any
-    ) -> None:
+    def iter_and_replace_nodes(self, curr_node: ast.AST) -> None:
         """
         Traverses all the nodes under the given node.
-
-        The `before_node` callback can return a generator which can be used to have
-        control in the callback of the start/end of the node being traversed.
-
-        If the generator yields `DONT_GO_INTO_NODE`, that node won't be traversed.
-
-        The `after_node` is called after the node is traversed (and is usually
-        the place where modifications should happen -- note that modifications
-        can still happen in the `before_node`, but in this case, the modified
-        node will be traversed and not the original one found in the AST).
         """
-        is_func_def: bool = isinstance(node, ast.FunctionDef)
+        is_func_def: bool = isinstance(curr_node, ast.FunctionDef)
         field: str
         if is_func_def:
             self._funcdef_memo_stack.push()
@@ -380,30 +374,45 @@ class ASTRewriter:
         DONT_GO_INTO_NODE = self.DONT_GO_INTO_NODE
 
         stack: List[AST] = self.stack
-        for field in node._fields:
-            value = getattr(node, field, None)
+
+        get_before = self._get_before_handler
+        get_after = self._get_after_handler
+
+        for field in curr_node._fields:
+            value = getattr(curr_node, field, None)
             if isinstance(value, list):
                 new_value: List[AST] = []
                 changed: bool = False
 
                 for item in value:
                     if isinstance(item, AST):
-                        self._cursor_stack.append(_RewriteCursor(node, item))
+                        handler_before = get_before(item.__class__)
+                        handler_after = get_after(item.__class__)
 
                         go_into: bool = True
-                        gen = before_node(item)
-                        if gen is not None:
-                            try:
-                                if next(gen) is DONT_GO_INTO_NODE:
-                                    go_into = False
-                            except StopIteration:
-                                raise AssertionError(
-                                    f"Expected generator {gen} to yield once. Handling: {ast.unparse(item)}"
-                                )
+                        self._cursor_stack.append(_RewriteCursor(curr_node, item))
+
+                        gen = None
+                        if handler_before is not None:
+                            gen = handler_before(
+                                self,
+                                self._config,
+                                self._module_path,
+                                self._kind,
+                                item,
+                            )
+                            if gen is not None:
+                                try:
+                                    if next(gen) is DONT_GO_INTO_NODE:
+                                        go_into = False
+                                except StopIteration:
+                                    raise AssertionError(
+                                        f"Expected generator {gen} to yield once. Handling: {ast.unparse(item)}"
+                                    )
 
                         if go_into:
                             stack.append(item)
-                            self.iter_and_replace_nodes(item, before_node, after_node)
+                            self.iter_and_replace_nodes(item)
                             stack.pop()
 
                         try:
@@ -411,7 +420,18 @@ class ASTRewriter:
                                 next(gen)
                         except StopIteration:
                             pass
-                        after_node(item)
+
+                        # After node
+                        if handler_after:
+                            result = handler_after(
+                                self,
+                                self._config,
+                                self._module_path,
+                                self._kind,
+                                item,
+                            )
+                            if result is not None:
+                                self.cursor.current = result
 
                         last_cursor: _RewriteCursor = self._cursor_stack.pop(-1)
                         last_cursor_before: Optional[List[AST]] = last_cursor._before
@@ -426,7 +446,7 @@ class ASTRewriter:
                             if isinstance(last_cursor_current, list):
                                 new_value.extend(last_cursor_current)
                             else:
-                                # assert isinstance(last_cursor_current, AST)
+                                assert isinstance(last_cursor_current, AST)
                                 new_value.append(last_cursor_current)
                             changed = True
                         else:
@@ -437,31 +457,51 @@ class ASTRewriter:
                             new_value.extend(last_cursor_after)
                             changed = True
 
+                    else:
+                        new_value.append(item)
+
                 if changed:
-                    setattr(node, field, new_value)
+                    setattr(curr_node, field, new_value)
 
             elif isinstance(value, AST):
-                self._cursor_stack.append(_RewriteCursor(node, value))
+                self._cursor_stack.append(_RewriteCursor(curr_node, value))
 
-                gen = before_node(value)
                 go_into = True
-                if gen is not None:
-                    try:
-                        if next(gen) is DONT_GO_INTO_NODE:
-                            go_into = False
-                    except StopIteration:
-                        raise AssertionError(f"Expected generator {gen} to yield once!")
+
+                # Before node
+                handler_before = get_before(value.__class__)
+                gen = None
+                if handler_before is not None:
+                    gen = handler_before(
+                        self, self._config, self._module_path, self._kind, value
+                    )
+                    if gen is not None:
+                        try:
+                            if next(gen) is DONT_GO_INTO_NODE:
+                                go_into = False
+                        except StopIteration:
+                            raise AssertionError(
+                                f"Expected generator {gen} to yield once. Handling: {ast.unparse(value)}"
+                            )
 
                 if go_into:
                     stack.append(value)
-                    self.iter_and_replace_nodes(value, before_node, after_node)
+                    self.iter_and_replace_nodes(value)
                     stack.pop()
                 try:
                     if gen is not None:
                         next(gen)
                 except StopIteration:
                     pass
-                after_node(value)
+
+                # After node
+                handler_after = get_after(value.__class__)
+                if handler_after:
+                    result = handler_after(
+                        self, self._config, self._module_path, self._kind, value
+                    )
+                    if result is not None:
+                        self.cursor.current = result
 
                 last_cursor = self._cursor_stack.pop(-1)
                 if last_cursor._before is not None or last_cursor._after is not None:
@@ -471,8 +511,8 @@ class ASTRewriter:
                     )
 
                 if last_cursor.current is not None:
-                    # assert isinstance(last_cursor.current, ast.AST)
-                    setattr(node, field, last_cursor.current)
+                    assert isinstance(last_cursor.current, ast.AST)
+                    setattr(curr_node, field, last_cursor.current)
 
         if is_func_def:
             self._funcdef_memo_stack.pop()

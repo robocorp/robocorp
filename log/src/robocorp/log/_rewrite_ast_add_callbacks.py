@@ -340,27 +340,10 @@ def rewrite_ast_add_callbacks(
     mod.body[pos:pos] = imports
 
     dispatch_table = _DispatchTable()
-    get_before_handler = dispatch_table.dispatch_before.get
-    get_after_handler = dispatch_table.dispatch_after.get
 
-    rewrite_ctx = ASTRewriter(mod)
-    rewrite_ctx.dispatch_data = dispatch_table
+    rewrite_ctx = ASTRewriter(mod, dispatch_table, config, module_path, kind)
 
-    def before_node(node: ast.AST):
-        # Can return a generator (which will be entered/resumed).
-        handler = get_before_handler(node.__class__)
-        if handler is not None:
-            return handler(rewrite_ctx, config, module_path, kind, node)
-
-    def after_node(node: ast.AST) -> None:
-        # Not expected to return anything.
-        handler = get_after_handler(node.__class__)
-        if handler:
-            result = handler(rewrite_ctx, config, module_path, kind, node)
-            if result is not None:
-                rewrite_ctx.cursor.current = result
-
-    rewrite_ctx.iter_and_replace_nodes(mod, before_node, after_node)
+    rewrite_ctx.iter_and_replace_nodes(mod)
 
     if DEBUG:
         print("\n============ New AST (with hooks in place) ==============\n")
