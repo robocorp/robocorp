@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.0 - 2023-09-11
+
+- Change URL path for asset upload
+
 ## 0.4.0 - 2023-09-07
 
 - Add support for `RC_DISABLE_SSL`

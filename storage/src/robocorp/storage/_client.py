@@ -157,7 +157,7 @@ class AssetsClient:
         if data is not None:
             payload["data"] = data
 
-        path = url_join(sanitize_id(asset_id), "upload")
+        path = url_join(sanitize_id(asset_id), "uploads")
         handler = self._handle_asset_not_found(asset_id)
         response = self._client.post(path, json=payload, _handle_error=handler)
         return cast(AssetUploadResponse, response.json())
