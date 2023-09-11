@@ -1,4 +1,4 @@
-## Dealing with sensitive data
+# Dealing with sensitive data
 
 By default `Robocorp Log` will show information for all method calls in user
 code as well as some selected libraries automatically.
