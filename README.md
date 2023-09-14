@@ -67,20 +67,23 @@ Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials
 
 The framework includes Python libraries for configuring project entrypoints and controlling features such as a logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
 
+The easiest way to get started is to install the [`robocorp`](./meta) metapackage, which includes the core features of the framework and libraries to integrate into Control Room.
+
+**Latest release:** [![robocorp](https://img.shields.io/pypi/v/robocorp?label=robocorp)](https://pypi.org/project/robocorp/)
+
+| Name | Release | Description | Metapackage |
+| --- | --- | --- | --- |
+| [`robocorp.tasks`](./tasks) | [![robocorp-tasks](https://img.shields.io/pypi/v/robocorp-tasks?label=robocorp-tasks)](https://pypi.org/project/robocorp-tasks/) | Create entrypoints for your automation project. | ✅ |
+| [`robocorp.log`](./log) | [![robocorp-log](https://img.shields.io/pypi/v/robocorp-log?label=robocorp-log)](https://pypi.org/project/robocorp-log/) | Configure and control the execution log. | ✅ |
+| [`robocorp.vault`](./vault) | [![robocorp-vault](https://img.shields.io/pypi/v/robocorp-vault?label=robocorp-vault)](https://pypi.org/project/robocorp-vault/) | Store secret values in Control Room and access them during the execution. | ✅ |
+| [`robocorp.workitems`](./workitems) | [![robocorp-workitems](https://img.shields.io/pypi/v/robocorp-workitems?label=robocorp-workitems)](https://pypi.org/project/robocorp-workitems/) | Interact with Control Room work items; Read data from previous steps, create output data. | ✅ |
+| [`robocorp.storage`](./storage) | [![robocorp-storage](https://img.shields.io/pypi/v/robocorp-storage?label=robocorp-storage)](https://pypi.org/project/robocorp-storage/) | Store assets in Control Room and manage them during the execution. | ✅ |
+| [`robocorp.browser`](./browser) | [![robocorp-browser](https://img.shields.io/pypi/v/robocorp-browser?label=robocorp-browser)](https://pypi.org/project/robocorp-browser/) | Automate actions in a browser, powered by [Playwright](https://playwright.dev/). | - |
+| [`robocorp.excel`](./excel) | [![robocorp-excel](https://img.shields.io/pypi/v/robocorp-excel?label=robocorp-excel)](https://pypi.org/project/robocorp-excel/) | Read and write Excel files directly, with support for both .xlsx and .xls. | - |
+| [`robocorp.http`](./http) | [![robocorp-http](https://img.shields.io/pypi/v/robocorp-http?label=robocorp-http)](https://pypi.org/project/robocorp-http/) | Download files easily, or make custom HTTP requests. | - |
+
 > **Note**<br/>
 > For additional automation capabilities on the Robocorp platform, please refer to the wide array of libraries and keywords available in [RPA Framework](https://robocorp.com/docs/libraries/rpa-framework).
-
-| Name | Release | Description |
-| --- | --- | --- |
-| [`robocorp`](./meta) | [![robocorp](https://img.shields.io/pypi/v/robocorp)](https://pypi.org/project/robocorp/) | Metapackage for core libraries. |
-| [`robocorp.tasks`](./tasks) | [![robocorp-tasks](https://img.shields.io/pypi/v/robocorp-tasks)](https://pypi.org/project/robocorp-tasks/) | Create entrypoints for your automation project. |
-| [`robocorp.log`](./log) | [![robocorp-log](https://img.shields.io/pypi/v/robocorp-log)](https://pypi.org/project/robocorp-log/) | Configure and control the execution log. |
-| [`robocorp.vault`](./vault) | [![robocorp-vault](https://img.shields.io/pypi/v/robocorp-vault)](https://pypi.org/project/robocorp-vault/) | Store secret values in Control Room and access them during the execution. |
-| [`robocorp.workitems`](./workitems) | [![robocorp-workitems](https://img.shields.io/pypi/v/robocorp-workitems)](https://pypi.org/project/robocorp-workitems/) | Interact with Control Room work items; Read data from previous steps, create output data. |
-| [`robocorp.storage`](./storage) | [![robocorp-storage](https://img.shields.io/pypi/v/robocorp-storage)](https://pypi.org/project/robocorp-storage/) | Store assets in Control Room and manage them during the execution. |
-| [`robocorp.browser`](./browser) | [![robocorp-browser](https://img.shields.io/pypi/v/robocorp-browser)](https://pypi.org/project/robocorp-browser/) | Automate actions in a browser, powered by [Playwright](https://playwright.dev/). |
-| [`robocorp.excel`](./excel) | [![robocorp-excel](https://img.shields.io/pypi/v/robocorp-excel)](https://pypi.org/project/robocorp-excel/) | Read and write Excel files directly, with support for both .xlsx and .xls. |
-| [`robocorp.http`](./http) | [![robocorp-http](https://img.shields.io/pypi/v/robocorp-http)](https://pypi.org/project/robocorp-http/) | Download files easily, or make custom HTTP requests. |
 
 ## CLI
 
