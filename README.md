@@ -67,9 +67,15 @@ Check out the [docs page](https://robocorp.com/docs) for more in-depth tutorials
 
 The framework includes Python libraries for configuring project entrypoints and controlling features such as a logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
 
-The easiest way to get started is to install the [`robocorp`](./meta) metapackage, which includes the core features of the framework and libraries to integrate into Control Room.
+### Metapackage
 
-**Latest release:** [![robocorp](https://img.shields.io/pypi/v/robocorp?label=robocorp)](https://pypi.org/project/robocorp/)
+The easiest way to get started is to install the [`robocorp`](./meta) metapackage, which includes the core features of the framework, such as logging and Control Room integration:
+
+[![robocorp](https://img.shields.io/pypi/v/robocorp?label=robocorp)](https://pypi.org/project/robocorp/)
+
+### Packages
+
+It's also possible to install individual components of the project as separate dependencies:
 
 | Name | Release | Description | Metapackage |
 | --- | --- | --- | --- |
