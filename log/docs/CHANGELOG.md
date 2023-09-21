@@ -4,6 +4,7 @@
 
 - `log.html`: It's now possible to click icon to show details (so, items without a message are also clickable).
 - `log.html`: The copy to clipboard button for variables no longer hides variable content.
+- If greenlet is available, also check if the current greenlet matches for logging (as logging from different greenlet threads messes up the stack).
 
 ## 2.7.1 - 2023-09-07
 

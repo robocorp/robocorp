@@ -46,6 +46,10 @@ module = "setuptools.*"
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
+module = "greenlet.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = "pytest_timeout.*"
 ignore_missing_imports = true
 

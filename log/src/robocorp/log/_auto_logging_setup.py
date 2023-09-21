@@ -11,6 +11,11 @@ from ._obj_info_repr import get_obj_type_and_repr
 from ._on_exit_context_manager import OnExitContextManager
 from .protocols import LogElementType, OptExcInfo, Status
 
+try:
+    import greenlet  # type: ignore
+except Exception:
+    greenlet = None
+
 
 def _get_obj_type_and_repr_and_hide_if_needed(key, val):
     obj_type, obj_repr = get_obj_type_and_repr(val)
@@ -69,6 +74,25 @@ class _AutoLogging:
         self._rewrite_hook_config = rewrite_hook_config
         self._hook: Optional[RewriteHook] = None
 
+        try:
+            if greenlet is not None:
+                self._greenlet_curr = greenlet.getcurrent()
+                self._is_same_thread = self._is_same_thread_greenlet  # type: ignore
+        except Exception:
+            pass
+
+    def _is_same_thread_greenlet(self):
+        if self.tid != threading.get_ident():
+            return False
+
+        return self._greenlet_curr == greenlet.getcurrent()
+
+    def _is_same_thread(self):
+        if self.tid != threading.get_ident():
+            return False
+
+        return True
+
     def register(self, add_rewrite_hook: bool = True) -> None:
         from robocorp.log import _lifecycle_hooks
 
@@ -101,7 +125,7 @@ class _AutoLogging:
         lineno: int,
         args: List[Tuple[str, str, str]],
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         # print("before", method_type, name)
@@ -132,7 +156,7 @@ class _AutoLogging:
         lineno: int,
         args_dict: dict,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
         args: List[Tuple[str, str, str]] = []
         for key, val in args_dict.items():
@@ -149,7 +173,7 @@ class _AutoLogging:
         lineno: int,
         targets: Sequence[Tuple[str, Any]],
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
         args: List[Tuple[str, str, str]] = []
         if targets is not None:
@@ -167,7 +191,7 @@ class _AutoLogging:
         lineno: int,
         targets: Sequence[Tuple[str, Any]],
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
         args: List[Tuple[str, str, str]] = []
         if targets is not None:
@@ -185,7 +209,7 @@ class _AutoLogging:
         lineno: int,
         targets: Sequence[Tuple[str, Any]],
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
         args: List[Tuple[str, str, str]] = []
         if targets is not None:
@@ -212,7 +236,7 @@ class _AutoLogging:
         name: str,
         lineno: int,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         # print("after", method_type, name)
@@ -253,7 +277,7 @@ class _AutoLogging:
         lineno: int,
         yielded_value: Any,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         # print("before YIELD", name)
@@ -292,7 +316,7 @@ class _AutoLogging:
         name: str,
         lineno: int,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         # print("after YIELD", name)
@@ -312,7 +336,7 @@ class _AutoLogging:
         lineno: int,
         variables: Sequence[Tuple[str, Any]],
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         variables_name_type_repr = []
@@ -379,7 +403,7 @@ class _AutoLogging:
         lineno: int,
         variables: Sequence[Tuple[str, Any]],
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         self._call_with_variables(
@@ -393,7 +417,7 @@ class _AutoLogging:
         name: str,
         lineno: int,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         # print("before YIELD FROM", name)
@@ -423,7 +447,7 @@ class _AutoLogging:
         name: str,
         lineno: int,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         # print("after YIELD FROM", name)
@@ -443,7 +467,7 @@ class _AutoLogging:
         assign_name: str,
         assign_value: Any,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         assign_type, assign_repr = _get_obj_type_and_repr_and_hide_if_needed(
@@ -470,7 +494,7 @@ class _AutoLogging:
         lineno: int,
         return_value: Any,
     ):
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         return_type, return_repr = _get_obj_type_and_repr_and_hide_if_needed(
@@ -497,7 +521,7 @@ class _AutoLogging:
         lineno: int,
         exc_info: OptExcInfo,
     ) -> None:
-        if self.tid != threading.get_ident():
+        if not self._is_same_thread():
             return
 
         if method_type == "UNTRACKED_GENERATOR":
