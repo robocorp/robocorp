@@ -1,18 +1,10 @@
 [tool.robo]
 name = "Browser"
 description = "Example of browser automation that solves the RPA Challenge"
-python = "3.9.13"
+python = "3.10.13"
 
 [tool.robo.dependencies]
-robocorp-tasks="1.0.0"
-robocorp-browser="1.0.1"
+robocorp="1.0.0"
+robocorp-browser="2.1.0"
 robocorp-excel="0.4.0"
-robocorp-http="0.2.0"
-
-[tool.robocorp.log]
-log_filter_rules = [
-    {name = "playwright", kind = "log_on_project_call"},
-    {name = "robocorp.browser", kind = "log_on_project_call"},
-    {name = "robocorp.excel", kind = "log_on_project_call"},
-    {name = "robocorp.http", kind = "log_on_project_call"},
-]
+robocorp-http="0.4.0"

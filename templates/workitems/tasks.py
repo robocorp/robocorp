@@ -8,9 +8,9 @@ def producer():
     """Split Excel rows into multiple work items"""
     for item in workitems.inputs:
         path = item.download_file("orders.xlsx")
-        orders = open_workbook(path).worksheet(0).as_table(header=True)
+        worksheet = open_workbook(path).worksheet(0)
 
-        for row in orders:
+        for row in worksheet.as_table(header=True):
             payload = {
                 "Name": row["Name"],
                 "Zip": row["Zip"],
@@ -25,9 +25,12 @@ def consumer():
     for item in workitems.inputs:
         try:
             name = item.payload["Name"]
-            address = item.payload["Zip"]
+            zipcode = item.payload["Zip"]
             product = item.payload["Product"]
-            print(f"Processing order: {name}, {address}, {product}")
+            print(f"Processing order: {name}, {zipcode}, {product}")
+            assert 1000 <= zipcode <= 9999, "Invalid ZIP code"
             item.done()
+        except AssertionError as err:
+            item.fail("BUSINESS", code="INVALID_ORDER", message=str(err))
         except KeyError as err:
-            item.fail(code="MISSING_VALUE", message=str(err))
+            item.fail("APPLICATION", message=str(err))
