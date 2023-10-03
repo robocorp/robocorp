@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Prevent invalid operations on released work items with `FileAdapter`
+
 ## 1.4.0 - 2023-09-07
 
 - Add support for `RC_DISABLE_SSL`

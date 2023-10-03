@@ -47,6 +47,16 @@ class TestFileAdapter:
             monkeypatch.setenv(request.param[1], str(items_out))
             yield FileAdapter()
 
+    @pytest.fixture
+    def workitems(self, adapter):
+        from robocorp import workitems
+
+        ctx = workitems.Context(adapter=adapter)
+        ctx.reserve_input()
+
+        with mock.patch("robocorp.workitems._ctx", lambda: ctx):
+            yield workitems
+
     def test_load_data(self, adapter):
         item_id = adapter.reserve_input()
         data = adapter.load_payload(item_id)
@@ -63,7 +73,7 @@ class TestFileAdapter:
         assert content == b"some mock content"
 
     def test_add_file(self, adapter):
-        item_id = adapter.create_output("not-used")
+        item_id = adapter.create_output("0")
         adapter.add_file(
             item_id,
             "secondfile.txt",
@@ -124,6 +134,28 @@ class TestFileAdapter:
             # Should not raise
             adapter = FileAdapter()
             adapter.create_output("0", {"key": "value"})
+
+    def test_invalid_reporter(self, workitems):
+        results = []
+        for work_item in workitems.inputs:
+            with work_item:
+                results.append(work_item.payload)
+
+        with pytest.raises(ValueError):
+            output = workitems.outputs.create()
+            output.payload = {"results": results}
+            output.save()
+
+    def test_valid_reporter(self, workitems):
+        output = workitems.outputs.create()
+
+        results = []
+        for work_item in workitems.inputs:
+            with work_item:
+                results.append(work_item.payload)
+
+        output.payload = {"results": results}
+        output.save()
 
 
 class TestRobocorpAdapter:
