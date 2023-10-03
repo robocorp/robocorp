@@ -66,7 +66,8 @@ class HTTPError(_HTTPError):
     """Custom `requests` HTTP error with status code and reason"""
 
     def __init__(self, message: str, status_code: int, reason: str):
-        super().__init__(message)
+        # NOTE: types-requests is too strict here, disable ignore when fixed
+        super().__init__(message)  # type: ignore
         self.message = message
         self.status_code = status_code
         self.reason = reason
