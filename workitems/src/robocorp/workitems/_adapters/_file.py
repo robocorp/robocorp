@@ -68,6 +68,7 @@ class FileAdapter(BaseAdapter):
 
         self._inputs: list[WorkItem] = self._load_inputs()
         self._outputs: list[WorkItem] = []
+        self._releases: dict[str, tuple[State, Optional[dict]]] = {}
         self._index: int = 0
 
     @property
@@ -177,7 +178,10 @@ class FileAdapter(BaseAdapter):
         state: State,
         exception: Optional[dict] = None,
     ):
-        # Note: No effect (as of now) when releasing during local development
+        if item_id in self._releases:
+            raise ValueError("Work item already released")
+
+        self._releases[item_id] = (state, exception)
         LOGGER.info(
             "Releasing item %r with %s state and exception: %s",
             item_id,
@@ -186,8 +190,11 @@ class FileAdapter(BaseAdapter):
         )
 
     def create_output(self, parent_id: str, payload: Optional[JSONType] = None) -> str:
-        # Note: The `parent_id` is not used during local development
-        del parent_id
+        source, _ = self._get_item(parent_id)
+        if source != "input":
+            raise ValueError(f"Work item parent ({parent_id}) must be an input")
+        if parent_id in self._releases:
+            raise ValueError(f"Work item parent ({parent_id}) already released")
 
         item: WorkItem = {"payload": payload, "files": {}}
 
