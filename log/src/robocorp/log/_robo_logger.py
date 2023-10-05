@@ -84,10 +84,10 @@ class _RoboLogger:
 
         config.min_messages_per_file = min_messages_per_file
 
-        if config.max_file_size_in_bytes < _convert_to_bytes("10kb"):
+        if config.max_file_size_in_bytes < _convert_to_bytes("1kb"):
             raise ValueError(
                 "Cannot generate logs where the max file size in bytes is less than"
-                f" 10kb. Found: {config.max_file_size_in_bytes}. Arg: {max_file_size}."
+                f" 1kb. Found: {config.max_file_size_in_bytes}. Arg: {max_file_size}."
             )
 
         # Note: expected to be used just when used in-memory (not part of the
