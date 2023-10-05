@@ -1,7 +1,8 @@
 import typing
+from contextlib import contextmanager
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Callable, Optional, Sequence, Set, TypeVar, Union
+from typing import Any, Callable, Iterator, Optional, Sequence, Set, TypeVar, Union
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
@@ -58,7 +59,7 @@ class ITask(typing.Protocol):
     def lineno(self) -> int:
         pass
 
-    def run(self) -> None:
+    def run(self, **fields: dict[str, Any]) -> Any:
         pass
 
     @property
@@ -69,8 +70,17 @@ class ITask(typing.Protocol):
         """
 
 
-class IContextErrorReport(typing.Protocol):
-    def show_error(self, message):
+class IContext(typing.Protocol):
+    def show(
+        self, msg: str, end: str = "", kind: str = "", flush: Optional[bool] = None
+    ):
+        pass
+
+    def show_error(self, msg: str, flush: Optional[bool] = None):
+        pass
+
+    @contextmanager
+    def register_lifecycle_prints(self) -> Iterator[None]:
         pass
 
 

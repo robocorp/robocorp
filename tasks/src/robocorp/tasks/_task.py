@@ -1,12 +1,12 @@
 import typing
 from contextlib import contextmanager
 from types import ModuleType
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
 
-from robocorp.tasks._protocols import ITask, Status
+from robocorp.tasks._protocols import IContext, ITask, Status
 
 
 class Task:
@@ -26,8 +26,8 @@ class Task:
     def lineno(self):
         return self.method.__code__.co_firstlineno
 
-    def run(self):
-        self.method()
+    def run(self, **kwargs: dict[str, Any]) -> Any:
+        return self.method(**kwargs)
 
     @property
     def failed(self):
@@ -184,3 +184,8 @@ class Context:
             self._after_task_run
         ):
             yield
+
+    def __typecheckself__(self) -> None:
+        from robocorp.tasks._protocols import check_implements
+
+        _: IContext = check_implements(self)

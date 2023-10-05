@@ -112,6 +112,78 @@ class _ArgDispatcher:
             action="store_true",
         )
 
+        # Serve
+        serve_parser = subparsers.add_parser(
+            "serve",
+            help="run will collect tasks with the @task decorator and run the first that matches based on the task name filter.",
+        )
+        serve_parser.add_argument(
+            dest="path",
+            help="The directory or file with the tasks to run.",
+            nargs="?",
+            default=".",
+        )
+        serve_parser.add_argument(
+            "-t",
+            "--task",
+            dest="task_name",
+            help="The name of the task that should be run.",
+            action="append",
+        )
+        serve_parser.add_argument(
+            "-o",
+            "--output-dir",
+            dest="output_dir",
+            help=(
+                "The directory where the logging output files will be stored "
+                "(default `ROBOT_ARTIFACTS` environment variable or `./output`)."
+            ),
+            default="",
+        )
+        serve_parser.add_argument(
+            "--max-log-files",
+            dest="max_log_files",
+            type=int,
+            help="The maximum number of output files to store the logs.",
+            default=5,
+        )
+        serve_parser.add_argument(
+            "--max-log-file-size",
+            dest="max_log_file_size",
+            help="The maximum size for the log files (i.e.: 1MB, 500kb).",
+            default="1MB",
+        )
+
+        serve_parser.add_argument(
+            "--console-colors",
+            help="""Define how the console messages shown should be color encoded.
+
+"auto" (default) will color either using the windows API or the ansi color codes.
+"plain" will disable console coloring.
+"ansi" will force the console coloring to use ansi color codes.
+""",
+            dest="console_colors",
+            type=str,
+            choices=["auto", "plain", "ansi"],
+            default="auto",
+        )
+
+        serve_parser.add_argument(
+            "--log-output-to-stdout",
+            help="Can be used so that log messages are also sent to the 'stdout' (if not specified the RC_LOG_OUTPUT_STDOUT is also queried).",
+            dest="log_output_to_stdout",
+            type=str,
+            choices=["no", "json"],
+            default="",
+        )
+
+        serve_parser.add_argument(
+            "--no-status-rc",
+            help="When set, if running tasks has an error inside the task the return code of the process is 0.",
+            dest="no_status_rc",
+            action="store_true",
+        )
+
         # List tasks
         list_parser = subparsers.add_parser(
             "list",
