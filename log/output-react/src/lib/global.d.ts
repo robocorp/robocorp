@@ -6,6 +6,7 @@ declare global {
     onChangedRun: (selectedRun: any) => void;
     setupScenario: (scenario: string) => void;
     setContents: (msg: ISetContentsRequest) => void;
+    appendContents: (msg) => void;
     getSampleContents: (t) => any;
 
     setAllEntriesWhenPossible: (

@@ -13,12 +13,8 @@
   <script>
     const displayedFiles = [];
     const texts = [];
-    let isPolling = false;
 
     async function pollFileIndex() {
-      if (isPolling) return; // Prevent overlapping polling intervals
-      isPolling = true;
-
       try {
         const cacheBusting = new Date().getTime();
         const filesResult = await fetch(`/output/fileindex.txt?_=${cacheBusting}`);
@@ -30,32 +26,28 @@
               const fileResult = await fetch(`/output/${filename}`);
               const fileText = await fileResult.text();
 
-              const index = files.indexOf(filename);
-              displayedFiles.splice(index, 0, filename);
-              texts.splice(index, 0, fileText);
+              window.appendContents({
+                appendContents: fileText
+              });
+
+              displayedFiles.push(filename);
             } catch (err) {
               console.error(`Failed to fetch file ${filename}:`, err);
               // Optionally, inform the user or take other actions
             }
           }
         }
-
-        window.setContents({
-          initialContents: texts.join("\n")
-        });
       } catch (err) {
         console.error('Failed to fetch fileindex.txt:', err);
         // Optionally, inform the user or take other actions
-      } finally {
-        isPolling = false; // Reset the polling flag when done
       }
+      setTimeout(pollFileIndex, 1000);
     }
-
     window.addEventListener('load', async () => {
-      pollFileIndex();
-      setInterval(() => {
-        pollFileIndex();
-      }, 1000);
+      window.setContents({
+        initialContents: ""
+      });
+      await pollFileIndex()
     });
   </script>
 </body>
