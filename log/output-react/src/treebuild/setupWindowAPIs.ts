@@ -116,6 +116,7 @@ export function setupGlobals() {
 
   window.onChangedRun = onChangedRun;
   window.setContents = setContents;
+  window.appendContents = appendContents;
   window.getSampleContents = getSampleContents;
   window.setupScenario = setupScenario;
   window.setAllEntriesWhenPossible = setAllEntriesWhenPossible;
