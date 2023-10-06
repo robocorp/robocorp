@@ -21,13 +21,13 @@
 
       try {
         const cacheBusting = new Date().getTime();
-        const filesResult = await fetch(`/fileindex.txt?_=${cacheBusting}`);
+        const filesResult = await fetch(`/output/fileindex.txt?_=${cacheBusting}`);
         const files = (await filesResult.text()).split("\n").filter(Boolean); // Filter out empty lines
 
         for (const filename of files) {
           if (!displayedFiles.includes(filename)) {
             try {
-              const fileResult = await fetch(filename);
+              const fileResult = await fetch(`/output/${filename}`);
               const fileText = await fileResult.text();
 
               const index = files.indexOf(filename);
@@ -52,9 +52,10 @@
     }
 
     window.addEventListener('load', async () => {
+      pollFileIndex();
       setInterval(() => {
         pollFileIndex();
-      }, 5000);
+      }, 1000);
     });
   </script>
 </body>
