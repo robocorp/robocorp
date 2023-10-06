@@ -2,6 +2,7 @@ import datetime
 import itertools
 import json
 import os
+import shutil
 import string
 import sys
 import threading
@@ -385,6 +386,21 @@ class _RoboOutputImpl:
 
         self._next_int: "partial[int]" = partial(next, itertools.count(0))
 
+    def _retire_active_log_file(self):
+        if self._stream:
+            # We have an active file open for logging we need to retire.
+            self._stream.close()
+            self._stream = None
+
+        if self._current_file:
+            dest = self._output_dir / self._current_file.name
+            shutil.move(self._current_file, dest)
+            self._current_file = None  # guards the retiring of an already rotated file
+
+    def __del__(self):
+        """Cleanup logging and retire the previously active file."""
+        self._retire_active_log_file()
+
     def show_error_message(self, msg):
         sys.stderr.write(msg)
         if self.on_show_error_message:
@@ -423,23 +439,21 @@ class _RoboOutputImpl:
 
         self._rotating = True
         try:
-            self._current_memo = {}
-            self._current_loc_memo = {}
+            self._current_memo.clear()
+            self._current_loc_memo.clear()
+            self._retire_active_log_file()
 
+            tmp_output_dir = self._output_dir / "active"
+            tmp_output_dir.mkdir(parents=True, exist_ok=True)
             self._current_entry += 1
             if self._current_entry != 1:
                 self._current_file = (
-                    self._output_dir / f"output_{self._current_entry}.robolog"
+                    tmp_output_dir / f"output_{self._current_entry}.robolog"
                 )
             else:
-                self._current_file = self._output_dir / f"output.robolog"
-
-            if self._stream is not None:
-                self._stream.close()
-                self._stream = None
+                self._current_file = tmp_output_dir / f"output.robolog"
 
             self._rotate_handler.register_file(self._current_file)
-
             self._stream = self._current_file.open("wb")
             self._write_on_start_or_after_rotate()
             self._messages_written_after_rotation = 0
