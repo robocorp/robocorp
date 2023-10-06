@@ -1,28 +1,39 @@
+import re
+from functools import cache
+
 from robocorp import browser, excel, http
-from robocorp.tasks import task
+from robocorp.tasks import hooks, task
 
 
-@task
-def solve_challenge():
-    """Solve the RPA challenge"""
+@hooks.setup
+def configure_browser(tasks):
     browser.configure(
-        slowmo=100,
         browser_engine="chromium",
         screenshot="only-on-failure",
         headless=False,
     )
 
-    http.download("https://rpachallenge.com/assets/downloadFiles/challenge.xlsx")
-    worksheet = excel.open_workbook("challenge.xlsx").worksheet("Sheet1")
 
+@task
+def solve_challenge() -> int:
+    """Solve the RPA challenge"""
     page = browser.goto("https://rpachallenge.com/")
     page.click("button:text('Start')")
 
-    for row in worksheet.as_table(header=True):
+    for row in get_worksheet().as_table(header=True):
         fill_and_submit_form(row)
 
-    element = page.locator("css=div.congratulations")
-    browser.screenshot(element)
+    duration = get_duration()
+    return duration
+
+
+@cache
+def get_worksheet():
+    http.download(
+        "https://rpachallenge.com/assets/downloadFiles/challenge.xlsx", overwrite=True
+    )
+    worksheet = excel.open_workbook("challenge.xlsx").worksheet("Sheet1")
+    return worksheet
 
 
 def fill_and_submit_form(row):
@@ -35,3 +46,14 @@ def fill_and_submit_form(row):
     page.fill("//input[@ng-reflect-name='labelEmail']", str(row["Email"]))
     page.fill("//input[@ng-reflect-name='labelPhone']", str(row["Phone Number"]))
     page.click("input:text('Submit')")
+
+
+def get_duration():
+    page = browser.page()
+    result = page.locator("css=.congratulations").inner_text()
+
+    match = re.search(r"(\d+) milliseconds", result)
+    assert match is not None, result
+
+    duration = int(match.group(1))
+    return duration
