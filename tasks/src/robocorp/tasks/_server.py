@@ -2,7 +2,7 @@ from enum import Enum
 from functools import cache, wraps
 from queue import Queue
 from threading import Thread
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Iterator, Optional
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -161,9 +161,10 @@ def _add_event_handlers(app: FastAPI, context: IContext):
     settings = get_settings()
 
     def _on_startup():
-        docs_url = f"http://{settings.host}:{settings.port}/docs"
+        base_url = f"http://{settings.host}:{settings.port}"
         context.show("\n\033[1mStarted server \033[93mଘ(੭ˊᵕˋ)੭* ੈ✩‧₊˚\033[0m")
-        context.show(f"Documentation: {docs_url}")
+        context.show(f"Documentation: {base_url}/docs")
+        context.show(f"Execution log: {base_url}/log")
 
     def _on_shutdown():
         pass
@@ -229,12 +230,20 @@ class TxQueue:
 
 def run_server(context: IContext, tasks: list[ITask]) -> tuple[TxQueue, Thread]:
     import uvicorn
+    from fastapi.staticfiles import StaticFiles
+    from starlette.responses import FileResponse
 
     app = _get_app()
     queue = TxQueue()
 
     _add_event_handlers(app, context)
     _add_error_handlers(app, context)
+
+    app.mount("/output", StaticFiles(directory="output"), name="output")
+
+    @app.get("/log", include_in_schema=False)
+    async def show_log():
+        return FileResponse("_log_stream.html")
 
     @app.get("/list")
     def list_tasks() -> list[TaskInfo]:

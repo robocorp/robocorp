@@ -32,7 +32,7 @@ clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
 """
 from pathlib import Path
-from typing import Optional
+from typing import Any, Callable, Optional, Sequence
 
 from ._protocols import ITask
 
@@ -138,11 +138,34 @@ def get_current_task() -> Optional[ITask]:
     return _task.get_current_task()
 
 
+class _Hooks:
+    @staticmethod
+    def setup(func: Callable[[Sequence[ITask]], Any]):
+        """
+        Run something before any tasks
+        """
+        from ._hooks import before_all_tasks_run
+
+        before_all_tasks_run.register(func)
+
+    @staticmethod
+    def teardown(func: Callable[[Sequence[ITask]], Any]):
+        """
+        Run something after all task executions
+        """
+        # from ._hooks import after_all_tasks_run
+        from . import _hooks
+
+        _hooks.after_all_tasks_run.register(func)
+
+
+hooks = _Hooks()
+
 __all__ = [
     "task",
     "session_cache",
     "task_cache",
     "get_output_dir",
     "get_current_task",
-    "Model",
+    "hooks",
 ]

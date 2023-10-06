@@ -363,6 +363,8 @@ def serve(
         0 if everything went well.
         1 if there was some error running the task.
     """
+    import importlib.resources
+
     from robocorp.log import console, redirect
     from robocorp.log.pyproject_config import (
         read_pyproject_toml,
@@ -496,14 +498,24 @@ def serve(
             finally:
                 log.end_task("Collect tasks", "setup", run_status, setup_message)
 
-            returncode = 0
-            before_all_tasks_run(tasks)
-
-            requests, _ = run_server(context, tasks)
             names = ", ".join(task.name for task in tasks)
             context.show(f"Available tasks: {names}")
 
+            index_path = Path("_log_stream.html")
+            index = importlib.resources.read_binary(
+                "robocorp.tasks.static", "index.html"
+            )
+            with open(index_path, "wb") as fd:
+                fd.write(index)
+
+            _start_index_generator(output_dir_path)
+
+            returncode = 0
+            before_all_tasks_run(tasks)
+
             try:
+                requests, _ = run_server(context, tasks)
+
                 for req in requests:
                     matches = [task for task in tasks if task.name == req.name]
                     if not matches:
@@ -546,6 +558,7 @@ def serve(
                 finally:
                     log.end_task("Teardown tasks", "teardown", Status.PASS, "")
 
+            index_path.unlink(missing_ok=True)
             return returncode
         finally:
             log.end_run(run_name, run_status)
@@ -571,3 +584,33 @@ def serve(
             t = Timer(timeout, on_timeout)
             t.daemon = True
             t.start()
+
+
+def _start_index_generator(output_dir_path: Path):
+    import time
+    from threading import Thread
+
+    from robocorp import log
+
+    (output_dir_path / "fileindex.txt").unlink(missing_ok=True)
+
+    def _poll_index():
+        files = set()
+        while True:
+            with log._logger_instances._get_logger_instances(
+                only_from_main_thread=False
+            ) as logger_instances:
+                for robo_logger in logger_instances:
+                    current = robo_logger.robot_output_impl.current_file
+                    if current is not None:
+                        files.add(current.name)
+
+            with open(output_dir_path / "fileindex.txt", "w", encoding="utf-8") as fd:
+                fd.write("\n".join(files))
+            time.sleep(1)
+
+    t = Thread(target=_poll_index)
+    t.daemon = True
+    t.start()
+
+    return t
