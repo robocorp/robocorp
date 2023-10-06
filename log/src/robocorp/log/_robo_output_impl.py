@@ -202,6 +202,13 @@ class _RotateHandler:
             except Exception:
                 traceback.print_exc()
 
+    def replace_registered_file(self, src, dest):
+        """Updates the new file path after retirement."""
+        files = self._found_files
+        idx = files.index(src)
+        files.pop(idx)
+        files.insert(idx, dest)
+
     def iter_found_files(self):
         yield from iter(self._found_files)
 
@@ -327,6 +334,9 @@ class _StackHandler:
 
 
 class _RoboOutputImpl:
+
+    ACTIVE_LOG_FILE_DIR = "active"
+
     def __init__(self, config: _Config):
         self._written_initial = False
         self._closed = False
@@ -395,6 +405,7 @@ class _RoboOutputImpl:
         if self._current_file:
             dest = self._output_dir / self._current_file.name
             shutil.move(self._current_file, dest)
+            self._rotate_handler.replace_registered_file(self._current_file, dest)
             self._current_file = None  # guards the retiring of an already rotated file
 
     def __del__(self):
@@ -443,7 +454,7 @@ class _RoboOutputImpl:
             self._current_loc_memo.clear()
             self._retire_active_log_file()
 
-            tmp_output_dir = self._output_dir / "active"
+            tmp_output_dir = self._output_dir / self.ACTIVE_LOG_FILE_DIR
             tmp_output_dir.mkdir(parents=True, exist_ok=True)
             self._current_entry += 1
             if self._current_entry != 1:
