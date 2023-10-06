@@ -56,5 +56,13 @@ def test_rotate_logs(tmpdir, str_regression) -> None:
             raise AssertionError(f"Some expected messages not found: {expect_types}")
     assert found_ids_at_step[0]["part"] == expected
 
+    log_index = Path(tmpdir.join("fileindex.txt"))
+    assert log_index.exists()
+    logs = log_index.read_text().splitlines()
+    assert len(logs) == 2
+    first = logs[0]
+    assert "active" not in first
+    assert first.endswith("output_16.robolog")
+
     # Depending on the times printed it may break a bit different.
     # str_regression.check(pretty_format_logs_from_log_html(log_target))

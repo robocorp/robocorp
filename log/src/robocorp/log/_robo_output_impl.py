@@ -173,7 +173,10 @@ class _Config:
 
 
 class _RotateHandler:
-    def __init__(self, max_file_size_in_bytes: int, max_files: int):
+
+    LOG_INDEX_FILE = "fileindex.txt"
+
+    def __init__(self, max_file_size_in_bytes: int, max_files: int, output_dir: Optional[Path] = None):
         if max_files <= 0:
             raise ValueError(f"max_files must be > 0. Found: {max_files}")
 
@@ -182,6 +185,8 @@ class _RotateHandler:
 
         self._found_files: List[Path] = []
         self._max_files = max_files
+
+        self._log_index_path = output_dir / self.LOG_INDEX_FILE if output_dir else self.LOG_INDEX_FILE
 
     def add_bytes(self, bytes_len):
         self._total_bytes += bytes_len
@@ -208,6 +213,8 @@ class _RotateHandler:
         idx = files.index(src)
         files.pop(idx)
         files.insert(idx, dest)
+        with open(self._log_index_path, "w") as stream:
+            stream.write("\n".join(map(str, files)))
 
     def iter_found_files(self):
         yield from iter(self._found_files)
@@ -380,7 +387,7 @@ class _RoboOutputImpl:
 
         self._rotating = False
         self._rotate_handler = _RotateHandler(
-            config.max_file_size_in_bytes, config.max_files
+            config.max_file_size_in_bytes, config.max_files, output_dir=self._output_dir
         )
         self._id_generator = _gen_id()
 
