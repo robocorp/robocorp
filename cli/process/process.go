@@ -44,7 +44,7 @@ func (proc *Process) String() string {
 	return fmt.Sprintf("Process[name='%v',args=%v]", proc.name, proc.args)
 }
 
-func (proc *Process) Run() (*Output, error) {
+func (proc *Process) Run() (*Output, *ProcessError) {
 	proc.cmd = exec.Command(proc.name, proc.args...)
 
 	if proc.Env != nil {
@@ -56,12 +56,12 @@ func (proc *Process) Run() (*Output, error) {
 
 	stdoutPipe, err := proc.cmd.StdoutPipe()
 	if err != nil {
-		return nil, ProcessError{Err: err}
+		return nil, &ProcessError{Err: err}
 	}
 
 	stderrPipe, err := proc.cmd.StderrPipe()
 	if err != nil {
-		return nil, ProcessError{Err: err}
+		return nil, &ProcessError{Err: err}
 	}
 
 	wg.Add(1)
@@ -101,19 +101,19 @@ func (proc *Process) Run() (*Output, error) {
 	}()
 
 	if err := proc.cmd.Start(); err != nil {
-		return nil, ProcessError{Err: err}
+		return nil, &ProcessError{Err: err}
 	}
 
 	wg.Wait()
 	err = proc.cmd.Wait()
 
 	output := &Output{
-		Stdout: strings.Join(stdout, "\n"),
-		Stderr: strings.Join(stderr, "\n"),
+		Stdout: strings.Join(stdout, ""),
+		Stderr: strings.Join(stderr, ""),
 	}
 
 	if err != nil {
-		return nil, ProcessError{Err: err, Output: output}
+		return nil, &ProcessError{Err: err, Output: output}
 	} else {
 		return output, nil
 	}

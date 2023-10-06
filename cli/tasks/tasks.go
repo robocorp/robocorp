@@ -3,6 +3,9 @@ package tasks
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/process"
@@ -76,6 +79,37 @@ func Run(env environment.Environment, name string) (Result, error) {
 	return result, nil
 }
 
+func Serve(env environment.Environment) error {
+	//env.Variables["RC_LOG_OUTPUT_STDOUT"] = "1"
+
+	cmd := ServeCommand()
+	cmd = append(cmd, "--no-status-rc")
+	exe := env.FindExecutable(cmd[0])
+
+	proc := process.New(exe, cmd[1:]...)
+	proc.Env = env.ToSlice()
+	proc.StdoutListener = func(line string) {
+		fmt.Print(line)
+	}
+	proc.StderrListener = func(line string) {
+		fmt.Print(line)
+	}
+
+    c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	defer signal.Reset(os.Interrupt, syscall.SIGTERM)
+    go func() {
+    	<- c
+ 		// TODO: Some sort of timeout?
+    }()
+
+	if _, err := proc.Run(); err != nil {
+		return err.Err
+	}
+
+	return nil
+}
+
 func ListCommand() []string {
 	return []string{"python", "-m", "robocorp.tasks", "list", "tasks.py"}
 }
@@ -89,6 +123,20 @@ func RunCommand(name string) []string {
 		"tasks.py",
 		"-t",
 		name,
+	}
+}
+
+func ServeCommand() []string {
+	return []string{
+		"python",
+		"-m",
+		"robocorp.tasks",
+		"serve",
+		"--max-log-file-size",
+		"10kb",
+		"--max-log-files",
+		"100",
+		"tasks.py",
 	}
 }
 
