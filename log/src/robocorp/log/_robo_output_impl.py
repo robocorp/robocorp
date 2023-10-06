@@ -207,14 +207,15 @@ class _RotateHandler:
             except Exception:
                 traceback.print_exc()
 
-    def replace_registered_file(self, src, dest):
+    def replace_registered_file(self, src: Path, dest: Path):
         """Updates the new file path after retirement."""
         files = self._found_files
         idx = files.index(src)
         files.pop(idx)
         files.insert(idx, dest)
+        file_names = [file.name for file in files]
         with open(self._log_index_path, "w") as stream:
-            stream.write("\n".join(map(str, files)))
+            stream.write("\n".join(file_names))
 
     def iter_found_files(self):
         yield from iter(self._found_files)
