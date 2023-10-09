@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "robocorp-windows"
+version = "0.0.1"
+description = "Robocorp Windows Automation (API to automate Windows)"
+authors = [
+	"Fabio Z. <fabio@robocorp.com>",
+]
+readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
+packages = [{include = "robocorp/windows", from="src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pillow = "^9.1.1"
+pywin32 = { version = ">=300,<304", platform = "win32", python = "!=3.8.1" }
+psutil = "^5.9.0"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+mock = "^5.0"
+types-mock = "^5.0"
+types-pywin32 = "304.0.0.6"
+types-Pillow = "^9.1.1"
+robocorp-log-pytest = "^0.0.1"
+types-psutil = "^5.9.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+exclude = "vendored"
+
+[tool.mypy]
+mypy_path = "src:tests"
+
+[[tool.mypy.overrides]]
+module = "uiautomation.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "comtypes.*"
+ignore_missing_imports = true
+
+[tool.robocorp.log]
+
+log_filter_rules = [
+    {name = "wincon", kind = "exclude"},
+]

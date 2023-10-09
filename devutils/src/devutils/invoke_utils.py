@@ -82,8 +82,8 @@ def get_all_tags(tag_prefix: str) -> List[str]:
 
 
 def to_identifier(value: str) -> str:
-    value = re.sub(r'[^\w\s_]', '', value.lower())
-    value = re.sub(r'[_\s]+', '_', value).strip('_')
+    value = re.sub(r"[^\w\s_]", "", value.lower())
+    value = re.sub(r"[_\s]+", "_", value).strip("_")
     return value
 
 
@@ -184,7 +184,7 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     @task
     def test(ctx):
         """Run unittests"""
-        poetry(ctx, f"run pytest")
+        poetry(ctx, f"run pytest -rfE -vv")
 
     @task
     def doctest(ctx):
@@ -225,7 +225,6 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
             tmp.write(output)
             tmp.close()  # Fix for Windows
             poetry(ctx, f"run mypy --strict {tmp.name}")
-
 
     @task(lint, typecheck, test)
     def check_all(ctx):
