@@ -1,0 +1,408 @@
+import re
+import time
+from re import Pattern
+from typing import Dict, Iterator, List, Literal, Optional, Protocol, Union
+
+import robocorp.windows.vendored.uiautomation as auto  # type: ignore
+from robocorp.windows.vendored.uiautomation import Control
+
+from robocorp.windows._iter_tree import ControlTreeNode
+from robocorp.windows._match_object import MatchObject, SearchType
+from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+from robocorp.windows.protocols import Locator
+
+from ._errors import ElementNotFound
+
+
+def _window_or_none(
+    window: "_UIAutomationControlWrapper",
+) -> Optional["_UIAutomationControlWrapper"]:
+    from comtypes import COMError  # type: ignore
+
+    if window and window.item:
+        try:
+            window.item.BoundingRectangle
+        except COMError:
+            # Failure to get the bounding rectangle proves that the window doesn't
+            #  exist anymore.
+            return None
+
+        return window
+
+    return None
+
+
+def _get_desktop_control() -> "Control":
+    root_control = auto.GetRootControl()
+    new_control = Control.CreateControlFromControl(root_control)
+    return new_control
+
+
+def get_desktop_element() -> _UIAutomationControlWrapper:
+    desktop_control = _get_desktop_control()
+    locator = "Path:"
+    return _UIAutomationControlWrapper(desktop_control, locator)
+
+
+class ICompareFunc(Protocol):
+    @classmethod
+    def __call__(cls, el: ControlTreeNode["Control"], search_value) -> bool:
+        pass
+
+
+def _cmp_subname(el: ControlTreeNode["Control"], search_value) -> bool:
+    if not isinstance(search_value, str):
+        return False
+    return search_value in el.control.Name
+
+
+def _cmp_regex(el: ControlTreeNode["Control"], search_value) -> bool:
+    return bool(re.match(search_value, el.control.Name))
+
+
+def _cmp_executable(el: ControlTreeNode["Control"], search_value) -> bool:
+    executable: Optional[str] = None
+    try:
+        from psutil import Process
+
+        proc = Process(el.control.ProcessId)
+        executable = proc.exe()
+    except Exception:
+        return False
+
+    executable = executable.replace("\\", "/")
+    search_value = search_value.replace("\\", "/").lower()
+    return executable.lower().endswith(search_value)
+
+
+_match_dispatch: Dict[Union[str, Pattern[str]], Union[str, ICompareFunc]] = {
+    # Same thing
+    "automationid": "AutomationId",
+    "id": "AutomationId",
+    # Same thing
+    "control": "ControlTypeName",
+    "type": "ControlTypeName",
+    # All match name in different ways
+    "name": "Name",
+    "subname": _cmp_subname,
+    "regex": _cmp_regex,
+    # Unique
+    "class": "ClassName",
+    "handle": "NativeWindowHandle",
+    "executable": _cmp_executable,
+    # "desktop": -- handled directly as this is the root object.
+    # "depth": -- this is a property of the hierarchy
+    # "index": -- this is a property of the hierarchy
+    # "path": -- this is a property of the hierarchy
+    # "offset": "offset", -- not supported
+}
+
+
+def _matches(search_params: SearchType, tree_node: ControlTreeNode["Control"]):
+    if not search_params:
+        return False
+
+    for search_key, search_val in search_params.items():
+        comp_func_or_attr = _match_dispatch[search_key]
+        if isinstance(comp_func_or_attr, str):
+            if getattr(tree_node.control, comp_func_or_attr) != search_val:
+                return False
+        elif not comp_func_or_attr(tree_node, search_val):
+            return False
+
+    return True
+
+
+def _get_control_from_path(
+    search_params: SearchType, root_control: "Control"
+) -> "Control":
+    # Follow a path in the tree of controls until reaching the final target.
+    path: List[int] = search_params["path"]
+    current = root_control
+
+    for index, position in enumerate(path):
+        children = current.GetChildren()
+        if position > len(children):
+            partial_path = MatchObject.PATH_SEP.join(str(pos) for pos in path[:index])
+
+            raise ElementNotFound(
+                f"Unable to retrieve child on position {position!r} under a parent"
+                f" with partial path {partial_path!r}"
+            )
+
+        current = children[position - 1]
+
+    return current
+
+
+def _resolve_root(
+    root_element: Optional[_UIAutomationControlWrapper],
+) -> _UIAutomationControlWrapper:
+    if root_element is None:
+        return get_desktop_element()
+
+    root = _window_or_none(root_element)
+    if root is None:
+        raise RuntimeError("`root_element` provided is no longer valid.")
+    return root
+
+
+# def _load_by_alias(self, criteria: str) -> str:
+#     try:
+#         from RPA.core.locators import LocatorsDatabase, WindowsLocator
+#
+#         locator = LocatorsDatabase.load_by_name(criteria, self._locators_path)
+#         if isinstance(locator, WindowsLocator):
+#             return locator.value
+#     except ValueError:
+#         pass
+#
+#     return criteria
+
+
+def _find_ui_automation_wrappers(
+    locator: Optional[Locator] = None,
+    search_depth: int = 8,
+    root_element: Optional[_UIAutomationControlWrapper] = None,
+    search_strategy: Literal["siblings", "all", "single"] = "single",
+    timeout_monitor: Optional["TimeoutMonitor"] = None,
+) -> Iterator[_UIAutomationControlWrapper]:
+    if not locator:
+        yield _resolve_root(root_element)
+        return
+
+    # split something as "name:Foo > name:Bar" to ["name:Foo", "name:Bar"]
+    locator_parts = locator.split(MatchObject.TREE_SEP)
+    if not locator_parts:
+        raise AssertionError(f"The locator passed ({locator!r}) is not valid.")
+
+    root_control = _resolve_root(root_element).item
+
+    # The timeout approach is the following: until we hit at least one object
+    # with the given structure, we'll keep on searching, but at least one full
+    # search should be done until the timeout is hit.
+
+    for i, locator_part in enumerate(locator_parts):
+        if timeout_monitor and timeout_monitor.timed_out():
+            return
+
+        is_last = i == len(locator_parts) - 1
+        # Prepare control search parameters.
+        search_params = MatchObject.parse_locator(locator_part).as_search_params()
+
+        if is_last:
+            if search_strategy == "all":
+                for control_tree_node in _search_step(
+                    root_control, search_params, search_depth, timeout_monitor
+                ):
+                    yield _UIAutomationControlWrapper(
+                        control_tree_node.control, locator
+                    )
+                return
+
+        try:
+            root_control_tree_node = next(
+                _search_step(
+                    root_control,
+                    search_params,
+                    search_depth,
+                    timeout_monitor,
+                )
+            )
+            root_control = root_control_tree_node.control
+        except StopIteration:
+            return
+        else:
+            if is_last:
+                yield _UIAutomationControlWrapper(root_control, locator)
+
+                search_params.pop("desktop", None)
+                search_params.pop("path", None)
+                if not search_params:
+                    # Can't keep on searching for matches in this case
+                    return
+
+                if search_strategy == "siblings":
+                    yield from _search_siblings(root_control, search_params, locator)
+                    return
+                assert search_strategy is None
+                # Don't keep on searching as the strategy is for a single match.
+                return
+
+
+def _search_step(
+    root_control,
+    search_params,
+    search_depth,
+    timeout_monitor: Optional["TimeoutMonitor"],
+) -> Iterator[ControlTreeNode["Control"]]:
+    # Obtain an element with the search parameters.
+    if "desktop" in search_params:
+        control = _get_desktop_control()
+        yield ControlTreeNode(
+            control,
+            depth=0,
+            child_pos=0,
+            path="",
+        )
+        return
+
+    if "path" in search_params:
+        path_param = search_params["path"]
+        control = _get_control_from_path(search_params, root_control)
+        yield ControlTreeNode(
+            control,
+            depth=len(path_param),
+            child_pos=path_param[-1],
+            path="|".join(str(x) for x in path_param),
+        )
+        return
+
+    from robocorp.windows._iter_tree import iter_tree
+
+    found = False
+    for el in iter_tree(root_control, max_depth=search_depth, include_top=False):
+        if not found:
+            # If we found one item, we cannot time-out anymore.
+            if timeout_monitor and timeout_monitor.timed_out():
+                return
+        if _matches(search_params, el):
+            found = True
+            yield el
+
+
+def _search_siblings(
+    root_control: "Control", search_params, locator
+) -> Iterator[_UIAutomationControlWrapper]:
+    while True:
+        next_control = root_control.GetNextSiblingControl()
+        if not next_control:
+            break
+
+        if _matches(search_params, ControlTreeNode(next_control, 0, 0, "")):
+            element = _UIAutomationControlWrapper(next_control, locator)
+            yield element
+        root_control = next_control
+
+
+def find_ui_automation_wrapper(
+    locator: Optional[Locator] = None,
+    search_depth: int = 8,
+    root_element: Optional[_UIAutomationControlWrapper] = None,
+    timeout: Optional[float] = None,
+    wait_for_element: bool = True,
+) -> _UIAutomationControlWrapper:
+    if wait_for_element:
+        from robocorp.windows import config
+
+        if timeout is not None:
+            use_timeout = timeout
+        else:
+            use_timeout = config().timeout
+        timeout_at = time.monotonic() + use_timeout
+
+    timeout_monitor = None
+    while True:
+        for wrapper in _find_ui_automation_wrappers(
+            locator,
+            search_depth,
+            root_element,
+            search_strategy="single",
+            timeout_monitor=timeout_monitor,
+        ):
+            return wrapper
+
+        if not wait_for_element:
+            break
+        else:
+            if time.monotonic() > timeout_at:
+                break
+            else:
+                time.sleep(0.05)
+                # Assign the timeout monitor only after at least one full
+                # search was done.
+                timeout_monitor = TimeoutMonitor(timeout_at)
+
+    raise ElementNotFound(f"Unable to find element with locator: {locator!r}.")
+
+
+def find_ui_automation_wrappers(
+    locator: Optional[Locator] = None,
+    search_depth: int = 8,
+    root_element: Optional[_UIAutomationControlWrapper] = None,
+    timeout: Optional[float] = None,
+    search_strategy: Literal["siblings", "all"] = "siblings",
+    wait_for_element: bool = False,
+    timeout_monitor: Optional["TimeoutMonitor"] = None,
+) -> List[_UIAutomationControlWrapper]:
+    """Get a list of elements matching the locator.
+
+    By default, only the siblings (similar elements on the same level) are taken
+    into account. In order to search globally, set `search_strategy="all"`, but be
+    aware that this will take more time to process.
+
+    Args:
+        locator: Locator string.
+        search_depth: How deep the element search will traverse. (default 8)
+        root_element: Will be used as search root element object if provided.
+        timeout: After how many seconds (float) to give up on search. Note
+            that at least one full search up to the given depth will be done.
+            Only used if `wait_for_element` is True.
+        search_strategy:
+            "siblings": only the siblings (similar elements on the same level)
+                will be found
+            "all": all the elements available (up to the search_depth) will be
+                searched.
+        wait_for_element: Defines whether the search should wait for some element
+            to be found.
+        timeout_monitor: If given, ignores the timeout parameter and uses the
+            TimeoutMonitor passed instead (meaning that it may timeout even
+            before a single full search is done). It's used even if wait_for_element
+            is False.
+    """
+    if wait_for_element:
+        from robocorp.windows import config
+
+        if timeout is not None:
+            use_timeout = timeout
+        else:
+            use_timeout = config().timeout
+        timeout_at = time.monotonic() + use_timeout
+
+    def _timed_out() -> bool:
+        if timeout_monitor is not None:
+            return timeout_monitor.timed_out()
+        else:
+            return time.monotonic() > timeout_at
+
+    while True:
+        # At least one search is always done (although it may time-out if
+        # the timeout_monitor was passed).
+        ret = list(
+            _find_ui_automation_wrappers(
+                locator,
+                search_depth,
+                root_element,
+                search_strategy=search_strategy,
+                timeout_monitor=timeout_monitor,
+            )
+        )
+        if not wait_for_element or len(ret) > 0:
+            return ret
+        else:
+            if _timed_out():
+                return ret  # timed out, return even if the list is empty
+            else:
+                time.sleep(1 / 15.0)
+                # Assign the timeout monitor only after at least one full
+                # search was done.
+                if timeout_monitor is None:
+                    timeout_monitor = TimeoutMonitor(timeout_at)
+
+
+class TimeoutMonitor:
+    def __init__(self, timeout_at: float):
+        self.timeout_at = timeout_at
+
+    def timed_out(self):
+        return time.monotonic() > self.timeout_at

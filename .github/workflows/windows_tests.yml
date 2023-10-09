@@ -1,0 +1,66 @@
+name: Windows Tests
+
+on:
+  push:
+    branches:
+      - "master"
+      - "wip"
+      - "feature/robocorp-windows"
+    paths:
+      - "windows/**"
+      - ".github/workflows/windows_tests.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "windows/**"
+      - ".github/workflows/windows_tests.yml"
+
+defaults:
+  run:
+    working-directory: './windows'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "windows-py310"
+            python: "3.10"
+            os: windows-latest
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Install dependencies
+      run: poetry install
+    - name: Run Typecheck
+      run: poetry run python -m invoke typecheck
+    - name: Run Unittests
+      run: poetry run python -m invoke test
+      env:
+        CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
+        CI_ENDPOINT: ${{ secrets.CI_ENDPOINT }}
+    - name: Run Lint
+      run: poetry run python -m invoke lint
+    - uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: log.${{ matrix.name }}.html
+        path: windows/output/log.html
+    - uses: actions/upload-artifact@v1
+      if: always()
+      with:
+        name: log.${{ matrix.name }}.robolog
+        path: windows/output/output.robolog
