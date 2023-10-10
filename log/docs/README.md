@@ -37,8 +37,11 @@ Although the setup is done through `robocorp-tasks`, there are still
 some APIs in `robocorp.log` which are interesting to use such as:
 
 - Utility methods to add a log message as `critical`, `warn`, `info`, `debug`, `exception`
-  (note that it's possible to embed html by passing `html=True` in those methods,
-  so, things as screenshots can be directly embedded into the log).
+
+- Utility method to add an `html` message (using the `html` method).
+  Note that the `html` method is tested for images with base64 contents in the `log.html`, 
+  other structures must be manually checked as they can break the layout. Also, keep
+  in mind that the provided html will be sanitized.
   
 - Supressing logging through `suppress_variables`, `suppress_methods`, `suppress`.
 
