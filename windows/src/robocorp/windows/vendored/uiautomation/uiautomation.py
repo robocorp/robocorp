@@ -1817,6 +1817,14 @@ def WindowFromPoint(x: int, y: int) -> int:
     return ctypes.windll.user32.WindowFromPoint(ctypes.wintypes.POINT(x, y))  # or ctypes.windll.user32.WindowFromPoint(x, y)
 
 
+def ChildWindowFromPoint(hWndParent, x: int, y: int) -> int:
+    """
+    WindowFromPoint from Win32.
+    Return int, a native window handle.
+    """
+    return ctypes.windll.user32.ChildWindowFromPoint(ctypes.c_void_p(hWndParent), ctypes.wintypes.POINT(x, y))
+
+
 def GetCursorPos() -> Tuple[int, int]:
     """
     GetCursorPos from Win32.
@@ -8233,6 +8241,18 @@ def ControlFromPoint2(x: int, y: int) -> Optional[Control]:
     Return `Control` subclass.
     """
     return Control.CreateControlFromElement(_AutomationClient.instance().IUIAutomation.ElementFromHandle(WindowFromPoint(x, y)))
+
+
+def ControlFromPointInParent(parentHandle, x: int, y: int) -> Optional[Control]:
+    """
+    Get a native handle from point x,y and call IUIAutomation.ElementFromHandle.
+    
+    Note that the x and y must be passed in relative coordinates from the parent,
+    NOT absolute cursor position.
+    
+    Return `Control` subclass.
+    """
+    return Control.CreateControlFromElement(_AutomationClient.instance().IUIAutomation.ElementFromHandle(ChildWindowFromPoint(parentHandle, x, y)))
 
 
 def ControlFromCursor() -> Optional[Control]:

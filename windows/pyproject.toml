@@ -15,6 +15,7 @@ python = "^3.9"
 pillow = "^9.1.1"
 pywin32 = { version = ">=300,<304", platform = "win32", python = "!=3.8.1" }
 psutil = "^5.9.0"
+comtypes = "^1.1"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
