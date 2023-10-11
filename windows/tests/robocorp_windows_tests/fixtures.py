@@ -64,7 +64,7 @@ def tk_process() -> Iterator[subprocess.Popen]:
 
     yield popen
     if popen.poll() is None:
-        kill_process_and_subprocesses(popen)
+        kill_process_and_subprocesses(popen.pid)
 
 
 @pytest.fixture

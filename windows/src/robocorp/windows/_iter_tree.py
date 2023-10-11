@@ -5,6 +5,7 @@ from _ctypes import COMError
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
+
     from robocorp.windows.vendored.uiautomation import Control
 
 T = TypeVar("T")
@@ -45,9 +46,8 @@ class ControlTreeNode(Generic[Y]):
         return f"ControlTreeNode({self.__str__()})"
 
     def _get_as_control(self) -> "Control":
-        from robocorp.windows.vendored.uiautomation import Control
-
         from robocorp.windows._control_element import ControlElement
+        from robocorp.windows.vendored.uiautomation import Control
 
         if isinstance(self.control, ControlElement):
             ui_automation_control = self.control.ui_automation_control

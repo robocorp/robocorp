@@ -1,3 +1,6 @@
+import sys
+import threading
+
 from robocorp.windows._window_element import WindowElement
 
 
@@ -10,6 +13,32 @@ def test_iter_windows_and_screenshot(calculator_window_element: WindowElement) -
 
     assert len(tree_elements) > 10
     assert found_img
+
+
+def test_build_hierarchy(tk_process):
+    import io
+
+    from robocorp.windows import find_window
+    from robocorp.windows._inspect import build_parent_hierarchy
+
+    window = find_window('name:"Tkinter Elements Showcase"')
+    bt = window.find("class:Button path:1|5")
+    found = []
+    for c in build_parent_hierarchy(bt, window):
+        found.append(
+            f"{c.control.control_type} {c.control.class_name} "
+            f"{c.path} {c.control.locator}"
+        )
+
+    assert found == [
+        "PaneControl TkChild 1 path:1",
+        "ButtonControl Button 1|5 path:1|5",
+    ]
+
+    stream = io.StringIO()
+    window.print_tree(stream=stream)
+    for c in build_parent_hierarchy(bt, window):
+        assert str(c) in stream.getvalue()
 
 
 def test_inspect(calculator_window_element: WindowElement):
@@ -49,3 +78,58 @@ def test_inspect(calculator_window_element: WindowElement):
                 print("end highlighting 'control:TextControl'...")
         finally:
             element_inspector.stop_highlight()
+
+
+def test_inspect_user_picks(calculator_window_element: WindowElement):
+    from robocorp.windows._errors import ElementNotFound
+    from robocorp.windows._inspect import ElementInspector
+    from robocorp.windows.vendored.uiautomation.uiautomation import SetCursorPos
+
+    with ElementInspector(calculator_window_element) as element_inspector:
+        ev = threading.Event()
+
+        found_elements = []
+
+        def on_pick(found):
+            found_elements.append(found)
+            ev.set()
+
+        try:
+            el = calculator_window_element.find("name:Zero", timeout=0.3)
+        except ElementNotFound:
+            el = calculator_window_element.find(
+                "name:0 control:ButtonControl", timeout=0.3
+            )
+
+        element_inspector.start_picking(on_pick)
+        try:
+            SetCursorPos(el.xcenter, el.ycenter)
+            ev.wait(5)
+            assert found_elements
+            found = found_elements[-1]
+            leaf = found[-1]
+            assert leaf.control.handle == el.handle
+            assert leaf.control.is_same_as(el)
+
+            # Check if the path is also correct
+            assert calculator_window_element.find(
+                f"path:{leaf.control.path}"
+            ).is_same_as(el)
+
+            # Check that the first item is just below the given parent.
+            first_found = found[0]
+            parent = first_found.control.get_parent()
+            assert calculator_window_element.is_same_as(parent)
+
+            assert leaf.control.path
+            parent = leaf.control.get_parent()
+            assert parent.path
+
+            assert parent.path == leaf.control.path.rsplit("|", 1)[0]
+        except Exception:
+            sys.stderr.write("Error happened in test. Printing tree:\n")
+            calculator_window_element.print_tree()
+
+            raise
+        finally:
+            element_inspector.stop_picking()

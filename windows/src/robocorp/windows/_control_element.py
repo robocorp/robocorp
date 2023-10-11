@@ -14,13 +14,12 @@ from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
 from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
+    from robocorp.windows._iter_tree import ControlTreeNode
     from robocorp.windows.vendored.uiautomation.uiautomation import (
         Control,
         LegacyIAccessiblePattern,
         ValuePattern,
     )
-
-    from robocorp.windows._iter_tree import ControlTreeNode
 
 
 PatternType = Union["ValuePattern", "LegacyIAccessiblePattern"]
@@ -67,11 +66,26 @@ class ControlElement:
     def __init__(self, wrapped: "_UIAutomationControlWrapper"):
         self._wrapped = wrapped
 
+    @property
+    def path(self) -> Optional[str]:
+        return self._wrapped.path
+
     def inspect(self):
         from robocorp.windows._inspect import ElementInspector
 
         element_inspector = ElementInspector(self)
         element_inspector.inspect()
+
+    def get_parent(self) -> Optional["ControlElement"]:
+        parent = self._wrapped.get_parent()
+        if parent is None:
+            return None
+        return ControlElement(parent)
+
+    def is_same_as(self, other: "ControlElement") -> bool:
+        from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
+
+        return ControlsAreSame(self._wrapped.item, other._wrapped.item)
 
     def _find_ui_automation_wrapper(
         self,
@@ -664,7 +678,7 @@ class ControlElement:
         self,
         locator: Optional[Locator] = None,
         timeout: Optional[float] = None,
-    ) -> str:
+    ) -> Optional[str]:
         """Get text from Control element defined by the locator.
 
         Exception ``ActionNotPossible`` is raised if element does not
