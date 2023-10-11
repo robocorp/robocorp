@@ -4,7 +4,9 @@ from typing import Optional
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
+
     from robocorp.windows.vendored.uiautomation.uiautomation import Control
+
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +22,8 @@ def screenshot(control: "Control") -> Optional["Image"]:
         bitmap = control.ToBitmap()
     except AttributeError:
         log.info(f"Unable to take screenshot of {control} (ToBitmap not available).")
+        return None
+    if bitmap is None:
         return None
     w, h = bitmap.Width, bitmap.Height
     bits = bitmap.GetAllPixelColors()

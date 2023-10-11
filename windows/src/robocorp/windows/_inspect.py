@@ -1,20 +1,42 @@
+import itertools
+import logging
+import math
 import sys
 import threading
 import time
 import typing
-from contextlib import contextmanager
-from io import StringIO
-from typing import Any, Callable, Dict, Iterator, List, Literal, Optional, Tuple
+from functools import partial
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+)
+
+import _ctypes
+from _ctypes import COMError
 
 from robocorp.windows._control_element import ControlElement
+from robocorp.windows._errors import ElementNotFound
 from robocorp.windows._window_element import WindowElement
 from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
     from robocorp.windows._iter_tree import ControlTreeNode
+    from robocorp.windows.vendored.uiautomation.uiautomation import Control
 
 
 NOT_AVAILABLE = "N/A"
+
+log = logging.getLogger(__name__)
+
+DEBUG = False
 
 
 class _BoundsIndex:
@@ -52,7 +74,8 @@ highlight         (h): Highlights all elements reachable given a locator.
                        i.e.: `h: name:"Calculator"`.
 highlight mouse   (m): Highlights based on the mouse position. 
 highlight all     (a): Creates highlight boxes in all the reachable elements.
-select window     (w): Selects a window to inspect. 
+select window     (s): Selects a window to inspect. Can include a filter as
+                       the parameter (i.e.: s:notepad). 
 quit              (q): Stops the inspection.
 """
         ).strip()
@@ -93,11 +116,7 @@ quit              (q): Stops the inspection.
         queue.join()
 
 
-def wait_for_input(msg, on_input):
-    try:
-        input(msg)
-    finally:
-        on_input()
+_next_id = partial(next, itertools.count(0))
 
 
 class _TkHandler:
@@ -105,52 +124,71 @@ class _TkHandler:
         self._current_thread = threading.current_thread()
         self._roots = []
         # Add the default one (to interact with the loop).
-        self._reset_rects = False
-        self._reused_index = 1
         self.add_rect(0, 0, 0, 0)
 
-    @contextmanager
-    def reset_rects(self):
+    def set_rects(self, rects):
+        if DEBUG:
+            print(f"--- Settings {len(rects)} rects (id: {_next_id()})")
         assert self._current_thread == threading.current_thread()
-        self._reset_rects = True
-        self._reused_index = 1  # The one at 0 is always kept
-        yield
-        while self._reused_index < len(self._roots):
+
+        reuse_index = 1
+
+        for rect in rects:
+            if DEBUG:
+                print(rect)
+            left, top, right, bottom = rect
+
+            if reuse_index < len(self._roots):
+                canvas = self._roots[reuse_index]
+                self.set_canvas_geometry(canvas, left, right, top, bottom)
+            else:
+                self.add_rect(left, right, top, bottom)
+
+            reuse_index += 1
+
+        while len(rects) + 1 < len(self._roots):
+            if DEBUG:
+                print("Destroy unused")
             self._roots.pop(-1).destroy()
+
+        assert len(self._roots) - 1 == len(rects)
+
+    def _create_canvas(self):
+        import tkinter as tk
+
+        root = tk.Tk()
+        root.title("Inspect picker root")
+        root.overrideredirect(True)  # Remove window decorations
+        root.attributes("-alpha", 0.1)  # Set window transparency (0.0 to 1.0)
+        root.geometry("0x0+0+0")
+        root.attributes("-topmost", 1)
+
+        from tkinter.constants import SOLID
+
+        canvas = tk.Canvas(
+            root, bg="red", highlightthickness=0, relief=SOLID, borderwidth=2
+        )
+
+        canvas.pack(fill=tk.BOTH, expand=True)
+        self._roots.append(root)
+        return root
 
     def add_rect(self, left, right, top, bottom):
         assert self._current_thread == threading.current_thread()
-        if self._reset_rects and len(self._roots) > self._reused_index:
-            root = self._roots[self._reused_index]
-            self._reused_index += 1
-        else:
-            import tkinter as tk
+        canvas = self._create_canvas()
+        self.set_canvas_geometry(canvas, left, right, top, bottom)
 
-            root = tk.Tk()
-            root.overrideredirect(True)  # Remove window decorations
-            root.attributes("-alpha", 0.1)  # Set window transparency (0.0 to 1.0)
-            root.geometry("0x0+0+0")
-            root.attributes("-topmost", 1)
-
-            from tkinter.constants import SOLID
-
-            canvas = tk.Canvas(
-                root, bg="red", highlightthickness=0, relief=SOLID, borderwidth=2
-            )
-
-            canvas.pack(fill=tk.BOTH, expand=True)
-            self._roots.append(root)
-
+    def set_canvas_geometry(self, canvas, left, right, top, bottom):
         x = left
         w = right - x
 
         y = top
         h = bottom - y
 
-        assert w >= 0
-        assert y >= 0
+        assert w >= 0, f"Found w: {w}"
+        assert h >= 0, f"Found h: {h}"
 
-        root.geometry(f"{w}x{h}+{x}+{y}")
+        canvas.geometry(f"{w}x{h}+{x}+{y}")
 
     def __len__(self):
         assert self._current_thread == threading.current_thread()
@@ -163,14 +201,16 @@ class _TkHandler:
     def loop(self, on_loop_poll_callback: Optional[Callable[[], Any]]):
         assert self._current_thread == threading.current_thread()
 
-        poll_15_times_per_second = int(1 / 15.0) * 1000
+        poll_5_times_per_second = int(1 / 5.0 * 1000)
 
-        def check_action():
-            # Keep calling itself
-            on_loop_poll_callback()
-            self._default_root.after(poll_15_times_per_second, check_action)
+        if on_loop_poll_callback is not None:
 
-        self._default_root.after(poll_15_times_per_second, check_action)
+            def check_action():
+                # Keep calling itself
+                on_loop_poll_callback()
+                self._default_root.after(poll_5_times_per_second, check_action)
+
+            self._default_root.after(poll_5_times_per_second, check_action)
 
         self._default_root.mainloop()
 
@@ -212,6 +252,15 @@ def _extract_max_depth(params: str) -> Tuple[Optional[int], str]:
 
 
 class _TkHandlerThread(threading.Thread):
+    """
+    This is a thread-safe facade to use _TkHandler.
+
+    The way it works is that this thread must be started and all the methods
+    will actually add the actual action to a queue and then they'll return
+    promptly (and later the thread should fetch the item from the queue
+    and actually perform the needed operation on tk).
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self._lock = threading.RLock()
@@ -227,7 +276,12 @@ class _TkHandlerThread(threading.Thread):
             if cmd is None:
                 self._quit_queue_loop.set()
                 return
-            cmd()
+            try:
+                cmd()
+            except Exception:
+                import traceback
+
+                traceback.print_exc()
 
     def dispose(self):
         self.quitloop()
@@ -252,26 +306,51 @@ class _TkHandlerThread(threading.Thread):
 
         self._queue.put_nowait(add_rect)
 
+    def set_rects(self, rects) -> threading.Event:
+        """
+        Returns:
+            An event called after the rects were actually updated.
+        """
+        ev = threading.Event()
+
+        def set_rects():
+            try:
+                tk_handler = self._tk_handler
+                if tk_handler is not None:
+                    tk_handler.set_rects(rects)
+            finally:
+                ev.set()
+
+        self._queue.put_nowait(set_rects)
+        return ev
+
     def loop(self):
         def loop():
             tk_handler = self._tk_handler
             if tk_handler is not None:
 
                 def on_loop_poll_callback():
+                    # This will be continually called in the tk loop.
+                    # We use it to check whether something was added
+                    # to the queue (so that the user can quit the
+                    # loop for instance).
                     import queue
 
                     try:
                         cmd = self._queue.get_nowait()
                     except queue.Empty:
-                        return True  # Reschedule
+                        return
 
-                    # A command was found. Don't reschedule.
                     if cmd is None:
                         self._quit_queue_loop.set()
-                        return False
-                    else:
+                        return
+
+                    try:
                         cmd()
-                        return False
+                    except Exception:
+                        import traceback
+
+                        traceback.print_exc()
 
                 self._tk_handler.loop(on_loop_poll_callback)
 
@@ -297,11 +376,335 @@ class _TkHandlerThread(threading.Thread):
         self._queue.put_nowait(quitloop)
 
 
+class PickedInspectorElementError(Exception):
+    """
+    This error is thrown when the inspector picks one of the widgets
+    related to highlighting.
+    """
+
+
+def build_parent_hierarchy(
+    control: ControlElement, up_to_parent: Optional[ControlElement]
+) -> List["ControlTreeNode[ControlElement]"]:
+    """
+    Builds the parent hierarchy from the given control up to the given parent.
+
+    If the parent cannot be found the return is empty.
+
+    Args:
+        control: The leaf element.
+        up_to_parent: The hierarchy will be built up to this element.
+
+    Returns:
+        A list containing the ControlElements to reach the given control
+        from the given parent (note that the parent itself will not be
+        included in the return, but the control will be).
+    """
+    from robocorp.windows._find_ui_automation import get_desktop_element
+    from robocorp.windows._iter_tree import ControlTreeNode
+    from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+    from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
+
+    if up_to_parent is None:
+        up_to_parent = ControlElement(get_desktop_element())
+
+    hierarchy: List["Control"] = []
+    curr: Optional["Control"] = control._wrapped.item
+    if DEBUG:
+        print("build_parent_hierarchy")
+        print("found control", curr)
+    while curr is not None:
+        if curr.Name == "Inspect picker root":
+            raise PickedInspectorElementError()
+        hierarchy.append(curr)
+        curr = curr.GetParentControl()
+        if DEBUG:
+            print("found control", curr)
+        if curr and ControlsAreSame(curr, up_to_parent._wrapped.item):
+            # This must be the last one in the hierarchy for searching
+            # for indexes afterwards.
+            hierarchy.append(curr)
+            break
+    else:
+        # Oops, the given parent wasn't found!
+        log.info(
+            f"It was not possible to find the given parent "
+            f"({str(up_to_parent).strip()} in the hierarchy "
+            f"of: {str(control).strip()}"
+        )
+        return []
+
+    found = []
+    if hierarchy:
+        hierarchy = list(reversed(hierarchy))
+        path = ""
+        for depth, c in enumerate(hierarchy):
+            if depth == 0:
+                continue  # Skip the 'up_to_parent'.
+            prev = hierarchy[depth - 1]
+
+            find_element = hierarchy[depth]
+
+            children = prev.GetChildren()
+            for child_pos, child in enumerate(children):
+                if ControlsAreSame(child, find_element):
+                    child_pos += 1  # It's one-based.
+                    if not path:
+                        path = f"{child_pos}"
+                    else:
+                        path = f"{path}|{child_pos}"
+
+                    el = ControlElement(_UIAutomationControlWrapper(c, f"path:{path}"))
+                    found.append(ControlTreeNode(el, depth, child_pos, path))
+                    break
+            else:
+                log.info(
+                    f"It was not possible to find the given child "
+                    f"({str(c).strip()} in the hierarchy "
+                    f"of: {str(control).strip()}"
+                )
+                return []  # Don't return partial match.
+
+    return found
+
+
+class CursorPos:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def as_tuple(self):
+        return self.x, self.y
+
+    def distance_to(self, cursor: "CursorPos"):
+        dx = self.x - cursor.x
+        dy = self.y - cursor.y
+        distance = math.sqrt(dx**2 + dy**2)
+        return distance
+
+    def consider_same_as(self, cursor: Optional["CursorPos"]):
+        if cursor is None:
+            return False
+        return self.distance_to(cursor) <= 3
+
+    def __str__(self):
+        return f"CursorPos({self.x}, {self.y})"
+
+    __repr__ = __str__
+
+
+class _PickerThread(threading.Thread):
+    def __init__(
+        self,
+        tk_handler_thread: _TkHandlerThread,
+        control_element: ControlElement,
+        on_pick,
+    ) -> None:
+        threading.Thread.__init__(self)
+
+        self._stop_event = threading.Event()
+        self.on_pick = on_pick
+        self.control_element = control_element
+        self._tk_handler_thread = tk_handler_thread
+
+    def _found_from_cursor_pos(
+        self, cursor_pos: Tuple[int, int], parent: Optional[ControlElement]
+    ) -> List["ControlTreeNode[ControlElement]"]:
+        """
+        Args:
+            parent: if None gets up to the desktop
+
+        Raises: PickedInspectorElementError
+        """
+        from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+        from robocorp.windows.vendored import uiautomation
+
+        try:
+            control = uiautomation.ControlFromPoint(*cursor_pos)
+        except COMError:
+            return []
+        else:
+            if control is None:
+                return []
+            return build_parent_hierarchy(
+                ControlElement(_UIAutomationControlWrapper(control, "")), parent
+            )
+
+    def _found_from_cursor_pos_with_point_in_parent(
+        self,
+        parent: Optional[ControlElement] = None,
+        cursor: Optional[Tuple[int, int]] = None,
+        visited_handles: Optional[Set[int]] = None,
+        depth: int = 1,
+        parent_path: str = "",
+    ) -> Iterator["ControlTreeNode[ControlElement]"]:
+        """
+        Note that this code isn't working (abandoned for now).
+        """
+        from robocorp.windows._iter_tree import ControlTreeNode
+        from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+        from robocorp.windows.vendored import uiautomation
+        from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
+
+        if parent is None:
+            parent = self.control_element
+            parent.update_geometry()
+
+        if cursor is None:
+            cursor = uiautomation.GetCursorPos()
+
+        if visited_handles is None:
+            visited_handles = set()
+
+        left = parent.left
+        top = parent.top
+        x_in_parent = cursor[0] - left
+        y_in_parent = cursor[1] - top
+        try:
+            children = parent._wrapped.item.GetChildren()
+
+            # XXX is the parent.handle the proper handle to pass?
+            control = uiautomation.ControlFromPointInParent(
+                parent.handle, x_in_parent, y_in_parent
+            )
+            if control is None or ControlsAreSame(control, parent._wrapped.item):
+                return
+            for child_pos, c in enumerate(children):
+                if ControlsAreSame(c, control):
+                    child_pos += 1
+                    break
+            else:
+                print(f"Unable to find child index for: {control}", file=sys.stderr)
+                return
+        except _ctypes.COMError:
+            pass  # Ignore, if the user is out of bounds it'll be raised.
+        else:
+            if not parent_path:
+                path = f"{child_pos}"
+            else:
+                path = f"{parent_path}|{child_pos}"
+            el = ControlTreeNode(
+                ControlElement(_UIAutomationControlWrapper(control, f"path:{path}")),
+                depth,
+                child_pos,
+                path,
+            )
+
+            yield el
+            yield from self._found_from_cursor_pos_with_point_in_parent(
+                el.control, cursor, visited_handles, depth, path
+            )
+
+    def _do_pick(
+        self, cursor_pos: CursorPos
+    ) -> Optional[List["ControlTreeNode[ControlElement]"]]:
+        """
+        Raises: PickedInspectorElementError
+        """
+        ev = self._tk_handler_thread.set_rects([])
+        ev.wait(0.1)
+
+        initial_time = time.monotonic()
+        timeout_at = initial_time + 5
+        while True:
+            try:
+                # This approach has a shortcoming in that if
+                # we create our own decoration widgets it can
+                # end up getting our own widgets instead of
+                # the ones we'd like to inspect!
+                # Due to this we first hide the contents and
+                # then request it.
+                return self._found_from_cursor_pos(
+                    cursor_pos.as_tuple(), parent=self.control_element
+                )
+
+                # Not working (this could be nicer as the UI doesn't need to be
+                # actually top-level and thus the tk decorations wouldn't be
+                # picked by it).
+                # self.control_element.update_geometry()
+                # return list(
+                #     self._found_from_cursor_pos_with_point_in_parent(
+                #         self.control_element, cursor_pos.as_tuple()
+                #     )
+                # )
+
+            except (PickedInspectorElementError, COMError):
+                # If we picked the inspector itself or something changed in the
+                # meanwhile, this didn't work.
+                if time.monotonic() > timeout_at:
+                    return None
+                time.sleep(0.1)
+
+    def run(self) -> None:
+        try:
+            self._run()
+        except Exception:
+            import traceback
+
+            traceback.print_exc()
+
+    def _run(self) -> None:
+        from robocorp.windows.vendored.uiautomation.uiautomation import (
+            GetCursorPos,
+            UIAutomationInitializerInThread,
+        )
+
+        DEBOUNCE_TIME = 0.3
+        with UIAutomationInitializerInThread(debug=False):
+            last_cursor_pos = CursorPos(*GetCursorPos())
+            cursor_time = time.monotonic()
+            last_pick_pos = None
+
+            while True:
+                if self._stop_event.wait(0.13):
+                    break
+
+                cursor_pos = CursorPos(*GetCursorPos())
+                if cursor_pos.consider_same_as(last_pick_pos):
+                    # If we did a pick at this position, don't do anything until the
+                    # user moves the mouse.
+                    continue
+
+                if not cursor_pos.consider_same_as(last_cursor_pos):
+                    # Clear the rects
+                    ev = self._tk_handler_thread.set_rects([])
+                    ev.wait(0.2)
+                    cursor_time = time.monotonic()
+                    last_cursor_pos = cursor_pos
+                    continue
+
+                if (time.monotonic() - cursor_time) > DEBOUNCE_TIME:
+                    cursor_time = time.monotonic()
+                else:
+                    # Still close, but wait for the debounce time
+                    continue
+
+                found = self._do_pick(cursor_pos)
+                last_cursor_pos = CursorPos(*GetCursorPos())
+                if not last_cursor_pos.consider_same_as(cursor_pos):
+                    # The position changed in the meanwhile, start things over
+                    continue
+                last_pick_pos = last_cursor_pos
+
+                if found and not self._stop_event.is_set():
+                    self.on_pick(found)
+                    # If we haven't found we don't even need to remove the
+                    # rects as the picker itself did that.
+                    new_rects = [f.control.rectangle for f in found[-1:]]
+                    ev = self._tk_handler_thread.set_rects(new_rects)
+                    ev.wait(0.2)
+
+    def stop(self):
+        self._stop_event.set()
+
+
 class ElementInspector:
     def __init__(self, control_element: ControlElement):
         self.control_element = control_element
         self._tk_handler_thread: _TkHandlerThread = _TkHandlerThread()
         self._tk_handler_thread.start()
+        self._picker_thread: Optional[_PickerThread] = None
+        self._current_thread = threading.current_thread()
 
     def __enter__(self):
         return self
@@ -309,63 +712,156 @@ class ElementInspector:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.dispose()
 
+    def _check_thread(self):
+        if self._current_thread != threading.current_thread():
+            raise AssertionError(
+                f"Error. Expected to be run in thread: {self._current_thread}."
+                f"Current thread: {threading.current_thread()}"
+            )
+
     def dispose(self):
+        self._check_thread()
         self._tk_handler_thread.dispose()
 
-    def print_tree_str(self, params: str = ""):
+    def start_highlight(
+        self,
+        locator: Optional[Locator] = None,
+        search_depth: int = 8,
+        timeout: Optional[float] = None,
+        search_strategy: Literal["siblings", "all"] = "all",
+    ) -> bool:
+        """
+        Args:
+            locator: If passed, entries matching the given locator will be highlighted.
+            search_depth: Up to which depth entries should be highlighted.
+            timeout: Timeout to find a locator.
+            search_strategy: After finding a locator, should only siblings be found
+              or should a full tree traversal be done?
+
+        Returns:
+            True if something is being highlighted.
+
+        Note:
+            The stop_highlight must always be called afterwards (both to stop
+            highlighting and to exit the tk loop).
+        """
+        self._check_thread()
+        self._tk_handler_thread.destroy_tk_handler()
+        self._tk_handler_thread.create()
+
+        matches: Sequence[ControlElement]
+        if locator:
+            try:
+                matches = self.control_element.find_all(
+                    locator,
+                    search_depth,
+                    timeout,
+                    search_strategy,
+                    wait_for_element=False,
+                )
+            except ElementNotFound:
+                matches = ()
+        else:
+            matches = ()
+
+        found_matches = bool(matches)
+
+        tk_handler_thread = self._tk_handler_thread
+        rects = []
+        for control_element in matches:
+            left, top, right, bottom = control_element.rectangle
+            if left == -1 and top == -1 and right == -1 and bottom == -1:
+                # print(f"Element skipped (invalid bounds): {control_element}")
+                continue
+            rects.append((left, top, right, bottom))
+
+        tk_handler_thread.set_rects(rects)
+        tk_handler_thread.loop()
+        return found_matches
+
+    def stop_highlight(self) -> None:
+        self._check_thread()
+        self._tk_handler_thread.quitloop()
+        self._tk_handler_thread.destroy_tk_handler()
+
+    def list_windows(self) -> List[WindowElement]:
+        self._check_thread()
+        from robocorp.windows import desktop
+
+        return desktop().find_windows("regex:.*")
+
+    def start_picking(self, on_pick):
+        self._check_thread()
+        assert self._picker_thread is None, "Error. A picking is already in place."
+        self.start_highlight(None)
+        self._picker_thread = _PickerThread(
+            self._tk_handler_thread, self.control_element, on_pick
+        )
+        self._picker_thread.start()
+
+    def stop_picking(self):
+        self._check_thread()
+        self._picker_thread.stop()
+        self._picker_thread.join()
+        self._picker_thread = None
+        self.stop_highlight()
+
+    def _interact_print_tree(self, params: str = ""):
         kwargs: Dict[str, Any] = {}
         max_depth, params = _extract_max_depth(params)
         if max_depth:
             kwargs["max_depth"] = max_depth
         self.control_element.print_tree(**kwargs)
 
-    def start_highlight(
-        self,
-        locator: Locator,
-        search_depth: int = 8,
-        timeout: Optional[float] = None,
-        search_strategy: Literal["siblings", "all"] = "all",
-    ) -> bool:
-        if locator is None:
-            # If not given, highlight everything.
-            locator = "regex:.*"
+    def _interact_select_window(self, filter_str):
+        available = self.list_windows()
 
-        self._tk_handler_thread.destroy_tk_handler()
-        self._tk_handler_thread.create()
+        print("Available windows:")
+        for i, window in enumerate(available):
+            if filter_str:
+                if filter_str.lower() in str(window).lower():
+                    print(f"{i}: {window}")
+            else:
+                print(f"{i}: {window}")
 
-        matches = self.control_element.find_all(
-            locator, search_depth, timeout, search_strategy, wait_for_element=False
-        )
-        if not matches:
-            return False
+        choice = input(
+            "Please enter the index of the window to be inspected:\n"
+        ).strip()
+        try:
+            choice_i = int(choice)
+        except ValueError:
+            print(
+                "Error. Unable to understand which window should be "
+                "inspected (please provide the number of the window "
+                "to be inspected)."
+            )
+        else:
+            try:
+                control = available[choice_i]
+            except IndexError:
+                print("Error. Invalid index.")
+            else:
+                self.control_element = control
 
-        tk_handler_thread = self._tk_handler_thread
-        for control_element in matches:
-            left, top, right, bottom = control_element.rectangle
-            tk_handler_thread.add_rect(left, right, top, bottom)
-
-        tk_handler_thread.loop()
-        return True
-
-    def stop_highlight(self) -> None:
-        self._tk_handler_thread.quitloop()
-        self._tk_handler_thread.destroy_tk_handler()
-
-    def list_windows(self) -> List[WindowElement]:
-        from robocorp.windows import desktop
-
-        return desktop().find_windows("regex:.*")
+    def _interact_print_filter(self, params):
+        kwargs = {}
+        max_depth, params = _extract_max_depth(params)
+        if max_depth:
+            kwargs["max_depth"] = max_depth
+        for child in self.control_element.iter_children(**kwargs):
+            s = str(child)
+            if params in s:
+                print(s)
 
     def inspect(self) -> None:
         from queue import Queue
-
-        import robocorp.windows.vendored.uiautomation as auto
 
         queue: "Queue[Tuple[str, str]]" = Queue()
         threading.Thread(target=request_action, args=(queue,)).start()
 
         while True:
             action, params = queue.get()
+            # action, params = "highlight mouse", ""
             try:
                 if action == "quit":
                     print("Stopping inspect.")
@@ -373,193 +869,63 @@ class ElementInspector:
                     break
 
                 elif action == "select window":
-                    available = self.list_windows()
-
-                    print("Available windows:")
-                    for i, window in enumerate(available):
-                        print(f"{i}: {window}")
-
-                    choice = input(
-                        "Please enter the index of the window to be inspected:\n"
-                    ).strip()
-                    try:
-                        choice_i = int(choice)
-                    except ValueError:
-                        print(
-                            "Error. Unable to understand which window should be "
-                            "inspected (please provide the number of the window "
-                            "to be inspected)."
-                        )
-                    else:
-                        try:
-                            control = available[choice_i]
-                        except IndexError:
-                            print("Error. Invalid index.")
-                        else:
-                            self.control_element = control
+                    self._interact_select_window(params)
 
                 elif action == "print tree":
-                    self.print_tree_str(params)
+                    self._interact_print_tree(params)
 
                 elif action == "filter":
-                    kwargs = {}
-                    max_depth, params = _extract_max_depth(params)
-                    if max_depth:
-                        kwargs["max_depth"] = max_depth
-                    for child in self.control_element.iter_children(**kwargs):
-                        s = str(child)
-                        if params in s:
-                            print(s)
+                    self._interact_print_filter(params)
 
                 elif action == "highlight all":
-                    tk_handler = _TkHandler()
-
-                    n_elements_found = 0
-                    initial_time = base_time = time.monotonic()
-                    for control_tree_node in self.control_element.iter_children():
-                        n_elements_found += 1
-                        if time.monotonic() - base_time > 2:
-                            print(
-                                f"Already found: {n_elements_found} elements "
-                                f"(elapsed: {time.monotonic()-initial_time:.1f}s)."
-                            )
-                            base_time = time.monotonic()
-                        left, top, right, bottom = control_tree_node.control.rectangle
-                        if left == -1 and top == -1 and right == -1 and bottom == -1:
-                            print(
-                                f"Element skipped (invalid bounds): {control_tree_node}"
-                            )
-                            continue
-
-                        tk_handler.add_rect(left, right, top, bottom)
-
-                    if len(tk_handler) == 0:
-                        print("No bounds found.")
-                    else:
-                        print(f"Number elements found: {n_elements_found}.")
-                        input_event = threading.Event()
-
-                        def on_input():
-                            tk_handler.quit()
-                            input_event.set()
-
-                        threading.Thread(
-                            target=wait_for_input,
-                            args=("Press enter to stop highlighting\n", on_input),
-                        ).start()
-
-                        while not input_event.is_set():
-                            tk_handler.loop(None)
-
-                    tk_handler.destroy_tk_handler()
+                    found_matches = self.start_highlight("regex:.*")
+                    try:
+                        if not found_matches:
+                            print("No elements found.")
+                        else:
+                            input("Press enter to stop highlighting\n")
+                    finally:
+                        self.stop_highlight()
 
                 elif action == "highlight":
                     locator = params
-
-                    matches = self.control_element.find_all(
-                        locator, search_strategy="all"
-                    )
-                    n_skipped = 0
-
-                    if not matches:
-                        print("No matching elements found.")
-                    else:
-                        tk_handler = _TkHandler()
-                        for control_element in matches:
-                            left, top, right, bottom = control_element.rectangle
-                            if (
-                                left == -1
-                                and top == -1
-                                and right == -1
-                                and bottom == -1
-                            ):
-                                n_skipped += 1
-                                print(
-                                    f"Element skipped (invalid bounds): "
-                                    f"{control_element}"
-                                )
-                                continue
-
-                            tk_handler.add_rect(left, right, top, bottom)
-
-                        if len(tk_handler) == 0:
-                            print("No bounds found.")
+                    found_matches = self.start_highlight(locator)
+                    try:
+                        if not found_matches:
+                            print("No elements found.")
                         else:
-                            print(
-                                f"Number elements found: {len(matches)} "
-                                f"(skipped: {n_skipped})."
-                            )
-                            input_event = threading.Event()
-
-                            def on_input():
-                                tk_handler.quit()
-                                input_event.set()
-
-                            threading.Thread(
-                                target=wait_for_input,
-                                args=("Press enter to stop highlighting\n", on_input),
-                            ).start()
-
-                            while not input_event.is_set():
-                                tk_handler.loop(None)
-
-                        tk_handler.destroy_tk_handler()
+                            input("Press enter to stop highlighting\n")
+                    finally:
+                        self.stop_highlight()
 
                 elif action == "highlight mouse":
-                    input_event = threading.Event()
-                    threading.Thread(
-                        target=wait_for_input,
-                        args=(
-                            "Press enter to stop highlighting\n",
-                            input_event.set,
-                        ),
-                    ).start()
+                    handle = self.control_element.handle
+                    if not handle:
+                        print(
+                            "Error, the current inspected element does not "
+                            "have an associated handle."
+                        )
+                    else:
+                        next_i = partial(next, itertools.count())
 
-                    tk_handler = _TkHandler()
-                    last_printed = ""
-                    last_i = 0
+                        def on_pick(found):
+                            if not found:
+                                print("No element found")
+                            else:
+                                print(
+                                    f"\n=== Found new element (pick: "
+                                    f"{next_i()}) ==="
+                                )
+                                for f in found:
+                                    print(f)
 
-                    # Collect the structure
-                    bounds_index = _BoundsIndex()
+                            print("Press enter to stop highlighting\n")
 
-                    for child in self.control_element.iter_children():
-                        bounds_index.insert(child.control.rectangle, child)
-
-                    def compute_new_highlight():
-                        if input_event.is_set():
-                            tk_handler.quit()
-                            return
-                        nonlocal last_printed
-                        nonlocal last_i
-                        x, y = auto.GetCursorPos()
-
-                        with tk_handler.reset_rects():
-                            stream = StringIO()
-                            for control_tree_node in bounds_index.intersect(x, y):
-                                (
-                                    left,
-                                    top,
-                                    right,
-                                    bottom,
-                                ) = control_tree_node.control.rectangle
-                                tk_handler.add_rect(left, right, top, bottom)
-                                print(control_tree_node, file=stream)
-
-                        new_to_print = stream.getvalue().strip()
-                        if new_to_print:
-                            if new_to_print != last_printed:
-                                last_i += 1
-                                print(f"\n=== Found new element (pick: {last_i}) ===")
-                                print(new_to_print)
-                                print("Press enter to stop highlighting\n")
-                                last_printed = new_to_print
-
-                        tk_handler.after(50, compute_new_highlight)
-
-                    tk_handler.after(50, compute_new_highlight)
-                    while not input_event.is_set():
-                        tk_handler.loop(None)
-                    tk_handler.destroy_tk_handler()
+                        self.start_picking(on_pick)
+                        try:
+                            input("Press enter to stop highlighting\n")
+                        finally:
+                            self.stop_picking()
 
             finally:
                 queue.task_done()

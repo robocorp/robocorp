@@ -65,6 +65,27 @@ class _UIAutomationControlWrapper:
 
         self.update_geometry()
 
+    def get_parent(self) -> Optional["_UIAutomationControlWrapper"]:
+        parent = self.item.GetParentControl()
+        if parent is None:
+            return None
+        path = self.path
+        if path:
+            parent_path = "|".join(path.split("|")[:-1])
+            if parent_path:
+                return _UIAutomationControlWrapper(parent, f"path:{parent_path}")
+
+        return _UIAutomationControlWrapper(parent, None)
+
+    @property
+    def path(self) -> Optional[str]:
+        locator = self.locator
+        if not locator:
+            return None
+        if locator.startswith("path:"):
+            return locator[5:]
+        return None
+
     def is_disposed(self) -> bool:
         try:
             self.item.Name

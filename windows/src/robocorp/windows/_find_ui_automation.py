@@ -3,13 +3,14 @@ import time
 from re import Pattern
 from typing import Dict, Iterator, List, Literal, Optional, Protocol, Union
 
-import robocorp.windows.vendored.uiautomation as auto  # type: ignore
-from robocorp.windows.vendored.uiautomation import Control
+from _ctypes import COMError
 
+import robocorp.windows.vendored.uiautomation as auto  # type: ignore
 from robocorp.windows._iter_tree import ControlTreeNode
 from robocorp.windows._match_object import MatchObject, SearchType
 from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
 from robocorp.windows.protocols import Locator
+from robocorp.windows.vendored.uiautomation import Control
 
 from ._errors import ElementNotFound
 
@@ -35,12 +36,13 @@ def _window_or_none(
 def _get_desktop_control() -> "Control":
     root_control = auto.GetRootControl()
     new_control = Control.CreateControlFromControl(root_control)
+    assert new_control is not None, "Did not expect RootControl to be None."
     return new_control
 
 
 def get_desktop_element() -> _UIAutomationControlWrapper:
     desktop_control = _get_desktop_control()
-    locator = "Path:"
+    locator = "desktop"
     return _UIAutomationControlWrapper(desktop_control, locator)
 
 
@@ -102,13 +104,16 @@ def _matches(search_params: SearchType, tree_node: ControlTreeNode["Control"]):
     if not search_params:
         return False
 
-    for search_key, search_val in search_params.items():
-        comp_func_or_attr = _match_dispatch[search_key]
-        if isinstance(comp_func_or_attr, str):
-            if getattr(tree_node.control, comp_func_or_attr) != search_val:
+    try:
+        for search_key, search_val in search_params.items():
+            comp_func_or_attr = _match_dispatch[search_key]
+            if isinstance(comp_func_or_attr, str):
+                if getattr(tree_node.control, comp_func_or_attr) != search_val:
+                    return False
+            elif not comp_func_or_attr(tree_node, search_val):
                 return False
-        elif not comp_func_or_attr(tree_node, search_val):
-            return False
+    except COMError:
+        return False
 
     return True
 
@@ -236,6 +241,8 @@ def _search_step(
     search_depth,
     timeout_monitor: Optional["TimeoutMonitor"],
 ) -> Iterator[ControlTreeNode["Control"]]:
+    from robocorp.windows._control_element import ControlElement
+
     # Obtain an element with the search parameters.
     if "desktop" in search_params:
         control = _get_desktop_control()
@@ -250,13 +257,26 @@ def _search_step(
     if "path" in search_params:
         path_param = search_params["path"]
         control = _get_control_from_path(search_params, root_control)
-        yield ControlTreeNode(
+
+        path_str = "|".join(str(x) for x in path_param)
+        node = ControlTreeNode(
             control,
             depth=len(path_param),
             child_pos=path_param[-1],
-            path="|".join(str(x) for x in path_param),
+            path=path_str,
         )
-        return
+        remaining_params = search_params.copy()
+        remaining_params.pop("path")
+        if not remaining_params or _matches(remaining_params, node):
+            yield node
+            return
+
+        # Convert to have the proper __str__ representation to show to the user.
+        as_el = ControlElement(_UIAutomationControlWrapper(control, f"path:{path_str}"))
+        raise ElementNotFound(
+            f"Found element: '{str(as_el).strip()}' in path, but other "
+            f"search parameters ({remaining_params}) did not match."
+        )
 
     from robocorp.windows._iter_tree import iter_tree
 

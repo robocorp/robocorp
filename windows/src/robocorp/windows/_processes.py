@@ -77,7 +77,7 @@ def _kill_process_and_subprocess_linux(pid):
     )
 
 
-def kill_process_and_subprocesses(pid):
+def kill_process_and_subprocesses(pid: int) -> None:
     log.debug("Killing process and subprocesses of: %s", pid)
     from subprocess import CalledProcessError
 
