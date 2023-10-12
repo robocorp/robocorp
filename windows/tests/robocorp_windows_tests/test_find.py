@@ -24,6 +24,24 @@ def test_find_windows():
         windows.desktop().close_windows("name:Calculator")
 
 
+def test_print(tk_process, str_regression):
+    import re
+    from io import StringIO
+
+    from robocorp.windows import find_window
+
+    window = find_window('name:"Tkinter Elements Showcase"')
+
+    s = StringIO()
+    window.find("path:1").print_tree(stream=s)
+
+    v = s.getvalue()
+    pattern = r"handle:[^)]+\)"
+
+    result = re.sub(pattern, "handle:XXX", v).replace("\r\n", "\n").replace("\r", "\n")
+    str_regression.check(result)
+
+
 def test_find(tk_process) -> None:
     from robocorp.windows import find_window
     from robocorp.windows._control_element import ControlElement

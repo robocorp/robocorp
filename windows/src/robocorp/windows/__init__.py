@@ -19,16 +19,29 @@ def get_icon_from_file(path: str) -> Optional["Image"]:
         A PIL image with the icon image or None if it was
         not possible to load it.
 
-    Sample code to convert it to a base64 string:
+    Example:
 
+        ```python
+        # Get icon from file and convert it to a base64 string
+        from robocorp import windows
         from io import BytesIO
+
+        img = windows.get_icon_from_file('c:/temp/my.exe')
         buffered = BytesIO()
         img.save(buffered, format="PNG")
         image_string = base64.b64encode(buffered.getvalue()).decode()
+        ```
 
-    Sample code to save it in the filesystem:
+    Example:
+
+        ```python
+        # Get icon from file and save it in the filesystem
+        from robocorp import windows
+
+        img = windows.get_icon_from_file('c:/temp/my.exe')
 
         img.save("c:/temp/my.png", format="PNG")
+        ```
     """
     from robocorp.windows import _icon_from_file
 
@@ -37,6 +50,22 @@ def get_icon_from_file(path: str) -> Optional["Image"]:
 
 @lru_cache
 def config():
+    """
+    Provides an instance to configure the basic settings such as
+    the default timeout, whether to simulate mouse movements, showing
+    verbose errors on failures, etc.
+
+    Returns:
+        Config object to be used to configure the settings.
+
+    Example:
+
+        ```
+        from robocorp import windows
+        config = windows.config()
+        config.verbose_errors = True
+        ```
+    """
     from ._config import Config
 
     return Config()
@@ -44,6 +73,18 @@ def config():
 
 @lru_cache  # Always return the same instance.
 def desktop() -> Desktop:
+    """
+    Provides the desktop element (which is the root control containing
+    top-level windows).
+
+    The elements provided by robocorp-windows are organized as:
+        Desktop (root control)
+            WindowElement (top-level windows)
+                ControlElement (controls inside a window)
+
+    Returns:
+        The Desktop element.
+    """
     return Desktop()
 
 
