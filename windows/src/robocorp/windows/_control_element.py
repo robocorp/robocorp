@@ -65,6 +65,7 @@ class ControlElement:
 
     def __init__(self, wrapped: "_UIAutomationControlWrapper"):
         self._wrapped = wrapped
+        self.location_info = self._wrapped.location_info
 
     @property
     def path(self) -> Optional[str]:
@@ -205,6 +206,23 @@ class ControlElement:
                 s = f'"{s}"'
             return s
 
+        # These are cached, so, no need for try..except here.
+        location_info = self.location_info
+
+        lst = []
+
+        if location_info.query_locator:
+            lst.append(f"locator: {location_info.query_locator}")
+
+        if location_info.depth:
+            lst.append(f"depth: {location_info.depth}")
+
+        if location_info.child_pos:
+            lst.append(f"index: {location_info.child_pos}")
+
+        if location_info.path:
+            lst.append(f"path: {location_info.path}")
+
         info = (
             f"control:{fmt(self.control_type)} "
             f"class:{fmt(self.class_name)} "
@@ -212,6 +230,10 @@ class ControlElement:
             f"id:{fmt(self.automation_id)} "
             f"handle:0x{handle:X}({handle})"
         )
+        if lst:
+            s = " ".join(lst)
+
+            info = f"{info} Search info({s})"
         return info
 
     def __repr__(self):
@@ -246,7 +268,7 @@ class ControlElement:
             msg += "\n".join(child_elements_msg)
             raise ElementNotFound(msg) from e
 
-    def find_all(
+    def find_many(
         self,
         locator: Locator,
         search_depth: int = 8,
@@ -272,9 +294,11 @@ class ControlElement:
         self, *, max_depth: int = 8
     ) -> Iterator["ControlTreeNode[ControlElement]"]:
         from robocorp.windows._iter_tree import ControlTreeNode, iter_tree
+        from robocorp.windows._ui_automation_wrapper import LocationInfo
 
-        for el in iter_tree(self._wrapped.item, max_depth, include_top=False):
-            wrapper = _UIAutomationControlWrapper(el.control, f"path:{el.path}")
+        for el in iter_tree(self._wrapped.item, max_depth):
+            location_info = LocationInfo(None, el.depth, el.child_pos, el.path)
+            wrapper = _UIAutomationControlWrapper(el.control, location_info)
             if wrapper.is_disposed():
                 continue
 

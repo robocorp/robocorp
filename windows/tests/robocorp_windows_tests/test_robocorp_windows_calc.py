@@ -138,7 +138,7 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
     name_to_bt = {}
     for el in find_ui_automation_wrappers("class:Button", root_element=buttons_in):
         name_to_bt[el.name] = el
-        assert el.locator == "class:Button"
+        assert el.location_info.query_locator == "class:Button"
 
     assert len(find_ui_automation_wrappers(name_zero, root_element=buttons_in)) == 1
 
