@@ -40,7 +40,7 @@ class ControlTreeNode(Generic[Y]):
         depth = self.depth
 
         space = " " * depth * 4
-        return f"{space}{depth}-{self.child_pos}. {control_str} path:{self.path}"
+        return f"{space}{depth}-{self.child_pos}. {control_str}"
 
     def __repr__(self):
         return f"ControlTreeNode({self.__str__()})"
@@ -103,43 +103,104 @@ def iter_tree(
     if only_depth is not None:
         max_depth = only_depth
 
+    # This code could be used to do a breadth first search (by default
+    # we do a depth first search).
+    # try:
+    #     children = root_ctrl.GetChildren()
+    # except COMError:
+    #     # Unable to get children.
+    #     return
+    # depth = 1
+    #
+    # # First iteration
+    # child_pos = 0
+    # # Note that the depth and child index visible to the user are 1-based.
+    # stack: List[ControlTreeNode] = []
+    # for control in children:
+    #     child_pos += 1
+    #     node = ControlTreeNode(control, depth, child_pos, f"{child_pos}")
+    #     stack.append(node)
+    #     if only_depth is None or only_depth == depth:
+    #         yield node
+    #
+    # while stack:  # Use stack instead of recursion (it's a bit faster).
+    #     depth += 1
+    #     if depth > max_depth:
+    #         return
+    #     next_stack: List[ControlTreeNode] = []
+    #     for tree_node in stack:
+    #         child_pos = 0
+    #         try:
+    #             children = tree_node.control.GetChildren()
+    #         except COMError:
+    #             continue
+    #         parent_path = tree_node.path
+    #         for control in children:
+    #             child_pos += 1
+    #             node = ControlTreeNode(
+    #                 control, depth, child_pos, f"{parent_path}|{child_pos}"
+    #             )
+    #             next_stack.append(node)
+    #             if only_depth is None or only_depth == depth:
+    #                 yield node
+    #
+    #     stack = next_stack
+
+    # Algorithm to do a depth-first search without recursion. This is the
+    # default because it's how we want to present the tree to the user when we
+    # print it.
+    depth = 0
     try:
         children = root_ctrl.GetChildren()
     except COMError:
-        # Unable to get children.
         return
-    depth = 1
 
-    # First iteration
-    child_pos = 0
-    # Note that the depth and child index visible to the user are 1-based.
-    stack: List[ControlTreeNode] = []
-    for control in children:
-        child_pos += 1
-        node = ControlTreeNode(control, depth, child_pos, f"{child_pos}")
-        stack.append(node)
-        if only_depth is None or only_depth == depth:
-            yield node
+    child_list = [(_ContainerView(children), "", len(children))]
 
-    while stack:  # Use stack instead of recursion (it's a bit faster).
-        depth += 1
-        if depth > max_depth:
-            return
-        next_stack: List[ControlTreeNode] = []
-        for tree_node in stack:
-            child_pos = 0
-            try:
-                children = tree_node.control.GetChildren()
-            except COMError:
-                continue
-            parent_path = tree_node.path
-            for control in children:
-                child_pos += 1
-                node = ControlTreeNode(
-                    control, depth, child_pos, f"{parent_path}|{child_pos}"
-                )
-                next_stack.append(node)
-                if only_depth is None or only_depth == depth:
-                    yield node
+    while depth >= 0:
+        last_items, parent_path, children_len = child_list[-1]
+        if last_items:
+            child_pos = children_len - len(last_items) + 1
+            if parent_path:
+                use_path = f"{parent_path}|{child_pos}"
+            else:
+                use_path = f"{child_pos}"
+            curr = last_items.popleft()
+            node = ControlTreeNode(curr, depth + 1, child_pos, use_path)
+            if only_depth is None:
+                yield node
+            elif only_depth == depth + 1:
+                yield node
+            if depth + 1 < max_depth:
+                try:
+                    children = curr.GetChildren()
+                except COMError:
+                    pass
+                else:
+                    if children:
+                        depth += 1
+                        child_list.append(
+                            (_ContainerView(children), use_path, len(children))
+                        )
+        else:
+            del child_list[depth]
+            depth -= 1
 
-        stack = next_stack
+
+class _ContainerView:
+    # A bit of an optimization: because lists in python are actually arrays
+    # removing from position 0 can be slow, so, we create a container view
+    # which will not really remove it, instead it'll just increment the
+    # first visible position. Better than a deque because we'd need to create
+    # it from the list which can be slow.
+
+    def __init__(self, lst):
+        self.first = 0
+        self._lst = lst
+
+    def popleft(self):
+        self.first += 1
+        return self._lst[self.first - 1]
+
+    def __len__(self):
+        return len(self._lst) - self.first

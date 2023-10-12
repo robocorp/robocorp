@@ -11,6 +11,15 @@ if typing.TYPE_CHECKING:
 
 
 class Desktop(ControlElement):
+    """
+    The desktop is the control, containing other top-level windows.
+
+    The elements provided by robocorp-windows are organized as:
+        Desktop (root control)
+            WindowElement (top-level windows)
+                ControlElement (controls inside a window)
+    """
+
     def __init__(self):
         from robocorp.windows._config_uiautomation import _config_uiautomation
         from robocorp.windows._find_ui_automation import find_ui_automation_wrapper
@@ -23,6 +32,48 @@ class Desktop(ControlElement):
     def print_tree(
         self, stream=None, show_properties: bool = False, max_depth: int = 1
     ) -> None:
+        """
+        Print a tree of control elements.
+
+        A Windows application structure can contain multilevel element structure.
+        Understanding this structure is crucial for creating locators. (based on
+        controls' details and their parent-child relationship)
+
+        This keyword can be used to output logs of application's element structure.
+
+        - The printed structure displays a tree prefixed with "depth" - "position" so
+          you know how deep (0 means root) in the tree you are and on what position
+          (1-indexed) the child you're looking for is.
+
+        Args:
+            stream: The stream to which the text should be printed (if not given,
+                sys.stdout is used).
+
+            show_properties: Whether the properties of each element should
+                be printed (off by default as it can be considerably slower
+                and makes the output very verbose).
+
+            max_depth: Up to which depth the tree should be printed.
+
+        Example:
+
+            Print the top-level window elements:
+
+            ```python
+            from robocorp import windows
+            windows.desktop().print_tree()
+            ```
+
+        Example:
+
+            Print the tree starting at some other element:
+
+            ```python
+            from robocorp import windows
+            windows.find("Calculator > path:2|3").print_tree()
+            ```
+        """
+
         return ControlElement.print_tree(
             self, stream=stream, show_properties=show_properties, max_depth=max_depth
         )

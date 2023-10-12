@@ -212,16 +212,16 @@ class ControlElement:
         lst = []
 
         if location_info.query_locator:
-            lst.append(f"locator: {location_info.query_locator}")
+            lst.append(f"locator:{location_info.query_locator}")
 
         if location_info.depth:
-            lst.append(f"depth: {location_info.depth}")
+            lst.append(f"depth:{location_info.depth}")
 
         if location_info.child_pos:
-            lst.append(f"index: {location_info.child_pos}")
+            lst.append(f"index:{location_info.child_pos}")
 
         if location_info.path:
-            lst.append(f"path: {location_info.path}")
+            lst.append(f"path:{location_info.path}")
 
         info = (
             f"control:{fmt(self.control_type)} "
