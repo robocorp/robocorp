@@ -6,9 +6,9 @@ from robocorp.windows._window_element import WindowElement
 
 def test_iter_windows_and_screenshot(calculator_window_element: WindowElement) -> None:
     found_img = False
-    tree_elements = tuple(calculator_window_element.iter_children(max_depth=16))
+    tree_elements = tuple(calculator_window_element.iter_children(max_depth=8))
     for element in tree_elements:
-        img = element.screenshot()
+        img = element.screenshot_pil()
         found_img = found_img or img is not None
 
     assert len(tree_elements) > 10

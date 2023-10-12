@@ -1,11 +1,9 @@
 import typing
-from typing import Generic, Iterator, List, Optional, TypeVar
+from typing import Generic, Iterator, Optional, TypeVar
 
 from _ctypes import COMError
 
 if typing.TYPE_CHECKING:
-    from PIL.Image import Image
-
     from robocorp.windows.vendored.uiautomation import Control
 
 T = TypeVar("T")
@@ -44,39 +42,6 @@ class ControlTreeNode(Generic[Y]):
 
     def __repr__(self):
         return f"ControlTreeNode({self.__str__()})"
-
-    def _get_as_control(self) -> "Control":
-        from robocorp.windows._control_element import ControlElement
-        from robocorp.windows.vendored.uiautomation import Control
-
-        if isinstance(self.control, ControlElement):
-            ui_automation_control = self.control.ui_automation_control
-            control = ui_automation_control
-        else:
-            assert isinstance(self.control, Control)
-            control = self.control
-        return control
-
-    def screenshot(self) -> Optional["Image"]:
-        """
-        Returns:
-            A PIL image with the contents of the bitmap.
-        """
-
-        from . import _screenshot
-
-        control = self._get_as_control()
-        return _screenshot.screenshot(control)
-
-    def screenshot_as_base64png(self) -> Optional[str]:
-        """
-        Returns:
-            The image with the contents as a base64 png.
-        """
-        from . import _screenshot
-
-        control = self._get_as_control()
-        return _screenshot.screenshot_as_base64png(control)
 
 
 def iter_tree(

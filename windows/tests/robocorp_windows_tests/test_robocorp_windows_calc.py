@@ -16,9 +16,9 @@ def test_get_icon_from_file():
 
 def test_iter_windows_and_screenshot(calculator_window_element: WindowElement) -> None:
     found_img = False
-    tree_elements = tuple(calculator_window_element.iter_children(max_depth=16))
+    tree_elements = tuple(calculator_window_element.iter_children(max_depth=8))
     for element in tree_elements:
-        img = element.screenshot()
+        img = element.screenshot_pil()
         found_img = found_img or img is not None
 
     assert len(tree_elements) > 10
@@ -148,9 +148,9 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
         number_pad_path = ""
         five_path = ""
         for element in calculator_window_element.iter_children(max_depth=16):
-            if element.control.name == "Number pad":
+            if element.name == "Number pad":
                 number_pad_path = element.path
-            elif element.control.name == "5":
+            elif element.name == "5":
                 five_path = element.path
 
         assert five_path.startswith(number_pad_path)

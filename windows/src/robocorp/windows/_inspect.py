@@ -862,7 +862,7 @@ class ElementInspector:
         max_depth, params = _extract_max_depth(params)
         if max_depth:
             kwargs["max_depth"] = max_depth
-        for child in self.control_element.iter_children(**kwargs):
+        for child in self.control_element._iter_children_nodes(**kwargs):
             s = str(child)
             if params in s:
                 print(s)

@@ -14,6 +14,8 @@ from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
 from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
+    from PIL.Image import Image
+
     from robocorp.windows._iter_tree import ControlTreeNode
     from robocorp.windows.vendored.uiautomation.uiautomation import (
         Control,
@@ -262,7 +264,7 @@ class ControlElement:
                 f"(timeout: {timeout if timeout is not None else config.timeout})"
             )
             child_elements_msg = ["\nChild Elements Found:"]
-            for w in self.iter_children(max_depth=search_depth):
+            for w in self._iter_children_nodes(max_depth=search_depth):
                 child_elements_msg.append(str(w))
 
             msg += "\n".join(child_elements_msg)
@@ -290,7 +292,7 @@ class ControlElement:
             )
         ]
 
-    def iter_children(
+    def _iter_children_nodes(
         self, *, max_depth: int = 8
     ) -> Iterator["ControlTreeNode[ControlElement]"]:
         from robocorp.windows._iter_tree import ControlTreeNode, iter_tree
@@ -306,9 +308,61 @@ class ControlElement:
                 ControlElement(wrapper), el.depth, el.child_pos, el.path
             )
 
+    def iter_children(self, *, max_depth: int = 8) -> Iterator["ControlElement"]:
+        from robocorp.windows._iter_tree import iter_tree
+        from robocorp.windows._ui_automation_wrapper import LocationInfo
+
+        for el in iter_tree(self._wrapped.item, max_depth):
+            location_info = LocationInfo(None, el.depth, el.child_pos, el.path)
+            wrapper = _UIAutomationControlWrapper(el.control, location_info)
+            if wrapper.is_disposed():
+                continue
+
+            yield ControlElement(wrapper)
+
     def print_tree(
         self, stream=None, show_properties: bool = False, max_depth: int = 8
     ) -> None:
+        """
+        Print a tree of control elements.
+
+        A Windows application structure can contain multilevel element structure.
+        Understanding this structure is crucial for creating locators. (based on
+        controls' details and their parent-child relationship)
+
+        This keyword can be used to output logs of application's element structure.
+
+        The printed element attributes correspond to the values that may be used
+        to create a locator to find the actual wanted element.
+
+        Args:
+            stream: The stream to which the text should be printed (if not given,
+                sys.stdout is used).
+
+            show_properties: Whether the properties of each element should
+                be printed (off by default as it can be considerably slower
+                and makes the output very verbose).
+
+            max_depth: Up to which depth the tree should be printed.
+
+        Example:
+
+            Print the top-level window elements:
+
+            ```python
+            from robocorp import windows
+            windows.desktop().print_tree()
+            ```
+
+        Example:
+
+            Print the tree starting at some other element:
+
+            ```python
+            from robocorp import windows
+            windows.find("Calculator > path:2|3").print_tree()
+            ```
+        """
         from robocorp.windows._iter_tree import ControlTreeNode
 
         if stream is None:
@@ -316,7 +370,9 @@ class ControlElement:
 
         # Show the root.
         root = ControlTreeNode(self, 0, 0, "")
-        iter_in = itertools.chain((root,), self.iter_children(max_depth=max_depth))
+        iter_in = itertools.chain(
+            (root,), self._iter_children_nodes(max_depth=max_depth)
+        )
 
         if not show_properties:
             for child in iter_in:
@@ -973,6 +1029,20 @@ class ControlElement:
 
         return element
 
+    def screenshot_pil(
+        self,
+        locator: Optional[Locator] = None,
+        search_depth: int = 8,
+        timeout: Optional[float] = None,
+    ) -> Optional["Image"]:
+        from robocorp.windows._screenshot import screenshot
+
+        el = self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
+        img = screenshot(el.item)
+        if img is None:
+            return None
+        return img
+
     def screenshot(
         self,
         filename: Union[str, Path],
@@ -1013,15 +1083,11 @@ class ControlElement:
         """
         import os
 
-        from robocorp.windows._screenshot import screenshot
-
-        location = os.path.abspath(str(filename))
-
-        el = self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
-        img = screenshot(el.item)
+        img = self.screenshot_pil(locator, search_depth, timeout)
         if img is None:
             return None
 
+        location = os.path.abspath(str(filename))
         img.save(location, img_format)
         return location
 
