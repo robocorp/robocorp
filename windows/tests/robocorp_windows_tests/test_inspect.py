@@ -27,12 +27,18 @@ def test_build_hierarchy(tk_process):
     for c in build_parent_hierarchy(bt, window):
         found.append(
             f"{c.control.control_type} {c.control.class_name} "
-            f"{c.path} {c.control.locator}"
+            f"path:{c.path} {c.control.location_info}"
         )
 
     assert found == [
-        "PaneControl TkChild 1 path:1",
-        "ButtonControl Button 1|5 path:1|5",
+        (
+            "PaneControl TkChild path:1 LocationInfo("
+            "query_locator=None, depth=1, child_pos=1, path='1')"
+        ),
+        (
+            "ButtonControl Button path:1|5 LocationInfo("
+            "query_locator=None, depth=2, child_pos=5, path='1|5')"
+        ),
     ]
 
     stream = io.StringIO()

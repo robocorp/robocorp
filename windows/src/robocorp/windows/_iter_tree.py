@@ -1,5 +1,5 @@
 import typing
-from typing import Dict, Generic, Iterator, List, Optional, TypeVar
+from typing import Generic, Iterator, List, Optional, TypeVar
 
 from _ctypes import COMError
 
@@ -82,7 +82,7 @@ class ControlTreeNode(Generic[Y]):
 def iter_tree(
     root_ctrl: "Control",
     max_depth: int = 8,
-    include_top: bool = True,
+    only_depth: Optional[int] = None,
 ) -> Iterator[ControlTreeNode["Control"]]:
     """
     Iterates the tree as a flattened iterator (the depth is available in the node).
@@ -93,39 +93,53 @@ def iter_tree(
         max_depth:
             The maximum depth for the iteration.
 
+        only_depth:
+            If given, only elements at the given depth will be returned.
+
     To get a nice representation it's possible to do something as:
         for control_node in iter_tree(...):
             print(control_node)
     """
-    import robocorp.windows.vendored.uiautomation as auto
+    if only_depth is not None:
+        max_depth = only_depth
 
-    # Cache how many brothers are in total given a child. (to know child position)
-    brothers_count: Dict[int, int] = {}
-    # Current path in the tree as children positions. (to compute the path locator)
-    children_stack: List[int] = [-1] * (max_depth + 1)
+    try:
+        children = root_ctrl.GetChildren()
+    except COMError:
+        # Unable to get children.
+        return
+    depth = 1
 
-    def get_children(ctrl: "Control") -> List["Control"]:
-        try:
-            children = ctrl.GetChildren()
-        except COMError:
-            # It's possible that it was collected while doing the iteration.
-            return []
-        children_count = len(children)
-        for child in children:
-            brothers_count[id(child)] = children_count
-        return children
+    # First iteration
+    child_pos = 0
+    # Note that the depth and child index visible to the user are 1-based.
+    stack: List[ControlTreeNode] = []
+    for control in children:
+        child_pos += 1
+        node = ControlTreeNode(control, depth, child_pos, f"{child_pos}")
+        stack.append(node)
+        if only_depth is None or only_depth == depth:
+            yield node
 
-    brothers_count[id(root_ctrl)] = 1  # the root is always singular here
+    while stack:  # Use stack instead of recursion (it's a bit faster).
+        depth += 1
+        if depth > max_depth:
+            return
+        next_stack: List[ControlTreeNode] = []
+        for tree_node in stack:
+            child_pos = 0
+            try:
+                children = tree_node.control.GetChildren()
+            except COMError:
+                continue
+            parent_path = tree_node.path
+            for control in children:
+                child_pos += 1
+                node = ControlTreeNode(
+                    control, depth, child_pos, f"{parent_path}|{child_pos}"
+                )
+                next_stack.append(node)
+                if only_depth is None or only_depth == depth:
+                    yield node
 
-    for control, depth, children_remaining in auto.WalkTree(
-        root_ctrl,
-        getChildren=get_children,
-        includeTop=include_top,
-        maxDepth=max_depth,
-    ):
-        child_pos = brothers_count[id(control)] - children_remaining
-        children_stack[depth] = child_pos
-        path = "|".join(str(pos) for pos in children_stack[1 : depth + 1])
-
-        node = ControlTreeNode(control, depth, child_pos, path)
-        yield node
+        stack = next_stack

@@ -402,7 +402,10 @@ def build_parent_hierarchy(
     """
     from robocorp.windows._find_ui_automation import get_desktop_element
     from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+    from robocorp.windows._ui_automation_wrapper import (
+        LocationInfo,
+        _UIAutomationControlWrapper,
+    )
     from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
 
     if up_to_parent is None:
@@ -454,7 +457,8 @@ def build_parent_hierarchy(
                     else:
                         path = f"{path}|{child_pos}"
 
-                    el = ControlElement(_UIAutomationControlWrapper(c, f"path:{path}"))
+                    location_info = LocationInfo(None, depth, child_pos, path)
+                    el = ControlElement(_UIAutomationControlWrapper(c, location_info))
                     found.append(ControlTreeNode(el, depth, child_pos, path))
                     break
             else:
@@ -516,7 +520,10 @@ class _PickerThread(threading.Thread):
 
         Raises: PickedInspectorElementError
         """
-        from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+        from robocorp.windows._ui_automation_wrapper import (
+            _UIAutomationControlWrapper,
+            empty_location_info,
+        )
         from robocorp.windows.vendored import uiautomation
 
         try:
@@ -527,7 +534,10 @@ class _PickerThread(threading.Thread):
             if control is None:
                 return []
             return build_parent_hierarchy(
-                ControlElement(_UIAutomationControlWrapper(control, "")), parent
+                ControlElement(
+                    _UIAutomationControlWrapper(control, empty_location_info())
+                ),
+                parent,
             )
 
     def _found_from_cursor_pos_with_point_in_parent(
@@ -542,7 +552,10 @@ class _PickerThread(threading.Thread):
         Note that this code isn't working (abandoned for now).
         """
         from robocorp.windows._iter_tree import ControlTreeNode
-        from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+        from robocorp.windows._ui_automation_wrapper import (
+            LocationInfo,
+            _UIAutomationControlWrapper,
+        )
         from robocorp.windows.vendored import uiautomation
         from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
 
@@ -583,8 +596,9 @@ class _PickerThread(threading.Thread):
                 path = f"{child_pos}"
             else:
                 path = f"{parent_path}|{child_pos}"
+            location_info = LocationInfo(None, depth, child_pos, path)
             el = ControlTreeNode(
-                ControlElement(_UIAutomationControlWrapper(control, f"path:{path}")),
+                ControlElement(_UIAutomationControlWrapper(control, location_info)),
                 depth,
                 child_pos,
                 path,
@@ -752,7 +766,7 @@ class ElementInspector:
         matches: Sequence[ControlElement]
         if locator:
             try:
-                matches = self.control_element.find_all(
+                matches = self.control_element.find_many(
                     locator,
                     search_depth,
                     timeout,

@@ -18,8 +18,6 @@ from ._errors import ElementNotFound
 def _window_or_none(
     window: "_UIAutomationControlWrapper",
 ) -> Optional["_UIAutomationControlWrapper"]:
-    from comtypes import COMError  # type: ignore
-
     if window and window.item:
         try:
             window.item.BoundingRectangle
@@ -41,9 +39,11 @@ def _get_desktop_control() -> "Control":
 
 
 def get_desktop_element() -> _UIAutomationControlWrapper:
+    from robocorp.windows._ui_automation_wrapper import LocationInfo
+
     desktop_control = _get_desktop_control()
-    locator = "desktop"
-    return _UIAutomationControlWrapper(desktop_control, locator)
+    location_info = LocationInfo("desktop", None, None, None)
+    return _UIAutomationControlWrapper(desktop_control, location_info)
 
 
 class ICompareFunc(Protocol):
@@ -172,6 +172,10 @@ def _find_ui_automation_wrappers(
     search_strategy: Literal["siblings", "all", "single"] = "single",
     timeout_monitor: Optional["TimeoutMonitor"] = None,
 ) -> Iterator[_UIAutomationControlWrapper]:
+    from robocorp.windows._ui_automation_wrapper import (
+        build_from_locator_and_control_tree_node,
+    )
+
     if not locator:
         yield _resolve_root(root_element)
         return
@@ -198,16 +202,22 @@ def _find_ui_automation_wrappers(
         if is_last:
             if search_strategy == "all":
                 for control_tree_node in _search_step(
-                    root_control, search_params, search_depth, timeout_monitor
+                    locator, root_control, search_params, search_depth, timeout_monitor
                 ):
+                    location_info = build_from_locator_and_control_tree_node(
+                        locator,
+                        control_tree_node,
+                    )
+
                     yield _UIAutomationControlWrapper(
-                        control_tree_node.control, locator
+                        control_tree_node.control, location_info
                     )
                 return
 
         try:
             root_control_tree_node = next(
                 _search_step(
+                    locator,
                     root_control,
                     search_params,
                     search_depth,
@@ -219,7 +229,12 @@ def _find_ui_automation_wrappers(
             return
         else:
             if is_last:
-                yield _UIAutomationControlWrapper(root_control, locator)
+                location_info = build_from_locator_and_control_tree_node(
+                    locator,
+                    root_control_tree_node,
+                )
+
+                yield _UIAutomationControlWrapper(root_control, location_info)
 
                 search_params.pop("desktop", None)
                 search_params.pop("path", None)
@@ -228,7 +243,12 @@ def _find_ui_automation_wrappers(
                     return
 
                 if search_strategy == "siblings":
-                    yield from _search_siblings(root_control, search_params, locator)
+                    # When searching siblings, we only search for the depth
+                    # of the first found element anyways.
+                    search_params.pop("depth", None)
+                    yield from _search_siblings(
+                        root_control_tree_node, root_control, search_params, locator
+                    )
                     return
                 assert search_strategy is None
                 # Don't keep on searching as the strategy is for a single match.
@@ -236,12 +256,16 @@ def _find_ui_automation_wrappers(
 
 
 def _search_step(
+    locator: str,
     root_control,
     search_params,
     search_depth,
     timeout_monitor: Optional["TimeoutMonitor"],
 ) -> Iterator[ControlTreeNode["Control"]]:
     from robocorp.windows._control_element import ControlElement
+    from robocorp.windows._ui_automation_wrapper import (
+        build_from_locator_and_control_tree_node,
+    )
 
     # Obtain an element with the search parameters.
     if "desktop" in search_params:
@@ -271,17 +295,25 @@ def _search_step(
             yield node
             return
 
+        location_info = build_from_locator_and_control_tree_node(locator, node)
         # Convert to have the proper __str__ representation to show to the user.
-        as_el = ControlElement(_UIAutomationControlWrapper(control, f"path:{path_str}"))
+        as_el = ControlElement(_UIAutomationControlWrapper(control, location_info))
         raise ElementNotFound(
             f"Found element: '{str(as_el).strip()}' in path, but other "
             f"search parameters ({remaining_params}) did not match."
         )
 
+    only_depth: Optional[int] = None
+    if "depth" in search_params:
+        search_params = search_params.copy()
+        depth = int(search_params.pop("depth"))
+        search_depth = depth
+        only_depth = depth
+
     from robocorp.windows._iter_tree import iter_tree
 
     found = False
-    for el in iter_tree(root_control, max_depth=search_depth, include_top=False):
+    for el in iter_tree(root_control, max_depth=search_depth, only_depth=only_depth):
         if not found:
             # If we found one item, we cannot time-out anymore.
             if timeout_monitor and timeout_monitor.timed_out():
@@ -292,15 +324,29 @@ def _search_step(
 
 
 def _search_siblings(
-    root_control: "Control", search_params, locator
+    root_control_tree_node: ControlTreeNode,
+    root_control: "Control",
+    search_params: SearchType,
+    locator: str,
 ) -> Iterator[_UIAutomationControlWrapper]:
+    from robocorp.windows._ui_automation_wrapper import LocationInfo
+
+    depth = root_control_tree_node.depth
+    child_pos = root_control_tree_node.child_pos
+    parent_path = "|".join(root_control_tree_node.path.split("|")[:-1])
+
     while True:
         next_control = root_control.GetNextSiblingControl()
         if not next_control:
             break
 
+        child_pos += 1
+
         if _matches(search_params, ControlTreeNode(next_control, 0, 0, "")):
-            element = _UIAutomationControlWrapper(next_control, locator)
+            path = f"{parent_path}|{child_pos}"
+
+            location_info = LocationInfo(locator, depth, child_pos, path)
+            element = _UIAutomationControlWrapper(next_control, location_info)
             yield element
         root_control = next_control
 

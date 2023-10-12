@@ -55,6 +55,8 @@ def find_window(
     foreground: bool = True,
 ) -> WindowElement:
     """
+    Finds the first window matching the passed locator.
+
     Args:
         locator: This is the locator which should be used to find the window.
 
@@ -88,7 +90,7 @@ def find_windows(
     wait_for_window: bool = False,
 ) -> List[WindowElement]:
     """
-    Finds windows matching the given locator.
+    Finds all windows matching the given locator.
 
     Args:
         locator: The locator which should be used to find windows.
