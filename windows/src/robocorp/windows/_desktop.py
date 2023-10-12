@@ -41,9 +41,8 @@ class Desktop(ControlElement):
 
         This keyword can be used to output logs of application's element structure.
 
-        - The printed structure displays a tree prefixed with "depth" - "position" so
-          you know how deep (0 means root) in the tree you are and on what position
-          (1-indexed) the child you're looking for is.
+        The printed element attributes correspond to the values that may be used
+        to create a locator to find the actual wanted element.
 
         Args:
             stream: The stream to which the text should be printed (if not given,
@@ -78,9 +77,12 @@ class Desktop(ControlElement):
             self, stream=stream, show_properties=show_properties, max_depth=max_depth
         )
 
-    def iter_children(
+    def _iter_children_nodes(
         self, *, max_depth: int = 1
     ) -> Iterator["ControlTreeNode[ControlElement]"]:
+        return ControlElement._iter_children_nodes(self, max_depth=max_depth)
+
+    def iter_children(self, *, max_depth: int = 1) -> Iterator["ControlElement"]:
         return ControlElement.iter_children(self, max_depth=max_depth)
 
     def find_window(
