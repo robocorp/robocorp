@@ -383,6 +383,42 @@ class PickedInspectorElementError(Exception):
     """
 
 
+class PickedElementNotInParentHierarchy(Exception):
+    """
+    This error is thrown when the picked element is not in the hierarchy
+    of the passed parent.
+    """
+
+
+class UnreachableElementInParentHierarchy(Exception):
+    """
+    This error is thrown when it's possible to get to the parent a path from
+    a picked control, but it's not possible to get to the picked control from
+    the parent using the tree hierarchy (i.e.: Control.GetChildren() can't
+    get to it).
+    """
+
+    def __init__(
+        self,
+        msg: str,
+        parent: ControlElement,
+        hierarchy: List["Control"],
+        partial_match: List["ControlElement"],
+    ) -> None:
+        """
+        Args:
+            msg: The error message.
+            parent: The parent which was used to scope down the search.
+            hierarchy: The hierarchy found -- note that it does not include the
+                parent, it contains the hierarchy of controls.
+            partial_match: The partial elements that could be found in the hierarchy.
+        """
+        Exception.__init__(self, msg)
+        self.parent = parent
+        self.hierarchy = hierarchy
+        self.partial_match = partial_match
+
+
 def build_parent_hierarchy(
     control: ControlElement, up_to_parent: Optional[ControlElement]
 ) -> List["ControlTreeNode[ControlElement]"]:
@@ -399,6 +435,13 @@ def build_parent_hierarchy(
         A list containing the ControlElements to reach the given control
         from the given parent (note that the parent itself will not be
         included in the return, but the control will be).
+
+    Raises:
+        PickedInspectorElementError: if an internal widget is highlighted.
+        PickedElementNotInParentHierarchy: if the element was not found in the
+            parent hierarchy.
+        UnreachableElementInParentHierarchy: if the element is not reachable from
+            the hierarchy.
     """
     from robocorp.windows._find_ui_automation import get_desktop_element
     from robocorp.windows._iter_tree import ControlTreeNode
@@ -429,8 +472,8 @@ def build_parent_hierarchy(
             hierarchy.append(curr)
             break
     else:
-        # Oops, the given parent wasn't found!
-        log.info(
+        # Oops, the given parent wasn't found.
+        raise PickedElementNotInParentHierarchy(
             f"It was not possible to find the given parent "
             f"({str(up_to_parent).strip()} in the hierarchy "
             f"of: {str(control).strip()}"
@@ -462,12 +505,19 @@ def build_parent_hierarchy(
                     found.append(ControlTreeNode(el, depth, child_pos, path))
                     break
             else:
-                log.info(
-                    f"It was not possible to find the given child "
-                    f"({str(c).strip()} in the hierarchy "
-                    f"of: {str(control).strip()}"
+                location_info = LocationInfo(None, depth, None, None)
+                child_not_found = ControlElement(
+                    _UIAutomationControlWrapper(c, location_info)
                 )
-                return []  # Don't return partial match.
+
+                raise UnreachableElementInParentHierarchy(
+                    f"It was not possible to find the given child:\n"
+                    f"({str(child_not_found).strip()}\nas a child "
+                    f"of:\n{str(control).strip()}",
+                    up_to_parent,
+                    hierarchy,
+                    [x.control for x in found],
+                )
 
     return found
 
@@ -518,7 +568,12 @@ class _PickerThread(threading.Thread):
         Args:
             parent: if None gets up to the desktop
 
-        Raises: PickedInspectorElementError
+        Raises:
+            PickedInspectorElementError: if an internal widget is highlighted.
+            PickedElementNotInParentHierarchy: if the element was not found in the
+                parent hierarchy.
+            UnreachableElementInParentHierarchy: if the element is not reachable from
+                the hierarchy.
         """
         from robocorp.windows._ui_automation_wrapper import (
             _UIAutomationControlWrapper,
@@ -613,7 +668,7 @@ class _PickerThread(threading.Thread):
         self, cursor_pos: CursorPos
     ) -> Optional[List["ControlTreeNode[ControlElement]"]]:
         """
-        Raises: PickedInspectorElementError
+        Returns the elements found in the given cursor position.
         """
         ev = self._tk_handler_thread.set_rects([])
         ev.wait(0.1)
@@ -642,12 +697,20 @@ class _PickerThread(threading.Thread):
                 #     )
                 # )
 
-            except (PickedInspectorElementError, COMError):
+            except (
+                PickedInspectorElementError,
+                COMError,
+            ):
                 # If we picked the inspector itself or something changed in the
                 # meanwhile, this didn't work.
                 if time.monotonic() > timeout_at:
                     return None
                 time.sleep(0.1)
+            except (
+                PickedElementNotInParentHierarchy,
+                UnreachableElementInParentHierarchy,
+            ):
+                return []
 
     def run(self) -> None:
         try:

@@ -7,7 +7,7 @@ from robocorp.windows._window_element import WindowElement
 from robocorp.windows.protocols import Locator
 
 
-def _iter_window_locators(locator: Locator) -> Iterator[Optional[Locator]]:
+def _iter_window_locators(locator: Locator) -> Iterator[Locator]:
     assert locator, "Empty locator passed."
 
     if "type:" in locator or "control:" in locator:
