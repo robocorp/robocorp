@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.1 - 2023-10-13
+
+- Fix support for Python 3.8
+
 ## 1.0.0 - 2023-09-11
 
 - Change URL path for asset upload
