@@ -4,7 +4,7 @@ import mimetypes
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from ._client import AssetNotFound, AssetUploadFailed
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 __version__ = "1.0.0"
 version_info = [int(x) for x in __version__.split(".")]
 
-JSON = Union[dict[str, "JSON"], list["JSON"], str, int, float, bool, None]
+JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
 
 LOGGER = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def _get_client() -> "AssetsClient":
     return AssetsClient(workspace, endpoint, token)
 
 
-def list_assets() -> list[str]:
+def list_assets() -> List[str]:
     """List all the existing assets.
 
     Returns:

@@ -2,7 +2,7 @@ import base64
 import logging
 import math
 import time
-from typing import Optional, cast
+from typing import List, Optional, cast
 from urllib.parse import quote as sanitize_id
 
 from ._requests import HTTPError, Requests, Response
@@ -68,7 +68,7 @@ class AssetsClient:
 
         return _handle_error
 
-    def list_assets(self) -> list[Asset]:
+    def list_assets(self) -> List[Asset]:
         """Retrieve list of assets."""
         return self._client.get("").json()
 

@@ -29,6 +29,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: "ubuntu-py38"
+            python: "3.8"
+            os: ubuntu-latest
           - name: "ubuntu-py310"
             python: "3.10"
             os: ubuntu-latest

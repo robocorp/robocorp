@@ -11,7 +11,7 @@ ______________________________________________________________________
 **Source:** [`__init__.py:45`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L45)
 
 ```python
-list_assets() → list[str]
+list_assets() → List[str]
 ```
 
 List all the existing assets.
@@ -74,7 +74,7 @@ ______________________________________________________________________
 get_json(
     name: str,
     **kwargs
-) → Union[dict[str, 'JSON'], list['JSON'], str, int, float, bool, NoneType]
+) → Union[Dict[str, ForwardRef('JSON')], List[ForwardRef('JSON')], str, int, float, bool, NoneType]
 ```
 
 Return the given asset as a deserialized JSON object.
@@ -168,7 +168,7 @@ ______________________________________________________________________
 ```python
 set_json(
     name: str,
-    value: Optional[dict[str, 'JSON'], list['JSON'], str, int, float, bool],
+    value: Optional[Dict[str, ForwardRef('JSON')], List[ForwardRef('JSON')], str, int, float, bool],
     wait: bool = True,
     **kwargs
 )
