@@ -149,9 +149,9 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
         five_path = ""
         for element in calculator_window_element.iter_children(max_depth=16):
             if element.name == "Number pad":
-                number_pad_path = element.path
+                number_pad_path = element.path or ""
             elif element.name == "5":
-                five_path = element.path
+                five_path = element.path or ""
 
         assert five_path.startswith(number_pad_path)
         subpath = five_path[len(number_pad_path) + 1 :]

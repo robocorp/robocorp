@@ -8,6 +8,7 @@ from robocorp.windows.protocols import Locator
 if typing.TYPE_CHECKING:
     from robocorp.windows._iter_tree import ControlTreeNode
     from robocorp.windows._window_element import WindowElement
+    from robocorp.windows.vendored.uiautomation.uiautomation import Control
 
 
 class Desktop(ControlElement):
@@ -294,9 +295,9 @@ class Desktop(ControlElement):
         search_cmd = "{Win}s"
         if self.get_win_version() == "11":
             search_cmd = search_cmd.rstrip("s")
-        self.send_keys(None, search_cmd)
-        self.send_keys(None, text)
-        self.send_keys(None, "{Enter}")
+        self.send_keys(search_cmd)
+        self.send_keys(text)
+        self.send_keys("{Enter}")
         time.sleep(wait_time)
 
     def get_win_version(self) -> str:
@@ -313,3 +314,177 @@ class Desktop(ControlElement):
             major = "11"
 
         return major
+
+    def wait_for_active_window(
+        self, locator: Locator, timeout: Optional[float] = None
+    ) -> "WindowElement":
+        """
+        Waits for a window with the given locator to be made active.
+
+        Args:
+            locator: The locator that the active window must match.
+            timeout: Timeout to wait for a window with the given locator to be
+                made active.
+
+        Raises:
+            ElementNotFound if no window was found as active until the timeout
+            was reached.
+
+        Note: if there's a matching window which matches the locator but it's not
+            the active one, this will fail (consider using `find_window`
+            for this use case).
+        """
+        from robocorp.windows import config
+        from robocorp.windows._errors import ElementNotFound
+        from robocorp.windows._find_ui_automation import _matches
+        from robocorp.windows._find_window import _iter_window_locators
+        from robocorp.windows._iter_tree import ControlTreeNode
+        from robocorp.windows._match_object import MatchObject
+        from robocorp.windows._ui_automation_wrapper import (
+            _UIAutomationControlWrapper,
+            empty_location_info,
+        )
+        from robocorp.windows._window_element import WindowElement
+        from robocorp.windows.vendored.uiautomation.uiautomation import (
+            GetForegroundControl,
+        )
+
+        locator_parts = locator.split(MatchObject.TREE_SEP)
+        if not locator_parts:
+            raise AssertionError(f"The locator passed ({locator!r}) is not valid.")
+        if len(locator_parts) > 1:
+            raise AssertionError(
+                f"The locator passed ({locator!r}) can only have one "
+                "level in this API ('>' not allowed)."
+            )
+
+        if timeout is None:
+            timeout = config().timeout
+
+        check_search_params = []
+        for loc in _iter_window_locators(locator):
+            search_params = MatchObject.parse_locator(loc).as_search_params()
+            if "depth" in search_params:
+                raise AssertionError('"depth" locator not valid for this API.')
+            if "path" in search_params:
+                raise AssertionError('"path" locator not valid for this API.')
+            if "desktop" in search_params:
+                raise AssertionError('"desktop" locator not valid for this API.')
+            check_search_params.append(search_params)
+
+        timeout_at = time.monotonic() + timeout
+        while True:
+            control = GetForegroundControl()
+
+            while control is not None:
+                if control.GetParentControl() is None:
+                    # We don't want to check the desktop itself
+                    break
+
+                for search_params in check_search_params:
+                    tree_node: "ControlTreeNode[Control]" = ControlTreeNode(
+                        control, 0, 0, ""
+                    )
+                    if _matches(search_params, tree_node):
+                        el = WindowElement(
+                            _UIAutomationControlWrapper(control, empty_location_info())
+                        )
+                        return el
+
+                control = control.GetParentControl()
+
+            if time.monotonic() > timeout_at:
+                # Check only after at least one search was done.
+                msg = (
+                    "No active window was found as active with the locator: "
+                    f"{locator!r}."
+                )
+
+                if control is not None:
+                    el = WindowElement(
+                        _UIAutomationControlWrapper(control, empty_location_info())
+                    )
+                    msg += f"\nActive window: {el}"
+                else:
+                    msg += "\nNo active window found."
+
+                curr_windows = self.find_windows("regex:.*")
+                if curr_windows:
+                    msg += "\nExisting Windows:\n"
+                    for w in curr_windows:
+                        msg += f"{w}\n"
+
+                self.log_screenshot()
+                raise ElementNotFound(msg)
+            else:
+                time.sleep(1 / 15.0)
+
+    def drag_and_drop(
+        self,
+        source_element: Locator,
+        target_element: Locator,
+        speed: float = 1.0,
+        copy: Optional[bool] = False,
+        wait_time: float = 1.0,
+        timeout: Optional[float] = None,
+    ):
+        """Drag and drop the source element into target element.
+
+        :param source: source element for the operation
+        :param target: target element for the operation
+        :param speed: adjust speed of operation, bigger value means more speed
+        :param copy: on True does copy drag and drop, defaults to move
+        :param wait_time: time to wait after drop, default 1.0 seconds
+
+        Example:
+
+        .. code-block:: robotframework
+
+            # copying a file, report.html, from source (File Explorer) window
+            # into a target (File Explorer) Window
+            # locator
+            Drag And Drop
+            ...    name:C:\\temp type:Windows > name:report.html type:ListItem
+            ...    name:%{USERPROFILE}\\Documents\\artifacts type:Windows > name:"Items View"
+            ...    copy=True
+
+        Example:
+
+        .. code-block:: robotframework
+
+            # moving *.txt files into subfolder within one (File Explorer) window
+            ${source_dir}=    Set Variable    %{USERPROFILE}\\Documents\\test
+            Control Window    name:${source_dir}
+            ${files}=    Find Files    ${source_dir}${/}*.txt
+            # first copy files to folder2
+            FOR    ${file}    IN    @{files}
+                Drag And Drop    name:${file.name}    name:folder2 type:ListItem    copy=True
+            END
+            # second move files to folder1
+            FOR    ${file}    IN    @{files}
+                Drag And Drop    name:${file.name}    name:folder1 type:ListItem
+            END
+        """  # noqa: E501
+        import robocorp.windows.vendored.uiautomation as auto
+        from robocorp.windows import config
+
+        source = self.find(source_element, timeout=timeout)
+        target = self.find(target_element, timeout=timeout)
+        try:
+            if copy:
+                auto.PressKey(auto.Keys.VK_CONTROL)
+            auto.DragDrop(
+                source.xcenter,
+                source.ycenter,
+                target.xcenter,
+                target.ycenter,
+                moveSpeed=speed,
+                waitTime=wait_time,
+            )
+        finally:
+            if copy:
+                click_wait_time: float = (
+                    wait_time if wait_time is not None else config().wait_time
+                )
+                self._click_element(source, "Click", click_wait_time)
+                auto.ReleaseKey(auto.Keys.VK_CONTROL)

@@ -1,3 +1,4 @@
+# ruff: noqa: E501
 import inspect
 import itertools
 import logging
@@ -5,7 +6,7 @@ import re
 import sys
 import typing
 from pathlib import Path
-from typing import Callable, Iterator, List, Literal, Optional, Protocol, Tuple, Union
+from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union
 
 from _ctypes import COMError
 
@@ -27,18 +28,6 @@ if typing.TYPE_CHECKING:
 PatternType = Union["ValuePattern", "LegacyIAccessiblePattern"]
 
 DEFAULT_SEND_KEYS_INTERVAL = 0.01
-
-
-class ISendKeys(Protocol):
-    def SendKeys(
-        self,
-        text: str,
-        interval: float = 0.01,
-        waitTime: float = 1,
-        charMode: bool = True,
-        debug: bool = False,
-    ) -> None:
-        pass
 
 
 def set_value_validator(expected: str, actual: str) -> bool:
@@ -129,7 +118,7 @@ class ControlElement:
         timeout: Optional[float] = None,
     ) -> "_UIAutomationControlWrapper":
         """
-        Internal API to find the control to interact with.
+        Internal API to find the control to interact with given a locator.
         """
         from robocorp.windows._find_ui_automation import find_ui_automation_wrapper
 
@@ -449,6 +438,8 @@ class ControlElement:
             ElementNotFound if an element with the given locator could not be
             found.
         """
+        if not locator:
+            return self
         try:
             return ControlElement(
                 self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
@@ -510,7 +501,7 @@ class ControlElement:
                 `all` means that all the elements up to the given search depth
                     will be searched.
 
-            wait_for_window: Defines whether the search should keep on searching
+            wait_for_element: Defines whether the search should keep on searching
                 until an element with the given locator is found (note that if True
                 and no element was found an ElementNotFound is raised).
 
@@ -706,104 +697,243 @@ class ControlElement:
         locator: Optional[Locator] = None,
         wait_time: Optional[float] = None,
         timeout: Optional[float] = None,
-    ) -> _UIAutomationControlWrapper:
-        """Mouse click on element matching given locator.
+    ) -> "ControlElement":
+        """
+        Clicks an element using the mouse.
 
-        Exception ``ActionNotPossible`` is raised if element does not
-        allow Click action.
+        Args:
+            locator: If given the child element which matches this locator will
+                be clicked.
+            wait_time: The time to wait after clicking the element. If not passed the
+                default value found in the config is used.
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-        :param locator: String locator or element object.
-        :param wait_time: time to wait after click, default is a
-         library `wait_time`, see keyword ``Set Wait Time``
-        :param timeout: float value in seconds, see keyword
-         ``Set Global Timeout``
-        :return: _UIAutomationControlWrapper object
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is passed.
 
         Example:
 
-        .. code-block:: robotframework
+            Click using a locator:
 
-            Click  id:button1
-            Click  id:button2 offset:10,10
-            ${element}=  Click  name:SendButton  wait_time=5.0
+            ```python
+            from robocorp import windows
+            windows.find_window('Calculator').click('id:button1')
+            ```
+
+            Click customizing wait time after the click:
+
+            ```python
+            from robocorp import windows
+            calculator_window = windows.find_window('Calculator')
+            calculator_window.find('name:SendButton').click(wait_time=5.0)
+            ```
+
+            Make an existing window foreground so that it can be clicked:
+
+            ```python
+            window.foreground_window()
+            window.click('name:SendButton', wait_time=5.0)
+            ```
+
+        Returns:
+            The clicked element.
+
+        Note:
+            The element clicked must be visible in the screen, if it's hidden
+            by some other window or control the click will not work.
+
+        Raises:
+            ActionNotPossible: if element does not allow the Click action.
         """
         return self._mouse_click(locator, "Click", wait_time, timeout)
 
     def double_click(
         self,
-        locator: Locator,
+        locator: Optional[Locator] = None,
         wait_time: Optional[float] = None,
         timeout: Optional[float] = None,
-    ) -> _UIAutomationControlWrapper:
-        """Double mouse click on element matching given locator.
+    ) -> "ControlElement":
+        """
+        Double-clicks an element using the mouse.
 
-        Exception ``ActionNotPossible`` is raised if element does not
-        allow Click action.
+        Args:
+            locator: If given the child element which matches this locator will
+                be double-clicked.
+            wait_time: The time to wait after double-clicking the element. If not
+                passed the default value found in the config is used.
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-        :param locator: String locator or element object.
-        :param wait_time: time to wait after click, default is a
-         library `wait_time`, see keyword ``Set Wait Time``
-        :param timeout: float value in seconds, see keyword
-         ``Set Global Timeout``
-        :return: _UIAutomationControlWrapper object
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is passed.
 
         Example:
 
-        .. code-block:: robotframework
+            Double-click using a locator:
 
-            ${element}=  Double Click  name:ResetButton
+            ```python
+            from robocorp import windows
+            windows.find_window('Calculator').double_click('id:button1')
+            ```
+
+            Click customizing wait time after the double-click:
+
+            ```python
+            from robocorp import windows
+            calculator_window = windows.find_window('Calculator')
+            calculator_window.find('name:SendButton').double_click(wait_time=5.0)
+            ```
+
+            Make an existing window foreground so that it can be double-clicked:
+
+            ```python
+            window.foreground_window()
+            window.double_click('name:SendButton', wait_time=5.0)
+            ```
+
+        Returns:
+            The clicked element.
+
+        Note:
+            The element clicked must be visible in the screen, if it's hidden
+            by some other window or control the double-click will not work.
+
+        Raises:
+            ActionNotPossible: if element does not allow the double-click action.
         """
+
         return self._mouse_click(locator, "DoubleClick", wait_time, timeout)
 
     def right_click(
         self,
-        locator: Locator,
+        locator: Optional[Locator] = None,
         wait_time: Optional[float] = None,
         timeout: Optional[float] = None,
-    ) -> _UIAutomationControlWrapper:
-        """Right mouse click on element matching given locator.
+    ) -> "ControlElement":
+        """
+        Right-clicks an element using the mouse.
 
-        Exception ``ActionNotPossible`` is raised if element does not
-        allow Click action.
+        Args:
+            locator: If given the child element which matches this locator will
+                be right-clicked.
+            wait_time: The time to wait after right-clicking the element. If not
+                passed the default value found in the config is used.
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-        :param locator: String locator or element object.
-        :param wait_time: time to wait after click, default is a
-         library `wait_time`, see keyword ``Set Wait Time``
-        :param timeout: float value in seconds, see keyword
-         ``Set Global Timeout``
-        :return: _UIAutomationControlWrapper object
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is passed.
 
         Example:
 
-        .. code-block:: robotframework
+            Right-click using a locator:
 
-            ${element}=  Right Click  name:MenuButton
+            ```python
+            from robocorp import windows
+            windows.find_window('Calculator').right_click('id:button1')
+            ```
+
+            Click customizing wait time after the right-click:
+
+            ```python
+            from robocorp import windows
+            calculator_window = windows.find_window('Calculator')
+            calculator_window.find('name:SendButton').right_click(wait_time=5.0)
+            ```
+
+            Make an existing window foreground so that it can be right-clicked:
+
+            ```python
+            window.foreground_window()
+            window.right_click('name:SendButton', wait_time=5.0)
+            ```
+
+        Returns:
+            The clicked element.
+
+        Note:
+            The element clicked must be visible in the screen, if it's hidden
+            by some other window or control the right-click will not work.
+
+        Raises:
+            ActionNotPossible: if element does not allow the right-click action.
         """
         return self._mouse_click(locator, "RightClick", wait_time, timeout)
 
     def middle_click(
         self,
-        locator: Locator,
+        locator: Optional[Locator] = None,
         wait_time: Optional[float] = None,
         timeout: Optional[float] = None,
-    ) -> _UIAutomationControlWrapper:
-        """Right mouse click on element matching given locator.
+    ) -> "ControlElement":
+        """
+        Middle-clicks an element using the mouse.
 
-        Exception ``ActionNotPossible`` is raised if element does not
-        allow Click action.
+        Args:
+            locator: If given the child element which matches this locator will
+                be middle-clicked.
+            wait_time: The time to wait after middle-clicking the element. If not
+                passed the default value found in the config is used.
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-        :param locator: String locator or element object.
-        :param wait_time: time to wait after click, default is a
-         library `wait_time`, see keyword ``Set Wait Time``
-        :param timeout: float value in seconds, see keyword
-         ``Set Global Timeout``
-        :return: _UIAutomationControlWrapper object
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is passed.
 
         Example:
 
-        .. code-block:: robotframework
+            Middle-click using a locator:
 
-            ${element}=  Middle Click  name:button2
+            ```python
+            from robocorp import windows
+            windows.find_window('Calculator').middle_click('id:button1')
+            ```
+
+            Click customizing wait time after the middle-click:
+
+            ```python
+            from robocorp import windows
+            calculator_window = windows.find_window('Calculator')
+            calculator_window.find('name:SendButton').middle_click(wait_time=5.0)
+            ```
+
+            Make an existing window foreground so that it can be middle-clicked:
+
+            ```python
+            window.foreground_window()
+            window.middle_click('name:SendButton', wait_time=5.0)
+            ```
+
+        Returns:
+            The clicked element.
+
+        Note:
+            The element clicked must be visible in the screen, if it's hidden
+            by some other window or control the middle-click will not work.
+
+        Raises:
+            ActionNotPossible: if element does not allow the middle-click action.
         """
         return self._mouse_click(locator, "MiddleClick", wait_time, timeout)
 
@@ -813,19 +943,22 @@ class ControlElement:
         click_type: str,
         wait_time: Optional[float],
         timeout: Optional[float],
-    ) -> _UIAutomationControlWrapper:
+    ) -> "ControlElement":
         click_wait_time: float = wait_time if wait_time is not None else _wait_time()
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
+        if not locator:
+            element = self
+        else:
+            element = self.find(locator, timeout=timeout)
         self._click_element(element, click_type, click_wait_time)
         return element
 
     def _click_element(
         self,
-        element: _UIAutomationControlWrapper,
+        element: "ControlElement",
         click_type: str,
         click_wait_time: float,
     ):
-        item = element.item
+        item = element.ui_automation_control
         click_function = getattr(item, click_type, None)
         if not click_function:
             raise ActionNotPossible(
@@ -852,120 +985,151 @@ class ControlElement:
 
     def select(
         self,
-        locator: Locator,
         value: str,
+        locator: Optional[Locator] = None,
         timeout: Optional[float] = None,
-    ) -> _UIAutomationControlWrapper:
-        """Select a value on the passed element if such action is supported.
-
-        The ``ActionNotPossible`` exception is raised when the element does not allow
-        the `Select` action. This is usually used with combo box elements.
-
-        :param locator: String locator or element object.
-        :param value: String value to select on Control element
-        :returns: The controlled Windows element.
-
-        **Example: Robot Framework**
-
-            *** Settings ***
-            Library     RPA.Windows
-
-            *** Tasks ***
-            Set Notepad Size
-                Select    id:FontSizeComboBox    22
-
-        **Example: Python**
-
-        .. code-block:: python
-
-            from RPA.Windows import Windows
-
-            lib = Windows()
-
-            def set_notepad_size():
-                lib.select("id:FontSizeComboBox", "22")
+    ) -> "ControlElement":
         """
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
-        if hasattr(element.item, "Select"):
+        Select a value on the passed element if such action is supported.
+
+        Args:
+            value: value to select on element.
+
+            locator: If given the child element which matches this locator will
+                be used for the selection.
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is passed.
+
+        Returns:
+            The element used in the selection.
+
+        Raises:
+            ActionNotPossible if the element does not allow the `Select` action.
+
+        Note:
+            This is usually used with combo box elements.
+
+        Example:
+
+            ```python
+            element.select("id:FontSizeComboBox", "22")
+            ```
+        """
+        if locator:
+            element = self.find(locator, timeout=timeout)
+        else:
+            element = self
+
+        control = element.ui_automation_control
+        if hasattr(control, "Select"):
             # NOTE(cmin764): This is not supposed to work on `*Pattern` or `TextRange`
             #  objects. (works with `Control`s and its derived flavors only, like a
             #  combobox)
-            element.item.Select(
-                value, simulateMove=_simulate_move(), waitTime=_wait_time()
-            )
+            control.Select(value, simulateMove=_simulate_move(), waitTime=_wait_time())
         else:
             raise ActionNotPossible(
-                f"Element {locator!r} does not support selection (try with"
+                f"Element {element!r} does not support selection (try with"
                 " `Set Value` instead)"
             )
         return element
 
     def send_keys(
         self,
-        locator: Optional[Locator] = None,
         keys: Optional[str] = None,
+        locator: Optional[Locator] = None,
         interval: float = DEFAULT_SEND_KEYS_INTERVAL,
         wait_time: Optional[float] = None,
         send_enter: bool = False,
         timeout: Optional[float] = None,
-    ):
-        """Send keys to desktop, current window or to Control element
-        defined by given locator.
+    ) -> "ControlElement":
+        """
+        Sends the given keys to the element (simulates typing keys on the keyboard).
 
-        If ``locator`` is `None` then keys are sent to desktop.
+        Args:
+            keys:
+                The keys to be sent.
+                Special keys may be sent as {Ctrl}{Alt}{Delete}, etc.
 
-        Exception ``ActionNotPossible`` is raised if element does not
-        allow SendKeys action.
+                Some examples of valid key combinations are shown below:
 
-        :param locator: Optional string locator or element object.
-        :param keys: The keys to send.
-        :param interval: Time between each sent key. (defaults to 0.01 seconds)
-        :param wait_time: Time to wait after sending all the keys. (defaults to
-            library's set value, see keyword ``Set Wait Time``)
-        :param send_enter: If `True` then the {Enter} key is pressed at the end of the
-            sent keys.
-        :returns: The element identified through `locator`.
+                ```python
+                '{Ctrl}a{Delete}{Ctrl}v{Ctrl}s{Ctrl}{Shift}s{Win}e{PageDown}'  # press Ctrl+a, Delete, Ctrl+v, Ctrl+s, Ctrl+Shift+s, Win+e, PageDown
+                '{Ctrl}(AB)({Shift}(123))'  # press Ctrl+A+B, type '(', press Shift+1+2+3, type ')', if '()' follows a hold key, hold key won't release util ')'
+                '{Ctrl}{a 3}'  # press Ctrl+a at the same time, release Ctrl+a, then type 'a' 2 times
+                '{a 3}{B 5}'  # type 'a' 3 times, type 'B' 5 times
+                '{{}Hello{}}abc {a}{b}{c} test{} 3}{!}{a} (){(}{)}'  # type: '{Hello}abc abc test}}}!a ()()'
+                '0123456789{Enter}'
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZ{Enter}'
+                'abcdefghijklmnopqrstuvwxyz{Enter}'
+                '`~!@#$%^&*()-_=+{Enter}'
+                '[]{{}{}}\\|;:\'\",<.>/?{Enter}'
+                ```
+
+            locator: If given the child element which matches this locator will
+                be used to send the keys.
+
+            interval: Time between each sent key. (defaults to 0.01 seconds)
+            wait_time: The time to wait after sending the keys to the element. If not passed the
+                default value found in the config is used.
+
+            send_enter: If `True` then the {Enter} key is pressed at the end of the sent keys.
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is passed.
+
+        Returns:
+            The element to which the keys were sent.
 
         Example:
+            ```python
+            from robocorp import windows
 
-        .. code-block:: robotframework
+            windows.desktop().send_keys('{Ctrl}{F4}')
+            windows.find_window('Calculator').send_keys('96+4=', send_enter=True)
+            ```
 
-            Send Keys  desktop   {Ctrl}{F4}
-            Send Keys  keys={Ctrl}{F4}   # locator will be NONE, keys sent to desktop
-            Send Keys  id:input5  username   send_enter=${True}
-            ${element}=   Get Element   id:pass
-            Send Keys  ${element}  password   send_enter=${True}
+        Raises:
+            ActionNotPossible: if the element does not allow the SendKeys action.
         """
-        element: Union["_UIAutomationControlWrapper", ISendKeys]
-        if locator:
-            element = self._find_ui_automation_wrapper(locator, timeout=timeout)
+        if not locator:
+            element = self
         else:
-            import robocorp.windows.vendored.uiautomation as auto
-
-            element = auto
-        return self._send_keys_to_element(
-            element,
+            element = self.find(locator, timeout=timeout)
+        self._send_keys_to_element(
+            element.ui_automation_control,
             keys or "",
             interval,
             wait_time,
             send_enter,
         )
+        return element
 
     @classmethod
     def _send_keys_to_element(
         cls,
-        element: Union["_UIAutomationControlWrapper", ISendKeys],
+        control: "Control",
         keys: str,
         interval: float = DEFAULT_SEND_KEYS_INTERVAL,
         wait_time: Optional[float] = None,
         send_enter: bool = False,
     ):
-        control: Union["Control", ISendKeys]
-        if isinstance(element, _UIAutomationControlWrapper):
-            control = element.item
-        else:
-            control = element
-
         if send_enter:
             keys += "{Enter}"
         if hasattr(control, "SendKeys"):
@@ -974,10 +1138,7 @@ class ControlElement:
             cls.logger.info("Sending keys %r to control: %s", keys, control)
             control.SendKeys(text=keys, interval=interval, waitTime=wait_time)
         else:
-            loc = getattr(element, "locator", "<not specified>")
-            raise ActionNotPossible(
-                f"Element found with {loc!r} does not have " "SendKeys' attribute"
-            )
+            raise ActionNotPossible("Element does not have " "SendKeys' attribute")
 
     def get_text(
         self,
@@ -998,18 +1159,22 @@ class ControlElement:
 
             ${date} =  Get Text   type:Edit name:"Date of birth"
         """
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
-        if hasattr(element.item, "GetWindowText"):
-            return element.item.GetWindowText()
+        if not locator:
+            element = self
+        else:
+            element = self.find(locator, timeout=timeout)
+
+        control = element.ui_automation_control
+        if hasattr(control, "GetWindowText"):
+            return control.GetWindowText()
         raise ActionNotPossible(
-            f"Element found with {locator!r} does not have 'GetWindowText' attribute"
+            f"Element {element!r} does not have 'GetWindowText' attribute"
         )
 
     @staticmethod
     def get_value_pattern(
-        element: _UIAutomationControlWrapper,
+        item: "Control",
     ) -> Optional[Callable[[], PatternType]]:
-        item: "Control" = element.item
         get_pattern: Optional[Callable] = getattr(
             item, "GetValuePattern", getattr(item, "GetLegacyIAccessiblePattern", None)
         )
@@ -1044,8 +1209,11 @@ class ControlElement:
             text = lib_win.get_value("Rich Text Window")
             print(text)
         """
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
-        get_value_pattern = self.get_value_pattern(element)
+        if not locator:
+            element = self
+        else:
+            element = self.find(locator, timeout=timeout)
+        get_value_pattern = self.get_value_pattern(element.ui_automation_control)
 
         if get_value_pattern:
             func_name = get_value_pattern.__name__
@@ -1067,7 +1235,6 @@ class ControlElement:
         action: str,
         get_value_pattern: Callable[[], PatternType],
         append: bool,
-        locator: Optional[Locator],
         validator: Optional[Callable],
     ):
         func_name = get_value_pattern.__name__
@@ -1076,9 +1243,11 @@ class ControlElement:
         current_value = value_pattern.Value if append else ""
         expected_value = f"{current_value}{value}{newline_string}"
         value_pattern.SetValue(expected_value)
-        if validator and not validator(expected_value, value_pattern.Value):
+        found_value = value_pattern.Value
+        if validator and not validator(expected_value, found_value):
             raise ValueError(
-                f"Element found with {locator!r} couldn't set value: {expected_value}"
+                f"Couldn't set value: {expected_value!r} (value found after trying "
+                f"to set_value: {found_value!r})."
             )
 
     def _set_value_with_keys(
@@ -1087,7 +1256,7 @@ class ControlElement:
         newline_string: str,
         *,
         action: str,
-        element: _UIAutomationControlWrapper,
+        element: "ControlElement",
         append: bool,
         locator: Optional[Locator],
         validator: Optional[Callable],
@@ -1100,7 +1269,8 @@ class ControlElement:
                 "The `newline` switch and EOLs are ignored when setting a value"
                 " through keys! (insert them with the `enter` parameter only)"
             )
-        get_text_pattern = getattr(element.item, "GetTextPattern", None)
+        control = element.ui_automation_control
+        get_text_pattern = getattr(control, "GetTextPattern", None)
 
         def get_text():
             return (
@@ -1111,10 +1281,10 @@ class ControlElement:
             current_value: str = get_text() or ""
         else:
             # Delete the entire present value inside.
-            self._send_keys_to_element(element, "{Ctrl}a{Del}")
+            self._send_keys_to_element(control, "{Ctrl}a{Del}")
             current_value = ""
         if value:
-            self._send_keys_to_element(element, value)
+            self._send_keys_to_element(control, value)
             actual_value = get_text()
             if actual_value is not None:
                 if validator and not validator(f"{current_value}{value}", actual_value):
@@ -1125,15 +1295,15 @@ class ControlElement:
 
     def set_value(
         self,
+        value: str,
         locator: Optional[Locator] = None,
-        value: Optional[str] = None,
         append: bool = False,
         enter: bool = False,
         newline: bool = False,
         send_keys_fallback: bool = True,
         validator: Optional[Callable] = set_value_validator,
         timeout: Optional[float] = None,
-    ) -> _UIAutomationControlWrapper:
+    ) -> "ControlElement":
         """Set value of the element defined by the locator.
 
         *Note:* An anchor will work only on element structures where you can
@@ -1217,8 +1387,12 @@ class ControlElement:
                 " new lines in the final text content."
             )
         newline_string = "\n" if newline else ""
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
-        get_value_pattern = self.get_value_pattern(element)
+        if not locator:
+            element = self
+        else:
+            element = self.find(locator, timeout=timeout)
+
+        get_value_pattern = self.get_value_pattern(element.ui_automation_control)
         action = "Appending" if append else "Setting"
 
         if get_value_pattern:
@@ -1228,7 +1402,6 @@ class ControlElement:
                 action=action,
                 get_value_pattern=get_value_pattern,
                 append=append,
-                locator=locator,
                 validator=validator,
             )
         elif send_keys_fallback:
@@ -1249,7 +1422,9 @@ class ControlElement:
         if enter:
             self.logger.info("Inserting a new line by sending the *Enter* key.")
             self._send_keys_to_element(
-                element, "{Ctrl}{End}{Enter}", wait_time=_wait_time()
+                element.ui_automation_control,
+                "{Ctrl}{End}{Enter}",
+                wait_time=_wait_time(),
             )
 
         return element
@@ -1323,13 +1498,19 @@ class ControlElement:
         level="INFO",
         timeout: Optional[float] = None,
     ):
-        from robocorp.log import html, suppress_variables
+        try:
+            from robocorp.log import html, suppress_variables
+        except ImportError:
+            return  # If it's not available, just return.
 
         from robocorp.windows._screenshot import screenshot_as_base64png
 
-        el = self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
+        if not locator:
+            el = self
+        else:
+            el = self.find(locator, search_depth, timeout=timeout)
         with suppress_variables():
-            img_as_base64 = screenshot_as_base64png(el.item)
+            img_as_base64 = screenshot_as_base64png(el.ui_automation_control)
             if img_as_base64 is None:
                 return None
 
@@ -1359,72 +1540,3 @@ class ControlElement:
                 f"Element found with {locator!r} does not have 'SetFocus' attribute"
             )
         element.item.SetFocus()
-
-    def drag_and_drop(
-        self,
-        source_element: Locator,
-        target_element: Locator,
-        speed: float = 1.0,
-        copy: Optional[bool] = False,
-        wait_time: float = 1.0,
-        timeout: Optional[float] = None,
-    ):
-        """Drag and drop the source element into target element.
-
-        :param source: source element for the operation
-        :param target: target element for the operation
-        :param speed: adjust speed of operation, bigger value means more speed
-        :param copy: on True does copy drag and drop, defaults to move
-        :param wait_time: time to wait after drop, default 1.0 seconds
-
-        Example:
-
-        .. code-block:: robotframework
-
-            # copying a file, report.html, from source (File Explorer) window
-            # into a target (File Explorer) Window
-            # locator
-            Drag And Drop
-            ...    name:C:\\temp type:Windows > name:report.html type:ListItem
-            ...    name:%{USERPROFILE}\\Documents\\artifacts type:Windows > name:"Items View"
-            ...    copy=True
-
-        Example:
-
-        .. code-block:: robotframework
-
-            # moving *.txt files into subfolder within one (File Explorer) window
-            ${source_dir}=    Set Variable    %{USERPROFILE}\\Documents\\test
-            Control Window    name:${source_dir}
-            ${files}=    Find Files    ${source_dir}${/}*.txt
-            # first copy files to folder2
-            FOR    ${file}    IN    @{files}
-                Drag And Drop    name:${file.name}    name:folder2 type:ListItem    copy=True
-            END
-            # second move files to folder1
-            FOR    ${file}    IN    @{files}
-                Drag And Drop    name:${file.name}    name:folder1 type:ListItem
-            END
-        """  # noqa: E501
-        import robocorp.windows.vendored.uiautomation as auto
-
-        source = self._find_ui_automation_wrapper(source_element, timeout=timeout)
-        target = self._find_ui_automation_wrapper(target_element, timeout=timeout)
-        try:
-            if copy:
-                auto.PressKey(auto.Keys.VK_CONTROL)
-            auto.DragDrop(
-                source.xcenter,
-                source.ycenter,
-                target.xcenter,
-                target.ycenter,
-                moveSpeed=speed,
-                waitTime=wait_time,
-            )
-        finally:
-            if copy:
-                click_wait_time: float = (
-                    wait_time if wait_time is not None else _wait_time()
-                )
-                self._click_element(source, "Click", click_wait_time)
-                auto.ReleaseKey(auto.Keys.VK_CONTROL)
