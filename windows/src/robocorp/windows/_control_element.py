@@ -71,21 +71,53 @@ class ControlElement:
 
     @property
     def path(self) -> Optional[str]:
-        return self._wrapped.path
+        """
+        Provides the relative path in which this element was found
 
-    def inspect(self):
+        Note: this is relative to the element which was used for the `find` or
+        `find_window` and cannot be used as an absolute path to be used to find
+        the control from the desktop.
+        """
+        return self.location_info.path
+
+    def inspect(self) -> None:
+        """
+        Starts inspecting with this element as the root element upon which
+        other elements will be found (i.e.: only elements under this element
+        in the hierarchy will be inspected, other elements can only be inspected
+        if the inspection root is changed).
+
+        Example:
+
+            ```python
+            from robocorp import windows
+            windows.find_window('Calculator').inspect()
+            ```
+        """
         from robocorp.windows._inspect import ElementInspector
 
         element_inspector = ElementInspector(self)
         element_inspector.inspect()
 
     def get_parent(self) -> Optional["ControlElement"]:
+        """
+        Returns:
+            The parent element for this control.
+        """
         parent = self._wrapped.get_parent()
         if parent is None:
             return None
         return ControlElement(parent)
 
     def is_same_as(self, other: "ControlElement") -> bool:
+        """
+        Args:
+            other: The element to compare to.
+
+        Returns:
+            True if this elements points to the same element represented
+            by the other control.
+        """
         from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
 
         return ControlsAreSame(self._wrapped.item, other._wrapped.item)
@@ -96,6 +128,9 @@ class ControlElement:
         search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> "_UIAutomationControlWrapper":
+        """
+        Internal API to find the control to interact with.
+        """
         from robocorp.windows._find_ui_automation import find_ui_automation_wrapper
 
         root = self._wrapped
@@ -113,11 +148,19 @@ class ControlElement:
     @property
     def ui_automation_control(self) -> "Control":
         """
-        Provides the item actually wrapped.
+        Provides the Control actually wrapped by this ControlElement.
+        Can be used as an escape hatch if some functionality is not directly
+        covered by this class (in general this API should only be used if
+        a better API isn't directly available in the ControlElement).
         """
         return self._wrapped.item
 
     def is_disposed(self) -> bool:
+        """
+        Returns:
+            True if the underlying control is already disposed and False
+            otherwise.
+        """
         try:
             self._wrapped.item.Name
         except COMError:
@@ -127,29 +170,74 @@ class ControlElement:
 
     @property
     def handle(self) -> int:
+        """
+        Returns:
+            The internal native window handle from the control wrapped in this
+            class.
+        """
         return self._wrapped.handle
 
     def has_keyboard_focus(self) -> bool:
+        """
+        Returns:
+            True if this control currently has keyboard focus.
+        """
         return self._wrapped.item.HasKeyboardFocus
 
     @property
-    def locator(self) -> Optional[Locator]:
-        return self._wrapped.locator
-
-    @property
     def name(self) -> str:
+        """
+        Returns:
+            The name of the underlying control wrapped in this class
+            (matches the locator `name`).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned.
+        """
         return self._wrapped.name
 
     @property
     def automation_id(self) -> str:
+        """
+        Returns:
+            The automation id of the underlying control wrapped in this class
+            (matches the locator `automationid` or `id`).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned.
+        """
         return self._wrapped.automation_id
 
     @property
     def control_type(self) -> str:
+        """
+        Returns:
+            The control type of the underlying control wrapped in this class
+            (matches the locator `control` or `type`).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned.
+        """
         return self._wrapped.control_type
 
     @property
     def class_name(self) -> str:
+        """
+        Returns:
+            The class name of the underlying control wrapped in this class
+            (matches the locator `class`).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned.
+        """
         return self._wrapped.class_name
 
     @property
@@ -157,42 +245,132 @@ class ControlElement:
         """
         Returns:
             The left bound of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
         """
         return self._wrapped.left
 
     @property
     def right(self) -> int:
+        """
+        Returns:
+            The right bound of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.right
 
     @property
     def top(self) -> int:
+        """
+        Returns:
+            The top bound of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.top
 
     @property
     def bottom(self) -> int:
+        """
+        Returns:
+            The bottom bound of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.bottom
 
     @property
     def width(self) -> int:
+        """
+        Returns:
+            The width of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.width
 
     @property
     def height(self) -> int:
+        """
+        Returns:
+            The height of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.height
 
     @property
     def rectangle(self) -> Tuple[int, int, int, int]:
+        """
+        Returns:
+            A tuple with (left, top, right, bottom) -- (all -1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return (self.left, self.top, self.right, self.bottom)
 
     @property
     def xcenter(self) -> int:
+        """
+        Returns:
+            The x position of the center of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.xcenter
 
     @property
     def ycenter(self) -> int:
+        """
+        Returns:
+            The y position of the center of the control (-1 if invalid).
+
+        Note:
+            This value is cached when the element is created and even if the
+            related value of the underlying control changes the initial value
+            found will still be returned. The method `update_geometry()` may
+            be used to get the new bounds of the control.
+        """
         return self._wrapped.ycenter
 
-    def update_geometry(self):
+    def update_geometry(self) -> None:
+        """
+        This method may be called to update the cached coordinates of the
+        control bounds.
+        """
         self._wrapped.update_geometry()
 
     def __str__(self) -> str:
@@ -247,6 +425,30 @@ class ControlElement:
         search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> "ControlElement":
+        """
+        This method may be used to find a control in the descendants of this
+        control.
+
+        The first matching element is returned.
+
+        Args:
+            locator: The locator to be used to search a child control.
+
+            search_depth: Up to which depth the hierarchy should be searched.
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+        Raises:
+            ElementNotFound if an element with the given locator could not be
+            found.
+        """
         try:
             return ControlElement(
                 self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
@@ -278,6 +480,46 @@ class ControlElement:
         search_strategy: Literal["siblings", "all"] = "siblings",
         wait_for_element=False,
     ) -> List["ControlElement"]:
+        """
+        This method may be used to find multiple descendants of the current
+        element matching the given locator.
+
+        Args:
+            locator: The locator that should be used to find elements.
+
+            search_depth: Up to which depth the tree will be traversed.
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `wait_for_element` is True.
+
+            search_strategy:
+                The search strategy to be used to find elements.
+
+                `siblings` means that after the first element is found, the tree
+                    traversal should be stopped and only sibling elements will be
+                    searched.
+
+                `all` means that all the elements up to the given search depth
+                    will be searched.
+
+            wait_for_window: Defines whether the search should keep on searching
+                until an element with the given locator is found (note that if True
+                and no element was found an ElementNotFound is raised).
+
+        Note:
+            Keep in mind that by default the search strategy is for searching
+            `siblings` of the initial element found (so, by default, after the first
+            element is found a tree traversal is not done and only sibling elements
+            from the initial element are found).
+        """
         from robocorp.windows._find_ui_automation import find_ui_automation_wrappers
 
         return [
@@ -295,6 +537,11 @@ class ControlElement:
     def _iter_children_nodes(
         self, *, max_depth: int = 8
     ) -> Iterator["ControlTreeNode[ControlElement]"]:
+        """
+        Internal API to provide structure with a `ControlTreeNode` for printing.
+        Not part of the public API (should not be used by client code).
+        """
+
         from robocorp.windows._iter_tree import ControlTreeNode, iter_tree
         from robocorp.windows._ui_automation_wrapper import LocationInfo
 
@@ -309,6 +556,22 @@ class ControlElement:
             )
 
     def iter_children(self, *, max_depth: int = 8) -> Iterator["ControlElement"]:
+        """
+        Iterates over all of the children of this element up to the max_depth
+        provided.
+
+        Args:
+            max_depth: the maximum depth which should be iterated to.
+
+        Returns:
+            An iterator of `ControlElement` which provides the descendants of
+            this element.
+
+        Note:
+            Iteration over too many items can be slow. Try to keep the
+            max depth up to a minimum to avoid slow iterations.
+        """
+
         from robocorp.windows._iter_tree import iter_tree
         from robocorp.windows._ui_automation_wrapper import LocationInfo
 
@@ -395,86 +658,48 @@ class ControlElement:
                 except ActionNotPossible:
                     pass
 
-                for attr in control.list_attributes():
+                ui_automation_control = control.ui_automation_control
+                # Skip attributes which don't seem relevant.
+                skip_attributes = {
+                    "ValidKeys",
+                    "CreateControlFromControl",
+                    "CreateControlFromElement",
+                    "searchDepth",
+                    "searchFromControl",
+                    "searchInterval",
+                    "searchProperties",
+                }
+                for attr in dir(ui_automation_control):
+                    if attr.startswith("_") or attr in skip_attributes:
+                        continue
                     try:
-                        v = control.get_attribute(attr)
-                        if v:
-                            print(
-                                f"  {space}get_attribute({attr!r}) = {v}", file=stream
-                            )
+                        try:
+                            v = getattr(ui_automation_control, attr)
+                        except AttributeError:
+                            pass
+                        else:
+                            if v:
+                                if inspect.ismethod(v):
+                                    if not attr.startswith(
+                                        "Is"
+                                    ) and not attr.startswith("Has"):
+                                        continue
+
+                                    v = v()
+                                    print(
+                                        (
+                                            f"  {space}ui_automation_control."
+                                            f"{attr}() = {v}"
+                                        ),
+                                        file=stream,
+                                    )
+                                else:
+                                    print(
+                                        f"  {space}ui_automation_control.{attr} = {v}",
+                                        file=stream,
+                                    )
                     except ActionNotPossible:
                         pass
-
-    def get_attribute(
-        self,
-        attribute: str,
-        locator: Optional[Locator] = None,
-        timeout: Optional[float] = None,
-    ) -> str:
-        """Get attribute value of the element defined by the locator.
-
-        :param attribute: name of the attribute to get
-        :param locator: string locator or Control element
-        :param timeout: used to locate element from the locator
-            (not used if the locator is not specified).
-
-        :return: value of attribute
-
-        Example:
-
-        .. code-block:: robotframework
-
-            ${id}=   Get Attribute  type:Edit name:firstname   AutomationId
-        """
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
-        attr = hasattr(element.item, attribute)
-        if not attr:
-            raise ActionNotPossible(
-                f"Element found with {locator!r} does not have {attribute!r} attribute"
-            )
-        if callable(attr):
-            raise ActionNotPossible(
-                f"Can't access attribute {attribute!r} of element {element!r}"
-            )
-        return str(getattr(element.item, attribute))
-
-    def list_attributes(
-        self,
-        locator: Optional[Locator] = None,
-        timeout: Optional[float] = None,
-    ) -> List:
-        """List all element attributes.
-
-        :param locator: string locator or Control element
-        :param timeout: used to locate element from the locator
-            (not used if the locator is not specified).
-
-        :return: list of element attributes (strings)
-        """
-        # Skip attributes which don't seem relevant.
-        skip_attributes = {
-            "ValidKeys",
-            "CreateControlFromControl",
-            "CreateControlFromElement",
-            "Culture",
-            "searchDepth",
-            "searchFromControl",
-            "searchInterval",
-            "searchProperties",
-        }
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
-        element_attributes = [
-            e
-            for e in dir(element.item)
-            if not e.startswith("_") and e not in skip_attributes
-        ]
-        attributes = []
-
-        for attr_name in element_attributes:
-            attr = getattr(element.item, attr_name)
-            if not inspect.ismethod(attr):
-                attributes.append(attr_name)
-        return attributes
 
     def click(
         self,

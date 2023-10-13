@@ -1,3 +1,7 @@
+"""
+The `robocorp-windows` library is a library to be used to interact
+with native widgets on the Windows OS.
+"""
 import typing
 from functools import lru_cache
 from typing import List, Optional
@@ -104,7 +108,14 @@ def find_window(
         search_depth: The search depth to find the window (by default == 1, meaning
             that only top-level windows will be found).
 
-        timeout: The timeout to be used for the search.
+        timeout:
+            The search for a child with the given locator will be retried
+            until the given timeout elapses.
+
+            At least one full search up to the given depth will always be done
+            and the timeout will only take place afterwards.
+
+            If not given the global config timeout will be used.
 
         wait_time: The time to wait after finding the window. If not passed the
             default value found in the config is used.
@@ -115,11 +126,14 @@ def find_window(
         The `WindowElement` which should be used to interact with the window.
 
     Example:
+
+        ```python
         window = find_window('Calculator')
         window = find_window('name:Calculator')
         window = find_window('subname:Notepad')
         window = find_window('regex:.*Notepad')
         window = find_window('executable:Spotify.exe')
+        ```
     """
     return desktop().find_window(locator, search_depth, timeout, wait_time, foreground)
 
@@ -134,17 +148,39 @@ def find_windows(
     Finds all windows matching the given locator.
 
     Args:
-        locator: The locator which should be used to find windows.
+        locator: The locator which should be used to find windows (if not
+            given, all windows are returned).
+
         search_depth: The search depth to be used to find windows (by default
             equals 1, meaning that only top-level windows will be found).
-        timeout: The timeout to be used to search for windows (note: only
-            used if `wait_for_window` is `True`).
+
+        timeout:
+            The search for a child with the given locator will be retried
+            until the given timeout elapses.
+
+            At least one full search up to the given depth will always be done
+            and the timeout will only take place afterwards.
+
+            If not given the global config timeout will be used.
+
+            Only used if `wait_for_window` is True.
+
         wait_for_window: Defines whether the search should keep on searching
             until a window with the given locator is found (note that if True
-            and no window was found an ElementNotFound is raised).
+            and no window was found a ElementNotFound is raised).
 
     Returns:
-        The `WindowElement` which should be used to interact with the window.
+        The `WindowElement`s which should be used to interact with the window.
+
+    Example:
+
+        ```python
+        window = find_windows('Calculator')
+        window = find_windows('name:Calculator')
+        window = find_windows('subname:Notepad')
+        window = find_windows('regex:.*Notepad')
+        window = find_windows('executable:Spotify.exe')
+        ```
     """
 
     return desktop().find_windows(locator, search_depth, timeout, wait_for_window)

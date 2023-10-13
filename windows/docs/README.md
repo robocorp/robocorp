@@ -44,6 +44,7 @@ The property names available for matching are:
 `executable`: identifies a target window by its executable name (may be the full path or just basename). Example: `executable:notepad.exe`)
 `handle`: the target window handle. Example: `handle:21345`.
 `path`: identifies a target element by its index-based path traversal from the parent. Example `path:2|3|8|2`.
+`depth`: identifies a target element by its depth from the parent. Example `depth:2`.
 
 Note: it's possible to consider the parent/child hierarchy so that multiple
 matches are done when using `>`. Example: `name:Calculator > class:TextBlock`.
@@ -73,7 +74,7 @@ children elements from that parent for faster access).
 Note: when querying the information, APIs may have a `search_depth` or `max_depth` 
 parameter which can be specified to determine up to which depth a given element 
 may be found. It's not recommended to have a big depth value as bigger depths
-mean that more items have to be traversed to
-find an element which can make such searches slower (so, more queries with a
-shalower depth is recommended over less queries with a bigger depth).
+mean that more items have to be traversed to find an element which can make 
+such searches slower (so, more queries with a shalower depth is recommended 
+over less queries with a bigger depth).
 

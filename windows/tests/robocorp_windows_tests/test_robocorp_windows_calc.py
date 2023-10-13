@@ -213,7 +213,8 @@ def test_find_click_print_tree(calc_process) -> None:
 
     # Depends on which calc version is available.
     if "get_text() = '100'" not in val:
-        assert "get_attribute('Name') = 100" in val
+        assert "ui_automation_control.Name = 100" in val
+        assert "ui_automation_control.IsTopmost() = False" in val
         assert "get_value() = ''" in val
         assert "get_text() = None" in val
 

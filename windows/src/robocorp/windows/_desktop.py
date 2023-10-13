@@ -69,7 +69,7 @@ class Desktop(ControlElement):
 
             ```python
             from robocorp import windows
-            windows.find("Calculator > path:2|3").print_tree()
+            windows.find_window("Calculator").find("path:2|3").print_tree()
             ```
         """
 
@@ -80,9 +80,28 @@ class Desktop(ControlElement):
     def _iter_children_nodes(
         self, *, max_depth: int = 1
     ) -> Iterator["ControlTreeNode[ControlElement]"]:
+        """
+        Internal API to provide structure with a `ControlTreeNode` for printing.
+        Not part of the public API (should not be used by client code).
+        """
         return ControlElement._iter_children_nodes(self, max_depth=max_depth)
 
     def iter_children(self, *, max_depth: int = 1) -> Iterator["ControlElement"]:
+        """
+        Iterates over all of the children of this element up to the max_depth
+        provided.
+
+        Args:
+            max_depth: the maximum depth which should be iterated to.
+
+        Returns:
+            An iterator of `ControlElement` which provides the descendants of
+            this element.
+
+        Note:
+            Iteration over too many items can be slow. Try to keep the
+            max depth up to a minimum to avoid slow iterations.
+        """
         return ControlElement.iter_children(self, max_depth=max_depth)
 
     def find_window(
@@ -93,6 +112,36 @@ class Desktop(ControlElement):
         wait_time: Optional[float] = None,
         foreground: bool = True,
     ) -> "WindowElement":
+        """
+        Finds windows matching the given locator.
+
+        Args:
+            locator: The locator which should be used to find a window.
+
+            search_depth: The search depth to be used to find the window (by default
+                equals 1, meaning that only top-level windows will be found).
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+            wait_time:
+                The time to wait after the windows was found.
+
+                If not given the global config wait_time will be used.
+
+            foreground:
+                If True the matched window will be made the foreground window.
+
+        Raises:
+            ElementNotFound if a window with the given locator could not be
+            found.
+        """
         from robocorp.windows import _find_window
 
         return _find_window.find_window(
@@ -112,13 +161,37 @@ class Desktop(ControlElement):
         Args:
             locator: The locator which should be used to find windows (if not
                 given, all windows are returned).
+
             search_depth: The search depth to be used to find windows (by default
                 equals 1, meaning that only top-level windows will be found).
-            timeout: The timeout to be used to search for windows (note: only
-                used if `wait_for_window` is `True`).
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `wait_for_window` is True.
+
             wait_for_window: Defines whether the search should keep on searching
                 until a window with the given locator is found (note that if True
                 and no window was found a ElementNotFound is raised).
+
+        Returns:
+            The `WindowElement`s which should be used to interact with the window.
+
+        Example:
+
+            ```python
+            window = find_windows('Calculator')
+            window = find_windows('name:Calculator')
+            window = find_windows('subname:Notepad')
+            window = find_windows('regex:.*Notepad')
+            window = find_windows('executable:Spotify.exe')
+            ```
         """
         from robocorp.windows import _find_window
 
@@ -135,18 +208,40 @@ class Desktop(ControlElement):
         wait_time: Optional[float] = 0,
     ) -> int:
         """
-        Closes the windows matching the given locator.
+        Closes the windows matching the given locator. Note that internally
+        this will force-kill the processes with the related `pid` as well
+        as all of the child processes of that `pid`.
 
         Args:
             locator: The locator which should be used to find windows to be closed.
+
             search_depth: The search depth to be used to find windows (by default
                 equals 1, meaning that only top-level windows will be closed).
                 Note that windows are closed by force-killing the pid related
                 to the window.
+
+            timeout:
+                The search for a window with the given locator will be retried
+                until the given timeout elapses. At least one full search up to
+                the given depth will always be done and the timeout will only
+                take place afterwards (if `wait_for_window` is True).
+
+                Only used if `wait_for_window` is True.
+
+                If not given the global config timeout will be used.
+
+            wait_for_window: If True windows this method will keep searching for
+                windows until a window is found or until the timeout is reached
+                (an ElementNotFound is raised if no window was found until the
+                timeout is reached, otherwise an empty list is returned).
+
             wait_time: A time to wait after closing each window.
 
         Returns:
             The number of closed windows.
+
+        Raises:
+            ElementNotFound: if wait_for_window is True and the timeout was reached.
         """
 
         from robocorp.windows import config
@@ -168,7 +263,7 @@ class Desktop(ControlElement):
 
     def windows_run(self, text: str, wait_time: float = 1) -> None:
         """
-        Use Windows Run window to launch an application.
+        Use Windows `Run window` to launch an application.
 
         Activated by pressing `Win + R`. Then the app name is typed in and finally the
         "Enter" key is pressed.
@@ -180,7 +275,7 @@ class Desktop(ControlElement):
         """
 
         # NOTE(cmin764): The waiting time after each key set sending can be controlled
-        #  globally and individually with `Set Wait Time`.
+        #  globally and individually with the config wait_time.
         self.send_keys(keys="{Win}r")
         self.send_keys(keys=text, interval=0.01)
         self.send_keys(send_enter=True)
@@ -188,7 +283,7 @@ class Desktop(ControlElement):
 
     def windows_search(self, text: str, wait_time: float = 3.0) -> None:
         """
-        Use Windows search window to launch application.
+        Use Windows `search window` to launch application.
 
         Activated by pressing `win + s`.
 
