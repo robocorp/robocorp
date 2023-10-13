@@ -104,10 +104,6 @@ class _UIAutomationControlWrapper:
 
         self.update_geometry()
 
-    @property
-    def locator(self):
-        raise AssertionError("Deprecated. Access .location_info.query_locator instead.")
-
     def get_parent(self) -> Optional["_UIAutomationControlWrapper"]:
         parent = self.item.GetParentControl()
         if parent is None:
