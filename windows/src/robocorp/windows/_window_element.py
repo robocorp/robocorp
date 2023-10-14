@@ -95,12 +95,21 @@ class WindowElement(ControlElement):
         return self._wrapped.pid
 
     def is_active(self) -> bool:
+        """
+        Returns:
+            True if this is currently the active window and False otherwise.
+        """
         from robocorp.windows.vendored.uiautomation import uiautomation
 
         return self.handle == uiautomation.GetForegroundWindow()
 
     @property
     def executable(self) -> Optional[str]:
+        """
+        Returns:
+            The executable associated to this window (or None if it was
+            not possible to get it).
+        """
         if isinstance(self._executable, _ExecutableNotSetSentinel):
             executable: Optional[str] = None
             try:
@@ -121,25 +130,46 @@ class WindowElement(ControlElement):
         wait_time: Optional[float] = None,
         timeout: Optional[float] = None,
     ) -> "WindowElement":
-        """Get control of child window of the active window
-        by locator.
+        """
+        Find a child window of this window given its locator.
 
-        :param locator: string locator or Control element
-        :param foreground: True to bring window to foreground
-        :param wait_time: time to wait after activeting a window
-        :param timeout: float value in seconds, see keyword
-         ``Set Global Timeout``
-        :return: _UIAutomationControlWrapper object
+        Args:
+            locator: The locator which should be used to find a child window.
+
+            search_depth: The search depth to be used to find the window.
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+            wait_time:
+                The time to wait after the windows was found.
+
+                If not given the global config wait_time will be used.
+
+            foreground:
+                If True the matched window will be made the foreground window.
+
+        Raises:
+            ElementNotFound if a window with the given locator could not be
+            found.
 
         Example:
 
-        .. code-block:: robotframework
+            ```python
+            from robocorp import windows
+            sage = windows.find_window('subname:"Sage 50" type:Window')
 
-            Control Window   subname:"Sage 50" type:Window
             # actions on the main application window
             # ...
             # get control of child window of Sage application
-            Control Child Window   subname:"Test Company" depth:1
+            child_window = sage.find_child_window('subname:"Test Company" depth:1')
+            ```
         """
         from robocorp.windows import _find_window
 
@@ -152,18 +182,19 @@ class WindowElement(ControlElement):
             foreground,
         )
 
-    def foreground_window(self) -> "_UIAutomationControlWrapper":
-        """Bring the current active window or the window defined
-        by the locator to the foreground.
-
-        :param locator: string locator or Control element
-        :return: _UIAutomationControlWrapper object
+    def foreground_window(self) -> "WindowElement":
+        """
+        Bring this window to the foreground (note: `find_window` makes the
+        window the foreground window by default).
 
         Example:
 
-        .. code-block:: robotframework
-
-            ${window}=  Foreground Window   Calculator
+            ```python
+            from robocorp import windows
+            calculator = windows.find_window('Calculator', foreground=False)
+            ...
+            calculator.foreground_window()
+            ```
         """
         from robocorp.windows import config
         from robocorp.windows._find_ui_automation import _window_or_none
@@ -175,7 +206,7 @@ class WindowElement(ControlElement):
         _call_attribute_if_available(window.item, "SetFocus")
         _call_attribute_if_available(window.item, "SetActive")
         window.item.MoveCursorToMyCenter(simulateMove=config().simulate_mouse_movement)
-        return window
+        return self
 
     def _resize_window(self, *, attribute: str) -> bool:
         attr_func = getattr(self.ui_automation_control, attribute, None)
@@ -187,66 +218,139 @@ class WindowElement(ControlElement):
             return False
 
     def minimize_window(self) -> bool:
-        """Minimize the current active window or the window defined
-        by the locator.
+        """
+        Maximizes the window.
 
-        :param locator: string locator or element
-        :return: `_UIAutomationControlWrapper` object
+        Returns:
+            True if it was possible to minimize the window and False otherwise.
 
         Example:
 
-        .. code-block:: robotframework
-
-            ${window} =    Minimize Window  # Current active window
-            Minimize Window    executable:Spotify.exe
+            ```python
+            from robocorp import windows
+            windows.find_window('executable:Spotify.exe').minimize_window()
+            ```
         """
         return self._resize_window(attribute="Minimize")
 
     def maximize_window(self) -> bool:
-        """Maximize the current active window or the window defined
-        by the locator.
+        """
+        Maximizes the window.
 
-        :param locator: string locator or element
-        :return: `_UIAutomationControlWrapper` object
+        Returns:
+            True if it was possible to maximize the window and False otherwise.
 
         Example:
 
-        .. code-block:: robotframework
-
-            ${window} =    Maximize Window  # Current active window
-            Maximize Window    executable:Spotify.exe
+            ```python
+            from robocorp import windows
+            windows.find_window('executable:Spotify.exe').maximize_window()
+            ```
         """
         return self._resize_window(attribute="Maximize")
 
     def restore_window(self) -> bool:
-        """Window restore the current active window or the window
-        defined by the locator.
+        """
+        Restores the window.
 
-        :param locator: string locator or element
-        :return: `_UIAutomationControlWrapper` object
+        Returns:
+            True if it was possible to restore the window and False otherwise.
 
         Example:
 
-        .. code-block:: robotframework
-
-            ${window} =    Restore Window  # Current active window
-            Restore Window    executable:Spotify.exe
+            ```python
+            from robocorp import windows
+            windows.find_window('executable:Spotify.exe').restore_window()
+            ```
         """
         return self._resize_window(attribute="Restore")
 
-    def close_window(self) -> bool:
-        from robocorp.windows._processes import kill_process_and_subprocesses
+    def set_window_pos(
+        self, x: int, y: int, width: int, height: int
+    ) -> "WindowElement":
+        """
+        Sets the window position.
 
+        Args:
+            x: The x-coordinate of the window.
+            y: The y-coordinate of the window.
+            width: The width of the window.
+            height: The height of the window.
+
+        Example:
+
+            ```python
+            from robocorp import windows
+            desktop = windows.desktop()
+            explorer = windows.find_window('executable:explorer.exe')
+            # Set the size of the window to be half of the screen.
+            explorer.set_window_pos(0, 0, desktop.width / 2, desktop.height)
+            ```
+        """
+        from robocorp.windows.vendored.uiautomation.uiautomation import (
+            SWP,
+            SetWindowPos,
+        )
+
+        flags = SWP.SWP_ShowWindow
+        SetWindowPos(self.handle, 0, int(x), int(y), int(width), int(height), flags)
+        return self
+
+    def is_running(self) -> bool:
+        """
+        Returns:
+            True if the pid associated to this window is still running and False
+            otherwise.
+        """
         try:
             pid = self.pid
         except COMError:
-            return False  # It was closed by someone else in the meanwhile.
+            return False
 
         try:
             if not psutil.Process(pid).is_running():
                 return False
         except Exception:
             pass
+        return True
+
+    def close_window(
+        self,
+        use_close_button: bool = False,
+        close_button_locator: Locator = "control:ButtonControl name:Close",
+    ) -> bool:
+        """
+        Closes the windows matching the given locator.
+
+        Note that by default the process tree will be force-killed by using the
+        `pid` associated to this window. `use_close_button` can be set to True
+        to try to close it by clicking on the close button (in this case any
+        confirmation dialog must be explicitly handled).
+
+        Args:
+            use_close_button: If True tries to close the window by searching
+                for a button with the locator: 'control:ButtonControl name:Close'
+                and clicking on it (in this case any confirmation dialog must be
+                explicitly handled).
+
+            close_button_locator: Only used if `use_close_button` is True. This
+                is the locator to be used to find the close button.
+
+        Returns:
+            True if the window was closed by this function and False otherwise.
+        """
+        if not self.is_running():
+            return False  # It was closed by someone else in the meanwhile.
+
+        if use_close_button:
+            self.click(close_button_locator)
+            return True
+
+        try:
+            pid = self.pid
+        except COMError:
+            return False
+        from robocorp.windows._processes import kill_process_and_subprocesses
 
         self.logger.info("Closing window with name: %s (PID: %d)", self.name, pid)
         kill_process_and_subprocesses(pid)

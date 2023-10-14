@@ -207,11 +207,16 @@ class Desktop(ControlElement):
         timeout: Optional[float] = None,
         wait_for_window: bool = False,
         wait_time: Optional[float] = 0,
+        use_close_button: bool = False,
+        close_button_locator: Locator = "control:ButtonControl name:Close",
     ) -> int:
         """
-        Closes the windows matching the given locator. Note that internally
-        this will force-kill the processes with the related `pid` as well
-        as all of the child processes of that `pid`.
+        Closes the windows matching the given locator.
+
+        Note that by default the process tree will be force-killed by using the
+        `pid` associated to the window. `use_close_button` can be set to True
+        to try to close it by clicking on the close button (in this case any
+        confirmation dialog must be explicitly handled).
 
         Args:
             locator: The locator which should be used to find windows to be closed.
@@ -238,6 +243,14 @@ class Desktop(ControlElement):
 
             wait_time: A time to wait after closing each window.
 
+            use_close_button: If True tries to close the window by searching
+                for a button with the locator: 'control:ButtonControl name:Close'
+                and clicking on it (in this case any confirmation dialog must be
+                explicitly handled).
+
+            close_button_locator: Only used if `use_close_button` is True. This
+                is the locator to be used to find the close button.
+
         Returns:
             The number of closed windows.
 
@@ -256,7 +269,10 @@ class Desktop(ControlElement):
 
         closed = 0
         for element in windows_elements:
-            if element.close_window():
+            if element.close_window(
+                use_close_button=use_close_button,
+                close_button_locator=close_button_locator,
+            ):
                 closed += 1
                 if wait_time:
                     time.sleep(wait_time)
@@ -303,6 +319,9 @@ class Desktop(ControlElement):
     def get_win_version(self) -> str:
         """
         Windows only utility which returns the current Windows major version.
+
+        Returns:
+            The current Windows major version (i.e.: '10', '11').
         """
         # Windows terminal `ver` command is bugged, until that's fixed, check by build
         #  number. (the same applies for `platform.version()`)
@@ -316,7 +335,10 @@ class Desktop(ControlElement):
         return major
 
     def wait_for_active_window(
-        self, locator: Locator, timeout: Optional[float] = None
+        self,
+        locator: Locator,
+        timeout: Optional[float] = None,
+        wait_time: Optional[float] = None,
     ) -> "WindowElement":
         """
         Waits for a window with the given locator to be made active.
@@ -325,6 +347,7 @@ class Desktop(ControlElement):
             locator: The locator that the active window must match.
             timeout: Timeout to wait for a window with the given locator to be
                 made active.
+            wait_time: A time to wait after the active window is found.
 
         Raises:
             ElementNotFound if no window was found as active until the timeout
@@ -375,7 +398,6 @@ class Desktop(ControlElement):
         timeout_at = time.monotonic() + timeout
         while True:
             control = GetForegroundControl()
-
             while control is not None:
                 if control.GetParentControl() is None:
                     # We don't want to check the desktop itself
@@ -389,6 +411,11 @@ class Desktop(ControlElement):
                         el = WindowElement(
                             _UIAutomationControlWrapper(control, empty_location_info())
                         )
+
+                        if wait_time is None:
+                            wait_time = config().wait_time
+                        time.sleep(wait_time)
+
                         return el
 
                 control = control.GetParentControl()
@@ -421,57 +448,45 @@ class Desktop(ControlElement):
 
     def drag_and_drop(
         self,
-        source_element: Locator,
-        target_element: Locator,
+        source: "ControlElement",
+        target: "ControlElement",
         speed: float = 1.0,
-        copy: Optional[bool] = False,
+        hold_ctrl: Optional[bool] = False,
         wait_time: float = 1.0,
-        timeout: Optional[float] = None,
     ):
         """Drag and drop the source element into target element.
 
-        :param source: source element for the operation
-        :param target: target element for the operation
-        :param speed: adjust speed of operation, bigger value means more speed
-        :param copy: on True does copy drag and drop, defaults to move
-        :param wait_time: time to wait after drop, default 1.0 seconds
+        Args:
+            source: Source element for the operation.
+            target: Target element for the operation
+            speed: The speed at which the mouse should move to make the drag
+                (1 means regular speed, values bigger than 1 mean that
+                the mouse should move faster and values lower than 1 mean that
+                the mouse should move slower).
+            hold_ctrl: Whether the `Ctrl` key should be hold while doing the
+                drag and drop (on some cases this means that a copy of
+                the item should be done).
+            wait_time: Time to wait after drop, defaults to 1.0 second.
 
         Example:
 
-        .. code-block:: robotframework
+            ```python
+            # Get the opened explorer on the c:\\temp folder
+            from robocorp import windows
+            explorer1 = windows.find_window(r'name:C:\temp executable:explorer.exe')
+            explorer2 = windows.find_window(r'name:C:\temp2 executable:explorer.exe')
 
             # copying a file, report.html, from source (File Explorer) window
             # into a target (File Explorer) Window
-            # locator
-            Drag And Drop
-            ...    name:C:\\temp type:Windows > name:report.html type:ListItem
-            ...    name:%{USERPROFILE}\\Documents\\artifacts type:Windows > name:"Items View"
-            ...    copy=True
-
-        Example:
-
-        .. code-block:: robotframework
-
-            # moving *.txt files into subfolder within one (File Explorer) window
-            ${source_dir}=    Set Variable    %{USERPROFILE}\\Documents\\test
-            Control Window    name:${source_dir}
-            ${files}=    Find Files    ${source_dir}${/}*.txt
-            # first copy files to folder2
-            FOR    ${file}    IN    @{files}
-                Drag And Drop    name:${file.name}    name:folder2 type:ListItem    copy=True
-            END
-            # second move files to folder1
-            FOR    ${file}    IN    @{files}
-                Drag And Drop    name:${file.name}    name:folder1 type:ListItem
-            END
-        """  # noqa: E501
+            report_html = explorer1.find('name:report.html type:ListItem')
+            items_view = explorer2.find('name:"Items View"')
+            explorer.drag_and_drop(report_html, items_view, hold_ctrl=True)
+            ```
+        """
         import robocorp.windows.vendored.uiautomation as auto
-        from robocorp.windows import config
 
-        source = self.find(source_element, timeout=timeout)
-        target = self.find(target_element, timeout=timeout)
         try:
-            if copy:
+            if hold_ctrl:
                 auto.PressKey(auto.Keys.VK_CONTROL)
             auto.DragDrop(
                 source.xcenter,
@@ -482,9 +497,5 @@ class Desktop(ControlElement):
                 waitTime=wait_time,
             )
         finally:
-            if copy:
-                click_wait_time: float = (
-                    wait_time if wait_time is not None else config().wait_time
-                )
-                self._click_element(source, "Click", click_wait_time)
+            if hold_ctrl:
                 auto.ReleaseKey(auto.Keys.VK_CONTROL)

@@ -11,13 +11,13 @@ from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union
 from _ctypes import COMError
 
 from robocorp.windows._errors import ActionNotPossible, ElementNotFound
-from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
 from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
     from robocorp.windows._iter_tree import ControlTreeNode
+    from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
     from robocorp.windows.vendored.uiautomation.uiautomation import (
         Control,
         LegacyIAccessiblePattern,
@@ -36,12 +36,19 @@ def set_value_validator(expected: str, actual: str) -> bool:
 
 
 def _wait_time() -> float:
+    """
+    Internal API to get the global wait time (usually used as default when
+    one is not set in a given API).
+    """
     from robocorp.windows import config
 
     return config().wait_time
 
 
 def _simulate_move() -> bool:
+    """
+    Internal API to determine if the mouse movement should be simulated.
+    """
     from robocorp.windows import config
 
     return config().simulate_mouse_movement
@@ -355,6 +362,21 @@ class ControlElement:
         """
         return self._wrapped.ycenter
 
+    def has_valid_geometry(self) -> bool:
+        """
+        Returns:
+            True if the geometry of this element is valid and False otherwise.
+
+        Note:
+            This value is based on cached coordinates. Call `update_geometry()`
+            to check it based on the current bounds of the control.
+        """
+        if self.width == 0 or self.height == 0:
+            return False
+
+        left, top, right, bottom = self.rectangle
+        return not bool(left == -1 and top == -1 and right == -1 and bottom == -1)
+
     def update_geometry(self) -> None:
         """
         This method may be called to update the cached coordinates of the
@@ -509,7 +531,8 @@ class ControlElement:
             Keep in mind that by default the search strategy is for searching
             `siblings` of the initial element found (so, by default, after the first
             element is found a tree traversal is not done and only sibling elements
-            from the initial element are found).
+            from the initial element are found). Use the `all` search strategy to
+            search for all elements.
         """
         from robocorp.windows._find_ui_automation import find_ui_automation_wrappers
 
@@ -534,7 +557,10 @@ class ControlElement:
         """
 
         from robocorp.windows._iter_tree import ControlTreeNode, iter_tree
-        from robocorp.windows._ui_automation_wrapper import LocationInfo
+        from robocorp.windows._ui_automation_wrapper import (
+            LocationInfo,
+            _UIAutomationControlWrapper,
+        )
 
         for el in iter_tree(self._wrapped.item, max_depth):
             location_info = LocationInfo(None, el.depth, el.child_pos, el.path)
@@ -564,7 +590,10 @@ class ControlElement:
         """
 
         from robocorp.windows._iter_tree import iter_tree
-        from robocorp.windows._ui_automation_wrapper import LocationInfo
+        from robocorp.windows._ui_automation_wrapper import (
+            LocationInfo,
+            _UIAutomationControlWrapper,
+        )
 
         for el in iter_tree(self._wrapped.item, max_depth):
             location_info = LocationInfo(None, el.depth, el.child_pos, el.path)
@@ -958,19 +987,28 @@ class ControlElement:
         click_type: str,
         click_wait_time: float,
     ):
-        item = element.ui_automation_control
-        click_function = getattr(item, click_type, None)
+        control = element.ui_automation_control
+        click_function = getattr(control, click_type, None)
         if not click_function:
             raise ActionNotPossible(
-                f"Element {element!r} does not have {click_type!r} attribute"
+                f"Element {element!r} does not have the {click_type!r} attribute"
             )
         # Get a new fresh bounding box each time, since the element might have been
         #  moved from its initial spot.
-        rect = item.BoundingRectangle
-        if not rect or rect.width() == 0 or rect.height() == 0:
+        self.update_geometry()
+        if not self.has_valid_geometry():
+            if self.is_disposed():
+                raise ActionNotPossible(
+                    f"The element: {element!r} is already disposed. "
+                    "Please do a new search from the parent/root to get a new valid handle."
+                )
+
             raise ActionNotPossible(
-                f"Element {element!r} is not visible for clicking, use a string"
-                " locator and ensure the root window is in focus"
+                (
+                    f"Element {element!r} is not visible for clicking. Ensure the root "
+                    "window is the foreground window. If it is, consider doing a new "
+                    "search for this element as the current reference may no longer be valid."
+                )
             )
 
         log_message = f"{click_type}-ing element"
@@ -1130,13 +1168,14 @@ class ControlElement:
         wait_time: Optional[float] = None,
         send_enter: bool = False,
     ):
-        if send_enter:
-            keys += "{Enter}"
         if hasattr(control, "SendKeys"):
             if wait_time is None:
                 wait_time = _wait_time()
             cls.logger.info("Sending keys %r to control: %s", keys, control)
-            control.SendKeys(text=keys, interval=interval, waitTime=wait_time)
+            if keys:
+                control.SendKeys(text=keys, interval=interval, waitTime=wait_time)
+            if send_enter:
+                control.SendKeys(text="{Enter}", interval=interval, waitTime=wait_time)
         else:
             raise ActionNotPossible("Element does not have " "SendKeys' attribute")
 
@@ -1145,19 +1184,36 @@ class ControlElement:
         locator: Optional[Locator] = None,
         timeout: Optional[float] = None,
     ) -> Optional[str]:
-        """Get text from Control element defined by the locator.
+        """
+        Get text from element (for elements which allow the GetWindowText action).
 
-        Exception ``ActionNotPossible`` is raised if element does not
-        allow GetWindowText action.
+        Args:
+            locator: String locator or element object.
 
-        :param locator: String locator or element object.
-        :return: value of WindowText attribute of an element
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is given.
+
+        Returns:
+            The window text of an attribute.
 
         Example:
 
-        .. code-block:: robotframework
+            ```python
+            from robocorp import windows
+            window = windows.find_window('...')
+            date = window.get_text('type:Edit name:"Date of birth"')
+            ```
 
-            ${date} =  Get Text   type:Edit name:"Date of birth"
+        Raises:
+            ActionNotPossible if the text cannot be gotten from this element.
         """
         if not locator:
             element = self
