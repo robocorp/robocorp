@@ -9,7 +9,6 @@ from functools import partial
 from typing import (
     Any,
     Callable,
-    Dict,
     Iterator,
     List,
     Literal,
@@ -62,14 +61,11 @@ def request_action(queue):
         user_entered = input(
             """
 Choose action:
-print tree        (p): Prints the tree of reachable elements.
-                       The depth may be customized with max_depth=<value>.
-                       i.e.: p:max_depth=1
-filter            (f): Prints the reachable elements that match the given filter.
-                       i.e.: `f: name:"Calc` will show all lines 
-                       containing that substring.
+print tree        (p): Prints the reachable elements that match the given filter.
+                       i.e.: `p: name:"calc` will show all lines containing that 
+                       substring (case independent).
                        The max depth may be customizable with max_depth=<value>
-                       i.e.: f:max_depth=1 name:"Calc
+                       i.e.: p:max_depth=1 calc
 highlight         (h): Highlights all elements reachable given a locator. 
                        i.e.: `h: name:"Calculator"`.
 highlight mouse   (m): Highlights based on the mouse position. 
@@ -88,10 +84,7 @@ quit              (q): Stops the inspection.
 
         action = action.strip()
         params = params.strip()
-        if action in ("f", "filter"):
-            queue.put(("filter", params))
-
-        elif action in ("p", "print tree"):
+        if action in ("p", "print tree"):
             queue.put(("print tree", params))
 
         elif action in ("h", "highlight"):
@@ -806,7 +799,7 @@ class ElementInspector:
         search_depth: int = 8,
         timeout: Optional[float] = None,
         search_strategy: Literal["siblings", "all"] = "all",
-    ) -> bool:
+    ) -> Sequence["ControlElement"]:
         """
         Args:
             locator: If passed, entries matching the given locator will be highlighted.
@@ -816,7 +809,7 @@ class ElementInspector:
               or should a full tree traversal be done?
 
         Returns:
-            True if something is being highlighted.
+            The elements found which matched the given locator.
 
         Note:
             The stop_highlight must always be called afterwards (both to stop
@@ -841,20 +834,17 @@ class ElementInspector:
         else:
             matches = ()
 
-        found_matches = bool(matches)
-
         tk_handler_thread = self._tk_handler_thread
         rects = []
         for control_element in matches:
-            left, top, right, bottom = control_element.rectangle
-            if left == -1 and top == -1 and right == -1 and bottom == -1:
-                # print(f"Element skipped (invalid bounds): {control_element}")
+            if not control_element.has_valid_geometry():
                 continue
+            left, top, right, bottom = control_element.rectangle
             rects.append((left, top, right, bottom))
 
         tk_handler_thread.set_rects(rects)
         tk_handler_thread.loop()
-        return found_matches
+        return matches
 
     def stop_highlight(self) -> None:
         self._check_thread()
@@ -882,13 +872,6 @@ class ElementInspector:
         self._picker_thread.join()
         self._picker_thread = None
         self.stop_highlight()
-
-    def _interact_print_tree(self, params: str = ""):
-        kwargs: Dict[str, Any] = {}
-        max_depth, params = _extract_max_depth(params)
-        if max_depth:
-            kwargs["max_depth"] = max_depth
-        self.control_element.print_tree(**kwargs)
 
     def _interact_select_window(self, filter_str):
         available = self.list_windows()
@@ -925,10 +908,27 @@ class ElementInspector:
         max_depth, params = _extract_max_depth(params)
         if max_depth:
             kwargs["max_depth"] = max_depth
+        params = params.lower().strip()
         for child in self.control_element._iter_children_nodes(**kwargs):
             s = str(child)
-            if params in s:
+            if params in s.lower():
                 print(s)
+
+    def _print_highlight(self, found_matches: Sequence[ControlElement]):
+        print("Highlighting elements:")
+        elements_with_invalid_bounds = []
+        for m in found_matches:
+            if m.has_valid_geometry():
+                left, top, right, bottom = m.rectangle
+                print(f"{m} (left:{left}, right:{right}, top:{top}, bottom:{bottom})")
+            else:
+                elements_with_invalid_bounds.append(m)
+
+        if elements_with_invalid_bounds:
+            print("Elements with invalid bounds (NOT highlighted):")
+            for m in elements_with_invalid_bounds:
+                print(m)
+        input("Press enter to stop highlighting\n")
 
     def inspect(self) -> None:
         from queue import Queue
@@ -949,9 +949,6 @@ class ElementInspector:
                     self._interact_select_window(params)
 
                 elif action == "print tree":
-                    self._interact_print_tree(params)
-
-                elif action == "filter":
                     self._interact_print_filter(params)
 
                 elif action == "highlight all":
@@ -960,7 +957,8 @@ class ElementInspector:
                         if not found_matches:
                             print("No elements found.")
                         else:
-                            input("Press enter to stop highlighting\n")
+                            self._print_highlight(found_matches)
+
                     finally:
                         self.stop_highlight()
 
@@ -971,7 +969,7 @@ class ElementInspector:
                         if not found_matches:
                             print("No elements found.")
                         else:
-                            input("Press enter to stop highlighting\n")
+                            self._print_highlight(found_matches)
                     finally:
                         self.stop_highlight()
 

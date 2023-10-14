@@ -1,10 +1,9 @@
 import subprocess
-import time
 from typing import Iterator, Optional
 
 import pytest
 
-from robocorp.windows import config
+from robocorp.windows import config, wait_for_condition
 from robocorp.windows._window_element import WindowElement
 
 
@@ -14,22 +13,6 @@ def wait_for_process_exit(popen: subprocess.Popen, timeout=8):
         timeout=8,
         msg=lambda: f"Process did not close in {timeout} seconds.",
     )
-
-
-def wait_for_condition(condition, timeout=8, msg=None):
-    if msg is None:
-
-        def msg():
-            return f"Condition not reached in {timeout} seconds."
-
-    initial_time = time.monotonic()
-    timeout = 8
-    while True:
-        if condition():
-            break
-        if time.monotonic() - initial_time > timeout:
-            raise AssertionError(msg())
-        time.sleep(1 / 10)
 
 
 @pytest.fixture(autouse=True)

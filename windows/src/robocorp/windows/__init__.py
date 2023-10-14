@@ -1,18 +1,22 @@
+# ruff: noqa: F401
 """
 The `robocorp-windows` library is a library to be used to interact
 with native widgets on the Windows OS.
 """
+import time
 import typing
 from functools import lru_cache
-from typing import List, Optional
-
-from robocorp.windows._window_element import WindowElement
+from typing import Callable, List, Optional
 
 from ._desktop import Desktop
+from ._errors import ActionNotPossible, ElementDisposed, ElementNotFound
 from .protocols import Locator
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
+
+    from ._config import Config
+    from ._window_element import WindowElement
 
 
 def get_icon_from_file(path: str) -> Optional["Image"]:
@@ -52,30 +56,12 @@ def get_icon_from_file(path: str) -> Optional["Image"]:
     return _icon_from_file.get_icon_from_file(path)
 
 
-@lru_cache
-def config():
-    """
-    Provides an instance to configure the basic settings such as
-    the default timeout, whether to simulate mouse movements, showing
-    verbose errors on failures, etc.
+_cache_decorator = lru_cache
 
-    Returns:
-        Config object to be used to configure the settings.
-
-    Example:
-
-        ```
-        from robocorp import windows
-        config = windows.config()
-        config.verbose_errors = True
-        ```
-    """
-    from ._config import Config
-
-    return Config()
+# Robocorp log not available, use implementation that always returns
+# the same instance
 
 
-@lru_cache  # Always return the same instance.
 def desktop() -> Desktop:
     """
     Provides the desktop element (which is the root control containing
@@ -89,7 +75,36 @@ def desktop() -> Desktop:
     Returns:
         The Desktop element.
     """
-    return Desktop()
+    try:
+        from . import _func_robocorp_tasks_cache as mod
+    except ImportError:
+        from . import _func_lru_cache as mod  # type:ignore
+    return mod.desktop()
+
+
+def config() -> "Config":
+    """
+    Provides an instance to configure the basic settings such as
+    the default timeout, whether to simulate mouse movements, showing
+    verbose errors on failures, screenshot on error (when running with
+    robocorp-tasks), etc.
+
+    Returns:
+        Config object to be used to configure the settings.
+
+    Example:
+
+        ```
+        from robocorp import windows
+        config = windows.config()
+        config.verbose_errors = True
+        ```
+    """
+    try:
+        from . import _func_robocorp_tasks_cache as mod
+    except ImportError:
+        from . import _func_lru_cache as mod  # type:ignore
+    return mod.config()
 
 
 def find_window(
@@ -98,7 +113,7 @@ def find_window(
     timeout: Optional[float] = None,
     wait_time: Optional[float] = None,
     foreground: bool = True,
-) -> WindowElement:
+) -> "WindowElement":
     """
     Finds the first window matching the passed locator.
 
@@ -143,7 +158,7 @@ def find_windows(
     search_depth: int = 1,
     timeout: Optional[float] = None,
     wait_for_window: bool = False,
-) -> List[WindowElement]:
+) -> List["WindowElement"]:
     """
     Finds all windows matching the given locator.
 
@@ -184,3 +199,44 @@ def find_windows(
     """
 
     return desktop().find_windows(locator, search_depth, timeout, wait_for_window)
+
+
+def wait_for_condition(
+    condition: Callable[[], bool],
+    timeout: float = 8.0,
+    msg: Optional[Callable[[], str]] = None,
+):
+    """
+    A helper function to wait for some condition.
+    Args:
+        condition: The condition to be waited for.
+        timeout: The time to wait for the condition.
+        msg: An optional message to be shown in the exception if the condition
+            is not satisfied.
+
+    Raises:
+        TimeoutError: If the condition was not satisfied in the given timeout.
+
+    Example:
+
+        ```python
+        from robocorp import windows
+
+        calc_window = windows.find_window("name:Calculator")
+        calc_window.click("Close Calculator")
+        windows.wait_for_condition(calc_window.is_disposed)
+        ```
+    """
+    if msg is None:
+
+        def msg():
+            return f"Condition not reached in {timeout} seconds."
+
+    initial_time = time.monotonic()
+    timeout = 8
+    while True:
+        if condition():
+            break
+        if time.monotonic() - initial_time > timeout:
+            raise TimeoutError(msg())
+        time.sleep(1 / 10)
