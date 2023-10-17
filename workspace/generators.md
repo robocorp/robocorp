@@ -31,3 +31,10 @@ A few points to tick when assessing the tool:
 - Observations: Looks like the proprietary precursor of
   [OpenAPI generator](#openapi-generator). (fork
   [reasons](https://github.com/OpenAPITools/openapi-generator/blob/master/docs/qna.md))  
+
+## OpenAPI Python client
+
+- URL: https://github.com/openapi-generators/openapi-python-client
+- Command: `openapi-python-client generate --url https://robocorp.com/api/openapi.json`
+- Observations: It fails due to schema validation [errors](./openapi-errors.txt).
+  ([comment](https://github.com/openapi-generators/openapi-python-client/issues/107#issuecomment-1766614815))
