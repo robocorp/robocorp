@@ -25,6 +25,9 @@ from .protocols import Locator
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
+__version__ = "0.0.1"
+version_info = [int(x) for x in __version__.split(".")]
+
 
 def get_icon_from_file(path: str) -> Optional["Image"]:
     """
