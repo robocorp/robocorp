@@ -1,0 +1,3 @@
+Search(name:"'my name'")
+WARNINGS:
+Strings should be enclosed with " (double quotes), strings enclosed with single quotes will use the single quote as a part of the match.

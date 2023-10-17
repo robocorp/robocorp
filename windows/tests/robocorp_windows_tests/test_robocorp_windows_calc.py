@@ -39,11 +39,8 @@ def test_find_window_verbose_error(calculator_window_element: WindowElement) -> 
 
 
 def test_inspector_process(calculator_window_element: WindowElement) -> None:
-    from robocorp.windows._find_ui_automation import (
-        find_ui_automation_wrapper,
-        find_ui_automation_wrappers,
-    )
-    from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+    from robocorp.windows import desktop
+    from robocorp.windows._control_element import ControlElement
 
     # Ok, we have the tree structure for the calc elements. Now, given
     # an element we have to highlight it in the calculator.
@@ -61,28 +58,32 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
     #
     # Get the element by the name
     assert calculator_window_element.name == "Calculator"
-    calculator_window = find_ui_automation_wrapper("name:Calculator")
-    assert calculator_window.item.NativeWindowHandle == calculator_window_element.handle
+
+    calculator_window = find_window("name:Calculator")
+    assert (
+        calculator_window.ui_automation_control.NativeWindowHandle
+        == calculator_window_element.handle
+    )
 
     # Get by the handle
     assert (
-        find_ui_automation_wrapper(
-            f"handle:{calculator_window.item.NativeWindowHandle}"
-        ).item.NativeWindowHandle
+        find_window(
+            f"handle:{calculator_window.ui_automation_control.NativeWindowHandle}"
+        ).ui_automation_control.NativeWindowHandle
         == calculator_window_element.handle
     )
 
     # Get the element by the executable
     assert (
-        find_ui_automation_wrapper(
+        find_window(
             f"executable:{calculator_window_element.executable}"
-        ).item.NativeWindowHandle
+        ).ui_automation_control.NativeWindowHandle
         == calculator_window_element.handle
     )
 
     try:
         version_with_path = True
-        number_pad = find_ui_automation_wrapper('name:Calculator > name:"Number pad"')
+        number_pad = desktop().find('name:Calculator > name:"Number pad"')
         assert number_pad
         buttons_in = number_pad
     except ElementNotFound:
@@ -90,11 +91,11 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
         # isn't the same (it doesn't have the "Number pad")
         # So, use different locators.
         version_with_path = False
-        buttons_in = find_ui_automation_wrapper("name:Calculator > path:1|3")
+        buttons_in = desktop().find("name:Calculator > path:1|3")
         assert buttons_in
 
-    name_to_bt: Dict[str, _UIAutomationControlWrapper] = {}
-    for el in find_ui_automation_wrappers("class:Button", root_element=buttons_in):
+    name_to_bt: Dict[str, ControlElement] = {}
+    for el in buttons_in.find_many("class:Button"):
         name_to_bt[el.name] = el
 
     if version_with_path:
@@ -136,11 +137,11 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
 
     # Check class strategy getting sibling elements.
     name_to_bt = {}
-    for el in find_ui_automation_wrappers("class:Button", root_element=buttons_in):
+    for el in buttons_in.find_many("class:Button"):
         name_to_bt[el.name] = el
         assert el.location_info.query_locator == "class:Button"
 
-    assert len(find_ui_automation_wrappers(name_zero, root_element=buttons_in)) == 1
+    assert len(buttons_in.find_many(name_zero)) == 1
 
     # Test the path strategy (note: for the version without the path we already
     # used a path strategy before).
@@ -155,7 +156,7 @@ def test_inspector_process(calculator_window_element: WindowElement) -> None:
 
         assert five_path.startswith(number_pad_path)
         subpath = five_path[len(number_pad_path) + 1 :]
-        el_five = find_ui_automation_wrapper(f"path:{subpath}", root_element=number_pad)
+        el_five = number_pad.find(f"path:{subpath}")
         assert el_five.name == "5"
 
 
@@ -164,38 +165,31 @@ def test_find_click_print_tree(calc_process) -> None:
 
     from robocorp import windows
 
-    window = windows.find_window("name:Calculator")
+    window = windows.find_window("name:Calculator and depth:1")
     assert window is not None
 
     stream = StringIO()
     window.print_tree(stream)
     found = stream.getvalue()
 
-    windows.config().verbose_errors = False
     assert "name:Calculator" in found
     assert "1-1. " in found
 
-    try:
-        window.click("id:clearButton")
-    except ElementNotFound:
-        window.click("name:Clear")
+    window.click("id:clearButton or name:Clear")
     window.send_keys(keys="96+4=")
 
     with pytest.raises(ElementNotFound) as e:
-        window.click("id:this_is_not_there", timeout=0)
+        with windows.config().disabled_verbose_errors():
+            window.click("id:this_is_not_there", timeout=0)
 
     msg = str(e.value)
     assert "control:TextControl" not in msg
 
     with pytest.raises(ElementNotFound):
-        window.find("name:this_is_not_there", timeout=0)
+        with windows.config().disabled_verbose_errors():
+            window.find("name:this_is_not_there", timeout=0)
 
-    try:
-        result = window.find("name:Result", timeout=0)
-    except ElementNotFound:
-        windows.config().verbose_errors = True
-        result = window.find("id:CalculatorResults", timeout=0)
-        windows.config().verbose_errors = False
+    result = window.find("name:Result or id:CalculatorResults", timeout=0)
 
     # Check verbose errors.
     windows.config().verbose_errors = True

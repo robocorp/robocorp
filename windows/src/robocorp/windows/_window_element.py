@@ -3,7 +3,6 @@ import typing
 from typing import Any, Optional, Union
 
 import psutil
-from _ctypes import COMError
 
 from robocorp.windows._control_element import ControlElement
 from robocorp.windows._errors import ElementDisposed
@@ -302,6 +301,8 @@ class WindowElement(ControlElement):
             True if the pid associated to this window is still running and False
             otherwise.
         """
+        from _ctypes import COMError
+
         try:
             pid = self.pid
         except COMError:
@@ -339,6 +340,8 @@ class WindowElement(ControlElement):
         Returns:
             True if the window was closed by this function and False otherwise.
         """
+        from _ctypes import COMError
+
         if not self.is_running():
             return False  # It was closed by someone else in the meanwhile.
 

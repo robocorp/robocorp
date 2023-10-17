@@ -11,6 +11,7 @@ from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union
 from _ctypes import COMError
 
 from robocorp.windows._errors import ActionNotPossible, ElementNotFound
+from robocorp.windows._find_ui_automation import LocatorStrAndOrSearchParams
 from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
@@ -120,7 +121,7 @@ class ControlElement:
 
     def _find_ui_automation_wrapper(
         self,
-        locator: Optional[Locator] = None,
+        locator: Optional[LocatorStrAndOrSearchParams] = None,
         search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> "_UIAutomationControlWrapper":
@@ -464,7 +465,11 @@ class ControlElement:
             return self
         try:
             return ControlElement(
-                self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
+                self._find_ui_automation_wrapper(
+                    self._convert_locator_to_locator_and_or_search_params(locator),
+                    search_depth,
+                    timeout=timeout,
+                )
             )
         except ElementNotFound as e:
             from robocorp import windows
@@ -539,7 +544,7 @@ class ControlElement:
         return [
             ControlElement(x)
             for x in find_ui_automation_wrappers(
-                locator,
+                self._convert_locator_to_locator_and_or_search_params(locator),
                 search_depth,
                 root_element=self._wrapped,
                 timeout=timeout,
@@ -547,6 +552,18 @@ class ControlElement:
                 wait_for_element=wait_for_element,
             )
         ]
+
+    def _convert_locator_to_locator_and_or_search_params(
+        self, locator: Optional[Locator]
+    ) -> Optional[LocatorStrAndOrSearchParams]:
+        if locator is None:
+            return None
+        from robocorp.windows._match_ast import collect_search_params
+
+        locator_and_or_search_params = LocatorStrAndOrSearchParams(
+            locator, collect_search_params(locator)
+        )
+        return locator_and_or_search_params
 
     def _iter_children_nodes(
         self, *, max_depth: int = 8
@@ -1493,7 +1510,11 @@ class ControlElement:
     ) -> Optional["Image"]:
         from robocorp.windows._screenshot import screenshot
 
-        el = self._find_ui_automation_wrapper(locator, search_depth, timeout=timeout)
+        el = self._find_ui_automation_wrapper(
+            self._convert_locator_to_locator_and_or_search_params(locator),
+            search_depth,
+            timeout=timeout,
+        )
         img = screenshot(el.item)
         if img is None:
             return None
@@ -1590,7 +1611,10 @@ class ControlElement:
 
             Set Focus  name:Buy type:Button
         """
-        element = self._find_ui_automation_wrapper(locator, timeout=timeout)
+        element = self._find_ui_automation_wrapper(
+            self._convert_locator_to_locator_and_or_search_params(locator),
+            timeout=timeout,
+        )
         if not hasattr(element.item, "SetFocus"):
             raise ActionNotPossible(
                 f"Element found with {locator!r} does not have 'SetFocus' attribute"

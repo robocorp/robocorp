@@ -1,13 +1,11 @@
 def _start_explorer_at_folder(folder: str):
     from robocorp import windows
-    from robocorp.windows import ElementNotFound
 
     desktop = windows.desktop()
     desktop.send_keys("{win}e")
-    try:
-        explorer = desktop.wait_for_active_window("name:Home", timeout=2)
-    except ElementNotFound:
-        explorer = desktop.wait_for_active_window('name:"File Explorer"')
+    explorer = desktop.wait_for_active_window(
+        'name:Home or name:"File Explorer"', timeout=2
+    )
     explorer.send_keys("{alt}d")
     explorer.send_keys(folder, send_enter=True)
     return explorer
@@ -20,7 +18,6 @@ def test_copy_with_explorer(tmpdir):
     from robocorp_windows_tests.fixtures import wait_for_condition
 
     from robocorp import windows
-    from robocorp.windows._errors import ElementNotFound
 
     folder_a = tmpdir.join("folderA")
     folder_a.mkdir()
@@ -41,17 +38,11 @@ def test_copy_with_explorer(tmpdir):
 
     # copying a file, dummy_file.txt, from source (File Explorer) window
     # into a target (File Explorer) Window
-    try:
-        report_html = explorer1.find("name:dummy_file.txt type:ListItem", timeout=1)
-    except ElementNotFound:
-        try:
-            report_html = explorer1.find(
-                "name:dummy_file.txt control:ListItemControl", timeout=1
-            )
-        except ElementNotFound:
-            report_html = explorer1.find(
-                "name:dummy_file control:ListItemControl", timeout=1
-            )
+    report_html = explorer1.find(
+        "(name:dummy_file.txt type:ListItem) or "
+        "(name:dummy_file.txt control:ListItemControl) or "
+        "(name:dummy_file control:ListItemControl)"
+    )
     items_view = explorer2.find('name:"Items View"')
     desktop.drag_and_drop(report_html, items_view, hold_ctrl=True)
 

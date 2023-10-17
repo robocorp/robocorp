@@ -87,7 +87,6 @@ def test_inspect(calculator_window_element: WindowElement):
 
 
 def test_inspect_user_picks(calculator_window_element: WindowElement):
-    from robocorp.windows._errors import ElementNotFound
     from robocorp.windows._inspect import ElementInspector
     from robocorp.windows.vendored.uiautomation.uiautomation import SetCursorPos
 
@@ -100,12 +99,10 @@ def test_inspect_user_picks(calculator_window_element: WindowElement):
             found_elements.append(found)
             ev.set()
 
-        try:
-            el = calculator_window_element.find("name:Zero", timeout=0.3)
-        except ElementNotFound:
-            el = calculator_window_element.find(
-                "name:0 control:ButtonControl", timeout=0.3
-            )
+        # Check for new and old version of Windows.
+        el = calculator_window_element.find(
+            "name:Zero or (name:0 control:ButtonControl)", timeout=0.3
+        )
 
         element_inspector.start_picking(on_pick)
         try:

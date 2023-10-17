@@ -8,15 +8,22 @@ import typing
 from functools import lru_cache
 from typing import Callable, List, Optional
 
+from ._config import Config
+from ._control_element import ControlElement
 from ._desktop import Desktop
-from ._errors import ActionNotPossible, ElementDisposed, ElementNotFound
+from ._errors import (
+    ActionNotPossible,
+    ElementDisposed,
+    ElementNotFound,
+    InvalidLocatorError,
+    InvalidStrategyDuplicated,
+    ParseError,
+)
+from ._window_element import WindowElement
 from .protocols import Locator
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
-
-    from ._config import Config
-    from ._window_element import WindowElement
 
 
 def get_icon_from_file(path: str) -> Optional["Image"]:
@@ -56,10 +63,15 @@ def get_icon_from_file(path: str) -> Optional["Image"]:
     return _icon_from_file.get_icon_from_file(path)
 
 
-_cache_decorator = lru_cache
-
-# Robocorp log not available, use implementation that always returns
-# the same instance
+@lru_cache
+def __get_cache_mod():
+    try:
+        from . import _func_robocorp_tasks_cache as mod
+    except ImportError:
+        # `robocorp-tasks` not available, use implementation that always returns
+        # the same instance
+        from . import _func_lru_cache as mod  # type:ignore
+    return mod
 
 
 def desktop() -> Desktop:
@@ -75,11 +87,7 @@ def desktop() -> Desktop:
     Returns:
         The Desktop element.
     """
-    try:
-        from . import _func_robocorp_tasks_cache as mod
-    except ImportError:
-        from . import _func_lru_cache as mod  # type:ignore
-    return mod.desktop()
+    return __get_cache_mod().desktop()
 
 
 def config() -> "Config":
@@ -100,11 +108,7 @@ def config() -> "Config":
         config.verbose_errors = True
         ```
     """
-    try:
-        from . import _func_robocorp_tasks_cache as mod
-    except ImportError:
-        from . import _func_lru_cache as mod  # type:ignore
-    return mod.config()
+    return __get_cache_mod().config()
 
 
 def find_window(
@@ -240,3 +244,25 @@ def wait_for_condition(
         if time.monotonic() - initial_time > timeout:
             raise TimeoutError(msg())
         time.sleep(1 / 10)
+
+
+__all__ = [
+    "Desktop",
+    "ActionNotPossible",
+    "ElementDisposed",
+    "ElementNotFound",
+    "InvalidLocatorError",
+    "InvalidStrategyDuplicated",
+    "ParseError",
+    "Locator",
+    "get_icon_from_file",
+    "desktop",
+    "config",
+    "find_window",
+    "find_windows",
+    "wait_for_condition",
+    # These cannot be instantiated by the client, but they're available
+    # for isinstance/type checking.
+    "WindowElement",
+    "ControlElement",
+]

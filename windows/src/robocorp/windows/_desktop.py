@@ -21,13 +21,24 @@ class Desktop(ControlElement):
                 ControlElement (controls inside a window)
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         from robocorp.windows._config_uiautomation import _config_uiautomation
-        from robocorp.windows._find_ui_automation import find_ui_automation_wrapper
+        from robocorp.windows._find_ui_automation import (
+            LocatorStrAndOrSearchParams,
+            find_ui_automation_wrapper,
+        )
 
         _config_uiautomation()
 
-        ControlElement.__init__(self, find_ui_automation_wrapper("desktop"))
+        from robocorp.windows._match_ast import collect_search_params
+
+        locator = "desktop"
+        locator_and_or_search_params = LocatorStrAndOrSearchParams(
+            locator, collect_search_params(locator)
+        )
+        ControlElement.__init__(
+            self, find_ui_automation_wrapper(locator_and_or_search_params)
+        )
 
     # Overridden just to change the default max_depth to 1
     def print_tree(
@@ -196,6 +207,7 @@ class Desktop(ControlElement):
         """
         from robocorp.windows import _find_window
 
+        self._convert_locator_to_locator_and_or_search_params(locator)
         return _find_window.find_windows(
             None, locator, search_depth, timeout, wait_for_window, search_strategy="all"
         )
@@ -360,9 +372,10 @@ class Desktop(ControlElement):
         from robocorp.windows import config
         from robocorp.windows._errors import ElementNotFound
         from robocorp.windows._find_ui_automation import _matches
-        from robocorp.windows._find_window import _iter_window_locators
+        from robocorp.windows._find_window import restrict_to_window_locators
         from robocorp.windows._iter_tree import ControlTreeNode
-        from robocorp.windows._match_object import MatchObject
+        from robocorp.windows._match_ast import SearchParams, collect_search_params
+        from robocorp.windows._match_common import SearchType
         from robocorp.windows._ui_automation_wrapper import (
             _UIAutomationControlWrapper,
             empty_location_info,
@@ -372,11 +385,9 @@ class Desktop(ControlElement):
             GetForegroundControl,
         )
 
-        locator_parts = locator.split(MatchObject.TREE_SEP)
-        if not locator_parts:
-            raise AssertionError(f"The locator passed ({locator!r}) is not valid.")
-        if len(locator_parts) > 1:
-            raise AssertionError(
+        or_search_params_by_level = collect_search_params(locator)
+        if len(or_search_params_by_level) > 1:
+            raise ValueError(
                 f"The locator passed ({locator!r}) can only have one "
                 "level in this API ('>' not allowed)."
             )
@@ -384,16 +395,20 @@ class Desktop(ControlElement):
         if timeout is None:
             timeout = config().timeout
 
-        check_search_params = []
-        for loc in _iter_window_locators(locator):
-            search_params = MatchObject.parse_locator(loc).as_search_params()
+        or_search_params = or_search_params_by_level[0]
+
+        search_params: SearchType
+        for s in or_search_params.parts:
+            assert isinstance(s, SearchParams)
+            search_params = s.search_params
             if "depth" in search_params:
-                raise AssertionError('"depth" locator not valid for this API.')
+                raise ValueError('"depth" locator not valid for this API.')
             if "path" in search_params:
-                raise AssertionError('"path" locator not valid for this API.')
+                raise ValueError('"path" locator not valid for this API.')
             if "desktop" in search_params:
-                raise AssertionError('"desktop" locator not valid for this API.')
-            check_search_params.append(search_params)
+                raise ValueError('"desktop" locator not valid for this API.')
+
+        restrict_to_window_locators((or_search_params,))
 
         timeout_at = time.monotonic() + timeout
         while True:
@@ -403,7 +418,10 @@ class Desktop(ControlElement):
                     # We don't want to check the desktop itself
                     break
 
-                for search_params in check_search_params:
+                for part in or_search_params.parts:
+                    assert isinstance(part, SearchParams)
+                    search_params = part.search_params
+
                     tree_node: "ControlTreeNode[Control]" = ControlTreeNode(
                         control, 0, 0, ""
                     )

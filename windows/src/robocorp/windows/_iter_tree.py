@@ -1,5 +1,5 @@
 import typing
-from typing import Generic, Iterator, Optional, TypeVar
+from typing import Generic, Iterator, Optional, Set, TypeVar
 
 from _ctypes import COMError
 
@@ -47,7 +47,7 @@ class ControlTreeNode(Generic[Y]):
 def iter_tree(
     root_ctrl: "Control",
     max_depth: int = 8,
-    only_depth: Optional[int] = None,
+    only_depths: Optional[Set[int]] = None,
 ) -> Iterator[ControlTreeNode["Control"]]:
     """
     Iterates the tree as a flattened iterator (the depth is available in the node).
@@ -58,15 +58,16 @@ def iter_tree(
         max_depth:
             The maximum depth for the iteration.
 
-        only_depth:
-            If given, only elements at the given depth will be returned.
+        only_depths:
+            If given, only elements at the given depths will be returned
+            (1-based indexes)
 
     To get a nice representation it's possible to do something as:
         for control_node in iter_tree(...):
             print(control_node)
     """
-    if only_depth is not None:
-        max_depth = only_depth
+    if only_depths is not None:
+        max_depth = max(only_depths)
 
     # This code could be used to do a breadth first search (by default
     # we do a depth first search).
@@ -132,9 +133,9 @@ def iter_tree(
                 use_path = f"{child_pos}"
             curr = last_items.popleft()
             node = ControlTreeNode(curr, depth + 1, child_pos, use_path)
-            if only_depth is None:
+            if only_depths is None:
                 yield node
-            elif only_depth == depth + 1:
+            elif (depth + 1) in only_depths:
                 yield node
             if depth + 1 < max_depth:
                 try:
