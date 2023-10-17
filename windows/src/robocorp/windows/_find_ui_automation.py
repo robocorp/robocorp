@@ -1,18 +1,30 @@
 import re
 import time
+from dataclasses import dataclass
 from re import Pattern
-from typing import Dict, Iterator, List, Literal, Optional, Protocol, Union
+from typing import Dict, Iterator, List, Literal, Optional, Protocol, Set, Tuple, Union
 
 from _ctypes import COMError
 
-import robocorp.windows.vendored.uiautomation as auto  # type: ignore
-from robocorp.windows._iter_tree import ControlTreeNode
-from robocorp.windows._match_object import MatchObject, SearchType
-from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
-from robocorp.windows.protocols import Locator
-from robocorp.windows.vendored.uiautomation import Control
-
 from ._errors import ElementNotFound
+from ._iter_tree import ControlTreeNode
+from ._match_ast import OrSearchParams, SearchParams
+from ._match_common import SearchType
+from ._ui_automation_wrapper import _UIAutomationControlWrapper
+from .protocols import Locator
+from .vendored.uiautomation import Control
+
+
+@dataclass
+class LocatorStrAndOrSearchParams:
+    locator: Locator
+    or_search_params: Tuple[OrSearchParams, ...]
+
+    def __str__(self):
+        return self.locator
+
+    def __repr__(self):
+        return repr(self.locator)
 
 
 def _window_or_none(
@@ -32,10 +44,11 @@ def _window_or_none(
 
 
 def _get_desktop_control() -> "Control":
+    import robocorp.windows.vendored.uiautomation as auto
+
     root_control = auto.GetRootControl()
-    new_control = Control.CreateControlFromControl(root_control)
-    assert new_control is not None, "Did not expect RootControl to be None."
-    return new_control
+    assert root_control is not None, "Did not expect RootControl to be None."
+    return root_control
 
 
 def get_desktop_element() -> _UIAutomationControlWrapper:
@@ -60,6 +73,10 @@ def _cmp_subname(el: ControlTreeNode["Control"], search_value) -> bool:
 
 def _cmp_regex(el: ControlTreeNode["Control"], search_value) -> bool:
     return bool(re.match(search_value, el.control.Name))
+
+
+def _cmp_depth(el: ControlTreeNode["Control"], search_value) -> bool:
+    return el.depth == search_value
 
 
 def _cmp_executable(el: ControlTreeNode["Control"], search_value) -> bool:
@@ -93,7 +110,7 @@ _match_dispatch: Dict[Union[str, Pattern[str]], Union[str, ICompareFunc]] = {
     "handle": "NativeWindowHandle",
     "executable": _cmp_executable,
     # "desktop": -- handled directly as this is the root object.
-    # "depth": -- this is a property of the hierarchy
+    "depth": _cmp_depth,
     # "index": -- this is a property of the hierarchy
     # "path": -- this is a property of the hierarchy
     # "offset": "offset", -- not supported
@@ -128,7 +145,7 @@ def _get_control_from_path(
     for index, position in enumerate(path):
         children = current.GetChildren()
         if position > len(children):
-            partial_path = MatchObject.PATH_SEP.join(str(pos) for pos in path[:index])
+            partial_path = "|".join(str(pos) for pos in path[:index])
 
             raise ElementNotFound(
                 f"Unable to retrieve child on position {position!r} under a parent"
@@ -166,7 +183,7 @@ def _resolve_root(
 
 
 def _find_ui_automation_wrappers(
-    locator: Optional[Locator] = None,
+    locator: Optional[LocatorStrAndOrSearchParams] = None,
     search_depth: int = 8,
     root_element: Optional[_UIAutomationControlWrapper] = None,
     search_strategy: Literal["siblings", "all", "single"] = "single",
@@ -180,32 +197,33 @@ def _find_ui_automation_wrappers(
         yield _resolve_root(root_element)
         return
 
-    # split something as "name:Foo > name:Bar" to ["name:Foo", "name:Bar"]
-    locator_parts = locator.split(MatchObject.TREE_SEP)
-    if not locator_parts:
-        raise AssertionError(f"The locator passed ({locator!r}) is not valid.")
-
     root_control = _resolve_root(root_element).item
 
     # The timeout approach is the following: until we hit at least one object
     # with the given structure, we'll keep on searching, but at least one full
     # search should be done until the timeout is hit.
 
-    for i, locator_part in enumerate(locator_parts):
+    search_params_by_level = locator.or_search_params
+    match_level: OrSearchParams
+
+    for i, match_level in enumerate(search_params_by_level):
         if timeout_monitor and timeout_monitor.timed_out():
             return
 
-        is_last = i == len(locator_parts) - 1
+        is_last = i == len(search_params_by_level) - 1
         # Prepare control search parameters.
-        search_params = MatchObject.parse_locator(locator_part).as_search_params()
 
         if is_last:
             if search_strategy == "all":
-                for control_tree_node in _search_step(
-                    locator, root_control, search_params, search_depth, timeout_monitor
+                for control_tree_node, _found_params in _search_step(
+                    locator.locator,
+                    root_control,
+                    match_level,
+                    search_depth,
+                    timeout_monitor,
                 ):
                     location_info = build_from_locator_and_control_tree_node(
-                        locator,
+                        locator.locator,
                         control_tree_node,
                     )
 
@@ -215,11 +233,11 @@ def _find_ui_automation_wrappers(
                 return
 
         try:
-            root_control_tree_node = next(
+            root_control_tree_node, found_params = next(
                 _search_step(
-                    locator,
+                    locator.locator,
                     root_control,
-                    search_params,
+                    match_level,
                     search_depth,
                     timeout_monitor,
                 )
@@ -230,24 +248,27 @@ def _find_ui_automation_wrappers(
         else:
             if is_last:
                 location_info = build_from_locator_and_control_tree_node(
-                    locator,
+                    locator.locator,
                     root_control_tree_node,
                 )
 
                 yield _UIAutomationControlWrapper(root_control, location_info)
 
-                search_params.pop("desktop", None)
-                search_params.pop("path", None)
-                if not search_params:
+                found_params.pop("desktop", None)
+                found_params.pop("path", None)
+                if not found_params:
                     # Can't keep on searching for matches in this case
                     return
 
                 if search_strategy == "siblings":
                     # When searching siblings, we only search for the depth
                     # of the first found element anyways.
-                    search_params.pop("depth", None)
+                    found_params.pop("depth", None)
                     yield from _search_siblings(
-                        root_control_tree_node, root_control, search_params, locator
+                        root_control_tree_node,
+                        root_control,
+                        found_params,
+                        locator.locator,
                     )
                     return
                 assert search_strategy is None
@@ -258,69 +279,102 @@ def _find_ui_automation_wrappers(
 def _search_step(
     locator: str,
     root_control,
-    search_params,
+    or_search_params: OrSearchParams,
     search_depth,
     timeout_monitor: Optional["TimeoutMonitor"],
-) -> Iterator[ControlTreeNode["Control"]]:
+) -> Iterator[Tuple[ControlTreeNode["Control"], SearchType]]:
     from robocorp.windows._control_element import ControlElement
     from robocorp.windows._ui_automation_wrapper import (
         build_from_locator_and_control_tree_node,
     )
 
-    # Obtain an element with the search parameters.
-    if "desktop" in search_params:
-        control = _get_desktop_control()
-        yield ControlTreeNode(
-            control,
-            depth=0,
-            child_pos=0,
-            path="",
-        )
-        return
+    errors: List[str] = []
 
-    if "path" in search_params:
-        path_param = search_params["path"]
-        control = _get_control_from_path(search_params, root_control)
+    keep_searching: List[SearchType] = []
+    for s in or_search_params.parts:
+        # First check the heuristics to match it directly.
+        try:
+            assert isinstance(s, SearchParams)
+            search_params = s.search_params
 
-        path_str = "|".join(str(x) for x in path_param)
-        node = ControlTreeNode(
-            control,
-            depth=len(path_param),
-            child_pos=path_param[-1],
-            path=path_str,
-        )
-        remaining_params = search_params.copy()
-        remaining_params.pop("path")
-        if not remaining_params or _matches(remaining_params, node):
-            yield node
-            return
+            # Obtain an element with the search parameters.
+            if "desktop" in search_params:
+                control = _get_desktop_control()
+                yield (
+                    ControlTreeNode(
+                        control,
+                        depth=0,
+                        child_pos=0,
+                        path="",
+                    ),
+                    search_params,
+                )
+                return
 
-        location_info = build_from_locator_and_control_tree_node(locator, node)
-        # Convert to have the proper __str__ representation to show to the user.
-        as_el = ControlElement(_UIAutomationControlWrapper(control, location_info))
-        raise ElementNotFound(
-            f"Found element: '{str(as_el).strip()}' in path, but other "
-            f"search parameters ({remaining_params}) did not match."
-        )
+            if "path" in search_params:
+                path_param = search_params["path"]
+                control = _get_control_from_path(search_params, root_control)
 
-    only_depth: Optional[int] = None
-    if "depth" in search_params:
-        search_params = search_params.copy()
-        depth = int(search_params.pop("depth"))
-        search_depth = depth
-        only_depth = depth
+                path_str = "|".join(str(x) for x in path_param)
+                node = ControlTreeNode(
+                    control,
+                    depth=len(path_param),
+                    child_pos=path_param[-1],
+                    path=path_str,
+                )
+                remaining_params = search_params.copy()
+                remaining_params.pop("path")
+                if not remaining_params or _matches(remaining_params, node):
+                    yield (node, search_params)
+                    return
+
+                location_info = build_from_locator_and_control_tree_node(locator, node)
+                # Convert to have the proper __str__ representation to show to the user.
+                as_el = ControlElement(
+                    _UIAutomationControlWrapper(control, location_info)
+                )
+                raise ElementNotFound(
+                    f"Found element: '{str(as_el).strip()}' in path, but other "
+                    f"search parameters ({remaining_params}) did not match."
+                )
+
+            # Add it here if it didn't have 'desktop' nor 'path'.
+            keep_searching.append(search_params)
+        except ElementNotFound as e:
+            errors.append(str(e))
+
+    if not keep_searching:
+        if errors:
+            raise ElementNotFound("\n\n".join(errors))
+        raise ElementNotFound(f"Unable to find locator: {locator!r}")
+
+    # It didn't find it yet, fallback to the tree search.
+    found_depths: List[int] = []
+    for search_params in keep_searching:
+        if "depth" in search_params:
+            depth = int(search_params["depth"])
+            found_depths.append(depth)
+            search_depth = max(search_depth, depth)
+
+    only_depths: Optional[Set[int]] = None
+    if len(found_depths) == len(keep_searching):
+        # Ok, we can use it if it's the same for all (but otherwise, we need
+        # iterate all as at least one of the conditions doesn't have a depth).
+        only_depths = set(found_depths)
+        search_depth = max(only_depths)  # We can restrict the max to it.
 
     from robocorp.windows._iter_tree import iter_tree
 
     found = False
-    for el in iter_tree(root_control, max_depth=search_depth, only_depth=only_depth):
+    for el in iter_tree(root_control, max_depth=search_depth, only_depths=only_depths):
         if not found:
             # If we found one item, we cannot time-out anymore.
             if timeout_monitor and timeout_monitor.timed_out():
                 return
-        if _matches(search_params, el):
-            found = True
-            yield el
+        for search_params in keep_searching:
+            if _matches(search_params, el):
+                found = True
+                yield (el, search_params)
 
 
 def _search_siblings(
@@ -352,7 +406,7 @@ def _search_siblings(
 
 
 def find_ui_automation_wrapper(
-    locator: Optional[Locator] = None,
+    locator: Optional[LocatorStrAndOrSearchParams] = None,
     search_depth: int = 8,
     root_element: Optional[_UIAutomationControlWrapper] = None,
     timeout: Optional[float] = None,
@@ -393,7 +447,7 @@ def find_ui_automation_wrapper(
 
 
 def find_ui_automation_wrappers(
-    locator: Optional[Locator] = None,
+    locator: Optional[LocatorStrAndOrSearchParams] = None,
     search_depth: int = 8,
     root_element: Optional[_UIAutomationControlWrapper] = None,
     timeout: Optional[float] = None,

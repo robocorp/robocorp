@@ -1,21 +1,37 @@
 import time
-from typing import Iterator, List, Literal, Optional
+from typing import List, Literal, Optional, Tuple
 
 from robocorp.windows._errors import ElementNotFound
+from robocorp.windows._match_ast import OrSearchParams, SearchParams
 from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
 from robocorp.windows._window_element import WindowElement
 from robocorp.windows.protocols import Locator
 
 
-def _iter_window_locators(locator: Locator) -> Iterator[Locator]:
-    assert locator, "Empty locator passed."
+def restrict_to_window_locators(
+    or_search_params: Tuple[OrSearchParams, ...]
+) -> Tuple[OrSearchParams, ...]:
+    last_part: OrSearchParams = or_search_params[-1]
+    also_add_as_pane = []
+    for search_params in last_part.parts:
+        assert isinstance(search_params, SearchParams)
 
-    if "type:" in locator or "control:" in locator:
-        yield locator  # yields rigid string locator
-    else:
-        # yields flexible string locators with different types
-        yield f"{locator} type:WindowControl"
-        yield f"{locator} type:PaneControl"
+        # Ok, leave is is (the type is already defined)
+        if search_params.search_params.get(
+            "control", search_params.search_params.get("type")
+        ):
+            continue
+
+        # Now, for each search param we have to add a new entry where we check
+        # for both 'WindowControl' and 'PaneControl'
+        also_add_as_pane.append(search_params.copy())
+        search_params.search_params["type"] = "WindowControl"
+
+    for param in also_add_as_pane:
+        param.search_params["type"] = "PaneControl"
+        last_part.parts.append(param)
+
+    return or_search_params
 
 
 def find_window(
@@ -27,43 +43,48 @@ def find_window(
     foreground: bool = True,
 ) -> WindowElement:
     from robocorp import windows
+    from robocorp.windows._find_ui_automation import (
+        LocatorStrAndOrSearchParams,
+        find_ui_automation_wrapper,
+    )
+    from robocorp.windows._match_ast import collect_search_params
 
     config = windows.config()
-    window_element: WindowElement
-    locators = tuple(_iter_window_locators(locator))
+    or_search_params = collect_search_params(locator)
+    restrict_to_window_locators(or_search_params)
+
+    locator_and_or_search_params = LocatorStrAndOrSearchParams(
+        locator, or_search_params
+    )
 
     if timeout is None:
         timeout = config.timeout
 
     assert timeout is not None
-    timeout /= len(locators)
     if wait_time is None:
         wait_time = config.wait_time
 
-    for loc in locators:
-        from robocorp.windows._find_ui_automation import find_ui_automation_wrapper
-
-        try:
-            element = find_ui_automation_wrapper(
-                loc, search_depth, root_element=root_element, timeout=timeout
-            )
-            window_element = WindowElement(element)
-        except ElementNotFound:
-            continue
-        else:
-            if foreground:
-                window_element.foreground_window()
-            if wait_time:
-                time.sleep(wait_time)
-            return window_element
-
-    # No matches.
-    _raise_window_not_found(locator, timeout, root_element)
+    try:
+        element = find_ui_automation_wrapper(
+            locator_and_or_search_params,
+            search_depth,
+            root_element=root_element,
+            timeout=timeout,
+        )
+        window_element = WindowElement(element)
+        if foreground:
+            window_element.foreground_window()
+        if wait_time:
+            time.sleep(wait_time)
+        return window_element
+    except ElementNotFound:
+        # No matches.
+        _raise_window_not_found(locator, timeout, root_element)
     raise AssertionError("Should never get here.")  # Just to satisfy typing.
 
 
 def _raise_window_not_found(
-    locator, timeout, root_element: Optional[_UIAutomationControlWrapper]
+    locator: Locator, timeout, root_element: Optional[_UIAutomationControlWrapper]
 ):
     from robocorp import windows
 
@@ -91,7 +112,12 @@ def find_windows(
     search_strategy: Literal["siblings", "all"] = "all",
 ) -> List[WindowElement]:
     from robocorp import windows
-    from robocorp.windows._find_ui_automation import TimeoutMonitor
+    from robocorp.windows._find_ui_automation import (
+        LocatorStrAndOrSearchParams,
+        TimeoutMonitor,
+        find_ui_automation_wrappers,
+    )
+    from robocorp.windows._match_ast import collect_search_params
 
     config = windows.config()
     window_element: WindowElement
@@ -102,20 +128,25 @@ def find_windows(
     timeout_monitor = TimeoutMonitor(time.time() + timeout)
 
     ret: List[WindowElement] = []
-    from robocorp.windows._find_ui_automation import find_ui_automation_wrappers
 
-    for loc in _iter_window_locators(locator):
-        # Use no timeout here (just a single search).
-        for element in find_ui_automation_wrappers(
-            loc,
-            search_depth,
-            root_element=root_element,
-            timeout=0,
-            search_strategy=search_strategy,
-            wait_for_element=False,
-        ):
-            window_element = WindowElement(element)
-            ret.append(window_element)
+    or_search_params = collect_search_params(locator)
+    restrict_to_window_locators(or_search_params)
+
+    locator_and_or_search_params = LocatorStrAndOrSearchParams(
+        locator, or_search_params
+    )
+
+    # Use no timeout here (just a single search).
+    for element in find_ui_automation_wrappers(
+        locator_and_or_search_params,
+        search_depth,
+        root_element=root_element,
+        timeout=0,
+        search_strategy=search_strategy,
+        wait_for_element=False,
+    ):
+        window_element = WindowElement(element)
+        ret.append(window_element)
 
     while wait_for_window and not ret and not timeout_monitor.timed_out():
         # We have to keep on searching until the timeout is reached.
@@ -123,17 +154,16 @@ def find_windows(
         # inside that function) but we still pass the timeout_monitor so that
         # it may return early if the timeout was reached.
         time.sleep(1 / 15.0)
-        for loc in _iter_window_locators(locator):
-            for element in find_ui_automation_wrappers(
-                loc,
-                search_depth,
-                root_element=root_element,
-                search_strategy=search_strategy,
-                wait_for_element=False,
-                timeout_monitor=timeout_monitor,
-            ):
-                window_element = WindowElement(element)
-                ret.append(window_element)
+        for element in find_ui_automation_wrappers(
+            locator_and_or_search_params,
+            search_depth,
+            root_element=root_element,
+            search_strategy=search_strategy,
+            wait_for_element=False,
+            timeout_monitor=timeout_monitor,
+        ):
+            window_element = WindowElement(element)
+            ret.append(window_element)
 
     if wait_for_window and not ret:
         # No matches.

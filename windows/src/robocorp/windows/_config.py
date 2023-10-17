@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from typing import Literal
 
 
@@ -10,6 +11,9 @@ class Config:
     ```python
     from robocorp import windows
     config = windows.config()
+
+    config.simulate_mouse_movement = True
+    config.wait_time = .2
     ```
     """
 
@@ -44,3 +48,23 @@ class Config:
         import robocorp.windows.vendored.uiautomation as auto
 
         auto.uiautomation.TIME_OUT_SECOND = timeout
+
+    @contextmanager
+    def disabled_verbose_errors(self):
+        """
+        Verbose errors are useful but slow, so, if it's expected that errors will
+        be thrown at a given location it's possible to use the code below to
+        temporarily disable the error verbosity:
+
+        ```python
+        from robocorp import windows
+        with windows.config().disabled_verbose_errors():
+            ... # Operation that may throw ElementNotFound errors.
+        ```
+        """
+        initial = self.verbose_errors
+        self.verbose_errors = False
+        try:
+            yield
+        finally:
+            self.verbose_errors = initial

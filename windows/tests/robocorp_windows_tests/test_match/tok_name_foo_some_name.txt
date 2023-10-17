@@ -1,0 +1,5 @@
+name (TokenKind.strategy)
+Foo (TokenKind.value)
+or (TokenKind.or_token)
+name (TokenKind.strategy)
+"some name" (TokenKind.value)

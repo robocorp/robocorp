@@ -1,0 +1,5 @@
+( (TokenKind.parens_start)
+a (TokenKind.value)
+or (TokenKind.or_token)
+b (TokenKind.value)
+) (TokenKind.parens_end)

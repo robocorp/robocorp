@@ -49,7 +49,10 @@ def test_find(tk_process) -> None:
 
     window = find_window('name:"Tkinter Elements Showcase"')
 
-    window.find("path:1|5")
+    path_1_5 = window.find("path:1|5")
+    assert path_1_5.is_same_as(
+        window.find('desktop > name:"Tkinter Elements Showcase" depth:1 > path:1|5')
+    )
 
     # The path matches, but the class didn't match!
     with pytest.raises(ElementNotFound):

@@ -1,0 +1,1 @@
+Error. Expected token after 'or' to be of kind: 'parens_start', 'strategy', 'value', 'desktop'. Found the end of the locator instead.

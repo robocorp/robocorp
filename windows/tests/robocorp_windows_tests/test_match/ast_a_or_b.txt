@@ -1,0 +1,6 @@
+Or(Search(name:a) or Search(name:b))
+WARNINGS:
+No locator strategy found in: 'a' (using: 'name:"a"' as the locator).
+Valid strategies: ('automationid', 'class', 'control', 'depth', 'desktop', 'executable', 'handle', 'id', 'index', 'name', 'offset', 'path', 'process', 'regex', 'subname', 'type').
+No locator strategy found in: 'b' (using: 'name:"b"' as the locator).
+Valid strategies: ('automationid', 'class', 'control', 'depth', 'desktop', 'executable', 'handle', 'id', 'index', 'name', 'offset', 'path', 'process', 'regex', 'subname', 'type').

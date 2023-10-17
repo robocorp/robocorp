@@ -1,0 +1,4 @@
+Search(name:name:)
+WARNINGS:
+No locator strategy found in: 'name:' (using: 'name:"name:"' as the locator).
+Valid strategies: ('automationid', 'class', 'control', 'depth', 'desktop', 'executable', 'handle', 'id', 'index', 'name', 'offset', 'path', 'process', 'regex', 'subname', 'type').

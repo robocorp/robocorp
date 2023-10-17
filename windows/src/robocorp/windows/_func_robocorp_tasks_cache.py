@@ -3,6 +3,8 @@
 import typing
 from typing import Iterator
 
+# It's important that these imports are top-level as they should fail if
+# robocorp-tasks is not there.
 from robocorp.tasks import get_current_task, task_cache  # type:ignore
 
 if typing.TYPE_CHECKING:
