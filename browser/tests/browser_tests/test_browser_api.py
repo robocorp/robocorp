@@ -74,7 +74,7 @@ def test_browser_api(datadir, pyfile) -> None:
             from pathlib import Path
 
             from robocorp.browser import configure, configure_context, page
-            from robocorp.browser._browser_context import browser_context_kwargs
+            from robocorp.browser._context import browser_context_kwargs
 
             assert "viewport" not in browser_context_kwargs()
             configure(viewport_size=(755, 600))
@@ -117,7 +117,7 @@ def test_browser_type_launch_args(clear_session_caches, monkeypatch):
     import os
 
     from robocorp import browser
-    from robocorp.browser._browser_context import browser_type_launch_args
+    from robocorp.browser._context import browser_type_launch_args
 
     default_headless = not os.environ.get(
         "GITHUB_ACTIONS_MATRIX_NAME"

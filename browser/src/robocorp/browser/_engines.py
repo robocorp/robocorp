@@ -3,30 +3,12 @@ import platform
 import subprocess
 import sys
 import threading
-from enum import Enum
-from functools import lru_cache
 from pathlib import Path
-from typing import BinaryIO, List
+from typing import BinaryIO, List, Optional
 
 from robocorp import log
 
-
-class InstallError(RuntimeError):
-    """Error encountered during browser install"""
-
-
-class BrowserEngine(str, Enum):
-    """Valid browser engines for Playwright."""
-
-    CHROMIUM = "chromium"
-    CHROME = "chrome"
-    CHROME_BETA = "chrome-beta"
-    MSEDGE = "msedge"
-    MSEDGE_BETA = "msedge-beta"
-    MSEDGE_DEV = "msedge-dev"
-    FIREFOX = "firefox"
-    WEBKIT = "webkit"
-
+from ._types import BrowserEngine, InstallError
 
 # Map of BrowserEngine to Playwright driver & channel
 ENGINE_TO_ARGS = {
@@ -41,12 +23,28 @@ ENGINE_TO_ARGS = {
 }
 
 
-@lru_cache
-def browsers_path() -> Path:
+def _holotree_path() -> Optional[Path]:
+    if holotree := os.getenv("RCC_HOLOTREE_SPACE_ROOT"):
+        return Path(holotree) / "robocorp" / "playwright"
+    return None
+
+
+def _robocorp_home_path() -> Path:
     if platform.system() == "Windows":
         return Path.home() / "AppData" / "Local" / "robocorp" / "playwright"
     else:
         return Path.home() / ".robocorp" / "playwright"
+
+
+def browsers_path(isolated: bool = False) -> Path:
+    if isolated:
+        path = _holotree_path()
+        if path is None:
+            raise InstallError("Not inside isolated environment")
+    else:
+        path = _robocorp_home_path()
+
+    return path
 
 
 def _build_install_command_line(engine, force):
@@ -61,16 +59,21 @@ def _build_install_command_line(engine, force):
     return cmd
 
 
-def install_browser(engine: BrowserEngine, force=False, interactive=False):
+def install_browser(
+    engine: BrowserEngine,
+    force: bool = False,
+    interactive: bool = False,
+    isolated: bool = False,
+) -> Path:
     from concurrent import futures
 
     cmd = _build_install_command_line(engine, force)
     name = BrowserEngine(engine).value
 
+    path = browsers_path(isolated=isolated)
     env = dict(os.environ)
-    path = str(browsers_path())
-    env["PLAYWRIGHT_BROWSERS_PATH"] = path
-    log.info(f"Installing browsers at: {path} (interactive: {interactive}).")
+    env["PLAYWRIGHT_BROWSERS_PATH"] = str(path)
+    log.info(f"Installing browsers at: {path} (interactive: {interactive})")
 
     if interactive:
         # This can take a while, but the output should be seen in 'sys.stderr',
@@ -166,3 +169,5 @@ def install_browser(engine: BrowserEngine, force=False, interactive=False):
                 + f"Return code: {returncode}\n"
                 + f"Output: {stdout}\n"
             )
+
+    return path
