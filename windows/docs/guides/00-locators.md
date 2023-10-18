@@ -17,25 +17,25 @@ Note: `>` must always be top-level and may not appear inside an `or`.
 
 The property names available for matching are:
 
-`name`: identifies a target window/control by its `name`. Example: `name:"My Window"`.
+- `name`: identifies a target window/control by its `name`. Example: `name:"My Window"`.
 
-`regex`: identifies a target window/control by its `name` matching using a regexp. Example: `regex:".*Calc.*"`.
+- `regex`: identifies a target window/control by its `name` matching using a regexp. Example: `regex:".*Calc.*"`.
 
-`subname` identifies a target window/control by its `name` matching using the `in` operator. Example: `subname:cal"`.
+- `subname` identifies a target window/control by its `name` matching using the `in` operator. Example: `subname:cal"`.
 
-`class`: identifies a target window/control by its `class`. Example: `control:Button`, `control:TextBlock`.
+- `class`: identifies a target window/control by its `class`. Example: `control:Button`, `control:TextBlock`.
 
-`control` (may also be used as `class`): identifies a target window/control by its `type`. Example: `control:ButtonControl`, `control:ButtonControl`.
+- `control` (may also be used as `class`): identifies a target window/control by its `type`. Example: `control:ButtonControl`, `control:ButtonControl`.
 
-`id` (may also be used as `automationid`): identifies a target window/control by its `automation id`. Example: `id:"open button"`.
+- `id` (may also be used as `automationid`): identifies a target window/control by its `automation id`. Example: `id:"open button"`.
 
-`executable`: identifies a target window by its executable name (may be the full path or just basename). Example: `executable:notepad.exe`)
+- `executable`: identifies a target window by its executable name (may be the full path or just basename). Example: `executable:notepad.exe`)
 
-`handle`: the target window handle. Example: `handle:21345`.
+- `handle`: the target window handle. Example: `handle:21345`.
 
-`path`: identifies a target element by its index-based path traversal from the parent. Example `path:2|3|8|2`.
+- `path`: identifies a target element by its index-based path traversal from the parent. Example `path:2|3|8|2`.
 
-`depth`: identifies a target element by its depth from the parent. Example `depth:2`.
+- `depth`: identifies a target element by its depth from the parent. Example `depth:2`.
 
 It's also possible to get an element and then go deeper in the structure to have the
 same result.

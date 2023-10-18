@@ -50,10 +50,10 @@ Hovering over the record button of Notepad++ will print something as:
 
 In this case some valid locators to reach it could be:
 
-`name:"Start Recording"`
-`control:ButtonControl`
-`class:ToolbarWindow32 > control:ButtonControl and name:"Start Recording"`
-`path:5|1|35`
+- `name:"Start Recording"`
+- `control:ButtonControl`
+- `class:ToolbarWindow32 > control:ButtonControl and name:"Start Recording"`
+- `path:5|1|35`
 
 Note that it's important to select a locator that will uniquely identify the
 element (so, for instance the `control:ButtonControl` may not be ideal because
@@ -63,7 +63,7 @@ Also, it's important to note that when a given element is printed, in the
 inspector you can interact with it to know whether it's actually valid,
 so, for instance, it's possible to test a locator with:
 
-`h:control:ButtonControl`
+    `h:control:ButtonControl`
 
 to see which elements would be selected by it.
 
