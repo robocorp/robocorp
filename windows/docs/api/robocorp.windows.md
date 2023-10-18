@@ -1290,7 +1290,7 @@ ______________________________________________________________________
 
 ### method `click`
 
-**Source:** [`_control_element.py:741`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L741)
+**Source:** [`_control_element.py:754`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L754)
 
 ```python
 click(
@@ -1354,7 +1354,7 @@ ______________________________________________________________________
 
 ### method `double_click`
 
-**Source:** [`_control_element.py:806`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L806)
+**Source:** [`_control_element.py:819`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L819)
 
 ```python
 double_click(
@@ -1509,7 +1509,7 @@ ______________________________________________________________________
 
 ### method `get_text`
 
-**Source:** [`_control_element.py:1236`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1236)
+**Source:** [`_control_element.py:1249`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1249)
 
 ```python
 get_text(
@@ -1553,7 +1553,7 @@ ______________________________________________________________________
 
 ### method `get_value`
 
-**Source:** [`_control_element.py:1298`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1298)
+**Source:** [`_control_element.py:1311`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1311)
 
 ```python
 get_value(
@@ -1699,7 +1699,7 @@ ______________________________________________________________________
 
 ### method `log_screenshot`
 
-**Source:** [`_control_element.py:1686`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1686)
+**Source:** [`_control_element.py:1699`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1699)
 
 ```python
 log_screenshot(
@@ -1745,7 +1745,7 @@ ______________________________________________________________________
 
 ### method `middle_click`
 
-**Source:** [`_control_element.py:941`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L941)
+**Source:** [`_control_element.py:954`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L954)
 
 ```python
 middle_click(
@@ -1811,6 +1811,18 @@ The clicked element.
 
 ______________________________________________________________________
 
+### method `mouse_hover`
+
+**Source:** [`_control_element.py:741`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L741)
+
+```python
+mouse_hover() → None
+```
+
+Moves the mouse to the center of this element to simulate a mouse hovering.
+
+______________________________________________________________________
+
 ### method `print_tree`
 
 **Source:** [`_control_element.py:623`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L623)
@@ -1861,7 +1873,7 @@ ______________________________________________________________________
 
 ### method `right_click`
 
-**Source:** [`_control_element.py:874`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L874)
+**Source:** [`_control_element.py:887`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L887)
 
 ```python
 right_click(
@@ -1925,7 +1937,7 @@ ______________________________________________________________________
 
 ### method `screenshot`
 
-**Source:** [`_control_element.py:1624`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1624)
+**Source:** [`_control_element.py:1637`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1637)
 
 ```python
 screenshot(
@@ -1975,7 +1987,7 @@ ______________________________________________________________________
 
 ### method `screenshot_pil`
 
-**Source:** [`_control_element.py:1569`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1569)
+**Source:** [`_control_element.py:1582`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1582)
 
 ```python
 screenshot_pil(
@@ -2020,7 +2032,7 @@ ______________________________________________________________________
 
 ### method `select`
 
-**Source:** [`_control_element.py:1066`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1066)
+**Source:** [`_control_element.py:1079`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1079)
 
 ```python
 select(
@@ -2069,7 +2081,7 @@ ______________________________________________________________________
 
 ### method `send_keys`
 
-**Source:** [`_control_element.py:1130`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1130)
+**Source:** [`_control_element.py:1143`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1143)
 
 ```python
 send_keys(
@@ -2143,7 +2155,7 @@ ______________________________________________________________________
 
 ### method `set_focus`
 
-**Source:** [`_control_element.py:1754`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1754)
+**Source:** [`_control_element.py:1767`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1767)
 
 ```python
 set_focus(
@@ -2181,7 +2193,7 @@ ______________________________________________________________________
 
 ### method `set_value`
 
-**Source:** [`_control_element.py:1423`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1423)
+**Source:** [`_control_element.py:1436`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1436)
 
 ```python
 set_value(
@@ -2190,7 +2202,7 @@ set_value(
     enter: bool = False,
     newline: bool = False,
     send_keys_fallback: bool = True,
-    validator: Optional[Callable] = <function set_value_validator at 0x000001CAC16296C0>,
+    validator: Optional[Callable] = <function set_value_validator at 0x0000017817CA9630>,
     locator: Optional[str] = None,
     search_depth: int = 8,
     timeout: Optional[float] = None
