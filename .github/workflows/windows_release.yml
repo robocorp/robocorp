@@ -1,0 +1,44 @@
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - "robocorp-windows-*"
+
+defaults:
+  run:
+    working-directory: './windows'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v3
+
+    - name: Install poetry
+      run: pipx install poetry
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+        cache: 'poetry'
+
+    - name: Install project
+      run: poetry install
+
+    - name: Check tag version
+      run: poetry run invoke check-tag-version
+
+    - name: Build with poetry
+      run: poetry build
+
+    - name: Upload to PyPI
+      run: |
+        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_WINDOWS }}
+        poetry publish
