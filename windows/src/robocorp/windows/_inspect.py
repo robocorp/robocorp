@@ -28,7 +28,7 @@ from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
     from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows.vendored.uiautomation.uiautomation import Control
+    from robocorp.windows._vendored.uiautomation.uiautomation import Control
 
 
 NOT_AVAILABLE = "N/A"
@@ -442,7 +442,7 @@ def build_parent_hierarchy(
         LocationInfo,
         _UIAutomationControlWrapper,
     )
-    from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
+    from robocorp.windows._vendored.uiautomation.uiautomation import ControlsAreSame
 
     if up_to_parent is None:
         up_to_parent = ControlElement(get_desktop_element())
@@ -572,7 +572,7 @@ class _PickerThread(threading.Thread):
             _UIAutomationControlWrapper,
             empty_location_info,
         )
-        from robocorp.windows.vendored import uiautomation
+        from robocorp.windows._vendored import uiautomation
 
         try:
             control = uiautomation.ControlFromPoint(*cursor_pos)
@@ -604,8 +604,8 @@ class _PickerThread(threading.Thread):
             LocationInfo,
             _UIAutomationControlWrapper,
         )
-        from robocorp.windows.vendored import uiautomation
-        from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
+        from robocorp.windows._vendored import uiautomation
+        from robocorp.windows._vendored.uiautomation.uiautomation import ControlsAreSame
 
         if parent is None:
             parent = self.control_element
@@ -714,7 +714,7 @@ class _PickerThread(threading.Thread):
             traceback.print_exc()
 
     def _run(self) -> None:
-        from robocorp.windows.vendored.uiautomation.uiautomation import (
+        from robocorp.windows._vendored.uiautomation.uiautomation import (
             GetCursorPos,
             UIAutomationInitializerInThread,
         )

@@ -5,7 +5,7 @@ from typing import Optional
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
-    from robocorp.windows.vendored.uiautomation.uiautomation import Control
+    from robocorp.windows._vendored.uiautomation.uiautomation import Control
 
 
 log = logging.getLogger(__name__)

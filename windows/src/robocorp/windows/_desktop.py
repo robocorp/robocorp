@@ -8,7 +8,7 @@ from robocorp.windows.protocols import Locator
 if typing.TYPE_CHECKING:
     from robocorp.windows._iter_tree import ControlTreeNode
     from robocorp.windows._window_element import WindowElement
-    from robocorp.windows.vendored.uiautomation.uiautomation import Control
+    from robocorp.windows._vendored.uiautomation.uiautomation import Control
 
 
 class Desktop(ControlElement):
@@ -381,7 +381,7 @@ class Desktop(ControlElement):
             empty_location_info,
         )
         from robocorp.windows._window_element import WindowElement
-        from robocorp.windows.vendored.uiautomation.uiautomation import (
+        from robocorp.windows._vendored.uiautomation.uiautomation import (
             GetForegroundControl,
         )
 
@@ -501,7 +501,7 @@ class Desktop(ControlElement):
             explorer.drag_and_drop(report_html, items_view, hold_ctrl=True)
             ```
         """
-        import robocorp.windows.vendored.uiautomation as auto
+        import robocorp.windows._vendored.uiautomation as auto
 
         try:
             if hold_ctrl:

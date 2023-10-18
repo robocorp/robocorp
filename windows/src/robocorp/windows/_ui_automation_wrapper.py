@@ -8,7 +8,7 @@ from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
     from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows.vendored.uiautomation.uiautomation import Control
+    from robocorp.windows._vendored.uiautomation.uiautomation import Control
 
 
 @dataclass

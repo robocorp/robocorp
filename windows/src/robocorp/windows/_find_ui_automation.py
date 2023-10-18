@@ -12,7 +12,7 @@ from ._match_ast import OrSearchParams, SearchParams
 from ._match_common import SearchType
 from ._ui_automation_wrapper import _UIAutomationControlWrapper
 from .protocols import Locator
-from .vendored.uiautomation import Control
+from ._vendored.uiautomation import Control
 
 
 @dataclass
@@ -44,7 +44,7 @@ def _window_or_none(
 
 
 def _get_desktop_control() -> "Control":
-    import robocorp.windows.vendored.uiautomation as auto
+    import robocorp.windows._vendored.uiautomation as auto
 
     root_control = auto.GetRootControl()
     assert root_control is not None, "Did not expect RootControl to be None."

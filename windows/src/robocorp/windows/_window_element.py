@@ -98,7 +98,7 @@ class WindowElement(ControlElement):
         Returns:
             True if this is currently the active window and False otherwise.
         """
-        from robocorp.windows.vendored.uiautomation import uiautomation
+        from robocorp.windows._vendored.uiautomation import uiautomation
 
         return self.handle == uiautomation.GetForegroundWindow()
 
@@ -286,7 +286,7 @@ class WindowElement(ControlElement):
             explorer.set_window_pos(0, 0, desktop.width / 2, desktop.height)
             ```
         """
-        from robocorp.windows.vendored.uiautomation.uiautomation import (
+        from robocorp.windows._vendored.uiautomation.uiautomation import (
             SWP,
             SetWindowPos,
         )

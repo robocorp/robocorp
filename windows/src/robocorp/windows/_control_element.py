@@ -19,7 +19,7 @@ if typing.TYPE_CHECKING:
 
     from robocorp.windows._iter_tree import ControlTreeNode
     from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
-    from robocorp.windows.vendored.uiautomation.uiautomation import (
+    from robocorp.windows._vendored.uiautomation.uiautomation import (
         Control,
         LegacyIAccessiblePattern,
         ValuePattern,
@@ -115,7 +115,7 @@ class ControlElement:
             True if this elements points to the same element represented
             by the other control.
         """
-        from robocorp.windows.vendored.uiautomation.uiautomation import ControlsAreSame
+        from robocorp.windows._vendored.uiautomation.uiautomation import ControlsAreSame
 
         return ControlsAreSame(self._wrapped.item, other._wrapped.item)
 
@@ -1205,7 +1205,7 @@ class ControlElement:
         Get text from element (for elements which allow the GetWindowText action).
 
         Args:
-            locator: String locator or element object.
+            locator: Optional locator if it should target a child element.
 
             timeout:
                 The search for a child with the given locator will be retried
@@ -1219,7 +1219,7 @@ class ControlElement:
                 Only used if `locator` is given.
 
         Returns:
-            The window text of an attribute.
+            The window text of the element.
 
         Example:
 
@@ -1258,29 +1258,36 @@ class ControlElement:
         locator: Optional[Locator] = None,
         timeout: Optional[float] = None,
     ) -> Optional[str]:
-        """Get the value of the element defined by the provided `locator`.
+        """
+        Get value from element.
 
-        The ``ActionNotPossible`` exception is raised if the identified element doesn't
-        support value retrieval.
+        Args:
+            locator: Optional locator if it should target a child element.
 
-        :param locator: String locator or element object.
-        :returns: Optionally the value of the identified element.
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-        **Example: Robot Framework**
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
 
-        .. code-block:: robotframework
+                If not given the global config timeout will be used.
 
-            ${value} =   Get Value   type:DataItem name:column1
+                Only used if `locator` is given.
 
-        **Example: Python**
+        Returns:
+            The value of the element.
 
-        .. code-block:: python
+        Example:
 
-            from RPA.Windows import Windows
+            ```python
+            from robocorp import windows
+            window = windows.find_window('...')
+            date = window.get_value('type:Edit name:"Date of birth"')
+            ```
 
-            lib_win = Windows()
-            text = lib_win.get_value("Rich Text Window")
-            print(text)
+        Raises:
+            ActionNotPossible if the text cannot be gotten from this element.
         """
         if not locator:
             element = self
