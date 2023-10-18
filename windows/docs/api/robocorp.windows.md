@@ -1295,8 +1295,9 @@ ______________________________________________________________________
 ```python
 click(
     locator: Optional[str] = None,
-    wait_time: Optional[float] = None,
-    timeout: Optional[float] = None
+    search_depth: int = 8,
+    timeout: Optional[float] = None,
+    wait_time: Optional[float] = None
 ) → ControlElement
 ```
 
@@ -1305,6 +1306,7 @@ Clicks an element using the mouse.
 **Args:**
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be clicked.
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 - <b>`wait_time`</b>:  The time to wait after clicking the element. If not passed the default value found in the config is used.timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
 At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
@@ -1352,13 +1354,14 @@ ______________________________________________________________________
 
 ### method `double_click`
 
-**Source:** [`_control_element.py:802`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L802)
+**Source:** [`_control_element.py:806`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L806)
 
 ```python
 double_click(
     locator: Optional[str] = None,
-    wait_time: Optional[float] = None,
-    timeout: Optional[float] = None
+    search_depth: int = 8,
+    timeout: Optional[float] = None,
+    wait_time: Optional[float] = None
 ) → ControlElement
 ```
 
@@ -1367,13 +1370,15 @@ Double-clicks an element using the mouse.
 **Args:**
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be double-clicked.
-- <b>`wait_time`</b>:  The time to wait after double-clicking the element. If not passed the default value found in the config is used.timeout: The search for a child with the given locator will be retried until the given timeout elapses.
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
 At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
 
 If not given the global config timeout will be used.
 
 Only used if `locator` is passed.
+
+- <b>`wait_time`</b>:  The time to wait after double-clicking the element. If not passed the default value found in the config is used.
 
 **Example:**
 
@@ -1504,11 +1509,12 @@ ______________________________________________________________________
 
 ### method `get_text`
 
-**Source:** [`_control_element.py:1199`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1199)
+**Source:** [`_control_element.py:1236`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1236)
 
 ```python
 get_text(
     locator: Optional[str] = None,
+    search_depth: int = 8,
     timeout: Optional[float] = None
 ) → Optional[str]
 ```
@@ -1518,6 +1524,8 @@ Get text from element (for elements which allow the GetWindowText action).
 **Args:**
 
 - <b>`locator`</b>:  Optional locator if it should target a child element.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
 timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
@@ -1545,20 +1553,23 @@ ______________________________________________________________________
 
 ### method `get_value`
 
-**Source:** [`_control_element.py:1256`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1256)
+**Source:** [`_control_element.py:1298`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1298)
 
 ```python
 get_value(
     locator: Optional[str] = None,
+    search_depth: int = 8,
     timeout: Optional[float] = None
 ) → Optional[str]
 ```
 
-Get value from element.
+Get value from element (usually used with combo boxes or text controls).
 
 **Args:**
 
 - <b>`locator`</b>:  Optional locator if it should target a child element.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
 timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
@@ -1581,18 +1592,6 @@ date = window.get_value('type:Edit name:"Date of birth"')
 
 **Raises:**
 ActionNotPossible if the text cannot be gotten from this element.
-
-______________________________________________________________________
-
-### method `get_value_pattern`
-
-**Source:** [`_control_element.py:1247`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1247)
-
-```python
-get_value_pattern(
-    item: 'Control'
-) → Optional[Callable[[], Union[ForwardRef('ValuePattern'), ForwardRef('LegacyIAccessiblePattern')]]]
-```
 
 ______________________________________________________________________
 
@@ -1700,28 +1699,60 @@ ______________________________________________________________________
 
 ### method `log_screenshot`
 
-**Source:** [`_control_element.py:1578`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1578)
+**Source:** [`_control_element.py:1686`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1686)
 
 ```python
 log_screenshot(
+    level='INFO',
     locator: Optional[str] = None,
     search_depth: int = 8,
-    level='INFO',
     timeout: Optional[float] = None
-)
+) → bool
 ```
+
+Makes a screenshot of the given element and saves it into the `log.html` using `robocorp-log`. If `robocorp-log` is not available returns False.
+
+**Args:**
+
+- <b>`level`</b>:  The log level for the screenshot.
+
+- <b>`locator`</b>:  Optional locator if it should target a child element.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+
+timeout: The search for a child with the given locator will be retried until the given timeout elapses.
+
+At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
+
+If not given the global config timeout will be used.
+
+Only used if `locator` is given.
+
+**Returns:**
+True if the screenshot was successfuly saved using `robocorp-log`and False otherwise.
+
+**Example:**
+
+```python
+from robocorp import windows
+windows.desktop().log_screenshot('ERROR')
+```
+
+**Raises:**
+ElementNotFound if the locator was passed but it was not possibleto find the element.
 
 ______________________________________________________________________
 
 ### method `middle_click`
 
-**Source:** [`_control_element.py:925`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L925)
+**Source:** [`_control_element.py:941`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L941)
 
 ```python
 middle_click(
     locator: Optional[str] = None,
-    wait_time: Optional[float] = None,
-    timeout: Optional[float] = None
+    search_depth: int = 8,
+    timeout: Optional[float] = None,
+    wait_time: Optional[float] = None
 ) → ControlElement
 ```
 
@@ -1730,13 +1761,18 @@ Middle-clicks an element using the mouse.
 **Args:**
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be middle-clicked.
-- <b>`wait_time`</b>:  The time to wait after middle-clicking the element. If not passed the default value found in the config is used.timeout: The search for a child with the given locator will be retried until the given timeout elapses.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+
+timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
 At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
 
 If not given the global config timeout will be used.
 
 Only used if `locator` is passed.
+
+- <b>`wait_time`</b>:  The time to wait after middle-clicking the element. If not passed the default value found in the config is used.
 
 **Example:**
 
@@ -1791,7 +1827,7 @@ Print a tree of control elements.
 
 A Windows application structure can contain multilevel element structure. Understanding this structure is crucial for creating locators. (based on controls' details and their parent-child relationship)
 
-This keyword can be used to output logs of application's element structure.
+This method can be used to output logs of application's element structure.
 
 The printed element attributes correspond to the values that may be used to create a locator to find the actual wanted element.
 
@@ -1825,13 +1861,14 @@ ______________________________________________________________________
 
 ### method `right_click`
 
-**Source:** [`_control_element.py:864`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L864)
+**Source:** [`_control_element.py:874`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L874)
 
 ```python
 right_click(
     locator: Optional[str] = None,
-    wait_time: Optional[float] = None,
-    timeout: Optional[float] = None
+    search_depth: int = 8,
+    timeout: Optional[float] = None,
+    wait_time: Optional[float] = None
 ) → ControlElement
 ```
 
@@ -1840,6 +1877,7 @@ Right-clicks an element using the mouse.
 **Args:**
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be right-clicked.
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 - <b>`wait_time`</b>:  The time to wait after right-clicking the element. If not passed the default value found in the config is used.timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
 At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
@@ -1887,43 +1925,57 @@ ______________________________________________________________________
 
 ### method `screenshot`
 
-**Source:** [`_control_element.py:1530`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1530)
+**Source:** [`_control_element.py:1624`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1624)
 
 ```python
 screenshot(
     filename: Union[str, Path],
+    img_format: Optional[str] = None,
     locator: Optional[str] = None,
     search_depth: int = 8,
-    img_format: str = 'png',
     timeout: Optional[float] = None
 ) → Optional[str]
 ```
 
-Take a screenshot of the element defined by the locator.
+Makes a screenshot of the given element and saves it into the given file.
 
-An `ActionNotPossible` exception is raised if the element doesn't allow being captured.
+**Args:**
 
-:param locator: String locator or element object. :param filename: Image file name/path. (can be absolute/relative) :raises ActionNotPossible: When the element can't be captured. :returns: Absolute file path of the taken screenshot image.
+- <b>`filename`</b>:  The file where the image should be saved.
 
-**Example: Robot Framework**
+- <b>`img_format`</b>:  The format in which the image should be saved (by default detects it from the filename).
 
-.. code-block:: robotframework
+- <b>`locator`</b>:  Optional locator if it should target a child element.
 
-\*\*\* Tasks \*\*\*Take ScreenshotsScreenshot    desktop    desktop.pngScreenshot    subname:Notepad    ${OUTPUT_DIR}${/}notepad.png
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
-**Example: Python**
+timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
-.. code-block:: python
+At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
 
-from RPA.Windows import Windowslib = Windows()
+If not given the global config timeout will be used.
 
-def take_screenshots():lib.screenshot("desktop", "desktop.png")lib.screenshot("subname:Notepad", "output/notepad.png")
+Only used if `locator` is given.
+
+**Example:**
+
+```python
+from robocorp import windows
+windows.desktop().screenshot('desktop.png')
+windows.find_window('subname:Notepad').screenshot('output/notepad.png')
+```
+
+**Returns:**
+The absolute path to the image saved or None if it was not possibleto obtain the screenshot.
+
+**Raises:**
+ElementNotFound if the locator was passed but it was not possibleto find the element.
 
 ______________________________________________________________________
 
 ### method `screenshot_pil`
 
-**Source:** [`_control_element.py:1512`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1512)
+**Source:** [`_control_element.py:1569`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1569)
 
 ```python
 screenshot_pil(
@@ -1933,16 +1985,48 @@ screenshot_pil(
 ) → Optional[ForwardRef('Image')]
 ```
 
+Makes a screenshot of the given element and returns it as a PIL image.
+
+**Args:**
+
+- <b>`locator`</b>:  Optional locator if it should target a child element.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+
+timeout: The search for a child with the given locator will be retried until the given timeout elapses.
+
+At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
+
+If not given the global config timeout will be used.
+
+Only used if `locator` is given.
+
+**Example:**
+
+```python
+from robocorp import windows
+img = windows.find_window('Notepad').screenshot_pil()
+if img is not None:
+    ...
+```
+
+**Returns:**
+The PIL image if it was possible to do the screenshot or None ifit was not possible to do the screenshot.
+
+**Raises:**
+ElementNotFound if the locator was passed but it was not possibleto find the element.
+
 ______________________________________________________________________
 
 ### method `select`
 
-**Source:** [`_control_element.py:1041`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1041)
+**Source:** [`_control_element.py:1066`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1066)
 
 ```python
 select(
     value: str,
     locator: Optional[str] = None,
+    search_depth: int = 8,
     timeout: Optional[float] = None
 ) → ControlElement
 ```
@@ -1954,6 +2038,8 @@ Select a value on the passed element if such action is supported.
 - <b>`value`</b>:  value to select on element.
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be used for the selection.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
 timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
@@ -1976,23 +2062,24 @@ ActionNotPossible if the element does not allow the `Select` action.
 **Example:**
 
 ```python
-element.select("id:FontSizeComboBox", "22")
+element.select("22", locator="id:FontSizeComboBox")
 ```
 
 ______________________________________________________________________
 
 ### method `send_keys`
 
-**Source:** [`_control_element.py:1100`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1100)
+**Source:** [`_control_element.py:1130`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1130)
 
 ```python
 send_keys(
     keys: Optional[str] = None,
-    locator: Optional[str] = None,
     interval: float = 0.01,
-    wait_time: Optional[float] = None,
     send_enter: bool = False,
-    timeout: Optional[float] = None
+    locator: Optional[str] = None,
+    search_depth: int = 8,
+    timeout: Optional[float] = None,
+    wait_time: Optional[float] = None
 ) → ControlElement
 ```
 
@@ -2018,13 +2105,13 @@ Some examples of valid key combinations are shown below:
  - <b>`'[]{{}{}}\|;`</b>: '",<.>/?{Enter}'
 ```
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be used to send the keys.
-
 - <b>`interval`</b>:  Time between each sent key. (defaults to 0.01 seconds)
 
-- <b>`wait_time`</b>:  The time to wait after sending the keys to the element. If not passed the default value found in the config is used.
-
 - <b>`send_enter`</b>:  If `True` then the {Enter} key is pressed at the end of the sent keys.
+
+- <b>`locator`</b>:  If given the child element which matches this locator will be used to send the keys.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
 timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
@@ -2033,6 +2120,8 @@ At least one full search up to the given depth will always be done and the timeo
 If not given the global config timeout will be used.
 
 Only used if `locator` is passed.
+
+- <b>`wait_time`</b>:  The time to wait after sending the keys to the element. If not passed the default value found in the config is used.
 
 **Returns:**
 The element to which the keys were sent.
@@ -2054,82 +2143,150 @@ ______________________________________________________________________
 
 ### method `set_focus`
 
-**Source:** [`_control_element.py:1606`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1606)
+**Source:** [`_control_element.py:1754`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1754)
 
 ```python
-set_focus(locator: Optional[str] = None, timeout: Optional[float] = None) → None
+set_focus(
+    locator: Optional[str] = None,
+    search_depth: int = 8,
+    timeout: Optional[float] = None
+) → ControlElement
 ```
 
-Set view focus to the element defined by the locator.
+Sets the view focus to the element (or elemen specified by the locator).
 
-:param locator: String locator or element object.
+**Args:**
+
+- <b>`locator`</b>:  Optional locator if it should target a child element.
+
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+
+timeout: The search for a child with the given locator will be retried until the given timeout elapses.
+
+At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
+
+If not given the global config timeout will be used.
+
+Only used if `locator` is given.
 
 **Example:**
 
-.. code-block:: robotframework
-
-Set Focus  name:Buy type:Button
+```python
+from robocorp import windows
+chrome = windows.find_window('executable:chrome')
+bt = chrome.set_focus('name:Buy type:Button')
+```
 
 ______________________________________________________________________
 
 ### method `set_value`
 
-**Source:** [`_control_element.py:1376`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1376)
+**Source:** [`_control_element.py:1423`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1423)
 
 ```python
 set_value(
     value: str,
-    locator: Optional[str] = None,
     append: bool = False,
     enter: bool = False,
     newline: bool = False,
     send_keys_fallback: bool = True,
-    validator: Optional[Callable] = <function set_value_validator at 0x000002DD471E96C0>,
+    validator: Optional[Callable] = <function set_value_validator at 0x000001CAC16296C0>,
+    locator: Optional[str] = None,
+    search_depth: int = 8,
     timeout: Optional[float] = None
 ) → ControlElement
 ```
 
-Set value of the element defined by the locator.
+Set the value in the element (usually used with combo boxes ortext controls).
 
-*Note:* An anchor will work only on element structures where you can rely on the stability of that root/child element tree, as remaining the same. Usually these kind of structures are tables. (but not restricted to)
-
-*Note:* It is important to set `append=${True}` if you want to keep the current text in the element. Other option is to read the current text into a variable, then modify that value as you wish and pass it to the `Set Value` keyword for a complete text replacement. (without setting the `append` flag)
-
-The following exceptions may be raised:
+**Args:**
 
 ```
-- ``ActionNotPossible`` if the element does not allow the `SetValue` actionto be run on it nor having ``send_keys_fallback=${True}``.
-- ``ValueError`` if the new value to be set can't be set correctly.
+     - <b>`value`</b>:  String value to be set.
+
+
+     - <b>`append`</b>:  `False` for setting the value, `True` for appending it. (OFF by default)
+
+
+     - <b>`enter`</b>:  Set it to `True` to press the `Enter` key at the end of the input. (nothing is pressed by default)
+
+
+     - <b>`newline`</b>:  Set it to `True` to add a new line at the end of the value. (no EOL included by default; this won't work with `send_keys_fallback` enabled)
+
+
+     - <b>`send_keys_fallback`</b>:  Tries to set the value by sending it through keys if the main way of setting it fails. (enabled by default)
+
+
+     - <b>`validator`</b>:  Function receiving two parameters post-setting, the expected and the current value, which returns `True` if the two values match. (by default, the method will raise if the values are different, set this to `None` to disable validation or pass your custom function instead)
+
+
+     - <b>`locator`</b>:  Optional locator if it should target a child element.
+
+
+     - <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 ```
 
-:param locator: String locator or element object. :param value: String value to be set. :param append: `False` for setting the value, `True` for appending it. (OFF by default):param enter: Set it to `True` to press the *Enter* key at the end of the input. (nothing is pressed by default):param newline: Set it to `True` to add a new line at the end of the value. (no EOL included by default; this won't work with `send_keys_fallback` enabled):param send_keys_fallback: Tries to set the value by sending it through keys if the main way of setting it fails. (enabled by default):param validator: Function receiving two parameters post-setting, the expected and the current value, which returns `True` if the two values match. (bydefault, the keyword will raise if the values are different, set this to`None` to disable validation or pass your custom function instead):returns: The element object identified through the passed `locator`.
+timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
-**Example: Robot Framework**
+At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
 
-.. code-block:: robotframework
+If not given the global config timeout will be used.
 
-\*\*\* Tasks \*\*\*Set Values In NotepadSet Value   type:DataItem name:column1   ab c  # Set value to "ab c"# Press ENTER after setting the value.Set Value    type:Edit name:"File name:"    console.txt   enter=${True}
+Only used if `locator` is given.
 
-# Add newline (manually) at the end of the string. (Notepad example)Set Value    name:"Text Editor"  abc\\n# Add newline with parameter.Set Value    name:"Text Editor"  abc   newline=${True}
+**Note:**
 
-# Clear Notepad window and start appending text.Set Anchor  name:"Text Editor"# All the following keyword calls will use the anchor element as a#  starting point, UNLESS they specify a locator explicitly or#  `Clear Anchor` is used.${time} =    Get Time# Clears with `append=${False}`. (default)Set Value    value=The time now is ${time}# Append text and add a newline at the end.Set Value    value= and it's the task run time.   append=${True}...    newline=${True}# Continue appending and ensure a new line at the end by pressing#  the Enter key this time.Set Value    value=But this will appear on the 2nd line now....    append=${True}   enter=${True}   validator=${None}
+> It is important to set `append=True` to keep the current text in the element. Other option is to read the current text into a variable, then modify that value as you wish and pass it to `set_value` for a complete text replacement. (without setting the `append` flag).
+> Returns: The element object identified through the passed `locator` or this element if no `locator` was passed.
 
-**Example: Python**
+**Raises:**
 
-.. code-block:: python
+```
+     - <b>`ActionNotPossible`</b>:  if the element does not allow the `SetValue` action to be run on it nor having `send_keys_fallback=True`.
+     - <b>`ValueError`</b>:  if the new value to be set can't be set correctly.
+```
 
-from RPA.Windows import Windows
+**Example:**
 
-lib_win = Windows()locator = "Document - WordPad > Rich Text Window"elem = lib_win.set_value(locator, value="My text", send_keys_fallback=True)text = lib_win.get_value(elem)print(text)
+```python
+# Set value to "ab c"
+window.set_value('ab c', locator='type:DataItem name:column1')
 
-______________________________________________________________________
+# Press ENTER after setting the value.
+window.set_value('console.txt', locator='type:Edit name:"File name:"', enter=True)
+
+# Add newline (manually) at the end of the string.
+element = window.find('name:"Text Editor"')
+element.set_value(r'abc
+
+
+# Add newline with parameter.
+element.set_value('abc', newline=True)
+
+# Validation disabled.
+element.set_value('2nd line', append=True, newline=True, validator=None)
+```
+
+**Example:**
+
+````python
+from robocorp import windows
+window = windows.find_window('Document - WordPad')
+element = window.find('Rich Text Window')
+element.set_value(value="My text", send_keys_fallback=True)
+text = element.get_value(elem)
+print(text)
+
+
+---
 
 ### method `update_geometry`
 
 **Source:** [`_control_element.py:381`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L381)
 
+
 ```python
 update_geometry() → None
-```
+````
 
 This method may be called to update the cached coordinates of the control bounds.
