@@ -738,6 +738,19 @@ class ControlElement:
                     except ActionNotPossible:
                         pass
 
+    def mouse_hover(self) -> None:
+        """
+        Moves the mouse to the center of this element to simulate a mouse hovering.
+        """
+        from robocorp.windows._vendored.uiautomation.uiautomation import SetCursorPos
+
+        self.update_geometry()
+        if not self.has_valid_geometry():
+            raise ActionNotPossible(
+                f"Cannot hover because the element ({self}) does not have a valid geometry."
+            )
+        SetCursorPos(self.xcenter, self.ycenter)
+
     def click(
         self,
         locator: Optional[Locator] = None,
