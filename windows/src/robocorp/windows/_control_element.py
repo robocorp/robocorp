@@ -480,7 +480,7 @@ class ControlElement:
 
             # Verbose error
             msg = (
-                f"Could not locate window with locator: {locator!r} "
+                f"Could not locate control with locator: {locator!r} "
                 f"(timeout: {timeout if timeout is not None else config.timeout})"
             )
             child_elements_msg = ["\nChild Elements Found:"]
@@ -630,7 +630,7 @@ class ControlElement:
         Understanding this structure is crucial for creating locators. (based on
         controls' details and their parent-child relationship)
 
-        This keyword can be used to output logs of application's element structure.
+        This method can be used to output logs of application's element structure.
 
         The printed element attributes correspond to the values that may be used
         to create a locator to find the actual wanted element.
@@ -741,8 +741,10 @@ class ControlElement:
     def click(
         self,
         locator: Optional[Locator] = None,
-        wait_time: Optional[float] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
+        wait_time: Optional[float] = None,
     ) -> "ControlElement":
         """
         Clicks an element using the mouse.
@@ -750,6 +752,8 @@ class ControlElement:
         Args:
             locator: If given the child element which matches this locator will
                 be clicked.
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
             wait_time: The time to wait after clicking the element. If not passed the
                 default value found in the config is used.
             timeout:
@@ -797,13 +801,15 @@ class ControlElement:
         Raises:
             ActionNotPossible: if element does not allow the Click action.
         """
-        return self._mouse_click(locator, "Click", wait_time, timeout)
+        return self._mouse_click(locator, search_depth, "Click", wait_time, timeout)
 
     def double_click(
         self,
         locator: Optional[Locator] = None,
-        wait_time: Optional[float] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
+        wait_time: Optional[float] = None,
     ) -> "ControlElement":
         """
         Double-clicks an element using the mouse.
@@ -811,8 +817,8 @@ class ControlElement:
         Args:
             locator: If given the child element which matches this locator will
                 be double-clicked.
-            wait_time: The time to wait after double-clicking the element. If not
-                passed the default value found in the config is used.
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
             timeout:
                 The search for a child with the given locator will be retried
                 until the given timeout elapses.
@@ -823,6 +829,8 @@ class ControlElement:
                 If not given the global config timeout will be used.
 
                 Only used if `locator` is passed.
+            wait_time: The time to wait after double-clicking the element. If not
+                passed the default value found in the config is used.
 
         Example:
 
@@ -859,13 +867,17 @@ class ControlElement:
             ActionNotPossible: if element does not allow the double-click action.
         """
 
-        return self._mouse_click(locator, "DoubleClick", wait_time, timeout)
+        return self._mouse_click(
+            locator, search_depth, "DoubleClick", wait_time, timeout
+        )
 
     def right_click(
         self,
         locator: Optional[Locator] = None,
-        wait_time: Optional[float] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
+        wait_time: Optional[float] = None,
     ) -> "ControlElement":
         """
         Right-clicks an element using the mouse.
@@ -873,6 +885,8 @@ class ControlElement:
         Args:
             locator: If given the child element which matches this locator will
                 be right-clicked.
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
             wait_time: The time to wait after right-clicking the element. If not
                 passed the default value found in the config is used.
             timeout:
@@ -920,13 +934,17 @@ class ControlElement:
         Raises:
             ActionNotPossible: if element does not allow the right-click action.
         """
-        return self._mouse_click(locator, "RightClick", wait_time, timeout)
+        return self._mouse_click(
+            locator, search_depth, "RightClick", wait_time, timeout
+        )
 
     def middle_click(
         self,
         locator: Optional[Locator] = None,
-        wait_time: Optional[float] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
+        wait_time: Optional[float] = None,
     ) -> "ControlElement":
         """
         Middle-clicks an element using the mouse.
@@ -934,8 +952,10 @@ class ControlElement:
         Args:
             locator: If given the child element which matches this locator will
                 be middle-clicked.
-            wait_time: The time to wait after middle-clicking the element. If not
-                passed the default value found in the config is used.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
+
             timeout:
                 The search for a child with the given locator will be retried
                 until the given timeout elapses.
@@ -946,6 +966,8 @@ class ControlElement:
                 If not given the global config timeout will be used.
 
                 Only used if `locator` is passed.
+            wait_time: The time to wait after middle-clicking the element. If not
+                passed the default value found in the config is used.
 
         Example:
 
@@ -981,11 +1003,14 @@ class ControlElement:
         Raises:
             ActionNotPossible: if element does not allow the middle-click action.
         """
-        return self._mouse_click(locator, "MiddleClick", wait_time, timeout)
+        return self._mouse_click(
+            locator, search_depth, "MiddleClick", wait_time, timeout
+        )
 
     def _mouse_click(
         self,
         locator: Optional[Locator],
+        search_depth: int,
         click_type: str,
         wait_time: Optional[float],
         timeout: Optional[float],
@@ -994,7 +1019,7 @@ class ControlElement:
         if not locator:
             element = self
         else:
-            element = self.find(locator, timeout=timeout)
+            element = self.find(locator, search_depth, timeout=timeout)
         self._click_element(element, click_type, click_wait_time)
         return element
 
@@ -1041,7 +1066,9 @@ class ControlElement:
     def select(
         self,
         value: str,
+        *,
         locator: Optional[Locator] = None,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> "ControlElement":
         """
@@ -1052,6 +1079,9 @@ class ControlElement:
 
             locator: If given the child element which matches this locator will
                 be used for the selection.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
 
             timeout:
                 The search for a child with the given locator will be retried
@@ -1076,11 +1106,11 @@ class ControlElement:
         Example:
 
             ```python
-            element.select("id:FontSizeComboBox", "22")
+            element.select("22", locator="id:FontSizeComboBox")
             ```
         """
         if locator:
-            element = self.find(locator, timeout=timeout)
+            element = self.find(locator, search_depth, timeout=timeout)
         else:
             element = self
 
@@ -1100,11 +1130,13 @@ class ControlElement:
     def send_keys(
         self,
         keys: Optional[str] = None,
-        locator: Optional[Locator] = None,
         interval: float = DEFAULT_SEND_KEYS_INTERVAL,
-        wait_time: Optional[float] = None,
         send_enter: bool = False,
+        *,
+        locator: Optional[Locator] = None,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
+        wait_time: Optional[float] = None,
     ) -> "ControlElement":
         """
         Sends the given keys to the element (simulates typing keys on the keyboard).
@@ -1129,14 +1161,16 @@ class ControlElement:
                 '[]{{}{}}\\|;:\'\",<.>/?{Enter}'
                 ```
 
+
+            interval: Time between each sent key. (defaults to 0.01 seconds)
+
+            send_enter: If `True` then the {Enter} key is pressed at the end of the sent keys.
+
             locator: If given the child element which matches this locator will
                 be used to send the keys.
 
-            interval: Time between each sent key. (defaults to 0.01 seconds)
-            wait_time: The time to wait after sending the keys to the element. If not passed the
-                default value found in the config is used.
-
-            send_enter: If `True` then the {Enter} key is pressed at the end of the sent keys.
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
 
             timeout:
                 The search for a child with the given locator will be retried
@@ -1148,6 +1182,9 @@ class ControlElement:
                 If not given the global config timeout will be used.
 
                 Only used if `locator` is passed.
+
+            wait_time: The time to wait after sending the keys to the element. If not passed the
+                default value found in the config is used.
 
         Returns:
             The element to which the keys were sent.
@@ -1166,7 +1203,7 @@ class ControlElement:
         if not locator:
             element = self
         else:
-            element = self.find(locator, timeout=timeout)
+            element = self.find(locator, search_depth, timeout=timeout)
         self._send_keys_to_element(
             element.ui_automation_control,
             keys or "",
@@ -1199,6 +1236,8 @@ class ControlElement:
     def get_text(
         self,
         locator: Optional[Locator] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> Optional[str]:
         """
@@ -1206,6 +1245,9 @@ class ControlElement:
 
         Args:
             locator: Optional locator if it should target a child element.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
 
             timeout:
                 The search for a child with the given locator will be retried
@@ -1235,7 +1277,7 @@ class ControlElement:
         if not locator:
             element = self
         else:
-            element = self.find(locator, timeout=timeout)
+            element = self.find(locator, search_depth, timeout=timeout)
 
         control = element.ui_automation_control
         if hasattr(control, "GetWindowText"):
@@ -1245,7 +1287,7 @@ class ControlElement:
         )
 
     @staticmethod
-    def get_value_pattern(
+    def _get_value_pattern(
         item: "Control",
     ) -> Optional[Callable[[], PatternType]]:
         get_pattern: Optional[Callable] = getattr(
@@ -1256,13 +1298,18 @@ class ControlElement:
     def get_value(
         self,
         locator: Optional[Locator] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> Optional[str]:
         """
-        Get value from element.
+        Get value from element (usually used with combo boxes or text controls).
 
         Args:
             locator: Optional locator if it should target a child element.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
 
             timeout:
                 The search for a child with the given locator will be retried
@@ -1292,8 +1339,8 @@ class ControlElement:
         if not locator:
             element = self
         else:
-            element = self.find(locator, timeout=timeout)
-        get_value_pattern = self.get_value_pattern(element.ui_automation_control)
+            element = self.find(locator, search_depth, timeout=timeout)
+        get_value_pattern = self._get_value_pattern(element.ui_automation_control)
 
         if get_value_pattern:
             func_name = get_value_pattern.__name__
@@ -1376,88 +1423,98 @@ class ControlElement:
     def set_value(
         self,
         value: str,
-        locator: Optional[Locator] = None,
+        *,
         append: bool = False,
         enter: bool = False,
         newline: bool = False,
         send_keys_fallback: bool = True,
         validator: Optional[Callable] = set_value_validator,
+        locator: Optional[Locator] = None,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> "ControlElement":
-        """Set value of the element defined by the locator.
+        """
+        Set the value in the element (usually used with combo boxes or
+        text controls).
 
-        *Note:* An anchor will work only on element structures where you can
-        rely on the stability of that root/child element tree, as remaining the same.
-        Usually these kind of structures are tables. (but not restricted to)
+        Args:
+            value: String value to be set.
 
-        *Note:* It is important to set ``append=${True}`` if you want to keep the
-        current text in the element. Other option is to read the current text into a
-        variable, then modify that value as you wish and pass it to the ``Set Value``
-        keyword for a complete text replacement. (without setting the `append` flag)
+            append: `False` for setting the value, `True` for appending it. (OFF by
+                default)
 
-        The following exceptions may be raised:
+            enter: Set it to `True` to press the `Enter` key at the end of the
+                input. (nothing is pressed by default)
 
-            - ``ActionNotPossible`` if the element does not allow the `SetValue` action
-              to be run on it nor having ``send_keys_fallback=${True}``.
-            - ``ValueError`` if the new value to be set can't be set correctly.
+            newline: Set it to `True` to add a new line at the end of the value. (no
+                EOL included by default; this won't work with `send_keys_fallback` enabled)
 
-        :param locator: String locator or element object.
-        :param value: String value to be set.
-        :param append: `False` for setting the value, `True` for appending it. (OFF by
-            default)
-        :param enter: Set it to `True` to press the *Enter* key at the end of the
-            input. (nothing is pressed by default)
-        :param newline: Set it to `True` to add a new line at the end of the value. (no
-            EOL included by default; this won't work with `send_keys_fallback` enabled)
-        :param send_keys_fallback: Tries to set the value by sending it through keys
-            if the main way of setting it fails. (enabled by default)
-        :param validator: Function receiving two parameters post-setting, the expected
-            and the current value, which returns `True` if the two values match. (by
-            default, the keyword will raise if the values are different, set this to
-            `None` to disable validation or pass your custom function instead)
-        :returns: The element object identified through the passed `locator`.
+            send_keys_fallback: Tries to set the value by sending it through keys
+                if the main way of setting it fails. (enabled by default)
 
-        **Example: Robot Framework**
+            validator: Function receiving two parameters post-setting, the expected
+                and the current value, which returns `True` if the two values match. (by
+                default, the method will raise if the values are different, set this to
+                `None` to disable validation or pass your custom function instead)
 
-        .. code-block:: robotframework
+            locator: Optional locator if it should target a child element.
 
-            *** Tasks ***
-            Set Values In Notepad
-                Set Value   type:DataItem name:column1   ab c  # Set value to "ab c"
-                # Press ENTER after setting the value.
-                Set Value    type:Edit name:"File name:"    console.txt   enter=${True}
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
 
-                # Add newline (manually) at the end of the string. (Notepad example)
-                Set Value    name:"Text Editor"  abc\\n
-                # Add newline with parameter.
-                Set Value    name:"Text Editor"  abc   newline=${True}
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-                # Clear Notepad window and start appending text.
-                Set Anchor  name:"Text Editor"
-                # All the following keyword calls will use the anchor element as a
-                #  starting point, UNLESS they specify a locator explicitly or
-                #  `Clear Anchor` is used.
-                ${time} =    Get Time
-                # Clears with `append=${False}`. (default)
-                Set Value    value=The time now is ${time}
-                # Append text and add a newline at the end.
-                Set Value    value= and it's the task run time.   append=${True}
-                ...    newline=${True}
-                # Continue appending and ensure a new line at the end by pressing
-                #  the Enter key this time.
-                Set Value    value=But this will appear on the 2nd line now.
-                ...    append=${True}   enter=${True}   validator=${None}
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
 
-        **Example: Python**
+                If not given the global config timeout will be used.
 
-        .. code-block:: python
+                Only used if `locator` is given.
 
-            from RPA.Windows import Windows
+        Note:
+            It is important to set `append=True` to keep the current text in the
+            element. Other option is to read the current text into a
+            variable, then modify that value as you wish and pass it to `set_value`
+            for a complete text replacement. (without setting the `append` flag).
 
-            lib_win = Windows()
-            locator = "Document - WordPad > Rich Text Window"
-            elem = lib_win.set_value(locator, value="My text", send_keys_fallback=True)
-            text = lib_win.get_value(elem)
+        Returns: The element object identified through the passed `locator` or
+            this element if no `locator` was passed.
+
+        Raises:
+            ActionNotPossible: if the element does not allow the `SetValue` action
+              to be run on it nor having `send_keys_fallback=True`.
+            ValueError: if the new value to be set can't be set correctly.
+
+        Example:
+
+            ```python
+            # Set value to "ab c"
+            window.set_value('ab c', locator='type:DataItem name:column1')
+
+            # Press ENTER after setting the value.
+            window.set_value('console.txt', locator='type:Edit name:"File name:"', enter=True)
+
+            # Add newline (manually) at the end of the string.
+            element = window.find('name:"Text Editor"')
+            element.set_value(r'abc\n')
+
+            # Add newline with parameter.
+            element.set_value('abc', newline=True)
+
+            # Validation disabled.
+            element.set_value('2nd line', append=True, newline=True, validator=None)
+            ```
+
+        Example:
+
+            ```python
+            from robocorp import windows
+            window = windows.find_window('Document - WordPad')
+            element = window.find('Rich Text Window')
+            element.set_value(value="My text", send_keys_fallback=True)
+            text = element.get_value(elem)
             print(text)
         """
         value = value or ""
@@ -1470,9 +1527,9 @@ class ControlElement:
         if not locator:
             element = self
         else:
-            element = self.find(locator, timeout=timeout)
+            element = self.find(locator, search_depth, timeout=timeout)
 
-        get_value_pattern = self.get_value_pattern(element.ui_automation_control)
+        get_value_pattern = self._get_value_pattern(element.ui_automation_control)
         action = "Appending" if append else "Setting"
 
         if get_value_pattern:
@@ -1512,17 +1569,54 @@ class ControlElement:
     def screenshot_pil(
         self,
         locator: Optional[Locator] = None,
+        *,
         search_depth: int = 8,
         timeout: Optional[float] = None,
     ) -> Optional["Image"]:
+        """
+        Makes a screenshot of the given element and returns it as a PIL image.
+
+        Args:
+            locator: Optional locator if it should target a child element.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is given.
+
+        Example:
+            ```python
+            from robocorp import windows
+            img = windows.find_window('Notepad').screenshot_pil()
+            if img is not None:
+                ...
+            ```
+
+        Returns:
+            The PIL image if it was possible to do the screenshot or None if
+            it was not possible to do the screenshot.
+
+        Raises:
+            ElementNotFound if the locator was passed but it was not possible
+            to find the element.
+        """
         from robocorp.windows._screenshot import screenshot
 
-        el = self._find_ui_automation_wrapper(
-            self._convert_locator_to_locator_and_or_search_params(locator),
-            search_depth,
-            timeout=timeout,
-        )
-        img = screenshot(el.item)
+        if not locator:
+            el = self
+        else:
+            el = self.find(locator, search_depth, timeout)
+
+        img = screenshot(el.ui_automation_control)
         if img is None:
             return None
         return img
@@ -1530,44 +1624,58 @@ class ControlElement:
     def screenshot(
         self,
         filename: Union[str, Path],
+        *,
+        img_format: Optional[str] = None,
         locator: Optional[Locator] = None,
         search_depth: int = 8,
-        img_format: str = "png",
         timeout: Optional[float] = None,
     ) -> Optional[str]:
-        """Take a screenshot of the element defined by the locator.
+        """
+        Makes a screenshot of the given element and saves it into the given
+        file.
 
-        An `ActionNotPossible` exception is raised if the element doesn't allow being
-        captured.
+        Args:
+            filename: The file where the image should be saved.
 
-        :param locator: String locator or element object.
-        :param filename: Image file name/path. (can be absolute/relative)
-        :raises ActionNotPossible: When the element can't be captured.
-        :returns: Absolute file path of the taken screenshot image.
+            img_format: The format in which the image should be saved
+                (by default detects it from the filename).
 
-        **Example: Robot Framework**
+            locator: Optional locator if it should target a child element.
 
-        .. code-block:: robotframework
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
 
-            *** Tasks ***
-            Take Screenshots
-                Screenshot    desktop    desktop.png
-                Screenshot    subname:Notepad    ${OUTPUT_DIR}${/}notepad.png
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
 
-        **Example: Python**
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
 
-        .. code-block:: python
+                If not given the global config timeout will be used.
 
-            from RPA.Windows import Windows
-            lib = Windows()
+                Only used if `locator` is given.
 
-            def take_screenshots():
-                lib.screenshot("desktop", "desktop.png")
-                lib.screenshot("subname:Notepad", "output/notepad.png")
+        Example:
+            ```python
+            from robocorp import windows
+            windows.desktop().screenshot('desktop.png')
+            windows.find_window('subname:Notepad').screenshot('output/notepad.png')
+            ```
+
+        Returns:
+            The absolute path to the image saved or None if it was not possible
+            to obtain the screenshot.
+
+        Raises:
+            ElementNotFound if the locator was passed but it was not possible
+            to find the element.
         """
         import os
 
-        img = self.screenshot_pil(locator, search_depth, timeout)
+        img = self.screenshot_pil(
+            locator=locator, search_depth=search_depth, timeout=timeout
+        )
         if img is None:
             return None
 
@@ -1577,15 +1685,54 @@ class ControlElement:
 
     def log_screenshot(
         self,
+        level="INFO",
+        *,
         locator: Optional[Locator] = None,
         search_depth: int = 8,
-        level="INFO",
         timeout: Optional[float] = None,
-    ):
+    ) -> bool:
+        """
+        Makes a screenshot of the given element and saves it into the `log.html`
+        using `robocorp-log`. If `robocorp-log` is not available returns False.
+
+        Args:
+            level: The log level for the screenshot.
+
+            locator: Optional locator if it should target a child element.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is given.
+
+        Returns:
+            True if the screenshot was successfuly saved using `robocorp-log`
+            and False otherwise.
+
+        Example:
+            ```python
+            from robocorp import windows
+            windows.desktop().log_screenshot('ERROR')
+            ```
+
+        Raises:
+            ElementNotFound if the locator was passed but it was not possible
+            to find the element.
+        """
+
         try:
             from robocorp.log import html, suppress_variables
         except ImportError:
-            return  # If it's not available, just return.
+            return False  # If it's not available, just return.
 
         from robocorp.windows._screenshot import screenshot_as_base64png
 
@@ -1596,34 +1743,56 @@ class ControlElement:
         with suppress_variables():
             img_as_base64 = screenshot_as_base64png(el.ui_automation_control)
             if img_as_base64 is None:
-                return None
+                return False
 
             assert level in ("ERROR", "WARN", "INFO")
 
             html_contents = f"""<img src="data:image/png;base64,{img_as_base64}"/>"""
             html(html_contents, level)
+            return True
 
     def set_focus(
         self,
         locator: Optional[Locator] = None,
+        *,
+        search_depth: int = 8,
         timeout: Optional[float] = None,
-    ) -> None:
-        """Set view focus to the element defined by the locator.
+    ) -> "ControlElement":
+        """
+        Sets the view focus to the element (or elemen specified by the locator).
 
-        :param locator: String locator or element object.
+        Args:
+            locator: Optional locator if it should target a child element.
+
+            search_depth: Used as the depth to search for the locator (only
+                used if the `locator` is specified).
+
+            timeout:
+                The search for a child with the given locator will be retried
+                until the given timeout elapses.
+
+                At least one full search up to the given depth will always be done
+                and the timeout will only take place afterwards.
+
+                If not given the global config timeout will be used.
+
+                Only used if `locator` is given.
 
         Example:
 
-        .. code-block:: robotframework
-
-            Set Focus  name:Buy type:Button
+            ```python
+            from robocorp import windows
+            chrome = windows.find_window('executable:chrome')
+            bt = chrome.set_focus('name:Buy type:Button')
+            ```
         """
-        element = self._find_ui_automation_wrapper(
-            self._convert_locator_to_locator_and_or_search_params(locator),
-            timeout=timeout,
-        )
-        if not hasattr(element.item, "SetFocus"):
+        if not locator:
+            element = self
+        else:
+            element = self.find(locator, search_depth, timeout)
+        if not hasattr(element.ui_automation_control, "SetFocus"):
             raise ActionNotPossible(
                 f"Element found with {locator!r} does not have 'SetFocus' attribute"
             )
-        element.item.SetFocus()
+        element.ui_automation_control.SetFocus()
+        return element

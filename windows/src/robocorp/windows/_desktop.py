@@ -7,8 +7,8 @@ from robocorp.windows.protocols import Locator
 
 if typing.TYPE_CHECKING:
     from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows._window_element import WindowElement
     from robocorp.windows._vendored.uiautomation.uiautomation import Control
+    from robocorp.windows._window_element import WindowElement
 
 
 class Desktop(ControlElement):
@@ -380,10 +380,10 @@ class Desktop(ControlElement):
             _UIAutomationControlWrapper,
             empty_location_info,
         )
-        from robocorp.windows._window_element import WindowElement
         from robocorp.windows._vendored.uiautomation.uiautomation import (
             GetForegroundControl,
         )
+        from robocorp.windows._window_element import WindowElement
 
         or_search_params_by_level = collect_search_params(locator)
         if len(or_search_params_by_level) > 1:

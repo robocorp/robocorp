@@ -7,6 +7,8 @@ def _start_explorer_at_folder(folder: str):
         'name:Home or name:"File Explorer"', timeout=2
     )
     explorer.send_keys("{alt}d")
+    # TODO: provide API related to checking focus.
+    # desktop.wait_for_focused_control('class:TextBox name:"Address Bar"')
     explorer.send_keys(folder, send_enter=True)
     return explorer
 

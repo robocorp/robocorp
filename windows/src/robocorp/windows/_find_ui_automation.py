@@ -11,8 +11,8 @@ from ._iter_tree import ControlTreeNode
 from ._match_ast import OrSearchParams, SearchParams
 from ._match_common import SearchType
 from ._ui_automation_wrapper import _UIAutomationControlWrapper
-from .protocols import Locator
 from ._vendored.uiautomation import Control
+from .protocols import Locator
 
 
 @dataclass
