@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from robocorp.tasks import session_cache
 
-from ._engines import BrowserEngine
+from ._types import BrowserEngine
 
 
 class _BrowserConfig:

@@ -2,7 +2,8 @@
 import argparse
 import sys
 
-from ._engines import BrowserEngine, InstallError, install_browser
+from ._engines import install_browser
+from ._types import BrowserEngine, InstallError
 
 
 def main():

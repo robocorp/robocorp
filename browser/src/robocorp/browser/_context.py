@@ -95,7 +95,9 @@ def _browser_launcher() -> Callable[..., Browser]:
             if "executable doesn't exist" not in err.message.lower():
                 raise
             install_path = browsers_path(isolated=config.isolated)
-            raise BrowserNotFound(f"No matching browser found ({install_path})")
+            raise BrowserNotFound(
+                f"No matching browser found ({install_path})"
+            ) from err
 
     return launch
 
