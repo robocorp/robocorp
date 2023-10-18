@@ -88,7 +88,7 @@ def test_inspect(calculator_window_element: WindowElement):
 
 def test_inspect_user_picks(calculator_window_element: WindowElement):
     from robocorp.windows._inspect import ElementInspector
-    from robocorp.windows.vendored.uiautomation.uiautomation import SetCursorPos
+    from robocorp.windows._vendored.uiautomation.uiautomation import SetCursorPos
 
     with ElementInspector(calculator_window_element) as element_inspector:
         ev = threading.Event()
