@@ -1,5 +1,5 @@
 generateSourceCodeOnly: true
-packageName: robocorp-workspace
+packageName: workspace
 packageUrl: https://github.com/robocorp/robo/
 packageVersion: 0.1.0
 projectName: robocorp-workspace
