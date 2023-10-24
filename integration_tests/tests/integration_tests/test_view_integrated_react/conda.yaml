@@ -1,9 +1,8 @@
 channels:
   - conda-forge
-
 dependencies:
-  - python=3.10                     # https://pyreadiness.org/3.9/ 
-  - pip=22.1.2                        # https://pip.pypa.io/en/stable/news/
+  - python=3.10
+  - pip=22.1.2
   - pip:
       - requests
       - playwright
@@ -14,3 +13,4 @@ dependencies:
       - xlutils
       - openpyxl
       - typing-extensions
+      - truststore

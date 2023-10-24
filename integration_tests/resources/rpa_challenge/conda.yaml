@@ -13,3 +13,4 @@ dependencies:
       - xlutils
       - openpyxl
       - typing-extensions
+      - truststore
