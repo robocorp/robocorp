@@ -126,6 +126,7 @@ def environ(overrides: dict[str, str]):
 
 @task
 def clean(ctx: Context):
+    """Remove build artifacts, binaries, and templates"""
     TIMESTAMP.unlink(missing_ok=True)
 
     if BUILD.exists():
