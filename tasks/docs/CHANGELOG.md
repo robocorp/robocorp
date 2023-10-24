@@ -4,6 +4,14 @@
 
 - Use `truststore` for native system certificates, if available in environment
 
+- `--teardown-dump-threads-timeout` argument can now be used to specify a timeout (in seconds) to print running threads after the teardown starts 
+    - if not specified the `RC_TEARDOWN_DUMP_THREADS_TIMEOUT` may be used instead.
+    - Defaults to `5` (seconds) if not specified.
+
+- `--teardown-interrupt-timeout` argument can now be used to specify a timeout (in seconds) to interrupt the teardown process. 
+    - If not specified the `RC_TEARDOWN_INTERRUPT_TIMEOUT` environment variable may also be used.
+
+
 ## 2.2.0 - 2023-09-07
 
 - The absolute output dir is saved before running tasks (so that changes to the `cwd` don't affect it).
