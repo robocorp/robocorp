@@ -58,7 +58,7 @@ func (proc *Process) String() string {
 	return fmt.Sprintf("Process[name='%v',args=%v]", proc.name, proc.args)
 }
 
-func (proc *Process) Run() (*Output, *ProcessError) {
+func (proc *Process) Run() (*Output, error) {
 	proc.cmd = exec.Command(proc.name, proc.args...)
 
 	if proc.Env != nil {
