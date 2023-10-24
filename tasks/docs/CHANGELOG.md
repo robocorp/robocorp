@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Use `truststore` package and native system certificates on Python 3.10 and later
+
 ## 2.2.0 - 2023-09-07
 
 - The absolute output dir is saved before running tasks (so that changes to the `cwd` don't affect it).

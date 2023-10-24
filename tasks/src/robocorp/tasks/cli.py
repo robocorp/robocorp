@@ -11,6 +11,12 @@ call.
 
 import sys
 
+# Use certificates from native storage
+if sys.version_info >= (3, 10):
+    import truststore
+
+    truststore.inject_into_ssl()
+
 # Just importing is enough to register the commands
 from . import _commands  # @UnusedImport
 from ._argdispatch import arg_dispatch as _arg_dispatch
@@ -20,6 +26,7 @@ def main(args=None, exit: bool = True) -> int:
     """Entry point for running tasks from robocorp-tasks."""
     if args is None:
         args = sys.argv[1:]
+
     returncode = _arg_dispatch.process_args(args)
     if exit:
         sys.exit(returncode)
