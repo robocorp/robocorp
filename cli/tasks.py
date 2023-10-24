@@ -9,7 +9,7 @@ from itertools import chain
 from pathlib import Path
 from typing import Optional
 
-from invoke import task
+from invoke import Context, Exit, Result, task
 
 CURDIR = Path(__file__).parent
 BUILD = CURDIR / "build"
@@ -25,12 +25,14 @@ RCC_URLS = {
 }
 
 
-def run(ctx, *parts):
+def run(ctx: Context, *parts, **kwargs) -> Result:
     args = " ".join(str(part) for part in parts)
-    ctx.run(args, pty=platform.system() != "Windows", echo=True)
+    kwargs.setdefault("pty", platform.system() != "Windows")
+    kwargs.setdefault("echo", True)
+    return ctx.run(args, **kwargs)
 
 
-def optional(ctx, *parts):
+def optional(ctx: Context, *parts):
     if shutil.which(parts[0]):
         run(ctx, *parts)
     else:
@@ -40,6 +42,16 @@ def optional(ctx, *parts):
 def touch(path: Path):
     with open(path, "w"):
         pass
+
+
+@contextmanager
+def chdir(path: Path):
+    old = Path.cwd()
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(old)
 
 
 def download_rcc(system: Optional[str] = None) -> Path:
@@ -66,13 +78,20 @@ def download_rcc(system: Optional[str] = None) -> Path:
     return rcc_path
 
 
-def copy_templates():
+def copy_templates(ctx: Context):
     src = CURDIR / ".." / "templates"
     print(f"Copying templates '{src}' to '{TEMPLATES}'")
+
+    with chdir(src):
+        output = run(ctx, "git", "ls-files", "--others", echo=False, hide=True)
+        if output.stdout.strip():
+            print(f"\nTemplate directory is dirty! Untracked files:\n{output.stdout}")
+            raise Exit(code=1)
+
     shutil.copytree(src, TEMPLATES, dirs_exist_ok=True)
 
 
-def go_build(ctx, output: Path, system: Optional[str] = None, arch="amd64"):
+def go_build(ctx: Context, output: Path, system: Optional[str] = None, arch="amd64"):
     if system is None:
         system = platform.system()
 
@@ -106,7 +125,7 @@ def environ(overrides: dict[str, str]):
 
 
 @task
-def clean(ctx):
+def clean(ctx: Context):
     TIMESTAMP.unlink(missing_ok=True)
 
     if BUILD.exists():
@@ -125,14 +144,14 @@ def clean(ctx):
 
 
 @task
-def lint(ctx):
+def lint(ctx: Context):
     """Run static analysis"""
     run(ctx, "go", "vet", CURDIR)
     optional(ctx, "golangci-lint", "run", CURDIR)
 
 
 @task
-def pretty(ctx):
+def pretty(ctx: Context):
     """Auto-format code"""
     run(ctx, "gofmt", "-s", "-w", CURDIR)
     optional(ctx, "golines", "-m", 88, "-w", CURDIR)
@@ -140,21 +159,21 @@ def pretty(ctx):
 
 
 @task
-def test(ctx):
+def test(ctx: Context):
     """Run unittests"""
     run(ctx, "go", "test", "-coverpkg=./...", "./...")
 
 
 @task
-def prepare(ctx):
+def prepare(ctx: Context):
     """Download/copy static assets"""
     download_rcc()
-    copy_templates()
+    copy_templates(ctx)
     touch(TIMESTAMP)
 
 
 @task
-def build(ctx):
+def build(ctx: Context):
     """Build robo binary"""
     if not TIMESTAMP.exists():
         print("Pre-requisites not met, run 'invoke prepare'")
@@ -164,9 +183,9 @@ def build(ctx):
 
 
 @task(clean)
-def crossbuild(ctx):
+def crossbuild(ctx: Context):
     """Build for all platforms"""
-    copy_templates()
+    copy_templates(ctx)
 
     for arch, system, dirname in (
         ("amd64", "Windows", "windows64"),
@@ -179,7 +198,7 @@ def crossbuild(ctx):
 
 
 @task
-def macos_sign(ctx):
+def macos_sign(ctx: Context):
     """Sign binary for macOS"""
     assert platform.system() == "Darwin"
     cert_data = os.environ["MACOS_SIGNING_CERT"]
@@ -202,7 +221,7 @@ def macos_sign(ctx):
 
 
 @task
-def macos_notarize(ctx):
+def macos_notarize(ctx: Context):
     """Notarize binary for macOS"""
     assert platform.system() == "Darwin"
     apple_id = os.environ["MACOS_APP_ID_FOR_SIGNING"]
