@@ -17,7 +17,7 @@ before_collect_tasks: IBeforeCollectTasksCallback = Callback()
 # Called as before_all_tasks_run(tasks: List[ITask])
 before_all_tasks_run: IBeforeAllTasksRunCallback = Callback()
 
-# Called as before_collect_tasks(task: ITask)
+# Called as before_task_run(task: ITask)
 before_task_run: IBeforeTaskRunCallback = Callback()
 
 # Called as after_task_run(task: ITask)

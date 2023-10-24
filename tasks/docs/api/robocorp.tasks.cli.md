@@ -14,7 +14,7 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`cli.py:19`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/cli.py#L19)
+**Source:** [`cli.py:28`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/cli.py#L28)
 
 ```python
 main(args=None, exit: bool = True) → int
