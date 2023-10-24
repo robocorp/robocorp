@@ -17,7 +17,7 @@ BIN = CURDIR / "include" / "bin"
 TEMPLATES = CURDIR / "include" / "templates"
 TIMESTAMP = CURDIR / ".timestamp"
 
-RCC_VERSION = "14.6.0"
+RCC_VERSION = "17.3.0"
 RCC_URLS = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
     "Darwin": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/macos64/rcc",

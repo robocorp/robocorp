@@ -3,6 +3,10 @@ package tasks
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
 
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/process"
@@ -34,7 +38,7 @@ func List(env environment.Environment) ([]Task, error) {
 	proc := process.New(exe, cmd[1:]...)
 	proc.Env = env.ToSlice()
 
-	output, err := proc.Run()
+	output, err := runWithInterrupt(proc)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +56,6 @@ func Run(env environment.Environment, name string) (Result, error) {
 	env.Variables["RC_LOG_OUTPUT_STDOUT"] = "1"
 
 	cmd := RunCommand(name)
-	cmd = append(cmd, "--no-status-rc")
 	exe := env.FindExecutable(cmd[0])
 
 	proc := process.New(exe, cmd[1:]...)
@@ -69,11 +72,8 @@ func Run(env environment.Environment, name string) (Result, error) {
 		}
 	}
 
-	if _, err := proc.Run(); err != nil {
-		return result, err
-	}
-
-	return result, nil
+	_, err := runWithInterrupt(proc)
+	return result, err
 }
 
 func ListCommand() []string {
@@ -86,9 +86,10 @@ func RunCommand(name string) []string {
 		"-m",
 		"robocorp.tasks",
 		"run",
-		"tasks.py",
-		"-t",
+		"--no-status-rc",
+		"--task",
 		name,
+		"tasks.py",
 	}
 }
 
@@ -110,4 +111,18 @@ func handleEvent(event *output.Event) (result Result, end bool) {
 		}
 	}
 	return
+}
+
+func runWithInterrupt(proc *process.Process) (*process.Output, error) {
+	signals := make(chan os.Signal, 1)
+	defer signal.Reset(os.Interrupt, syscall.SIGTERM)
+	defer close(signals)
+
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-signals
+		defer signal.Reset(os.Interrupt, syscall.SIGTERM)
+	}()
+
+	return proc.Run()
 }

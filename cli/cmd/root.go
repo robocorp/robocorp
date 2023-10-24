@@ -3,7 +3,7 @@ package cmd
 import (
 	"os"
 
-	"github.com/robocorp/robo/cli/fatal"
+	"github.com/robocorp/robo/cli/exit"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +30,7 @@ func Execute() {
 	setDirectoryDefault()
 
 	if err := rootCmd.Execute(); err != nil {
-		fatal.FatalError(err)
+		exit.FatalExit(err)
 	}
 }
 
@@ -39,7 +39,7 @@ func setDirectoryDefault() {
 		var err error
 		directory, err = os.Getwd()
 		if err != nil {
-			fatal.FatalError(err)
+			exit.FatalExit(err)
 		}
 	}
 }
