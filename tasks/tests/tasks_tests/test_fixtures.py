@@ -138,3 +138,21 @@ def test_teardown_task():
 
     after_task_run("placeholder")
     assert is_called
+
+
+def test_raises():
+    @tasks_setup
+    def raises_setup(_):
+        raise RuntimeError("Oopsie")
+
+    @tasks_teardown
+    def raises_teardown(_):
+        raise RuntimeError("Oopsie #2")
+
+    assert len(before_task_run) == 1
+    assert len(after_task_run) == 1
+
+    with pytest.raises(RuntimeError):
+        before_task_run(None)
+
+    after_task_run(None)
