@@ -112,6 +112,20 @@ class _ArgDispatcher:
             action="store_true",
         )
 
+        run_parser.add_argument(
+            "--teardown-dump-threads-timeout",
+            dest="teardown_dump_threads_timeout",
+            type=float,
+            help="The timeout (in seconds) to print running threads after the teardown starts (if not specified the RC_TEARDOWN_DUMP_THREADS_TIMEOUT is also queried). Defaults to 5 seconds.",
+        )
+
+        run_parser.add_argument(
+            "--teardown-interrupt-timeout",
+            dest="teardown_interrupt_timeout",
+            type=float,
+            help="The timeout (in seconds) to interrupt the teardown process  (if not specified the RC_TEARDOWN_INTERRUPT_TIMEOUT is also queried).",
+        )
+
         # List tasks
         list_parser = subparsers.add_parser(
             "list",
