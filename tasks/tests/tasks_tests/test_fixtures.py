@@ -156,3 +156,34 @@ def test_raises():
         before_task_run(None)
 
     after_task_run(None)
+
+
+def test_setup_generator():
+    assert len(before_task_run) == 0
+    assert len(after_task_run) == 0
+
+    is_called = False
+
+    @tasks_setup
+    def fixture_gen(before):
+        assert before == "before"
+        after = yield
+        assert after == "after"
+        nonlocal is_called
+        is_called = True
+
+    assert not is_called
+    assert len(before_task_run) == 1
+    assert len(after_task_run) == 0
+
+    before_task_run("before")
+
+    assert not is_called
+    assert len(before_task_run) == 1
+    assert len(after_task_run) == 1
+
+    after_task_run("after")
+
+    assert is_called
+    assert len(before_task_run) == 1
+    assert len(after_task_run) == 0

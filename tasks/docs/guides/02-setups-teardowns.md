@@ -25,7 +25,7 @@ A `Task` object is the internal representation of a parsed task in a Python file
 It contains, for instance, the `filename` and `lineno` of the function, but
 also the `status` and optional `message` after it has been executed.
 
-## Example
+## Example usage
 
 ```python
 from robocorp import browser
@@ -50,5 +50,52 @@ def scrape_website():
 
 @task
 def process_data():
+    ...
+```
+
+## Yielding fixtures
+
+Sometimes it's necessary to access a resource created in a `setup` inside a
+`teardown` fixture. In these cases, it's possible to create a `setup` fixture
+that `yield`s.
+
+The library will call the fixture up until the `yield` statement, execute the task,
+and then call the rest of the fixture (in reverse order):
+
+```python
+import time
+from robocorp.tasks import setup
+
+
+@setup
+def measure_time(task):
+    start = time.time()
+    yield  # Task executes here
+    duration = time.time() - start
+    print(f"Task {task.name} took {duration} seconds")
+
+
+@task
+def my_long_task():
+    ...
+```
+
+It's also possible to access the task's result by assigning a value from
+the `yield` statement:
+
+```python
+from robocorp.import browser
+from robocorp.tasks import setup
+
+
+@setup
+def before_and_after(task_before):
+    print(f"Task before running: {task_before}")
+    task_after = yield
+    print(f"Task after running: {task_after}")
+
+
+@task
+def my_task():
     ...
 ```

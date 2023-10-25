@@ -1,3 +1,5 @@
+import inspect
+from functools import wraps
 from typing import Callable, Literal, TypeVar, Union, overload
 
 from ._protocols import ITaskCallback, ITasksCallback
@@ -55,29 +57,73 @@ def setup(
 
     By default, runs setups in `task` scope.
 
+    The `setup` fixture also allows running code after the execution,
+    if it `yield`s the execution to the task(s):
+
+    ```python
+    import time
+    from robocorp.tasks import setup
+
+    @setup
+    def measure_time(task):
+        start = time.time()
+        yield  # Task executes here
+        duration = time.time() - start
+        print(f"Task took {duration} seconds")
+
+    @task
+    def my_long_task():
+        ...
+    ```
+
     **Note:** If fixtures are defined in another file, they need to be imported
      in the main tasks file to be taken into use
     """
-    from ._hooks import before_all_tasks_run, before_task_run
+    from ._hooks import (
+        after_all_tasks_run,
+        after_task_run,
+        before_all_tasks_run,
+        before_task_run,
+    )
+
+    def _register_callback(before, after, func):
+        if inspect.isgeneratorfunction(func):
+
+            @wraps(func)
+            def generator(*args, **kwargs):
+                gen = func(*args, **kwargs)
+                next(gen)
+
+                def teardown(*args, **kwargs):
+                    try:
+                        gen.send(*args, **kwargs)
+                    except StopIteration:
+                        pass
+                    finally:
+                        after.unregister(teardown)
+
+                after.register(teardown)
+
+            before.register(generator)
+            return generator
+        else:
+            before.register(func)
+            return func
 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        func: ITaskCallback = args[0]
-        before_task_run.register(func)
-        return func
+        return _register_callback(before_task_run, after_task_run, args[0])
 
     scope = kwargs.get("scope", "task")
     if scope == "task":
 
-        def wrapped_task(func: ITaskCallback):
-            before_task_run.register(func)
-            return func
+        def wrapped_task(func):
+            return _register_callback(before_task_run, after_task_run, func)
 
         return wrapped_task
     elif scope == "session":
 
-        def wrapped_session(func: ITasksCallback):
-            before_all_tasks_run.register(func)
-            return func
+        def wrapped_session(func):
+            return _register_callback(before_all_tasks_run, after_all_tasks_run, func)
 
         return wrapped_session
     else:
