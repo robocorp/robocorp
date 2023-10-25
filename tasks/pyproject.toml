@@ -20,7 +20,6 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 robocorp-log = ">=2.4,<3"
-truststore = {version = "^0.8.0", python = ">=3.10,<4.0"}
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}

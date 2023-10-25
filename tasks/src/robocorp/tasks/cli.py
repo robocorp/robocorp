@@ -11,11 +11,14 @@ call.
 
 import sys
 
-# Use certificates from native storage
+# Use certificates from native storage (if `truststore` installed)
 if sys.version_info >= (3, 10):
-    import truststore
+    try:
+        import truststore
 
-    truststore.inject_into_ssl()
+        truststore.inject_into_ssl()
+    except ModuleNotFoundError:
+        pass
 
 # Just importing is enough to register the commands
 from . import _commands  # @UnusedImport

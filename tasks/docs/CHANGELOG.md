@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Use `truststore` package and native system certificates on Python 3.10 and later
+- Use `truststore` for native system certificates, if available in environment
 
 ## 2.2.0 - 2023-09-07
 
