@@ -27,16 +27,16 @@ def test_setup_default():
     is_called = False
 
     @tasks_setup
-    def fixture(tasks):
-        assert isinstance(tasks, Iterable)
+    def fixture(task):
+        assert task == "placeholder"
         nonlocal is_called
         is_called = True
 
     assert not is_called
-    assert len(before_task_run) == 0
-    assert len(before_all_tasks_run) == 1
+    assert len(before_task_run) == 1
+    assert len(before_all_tasks_run) == 0
 
-    before_all_tasks_run([])
+    before_task_run("placeholder")
     assert is_called
 
 
@@ -87,16 +87,16 @@ def test_teardown_default():
     is_called = False
 
     @tasks_teardown
-    def fixture(tasks):
-        assert isinstance(tasks, Iterable)
+    def fixture(task):
+        assert task == "placeholder"
         nonlocal is_called
         is_called = True
 
     assert not is_called
-    assert len(after_task_run) == 0
-    assert len(after_all_tasks_run) == 1
+    assert len(after_task_run) == 1
+    assert len(after_all_tasks_run) == 0
 
-    after_all_tasks_run([])
+    after_task_run("placeholder")
     assert is_called
 
 

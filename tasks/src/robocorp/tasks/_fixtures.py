@@ -7,6 +7,11 @@ Decorator = Callable[[T], T]
 
 
 @overload
+def setup(func: ITaskCallback) -> ITaskCallback:
+    ...
+
+
+@overload
 def setup(*, scope: Literal["task"] = "task") -> Decorator[ITaskCallback]:
     ...
 
@@ -16,14 +21,9 @@ def setup(*, scope: Literal["session"]) -> Decorator[ITasksCallback]:
     ...
 
 
-@overload
-def setup(func: ITasksCallback) -> ITasksCallback:
-    ...
-
-
 def setup(
     *args, **kwargs
-) -> Union[ITasksCallback, Decorator[ITasksCallback], Decorator[ITaskCallback]]:
+) -> Union[ITaskCallback, Decorator[ITaskCallback], Decorator[ITasksCallback]]:
     """Run code before any tasks start, or before each separate task.
 
     Receives as an argument the task or tasks that will be run.
@@ -61,8 +61,8 @@ def setup(
     from ._hooks import before_all_tasks_run, before_task_run
 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        func: ITasksCallback = args[0]
-        before_all_tasks_run.register(func)
+        func: ITaskCallback = args[0]
+        before_task_run.register(func)
         return func
 
     scope = kwargs.get("scope", "task")
@@ -85,6 +85,11 @@ def setup(
 
 
 @overload
+def teardown(func: ITaskCallback) -> ITaskCallback:
+    ...
+
+
+@overload
 def teardown(*, scope: Literal["task"] = "task") -> Decorator[ITaskCallback]:
     ...
 
@@ -94,14 +99,9 @@ def teardown(*, scope: Literal["session"]) -> Decorator[ITasksCallback]:
     ...
 
 
-@overload
-def teardown(func: ITasksCallback) -> ITasksCallback:
-    ...
-
-
 def teardown(
     *args, **kwargs
-) -> Union[ITasksCallback, Decorator[ITasksCallback], Decorator[ITaskCallback]]:
+) -> Union[ITaskCallback, Decorator[ITaskCallback], Decorator[ITasksCallback]]:
     """Run code after tasks have been run, or after each separate task.
 
     Receives as an argument the task or tasks that were executed, which
@@ -140,8 +140,8 @@ def teardown(
     from ._hooks import after_all_tasks_run, after_task_run
 
     if len(args) == 1 and len(kwargs) == 0 and callable(args[0]):
-        func: ITasksCallback = args[0]
-        after_all_tasks_run.register(func)
+        func: ITaskCallback = args[0]
+        after_task_run.register(func)
         return func
 
     scope = kwargs.get("scope", "task")
