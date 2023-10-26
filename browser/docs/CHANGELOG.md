@@ -3,6 +3,7 @@
 ## UNRELEASED
 
 - When browsers are installed with playwright additional logging is added.
+- Fixed issue where shutting down playwright could lead to a halting condition inside of asyncio.
 
 ## 2.1.0 - 2023-08-04
 
