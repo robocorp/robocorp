@@ -11,6 +11,7 @@
 - `--teardown-interrupt-timeout` argument can now be used to specify a timeout (in seconds) to interrupt the teardown process. 
     - If not specified the `RC_TEARDOWN_INTERRUPT_TIMEOUT` environment variable may also be used.
 
+- Add support for fixtures with the new `setup` and `teardown` decorators
 
 ## 2.2.0 - 2023-09-07
 
