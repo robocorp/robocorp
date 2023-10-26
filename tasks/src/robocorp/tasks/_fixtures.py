@@ -96,7 +96,7 @@ def setup(
 
                 def teardown(*args, **kwargs):
                     try:
-                        gen.send(*args, **kwargs)
+                        next(gen)
                     except StopIteration:
                         pass
                     finally:

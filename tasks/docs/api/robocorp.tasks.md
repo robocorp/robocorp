@@ -66,13 +66,13 @@ ______________________________________________________________________
 
 ## function `setup`
 
-**Source:** [`_fixtures.py:24`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L24)
+**Source:** [`_fixtures.py:26`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L26)
 
 ```python
 setup(
     *args,
     **kwargs
-) → Union[Callable[[Sequence[ITask]], Any], Callable[[Callable[[Sequence[ITask]], Any]], Callable[[Sequence[ITask]], Any]], Callable[[Callable[[ITask], Any]], Callable[[ITask], Any]]]
+) → Union[Callable[[ITask], Any], Callable[[Callable[[ITask], Any]], Callable[[ITask], Any]], Callable[[Callable[[Sequence[ITask]], Any]], Callable[[Sequence[ITask]], Any]]]
 ```
 
 Run code before any tasks start, or before each separate task.
@@ -105,19 +105,37 @@ def before_all(tasks):
 
 By default, runs setups in `task` scope.
 
+The `setup` fixture also allows running code after the execution, if it `yield`s the execution to the task(s):
+
+```python
+import time
+from robocorp.tasks import setup
+
+@setup
+def measure_time(task):
+    start = time.time()
+    yield  # Task executes here
+    duration = time.time() - start
+    print(f"Task took {duration} seconds")
+
+@task
+def my_long_task():
+    ...
+```
+
 **Note:** If fixtures are defined in another file, they need to be imported in the main tasks file to be taken into use
 
 ______________________________________________________________________
 
 ## function `teardown`
 
-**Source:** [`_fixtures.py:102`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L102)
+**Source:** [`_fixtures.py:148`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L148)
 
 ```python
 teardown(
     *args,
     **kwargs
-) → Union[Callable[[Sequence[ITask]], Any], Callable[[Callable[[Sequence[ITask]], Any]], Callable[[Sequence[ITask]], Any]], Callable[[Callable[[ITask], Any]], Callable[[ITask], Any]]]
+) → Union[Callable[[ITask], Any], Callable[[Callable[[ITask], Any]], Callable[[ITask], Any]], Callable[[Callable[[Sequence[ITask]], Any]], Callable[[Sequence[ITask]], Any]]]
 ```
 
 Run code after tasks have been run, or after each separate task.

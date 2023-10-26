@@ -165,10 +165,9 @@ def test_setup_generator():
     is_called = False
 
     @tasks_setup
-    def fixture_gen(before):
-        assert before == "before"
-        after = yield
-        assert after == "after"
+    def fixture_gen(task):
+        assert task == "task"
+        yield
         nonlocal is_called
         is_called = True
 
@@ -176,13 +175,13 @@ def test_setup_generator():
     assert len(before_task_run) == 1
     assert len(after_task_run) == 0
 
-    before_task_run("before")
+    before_task_run("task")
 
     assert not is_called
     assert len(before_task_run) == 1
     assert len(after_task_run) == 1
 
-    after_task_run("after")
+    after_task_run("task")
 
     assert is_called
     assert len(before_task_run) == 1

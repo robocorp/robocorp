@@ -79,23 +79,3 @@ def measure_time(task):
 def my_long_task():
     ...
 ```
-
-It's also possible to access the task's result by assigning a value from
-the `yield` statement:
-
-```python
-from robocorp.import browser
-from robocorp.tasks import setup
-
-
-@setup
-def before_and_after(task_before):
-    print(f"Task before running: {task_before}")
-    task_after = yield
-    print(f"Task after running: {task_after}")
-
-
-@task
-def my_task():
-    ...
-```
