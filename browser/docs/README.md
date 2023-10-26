@@ -2,7 +2,7 @@
 
 The `robocorp-browser` is a wrapper for the [Playwright](https://playwright.dev/python/)
 project, with quality-of-life improvements such as automatic lifecycle management
-for Playwright objects.
+for Playwright objects (meant to be used with `robocorp-tasks`).
 
 ## Getting started
 
@@ -54,6 +54,7 @@ def login():
 ## Guides
 
 - [Browser configuration](https://github.com/robocorp/robo/blob/master/browser/docs/guides/00-configuration.md)
+- [Persistent Context](https://github.com/robocorp/robo/blob/master/browser/docs/guides/01-persistent-context.md)
 
 ## API Reference
 

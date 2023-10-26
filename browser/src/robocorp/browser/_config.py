@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional, Union
 
 from robocorp.tasks import session_cache
@@ -13,6 +14,7 @@ class _BrowserConfig:
         "_slowmo",
         "_screenshot",
         "_isolated",
+        "_persistent_context_directory",
         "__weakref__",
     ]
 
@@ -24,6 +26,7 @@ class _BrowserConfig:
         slowmo: int = 0,
         screenshot: str = "only-on-failure",
         isolated: bool = False,
+        persistent_context_directory: Optional[Union[str, Path]] = None,
     ):
         """
         Args:
@@ -37,8 +40,9 @@ class _BrowserConfig:
                 Install browser or not. If not defined, download is only
                 attempted if the browser fails to launch.
 
-            headless:
-                Run headless or not.
+            headless: If set to False the browser UI will be shown. If set to True
+                the browser UI will be kept hidden. If unset or set to None it'll
+                show the browser UI only if a debugger is detected.
 
             slowmo:
                 Run interactions in slow motion (number in millis).
@@ -49,8 +53,16 @@ class _BrowserConfig:
                 choices=["on", "off", "only-on-failure"]
 
             isolated:
-                Whether to store downloaded browser engines inside the isolated
-                environment, or in a global cache
+                Used to define where the browser should be downloaded. If
+                `True`, it'll be installed inside the isolated environment. If
+                `False` (default) it'll be installed in a global cache folder.
+
+            persistent_context_directory:
+                If a persistent context should be used, this should be the
+                directory in which the persistent context should be
+                stored/loaded from (it can be used to store the state of the
+                automation to allow for sessions and cookies to be reused in a
+                new automation).
         """  # noqa
         self.browser_engine = browser_engine
         self.install = install
@@ -58,6 +70,7 @@ class _BrowserConfig:
         self.slowmo = slowmo
         self.screenshot = screenshot
         self.isolated = isolated
+        self.persistent_context_directory = persistent_context_directory
 
     @property
     def browser_engine(self) -> BrowserEngine:
@@ -112,6 +125,14 @@ class _BrowserConfig:
     def isolated(self, value: bool):
         assert isinstance(value, bool)
         self._isolated = value
+
+    @property
+    def persistent_context_directory(self) -> Optional[Union[str, Path]]:
+        return self._persistent_context_directory
+
+    @persistent_context_directory.setter
+    def persistent_context_directory(self, value: Optional[Union[str, Path]]):
+        self._persistent_context_directory = value
 
 
 @session_cache
