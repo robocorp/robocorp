@@ -148,3 +148,28 @@ def test_browser_type_launch_args(clear_session_caches, monkeypatch):
     clear_session_caches()
     browser.configure(headless=None)
     assert browser_type_launch_args()["headless"] is default_headless
+
+
+def test_close_with_multiple_pages(pyfile, datadir):
+    from devutils.fixtures import robocorp_tasks_run
+    from robocorp.log import verify_log_messages_from_log_html
+
+    @pyfile
+    def task_pyfile_run_tasks():
+        from robocorp import browser, tasks
+
+        @tasks.task
+        def check_close_multiple_pages() -> None:
+            browser.page()
+            browser.context().new_page()
+
+    robocorp_tasks_run(["run", task_pyfile_run_tasks], returncode=0, cwd=datadir)
+    log_html = datadir / "output" / "log.html"
+    assert log_html.exists()
+    verify_log_messages_from_log_html(
+        log_html,
+        [
+            {"message_type": "ST", "name": "check_close_multiple_pages"},
+            {"message_type": "ET", "status": "PASS"},
+        ],
+    )

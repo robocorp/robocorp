@@ -53,6 +53,8 @@ def browser_type_launch_args() -> dict[str, Any]:
 
 @session_cache
 def playwright() -> Iterator[Playwright]:
+    import asyncio
+
     config = browser_config()
 
     # Make sure playwright searches from robocorp-specific path
@@ -62,8 +64,24 @@ def playwright() -> Iterator[Playwright]:
 
     pw = sync_playwright().start()
     yield pw
-    # Need to stop when tasks finish running.
-    pw.stop()
+    loop = asyncio.get_running_loop()
+
+    def _stop_loop():
+        loop.stop()
+
+    # Fix for https://github.com/microsoft/playwright-python/issues/2135
+    # (where playwright gets stuck on pw.stop()).
+    loop.call_later(2, _stop_loop)
+    try:
+        pw.stop()
+    except Exception as e:
+        # This could happen in theory if there's some upcoming item scheduled
+        # to run later which still hasn't run (for us, at teardown, this is Ok,
+        # we don't want to fail due to that).
+        log.exception(
+            f"Ignoring Exception raised when finishing playwright and "
+            f"the asyncio loop: {e}"
+        )
 
 
 @session_cache
@@ -146,8 +164,6 @@ def browser_context_kwargs() -> dict:
 @task_cache
 def context(**kwargs) -> Iterator[BrowserContext]:
     from robocorp.tasks import get_current_task
-
-    from ._config import browser_config
 
     pages: list[Page] = []
     all_kwargs: dict = {}
