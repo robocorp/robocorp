@@ -3,6 +3,7 @@ import json
 import sys
 import threading
 import typing
+from collections.abc import MutableSet
 from contextlib import contextmanager, nullcontext
 from io import StringIO
 from pathlib import Path
@@ -23,12 +24,13 @@ from typing import (
 )
 
 from . import _config
+from ._log_redacter import _log_redacter
 from ._logger_instances import _get_logger_instances
 
 # Not part of the API, used to determine whether a file is a project file
 # or a library file when running with the FilterKind.log_on_project_call kind.
 from ._rewrite_filtering import FilesFiltering as _FilesFiltering
-from ._sensitive_variable_names import SensitiveVariableNames as _SensitiveVariableNames
+from ._sensitive_variable_names import _sensitive_names
 from ._suppress_helper import SuppressHelper as _SuppressHelper
 from .protocols import IReadLines, LogHTMLStyle, Status
 
@@ -75,7 +77,7 @@ def _log(level, message: Sequence[Any], html: bool = False) -> None:
 
         name, libname, source, lineno
 
-        robo_logger: _RoboLogger
+        robo_logger: "_RoboLogger"
         with _get_logger_instances() as logger_instances:
             for robo_logger in logger_instances:
                 robo_logger.log_message(level, m, html, name, libname, source, lineno)
@@ -341,7 +343,7 @@ def console_message(
     _ConsoleMessagesLock.tlocal._writing = True
 
     try:
-        robo_logger: _RoboLogger
+        robo_logger: "_RoboLogger"
         with _get_logger_instances() as logger_instances:
             for robo_logger in logger_instances:
                 robo_logger.console_message(message, kind)
@@ -522,9 +524,6 @@ def suppress(*args, **kwargs):
     return _suppress_helper.handle(*args, **kwargs)
 
 
-_sensitive_names = _SensitiveVariableNames(("password", "passwd"))
-
-
 def is_sensitive_variable_name(variable_name: str) -> bool:
     """
     Returns true if the given variable name should be considered sensitive.
@@ -584,9 +583,60 @@ def hide_from_output(string_to_hide: str) -> None:
     Args:
         string_to_hide: The string that should be hidden from the output.
     """
-    with _get_logger_instances() as logger_instances:
-        for robo_logger in logger_instances:
-            robo_logger.hide_from_output(string_to_hide)
+
+    _log_redacter.hide_from_output(string_to_hide)
+
+
+class IRedactConfiguration(Protocol):
+    @property
+    def dont_hide_strings(self) -> MutableSet[str]:
+        """
+        This provides the set of strings that should not be hidden from the
+        logs.
+
+        The default strings that should not be hidden are:
+        'None', 'True', 'False'
+        """
+
+    @property
+    def hide_strings(self) -> MutableSet[str]:
+        """
+        This provides the set of strings that should be hidden from the logs.
+        """
+
+    # Strings smaller than this value won't be redacted in the logs.
+    # Default value 2 means that strings with 1 or 2 chars will never be
+    # hidden from the logs.
+    dont_hide_strings_smaller_or_equal_to: int = 2
+
+
+def hide_strings_config() -> IRedactConfiguration:
+    """
+    Can be used to configure heuristics on what should be hidden and what
+    should not be hidden from the logs.
+
+    Example:
+        ```python
+        from robocorp import log
+        config = log.hide_strings_config()
+
+        # The word 'House' will not be hidden going forward.
+        config.dont_hide_strings.add('House')
+
+        # By default 'True' is not hidden, change it so that it is hidden if
+        # requested.
+        config.dont_hide_strings.discard('True')
+
+        # Note: this has the same effect as `log.hide_from_output('True')`
+        config.hide_strings.add('True')
+
+        # It's also possible to determine the minimum size of the strings
+        # to be redacted. The setting below sets things so that strings
+        # with 1, 2 or 3 chars won't be hidden.
+        config.dont_hide_strings_smaller_or_equal_to = 3
+        ```
+    """
+    return _log_redacter.config
 
 
 # --- Logging methods usually called automatically from the framework.

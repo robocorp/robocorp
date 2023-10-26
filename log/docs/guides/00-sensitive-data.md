@@ -80,3 +80,25 @@ def handle_sensitive_info()
         ...
 
 ```
+
+
+### Specifying strings that should never be hidden
+
+On some cases it's possible that some common string ends up being redacted
+(for instance, `None` could end up being redacted or just the letter `a`).
+This can make it really hard to read logs afterwards, as those strings would
+be redacted everywhere.
+
+For such circumstances it's possible to configure the logging so that redaction
+of such strings doesn't happen (by default `'None', 'True', 'False' and
+strings with 2 or less chars won't be redacted, but it's possible to configure
+it as needed).
+
+Example:
+
+```python
+from robocorp import log
+config = log.hide_strings_config()
+config.dont_hide_strings_smaller_or_equal_to = 3
+config.dont_hide_strings.add('hour')
+```
