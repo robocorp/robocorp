@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
 
-from robocorp.tasks._protocols import ITask, Status
+from robocorp.tasks._protocols import IContext, ITask, Status
 
 
 class Task:
@@ -184,3 +184,8 @@ class Context:
             self._after_task_run
         ):
             yield
+
+    def __typecheckself__(self) -> None:
+        from robocorp.tasks._protocols import check_implements
+
+        _: IContext = check_implements(self)

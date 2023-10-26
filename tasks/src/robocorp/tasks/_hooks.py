@@ -15,10 +15,10 @@ on_task_func_found: IOnTaskFuncFoundCallback = Callback(raise_exceptions=True)
 before_collect_tasks: IBeforeCollectTasksCallback = Callback()
 
 # Called as before_all_tasks_run(tasks: List[ITask])
-before_all_tasks_run: IBeforeAllTasksRunCallback = Callback()
+before_all_tasks_run: IBeforeAllTasksRunCallback = Callback(raise_exceptions=True)
 
-# Called as before_collect_tasks(task: ITask)
-before_task_run: IBeforeTaskRunCallback = Callback()
+# Called as before_task_run(task: ITask)
+before_task_run: IBeforeTaskRunCallback = Callback(raise_exceptions=True)
 
 # Called as after_task_run(task: ITask)
 # Note that this one is done in reversed registry order (as is usually

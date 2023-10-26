@@ -14,7 +14,7 @@ class OnExitContextManager:
         self.on_exit()
 
 
-class Callback(object):
+class Callback:
     """
     Note that it's thread safe to register/unregister callbacks while callbacks
     are being notified, but it's not thread-safe to register/unregister at the

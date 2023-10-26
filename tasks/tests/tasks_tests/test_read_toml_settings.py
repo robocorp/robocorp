@@ -2,8 +2,7 @@ from pathlib import Path
 
 
 def test_read_toml_settings():
-    from robocorp.log.pyproject_config import PyProjectInfo
-    from robocorp.log.pyproject_config import read_section_from_toml
+    from robocorp.log.pyproject_config import PyProjectInfo, read_section_from_toml
 
     errors_shown = []
 

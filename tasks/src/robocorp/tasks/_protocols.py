@@ -1,7 +1,8 @@
 import typing
+from contextlib import contextmanager
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Callable, Optional, Sequence, Set, TypeVar, Union
+from typing import Any, Callable, Iterator, Optional, Sequence, Set, TypeVar, Union
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
@@ -69,8 +70,17 @@ class ITask(typing.Protocol):
         """
 
 
-class IContextErrorReport(typing.Protocol):
-    def show_error(self, message):
+class IContext(typing.Protocol):
+    def show(
+        self, msg: str, end: str = "", kind: str = "", flush: Optional[bool] = None
+    ):
+        pass
+
+    def show_error(self, msg: str, flush: Optional[bool] = None):
+        pass
+
+    @contextmanager
+    def register_lifecycle_prints(self) -> Iterator[None]:
         pass
 
 
@@ -118,16 +128,18 @@ class IBeforeCollectTasksCallback(ICallback, typing.Protocol):
         pass
 
 
+ITaskCallback = Callable[[ITask], Any]
+ITasksCallback = Callable[[Sequence[ITask]], Any]
+
+
 class IBeforeTaskRunCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
         pass
 
-    def register(
-        self, callback: Callable[[ITask], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITaskCallback) -> IAutoUnregisterContextManager:
         pass
 
-    def unregister(self, callback: Callable[[ITask], Any]) -> None:
+    def unregister(self, callback: ITaskCallback) -> None:
         pass
 
 
@@ -135,9 +147,7 @@ class IBeforeAllTasksRunCallback(ICallback, typing.Protocol):
     def __call__(self, tasks: Sequence[ITask]):
         pass
 
-    def register(
-        self, callback: Callable[[Sequence[ITask]], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITasksCallback) -> IAutoUnregisterContextManager:
         pass
 
     def unregister(self, callback: Callable[[Sequence[ITask]], Any]) -> None:
@@ -148,12 +158,10 @@ class IAfterAllTasksRunCallback(ICallback, typing.Protocol):
     def __call__(self, tasks: Sequence[ITask]):
         pass
 
-    def register(
-        self, callback: Callable[[Sequence[ITask]], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITasksCallback) -> IAutoUnregisterContextManager:
         pass
 
-    def unregister(self, callback: Callable[[Sequence[ITask]], Any]) -> None:
+    def unregister(self, callback: ITasksCallback) -> None:
         pass
 
 
@@ -161,10 +169,8 @@ class IAfterTaskRunCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
         pass
 
-    def register(
-        self, callback: Callable[[ITask], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITaskCallback) -> IAutoUnregisterContextManager:
         pass
 
-    def unregister(self, callback: Callable[[ITask], Any]) -> None:
+    def unregister(self, callback: ITaskCallback) -> None:
         pass

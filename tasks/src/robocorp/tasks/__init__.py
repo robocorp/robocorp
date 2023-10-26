@@ -34,6 +34,7 @@ automatically logged is not imported prior the the `cli.main` call.
 from pathlib import Path
 from typing import Optional
 
+from ._fixtures import setup, teardown
 from ._protocols import ITask
 
 __version__ = "2.2.0"
@@ -138,4 +139,13 @@ def get_current_task() -> Optional[ITask]:
     return _task.get_current_task()
 
 
-__all__ = ["task", "session_cache", "task_cache", "get_output_dir", "get_current_task"]
+__all__ = [
+    "task",
+    "setup",
+    "teardown",
+    "session_cache",
+    "task_cache",
+    "get_output_dir",
+    "get_current_task",
+    "ITask",
+]

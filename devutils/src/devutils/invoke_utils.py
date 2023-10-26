@@ -163,9 +163,9 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
             poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
 
     @task
-    def typecheck(ctx):
+    def typecheck(ctx, strict: bool = False):
         """Type check code"""
-        poetry(
+        cmd = [
             ctx,
             "run mypy",
             "--follow-imports=silent",
@@ -173,7 +173,10 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
             "--namespace-packages",
             "--explicit-package-bases",
             f"-p {package_name}",
-        )
+        ]
+        if strict:
+            cmd.append("--strict")
+        poetry(*cmd)
 
     @task
     def pretty(ctx):
