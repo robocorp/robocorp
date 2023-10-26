@@ -24,11 +24,14 @@ robocorp-log = ">=2.4,<3"
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
 
-[tool.mypy]
-mypy_path = "src:tests"
-
 [tool.isort]
 profile = "black"
+
+[tool.ruff]
+ignore = ["E501"]
+
+[tool.mypy]
+mypy_path = "src:tests"
 
 [[tool.mypy.overrides]]
 module = "setuptools.*"
