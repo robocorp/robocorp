@@ -12,6 +12,7 @@
     - If not specified the `RC_TEARDOWN_INTERRUPT_TIMEOUT` environment variable may also be used.
 
 - Add support for fixtures with the new `setup` and `teardown` decorators
+- Allow modifying the `status` of tasks in fixtures
 
 ## 2.2.0 - 2023-09-07
 
