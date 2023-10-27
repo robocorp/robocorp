@@ -648,8 +648,8 @@ def end_task(name: str, libname: str, status: str, message: str) -> None:
     Args:
         name: The name of the task.
         libname: The library (module name) where the task is defined.
-        status: The source of the task.
-        message: The line number of the task in the given source.
+        status: The pass/fail status of the task
+        message: The message for a failed task
 
     Note: robocorp-tasks calls this method automatically.
     """

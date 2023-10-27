@@ -1,5 +1,6 @@
 import typing
 from contextlib import contextmanager
+from enum import Enum
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Callable, Iterator, Optional, Sequence, Set, TypeVar, Union
@@ -29,17 +30,12 @@ def check_implements(x: T) -> T:
     return x
 
 
-# Note: this is a bit messy as we're mixing task states with log levels.
-# Note2: This is for the log.html and not really for user APIs.
-class Status:
-    NOT_RUN = "NOT_RUN"  # Initial status for a task which is not run.
-    PASS = "PASS"  # Used for task pass
-    FAIL = "FAIL"  # Used for task failure
+class Status(str, Enum):
+    """Task state"""
 
-    ERROR = "ERROR"  # log.critical
-    INFO = "INFO"  # log.info
-    WARN = "WARN"  # log.warn
-    DEBUG = "DEBUG"  # log.debug
+    NOT_RUN = "NOT_RUN"
+    PASS = "PASS"
+    FAIL = "FAIL"
 
 
 class ITask(typing.Protocol):
@@ -47,7 +43,7 @@ class ITask(typing.Protocol):
     filename: str
     method: typing.Callable
 
-    status: str
+    status: Status
     message: str
     exc_info: Optional[OptExcInfo]
 

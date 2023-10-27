@@ -1,10 +1,9 @@
 import json
 import os
 import sys
-import threading
 import traceback
 from pathlib import Path
-from typing import List, Optional, Sequence, Union
+from typing import List, Literal, Optional, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
@@ -229,16 +228,17 @@ def run(
         max_files=max_log_files,
         max_file_size=max_log_file_size,
     ), setup_log_output_to_port(), context.register_lifecycle_prints():
-        run_status = "PASS"
-        setup_message = ""
-
         run_name = os.path.basename(p)
         if task_name:
             run_name += f" - {task_name}"
 
+        # Status string from `log` module
+        # TODO: Replace with enum
+        run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
         log.start_run(run_name)
 
         try:
+            setup_message = ""
             log.start_task("Collect tasks", "setup", "", 0)
             try:
                 if not task_name:
@@ -257,8 +257,8 @@ def run(
             except Exception as e:
                 run_status = "ERROR"
                 setup_message = str(e)
-                log.exception()
 
+                log.exception()
                 if not isinstance(e, RobocorpTasksCollectError):
                     traceback.print_exc()
                 else:
@@ -268,8 +268,6 @@ def run(
             finally:
                 log.end_task("Collect tasks", "setup", run_status, setup_message)
 
-            returncode = 0
-
             before_all_tasks_run(tasks)
 
             try:
@@ -278,11 +276,9 @@ def run(
                     before_task_run(task)
                     try:
                         task.run()
-                        run_status = task.status = Status.PASS
+                        task.status = Status.PASS
                     except Exception as e:
-                        run_status = task.status = Status.ERROR
-                        if not no_status_rc:
-                            returncode = 1
+                        task.status = Status.FAIL
                         task.message = str(e)
                         task.exc_info = sys.exc_info()
                     finally:
@@ -297,6 +293,8 @@ def run(
                         ):
                             after_task_run(task)
                         set_current_task(None)
+                        if task.failed:
+                            run_status = "ERROR"
             finally:
                 log.start_task("Teardown tasks", "teardown", "", 0)
                 try:
@@ -315,7 +313,10 @@ def run(
                 finally:
                     log.end_task("Teardown tasks", "teardown", Status.PASS, "")
 
-            return returncode
+            if no_status_rc:
+                return 0
+            else:
+                return int(any(task.failed for task in tasks))
         finally:
             log.end_run(run_name, run_status)
 
