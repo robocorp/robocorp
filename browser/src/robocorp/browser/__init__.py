@@ -24,13 +24,38 @@ def configure(**kwargs) -> None:
     initialized will have no effect).
 
     Args:
-        browser_engine: Browser engine which should be used (default: Chromium)
+        browser_engine:
+            Browser engine which should be used
+            default="chromium"
+            choices=["chromium", "chrome", "chrome-beta", "msedge",
+                     "msedge-beta", "msedge-dev", "firefox", "webkit"]
+
+        install:
+            Install browser or not. If not defined, download is only
+            attempted if the browser fails to launch.
+
         headless: If set to False the browser UI will be shown. If set to True
             the browser UI will be kept hidden. If unset or set to None it'll
             show the browser UI only if a debugger is detected.
-        slowmo: Run interactions in slow motion.
+
+        slowmo:
+            Run interactions in slow motion (number in millis).
+
         screenshot: Whether to automatically capture a screenshot after each task.
             Options are `on`, `off`, and `only-on-failure` (default).
+
+        isolated:
+            Used to define where the browser should be downloaded. If `True`,
+            it'll be installed inside the isolated environment. If `False`
+            (default) it'll be installed in a global cache folder.
+
+        persistent_context_directory:
+            If a persistent context should be used, this should be the
+            directory in which the persistent context should be
+            stored/loaded (it can be used to store the state of the
+            automation to allow for sessions and cookies to be reused in a
+            new automation).
+
         viewport_size: Size to be set for the viewport. Specified as tuple(width, height).
 
     Note:
@@ -117,6 +142,13 @@ def browser() -> Browser:
 
         Note that the returned browser must not be closed. It will be
         automatically closed when the task run session finishes.
+
+    Raises:
+        RuntimeError:
+            If `persistent_context_directory` is specified in the configuration
+            and this method is called a RuntimeError is raised (as in this case
+            this API is not applicable as the browser and the context must be
+            created at once and the browser can't be reused for the session).
     """
     from . import _context
 

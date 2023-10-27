@@ -1,6 +1,8 @@
 import os
 import sys
-from typing import Any, Callable, Iterator
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable, Iterator, Optional, Union
 
 from playwright.sync_api import (
     Browser,
@@ -95,11 +97,19 @@ def _browser_type() -> BrowserType:
 
 
 @session_cache
-def _browser_launcher() -> Callable[..., Browser]:
+def _browser_launcher() -> Callable[..., Union[Browser, BrowserContext]]:
+    """
+    If a persistent_context_directory is requested, playwright doesn't really
+    have an API to provide a `Browser`, just a `BrowserContext` (it opens with
+    a default blank page by default), so, in this case we have to deal with
+    both returns (the regular browser() api will throw an error if that's the
+    case -- that's backward compatible because this would never happen
+    before the `persistent_context_directory` configuration option was available).
+    """
     config = browser_config()
     browser_type: BrowserType = _browser_type()
 
-    def launch(**kwargs: dict[str, Any]) -> Browser:
+    def launch(**kwargs: dict[str, Any]) -> Union[Browser, BrowserContext]:
         launch_options = {**browser_type_launch_args(), **kwargs}
 
         if "channel" not in launch_options:
@@ -107,8 +117,18 @@ def _browser_launcher() -> Callable[..., Browser]:
             if channel is not None:
                 launch_options["channel"] = channel
 
+        persistent_context_directory = __persistent_context_directory()
         try:
-            return browser_type.launch(**launch_options)
+            if persistent_context_directory is None:
+                return browser_type.launch(**launch_options)
+            else:
+                # launch_persistent_context is a mixture of the launch + context,
+                # so, in this case we use both here.
+                launch_options.update(browser_context_kwargs())
+                ctx = browser_type.launch_persistent_context(
+                    persistent_context_directory, **launch_options
+                )
+                return ctx
         except Error as err:
             if "executable doesn't exist" not in err.message.lower():
                 raise
@@ -121,28 +141,60 @@ def _browser_launcher() -> Callable[..., Browser]:
 
 
 @session_cache
+def __persistent_context_directory() -> Optional[Union[str, Path]]:
+    # After queried once it cannot change anymore (so, be careful with it).
+    return browser_config().persistent_context_directory
+
+
+def __launch_browser_or_context(
+    check_install: bool, **kwargs
+) -> Union[Browser, BrowserContext]:
+    """
+    Note: this is not directly cached, but it should be called from
+    functions which are `session_cache` or `task_cache` themselves.
+
+    Args:
+        check_install: Flag which determines whether we should install the
+        browser if it's not available.
+    """
+    config = browser_config()
+    launcher = _browser_launcher()
+
+    if check_install and config.install:
+        install_browser(engine=config.browser_engine, isolated=config.isolated)
+
+    try:
+        return launcher(**kwargs)
+    except BrowserNotFound:
+        if not check_install:
+            raise
+
+        if config.install is not None:
+            raise
+
+    # If we reached here we must check whether the browser was installed.
+    install_browser(engine=config.browser_engine, isolated=config.isolated)
+    return launcher(**kwargs)
+
+
+@session_cache
 def browser(**kwargs) -> Iterator[Browser]:
     """
     The kwargs are passed as additional launch options to the
     BrowserType.launch(**kwargs).
     """
-    # Note: one per session (must be tear-down).
-    config = browser_config()
-    launcher = _browser_launcher()
+    if __persistent_context_directory() is not None:
+        raise RuntimeError(
+            "This API is not available when launching a persistent context. "
+            "Please use the `context` instead."
+        )
 
-    if config.install:
-        install_browser(engine=config.browser_engine, isolated=config.isolated)
-
-    try:
-        browser = launcher(**kwargs)
-    except BrowserNotFound:
-        browser = None
-        if config.install is not None:
-            raise
-
-    if browser is None:
-        install_browser(engine=config.browser_engine, isolated=config.isolated)
-        browser = launcher(**kwargs)
+    browser = __launch_browser_or_context(True, **kwargs)
+    if not isinstance(browser, Browser):
+        raise AssertionError(
+            f"When not using a persistent context directory a Browser is expected here."
+            f" Found: {type(browser)} ({browser})."
+        )
 
     yield browser
     browser.close()
@@ -161,45 +213,73 @@ def browser_context_kwargs() -> dict:
     return {}
 
 
+@dataclass
+class _State:
+    # With a persistent context we have to check the install on the
+    # first call, but not on subsequent ones.
+    check_install: bool = True
+
+
+@session_cache
+def __state():
+    # Helper to provide the state given a session.
+    return _State()
+
+
 @task_cache
 def context(**kwargs) -> Iterator[BrowserContext]:
     from robocorp.tasks import get_current_task
 
-    pages: list[Page] = []
-    all_kwargs: dict = {}
-    all_kwargs.update(**browser_context_kwargs())
-    all_kwargs.update(**kwargs)
-    ctx = browser().new_context(**all_kwargs)
-    ctx.on("page", lambda page: pages.append(page))
+    if __persistent_context_directory() is None:
+        all_kwargs: dict = {}
+        all_kwargs.update(**browser_context_kwargs())
+        all_kwargs.update(**kwargs)
+
+        ctx = browser().new_context(**all_kwargs)
+    else:
+        state = __state()
+        check_install = state.check_install
+        state.check_install = False  # On subsequent calls we shouldn't check it.
+        browser_or_context = __launch_browser_or_context(check_install, **kwargs)
+        ctx = browser_or_context
 
     yield ctx
 
-    task = get_current_task()
-    failed = False
-    if task is not None:
-        failed = task.failed
+    try:
+        task = get_current_task()
+        failed = False
+        if task is not None:
+            failed = task.failed
 
-    screenshot_option = browser_config().screenshot
-    capture_screenshot = screenshot_option == "on" or (
-        failed and screenshot_option == "only-on-failure"
-    )
-    if capture_screenshot:
-        from robocorp.browser import screenshot
+        screenshot_option = browser_config().screenshot
+        capture_screenshot = screenshot_option == "on" or (
+            failed and screenshot_option == "only-on-failure"
+        )
+        if capture_screenshot:
+            from robocorp.browser import screenshot
 
-        for p in pages:
-            if not p.is_closed():
-                try:
-                    screenshot(p, log_level="ERROR" if failed else "INFO")
-                except Error:
-                    pass
-
-    ctx.close()
+            for p in ctx.pages:
+                if not p.is_closed():
+                    try:
+                        screenshot(p, log_level="ERROR" if failed else "INFO")
+                    except Error:
+                        pass
+    finally:
+        ctx.close()
 
 
 @task_cache
 def page() -> Page:
     ctx: BrowserContext = context()
-    p = ctx.new_page()
+
+    current_pages = ctx.pages
+    if len(current_pages) > 0:
+        # On the case where the persistent_context_directory is specified
+        # playwright automatically creates an empty page, so, provide it
+        # by default.
+        p = current_pages[0]
+    else:
+        p = ctx.new_page()
 
     # When the page is closed we automatically clear the cache.
     p.on("close", lambda *args: page.clear_cache())

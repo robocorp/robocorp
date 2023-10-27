@@ -31,11 +31,6 @@ Valid values:
 - firefox
 - webkit
 
-### `install`
-
-Install browser before starting. If not defined, download is only
-attempted if the browser fails to launch.
-
 ### `headless`
 
 Run the browser in headless mode.
@@ -55,3 +50,25 @@ Valid values:
 - on
 - off
 - only-on-failure
+
+
+### `install`
+
+Install browser before starting. If not defined, download is only
+attempted if the browser fails to launch.
+
+
+### `isolated`
+
+Used to define where the browser should be downloaded. If `True`, it'll be installed 
+inside the isolated environment. If `False` (default) it'll be installed in a global cache folder.
+
+
+### `persistent_context_directory`
+
+If a persistent context should be used, this should be the directory in which 
+the persistent context should be stored/loaded from (it can be used to store 
+the state of the automation to allow for sessions and cookies to be reused in a
+new automation).
+
+See: [Persistent Context Directory Guide](https://github.com/robocorp/robo/blob/master/browser/docs/guides/01-persistent_context.md)
