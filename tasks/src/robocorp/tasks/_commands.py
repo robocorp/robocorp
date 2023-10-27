@@ -3,7 +3,7 @@ import os
 import sys
 import traceback
 from pathlib import Path
-from typing import List, Optional, Sequence, Union
+from typing import List, Literal, Optional, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
@@ -232,7 +232,9 @@ def run(
         if task_name:
             run_name += f" - {task_name}"
 
-        run_status: str = Status.PASS
+        # Status string from `log` module
+        # TODO: Replace with enum
+        run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
         log.start_run(run_name)
 
         try:
@@ -253,7 +255,7 @@ def run(
                         f"Did not find any tasks in: {path}"
                     )
             except Exception as e:
-                run_status = Status.ERROR
+                run_status = "ERROR"
                 setup_message = str(e)
 
                 log.exception()
@@ -276,7 +278,7 @@ def run(
                         task.run()
                         task.status = Status.PASS
                     except Exception as e:
-                        task.status = Status.ERROR
+                        task.status = Status.FAIL
                         task.message = str(e)
                         task.exc_info = sys.exc_info()
                     finally:
@@ -292,7 +294,7 @@ def run(
                             after_task_run(task)
                         set_current_task(None)
                         if task.failed:
-                            run_status = Status.ERROR
+                            run_status = "ERROR"
             finally:
                 log.start_task("Teardown tasks", "teardown", "", 0)
                 try:

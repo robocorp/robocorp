@@ -35,7 +35,7 @@ from pathlib import Path
 from typing import Optional
 
 from ._fixtures import setup, teardown
-from ._protocols import ITask
+from ._protocols import ITask, Status
 
 __version__ = "2.2.0"
 version_info = [int(x) for x in __version__.split(".")]
@@ -148,4 +148,5 @@ __all__ = [
     "get_output_dir",
     "get_current_task",
     "ITask",
+    "Status",
 ]
