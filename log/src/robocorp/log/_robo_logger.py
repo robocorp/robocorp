@@ -100,9 +100,6 @@ class _RoboLogger:
         self._skip_log_methods = 0
         self._skip_log_variables = 0
 
-    def hide_from_output(self, string_to_hide: str) -> None:
-        self._robot_output_impl.hide_from_output(string_to_hide)
-
     @property
     def robot_output_impl(self):
         return self._robot_output_impl

@@ -1,0 +1,11 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_dont_redact_configure
+            AS: config: <robocorp.log._log_redacter.RedactConfiguration object at 0xXXXXXXXXX>
+            L: D: '<redacted>'
+            L: D: 'value'
+            L: D: 'sss'
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

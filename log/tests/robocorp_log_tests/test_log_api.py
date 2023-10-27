@@ -1,19 +1,21 @@
 """
 This module should provide a basic example on the usage of the logging.
 """
-import threading
 import contextlib
+import threading
 
 
 def test_log_api(tmpdir, str_regression) -> None:
+    import io
     from imp import reload
 
     from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import basic_log_setup
+    from robocorp_log_tests.fixtures import (
+        basic_log_setup,
+        pretty_format_logs_from_log_html,
+    )
 
     from robocorp import log
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
-    import io
 
     stdout = io.StringIO()
     stderr = io.StringIO()
@@ -70,8 +72,7 @@ def test_log_api_without_with_statments(tmpdir) -> None:
     from robocorp.log import verify_log_messages_from_log_html
 
     log_target = Path(tmpdir.join("log.html"))
-    ctx = log.setup_auto_logging()
-    try:
+    with log.setup_auto_logging():
         try:
             check = reload(check)
 
@@ -93,5 +94,3 @@ def test_log_api_without_with_statments(tmpdir) -> None:
 
         assert log_target.exists()
         verify_log_messages_from_log_html(log_target, [dict(message_type="SE")], [])
-    finally:
-        ctx.__exit__(None, None, None)

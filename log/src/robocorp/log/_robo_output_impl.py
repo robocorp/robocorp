@@ -12,20 +12,10 @@ from datetime import timezone
 from functools import partial
 from pathlib import Path
 from types import FrameType
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Pattern,
-    Sequence,
-    Set,
-    Tuple,
-)
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 from robocorp.log._constants import UNSCOPED_ELEMENTS
+from robocorp.log._log_redacter import _log_redacter
 
 from .protocols import LogElementType, OptExcInfo
 
@@ -380,28 +370,12 @@ class _RoboOutputImpl:
             self._write_on_start_or_after_rotate()
 
         self.on_show_error_message = None
-        self._hide_strings_re: Optional[Pattern[str]] = None
-        self._hide_strings: Set[str] = set()
-
         self._next_int: "partial[int]" = partial(next, itertools.count(0))
 
     def show_error_message(self, msg):
         sys.stderr.write(msg)
         if self.on_show_error_message:
             self.on_show_error_message(msg)
-
-    def hide_from_output(self, string_to_hide: str) -> None:
-        import re
-
-        if string_to_hide in self._hide_strings:
-            return
-
-        self._hide_strings.add(string_to_hide)
-        lst = []
-        for s in self._hide_strings:
-            lst.append(re.escape(s))
-
-        self._hide_strings_re = re.compile("|".join(lst))
 
     @property
     def current_file(self) -> Optional[Path]:
@@ -960,6 +934,7 @@ Virtual Memory Size: {vms}"""
             )
 
             if not hide_vars:
+                redact = _log_redacter.redact
                 for key, val in tuple(frame.f_locals.items()):
                     if key.startswith("@"):
                         # Skip our own variables.
@@ -967,9 +942,7 @@ Virtual Memory Size: {vms}"""
 
                     obj_type, obj_repr = get_obj_type_and_repr(val)
 
-                    hide_strings_re = self._hide_strings_re
-                    if hide_strings_re:
-                        obj_repr = hide_strings_re.sub("<redacted>", obj_repr)
+                    obj_repr = redact(obj_repr)
                     self._write_with_separator(
                         "TBV ",
                         [
@@ -1053,10 +1026,9 @@ Virtual Memory Size: {vms}"""
             write_it(self, "SE")
 
         if args:
+            redact = _log_redacter.redact
             for name, arg_type, arg in args:
-                hide_strings_re = self._hide_strings_re
-                if hide_strings_re:
-                    arg = hide_strings_re.sub("<redacted>", arg)
+                arg = redact(arg)
 
                 self._write_with_separator(
                     "EA ",
@@ -1121,9 +1093,7 @@ Virtual Memory Size: {vms}"""
 
         oid = self._obtain_id
 
-        hide_strings_re = self._hide_strings_re
-        if hide_strings_re:
-            yielded_value_repr = hide_strings_re.sub("<redacted>", yielded_value_repr)
+        yielded_value_repr = _log_redacter.redact(yielded_value_repr)
 
         self._write_with_separator(
             "YS ",
@@ -1147,9 +1117,7 @@ Virtual Memory Size: {vms}"""
     ):
         oid = self._obtain_id
 
-        hide_strings_re = self._hide_strings_re
-        if hide_strings_re:
-            return_repr = hide_strings_re.sub("<redacted>", return_repr)
+        return_repr = _log_redacter.redact(return_repr)
 
         self._write_with_separator(
             "R ",
@@ -1295,9 +1263,7 @@ Virtual Memory Size: {vms}"""
 
         oid = self._obtain_id
 
-        hide_strings_re = self._hide_strings_re
-        if hide_strings_re:
-            assign_repr = hide_strings_re.sub("<redacted>", assign_repr)
+        assign_repr = _log_redacter.redact(assign_repr)
 
         self._write_with_separator(
             "AS ",
@@ -1329,13 +1295,9 @@ Virtual Memory Size: {vms}"""
             # From output.xml it's "true", from listener it's "yes".
             msg_type = "LH "
 
-            hide_strings_re = self._hide_strings_re
-            if hide_strings_re:
-                message = hide_strings_re.sub("&lt;redacted&gt;", message)
+            message = _log_redacter.redact(message, "&lt;redacted&gt;")
         else:
-            hide_strings_re = self._hide_strings_re
-            if hide_strings_re:
-                message = hide_strings_re.sub("<redacted>", message)
+            message = _log_redacter.redact(message)
 
         self._write_with_separator(
             msg_type,
@@ -1359,9 +1321,7 @@ Virtual Memory Size: {vms}"""
         time_delta: float,
     ) -> None:
         self._rotate_if_needed()
-        hide_strings_re = self._hide_strings_re
-        if hide_strings_re:
-            message = hide_strings_re.sub("&lt;redacted&gt;", message)
+        message = _log_redacter.redact(message)
 
         self._write_with_separator(
             "C ",

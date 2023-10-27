@@ -1,0 +1,16 @@
+
+SR: Root Suite
+    ST: my_task
+        SE: METHOD: check_dont_redact_simple
+            AS: myvar: <redacted>
+            AS: myvar2: <redacted>
+            AS: myvar3: <redacted>
+            L: D: 'None'
+            L: D: 'a'
+            L: D: 'ab'
+            L: D: 'None'
+            L: D: 'a'
+            L: D: 'ab'
+        EE: METHOD: PASS
+    ET: PASS
+ER: PASS

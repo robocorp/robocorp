@@ -2,13 +2,25 @@ from imp import reload
 from pathlib import Path
 
 import pytest
-from robocorp.log import setup_log, verify_log_messages_from_log_html
 from robocorp_log_tests._resources import check, check_iterators
 from robocorp_log_tests.fixtures import (
     AutoLogConfigForTest,
     basic_log_setup,
     pretty_format_logs_from_log_html,
 )
+
+from robocorp.log import setup_log, verify_log_messages_from_log_html
+
+
+@pytest.fixture(autouse=True)
+def _reset_hide_strings_config():
+    from robocorp.log import hide_strings_config
+
+    config = hide_strings_config()
+    config.hide_strings.clear()
+    config.dont_hide_strings_smaller_or_equal_to = 2
+    config.dont_hide_strings.clear()
+    config.dont_hide_strings.update(("None", "True", "False"))
 
 
 def test_log_with_yield_iterator(tmpdir, ui_regenerate, str_regression):
@@ -213,6 +225,38 @@ def test_exception_suppress_variables(tmpdir, ui_regenerate, str_regression):
     assert log_target.exists()
     str_regression.check(
         pretty_format_logs_from_log_html(log_target, show_exception_vars=True)
+    )
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
+
+
+def test_dont_redact_simple(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check).check_dont_redact_simple()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(
+        pretty_format_logs_from_log_html(log_target, show_log_messages=True)
+    )
+    # for m in msgs:
+    #     print(m)
+    # setup_info.open_log_target()
+
+
+def test_dont_redact_configure(tmpdir, ui_regenerate, str_regression):
+    __tracebackhide__ = 1
+    config = AutoLogConfigForTest()
+    with basic_log_setup(tmpdir, config=config) as setup_info:
+        reload(check).check_dont_redact_configure()
+
+    log_target = setup_info.log_target
+    assert log_target.exists()
+    str_regression.check(
+        pretty_format_logs_from_log_html(log_target, show_log_messages=True)
     )
     # for m in msgs:
     #     print(m)

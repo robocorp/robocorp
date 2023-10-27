@@ -199,3 +199,37 @@ def check_with_and_for_and_yield():
             versions = range(3)
             for version in versions:
                 check(name, version)
+
+
+def check_dont_redact_simple():
+    log.add_sensitive_variable_name("myvar")
+    log.add_sensitive_variable_name("myvar2")
+    log.add_sensitive_variable_name("myvar3")
+
+    # The assign will appear redacted, but afterwards
+    # printing it will appear.
+    myvar = None
+    myvar2 = "a"
+    myvar3 = "ab"
+
+    log.debug(None)
+    log.debug("a")
+    log.debug("ab")
+    log.debug(myvar)
+    log.debug(myvar2)
+    log.debug(myvar3)
+
+
+def check_dont_redact_configure():
+    config = log.hide_strings_config()
+
+    config.hide_strings.add("something")
+    config.hide_strings.add("value")
+    config.hide_strings.add("sss")
+
+    config.dont_hide_strings.add("value")
+    config.dont_hide_strings_smaller_or_equal_to = 3
+
+    log.debug("something")
+    log.debug("value")
+    log.debug("sss")
