@@ -2,7 +2,7 @@ import threading
 
 
 def test_log_and_threads(tmpdir):
-    from imp import reload
+    from importlib import reload
 
     from robocorp_log_tests._resources import check
     from robocorp_log_tests.fixtures import AutoLogConfigForTest, basic_log_setup

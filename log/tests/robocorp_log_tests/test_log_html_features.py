@@ -8,7 +8,7 @@ def test_log_html_features(tmpdir, ui_regenerate) -> None:
     This is a test which should generate an output for a log.html which
     showcases all the features available.
     """
-    from imp import reload
+    from importlib import reload
     from pathlib import Path
 
     from robocorp_log_tests._resources import (

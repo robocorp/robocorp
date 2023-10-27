@@ -7,7 +7,7 @@ import threading
 
 def test_log_api(tmpdir, str_regression) -> None:
     import io
-    from imp import reload
+    from importlib import reload
 
     from robocorp_log_tests._resources import check
     from robocorp_log_tests.fixtures import (
@@ -63,7 +63,7 @@ def test_log_api(tmpdir, str_regression) -> None:
 
 
 def test_log_api_without_with_statments(tmpdir) -> None:
-    from imp import reload
+    from importlib import reload
     from pathlib import Path
 
     from robocorp_log_tests._resources import check

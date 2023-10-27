@@ -73,7 +73,7 @@ def _setup_test_callbacks():
 
 @pytest.mark.parametrize("config", [AutoLogConfigForTest(), DefaultAutoLogConfig()])
 def test_rewrite_hook_basic(config):
-    from imp import reload
+    from importlib import reload
 
     from robocorp_log_tests._resources import check
 
@@ -109,7 +109,7 @@ def test_rewrite_hook_basic(config):
 
 
 def test_rewrite_hook_except():
-    from imp import reload
+    from importlib import reload
 
     from robocorp_log_tests._resources import check_traceback
 
@@ -143,7 +143,7 @@ def test_rewrite_hook_except():
 
 
 def test_rewrite_hook_log_on_project_call():
-    from imp import reload
+    from importlib import reload
     from unittest import mock
 
     from robocorp_log_tests._resources import check_lib_lib, check_lib_main

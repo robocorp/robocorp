@@ -7,7 +7,7 @@ from integration_tests import _case_names
 
 
 def case_task_and_element(rcc_loc, resources_dir: Path) -> str:
-    from imp import reload
+    from importlib import reload
     from io import StringIO
 
     from robocorp import log
@@ -36,7 +36,7 @@ def case_task_and_element(rcc_loc, resources_dir: Path) -> str:
 
 
 def case_big_structures(rcc_loc, resources_dir: Path) -> str:
-    from imp import reload
+    from importlib import reload
     from io import StringIO
 
     from robocorp import log

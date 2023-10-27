@@ -2,7 +2,7 @@ from robocorp.log import verify_log_messages_from_log_html
 
 
 def test_error_in_repr(tmpdir):
-    from imp import reload
+    from importlib import reload
 
     from robocorp_log_tests._resources import check_repr_error
     from robocorp_log_tests.fixtures import basic_log_setup

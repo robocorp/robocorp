@@ -4,7 +4,7 @@ from robocorp import log as robolog
 
 
 def test_sensitive_data():
-    from imp import reload
+    from importlib import reload
     from io import StringIO
 
     from robocorp_log_tests._resources import check_sensitive_data
@@ -46,7 +46,7 @@ def test_sensitive_data():
 
 
 def test_sensitive_data_in_traceback():
-    from imp import reload
+    from importlib import reload
     from io import StringIO
 
     from robocorp_log_tests._resources import check_sensitive_data
