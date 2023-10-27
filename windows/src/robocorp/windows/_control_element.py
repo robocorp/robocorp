@@ -10,16 +10,16 @@ from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union
 
 from _ctypes import COMError
 
-from robocorp.windows._errors import ActionNotPossible, ElementNotFound
-from robocorp.windows._find_ui_automation import LocatorStrAndOrSearchParams
-from robocorp.windows.protocols import Locator
+from ._errors import ActionNotPossible, ElementNotFound
+from ._find_ui_automation import LocatorStrAndOrSearchParams
+from .protocols import Locator
 
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
-    from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
-    from robocorp.windows._vendored.uiautomation.uiautomation import (
+    from ._iter_tree import ControlTreeNode
+    from ._ui_automation_wrapper import _UIAutomationControlWrapper
+    from ._vendored.uiautomation.uiautomation import (
         Control,
         LegacyIAccessiblePattern,
         ValuePattern,
@@ -41,7 +41,7 @@ def _wait_time() -> float:
     Internal API to get the global wait time (usually used as default when
     one is not set in a given API).
     """
-    from robocorp.windows import config
+    from . import config
 
     return config().wait_time
 
@@ -50,7 +50,7 @@ def _simulate_move() -> bool:
     """
     Internal API to determine if the mouse movement should be simulated.
     """
-    from robocorp.windows import config
+    from . import config
 
     return config().simulate_mouse_movement
 
@@ -91,7 +91,7 @@ class ControlElement:
             windows.find_window('Calculator').inspect()
             ```
         """
-        from robocorp.windows._inspect import ElementInspector
+        from ._inspect import ElementInspector
 
         element_inspector = ElementInspector(self)
         element_inspector.inspect()
@@ -115,7 +115,7 @@ class ControlElement:
             True if this elements points to the same element represented
             by the other control.
         """
-        from robocorp.windows._vendored.uiautomation.uiautomation import ControlsAreSame
+        from ._vendored.uiautomation.uiautomation import ControlsAreSame
 
         return ControlsAreSame(self._wrapped.item, other._wrapped.item)
 
@@ -128,7 +128,7 @@ class ControlElement:
         """
         Internal API to find the control to interact with given a locator.
         """
-        from robocorp.windows._find_ui_automation import find_ui_automation_wrapper
+        from ._find_ui_automation import find_ui_automation_wrapper
 
         root = self._wrapped
 
@@ -539,7 +539,7 @@ class ControlElement:
             from the initial element are found). Use the `all` search strategy to
             search for all elements.
         """
-        from robocorp.windows._find_ui_automation import find_ui_automation_wrappers
+        from ._find_ui_automation import find_ui_automation_wrappers
 
         return [
             ControlElement(x)
@@ -558,7 +558,7 @@ class ControlElement:
     ) -> Optional[LocatorStrAndOrSearchParams]:
         if locator is None:
             return None
-        from robocorp.windows._match_ast import collect_search_params
+        from ._match_ast import collect_search_params
 
         locator_and_or_search_params = LocatorStrAndOrSearchParams(
             locator, collect_search_params(locator)
@@ -573,11 +573,8 @@ class ControlElement:
         Not part of the public API (should not be used by client code).
         """
 
-        from robocorp.windows._iter_tree import ControlTreeNode, iter_tree
-        from robocorp.windows._ui_automation_wrapper import (
-            LocationInfo,
-            _UIAutomationControlWrapper,
-        )
+        from ._iter_tree import ControlTreeNode, iter_tree
+        from ._ui_automation_wrapper import LocationInfo, _UIAutomationControlWrapper
 
         for el in iter_tree(self._wrapped.item, max_depth):
             location_info = LocationInfo(None, el.depth, el.child_pos, el.path)
@@ -606,11 +603,8 @@ class ControlElement:
             max depth up to a minimum to avoid slow iterations.
         """
 
-        from robocorp.windows._iter_tree import iter_tree
-        from robocorp.windows._ui_automation_wrapper import (
-            LocationInfo,
-            _UIAutomationControlWrapper,
-        )
+        from ._iter_tree import iter_tree
+        from ._ui_automation_wrapper import LocationInfo, _UIAutomationControlWrapper
 
         for el in iter_tree(self._wrapped.item, max_depth):
             location_info = LocationInfo(None, el.depth, el.child_pos, el.path)
@@ -663,7 +657,7 @@ class ControlElement:
             windows.find("Calculator > path:2|3").print_tree()
             ```
         """
-        from robocorp.windows._iter_tree import ControlTreeNode
+        from ._iter_tree import ControlTreeNode
 
         if stream is None:
             stream = sys.stderr
@@ -742,7 +736,7 @@ class ControlElement:
         """
         Moves the mouse to the center of this element to simulate a mouse hovering.
         """
-        from robocorp.windows._vendored.uiautomation.uiautomation import SetCursorPos
+        from ._vendored.uiautomation.uiautomation import SetCursorPos
 
         self.update_geometry()
         if not self.has_valid_geometry():
@@ -1622,7 +1616,7 @@ class ControlElement:
             ElementNotFound if the locator was passed but it was not possible
             to find the element.
         """
-        from robocorp.windows._screenshot import screenshot
+        from ._screenshot import screenshot
 
         if not locator:
             el = self
@@ -1747,7 +1741,7 @@ class ControlElement:
         except ImportError:
             return False  # If it's not available, just return.
 
-        from robocorp.windows._screenshot import screenshot_as_base64png
+        from ._screenshot import screenshot_as_base64png
 
         if not locator:
             el = self

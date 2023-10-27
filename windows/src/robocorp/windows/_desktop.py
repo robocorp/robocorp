@@ -2,13 +2,13 @@ import time
 import typing
 from typing import Iterator, List, Optional
 
-from robocorp.windows._control_element import ControlElement
-from robocorp.windows.protocols import Locator
+from ._control_element import ControlElement
+from .protocols import Locator
 
 if typing.TYPE_CHECKING:
-    from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows._vendored.uiautomation.uiautomation import Control
-    from robocorp.windows._window_element import WindowElement
+    from ._iter_tree import ControlTreeNode
+    from ._vendored.uiautomation.uiautomation import Control
+    from ._window_element import WindowElement
 
 
 class Desktop(ControlElement):
@@ -22,15 +22,15 @@ class Desktop(ControlElement):
     """
 
     def __init__(self) -> None:
-        from robocorp.windows._config_uiautomation import _config_uiautomation
-        from robocorp.windows._find_ui_automation import (
+        from ._config_uiautomation import _config_uiautomation
+        from ._find_ui_automation import (
             LocatorStrAndOrSearchParams,
             find_ui_automation_wrapper,
         )
 
         _config_uiautomation()
 
-        from robocorp.windows._match_ast import collect_search_params
+        from ._match_ast import collect_search_params
 
         locator = "desktop"
         locator_and_or_search_params = LocatorStrAndOrSearchParams(
@@ -154,7 +154,7 @@ class Desktop(ControlElement):
             ElementNotFound if a window with the given locator could not be
             found.
         """
-        from robocorp.windows import _find_window
+        from . import _find_window
 
         return _find_window.find_window(
             None, locator, search_depth, timeout, wait_time, foreground
@@ -205,7 +205,7 @@ class Desktop(ControlElement):
             window = find_windows('executable:Spotify.exe')
             ```
         """
-        from robocorp.windows import _find_window
+        from . import _find_window
 
         self._convert_locator_to_locator_and_or_search_params(locator)
         return _find_window.find_windows(
@@ -270,7 +270,7 @@ class Desktop(ControlElement):
             ElementNotFound: if wait_for_window is True and the timeout was reached.
         """
 
-        from robocorp.windows import config
+        from . import config
 
         windows_elements = self.find_windows(
             locator, search_depth, timeout=timeout, wait_for_window=wait_for_window
@@ -369,21 +369,19 @@ class Desktop(ControlElement):
             the active one, this will fail (consider using `find_window`
             for this use case).
         """
-        from robocorp.windows import config
-        from robocorp.windows._errors import ElementNotFound
-        from robocorp.windows._find_ui_automation import _matches
-        from robocorp.windows._find_window import restrict_to_window_locators
-        from robocorp.windows._iter_tree import ControlTreeNode
-        from robocorp.windows._match_ast import SearchParams, collect_search_params
-        from robocorp.windows._match_common import SearchType
-        from robocorp.windows._ui_automation_wrapper import (
+        from . import config
+        from ._errors import ElementNotFound
+        from ._find_ui_automation import _matches
+        from ._find_window import restrict_to_window_locators
+        from ._iter_tree import ControlTreeNode
+        from ._match_ast import SearchParams, collect_search_params
+        from ._match_common import SearchType
+        from ._ui_automation_wrapper import (
             _UIAutomationControlWrapper,
             empty_location_info,
         )
-        from robocorp.windows._vendored.uiautomation.uiautomation import (
-            GetForegroundControl,
-        )
-        from robocorp.windows._window_element import WindowElement
+        from ._vendored.uiautomation.uiautomation import GetForegroundControl
+        from ._window_element import WindowElement
 
         or_search_params_by_level = collect_search_params(locator)
         if len(or_search_params_by_level) > 1:

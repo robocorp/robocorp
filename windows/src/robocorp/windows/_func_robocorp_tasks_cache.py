@@ -28,7 +28,7 @@ def desktop() -> Iterator["Desktop"]:
     Internal API to create a desktop valid for the current task which will
     do a screenshot if an error happens.
     """
-    from robocorp.windows._desktop import Desktop
+    from ._desktop import Desktop
 
     desktop = Desktop()
     yield desktop

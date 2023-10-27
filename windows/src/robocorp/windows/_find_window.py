@@ -1,11 +1,11 @@
 import time
 from typing import List, Literal, Optional, Tuple
 
-from robocorp.windows._errors import ElementNotFound
-from robocorp.windows._match_ast import OrSearchParams, SearchParams
-from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
-from robocorp.windows._window_element import WindowElement
-from robocorp.windows.protocols import Locator
+from ._errors import ElementNotFound
+from ._match_ast import OrSearchParams, SearchParams
+from ._ui_automation_wrapper import _UIAutomationControlWrapper
+from ._window_element import WindowElement
+from .protocols import Locator
 
 
 def restrict_to_window_locators(
@@ -43,11 +43,12 @@ def find_window(
     foreground: bool = True,
 ) -> WindowElement:
     from robocorp import windows
-    from robocorp.windows._find_ui_automation import (
+
+    from ._find_ui_automation import (
         LocatorStrAndOrSearchParams,
         find_ui_automation_wrapper,
     )
-    from robocorp.windows._match_ast import collect_search_params
+    from ._match_ast import collect_search_params
 
     config = windows.config()
     or_search_params = collect_search_params(locator)
@@ -112,12 +113,13 @@ def find_windows(
     search_strategy: Literal["siblings", "all"] = "all",
 ) -> List[WindowElement]:
     from robocorp import windows
-    from robocorp.windows._find_ui_automation import (
+
+    from ._find_ui_automation import (
         LocatorStrAndOrSearchParams,
         TimeoutMonitor,
         find_ui_automation_wrappers,
     )
-    from robocorp.windows._match_ast import collect_search_params
+    from ._match_ast import collect_search_params
 
     config = windows.config()
     window_element: WindowElement

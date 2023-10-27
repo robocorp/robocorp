@@ -61,7 +61,7 @@ def get_icon_from_file(path: str) -> Optional["Image"]:
         img.save("c:/temp/my.png", format="PNG")
         ```
     """
-    from robocorp.windows import _icon_from_file
+    from . import _icon_from_file
 
     return _icon_from_file.get_icon_from_file(path)
 

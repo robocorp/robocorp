@@ -21,14 +21,14 @@ from typing import (
 import _ctypes
 from _ctypes import COMError
 
-from robocorp.windows._control_element import ControlElement
-from robocorp.windows._errors import ElementNotFound
-from robocorp.windows._window_element import WindowElement
-from robocorp.windows.protocols import Locator
+from ._control_element import ControlElement
+from ._errors import ElementNotFound
+from ._window_element import WindowElement
+from .protocols import Locator
 
 if typing.TYPE_CHECKING:
-    from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows._vendored.uiautomation.uiautomation import Control
+    from ._iter_tree import ControlTreeNode
+    from ._vendored.uiautomation.uiautomation import Control
 
 
 NOT_AVAILABLE = "N/A"
@@ -436,13 +436,10 @@ def build_parent_hierarchy(
         UnreachableElementInParentHierarchy: if the element is not reachable from
             the hierarchy.
     """
-    from robocorp.windows._find_ui_automation import get_desktop_element
-    from robocorp.windows._iter_tree import ControlTreeNode
-    from robocorp.windows._ui_automation_wrapper import (
-        LocationInfo,
-        _UIAutomationControlWrapper,
-    )
-    from robocorp.windows._vendored.uiautomation.uiautomation import ControlsAreSame
+    from ._find_ui_automation import get_desktop_element
+    from ._iter_tree import ControlTreeNode
+    from ._ui_automation_wrapper import LocationInfo, _UIAutomationControlWrapper
+    from ._vendored.uiautomation.uiautomation import ControlsAreSame
 
     if up_to_parent is None:
         up_to_parent = ControlElement(get_desktop_element())
@@ -568,11 +565,11 @@ class _PickerThread(threading.Thread):
             UnreachableElementInParentHierarchy: if the element is not reachable from
                 the hierarchy.
         """
-        from robocorp.windows._ui_automation_wrapper import (
+        from ._ui_automation_wrapper import (
             _UIAutomationControlWrapper,
             empty_location_info,
         )
-        from robocorp.windows._vendored import uiautomation
+        from ._vendored import uiautomation
 
         try:
             control = uiautomation.ControlFromPoint(*cursor_pos)
@@ -599,13 +596,10 @@ class _PickerThread(threading.Thread):
         """
         Note that this code isn't working (abandoned for now).
         """
-        from robocorp.windows._iter_tree import ControlTreeNode
-        from robocorp.windows._ui_automation_wrapper import (
-            LocationInfo,
-            _UIAutomationControlWrapper,
-        )
-        from robocorp.windows._vendored import uiautomation
-        from robocorp.windows._vendored.uiautomation.uiautomation import ControlsAreSame
+        from ._iter_tree import ControlTreeNode
+        from ._ui_automation_wrapper import LocationInfo, _UIAutomationControlWrapper
+        from ._vendored import uiautomation
+        from ._vendored.uiautomation.uiautomation import ControlsAreSame
 
         if parent is None:
             parent = self.control_element
@@ -714,7 +708,7 @@ class _PickerThread(threading.Thread):
             traceback.print_exc()
 
     def _run(self) -> None:
-        from robocorp.windows._vendored.uiautomation.uiautomation import (
+        from ._vendored.uiautomation.uiautomation import (
             GetCursorPos,
             UIAutomationInitializerInThread,
         )
@@ -853,7 +847,7 @@ class ElementInspector:
 
     def list_windows(self) -> List[WindowElement]:
         self._check_thread()
-        from robocorp.windows import desktop
+        from . import desktop
 
         return desktop().find_windows("regex:.*")
 

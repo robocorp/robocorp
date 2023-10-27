@@ -94,7 +94,7 @@ class SearchParams(_AbstractAstNode):
         return new_params
 
     def update(self, other: "SearchParams"):
-        from robocorp.windows._errors import InvalidStrategyDuplicated
+        from ._errors import InvalidStrategyDuplicated
 
         search_params = self.search_params
         for strategy, value in other.search_params.items():
@@ -111,7 +111,7 @@ class SearchParams(_AbstractAstNode):
         strategy: _LocatorKeys,
         value: str,
     ) -> None:
-        from robocorp.windows._errors import InvalidStrategyDuplicated
+        from ._errors import InvalidStrategyDuplicated
 
         assert strategy in _valid_strategies
         assert isinstance(value, str)
@@ -434,10 +434,8 @@ class OrSearchParams(_AbstractPartsAstNode):
 
 class _StrategyBuilder:
     def __init__(self, strategy: str):
-        from robocorp.windows._match_common import (
-            _strategies_accepting_multiple_strings,
-        )
-        from robocorp.windows._match_tokenization import Token
+        from ._match_common import _strategies_accepting_multiple_strings
+        from ._match_tokenization import Token
 
         self.strategy = strategy
         self.values: List[Token] = []
@@ -464,9 +462,7 @@ def _build_locator_match(locator: Locator) -> _LocatorMatch:
     """
     if not locator.strip():
         raise InvalidLocatorError("The locator may not be empty.")
-    from robocorp.windows._match_tokenization import Token
-
-    from ._match_tokenization import TokenKind, _Tokenizer
+    from ._match_tokenization import Token, TokenKind, _Tokenizer
 
     locator_match = _LocatorMatch(locator)
 

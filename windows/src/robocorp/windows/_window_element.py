@@ -4,12 +4,12 @@ from typing import Any, Optional, Union
 
 import psutil
 
-from robocorp.windows._control_element import ControlElement
-from robocorp.windows._errors import ElementDisposed
-from robocorp.windows.protocols import Locator
+from ._control_element import ControlElement
+from ._errors import ElementDisposed
+from .protocols import Locator
 
 if typing.TYPE_CHECKING:
-    from robocorp.windows._ui_automation_wrapper import _UIAutomationControlWrapper
+    from ._ui_automation_wrapper import _UIAutomationControlWrapper
 
 log = logging.getLogger(__name__)
 
@@ -98,7 +98,7 @@ class WindowElement(ControlElement):
         Returns:
             True if this is currently the active window and False otherwise.
         """
-        from robocorp.windows._vendored.uiautomation import uiautomation
+        from ._vendored.uiautomation import uiautomation
 
         return self.handle == uiautomation.GetForegroundWindow()
 
@@ -170,7 +170,7 @@ class WindowElement(ControlElement):
             child_window = sage.find_child_window('subname:"Test Company" depth:1')
             ```
         """
-        from robocorp.windows import _find_window
+        from . import _find_window
 
         return _find_window.find_window(
             self._wrapped,
@@ -195,8 +195,8 @@ class WindowElement(ControlElement):
             calculator.foreground_window()
             ```
         """
-        from robocorp.windows import config
-        from robocorp.windows._find_ui_automation import _window_or_none
+        from . import config
+        from ._find_ui_automation import _window_or_none
 
         window: Optional["_UIAutomationControlWrapper"] = _window_or_none(self._wrapped)
         if window is None:
@@ -286,10 +286,7 @@ class WindowElement(ControlElement):
             explorer.set_window_pos(0, 0, desktop.width / 2, desktop.height)
             ```
         """
-        from robocorp.windows._vendored.uiautomation.uiautomation import (
-            SWP,
-            SetWindowPos,
-        )
+        from ._vendored.uiautomation.uiautomation import SWP, SetWindowPos
 
         flags = SWP.SWP_ShowWindow
         SetWindowPos(self.handle, 0, int(x), int(y), int(width), int(height), flags)
@@ -353,7 +350,7 @@ class WindowElement(ControlElement):
             pid = self.pid
         except COMError:
             return False
-        from robocorp.windows._processes import kill_process_and_subprocesses
+        from ._processes import kill_process_and_subprocesses
 
         self.logger.info("Closing window with name: %s (PID: %d)", self.name, pid)
         kill_process_and_subprocesses(pid)

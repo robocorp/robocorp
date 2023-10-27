@@ -12,7 +12,7 @@ def _config_uiautomation():
 
         import comtypes.client
 
-        from robocorp.windows._vendored.uiautomation.uiautomation import Logger
+        from ._vendored.uiautomation.uiautomation import Logger
 
         comtypes.client.gen_dir = None
 

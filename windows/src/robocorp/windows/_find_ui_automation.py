@@ -52,7 +52,7 @@ def _get_desktop_control() -> "Control":
 
 
 def get_desktop_element() -> _UIAutomationControlWrapper:
-    from robocorp.windows._ui_automation_wrapper import LocationInfo
+    from ._ui_automation_wrapper import LocationInfo
 
     desktop_control = _get_desktop_control()
     location_info = LocationInfo("desktop", None, None, None)
@@ -189,9 +189,7 @@ def _find_ui_automation_wrappers(
     search_strategy: Literal["siblings", "all", "single"] = "single",
     timeout_monitor: Optional["TimeoutMonitor"] = None,
 ) -> Iterator[_UIAutomationControlWrapper]:
-    from robocorp.windows._ui_automation_wrapper import (
-        build_from_locator_and_control_tree_node,
-    )
+    from ._ui_automation_wrapper import build_from_locator_and_control_tree_node
 
     if not locator:
         yield _resolve_root(root_element)
@@ -283,10 +281,8 @@ def _search_step(
     search_depth,
     timeout_monitor: Optional["TimeoutMonitor"],
 ) -> Iterator[Tuple[ControlTreeNode["Control"], SearchType]]:
-    from robocorp.windows._control_element import ControlElement
-    from robocorp.windows._ui_automation_wrapper import (
-        build_from_locator_and_control_tree_node,
-    )
+    from ._control_element import ControlElement
+    from ._ui_automation_wrapper import build_from_locator_and_control_tree_node
 
     errors: List[str] = []
 
@@ -363,7 +359,7 @@ def _search_step(
         only_depths = set(found_depths)
         search_depth = max(only_depths)  # We can restrict the max to it.
 
-    from robocorp.windows._iter_tree import iter_tree
+    from ._iter_tree import iter_tree
 
     found = False
     for el in iter_tree(root_control, max_depth=search_depth, only_depths=only_depths):
@@ -383,7 +379,7 @@ def _search_siblings(
     search_params: SearchType,
     locator: str,
 ) -> Iterator[_UIAutomationControlWrapper]:
-    from robocorp.windows._ui_automation_wrapper import LocationInfo
+    from ._ui_automation_wrapper import LocationInfo
 
     depth = root_control_tree_node.depth
     child_pos = root_control_tree_node.child_pos
@@ -413,7 +409,7 @@ def find_ui_automation_wrapper(
     wait_for_element: bool = True,
 ) -> _UIAutomationControlWrapper:
     if wait_for_element:
-        from robocorp.windows import config
+        from . import config
 
         if timeout is not None:
             use_timeout = timeout
@@ -481,7 +477,7 @@ def find_ui_automation_wrappers(
             is False.
     """
     if wait_for_element:
-        from robocorp.windows import config
+        from . import config
 
         if timeout is not None:
             use_timeout = timeout

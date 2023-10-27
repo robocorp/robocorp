@@ -4,7 +4,7 @@ from typing import Generic, Iterator, Optional, Set, TypeVar
 from _ctypes import COMError
 
 if typing.TYPE_CHECKING:
-    from robocorp.windows._vendored.uiautomation import Control
+    from ._vendored.uiautomation import Control
 
 T = TypeVar("T")
 Y = TypeVar("Y", covariant=True)
