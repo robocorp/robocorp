@@ -44,7 +44,7 @@ def _window_or_none(
 
 
 def _get_desktop_control() -> "Control":
-    import robocorp.windows._vendored.uiautomation as auto
+    from ._vendored import uiautomation as auto
 
     root_control = auto.GetRootControl()
     assert root_control is not None, "Did not expect RootControl to be None."

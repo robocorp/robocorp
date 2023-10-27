@@ -37,8 +37,9 @@ class Config:
 
     @property
     def timeout(self) -> float:
+        from ._vendored import uiautomation as auto
+
         # This value can change based on `auto.SetGlobalSearchTimeout(...)` calls.
-        import robocorp.windows._vendored.uiautomation as auto
 
         return auto.uiautomation.TIME_OUT_SECOND
 

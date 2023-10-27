@@ -499,7 +499,7 @@ class Desktop(ControlElement):
             explorer.drag_and_drop(report_html, items_view, hold_ctrl=True)
             ```
         """
-        import robocorp.windows._vendored.uiautomation as auto
+        from ._vendored import uiautomation as auto
 
         try:
             if hold_ctrl:

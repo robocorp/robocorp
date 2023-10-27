@@ -472,9 +472,9 @@ class ControlElement:
                 )
             )
         except ElementNotFound as e:
-            from robocorp import windows
+            from . import config as windows_config
 
-            config = windows.config()
+            config = windows_config()
             if not config.verbose_errors:
                 raise
 
