@@ -10,6 +10,7 @@
 ## Classes
 
 - [`_protocols.ITask`](./robocorp.tasks._protocols.md#class-itask)
+- [`_protocols.Status`](./robocorp.tasks._protocols.md#class-status): Task state
 
 ## Functions
 

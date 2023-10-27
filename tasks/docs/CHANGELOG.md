@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.3.0 - 2023-10-27
 
 - Use `truststore` for native system certificates, if available in environment
 

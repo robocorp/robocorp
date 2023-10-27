@@ -238,7 +238,7 @@ ______________________________________________________________________
 
 ## class `ITask`
 
-**Source:** [`_protocols.py:45`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L45)
+**Source:** [`_protocols.py:41`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L41)
 
 #### property `failed`
 
@@ -252,8 +252,22 @@ ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`_protocols.py:62`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L62)
+**Source:** [`_protocols.py:58`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L58)
 
 ```python
 run() → None
 ```
+
+______________________________________________________________________
+
+## enum `Status`
+
+**Source:** [`_protocols.py:33`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L33)
+
+Task state
+
+### Values
+
+- **NOT_RUN** = NOT_RUN
+- **PASS** = PASS
+- **FAIL** = FAIL
