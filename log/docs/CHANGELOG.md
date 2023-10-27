@@ -1,12 +1,12 @@
 # Changelog
 
-## Unreleased
+## 2.8.0 - 2023-10-27
 
 - `log.html`: It's now possible to click icon to show details (so, items without a message are also clickable).
 - `log.html`: The copy to clipboard button for variables no longer hides variable content.
 - If greenlet is available, also check if the current greenlet matches for logging (as logging from different greenlet threads messes up the stack).
-- Don't automatically redact common python words such as `None`, `True`, `False` as well as strings with 2 or less characters.
-- New API to specify which words should not be redacted (`robocorp.log.hide_strings_config()`).
+- Don't hide from the logs common python words: `None`, `True`, `False` as well as strings with 2 or less characters.
+- New API to specify which words should not be hidden (`robocorp.log.hide_strings_config()`).
 
 ## 2.7.1 - 2023-09-07
 

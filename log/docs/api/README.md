@@ -15,6 +15,7 @@
 - [`log.ConsoleMessageKind`](./robocorp.log.md#class-consolemessagekind)
 - [`log.FilterLogLevel`](./robocorp.log.md#class-filterloglevel): An enumeration.
 - [`log.IContextManager`](./robocorp.log.md#class-icontextmanager): Typing for a "generic" context manager.
+- [`log.IRedactConfiguration`](./robocorp.log.md#class-iredactconfiguration)
 - [`protocols.IContextErrorReport`](./robocorp.log.protocols.md#class-icontexterrorreport)
 - [`protocols.IReadLines`](./robocorp.log.protocols.md#class-ireadlines)
 - [`protocols.Status`](./robocorp.log.protocols.md#class-status)
@@ -34,6 +35,7 @@
 - [`log.end_task`](./robocorp.log.md#function-end_task): Ends a task (adds the related event to the log).
 - [`log.exception`](./robocorp.log.md#function-exception): Adds to the logging the exceptions that's currently raised.
 - [`log.hide_from_output`](./robocorp.log.md#function-hide_from_output): Should be called to hide sensitive information from appearing in the output.
+- [`log.hide_strings_config`](./robocorp.log.md#function-hide_strings_config): Can be used to configure heuristics on what should be hidden and what
 - [`log.html`](./robocorp.log.md#function-html): Adds html contents to the log.
 - [`log.info`](./robocorp.log.md#function-info): Adds a new logging message with an info level.
 - [`log.is_sensitive_variable_name`](./robocorp.log.md#function-is_sensitive_variable_name): Returns true if the given variable name should be considered sensitive.
