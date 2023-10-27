@@ -1,9 +1,9 @@
 # Changelog
 
-## UNRELEASED
+## 2.2.0 - 2023-10-27
 
 - When browsers are installed with playwright additional logging is added.
-- Fixed issue where shutting down playwright could lead to a halting condition inside of asyncio.
+- Fixed issue where shutting down playwright could lead to a halting condition inside of `asyncio`.
 - It's now possible to configure the browser to launch with a persistent context
   directory (i.e.: `launch_persistent_context`) by specifying a `persistent_context_directory`
   in the configuration.  

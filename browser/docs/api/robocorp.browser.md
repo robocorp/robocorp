@@ -19,11 +19,20 @@ May be called before any other method to configure the browser settings.
 Calling this method is optional (if not called a default configuration will be used -- note that calling this method after the browser is already initialized will have no effect).
 
 **Args:**
+browser_engine: Browser engine which should be used default="chromium" choices=\["chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"\]
 
-- <b>`browser_engine`</b>:  Browser engine which should be used (default: Chromium)
+install: Install browser or not. If not defined, download is only attempted if the browser fails to launch.
+
 - <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True the browser UI will be kept hidden. If unset or set to None it'll show the browser UI only if a debugger is detected.
-- <b>`slowmo`</b>:  Run interactions in slow motion.
+
+slowmo: Run interactions in slow motion (number in millis).
+
 - <b>`screenshot`</b>:  Whether to automatically capture a screenshot after each task. Options are `on`, `off`, and `only-on-failure` (default).
+
+isolated: Used to define where the browser should be downloaded. If `True`, it'll be installed inside the isolated environment. If `False` (default) it'll be installed in a global cache folder.
+
+persistent_context_directory: If a persistent context should be used, this should be the directory in which the persistent context should be stored/loaded (it can be used to store the state of the automation to allow for sessions and cookies to be reused in a new automation).
+
 - <b>`viewport_size`</b>:  Size to be set for the viewport. Specified as tuple(width, height).
 
 **Note:**
@@ -34,7 +43,7 @@ ______________________________________________________________________
 
 ## function `configure_context`
 
-**Source:** [`__init__.py:55`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L55)
+**Source:** [`__init__.py:80`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L80)
 
 ```python
 configure_context(**kwargs) → None
@@ -59,7 +68,7 @@ ______________________________________________________________________
 
 ## function `page`
 
-**Source:** [`__init__.py:83`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L83)
+**Source:** [`__init__.py:108`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L108)
 
 ```python
 page() → Page
@@ -83,7 +92,7 @@ ______________________________________________________________________
 
 ## function `browser`
 
-**Source:** [`__init__.py:105`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L105)
+**Source:** [`__init__.py:130`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L130)
 
 ```python
 browser() → Browser
@@ -100,11 +109,14 @@ To customize the browser use the `configure` method (prior to calling this metho
 
 Note that the returned browser must not be closed. It will be automatically closed when the task run session finishes.
 
+**Raises:**
+RuntimeError: If `persistent_context_directory` is specified in the configuration and this method is called a RuntimeError is raised (as in this case this API is not applicable as the browser and the context must be created at once and the browser can't be reused for the session).
+
 ______________________________________________________________________
 
 ## function `playwright`
 
-**Source:** [`__init__.py:126`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L126)
+**Source:** [`__init__.py:158`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L158)
 
 ```python
 playwright() → Playwright
@@ -125,7 +137,7 @@ ______________________________________________________________________
 
 ## function `context`
 
-**Source:** [`__init__.py:147`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L147)
+**Source:** [`__init__.py:179`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L179)
 
 ```python
 context(**kwargs) → BrowserContext
@@ -149,7 +161,7 @@ ______________________________________________________________________
 
 ## function `goto`
 
-**Source:** [`__init__.py:173`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L173)
+**Source:** [`__init__.py:205`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L205)
 
 ```python
 goto(url: str) → Page
@@ -168,7 +180,7 @@ ______________________________________________________________________
 
 ## function `screenshot`
 
-**Source:** [`__init__.py:189`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L189)
+**Source:** [`__init__.py:221`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L221)
 
 ```python
 screenshot(
@@ -194,10 +206,10 @@ ______________________________________________________________________
 
 ## function `install`
 
-**Source:** [`__init__.py:232`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L232)
+**Source:** [`__init__.py:264`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L264)
 
 ```python
-install(browser_engine: BrowserEngine)
+install(browser_engine: BrowserEngine, force: bool = False)
 ```
 
 Downloads and installs the given browser engine.
@@ -212,7 +224,7 @@ ______________________________________________________________________
 
 ## enum `BrowserEngine`
 
-**Source:** [`_browser_engines.py:14`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_browser_engines.py#L14)
+**Source:** [`_types.py:14`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_types.py#L14)
 
 Valid browser engines for Playwright.
 
@@ -226,3 +238,25 @@ Valid browser engines for Playwright.
 - **MSEDGE_DEV** = msedge-dev
 - **FIREFOX** = firefox
 - **WEBKIT** = webkit
+
+______________________________________________________________________
+
+## exception `InstallError`
+
+**Source:** [`_types.py:10`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_types.py#L10)
+
+Error encountered during browser install
+
+______________________________________________________________________
+
+## exception `BrowserNotFound`
+
+**Source:** [`_types.py:6`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_types.py#L6)
+
+No matching browser found in the environment.
+
+#### property `message`
+
+#### property `name`
+
+#### property `stack`

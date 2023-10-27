@@ -9,7 +9,9 @@
 
 ## Classes
 
-- [`_browser_engines.BrowserEngine`](./robocorp.browser._browser_engines.md#class-browserengine): Valid browser engines for Playwright.
+- [`_types.BrowserEngine`](./robocorp.browser._types.md#class-browserengine): Valid browser engines for Playwright.
+- [`_types.BrowserNotFound`](./robocorp.browser._types.md#class-browsernotfound): No matching browser found in the environment.
+- [`_types.InstallError`](./robocorp.browser._types.md#class-installerror): Error encountered during browser install
 
 ## Functions
 
