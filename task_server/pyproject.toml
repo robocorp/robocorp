@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "robocorp-task-server"
+version = "0.1.0"
+description = "Robocorp local task server"
+authors = [
+	"Ossi R. <ossi@robocorp.com>",
+]
+readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
+packages = [{include = "robocorp", from="src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.1"
+uvicorn = "^0.23.2"
+pydantic = "^2.4.2"
+rich = "^13.6.0"
+watchfiles = "^0.21.0"
+robocorp-tasks = { path = "../tasks", develop = true }
+jsonschema = "^4.19.2"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

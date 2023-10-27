@@ -43,6 +43,7 @@ class ITask(typing.Protocol):
     filename: str
     method: typing.Callable
 
+    # TODO: Type checker doesn't like @property with setter, it seems
     status: Status
     message: str
     exc_info: Optional[OptExcInfo]
@@ -64,6 +65,14 @@ class ITask(typing.Protocol):
         Returns true if the task failed.
         (in which case usually exc_info is not None).
         """
+
+    @property
+    def input_schema(self) -> dict[str, Any]:
+        pass
+    
+    @property
+    def output_schema(self) -> dict[str, Any]:
+        pass
 
 
 class IContext(typing.Protocol):

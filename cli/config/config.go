@@ -5,50 +5,65 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/robocorp/robo/cli/config/pyproject"
+	"github.com/robocorp/robo/cli/config/tasks"
 	"github.com/robocorp/robo/cli/paths"
 )
+
+
+type PyPI struct {
+	Dependencies map[string]string
+}
+
+type Conda struct {
+	Dependencies map[string]string
+	Channels     []string
+}
 
 type Config struct {
 	Dir             string
 	Name            string
 	Description     string
+	ReadmePath      string
 	PythonVersion   string
 	PipVersion      string
 	OutputDir       string
-	Dependencies    map[string]string
-	DevDependencies map[string]string
-	Channels        []string
+	TasksFiles      []string
+	IncludePatterns []string
+	PyPI            PyPI
+	Conda           Conda
 }
 
 func FromPath(root string) (Config, error) {
-	cfg, err := pyproject.LoadPath(path.Join(root, "pyproject.toml"))
+	toml, err := tasks.LoadPath(path.Join(root, "tasks.toml"))
 	if err != nil {
 		return Config{}, err
-	}
-
-	robo := cfg.Tool.Robo
-	if robo == nil {
-		return Config{}, errors.New("Missing 'tool.robo' section in pyproject.toml")
 	}
 
 	config := CreateDefaults()
 
 	config.Dir = root
-	config.Name = robo.Name
-	config.Description = robo.Description
-	config.Dependencies = robo.Dependencies
-	config.DevDependencies = robo.DevDependencies
+	config.Name = toml.Name  // TODO: Not used yet
+	config.Description = toml.Description  // TODO: Not used yet
+	config.ReadmePath = toml.Readme  // TODO: Not used yet
+	config.PyPI.Dependencies = toml.PyPI
+	config.Conda.Dependencies = toml.CondaForge
+	config.Conda.Channels = []string{"conda-forge"}
 
-	if robo.Python != "" {
-		config.PythonVersion = robo.Python
+	if (len(toml.Include) > 0) {
+		config.IncludePatterns = toml.Include  // TODO: Not used yet
+	}
+	if (len(toml.Tasks) > 0) {
+		config.TasksFiles = toml.Tasks
+	}
+	if toml.Python != "" {
+		config.PythonVersion = toml.Python
 	}
 
-	if robo.Output != "" {
-		config.OutputDir = path.Join(config.Dir, robo.Output)
+	if toml.Output != "" {
+		config.OutputDir = path.Join(config.Dir, toml.Output)
 		isChild, err := paths.IsChild(config.Dir, config.OutputDir)
 		if err != nil {
-			return Config{}, fmt.Errorf("Unable to read output directory: %v", err)
+			return Config{}, fmt.Errorf("Unable to parse output directory: %v", err)
 		}
 		if !isChild {
 			return Config{}, errors.New("Output directory must be inside project")
@@ -58,11 +73,13 @@ func FromPath(root string) (Config, error) {
 	return config, nil
 }
 
+// TODO: Check these. Also, pip version probably will come from rcc eventually?
 func CreateDefaults() Config {
 	return Config{
-		PythonVersion: "3.9.13",
-		PipVersion:    "22.1.2",
-		OutputDir:     "output",
-		Channels:      []string{"conda-forge"},
+		PythonVersion:   "3.9.13",
+		PipVersion:      "22.1.2",
+		OutputDir:       "output",
+		TasksFiles:      []string{"tasks.py"},
+		IncludePatterns: []string{"*.py"},
 	}
 }

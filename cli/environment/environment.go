@@ -16,6 +16,7 @@ import (
 
 type Environment struct {
 	Variables map[string]string
+	Capabilities
 }
 
 func (e Environment) FindExecutable(name string) string {
@@ -40,8 +41,11 @@ func TryCache(cfg config.Config) (Environment, bool) {
 	condaYaml := conda.NewFromConfig(cfg)
 	digest := digest(cfg.Dir, condaYaml)
 
-	if env, ok := cache.Get(digest); ok {
-		return Environment{merge(env)}, true
+	if entry, ok := cache.Get(digest); ok {
+		return Environment{
+			Variables:    merge(entry.Variables),
+			Capabilities: Capabilities(entry.Capabilities),
+		}, true
 	} else {
 		return Environment{}, false
 	}
@@ -62,16 +66,27 @@ func Create(
 	key := digest(cfg.Dir, condaYaml)
 	space := fmt.Sprintf("robo-%v", key)
 
-	env, err := rcc.HolotreeVariables(condaPath, space, onProgress)
+	vars, err := rcc.HolotreeVariables(condaPath, space, onProgress)
 	if err != nil {
 		return Environment{}, err
 	}
 
-	if err := cache.Add(key, env); err != nil {
-		return Environment{}, err
+	// Parse supported features from new environment
+	env := Environment{Variables: merge(vars)}
+	cap := probeCapabilities(env)
+	env.Capabilities = cap
+
+	// Cache ht variables result, not merged environment
+	entry := cache.CacheEntry{}
+	entry.Variables = vars
+	entry.Capabilities.Tasks = cap.Tasks
+	entry.Capabilities.Server = cap.Server
+
+	if err := cache.Add(key, entry); err != nil {
+		return env, err
 	}
 
-	return Environment{merge(env)}, nil
+	return env, nil
 }
 
 func merge(holotree map[string]string) map[string]string {

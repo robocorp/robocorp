@@ -28,7 +28,7 @@ func RunTask(dir, name string) (tasks.Result, error) {
 	fmt.Println("")
 	if name == "" {
 		fmt.Println("Parsing tasks")
-		name, err = selectTask(env)
+		name, err = selectTask(cfg, env)
 		if err != nil {
 			return tasks.Result{}, err
 		}
@@ -39,7 +39,7 @@ func RunTask(dir, name string) (tasks.Result, error) {
 	}
 
 	fmt.Println("Running task: " + bold(name))
-	return tasks.Run(env, name)
+	return tasks.Run(cfg, env, name)
 }
 
 func clearOutput(cfg config.Config) error {

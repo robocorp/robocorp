@@ -1,0 +1,6 @@
+name = "Task Server"
+description = "Local task server template"
+python = "3.10"
+
+[pypi]
+robocorp-task-server = "robocorp_task_server-0.1.0-py3-none-any.whl"

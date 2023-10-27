@@ -8,3 +8,6 @@ templates:
   - name: Work Items
     desc: Control Room work items template
     dirName: workitems
+  - name: Task Server
+    desc: Local task server template
+    dirName: server

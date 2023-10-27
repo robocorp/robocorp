@@ -5,7 +5,7 @@ import sys
 import time
 import traceback
 from pathlib import Path
-from typing import List, Literal, Optional, Sequence, Union
+from typing import Any, List, Literal, Optional, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
@@ -54,6 +54,8 @@ def list_tasks(
                     "line": task.lineno,
                     "file": task.filename,
                     "docs": getattr(task.method, "__doc__") or "",
+                    "input_schema": task.input_schema,
+                    "output_schema": task.output_schema,
                 }
             )
 
@@ -129,6 +131,7 @@ def run(
     teardown_dump_threads_timeout: Optional[float] = None,
     teardown_interrupt_timeout: Optional[float] = None,
     os_exit: Optional[str] = None,
+    task_arguments: Optional[list[str]] = None
 ) -> int:
     """
     Runs a task.
@@ -269,6 +272,9 @@ def run(
 
     from robocorp import log
 
+    # TODO: Do we actually want this behaviour? Running all tasks when none is defined
+    #       does seem like a bit of a footgun with the use-cases we're targeting.
+    #       Maybe if multiple are requested explicitly...
     task_names: Sequence[str]
     if not task_name:
         task_names = []
@@ -357,6 +363,7 @@ def run(
                 finally:
                     log.end_task("Collect tasks", "setup", run_status, setup_message)
 
+                args, kwargs = _normalize_arguments(task_arguments or [])
                 before_all_tasks_run(tasks)
 
                 try:
@@ -364,7 +371,12 @@ def run(
                         set_current_task(task)
                         before_task_run(task)
                         try:
-                            task.run()
+                            # TODO: Return value only matters in the case of
+                            #  work items or local task server. Just print it out
+                            #  when running through CLI options?
+                            #  For task server, will probably need to output
+                            #  it through stdout events
+                            _ = task.run(*args, **kwargs)
                             task.status = Status.PASS
                         except Exception as e:
                             task.status = Status.FAIL
@@ -465,3 +477,26 @@ def run(
             t = Timer(timeout, on_timeout)
             t.daemon = True
             t.start()
+
+
+def _normalize_arguments(opts: list[str]) -> tuple[list[Any], dict[str, Any]]:
+    # TODO: Make this better, can be probably copied/inspired from pyinvoke.
+    #  For instance, boolean values should be mapped as options without
+    #  corresponding value. Also would be nice if lists worked, etc.
+    args = []
+    kwargs = {}
+
+    key: Optional[str] = None
+    for opt in opts:
+        if opt.startswith("--"):
+            key = opt[2:]
+        elif opt.startswith("-"):
+            # TODO: Figure out how to handle shorthand, if needed at all
+            raise NotImplementedError("Shorthand arguments not supported")
+        elif key is not None:
+            kwargs[key] = opt
+            key = None
+        else:
+            args.append(opt)
+
+    return (args, kwargs)

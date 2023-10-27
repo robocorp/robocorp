@@ -1,7 +1,10 @@
 import typing
 from contextlib import contextmanager
 from types import ModuleType
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
+
+from pydantic import validate_call
+from pydantic.json_schema import GenerateJsonSchema
 
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
@@ -12,8 +15,8 @@ from robocorp.tasks._protocols import IContext, ITask, Status
 class Task:
     def __init__(self, module: ModuleType, method: typing.Callable):
         self.module_name = module.__name__
-        self.filename = module.__file__ or "<filename unavailable>"
         self.method = method
+        self.filename = module.__file__ or "<filename unavailable>"
         self.message = ""
         self.exc_info: Optional[OptExcInfo] = None
         self._status = Status.NOT_RUN
@@ -26,8 +29,9 @@ class Task:
     def lineno(self):
         return self.method.__code__.co_firstlineno
 
-    def run(self):
-        self.method()
+    def run(self, *args, **kwargs):
+        # TODO: Might raise pydantic.ValidationError, wrap it nicely?
+        return self._validated_method(*args, **kwargs)
 
     @property
     def status(self) -> Status:
@@ -41,6 +45,20 @@ class Task:
     def failed(self):
         return self._status == Status.FAIL
 
+    @property
+    def input_schema(self) -> dict[str, Any]:
+        schema = self._validated_method.__pydantic_core_schema__
+        return GenerateJsonSchema().generate(schema) or {}
+
+    @property
+    def output_schema(self) -> dict[str, Any]:
+        schema = self._validated_method.__return_pydantic_core_schema__
+        return GenerateJsonSchema().generate(schema) or {}
+
+    @property
+    def _validated_method(self):
+        return validate_call(validate_return=True)(self.method)
+    
     def __typecheckself__(self) -> None:
         from robocorp.tasks._protocols import check_implements
 

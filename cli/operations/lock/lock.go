@@ -66,16 +66,20 @@ func parseTasks(cfg config.Config) (map[string]*robot.Task, error) {
 		return nil, err
 	}
 
-	items, err := tasks.List(env)
+	robotTasks := make(map[string]*robot.Task, 0)
+	if len(cfg.TasksFiles) == 0 {
+		return robotTasks, nil
+	}
+
+	items, err := tasks.List(cfg, env)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read tasks:\n%v", err)
 	}
 
-	cmds := make(map[string]*robot.Task, 0)
 	for _, t := range items {
-		cmd := tasks.RunCommand(t.Name)
-		cmds[t.Name] = &robot.Task{Command: cmd}
+		cmd := tasks.RunCommand(cfg.TasksFiles, t.Name)
+		robotTasks[t.Name] = &robot.Task{Command: cmd}
 	}
 
-	return cmds, nil
+	return robotTasks, nil
 }

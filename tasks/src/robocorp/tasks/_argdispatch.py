@@ -17,6 +17,7 @@ class _ArgDispatcher:
         method = self._name_to_func[parsed.command]
         dct = parsed.__dict__.copy()
         dct.pop("command")
+
         return method(**dct)
 
     def register(self, name=None):
@@ -133,6 +134,7 @@ class _ArgDispatcher:
             choices=["no", "before-teardown", "after-teardown"],
             help="Can be used to do an early os._exit to avoid the tasks session teardown or the interpreter teardown. Not recommended in general.",
         )
+        run_parser.add_argument("task_arguments", nargs=argparse.REMAINDER)
 
         # List tasks
         list_parser = subparsers.add_parser(

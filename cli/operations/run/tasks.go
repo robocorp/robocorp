@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/robocorp/robo/cli/config"
 	"github.com/robocorp/robo/cli/environment"
 	"github.com/robocorp/robo/cli/tasks"
 	"github.com/robocorp/robo/cli/ui"
@@ -17,8 +18,8 @@ var (
 	padding = lipgloss.NewStyle().Padding(1, 0).Render
 )
 
-func selectTask(env environment.Environment) (string, error) {
-	items, err := tasks.List(env)
+func selectTask(cfg config.Config, env environment.Environment) (string, error) {
+	items, err := tasks.List(cfg, env)
 	if err != nil {
 		return "", fmt.Errorf("Failed to read tasks:\n%v", err)
 	}
