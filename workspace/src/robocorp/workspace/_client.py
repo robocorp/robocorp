@@ -11,7 +11,7 @@ CONFIG = {
 
 
 @lru_cache(maxsize=1)
-def _get_configuration(conf: dict) -> Configuration:
+def _get_configuration(**conf) -> Configuration:
     from ._environment import get_endpoint, get_token, get_workspace
 
     endpoint = conf["endpoint"] or get_endpoint()
@@ -21,7 +21,8 @@ def _get_configuration(conf: dict) -> Configuration:
         api_key = get_token()
         api_key_prefix = "Bearer"
 
-    configuration = Configuration(host=endpoint, api_key=api_key, api_key_prefix=api_key_prefix)
+    identifier = "API Key with permissions"
+    configuration = Configuration(host=endpoint, api_key={identifier: api_key}, api_key_prefix={identifier: api_key_prefix})
     configuration.workspace = conf["workspace"] or get_workspace()
     return configuration
 
@@ -35,7 +36,7 @@ def get_configured_client() -> ApiClient:
     """Creates and returns a generic API client based on the injected environment
     variables from Control Room (or RCC) in the absence of an explicit configuration.
     """
-    configuration = _get_configuration(CONFIG)
+    configuration = _get_configuration(**CONFIG)
     return _get_client(configuration)
 
 

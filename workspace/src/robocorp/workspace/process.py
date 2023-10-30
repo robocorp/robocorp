@@ -20,5 +20,5 @@ def list_processes(limit: Optional[int] = None) -> ListProcesses200Response:
     # FIXME(cmin764, 30 Oct 2023): Auto-inject the Workspace ID from configuration
     #  through the templates. (so we'd eliminate this wrapper)
     from ._client import CONFIG, _get_configuration
-    configuration = _get_configuration(CONFIG)
+    configuration = _get_configuration(**CONFIG)
     return get_process_api_instance().list_processes(configuration.workspace, limit=limit)
