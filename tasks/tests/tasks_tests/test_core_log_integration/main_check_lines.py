@@ -1,5 +1,5 @@
-from robocorp.tasks import task
 from robocorp import log
+from robocorp.tasks import task
 
 
 def another_method_at_line_5(a):

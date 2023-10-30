@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"os"
-
-	"github.com/robocorp/robo/cli/fatal"
+	"github.com/robocorp/robo/cli/exit"
 	"github.com/robocorp/robo/cli/operations/exec"
 	"github.com/spf13/cobra"
 )
@@ -14,11 +12,11 @@ var execCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			cmd.Help()
-			os.Exit(1)
+			exit.SafeExit(1)
 		}
 
 		if err := exec.Exec(directory, args); err != nil {
-			fatal.FatalError(err)
+			exit.FatalExit(err)
 		}
 	},
 }

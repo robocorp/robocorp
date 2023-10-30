@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.4.1 - 2023-10-24
+
+- Fix dangling processes after interrupted run
+- Fix cache miss for newly created projects
+- Fix various formatting issues in console output
+- Fix Python version in templates
+- Upgrade vendored `rcc` version
+
 ## 0.4.0 - 2023-08-21
 
 - Add `lock` command

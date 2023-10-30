@@ -19,6 +19,7 @@ import (
 )
 
 type State int
+type InstallDoneMsg struct{}
 
 const (
 	StateTemplate State = iota
@@ -136,7 +137,7 @@ func (m model) View() string {
 			faintText("\nPress ctrl-c to abort"),
 		)
 	case StateDone:
-		guide := ("Created project ✨" +
+		guide := ("Created project ✨\n" +
 			faintText("To run the project ") +
 			"cd " + m.dirName +
 			faintText(" and then ") +
@@ -200,7 +201,7 @@ func (m model) updateStateName(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) updateStateInstall(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg.(type) {
-	case progress.ProgressDone:
+	case InstallDoneMsg:
 		m.currentState = StateDone
 		return m, tea.Quit
 	}
@@ -241,12 +242,12 @@ func (m model) installProject() tea.Cmd {
 				Total:   1,
 				Message: "Found cached environment",
 			}
-			return nil
+			return InstallDoneMsg{}
 		}
 		if _, err := environment.Create(cfg, onProgress); err != nil {
 			return ui.ErrorMsg(err)
 		}
-		return nil
+		return InstallDoneMsg{}
 	}
 }
 

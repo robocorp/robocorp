@@ -45,12 +45,13 @@ def clear_cached_vault():
 def test_secrets_hidden(
     check_secrets_mod, monkeypatch, datadir, clear_cached_vault, capsys, add_log_to_env
 ):
+    from importlib import reload
+
     from robocorp.log import verify_log_messages_from_stream
 
     monkeypatch.setenv("RC_VAULT_SECRET_MANAGER", "FileSecrets")
     monkeypatch.setenv("RC_VAULT_SECRETS_FILE", str(datadir / "secrets.json"))
 
-    from imp import reload
     from io import StringIO
 
     from robocorp.log import setup_auto_logging

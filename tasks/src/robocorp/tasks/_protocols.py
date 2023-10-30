@@ -1,7 +1,9 @@
 import typing
+from contextlib import contextmanager
+from enum import Enum
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Callable, Optional, Sequence, Set, TypeVar, Union
+from typing import Any, Callable, Iterator, Optional, Sequence, Set, TypeVar, Union
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
@@ -28,17 +30,12 @@ def check_implements(x: T) -> T:
     return x
 
 
-# Note: this is a bit messy as we're mixing task states with log levels.
-# Note2: This is for the log.html and not really for user APIs.
-class Status:
-    NOT_RUN = "NOT_RUN"  # Initial status for a task which is not run.
-    PASS = "PASS"  # Used for task pass
-    FAIL = "FAIL"  # Used for task failure
+class Status(str, Enum):
+    """Task state"""
 
-    ERROR = "ERROR"  # log.critical
-    INFO = "INFO"  # log.info
-    WARN = "WARN"  # log.warn
-    DEBUG = "DEBUG"  # log.debug
+    NOT_RUN = "NOT_RUN"
+    PASS = "PASS"
+    FAIL = "FAIL"
 
 
 class ITask(typing.Protocol):
@@ -46,7 +43,7 @@ class ITask(typing.Protocol):
     filename: str
     method: typing.Callable
 
-    status: str
+    status: Status
     message: str
     exc_info: Optional[OptExcInfo]
 
@@ -69,8 +66,17 @@ class ITask(typing.Protocol):
         """
 
 
-class IContextErrorReport(typing.Protocol):
-    def show_error(self, message):
+class IContext(typing.Protocol):
+    def show(
+        self, msg: str, end: str = "", kind: str = "", flush: Optional[bool] = None
+    ):
+        pass
+
+    def show_error(self, msg: str, flush: Optional[bool] = None):
+        pass
+
+    @contextmanager
+    def register_lifecycle_prints(self) -> Iterator[None]:
         pass
 
 
@@ -118,16 +124,18 @@ class IBeforeCollectTasksCallback(ICallback, typing.Protocol):
         pass
 
 
+ITaskCallback = Callable[[ITask], Any]
+ITasksCallback = Callable[[Sequence[ITask]], Any]
+
+
 class IBeforeTaskRunCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
         pass
 
-    def register(
-        self, callback: Callable[[ITask], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITaskCallback) -> IAutoUnregisterContextManager:
         pass
 
-    def unregister(self, callback: Callable[[ITask], Any]) -> None:
+    def unregister(self, callback: ITaskCallback) -> None:
         pass
 
 
@@ -135,9 +143,7 @@ class IBeforeAllTasksRunCallback(ICallback, typing.Protocol):
     def __call__(self, tasks: Sequence[ITask]):
         pass
 
-    def register(
-        self, callback: Callable[[Sequence[ITask]], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITasksCallback) -> IAutoUnregisterContextManager:
         pass
 
     def unregister(self, callback: Callable[[Sequence[ITask]], Any]) -> None:
@@ -148,12 +154,10 @@ class IAfterAllTasksRunCallback(ICallback, typing.Protocol):
     def __call__(self, tasks: Sequence[ITask]):
         pass
 
-    def register(
-        self, callback: Callable[[Sequence[ITask]], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITasksCallback) -> IAutoUnregisterContextManager:
         pass
 
-    def unregister(self, callback: Callable[[Sequence[ITask]], Any]) -> None:
+    def unregister(self, callback: ITasksCallback) -> None:
         pass
 
 
@@ -161,10 +165,8 @@ class IAfterTaskRunCallback(ICallback, typing.Protocol):
     def __call__(self, task: ITask):
         pass
 
-    def register(
-        self, callback: Callable[[ITask], Any]
-    ) -> IAutoUnregisterContextManager:
+    def register(self, callback: ITaskCallback) -> IAutoUnregisterContextManager:
         pass
 
-    def unregister(self, callback: Callable[[ITask], Any]) -> None:
+    def unregister(self, callback: ITaskCallback) -> None:
         pass

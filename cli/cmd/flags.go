@@ -2,5 +2,7 @@ package cmd
 
 // Shared flags between commands
 var (
-	forceFlag bool
+	forceFlag      bool
+	maxLogFiles    int
+	maxLogFileSize string
 )

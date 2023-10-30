@@ -1,7 +1,6 @@
 from typing import Any, Tuple
 
-from . import _config
-from . import suppress
+from . import _config, suppress
 
 
 def get_obj_type_and_repr(obj: Any) -> Tuple[str, str]:

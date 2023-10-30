@@ -63,3 +63,6 @@ class SensitiveVariableNames:
                 f"Expected a str or Pattern. Received: {type(variable_name_pattern)}."
             )
         self._cache.clear()
+
+
+_sensitive_names = SensitiveVariableNames(("password", "passwd"))

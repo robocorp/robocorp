@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 
 	"github.com/robocorp/robo/cli/config"
@@ -78,11 +79,24 @@ func (it *CondaYaml) SaveAs(path string, force bool) error {
 	return os.WriteFile(path, content, 0o666)
 }
 
+func isFile(path string, cfg config.Config) bool {
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(cfg.Dir, path)
+	}
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return !info.IsDir()
+}
+
 func generatePipDependencies(cfg config.Config) []string {
 	rows := make([]string, 0)
 	for k, v := range cfg.Dependencies {
 		if v == "*" {
 			rows = append(rows, k)
+		} else if isFile(v, cfg) {
+			rows = append(rows, v)
 		} else {
 			rows = append(rows, fmt.Sprintf("%v==%v", k, v))
 		}

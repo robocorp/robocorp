@@ -4,6 +4,7 @@ from functools import partial
 from typing import Any, List, Optional, Sequence, Tuple
 
 from robocorp.log import critical, is_sensitive_variable_name
+from robocorp.log._log_redacter import _log_redacter
 
 from ._config import AutoLogConfigBase
 from ._logger_instances import _get_logger_instances
@@ -17,15 +18,15 @@ except Exception:
     greenlet = None
 
 
-def _get_obj_type_and_repr_and_hide_if_needed(key, val):
+def _get_obj_type_and_repr_and_hide_if_needed(key, val) -> Tuple[str, str]:
     obj_type, obj_repr = get_obj_type_and_repr(val)
 
     if is_sensitive_variable_name(key):
-        with _get_logger_instances() as logger_instances:
-            for robo_logger in logger_instances:
-                robo_logger.hide_from_output(obj_repr)
-                if isinstance(val, str):
-                    robo_logger.hide_from_output(val)
+        _log_redacter.hide_from_output(obj_repr)
+        if isinstance(val, str):
+            _log_redacter.hide_from_output(val)
+
+        obj_repr = "<redacted>"
     return obj_type, obj_repr
 
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-tasks"
-version = "2.2.0"
+version = "2.3.0"
 description = "The automation framework for Python"
 authors = [
 	"Fabio Zadrozny <fabio@robocorp.com>",
@@ -24,11 +24,14 @@ robocorp-log = ">=2.4,<3"
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
 
-[tool.mypy]
-mypy_path = "src:tests"
-
 [tool.isort]
 profile = "black"
+
+[tool.ruff]
+ignore = ["E501"]
+
+[tool.mypy]
+mypy_path = "src:tests"
 
 [[tool.mypy.overrides]]
 module = "setuptools.*"

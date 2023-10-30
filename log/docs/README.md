@@ -30,8 +30,11 @@ where you just need to worry about marking the entry point method with a `@tasks
 decorator and it'll automatically setup the auto-logging and provide the
 log result in `output/log.html`.
 
-`robocorp-tasks` also takes care of customizing `robocorp-log` through `pyproject.toml`.
-See `robocorp-tasks` for more information.
+#### Configuring with pyproject.toml
+
+`robocorp-tasks` takes care of customizing `robocorp-log` through `pyproject.toml`.
+See the `robocorp-tasks` project for more information (`robocorp-log` only provides
+the core logging structure and different libraries may customize it in different ways).
 
 Although the setup is done through `robocorp-tasks`, there are still
 some APIs in `robocorp.log` which are interesting to use such as:

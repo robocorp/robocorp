@@ -1,0 +1,5 @@
+Robocorp (TokenKind.value)
+Window (TokenKind.value)
+> (TokenKind.match_child)
+path (TokenKind.strategy)
+2|3|2|8|2 (TokenKind.value)

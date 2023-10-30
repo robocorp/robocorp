@@ -1,10 +1,9 @@
 import json
 import os
 import sys
-import threading
 import traceback
 from pathlib import Path
-from typing import List, Sequence, Union
+from typing import List, Literal, Optional, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
@@ -72,6 +71,8 @@ def run(
     console_colors: str = "auto",
     log_output_to_stdout: str = "",
     no_status_rc: bool = False,
+    teardown_dump_threads_timeout: Optional[float] = None,
+    teardown_interrupt_timeout: Optional[float] = None,
 ) -> int:
     """
     Runs a task.
@@ -94,6 +95,17 @@ def run(
         no_status_rc:
             Set to True so that if running tasks has an error inside the task
             the return code of the process is 0.
+        teardown_dump_threads_timeout: Can be used to customize the time
+            to dump threads in the teardown process if it doesn't complete
+            until the specified timeout.
+            It's also possible to specify it with the
+            RC_TEARDOWN_DUMP_THREADS_TIMEOUT environment variable.
+            Defaults to 5 seconds if not specified.
+        teardown_interrupt_timeout: Can be used to customize the time
+            to interrupt the teardown process after a given timeout.
+            It's also possible to specify it with the
+            RC_TEARDOWN_INTERRUPT_TIMEOUT environment variable.
+            Defaults to not interrupting.
 
     Returns:
         0 if everything went well.
@@ -104,6 +116,8 @@ def run(
         read_pyproject_toml,
         read_robocorp_auto_log_config,
     )
+
+    from robocorp.tasks._interrupts import interrupt_on_timeout
 
     from ._collect_tasks import collect_tasks
     from ._config import RunConfig, set_config
@@ -137,6 +151,28 @@ def run(
     if not p.exists():
         context.show_error(f"Path: {path} does not exist")
         return 1
+
+    if teardown_dump_threads_timeout is None:
+        v = os.getenv("RC_TEARDOWN_DUMP_THREADS_TIMEOUT", "5")
+
+        try:
+            teardown_dump_threads_timeout = float(v)
+        except ValueError:
+            sys.stderr.write(
+                f"Value set for RC_TEARDOWN_DUMP_THREADS_TIMEOUT ({v}) is not a valid float."
+            )
+            sys.exit(1)
+
+    if teardown_interrupt_timeout is None:
+        v = os.getenv("RC_TEARDOWN_INTERRUPT_TIMEOUT", "-1")
+
+        try:
+            teardown_interrupt_timeout = float(v)
+        except ValueError:
+            sys.stderr.write(
+                f"Value set for RC_TEARDOWN_INTERRUPT_TIMEOUT ({v}) is not a valid float."
+            )
+            sys.exit(1)
 
     # Enable faulthandler (writing to sys.stderr) early on in the
     # task execution process.
@@ -184,24 +220,25 @@ def run(
     )
 
     with set_config(run_config), setup_cli_auto_logging(
-        # Note: we can't customize what's a "project" file or a "library" file, right now
-        # the customizations are all based on module names.
+        # Note: we can't customize what's a "project" file or a "library" file,
+        # right now the customizations are all based on module names.
         config
     ), redirect.setup_stdout_logging(log_output_to_stdout), setup_log_output(
         output_dir=output_dir_path,
         max_files=max_log_files,
         max_file_size=max_log_file_size,
     ), setup_log_output_to_port(), context.register_lifecycle_prints():
-        run_status = "PASS"
-        setup_message = ""
-
         run_name = os.path.basename(p)
         if task_name:
             run_name += f" - {task_name}"
 
+        # Status string from `log` module
+        # TODO: Replace with enum
+        run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
         log.start_run(run_name)
 
         try:
+            setup_message = ""
             log.start_task("Collect tasks", "setup", "", 0)
             try:
                 if not task_name:
@@ -220,8 +257,8 @@ def run(
             except Exception as e:
                 run_status = "ERROR"
                 setup_message = str(e)
-                log.exception()
 
+                log.exception()
                 if not isinstance(e, RobocorpTasksCollectError):
                     traceback.print_exc()
                 else:
@@ -231,8 +268,6 @@ def run(
             finally:
                 log.end_task("Collect tasks", "setup", run_status, setup_message)
 
-            returncode = 0
-
             before_all_tasks_run(tasks)
 
             try:
@@ -241,26 +276,47 @@ def run(
                     before_task_run(task)
                     try:
                         task.run()
-                        run_status = task.status = Status.PASS
+                        task.status = Status.PASS
                     except Exception as e:
-                        run_status = task.status = Status.ERROR
-                        if not no_status_rc:
-                            returncode = 1
+                        task.status = Status.FAIL
                         task.message = str(e)
                         task.exc_info = sys.exc_info()
                     finally:
-                        after_task_run(task)
+                        with interrupt_on_timeout(
+                            teardown_dump_threads_timeout,
+                            teardown_interrupt_timeout,
+                            "Teardown",
+                            "--teardown-dump-threads-timeout",
+                            "RC_TEARDOWN_DUMP_THREADS_TIMEOUT",
+                            "--teardown-interrupt-timeout",
+                            "RC_TEARDOWN_INTERRUPT_TIMEOUT",
+                        ):
+                            after_task_run(task)
                         set_current_task(None)
+                        if task.failed:
+                            run_status = "ERROR"
             finally:
                 log.start_task("Teardown tasks", "teardown", "", 0)
                 try:
-                    after_all_tasks_run(tasks)
+                    with interrupt_on_timeout(
+                        teardown_dump_threads_timeout,
+                        teardown_interrupt_timeout,
+                        "Teardown",
+                        "--teardown-dump-threads-timeout",
+                        "RC_TEARDOWN_DUMP_THREADS_TIMEOUT",
+                        "--teardown-interrupt-timeout",
+                        "RC_TEARDOWN_INTERRUPT_TIMEOUT",
+                    ):
+                        after_all_tasks_run(tasks)
                     # Always do a process snapshot as the process is about to finish.
                     log.process_snapshot()
                 finally:
                     log.end_task("Teardown tasks", "teardown", Status.PASS, "")
 
-            return returncode
+            if no_status_rc:
+                return 0
+            else:
+                return int(any(task.failed for task in tasks))
         finally:
             log.end_run(run_name, run_status)
 
@@ -277,48 +333,16 @@ def run(
                 )
                 timeout = 40
 
+            from robocorp.tasks._interrupts import dump_threads
+
             def on_timeout():
-                _dump_threads(
-                    message=f"All tasks have run but the process still hasn't exited after {timeout} seconds. Showing threads found:"
+                dump_threads(
+                    message=(
+                        f"All tasks have run but the process still hasn't exited "
+                        f"after {timeout} seconds. Showing threads found:"
+                    )
                 )
 
             t = Timer(timeout, on_timeout)
             t.daemon = True
             t.start()
-
-
-def _dump_threads(stream=None, message="Threads found"):
-    if stream is None:
-        stream = sys.stderr
-
-    thread_id_to_name = {}
-    try:
-        for t in threading.enumerate():
-            thread_id_to_name[t.ident] = "%s  (daemon: %s)" % (t.name, t.daemon)
-    except Exception:
-        pass
-
-    stack_trace = [
-        "===============================================================================",
-        message,
-        "================================= Thread Dump =================================",
-    ]
-
-    for thread_id, stack in sys._current_frames().items():
-        stack_trace.append(
-            "\n-------------------------------------------------------------------------------"
-        )
-        stack_trace.append(" Thread %s" % thread_id_to_name.get(thread_id, thread_id))
-        stack_trace.append("")
-
-        if "self" in stack.f_locals:
-            sys.stderr.write(str(stack.f_locals["self"]) + "\n")
-
-        for filename, lineno, name, line in traceback.extract_stack(stack):
-            stack_trace.append(' File "%s", line %d, in %s' % (filename, lineno, name))
-            if line:
-                stack_trace.append("   %s" % (line.strip()))
-    stack_trace.append(
-        "\n=============================== END Thread Dump ==============================="
-    )
-    stream.write("\n".join(stack_trace))

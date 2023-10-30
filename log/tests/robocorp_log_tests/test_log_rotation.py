@@ -1,5 +1,5 @@
 def test_rotate_logs(tmpdir, str_regression) -> None:
-    from imp import reload
+    from importlib import reload
     from pathlib import Path
 
     from robocorp_log_tests._resources import check

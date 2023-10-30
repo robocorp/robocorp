@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
+
 from robocorp.log import AutoLogConfigBase, FilterKind
 from robocorp.log._constants import UNSCOPED_ELEMENTS
 from robocorp.log.protocols import IReadLines, LogHTMLStyle

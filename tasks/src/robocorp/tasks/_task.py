@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
 
-from robocorp.tasks._protocols import ITask, Status
+from robocorp.tasks._protocols import IContext, ITask, Status
 
 
 class Task:
@@ -14,9 +14,9 @@ class Task:
         self.module_name = module.__name__
         self.filename = module.__file__ or "<filename unavailable>"
         self.method = method
-        self.status = Status.NOT_RUN
         self.message = ""
         self.exc_info: Optional[OptExcInfo] = None
+        self._status = Status.NOT_RUN
 
     @property
     def name(self):
@@ -30,8 +30,16 @@ class Task:
         self.method()
 
     @property
+    def status(self) -> Status:
+        return self._status
+
+    @status.setter
+    def status(self, value: Status):
+        self._status = Status(value)
+
+    @property
     def failed(self):
-        return self.status in (Status.ERROR, Status.FAIL)
+        return self._status == Status.FAIL
 
     def __typecheckself__(self) -> None:
         from robocorp.tasks._protocols import check_implements
@@ -150,7 +158,7 @@ class Context:
             msg = f"\n{task.message}"
 
         status_kind = self.KIND_REGULAR
-        if task.status == Status.ERROR:
+        if task.status == Status.FAIL:
             status_kind = self.KIND_ERROR
 
         show = self.show
@@ -184,3 +192,8 @@ class Context:
             self._after_task_run
         ):
             yield
+
+    def __typecheckself__(self) -> None:
+        from robocorp.tasks._protocols import check_implements
+
+        _: IContext = check_implements(self)

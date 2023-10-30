@@ -4,7 +4,7 @@ import sys
 from contextlib import nullcontext
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, Literal, Optional, Sequence, Union
 
 import pytest
 
@@ -262,19 +262,29 @@ def str_regression(datadir, original_datadir, request):
 
 
 def robocorp_tasks_run(
-    cmdline, returncode, cwd=None, additional_env: Optional[Dict[str, str]] = None
+    cmdline,
+    returncode: Union[Literal["error"], int],
+    cwd=None,
+    additional_env: Optional[Dict[str, str]] = None,
+    timeout=None,
 ) -> CompletedProcess:
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
     if additional_env:
         cp.update(additional_env)
     args = [sys.executable, "-m", "robocorp.tasks"] + cmdline
-    result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd)
-    if result.returncode != returncode:
-        env_str = "\n".join(str(x) for x in sorted(cp.items()))
+    result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd, timeout=timeout)
 
-        raise AssertionError(
-            f"""Expected returncode: {returncode}. Found: {result.returncode}.
+    if returncode == "error" and result.returncode:
+        return result
+
+    if result.returncode == returncode:
+        return result
+
+    env_str = "\n".join(str(x) for x in sorted(cp.items()))
+
+    raise AssertionError(
+        f"""Expected returncode: {returncode}. Found: {result.returncode}.
 === stdout:
 {result.stdout.decode('utf-8')}
 
@@ -288,8 +298,7 @@ def robocorp_tasks_run(
 {args}
 
 """
-        )
-    return result
+    )
 
 
 class RobocorpTaskRunner:
@@ -423,3 +432,63 @@ def pyfile(request, datadir):
         return tmpfile
 
     return factory
+
+
+DEFAULT_TIMEOUT = 10
+
+
+def wait_for_condition(condition, msg=None, timeout=DEFAULT_TIMEOUT, sleep=1 / 20.0):
+    """
+    Note: wait_for_expected_func_return is usually a better API to use as
+    the error message is automatically built.
+    """
+    import time
+
+    curtime = time.time()
+
+    while True:
+        if condition():
+            break
+        if timeout is not None and (time.time() - curtime > timeout):
+            error_msg = f"Condition not reached in {timeout} seconds"
+            if msg is not None:
+                error_msg += "\n"
+                if callable(msg):
+                    error_msg += msg()
+                else:
+                    error_msg += str(msg)
+
+            raise TimeoutError(error_msg)
+        time.sleep(sleep)
+
+
+def wait_for_non_error_condition(
+    generate_error_or_none, timeout=DEFAULT_TIMEOUT, sleep=1 / 20.0
+):
+    import time
+
+    curtime = time.time()
+
+    while True:
+        error_msg = generate_error_or_none()
+        if error_msg is None:
+            break
+
+        if timeout is not None and (time.time() - curtime > timeout):
+            raise TimeoutError(
+                f"Condition not reached in {timeout} seconds\n{error_msg}"
+            )
+        time.sleep(sleep)
+
+
+def wait_for_expected_func_return(
+    func, expected_return, timeout=DEFAULT_TIMEOUT, sleep=1 / 20.0
+):
+    def check():
+        found = func()
+        if found != expected_return:
+            return "Expected: %s. Found: %s" % (expected_return, found)
+
+        return None
+
+    wait_for_non_error_condition(check, timeout, sleep)

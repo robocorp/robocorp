@@ -3,9 +3,10 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
+from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
+
 from robocorp.log._config import FilterKind
 from robocorp.log._rewrite_importhook import _rewrite
-from robocorp_log_tests.test_rewrite_hook import AutoLogConfigForTest
 
 
 def test_ast_utils() -> None:

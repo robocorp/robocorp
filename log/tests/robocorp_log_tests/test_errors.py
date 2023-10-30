@@ -1,5 +1,5 @@
 def test_errors(log_setup, tmpdir):
-    from imp import reload
+    from importlib import reload
 
     from robocorp_log_tests._resources import check_traceback
 

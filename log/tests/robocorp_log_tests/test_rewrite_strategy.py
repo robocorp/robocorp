@@ -43,6 +43,7 @@ try..except as well as leveraging a main `with` statement in the method.
 """
 
 import pytest
+
 from robocorp.log._lifecycle_hooks import MethodLifecycleContext
 
 
