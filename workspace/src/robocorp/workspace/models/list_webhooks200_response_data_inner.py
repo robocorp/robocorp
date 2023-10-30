@@ -20,7 +20,7 @@ import json
 
 from typing import List, Optional
 from pydantic import BaseModel, Field, StrictStr, conlist
-from workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
+from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
 
 class ListWebhooks200ResponseDataInner(BaseModel):
     """

@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.step_run_resource import StepRunResource
+from robocorp.workspace.models.step_run_resource import StepRunResource
 
 class ListStepRuns200Response(BaseModel):
     """

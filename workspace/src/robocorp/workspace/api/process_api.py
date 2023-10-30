@@ -19,13 +19,15 @@ import warnings
 from pydantic import validate_arguments, ValidationError
 
 from typing_extensions import Annotated
-from pydantic import Field, StrictStr
+from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
-from workspace.models.list_processes200_response import ListProcesses200Response
+from typing import Optional, Union
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.models.list_processes200_response import ListProcesses200Response
+
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -44,18 +46,20 @@ class ProcessApi:
         self.api_client = api_client
 
     @validate_arguments
-    def list_processes(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], **kwargs) -> ListProcesses200Response:  # noqa: E501
+    def list_processes(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListProcesses200Response:  # noqa: E501
         """List processes  # noqa: E501
 
         Returns a list of all processes linked to the requested workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_processes(workspace_id, async_req=True)
+        >>> thread = api.list_processes(workspace_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: Workspace ID (required)
         :type workspace_id: str
+        :param limit: Limit for paginated response
+        :type limit: float
         :param async_req: Whether to execute the request asynchronously.
         :type async_req: bool, optional
         :param _request_timeout: timeout setting for this request.
@@ -71,21 +75,23 @@ class ProcessApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_processes_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_processes_with_http_info(workspace_id, **kwargs)  # noqa: E501
+        return self.list_processes_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
     @validate_arguments
-    def list_processes_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], **kwargs) -> ApiResponse:  # noqa: E501
+    def list_processes_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
         """List processes  # noqa: E501
 
         Returns a list of all processes linked to the requested workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_processes_with_http_info(workspace_id, async_req=True)
+        >>> thread = api.list_processes_with_http_info(workspace_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: Workspace ID (required)
         :type workspace_id: str
+        :param limit: Limit for paginated response
+        :type limit: float
         :param async_req: Whether to execute the request asynchronously.
         :type async_req: bool, optional
         :param _preload_content: if False, the ApiResponse.data will
@@ -114,7 +120,8 @@ class ProcessApi:
         _params = locals()
 
         _all_params = [
-            'workspace_id'
+            'workspace_id',
+            'limit'
         ]
         _all_params.extend(
             [
@@ -148,6 +155,9 @@ class ProcessApi:
 
         # process the query parameters
         _query_params = []
+        if _params.get('limit') is not None:  # noqa: E501
+            _query_params.append(('limit', _params['limit']))
+
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters

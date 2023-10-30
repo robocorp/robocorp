@@ -1,4 +1,4 @@
-# workspace.WorkerApi
+# robocorp.workspace.WorkerApi
 
 All URIs are relative to *http://localhost*
 
@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**delete_worker**](WorkerApi.md#delete_worker) | **DELETE** /workspaces/{workspace_id}/workers/{worker_id} | Delete worker
 [**get_worker**](WorkerApi.md#get_worker) | **GET** /workspaces/{workspace_id}/workers/{worker_id} | Get worker
 [**list_workers**](WorkerApi.md#list_workers) | **GET** /workspaces/{workspace_id}/workers | List workers
-[**update_worker**](WorkerApi.md#update_worker) | **PUT** /workspaces/{workspace_id}/workers/{worker_id} | Update worker
+[**update_worker**](WorkerApi.md#update_worker) | **POST** /workspaces/{workspace_id}/workers/{worker_id} | Update worker
 
 
 # **create_link_token**
@@ -24,15 +24,15 @@ Generates and returns a link token used to link a new worker to the requested wo
 ```python
 import time
 import os
-import workspace
-from workspace.models.create_link_token_request import CreateLinkTokenRequest
-from workspace.models.link_token_resource import LinkTokenResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.create_link_token_request import CreateLinkTokenRequest
+from robocorp.workspace.models.link_token_resource import LinkTokenResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -48,11 +48,11 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerApi(api_client)
+    api_instance = robocorp.workspace.WorkerApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker should reside.
-    create_link_token_request = workspace.CreateLinkTokenRequest() # CreateLinkTokenRequest | 
+    create_link_token_request = robocorp.workspace.CreateLinkTokenRequest() # CreateLinkTokenRequest | 
 
     try:
         # Create worker link token
@@ -107,14 +107,14 @@ Deletes the requested worker. This action is irreversible!
 ```python
 import time
 import os
-import workspace
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -130,9 +130,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerApi(api_client)
+    api_instance = robocorp.workspace.WorkerApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker resides.
     worker_id = 'worker_id_example' # str | The id of the worker to delete.
 
@@ -189,14 +189,14 @@ Returns a worker linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.worker_resource import WorkerResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.worker_resource import WorkerResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -212,9 +212,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerApi(api_client)
+    api_instance = robocorp.workspace.WorkerApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker resides.
     worker_id = 'worker_id_example' # str | The id of the worker to retrieve.
 
@@ -271,14 +271,14 @@ Returns a list of all workers linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_workers200_response import ListWorkers200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_workers200_response import ListWorkers200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -294,9 +294,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerApi(api_client)
+    api_instance = robocorp.workspace.WorkerApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker resides.
     limit = 3.4 # float | Limit for paginated response (optional)
 
@@ -352,15 +352,15 @@ Updates the requested worker by setting only the values defined in the request b
 ```python
 import time
 import os
-import workspace
-from workspace.models.update_worker_request import UpdateWorkerRequest
-from workspace.models.worker_resource import WorkerResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
+from robocorp.workspace.models.worker_resource import WorkerResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -376,12 +376,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerApi(api_client)
+    api_instance = robocorp.workspace.WorkerApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker resides.
     worker_id = 'worker_id_example' # str | The id of the worker to update.
-    update_worker_request = workspace.UpdateWorkerRequest() # UpdateWorkerRequest | The worker details to update.
+    update_worker_request = robocorp.workspace.UpdateWorkerRequest() # UpdateWorkerRequest | The worker details to update.
 
     try:
         # Update worker

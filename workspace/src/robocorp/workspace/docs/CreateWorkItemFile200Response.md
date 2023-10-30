@@ -4,13 +4,12 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**url** | **str** |  | 
-**form_data** | **object** | The form data fields you must include when uploading the file | 
+**upload** | [**CreateWorkItemFile200ResponseUpload**](CreateWorkItemFile200ResponseUpload.md) |  | 
 
 ## Example
 
 ```python
-from workspace.models.create_work_item_file200_response import CreateWorkItemFile200Response
+from robocorp.workspace.models.create_work_item_file200_response import CreateWorkItemFile200Response
 
 # TODO update the JSON string below
 json = "{}"

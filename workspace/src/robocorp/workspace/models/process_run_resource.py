@@ -20,8 +20,8 @@ import json
 from datetime import datetime
 from typing import Optional, Union
 from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, validator
-from workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
-from workspace.models.process_run_resource_started_by import ProcessRunResourceStartedBy
+from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
+from robocorp.workspace.models.process_run_resource_started_by import ProcessRunResourceStartedBy
 
 class ProcessRunResource(BaseModel):
     """

@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.activity_resource import ActivityResource
+from robocorp.workspace.models.activity_resource import ActivityResource
 
 # TODO update the JSON string below
 json = "{}"

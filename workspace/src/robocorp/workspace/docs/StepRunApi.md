@@ -1,4 +1,4 @@
-# workspace.StepRunApi
+# robocorp.workspace.StepRunApi
 
 All URIs are relative to *http://localhost*
 
@@ -25,14 +25,14 @@ Returns a specific step run from a process run.
 ```python
 import time
 import os
-import workspace
-from workspace.models.step_run_resource import StepRunResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.step_run_resource import StepRunResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -48,9 +48,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.StepRunApi(api_client)
+    api_instance = robocorp.workspace.StepRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     step_run_id = 'step_run_id_example' # str | ID of the step run
 
@@ -106,14 +106,14 @@ Returns a step run artifact.
 ```python
 import time
 import os
-import workspace
-from workspace.models.get_step_run_artifact200_response import GetStepRunArtifact200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.get_step_run_artifact200_response import GetStepRunArtifact200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -129,9 +129,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.StepRunApi(api_client)
+    api_instance = robocorp.workspace.StepRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     step_run_id = 'step_run_id_example' # str | ID of the step run
     artifact_id = 'artifact_id_example' # str | ID of the artifact to retrieve
@@ -189,14 +189,14 @@ Returns the list of all artifacts for a step run.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_step_run_artifacts200_response import ListStepRunArtifacts200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_step_run_artifacts200_response import ListStepRunArtifacts200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -212,9 +212,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.StepRunApi(api_client)
+    api_instance = robocorp.workspace.StepRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     step_run_id = 'step_run_id_example' # str | Step Run ID
     limit = 3.4 # float | Limit for paginated response (optional)
@@ -272,14 +272,14 @@ Returns a paginated list of console messages for the step run.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_step_run_console_messages200_response import ListStepRunConsoleMessages200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_step_run_console_messages200_response import ListStepRunConsoleMessages200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -295,9 +295,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.StepRunApi(api_client)
+    api_instance = robocorp.workspace.StepRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     step_run_id = 'step_run_id_example' # str | Step Run ID
 
@@ -354,14 +354,14 @@ Returns the events of a step run.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_step_run_events200_response import ListStepRunEvents200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_step_run_events200_response import ListStepRunEvents200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -377,9 +377,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.StepRunApi(api_client)
+    api_instance = robocorp.workspace.StepRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     step_run_id = 'step_run_id_example' # str | ID of the step run
     limit = 3.4 # float | Limit for paginated response (optional)
@@ -437,14 +437,14 @@ Returns a paginated list of step runs.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_step_runs200_response import ListStepRuns200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_step_runs200_response import ListStepRuns200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -460,9 +460,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.StepRunApi(api_client)
+    api_instance = robocorp.workspace.StepRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     process_run_id = 'process_run_id_example' # str | Process Run ID
     limit = 3.4 # float | Limit for paginated response (optional)

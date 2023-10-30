@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
+from robocorp.workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
 
 # TODO update the JSON string below
 json = "{}"

@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.process_run_output_resource import ProcessRunOutputResource
+from robocorp.workspace.models.process_run_output_resource import ProcessRunOutputResource
 
 class ListProcessRunOutputs200Response(BaseModel):
     """

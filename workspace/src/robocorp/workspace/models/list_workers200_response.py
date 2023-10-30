@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.worker_resource import WorkerResource
+from robocorp.workspace.models.worker_resource import WorkerResource
 
 class ListWorkers200Response(BaseModel):
     """

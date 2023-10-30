@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 
 # TODO update the JSON string below
 json = "{}"

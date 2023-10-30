@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, StrictStr, conlist, validator
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 
 class ProcessWebhookPayload(BaseModel):
     """

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.asset_payload_data_resource import AssetPayloadDataResource
+from robocorp.workspace.models.asset_payload_data_resource import AssetPayloadDataResource
 
 # TODO update the JSON string below
 json = "{}"

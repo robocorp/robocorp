@@ -23,16 +23,16 @@ from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
-from workspace.models.assistant_run_resource import AssistantRunResource
-from workspace.models.create_assistant_request import CreateAssistantRequest
-from workspace.models.get_assistant200_response import GetAssistant200Response
-from workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
-from workspace.models.list_assistant_assistant_runs200_response import ListAssistantAssistantRuns200Response
-from workspace.models.list_assistants200_response import ListAssistants200Response
+from robocorp.workspace.models.assistant_run_resource import AssistantRunResource
+from robocorp.workspace.models.create_assistant_request import CreateAssistantRequest
+from robocorp.workspace.models.get_assistant200_response import GetAssistant200Response
+from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
+from robocorp.workspace.models.list_assistant_runs200_response import ListAssistantRuns200Response
+from robocorp.workspace.models.list_assistants200_response import ListAssistants200Response
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -510,19 +510,19 @@ class AssistantApi:
             _request_auth=_params.get('_request_auth'))
 
     @validate_arguments
-    def list_assistant_assistant_runs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[StrictStr, Field(..., description="Assistant ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListAssistantAssistantRuns200Response:  # noqa: E501
-        """List assistant runs for an assistant  # noqa: E501
+    def list_assistant_runs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[Optional[StrictStr], Field(description="Assistant ID. If specified, the response will only contain assistant runs for that assistant.")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListAssistantRuns200Response:  # noqa: E501
+        """List assistant runs  # noqa: E501
 
-        Returns a paginated list of assistant runs for the assistant.  # noqa: E501
+        Returns a paginated list of assistant runs. If an assistant id is specified, the response will only contain assistant runs for that assistant, otherwise it will return the assistant runs for all assistants in the workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_assistant_assistant_runs(workspace_id, assistant_id, limit, async_req=True)
+        >>> thread = api.list_assistant_runs(workspace_id, assistant_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: Workspace ID (required)
         :type workspace_id: str
-        :param assistant_id: Assistant ID (required)
+        :param assistant_id: Assistant ID. If specified, the response will only contain assistant runs for that assistant.
         :type assistant_id: str
         :param limit: Limit for paginated response
         :type limit: float
@@ -535,28 +535,28 @@ class AssistantApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: ListAssistantAssistantRuns200Response
+        :rtype: ListAssistantRuns200Response
         """
         kwargs['_return_http_data_only'] = True
         if '_preload_content' in kwargs:
-            message = "Error! Please call the list_assistant_assistant_runs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            message = "Error! Please call the list_assistant_runs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_assistant_assistant_runs_with_http_info(workspace_id, assistant_id, limit, **kwargs)  # noqa: E501
+        return self.list_assistant_runs_with_http_info(workspace_id, assistant_id, limit, **kwargs)  # noqa: E501
 
     @validate_arguments
-    def list_assistant_assistant_runs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[StrictStr, Field(..., description="Assistant ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
-        """List assistant runs for an assistant  # noqa: E501
+    def list_assistant_runs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[Optional[StrictStr], Field(description="Assistant ID. If specified, the response will only contain assistant runs for that assistant.")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """List assistant runs  # noqa: E501
 
-        Returns a paginated list of assistant runs for the assistant.  # noqa: E501
+        Returns a paginated list of assistant runs. If an assistant id is specified, the response will only contain assistant runs for that assistant, otherwise it will return the assistant runs for all assistants in the workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_assistant_assistant_runs_with_http_info(workspace_id, assistant_id, limit, async_req=True)
+        >>> thread = api.list_assistant_runs_with_http_info(workspace_id, assistant_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: Workspace ID (required)
         :type workspace_id: str
-        :param assistant_id: Assistant ID (required)
+        :param assistant_id: Assistant ID. If specified, the response will only contain assistant runs for that assistant.
         :type assistant_id: str
         :param limit: Limit for paginated response
         :type limit: float
@@ -582,7 +582,7 @@ class AssistantApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(ListAssistantAssistantRuns200Response, status_code(int), headers(HTTPHeaderDict))
+        :rtype: tuple(ListAssistantRuns200Response, status_code(int), headers(HTTPHeaderDict))
         """
 
         _params = locals()
@@ -609,7 +609,7 @@ class AssistantApi:
             if _key not in _all_params:
                 raise ApiTypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_assistant_assistant_runs" % _key
+                    " to method list_assistant_runs" % _key
                 )
             _params[_key] = _val
         del _params['kwargs']
@@ -621,12 +621,12 @@ class AssistantApi:
         if _params['workspace_id']:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['assistant_id']:
-            _path_params['assistant_id'] = _params['assistant_id']
-
 
         # process the query parameters
         _query_params = []
+        if _params.get('assistant_id') is not None:  # noqa: E501
+            _query_params.append(('assistant_id', _params['assistant_id']))
+
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
@@ -645,12 +645,13 @@ class AssistantApi:
         _auth_settings = ['API Key with permissions']  # noqa: E501
 
         _response_types_map = {
-            '200': "ListAssistantAssistantRuns200Response",
+            '200': "ListAssistantRuns200Response",
             '403': "GenericErrorResponse",
+            '404': "GenericErrorResponse",
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/assistants/{assistant_id}/assistant-runs', 'GET',
+            '/workspaces/{workspace_id}/assistant-runs', 'GET',
             _path_params,
             _query_params,
             _header_params,
@@ -801,155 +802,6 @@ class AssistantApi:
 
         return self.api_client.call_api(
             '/workspaces/{workspace_id}/assistants', 'GET',
-            _path_params,
-            _query_params,
-            _header_params,
-            body=_body_params,
-            post_params=_form_params,
-            files=_files,
-            response_types_map=_response_types_map,
-            auth_settings=_auth_settings,
-            async_req=_params.get('async_req'),
-            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
-            _preload_content=_params.get('_preload_content', True),
-            _request_timeout=_params.get('_request_timeout'),
-            collection_formats=_collection_formats,
-            _request_auth=_params.get('_request_auth'))
-
-    @validate_arguments
-    def list_workspace_assistant_runs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListAssistantAssistantRuns200Response:  # noqa: E501
-        """List assistant runs for workspace  # noqa: E501
-
-        Returns a paginated list of assistant runs for the workspace.  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-
-        >>> thread = api.list_workspace_assistant_runs(workspace_id, limit, async_req=True)
-        >>> result = thread.get()
-
-        :param workspace_id: Workspace ID (required)
-        :type workspace_id: str
-        :param limit: Limit for paginated response
-        :type limit: float
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _request_timeout: timeout setting for this request.
-               If one number provided, it will be total request
-               timeout. It can also be a pair (tuple) of
-               (connection, read) timeouts.
-        :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: ListAssistantAssistantRuns200Response
-        """
-        kwargs['_return_http_data_only'] = True
-        if '_preload_content' in kwargs:
-            message = "Error! Please call the list_workspace_assistant_runs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
-            raise ValueError(message)
-        return self.list_workspace_assistant_runs_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
-
-    @validate_arguments
-    def list_workspace_assistant_runs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
-        """List assistant runs for workspace  # noqa: E501
-
-        Returns a paginated list of assistant runs for the workspace.  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-
-        >>> thread = api.list_workspace_assistant_runs_with_http_info(workspace_id, limit, async_req=True)
-        >>> result = thread.get()
-
-        :param workspace_id: Workspace ID (required)
-        :type workspace_id: str
-        :param limit: Limit for paginated response
-        :type limit: float
-        :param async_req: Whether to execute the request asynchronously.
-        :type async_req: bool, optional
-        :param _preload_content: if False, the ApiResponse.data will
-                                 be set to none and raw_data will store the
-                                 HTTP response body without reading/decoding.
-                                 Default is True.
-        :type _preload_content: bool, optional
-        :param _return_http_data_only: response data instead of ApiResponse
-                                       object with status code, headers, etc
-        :type _return_http_data_only: bool, optional
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the authentication
-                              in the spec for a single request.
-        :type _request_auth: dict, optional
-        :type _content_type: string, optional: force content-type for the request
-        :return: Returns the result object.
-                 If the method is called asynchronously,
-                 returns the request thread.
-        :rtype: tuple(ListAssistantAssistantRuns200Response, status_code(int), headers(HTTPHeaderDict))
-        """
-
-        _params = locals()
-
-        _all_params = [
-            'workspace_id',
-            'limit'
-        ]
-        _all_params.extend(
-            [
-                'async_req',
-                '_return_http_data_only',
-                '_preload_content',
-                '_request_timeout',
-                '_request_auth',
-                '_content_type',
-                '_headers'
-            ]
-        )
-
-        # validate the arguments
-        for _key, _val in _params['kwargs'].items():
-            if _key not in _all_params:
-                raise ApiTypeError(
-                    "Got an unexpected keyword argument '%s'"
-                    " to method list_workspace_assistant_runs" % _key
-                )
-            _params[_key] = _val
-        del _params['kwargs']
-
-        _collection_formats = {}
-
-        # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
-            _path_params['workspace_id'] = _params['workspace_id']
-
-
-        # process the query parameters
-        _query_params = []
-        if _params.get('limit') is not None:  # noqa: E501
-            _query_params.append(('limit', _params['limit']))
-
-        # process the header parameters
-        _header_params = dict(_params.get('_headers', {}))
-        # process the form parameters
-        _form_params = []
-        _files = {}
-        # process the body parameter
-        _body_params = None
-        # set the HTTP header `Accept`
-        _header_params['Accept'] = self.api_client.select_header_accept(
-            ['application/json'])  # noqa: E501
-
-        # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
-
-        _response_types_map = {
-            '200': "ListAssistantAssistantRuns200Response",
-            '403': "GenericErrorResponse",
-        }
-
-        return self.api_client.call_api(
-            '/workspaces/{workspace_id}/assistant-runs', 'GET',
             _path_params,
             _query_params,
             _header_params,

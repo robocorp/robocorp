@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.process_webhook_payload import ProcessWebhookPayload
+from robocorp.workspace.models.process_webhook_payload import ProcessWebhookPayload
 
 # TODO update the JSON string below
 json = "{}"

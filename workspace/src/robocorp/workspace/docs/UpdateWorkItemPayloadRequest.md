@@ -4,12 +4,12 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**payload** | [**AnyValidJson**](AnyValidJson.md) |  | [optional] 
+**payload** | [**AnyValidJson**](AnyValidJson.md) |  | 
 
 ## Example
 
 ```python
-from workspace.models.update_work_item_payload_request import UpdateWorkItemPayloadRequest
+from robocorp.workspace.models.update_work_item_payload_request import UpdateWorkItemPayloadRequest
 
 # TODO update the JSON string below
 json = "{}"

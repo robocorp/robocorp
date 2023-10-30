@@ -20,7 +20,7 @@ import json
 
 
 from pydantic import BaseModel, Field, StrictStr
-from workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
+from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 
 class WorkspaceResource(BaseModel):
     """

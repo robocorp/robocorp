@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.pagination_details import PaginationDetails
+from robocorp.workspace.models.pagination_details import PaginationDetails
 
 # TODO update the JSON string below
 json = "{}"

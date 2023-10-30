@@ -20,7 +20,7 @@ import json
 
 
 from pydantic import BaseModel, Field, StrictStr
-from workspace.models.create_assistant_request_task import CreateAssistantRequestTask
+from robocorp.workspace.models.create_assistant_request_task import CreateAssistantRequestTask
 
 class CreateAssistantRequest(BaseModel):
     """

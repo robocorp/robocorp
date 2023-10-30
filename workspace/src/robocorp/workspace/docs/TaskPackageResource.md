@@ -6,11 +6,14 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **str** |  | 
 **name** | **str** |  | 
+**type** | **str** |  | 
+**tasks** | [**List[UpdateWorkerRequest]**](UpdateWorkerRequest.md) | Tasks contained in the task package: empty array if the task package has not been uploaded yet. | 
+**download** | [**TaskPackageResourceDownload**](TaskPackageResourceDownload.md) |  | 
 
 ## Example
 
 ```python
-from workspace.models.task_package_resource import TaskPackageResource
+from robocorp.workspace.models.task_package_resource import TaskPackageResource
 
 # TODO update the JSON string below
 json = "{}"

@@ -22,7 +22,8 @@
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
 
-# Library code. (not auto-generated)
-workspace/_client.py
-workspace/_environment.py
-workspace/process.py
+# Library code. (not auto-generated or simply ignored)
+robocorp/__init__.py
+robocorp/workspace/_client.py
+robocorp/workspace/_environment.py
+robocorp/workspace/process.py

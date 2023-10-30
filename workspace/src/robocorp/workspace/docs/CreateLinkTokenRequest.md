@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.create_link_token_request import CreateLinkTokenRequest
+from robocorp.workspace.models.create_link_token_request import CreateLinkTokenRequest
 
 # TODO update the JSON string below
 json = "{}"

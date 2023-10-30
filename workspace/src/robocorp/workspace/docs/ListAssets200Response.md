@@ -5,11 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data** | [**List[ListAssets200ResponseDataInner]**](ListAssets200ResponseDataInner.md) |  | 
+**has_more** | **bool** | Whether or not there are more elements available after this set. If false, this set comprises the end of the list. | 
+**next** | **str** | The full URL to access the next set of results. Null if there are no next set of results. | 
 
 ## Example
 
 ```python
-from workspace.models.list_assets200_response import ListAssets200Response
+from robocorp.workspace.models.list_assets200_response import ListAssets200Response
 
 # TODO update the JSON string below
 json = "{}"

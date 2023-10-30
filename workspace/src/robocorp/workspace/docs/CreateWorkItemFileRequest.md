@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.create_work_item_file_request import CreateWorkItemFileRequest
+from robocorp.workspace.models.create_work_item_file_request import CreateWorkItemFileRequest
 
 # TODO update the JSON string below
 json = "{}"

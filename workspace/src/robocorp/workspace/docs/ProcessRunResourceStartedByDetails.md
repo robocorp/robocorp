@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.process_run_resource_started_by_details import ProcessRunResourceStartedByDetails
+from robocorp.workspace.models.process_run_resource_started_by_details import ProcessRunResourceStartedByDetails
 
 # TODO update the JSON string below
 json = "{}"

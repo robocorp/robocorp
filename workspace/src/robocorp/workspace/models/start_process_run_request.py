@@ -20,10 +20,10 @@ import re  # noqa: F401
 
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
-from workspace.models.start_process_run_request_one_of import StartProcessRunRequestOneOf
-from workspace.models.start_process_run_request_one_of1 import StartProcessRunRequestOneOf1
-from workspace.models.start_process_run_request_one_of2 import StartProcessRunRequestOneOf2
-from workspace.models.start_process_run_request_one_of3 import StartProcessRunRequestOneOf3
+from robocorp.workspace.models.start_process_run_request_one_of import StartProcessRunRequestOneOf
+from robocorp.workspace.models.start_process_run_request_one_of1 import StartProcessRunRequestOneOf1
+from robocorp.workspace.models.start_process_run_request_one_of2 import StartProcessRunRequestOneOf2
+from robocorp.workspace.models.start_process_run_request_one_of3 import StartProcessRunRequestOneOf3
 from typing import Union, Any, List, TYPE_CHECKING
 from pydantic import StrictStr, Field
 

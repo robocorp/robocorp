@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.list_step_run_artifacts200_response_data_inner import ListStepRunArtifacts200ResponseDataInner
+from robocorp.workspace.models.list_step_run_artifacts200_response_data_inner import ListStepRunArtifacts200ResponseDataInner
 
 # TODO update the JSON string below
 json = "{}"

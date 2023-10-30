@@ -20,7 +20,7 @@ import json
 from datetime import datetime
 
 from pydantic import BaseModel, Field, StrictStr
-from workspace.models.assistant_resource_task import AssistantResourceTask
+from robocorp.workspace.models.assistant_resource_task import AssistantResourceTask
 
 class AssistantResource(BaseModel):
     """

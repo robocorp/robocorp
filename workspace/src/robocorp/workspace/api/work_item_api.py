@@ -23,20 +23,19 @@ from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
-from workspace.models.create_work_item_file200_response import CreateWorkItemFile200Response
-from workspace.models.create_work_item_file_request import CreateWorkItemFileRequest
-from workspace.models.create_work_item_request import CreateWorkItemRequest
-from workspace.models.list_work_items200_response import ListWorkItems200Response
-from workspace.models.run_work_item_batch_operation_request import RunWorkItemBatchOperationRequest
-from workspace.models.stop_process_run200_response import StopProcessRun200Response
-from workspace.models.update_work_item_payload200_response import UpdateWorkItemPayload200Response
-from workspace.models.update_work_item_payload_request import UpdateWorkItemPayloadRequest
-from workspace.models.work_item_resource import WorkItemResource
-from workspace.models.work_item_state import WorkItemState
+from robocorp.workspace.models.create_work_item_file200_response import CreateWorkItemFile200Response
+from robocorp.workspace.models.create_work_item_file_request import CreateWorkItemFileRequest
+from robocorp.workspace.models.create_work_item_request import CreateWorkItemRequest
+from robocorp.workspace.models.list_work_items200_response import ListWorkItems200Response
+from robocorp.workspace.models.run_work_item_batch_operation_request import RunWorkItemBatchOperationRequest
+from robocorp.workspace.models.stop_process_run200_response import StopProcessRun200Response
+from robocorp.workspace.models.update_work_item_payload_request import UpdateWorkItemPayloadRequest
+from robocorp.workspace.models.work_item_resource import WorkItemResource
+from robocorp.workspace.models.work_item_state import WorkItemState
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -361,7 +360,7 @@ class WorkItemApi:
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/work-items/{work_item_id}/files/upload', 'POST',
+            '/workspaces/{workspace_id}/work-items/{work_item_id}/files', 'POST',
             _path_params,
             _query_params,
             _header_params,
@@ -856,7 +855,7 @@ class WorkItemApi:
             _request_auth=_params.get('_request_auth'))
 
     @validate_arguments
-    def update_work_item_payload(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], update_work_item_payload_request : Annotated[UpdateWorkItemPayloadRequest, Field(..., description="The updated payload of work item")], **kwargs) -> UpdateWorkItemPayload200Response:  # noqa: E501
+    def update_work_item_payload(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], update_work_item_payload_request : Annotated[UpdateWorkItemPayloadRequest, Field(..., description="The updated payload of work item")], **kwargs) -> UpdateWorkItemPayloadRequest:  # noqa: E501
         """Update work item payload  # noqa: E501
 
         Update the payload for the requested work item.  # noqa: E501
@@ -881,7 +880,7 @@ class WorkItemApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: UpdateWorkItemPayload200Response
+        :rtype: UpdateWorkItemPayloadRequest
         """
         kwargs['_return_http_data_only'] = True
         if '_preload_content' in kwargs:
@@ -928,7 +927,7 @@ class WorkItemApi:
         :return: Returns the result object.
                  If the method is called asynchronously,
                  returns the request thread.
-        :rtype: tuple(UpdateWorkItemPayload200Response, status_code(int), headers(HTTPHeaderDict))
+        :rtype: tuple(UpdateWorkItemPayloadRequest, status_code(int), headers(HTTPHeaderDict))
         """
 
         _params = locals()
@@ -998,13 +997,13 @@ class WorkItemApi:
         _auth_settings = ['API Key with permissions']  # noqa: E501
 
         _response_types_map = {
-            '200': "UpdateWorkItemPayload200Response",
+            '200': "UpdateWorkItemPayloadRequest",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/work-items/{work_item_id}/payload', 'PUT',
+            '/workspaces/{workspace_id}/work-items/{work_item_id}/payload', 'POST',
             _path_params,
             _query_params,
             _header_params,

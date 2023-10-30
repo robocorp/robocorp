@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.webhook_resource import WebhookResource
+from robocorp.workspace.models.webhook_resource import WebhookResource
 
 # TODO update the JSON string below
 json = "{}"

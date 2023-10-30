@@ -20,8 +20,8 @@ import re  # noqa: F401
 
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
-from workspace.models.asset_upload_created_resource import AssetUploadCreatedResource
-from workspace.models.asset_upload_created_resource_with_url import AssetUploadCreatedResourceWithUrl
+from robocorp.workspace.models.asset_upload_created_resource import AssetUploadCreatedResource
+from robocorp.workspace.models.asset_upload_created_resource_with_url import AssetUploadCreatedResourceWithUrl
 from typing import Union, Any, List, TYPE_CHECKING
 from pydantic import StrictStr, Field
 

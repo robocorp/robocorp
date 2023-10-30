@@ -24,11 +24,11 @@ import tempfile
 
 from urllib.parse import quote
 
-from workspace.configuration import Configuration
-from workspace.api_response import ApiResponse
-import workspace.models
-from workspace import rest
-from workspace.exceptions import ApiValueError, ApiException
+from robocorp.workspace.configuration import Configuration
+from robocorp.workspace.api_response import ApiResponse
+import robocorp.workspace.models
+from robocorp.workspace import rest
+from robocorp.workspace.exceptions import ApiValueError, ApiException
 
 
 class ApiClient:
@@ -344,7 +344,7 @@ class ApiClient:
             if klass in self.NATIVE_TYPES_MAPPING:
                 klass = self.NATIVE_TYPES_MAPPING[klass]
             else:
-                klass = getattr(workspace.models, klass)
+                klass = getattr(robocorp.workspace.models, klass)
 
         if klass in self.PRIMITIVE_TYPES:
             return self.__deserialize_primitive(data, klass)

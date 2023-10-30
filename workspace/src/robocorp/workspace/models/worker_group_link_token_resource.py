@@ -20,7 +20,7 @@ import json
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, StrictStr
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 
 class WorkerGroupLinkTokenResource(BaseModel):
     """

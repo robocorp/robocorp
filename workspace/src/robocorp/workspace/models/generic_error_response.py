@@ -20,7 +20,7 @@ import json
 
 
 from pydantic import BaseModel, Field
-from workspace.models.generic_error_response_error import GenericErrorResponseError
+from robocorp.workspace.models.generic_error_response_error import GenericErrorResponseError
 
 class GenericErrorResponse(BaseModel):
     """

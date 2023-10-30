@@ -10,22 +10,22 @@ globals().update(
 )
 
 OPENAPI_JSON = "https://robocorp.com/api/openapi.json"
-OPENAPI_CONFIG = "openapiconf.yaml"
 
 
 @task
 def generate_api_client(ctx, minimal_update: bool = True, dry_run: bool = False):
     """Generate a Python OpenAPI client over the new Robocorp API."""
-    output = Path("src") / "robocorp"
     opts_list = [
+        "-g python",
         f"-i {OPENAPI_JSON}",
-        f"-c {OPENAPI_CONFIG}",
+        "-c openapiconf.yaml",
         "--skip-validate-spec",
-        f"-o {str(output)}",
+        "-o src",
+        "-t templates"
     ]
     if minimal_update:
         opts_list.append("--minimal-update")
     if dry_run:
         opts_list.append("--dry-run")
     opts = " ".join(opts_list)
-    poetry(ctx, f"run openapi-generator-cli generate -g python {opts}")
+    poetry(ctx, f"run openapi-generator-cli generate {opts}")

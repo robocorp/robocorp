@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.run_work_item_batch_operation_request import RunWorkItemBatchOperationRequest
+from robocorp.workspace.models.run_work_item_batch_operation_request import RunWorkItemBatchOperationRequest
 
 # TODO update the JSON string below
 json = "{}"

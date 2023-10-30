@@ -20,7 +20,7 @@ import re  # noqa: F401
 
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
-from workspace.models.asset_payload_empty_resource import AssetPayloadEmptyResource
+from robocorp.workspace.models.asset_payload_empty_resource import AssetPayloadEmptyResource
 from typing import Union, Any, List, TYPE_CHECKING
 from pydantic import StrictStr, Field
 

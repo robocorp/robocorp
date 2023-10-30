@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.assistant_run_resource_error import AssistantRunResourceError
+from robocorp.workspace.models.assistant_run_resource_error import AssistantRunResourceError
 
 # TODO update the JSON string below
 json = "{}"

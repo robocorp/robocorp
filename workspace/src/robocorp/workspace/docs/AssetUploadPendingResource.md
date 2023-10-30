@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.asset_upload_pending_resource import AssetUploadPendingResource
+from robocorp.workspace.models.asset_upload_pending_resource import AssetUploadPendingResource
 
 # TODO update the JSON string below
 json = "{}"

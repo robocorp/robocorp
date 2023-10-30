@@ -5,11 +5,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data** | [**List[ListWebhooks200ResponseDataInner]**](ListWebhooks200ResponseDataInner.md) |  | 
+**next** | [**Next**](Next.md) |  | 
+**has_more** | [**HasMore**](HasMore.md) |  | 
 
 ## Example
 
 ```python
-from workspace.models.list_webhooks200_response import ListWebhooks200Response
+from robocorp.workspace.models.list_webhooks200_response import ListWebhooks200Response
 
 # TODO update the JSON string below
 json = "{}"

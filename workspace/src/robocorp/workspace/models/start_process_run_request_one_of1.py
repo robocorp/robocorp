@@ -20,7 +20,7 @@ import json
 
 from typing import List, Optional
 from pydantic import BaseModel, Field, StrictStr, conlist, validator
-from workspace.models.process_run_callback import ProcessRunCallback
+from robocorp.workspace.models.process_run_callback import ProcessRunCallback
 
 class StartProcessRunRequestOneOf1(BaseModel):
     """

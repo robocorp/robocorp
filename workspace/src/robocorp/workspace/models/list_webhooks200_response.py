@@ -20,14 +20,16 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.list_webhooks200_response_data_inner import ListWebhooks200ResponseDataInner
+from robocorp.workspace.models.list_webhooks200_response_data_inner import ListWebhooks200ResponseDataInner
 
 class ListWebhooks200Response(BaseModel):
     """
     ListWebhooks200Response
     """
     data: conlist(ListWebhooks200ResponseDataInner) = Field(...)
-    __properties = ["data"]
+    next: Next = Field(...)
+    has_more: HasMore = Field(...)
+    __properties = ["data", "next", "has_more"]
 
     class Config:
         """Pydantic configuration"""
@@ -60,6 +62,12 @@ class ListWebhooks200Response(BaseModel):
                 if _item:
                     _items.append(_item.to_dict())
             _dict['data'] = _items
+        # override the default output from pydantic by calling `to_dict()` of next
+        if self.next:
+            _dict['next'] = self.next.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of has_more
+        if self.has_more:
+            _dict['has_more'] = self.has_more.to_dict()
         return _dict
 
     @classmethod
@@ -72,7 +80,9 @@ class ListWebhooks200Response(BaseModel):
             return ListWebhooks200Response.parse_obj(obj)
 
         _obj = ListWebhooks200Response.parse_obj({
-            "data": [ListWebhooks200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
+            "data": [ListWebhooks200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None,
+            "next": Next.from_dict(obj.get("next")) if obj.get("next") is not None else None,
+            "has_more": HasMore.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None
         })
         return _obj
 

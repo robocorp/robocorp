@@ -18,16 +18,18 @@ import re  # noqa: F401
 import json
 
 
-from typing import List
-from pydantic import BaseModel, Field, conlist
-from workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
+from typing import List, Optional
+from pydantic import BaseModel, Field, StrictBool, StrictStr, conlist
+from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 
 class ListAssets200Response(BaseModel):
     """
     ListAssets200Response
     """
     data: conlist(ListAssets200ResponseDataInner) = Field(...)
-    __properties = ["data"]
+    has_more: StrictBool = Field(..., description="Whether or not there are more elements available after this set. If false, this set comprises the end of the list.")
+    next: Optional[StrictStr] = Field(..., description="The full URL to access the next set of results. Null if there are no next set of results.")
+    __properties = ["data", "has_more", "next"]
 
     class Config:
         """Pydantic configuration"""
@@ -60,6 +62,11 @@ class ListAssets200Response(BaseModel):
                 if _item:
                     _items.append(_item.to_dict())
             _dict['data'] = _items
+        # set to None if next (nullable) is None
+        # and __fields_set__ contains the field
+        if self.next is None and "next" in self.__fields_set__:
+            _dict['next'] = None
+
         return _dict
 
     @classmethod
@@ -72,7 +79,9 @@ class ListAssets200Response(BaseModel):
             return ListAssets200Response.parse_obj(obj)
 
         _obj = ListAssets200Response.parse_obj({
-            "data": [ListAssets200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
+            "data": [ListAssets200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None,
+            "has_more": obj.get("has_more"),
+            "next": obj.get("next")
         })
         return _obj
 

@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.start_process_run_request_one_of import StartProcessRunRequestOneOf
+from robocorp.workspace.models.start_process_run_request_one_of import StartProcessRunRequestOneOf
 
 # TODO update the JSON string below
 json = "{}"

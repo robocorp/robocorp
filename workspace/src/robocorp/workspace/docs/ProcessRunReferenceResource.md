@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.process_run_reference_resource import ProcessRunReferenceResource
+from robocorp.workspace.models.process_run_reference_resource import ProcessRunReferenceResource
 
 # TODO update the JSON string below
 json = "{}"

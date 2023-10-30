@@ -20,8 +20,8 @@ import json
 
 
 from pydantic import BaseModel, Field
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
-from workspace.models.any_valid_json import AnyValidJson
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.any_valid_json import AnyValidJson
 
 class CreateWorkItemRequest(BaseModel):
     """

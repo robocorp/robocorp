@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.list_workers200_response import ListWorkers200Response
+from robocorp.workspace.models.list_workers200_response import ListWorkers200Response
 
 # TODO update the JSON string below
 json = "{}"

@@ -23,19 +23,19 @@ from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
-from workspace.models.add_worker_to_group_request import AddWorkerToGroupRequest
-from workspace.models.create_worker_group_link_token_request import CreateWorkerGroupLinkTokenRequest
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.models.list_worker_group_link_tokens200_response import ListWorkerGroupLinkTokens200Response
-from workspace.models.list_worker_groups200_response import ListWorkerGroups200Response
-from workspace.models.update_worker_request import UpdateWorkerRequest
-from workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
-from workspace.models.worker_group_resource import WorkerGroupResource
-from workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
+from robocorp.workspace.models.add_worker_to_group_request import AddWorkerToGroupRequest
+from robocorp.workspace.models.create_worker_group_link_token_request import CreateWorkerGroupLinkTokenRequest
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.models.list_worker_group_link_tokens200_response import ListWorkerGroupLinkTokens200Response
+from robocorp.workspace.models.list_worker_groups200_response import ListWorkerGroups200Response
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
+from robocorp.workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
+from robocorp.workspace.models.worker_group_resource import WorkerGroupResource
+from robocorp.workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -202,7 +202,7 @@ class WorkerGroupApi:
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/worker-groups/{worker_group_id}/workers', 'PUT',
+            '/workspaces/{workspace_id}/worker-groups/{worker_group_id}/workers', 'POST',
             _path_params,
             _query_params,
             _header_params,
@@ -1771,7 +1771,7 @@ class WorkerGroupApi:
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/worker-groups/{worker_group_id}', 'PUT',
+            '/workspaces/{workspace_id}/worker-groups/{worker_group_id}', 'POST',
             _path_params,
             _query_params,
             _header_params,
@@ -1944,7 +1944,7 @@ class WorkerGroupApi:
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}', 'PUT',
+            '/workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}', 'POST',
             _path_params,
             _query_params,
             _header_params,

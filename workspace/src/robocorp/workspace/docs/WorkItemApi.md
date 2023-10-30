@@ -1,15 +1,15 @@
-# workspace.WorkItemApi
+# robocorp.workspace.WorkItemApi
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**create_work_item**](WorkItemApi.md#create_work_item) | **POST** /workspaces/{workspace_id}/work-items | Create work item
-[**create_work_item_file**](WorkItemApi.md#create_work_item_file) | **POST** /workspaces/{workspace_id}/work-items/{work_item_id}/files/upload | Create work item file
+[**create_work_item_file**](WorkItemApi.md#create_work_item_file) | **POST** /workspaces/{workspace_id}/work-items/{work_item_id}/files | Create work item file
 [**get_work_item**](WorkItemApi.md#get_work_item) | **GET** /workspaces/{workspace_id}/work-items/{work_item_id} | Get work item
 [**list_work_items**](WorkItemApi.md#list_work_items) | **GET** /workspaces/{workspace_id}/work-items | List work items
 [**run_work_item_batch_operation**](WorkItemApi.md#run_work_item_batch_operation) | **POST** /workspaces/{workspace_id}/work-items/batch | Retry, delete or mark work items as done
-[**update_work_item_payload**](WorkItemApi.md#update_work_item_payload) | **PUT** /workspaces/{workspace_id}/work-items/{work_item_id}/payload | Update work item payload
+[**update_work_item_payload**](WorkItemApi.md#update_work_item_payload) | **POST** /workspaces/{workspace_id}/work-items/{work_item_id}/payload | Update work item payload
 
 
 # **create_work_item**
@@ -25,15 +25,15 @@ Create a work item for the requested process.
 ```python
 import time
 import os
-import workspace
-from workspace.models.create_work_item_request import CreateWorkItemRequest
-from workspace.models.work_item_resource import WorkItemResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.create_work_item_request import CreateWorkItemRequest
+from robocorp.workspace.models.work_item_resource import WorkItemResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -49,11 +49,11 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkItemApi(api_client)
+    api_instance = robocorp.workspace.WorkItemApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
-    create_work_item_request = workspace.CreateWorkItemRequest() # CreateWorkItemRequest | Process work item payload
+    create_work_item_request = robocorp.workspace.CreateWorkItemRequest() # CreateWorkItemRequest | Process work item payload
 
     try:
         # Create work item
@@ -109,15 +109,15 @@ Request to upload a work item file.
 ```python
 import time
 import os
-import workspace
-from workspace.models.create_work_item_file200_response import CreateWorkItemFile200Response
-from workspace.models.create_work_item_file_request import CreateWorkItemFileRequest
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.create_work_item_file200_response import CreateWorkItemFile200Response
+from robocorp.workspace.models.create_work_item_file_request import CreateWorkItemFileRequest
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -133,12 +133,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkItemApi(api_client)
+    api_instance = robocorp.workspace.WorkItemApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     work_item_id = 'work_item_id_example' # str | Work Item ID
-    create_work_item_file_request = workspace.CreateWorkItemFileRequest() # CreateWorkItemFileRequest | The name and size of work item file to create
+    create_work_item_file_request = robocorp.workspace.CreateWorkItemFileRequest() # CreateWorkItemFileRequest | The name and size of work item file to create
 
     try:
         # Create work item file
@@ -194,14 +194,14 @@ Returns a work item for the requested process. You can specify whether you want 
 ```python
 import time
 import os
-import workspace
-from workspace.models.work_item_resource import WorkItemResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.work_item_resource import WorkItemResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -217,9 +217,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkItemApi(api_client)
+    api_instance = robocorp.workspace.WorkItemApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     work_item_id = 'work_item_id_example' # str | Work Item ID
 
@@ -276,15 +276,15 @@ Returns a paginated list of work items. You can specify filtering work item by s
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_work_items200_response import ListWorkItems200Response
-from workspace.models.work_item_state import WorkItemState
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_work_items200_response import ListWorkItems200Response
+from robocorp.workspace.models.work_item_state import WorkItemState
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -300,13 +300,13 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkItemApi(api_client)
+    api_instance = robocorp.workspace.WorkItemApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     process_id = 'process_id_example' # str | Process ID (optional)
     process_run_id = 'process_run_id_example' # str | Process Run ID (optional)
-    state = workspace.WorkItemState() # WorkItemState | Work item state filter (optional)
+    state = robocorp.workspace.WorkItemState() # WorkItemState | Work item state filter (optional)
     limit = 3.4 # float | Limit for paginated response (optional)
 
     try:
@@ -364,15 +364,15 @@ Run a batch operation on one or more work items. You can retry, delete or mark f
 ```python
 import time
 import os
-import workspace
-from workspace.models.run_work_item_batch_operation_request import RunWorkItemBatchOperationRequest
-from workspace.models.stop_process_run200_response import StopProcessRun200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.run_work_item_batch_operation_request import RunWorkItemBatchOperationRequest
+from robocorp.workspace.models.stop_process_run200_response import StopProcessRun200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -388,11 +388,11 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkItemApi(api_client)
+    api_instance = robocorp.workspace.WorkItemApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
-    run_work_item_batch_operation_request = workspace.RunWorkItemBatchOperationRequest() # RunWorkItemBatchOperationRequest | Work item batch operation
+    run_work_item_batch_operation_request = robocorp.workspace.RunWorkItemBatchOperationRequest() # RunWorkItemBatchOperationRequest | Work item batch operation
 
     try:
         # Retry, delete or mark work items as done
@@ -433,7 +433,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **update_work_item_payload**
-> UpdateWorkItemPayload200Response update_work_item_payload(workspace_id, work_item_id, update_work_item_payload_request)
+> UpdateWorkItemPayloadRequest update_work_item_payload(workspace_id, work_item_id, update_work_item_payload_request)
 
 Update work item payload
 
@@ -445,15 +445,14 @@ Update the payload for the requested work item.
 ```python
 import time
 import os
-import workspace
-from workspace.models.update_work_item_payload200_response import UpdateWorkItemPayload200Response
-from workspace.models.update_work_item_payload_request import UpdateWorkItemPayloadRequest
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.update_work_item_payload_request import UpdateWorkItemPayloadRequest
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -469,12 +468,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkItemApi(api_client)
+    api_instance = robocorp.workspace.WorkItemApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     work_item_id = 'work_item_id_example' # str | Work Item ID
-    update_work_item_payload_request = workspace.UpdateWorkItemPayloadRequest() # UpdateWorkItemPayloadRequest | The updated payload of work item
+    update_work_item_payload_request = robocorp.workspace.UpdateWorkItemPayloadRequest() # UpdateWorkItemPayloadRequest | The updated payload of work item
 
     try:
         # Update work item payload
@@ -497,7 +496,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**UpdateWorkItemPayload200Response**](UpdateWorkItemPayload200Response.md)
+[**UpdateWorkItemPayloadRequest**](UpdateWorkItemPayloadRequest.md)
 
 ### Authorization
 

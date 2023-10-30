@@ -20,7 +20,7 @@ import json
 
 
 from pydantic import BaseModel, Field
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 
 class AddWorkerToGroupRequest(BaseModel):
     """

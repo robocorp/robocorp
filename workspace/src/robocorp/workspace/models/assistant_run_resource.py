@@ -20,8 +20,8 @@ import json
 from datetime import datetime
 from typing import Optional, Union
 from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, validator
-from workspace.models.assistant_run_resource_error import AssistantRunResourceError
-from workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
+from robocorp.workspace.models.assistant_run_resource_error import AssistantRunResourceError
+from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 
 class AssistantRunResource(BaseModel):
     """

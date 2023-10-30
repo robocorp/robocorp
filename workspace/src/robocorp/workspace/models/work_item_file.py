@@ -20,6 +20,7 @@ import json
 
 from typing import Union
 from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from robocorp.workspace.models.work_item_file_download import WorkItemFileDownload
 
 class WorkItemFile(BaseModel):
     """
@@ -28,7 +29,8 @@ class WorkItemFile(BaseModel):
     id: StrictStr = Field(...)
     size: Union[StrictFloat, StrictInt] = Field(..., description="File size in bytes")
     name: StrictStr = Field(..., description="File name")
-    __properties = ["id", "size", "name"]
+    download: WorkItemFileDownload = Field(...)
+    __properties = ["id", "size", "name", "download"]
 
     class Config:
         """Pydantic configuration"""
@@ -54,6 +56,9 @@ class WorkItemFile(BaseModel):
                           exclude={
                           },
                           exclude_none=True)
+        # override the default output from pydantic by calling `to_dict()` of download
+        if self.download:
+            _dict['download'] = self.download.to_dict()
         return _dict
 
     @classmethod
@@ -68,7 +73,8 @@ class WorkItemFile(BaseModel):
         _obj = WorkItemFile.parse_obj({
             "id": obj.get("id"),
             "size": obj.get("size"),
-            "name": obj.get("name")
+            "name": obj.get("name"),
+            "download": WorkItemFileDownload.from_dict(obj.get("download")) if obj.get("download") is not None else None
         })
         return _obj
 

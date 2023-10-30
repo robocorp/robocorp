@@ -4,12 +4,14 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**next** | [**Next**](Next.md) |  | 
+**has_more** | [**HasMore**](HasMore.md) |  | 
 **data** | [**List[ListProcesses200ResponseDataInner]**](ListProcesses200ResponseDataInner.md) |  | 
 
 ## Example
 
 ```python
-from workspace.models.list_processes200_response import ListProcesses200Response
+from robocorp.workspace.models.list_processes200_response import ListProcesses200Response
 
 # TODO update the JSON string below
 json = "{}"

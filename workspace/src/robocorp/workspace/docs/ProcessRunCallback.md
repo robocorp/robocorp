@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.process_run_callback import ProcessRunCallback
+from robocorp.workspace.models.process_run_callback import ProcessRunCallback
 
 # TODO update the JSON string below
 json = "{}"

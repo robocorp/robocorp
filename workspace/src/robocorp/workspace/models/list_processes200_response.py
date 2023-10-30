@@ -20,14 +20,16 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.list_processes200_response_data_inner import ListProcesses200ResponseDataInner
+from robocorp.workspace.models.list_processes200_response_data_inner import ListProcesses200ResponseDataInner
 
 class ListProcesses200Response(BaseModel):
     """
     ListProcesses200Response
     """
+    next: Next = Field(...)
+    has_more: HasMore = Field(...)
     data: conlist(ListProcesses200ResponseDataInner) = Field(...)
-    __properties = ["data"]
+    __properties = ["next", "has_more", "data"]
 
     class Config:
         """Pydantic configuration"""
@@ -53,6 +55,12 @@ class ListProcesses200Response(BaseModel):
                           exclude={
                           },
                           exclude_none=True)
+        # override the default output from pydantic by calling `to_dict()` of next
+        if self.next:
+            _dict['next'] = self.next.to_dict()
+        # override the default output from pydantic by calling `to_dict()` of has_more
+        if self.has_more:
+            _dict['has_more'] = self.has_more.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in data (list)
         _items = []
         if self.data:
@@ -72,6 +80,8 @@ class ListProcesses200Response(BaseModel):
             return ListProcesses200Response.parse_obj(obj)
 
         _obj = ListProcesses200Response.parse_obj({
+            "next": Next.from_dict(obj.get("next")) if obj.get("next") is not None else None,
+            "has_more": HasMore.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
             "data": [ListProcesses200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
         })
         return _obj

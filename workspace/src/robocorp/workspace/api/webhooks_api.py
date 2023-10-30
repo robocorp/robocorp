@@ -19,16 +19,18 @@ import warnings
 from pydantic import validate_arguments, ValidationError
 
 from typing_extensions import Annotated
-from pydantic import Field, StrictStr
+from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.models.list_webhooks200_response import ListWebhooks200Response
-from workspace.models.process_webhook_payload import ProcessWebhookPayload
-from workspace.models.webhook_resource import WebhookResource
+from typing import Optional, Union
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.models.list_webhooks200_response import ListWebhooks200Response
+from robocorp.workspace.models.process_webhook_payload import ProcessWebhookPayload
+from robocorp.workspace.models.webhook_resource import WebhookResource
+
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -503,18 +505,20 @@ class WebhooksApi:
             _request_auth=_params.get('_request_auth'))
 
     @validate_arguments
-    def list_webhooks(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], **kwargs) -> ListWebhooks200Response:  # noqa: E501
+    def list_webhooks(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListWebhooks200Response:  # noqa: E501
         """List Webhooks  # noqa: E501
 
         Retrieves a list of all webhooks for the requested workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_webhooks(workspace_id, async_req=True)
+        >>> thread = api.list_webhooks(workspace_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: The ID of the workspace (required)
         :type workspace_id: str
+        :param limit: Limit for paginated response
+        :type limit: float
         :param async_req: Whether to execute the request asynchronously.
         :type async_req: bool, optional
         :param _request_timeout: timeout setting for this request.
@@ -530,21 +534,23 @@ class WebhooksApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_webhooks_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_webhooks_with_http_info(workspace_id, **kwargs)  # noqa: E501
+        return self.list_webhooks_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
     @validate_arguments
-    def list_webhooks_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], **kwargs) -> ApiResponse:  # noqa: E501
+    def list_webhooks_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
         """List Webhooks  # noqa: E501
 
         Retrieves a list of all webhooks for the requested workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_webhooks_with_http_info(workspace_id, async_req=True)
+        >>> thread = api.list_webhooks_with_http_info(workspace_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: The ID of the workspace (required)
         :type workspace_id: str
+        :param limit: Limit for paginated response
+        :type limit: float
         :param async_req: Whether to execute the request asynchronously.
         :type async_req: bool, optional
         :param _preload_content: if False, the ApiResponse.data will
@@ -573,7 +579,8 @@ class WebhooksApi:
         _params = locals()
 
         _all_params = [
-            'workspace_id'
+            'workspace_id',
+            'limit'
         ]
         _all_params.extend(
             [
@@ -607,6 +614,9 @@ class WebhooksApi:
 
         # process the query parameters
         _query_params = []
+        if _params.get('limit') is not None:  # noqa: E501
+            _query_params.append(('limit', _params['limit']))
+
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters

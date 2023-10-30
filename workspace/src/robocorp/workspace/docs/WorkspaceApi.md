@@ -1,4 +1,4 @@
-# workspace.WorkspaceApi
+# robocorp.workspace.WorkspaceApi
 
 All URIs are relative to *http://localhost*
 
@@ -20,14 +20,14 @@ Returns the workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.workspace_resource import WorkspaceResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.workspace_resource import WorkspaceResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -43,9 +43,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkspaceApi(api_client)
+    api_instance = robocorp.workspace.WorkspaceApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace.
 
     try:

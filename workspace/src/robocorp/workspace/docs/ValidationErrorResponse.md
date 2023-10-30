@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.validation_error_response import ValidationErrorResponse
+from robocorp.workspace.models.validation_error_response import ValidationErrorResponse
 
 # TODO update the JSON string below
 json = "{}"

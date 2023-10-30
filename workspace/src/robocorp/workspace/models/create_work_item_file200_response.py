@@ -18,16 +18,16 @@ import re  # noqa: F401
 import json
 
 
-from typing import Any, Dict
-from pydantic import BaseModel, Field, StrictStr
+
+from pydantic import BaseModel, Field
+from robocorp.workspace.models.create_work_item_file200_response_upload import CreateWorkItemFile200ResponseUpload
 
 class CreateWorkItemFile200Response(BaseModel):
     """
     CreateWorkItemFile200Response
     """
-    url: StrictStr = Field(...)
-    form_data: Dict[str, Any] = Field(..., description="The form data fields you must include when uploading the file")
-    __properties = ["url", "form_data"]
+    upload: CreateWorkItemFile200ResponseUpload = Field(...)
+    __properties = ["upload"]
 
     class Config:
         """Pydantic configuration"""
@@ -53,6 +53,9 @@ class CreateWorkItemFile200Response(BaseModel):
                           exclude={
                           },
                           exclude_none=True)
+        # override the default output from pydantic by calling `to_dict()` of upload
+        if self.upload:
+            _dict['upload'] = self.upload.to_dict()
         return _dict
 
     @classmethod
@@ -65,8 +68,7 @@ class CreateWorkItemFile200Response(BaseModel):
             return CreateWorkItemFile200Response.parse_obj(obj)
 
         _obj = CreateWorkItemFile200Response.parse_obj({
-            "url": obj.get("url"),
-            "form_data": obj.get("form_data")
+            "upload": CreateWorkItemFile200ResponseUpload.from_dict(obj.get("upload")) if obj.get("upload") is not None else None
         })
         return _obj
 

@@ -1,10 +1,10 @@
-# workspace.WorkerGroupApi
+# robocorp.workspace.WorkerGroupApi
 
 All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**add_worker_to_group**](WorkerGroupApi.md#add_worker_to_group) | **PUT** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/workers | Add worker to worker group
+[**add_worker_to_group**](WorkerGroupApi.md#add_worker_to_group) | **POST** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/workers | Add worker to worker group
 [**create_worker_group**](WorkerGroupApi.md#create_worker_group) | **POST** /workspaces/{workspace_id}/worker-groups | Create worker group
 [**create_worker_group_link_token**](WorkerGroupApi.md#create_worker_group_link_token) | **POST** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens | Create worker group link token
 [**delete_worker_group**](WorkerGroupApi.md#delete_worker_group) | **DELETE** /workspaces/{workspace_id}/worker-groups/{worker_group_id} | Delete worker group
@@ -14,8 +14,8 @@ Method | HTTP request | Description
 [**list_worker_group_link_tokens**](WorkerGroupApi.md#list_worker_group_link_tokens) | **GET** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens | List worker group link tokens
 [**list_worker_groups**](WorkerGroupApi.md#list_worker_groups) | **GET** /workspaces/{workspace_id}/worker-groups | List worker groups
 [**remove_worker_from_group**](WorkerGroupApi.md#remove_worker_from_group) | **DELETE** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/workers/{worker_id} | Remove worker from worker group
-[**update_worker_group**](WorkerGroupApi.md#update_worker_group) | **PUT** /workspaces/{workspace_id}/worker-groups/{worker_group_id} | Update worker group
-[**update_worker_group_link_token**](WorkerGroupApi.md#update_worker_group_link_token) | **PUT** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id} | Update worker group link token
+[**update_worker_group**](WorkerGroupApi.md#update_worker_group) | **POST** /workspaces/{workspace_id}/worker-groups/{worker_group_id} | Update worker group
+[**update_worker_group_link_token**](WorkerGroupApi.md#update_worker_group_link_token) | **POST** /workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id} | Update worker group link token
 
 
 # **add_worker_to_group**
@@ -31,15 +31,15 @@ Adds an existing worker to the requested worker group.
 ```python
 import time
 import os
-import workspace
-from workspace.models.add_worker_to_group_request import AddWorkerToGroupRequest
-from workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.add_worker_to_group_request import AddWorkerToGroupRequest
+from robocorp.workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -55,12 +55,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to add the worker to
-    add_worker_to_group_request = workspace.AddWorkerToGroupRequest() # AddWorkerToGroupRequest | The id of the worker to add to the worker group 
+    add_worker_to_group_request = robocorp.workspace.AddWorkerToGroupRequest() # AddWorkerToGroupRequest | The id of the worker to add to the worker group 
 
     try:
         # Add worker to worker group
@@ -116,15 +116,15 @@ Creates a new worker group linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.update_worker_request import UpdateWorkerRequest
-from workspace.models.worker_group_resource import WorkerGroupResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
+from robocorp.workspace.models.worker_group_resource import WorkerGroupResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -140,11 +140,11 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace under which the worker group should be created.
-    update_worker_request = workspace.UpdateWorkerRequest() # UpdateWorkerRequest | The name of the worker group to create
+    update_worker_request = robocorp.workspace.UpdateWorkerRequest() # UpdateWorkerRequest | The name of the worker group to create
 
     try:
         # Create worker group
@@ -199,15 +199,15 @@ Generates and returns a link token used to link a worker to the requested worker
 ```python
 import time
 import os
-import workspace
-from workspace.models.create_worker_group_link_token_request import CreateWorkerGroupLinkTokenRequest
-from workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.create_worker_group_link_token_request import CreateWorkerGroupLinkTokenRequest
+from robocorp.workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -223,12 +223,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to which the link token belongs.
-    create_worker_group_link_token_request = workspace.CreateWorkerGroupLinkTokenRequest() # CreateWorkerGroupLinkTokenRequest | The name of the worker group link token to create 
+    create_worker_group_link_token_request = robocorp.workspace.CreateWorkerGroupLinkTokenRequest() # CreateWorkerGroupLinkTokenRequest | The name of the worker group link token to create 
 
     try:
         # Create worker group link token
@@ -284,14 +284,14 @@ Deletes the requested worker group. This action is irreversible!
 ```python
 import time
 import os
-import workspace
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -307,9 +307,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to delete.
 
@@ -366,14 +366,14 @@ Deletes the requested link token. This action is irreversible!
 ```python
 import time
 import os
-import workspace
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -389,9 +389,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to which the link token belongs.
     link_token_id = 'link_token_id_example' # str | The id of the worker group link token to delete.
@@ -451,14 +451,14 @@ Returns a worker group linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.worker_group_resource import WorkerGroupResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.worker_group_resource import WorkerGroupResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -474,9 +474,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to retrieve.
 
@@ -533,14 +533,14 @@ Returns a link token for the requested work group. **Note**: For security reason
 ```python
 import time
 import os
-import workspace
-from workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -556,9 +556,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to which the link token belongs.
     link_token_id = 'link_token_id_example' # str | The id of the worker group link token to retrieve.
@@ -616,14 +616,14 @@ Returns a list of all link tokens for the requested worker group. **Note:** For 
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_worker_group_link_tokens200_response import ListWorkerGroupLinkTokens200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_worker_group_link_tokens200_response import ListWorkerGroupLinkTokens200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -639,9 +639,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to which the link tokens belong.
     limit = 3.4 # float | Limit for paginated response (optional)
@@ -700,14 +700,14 @@ Returns a list of all worker groups linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_worker_groups200_response import ListWorkerGroups200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_worker_groups200_response import ListWorkerGroups200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -723,9 +723,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace to list worker groups for
     limit = 3.4 # float | Limit for paginated response (optional)
 
@@ -781,14 +781,14 @@ Removes an existing worker from the requested worker group.
 ```python
 import time
 import os
-import workspace
-from workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.worker_to_group_link_listing import WorkerToGroupLinkListing
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -804,9 +804,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to remove the worker from
     worker_id = 'worker_id_example' # str | The id of the worker to remove from the worker group
@@ -865,15 +865,15 @@ Updates the requested worker group by setting only the values defined in the req
 ```python
 import time
 import os
-import workspace
-from workspace.models.update_worker_request import UpdateWorkerRequest
-from workspace.models.worker_group_resource import WorkerGroupResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
+from robocorp.workspace.models.worker_group_resource import WorkerGroupResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -889,12 +889,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to update.
-    update_worker_request = workspace.UpdateWorkerRequest() # UpdateWorkerRequest | The worker group details to update
+    update_worker_request = robocorp.workspace.UpdateWorkerRequest() # UpdateWorkerRequest | The worker group details to update
 
     try:
         # Update worker group
@@ -951,15 +951,15 @@ Updates a link token by setting only the values defined in the request body.
 ```python
 import time
 import os
-import workspace
-from workspace.models.create_worker_group_link_token_request import CreateWorkerGroupLinkTokenRequest
-from workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.create_worker_group_link_token_request import CreateWorkerGroupLinkTokenRequest
+from robocorp.workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -975,13 +975,13 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.WorkerGroupApi(api_client)
+    api_instance = robocorp.workspace.WorkerGroupApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker group resides.
     worker_group_id = 'worker_group_id_example' # str | The id of the worker group to which the link token belongs.
     link_token_id = 'link_token_id_example' # str | The id of the worker group link token to update.
-    create_worker_group_link_token_request = workspace.CreateWorkerGroupLinkTokenRequest() # CreateWorkerGroupLinkTokenRequest | The name of the worker group link token to update
+    create_worker_group_link_token_request = robocorp.workspace.CreateWorkerGroupLinkTokenRequest() # CreateWorkerGroupLinkTokenRequest | The name of the worker group link token to update
 
     try:
         # Update worker group link token

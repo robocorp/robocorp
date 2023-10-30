@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.work_item_exception import WorkItemException
+from robocorp.workspace.models.work_item_exception import WorkItemException
 
 # TODO update the JSON string below
 json = "{}"

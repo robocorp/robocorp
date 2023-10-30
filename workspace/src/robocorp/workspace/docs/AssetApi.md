@@ -1,4 +1,4 @@
-# workspace.AssetApi
+# robocorp.workspace.AssetApi
 
 All URIs are relative to *http://localhost*
 
@@ -25,15 +25,15 @@ Creating an asset is a multi-step process, see “Create an asset upload” to s
 ```python
 import time
 import os
-import workspace
-from workspace.models.empty_asset_details_resource import EmptyAssetDetailsResource
-from workspace.models.update_worker_request import UpdateWorkerRequest
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.empty_asset_details_resource import EmptyAssetDetailsResource
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -49,11 +49,11 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.AssetApi(api_client)
+    api_instance = robocorp.workspace.AssetApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker should reside.
-    update_worker_request = workspace.UpdateWorkerRequest() # UpdateWorkerRequest | 
+    update_worker_request = robocorp.workspace.UpdateWorkerRequest() # UpdateWorkerRequest | 
 
     try:
         # Create new asset
@@ -108,15 +108,15 @@ Create an upload for the requested asset payload. For payloads with less than 5M
 ```python
 import time
 import os
-import workspace
-from workspace.models.create_asset_upload200_response import CreateAssetUpload200Response
-from workspace.models.create_asset_upload_request import CreateAssetUploadRequest
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.create_asset_upload200_response import CreateAssetUpload200Response
+from robocorp.workspace.models.create_asset_upload_request import CreateAssetUploadRequest
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -132,12 +132,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.AssetApi(api_client)
+    api_instance = robocorp.workspace.AssetApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     asset_id = 'asset_id_example' # str | Asset ID or Asset Name prefixed with `name:` e.g. `name:my-asset-name`
-    create_asset_upload_request = workspace.CreateAssetUploadRequest() # CreateAssetUploadRequest | 
+    create_asset_upload_request = robocorp.workspace.CreateAssetUploadRequest() # CreateAssetUploadRequest | 
 
     try:
         # Create asset upload
@@ -194,14 +194,14 @@ Deletes the requested asset. This action is irreversible!
 ```python
 import time
 import os
-import workspace
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -217,9 +217,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.AssetApi(api_client)
+    api_instance = robocorp.workspace.AssetApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the worker resides.
     asset_id = 'asset_id_example' # str | Asset ID or Asset Name prefixed with `name:` e.g. `name:my-asset-name`
 
@@ -276,14 +276,14 @@ Returns an asset for the requested workspace. The asset is returned including it
 ```python
 import time
 import os
-import workspace
-from workspace.models.asset_details_resource import AssetDetailsResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.asset_details_resource import AssetDetailsResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -299,9 +299,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.AssetApi(api_client)
+    api_instance = robocorp.workspace.AssetApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     asset_id = 'asset_id_example' # str | Asset ID or Asset Name prefixed with `name:` e.g. `name:my-asset-name`
 
@@ -358,14 +358,14 @@ Get the upload of an asset.
 ```python
 import time
 import os
-import workspace
-from workspace.models.asset_upload_resource import AssetUploadResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.asset_upload_resource import AssetUploadResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -381,9 +381,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.AssetApi(api_client)
+    api_instance = robocorp.workspace.AssetApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     asset_id = 'asset_id_example' # str | Asset ID
     upload_id = 'upload_id_example' # str | Payload Upload ID
@@ -430,7 +430,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **list_assets**
-> ListAssets200Response list_assets(workspace_id)
+> ListAssets200Response list_assets(workspace_id, limit=limit)
 
 List assets
 
@@ -442,14 +442,14 @@ Returns a list of all assets linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_assets200_response import ListAssets200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_assets200_response import ListAssets200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -465,14 +465,15 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.AssetApi(api_client)
+    api_instance = robocorp.workspace.AssetApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
+    limit = 3.4 # float | Limit for paginated response (optional)
 
     try:
         # List assets
-        api_response = api_instance.list_assets(workspace_id)
+        api_response = api_instance.list_assets(workspace_id, limit=limit)
         print("The response of AssetApi->list_assets:\n")
         pprint(api_response)
     except Exception as e:
@@ -486,6 +487,7 @@ with workspace.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **workspace_id** | **str**| Workspace ID | 
+ **limit** | **float**| Limit for paginated response | [optional] 
 
 ### Return type
 

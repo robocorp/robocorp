@@ -18,15 +18,15 @@ import re  # noqa: F401
 import json
 
 
-from typing import Optional
-from pydantic import BaseModel
-from workspace.models.any_valid_json import AnyValidJson
+
+from pydantic import BaseModel, Field
+from robocorp.workspace.models.any_valid_json import AnyValidJson
 
 class UpdateWorkItemPayloadRequest(BaseModel):
     """
     UpdateWorkItemPayloadRequest
     """
-    payload: Optional[AnyValidJson] = None
+    payload: AnyValidJson = Field(...)
     __properties = ["payload"]
 
     class Config:

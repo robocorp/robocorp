@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
+from robocorp.workspace.models.worker_group_link_token_resource import WorkerGroupLinkTokenResource
 
 class ListWorkerGroupLinkTokens200Response(BaseModel):
     """

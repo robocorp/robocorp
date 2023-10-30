@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.stop_process_run_request import StopProcessRunRequest
+from robocorp.workspace.models.stop_process_run_request import StopProcessRunRequest
 
 # TODO update the JSON string below
 json = "{}"

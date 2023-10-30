@@ -20,7 +20,7 @@ import json
 from datetime import datetime
 
 from pydantic import BaseModel, Field, StrictStr
-from workspace.models.create_assistant_request_task import CreateAssistantRequestTask
+from robocorp.workspace.models.create_assistant_request_task import CreateAssistantRequestTask
 
 class GetAssistant200Response(BaseModel):
     """

@@ -1,4 +1,4 @@
-# workspace.ProcessApi
+# robocorp.workspace.ProcessApi
 
 All URIs are relative to *http://localhost*
 
@@ -8,7 +8,7 @@ Method | HTTP request | Description
 
 
 # **list_processes**
-> ListProcesses200Response list_processes(workspace_id)
+> ListProcesses200Response list_processes(workspace_id, limit=limit)
 
 List processes
 
@@ -20,14 +20,14 @@ Returns a list of all processes linked to the requested workspace.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_processes200_response import ListProcesses200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_processes200_response import ListProcesses200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -43,14 +43,15 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessApi(api_client)
+    api_instance = robocorp.workspace.ProcessApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
+    limit = 3.4 # float | Limit for paginated response (optional)
 
     try:
         # List processes
-        api_response = api_instance.list_processes(workspace_id)
+        api_response = api_instance.list_processes(workspace_id, limit=limit)
         print("The response of ProcessApi->list_processes:\n")
         pprint(api_response)
     except Exception as e:
@@ -64,6 +65,7 @@ with workspace.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **workspace_id** | **str**| Workspace ID | 
+ **limit** | **float**| Limit for paginated response | [optional] 
 
 ### Return type
 

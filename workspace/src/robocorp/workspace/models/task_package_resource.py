@@ -18,8 +18,10 @@ import re  # noqa: F401
 import json
 
 
-
-from pydantic import BaseModel, Field, StrictStr
+from typing import List, Optional
+from pydantic import BaseModel, Field, StrictStr, conlist, validator
+from robocorp.workspace.models.task_package_resource_download import TaskPackageResourceDownload
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
 
 class TaskPackageResource(BaseModel):
     """
@@ -27,7 +29,17 @@ class TaskPackageResource(BaseModel):
     """
     id: StrictStr = Field(...)
     name: StrictStr = Field(...)
-    __properties = ["id", "name"]
+    type: StrictStr = Field(...)
+    tasks: conlist(UpdateWorkerRequest) = Field(..., description="Tasks contained in the task package: empty array if the task package has not been uploaded yet.")
+    download: Optional[TaskPackageResourceDownload] = Field(...)
+    __properties = ["id", "name", "type", "tasks", "download"]
+
+    @validator('type')
+    def type_validate_enum(cls, value):
+        """Validates the enum"""
+        if value not in ('zip'):
+            raise ValueError("must be one of enum values ('zip')")
+        return value
 
     class Config:
         """Pydantic configuration"""
@@ -53,6 +65,21 @@ class TaskPackageResource(BaseModel):
                           exclude={
                           },
                           exclude_none=True)
+        # override the default output from pydantic by calling `to_dict()` of each item in tasks (list)
+        _items = []
+        if self.tasks:
+            for _item in self.tasks:
+                if _item:
+                    _items.append(_item.to_dict())
+            _dict['tasks'] = _items
+        # override the default output from pydantic by calling `to_dict()` of download
+        if self.download:
+            _dict['download'] = self.download.to_dict()
+        # set to None if download (nullable) is None
+        # and __fields_set__ contains the field
+        if self.download is None and "download" in self.__fields_set__:
+            _dict['download'] = None
+
         return _dict
 
     @classmethod
@@ -66,7 +93,10 @@ class TaskPackageResource(BaseModel):
 
         _obj = TaskPackageResource.parse_obj({
             "id": obj.get("id"),
-            "name": obj.get("name")
+            "name": obj.get("name"),
+            "type": obj.get("type"),
+            "tasks": [UpdateWorkerRequest.from_dict(_item) for _item in obj.get("tasks")] if obj.get("tasks") is not None else None,
+            "download": TaskPackageResourceDownload.from_dict(obj.get("download")) if obj.get("download") is not None else None
         })
         return _obj
 

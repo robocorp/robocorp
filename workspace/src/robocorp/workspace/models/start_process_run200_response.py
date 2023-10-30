@@ -20,8 +20,8 @@ import re  # noqa: F401
 
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
-from workspace.models.start_process_run200_response_one_of import StartProcessRun200ResponseOneOf
-from workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
+from robocorp.workspace.models.start_process_run200_response_one_of import StartProcessRun200ResponseOneOf
+from robocorp.workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
 from typing import Union, Any, List, TYPE_CHECKING
 from pydantic import StrictStr, Field
 

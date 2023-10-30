@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.list_step_run_console_messages200_response_data_inner import ListStepRunConsoleMessages200ResponseDataInner
+from robocorp.workspace.models.list_step_run_console_messages200_response_data_inner import ListStepRunConsoleMessages200ResponseDataInner
 
 class ListStepRunConsoleMessages200Response(BaseModel):
     """

@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.get_step_run_artifact200_response import GetStepRunArtifact200Response
+from robocorp.workspace.models.get_step_run_artifact200_response import GetStepRunArtifact200Response
 
 # TODO update the JSON string below
 json = "{}"

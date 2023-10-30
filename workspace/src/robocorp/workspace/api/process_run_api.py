@@ -23,20 +23,20 @@ from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
-from workspace.models.any_valid_json import AnyValidJson
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.models.list_process_run_outputs200_response import ListProcessRunOutputs200Response
-from workspace.models.list_process_runs200_response import ListProcessRuns200Response
-from workspace.models.process_run_resource import ProcessRunResource
-from workspace.models.start_process_run200_response import StartProcessRun200Response
-from workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
-from workspace.models.start_process_run_request import StartProcessRunRequest
-from workspace.models.stop_process_run200_response import StopProcessRun200Response
-from workspace.models.stop_process_run_request import StopProcessRunRequest
+from robocorp.workspace.models.any_valid_json import AnyValidJson
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.models.list_process_run_outputs200_response import ListProcessRunOutputs200Response
+from robocorp.workspace.models.list_process_runs200_response import ListProcessRuns200Response
+from robocorp.workspace.models.process_run_resource import ProcessRunResource
+from robocorp.workspace.models.start_process_run200_response import StartProcessRun200Response
+from robocorp.workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
+from robocorp.workspace.models.start_process_run_request import StartProcessRunRequest
+from robocorp.workspace.models.stop_process_run200_response import StopProcessRun200Response
+from robocorp.workspace.models.stop_process_run_request import StopProcessRunRequest
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -357,19 +357,19 @@ class ProcessRunApi:
             _request_auth=_params.get('_request_auth'))
 
     @validate_arguments
-    def list_process_run_outputs(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the process run resides.")], process_run_id : Annotated[StrictStr, Field(..., description="The id of the process run for which to list the process run outputs.")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListProcessRunOutputs200Response:  # noqa: E501
+    def list_process_run_outputs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="Process Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListProcessRunOutputs200Response:  # noqa: E501
         """List process run outputs  # noqa: E501
 
-        Returns a list of all outputs for the requested process run.  # noqa: E501
+        Returns a list of process run outputs.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
         >>> thread = api.list_process_run_outputs(workspace_id, process_run_id, limit, async_req=True)
         >>> result = thread.get()
 
-        :param workspace_id: The id of the workspace on which the process run resides. (required)
+        :param workspace_id: Workspace ID (required)
         :type workspace_id: str
-        :param process_run_id: The id of the process run for which to list the process run outputs. (required)
+        :param process_run_id: Process Run ID (required)
         :type process_run_id: str
         :param limit: Limit for paginated response
         :type limit: float
@@ -391,19 +391,19 @@ class ProcessRunApi:
         return self.list_process_run_outputs_with_http_info(workspace_id, process_run_id, limit, **kwargs)  # noqa: E501
 
     @validate_arguments
-    def list_process_run_outputs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the process run resides.")], process_run_id : Annotated[StrictStr, Field(..., description="The id of the process run for which to list the process run outputs.")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+    def list_process_run_outputs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="Process Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
         """List process run outputs  # noqa: E501
 
-        Returns a list of all outputs for the requested process run.  # noqa: E501
+        Returns a list of process run outputs.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
         >>> thread = api.list_process_run_outputs_with_http_info(workspace_id, process_run_id, limit, async_req=True)
         >>> result = thread.get()
 
-        :param workspace_id: The id of the workspace on which the process run resides. (required)
+        :param workspace_id: Workspace ID (required)
         :type workspace_id: str
-        :param process_run_id: The id of the process run for which to list the process run outputs. (required)
+        :param process_run_id: Process Run ID (required)
         :type process_run_id: str
         :param limit: Limit for paginated response
         :type limit: float
@@ -468,12 +468,12 @@ class ProcessRunApi:
         if _params['workspace_id']:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['process_run_id']:
-            _path_params['process_run_id'] = _params['process_run_id']
-
 
         # process the query parameters
         _query_params = []
+        if _params.get('process_run_id') is not None:  # noqa: E501
+            _query_params.append(('process_run_id', _params['process_run_id']))
+
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
@@ -497,7 +497,7 @@ class ProcessRunApi:
         }
 
         return self.api_client.call_api(
-            '/workspaces/{workspace_id}/process-runs/{process_run_id}/outputs', 'GET',
+            '/workspaces/{workspace_id}/outputs', 'GET',
             _path_params,
             _query_params,
             _header_params,

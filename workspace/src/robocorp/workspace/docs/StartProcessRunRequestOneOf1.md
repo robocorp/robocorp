@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.start_process_run_request_one_of1 import StartProcessRunRequestOneOf1
+from robocorp.workspace.models.start_process_run_request_one_of1 import StartProcessRunRequestOneOf1
 
 # TODO update the JSON string below
 json = "{}"

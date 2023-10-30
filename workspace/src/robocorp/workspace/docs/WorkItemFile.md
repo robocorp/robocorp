@@ -7,11 +7,12 @@ Name | Type | Description | Notes
 **id** | **str** |  | 
 **size** | **float** | File size in bytes | 
 **name** | **str** | File name | 
+**download** | [**WorkItemFileDownload**](WorkItemFileDownload.md) |  | 
 
 ## Example
 
 ```python
-from workspace.models.work_item_file import WorkItemFile
+from robocorp.workspace.models.work_item_file import WorkItemFile
 
 # TODO update the JSON string below
 json = "{}"

@@ -20,7 +20,7 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.work_item_without_data_resource import WorkItemWithoutDataResource
+from robocorp.workspace.models.work_item_without_data_resource import WorkItemWithoutDataResource
 
 class ListWorkItems200Response(BaseModel):
     """

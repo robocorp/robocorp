@@ -23,16 +23,16 @@ from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
-from workspace.models.get_step_run_artifact200_response import GetStepRunArtifact200Response
-from workspace.models.list_step_run_artifacts200_response import ListStepRunArtifacts200Response
-from workspace.models.list_step_run_console_messages200_response import ListStepRunConsoleMessages200Response
-from workspace.models.list_step_run_events200_response import ListStepRunEvents200Response
-from workspace.models.list_step_runs200_response import ListStepRuns200Response
-from workspace.models.step_run_resource import StepRunResource
+from robocorp.workspace.models.get_step_run_artifact200_response import GetStepRunArtifact200Response
+from robocorp.workspace.models.list_step_run_artifacts200_response import ListStepRunArtifacts200Response
+from robocorp.workspace.models.list_step_run_console_messages200_response import ListStepRunConsoleMessages200Response
+from robocorp.workspace.models.list_step_run_events200_response import ListStepRunEvents200Response
+from robocorp.workspace.models.list_step_runs200_response import ListStepRuns200Response
+from robocorp.workspace.models.step_run_resource import StepRunResource
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )

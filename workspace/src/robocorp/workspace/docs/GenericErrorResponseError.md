@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.generic_error_response_error import GenericErrorResponseError
+from robocorp.workspace.models.generic_error_response_error import GenericErrorResponseError
 
 # TODO update the JSON string below
 json = "{}"

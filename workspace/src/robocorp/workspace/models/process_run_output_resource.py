@@ -20,8 +20,8 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List
 from pydantic import BaseModel, Field, StrictStr, conlist
-from workspace.models.any_valid_json import AnyValidJson
-from workspace.models.work_item_file import WorkItemFile
+from robocorp.workspace.models.any_valid_json import AnyValidJson
+from robocorp.workspace.models.work_item_file import WorkItemFile
 
 class ProcessRunOutputResource(BaseModel):
     """

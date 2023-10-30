@@ -1,4 +1,4 @@
-# workspace.ProcessRunApi
+# robocorp.workspace.ProcessRunApi
 
 All URIs are relative to *http://localhost*
 
@@ -6,7 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**delete_process_run**](ProcessRunApi.md#delete_process_run) | **DELETE** /workspaces/{workspace_id}/process-runs/{process_run_id} | Delete process run
 [**get_process_run**](ProcessRunApi.md#get_process_run) | **GET** /workspaces/{workspace_id}/process-runs/{process_run_id} | Get process run
-[**list_process_run_outputs**](ProcessRunApi.md#list_process_run_outputs) | **GET** /workspaces/{workspace_id}/process-runs/{process_run_id}/outputs | List process run outputs
+[**list_process_run_outputs**](ProcessRunApi.md#list_process_run_outputs) | **GET** /workspaces/{workspace_id}/outputs | List process run outputs
 [**list_process_runs**](ProcessRunApi.md#list_process_runs) | **GET** /workspaces/{workspace_id}/process-runs | List process runs
 [**start_process_run**](ProcessRunApi.md#start_process_run) | **POST** /workspaces/{workspace_id}/processes/{process_id}/process-runs | Start process run
 [**start_process_run_qs_auth**](ProcessRunApi.md#start_process_run_qs_auth) | **POST** /workspaces/{workspace_id}/processes/{process_id}/process-runs-integrations | Start process run (for integrations)
@@ -26,14 +26,14 @@ Deletes a process run. This action is irreversible!
 ```python
 import time
 import os
-import workspace
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -49,9 +49,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the robot resides.
     process_run_id = 'process_run_id_example' # str | The id of the process run to delete.
 
@@ -110,14 +110,14 @@ Returns a process run
 ```python
 import time
 import os
-import workspace
-from workspace.models.process_run_resource import ProcessRunResource
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.process_run_resource import ProcessRunResource
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -133,9 +133,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     process_run_id = 'process_run_id_example' # str | ID of the process run
 
@@ -184,7 +184,7 @@ Name | Type | Description  | Notes
 
 List process run outputs
 
-Returns a list of all outputs for the requested process run.
+Returns a list of process run outputs.
 
 ### Example
 
@@ -192,14 +192,14 @@ Returns a list of all outputs for the requested process run.
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_process_run_outputs200_response import ListProcessRunOutputs200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_process_run_outputs200_response import ListProcessRunOutputs200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -215,11 +215,11 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
-    workspace_id = 'workspace_id_example' # str | The id of the workspace on which the process run resides.
-    process_run_id = 'process_run_id_example' # str | The id of the process run for which to list the process run outputs.
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
+    workspace_id = 'workspace_id_example' # str | Workspace ID
+    process_run_id = 'process_run_id_example' # str | Process Run ID
     limit = 3.4 # float | Limit for paginated response (optional)
 
     try:
@@ -237,8 +237,8 @@ with workspace.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **workspace_id** | **str**| The id of the workspace on which the process run resides. | 
- **process_run_id** | **str**| The id of the process run for which to list the process run outputs. | 
+ **workspace_id** | **str**| Workspace ID | 
+ **process_run_id** | **str**| Process Run ID | 
  **limit** | **float**| Limit for paginated response | [optional] 
 
 ### Return type
@@ -275,14 +275,14 @@ Returns a paginated list of process runs. If a process id is specified in the qu
 ```python
 import time
 import os
-import workspace
-from workspace.models.list_process_runs200_response import ListProcessRuns200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.list_process_runs200_response import ListProcessRuns200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -298,9 +298,9 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     process_id = 'process_id_example' # str | Process ID, if specified, the response will only contain the process runs from this process (optional)
     state = 'state_example' # str | State of process runs (optional)
@@ -360,15 +360,15 @@ Starts a process run for the requested process. You may choose to start a proces
 ```python
 import time
 import os
-import workspace
-from workspace.models.start_process_run200_response import StartProcessRun200Response
-from workspace.models.start_process_run_request import StartProcessRunRequest
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.start_process_run200_response import StartProcessRun200Response
+from robocorp.workspace.models.start_process_run_request import StartProcessRunRequest
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -384,12 +384,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the process resides.
     process_id = 'process_id_example' # str | The id of the process to start.
-    start_process_run_request = workspace.StartProcessRunRequest() # StartProcessRunRequest | Omitting the request body will start a process run with either the default work item, if configured, or an empty work item.  (optional)
+    start_process_run_request = robocorp.workspace.StartProcessRunRequest() # StartProcessRunRequest | Omitting the request body will start a process run with either the default work item, if configured, or an empty work item.  (optional)
 
     try:
         # Start process run
@@ -446,15 +446,15 @@ Starts a process run for the requested process. This endpoint is useful when you
 ```python
 import time
 import os
-import workspace
-from workspace.models.any_valid_json import AnyValidJson
-from workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.any_valid_json import AnyValidJson
+from robocorp.workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -470,13 +470,13 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | Workspace ID
     process_id = 'process_id_example' # str | Process ID
     token = 'token_example' # str | Authorization token
-    any_valid_json = workspace.AnyValidJson() # AnyValidJson | Any valid JSON payload. The full request body is passed as a work item to the process run input. 
+    any_valid_json = robocorp.workspace.AnyValidJson() # AnyValidJson | Any valid JSON payload. The full request body is passed as a work item to the process run input. 
     with_handshake = 'with_handshake_example' # str | Handshake type (optional)
 
     try:
@@ -534,15 +534,15 @@ Stops the process run.
 ```python
 import time
 import os
-import workspace
-from workspace.models.stop_process_run200_response import StopProcessRun200Response
-from workspace.models.stop_process_run_request import StopProcessRunRequest
-from workspace.rest import ApiException
+import robocorp.workspace
+from robocorp.workspace.models.stop_process_run200_response import StopProcessRun200Response
+from robocorp.workspace.models.stop_process_run_request import StopProcessRunRequest
+from robocorp.workspace.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = workspace.Configuration(
+configuration = robocorp.workspace.Configuration(
     host = "http://localhost"
 )
 
@@ -558,12 +558,12 @@ configuration.api_key['API Key with permissions'] = os.environ["API_KEY"]
 # configuration.api_key_prefix['API Key with permissions'] = 'Bearer'
 
 # Enter a context with an instance of the API client
-with workspace.ApiClient(configuration) as api_client:
+with robocorp.workspace.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = workspace.ProcessRunApi(api_client)
+    api_instance = robocorp.workspace.ProcessRunApi(api_client)
     workspace_id = 'workspace_id_example' # str | The id of the workspace on which the process run resides.
     process_run_id = 'process_run_id_example' # str | The id of the process run to stop.
-    stop_process_run_request = workspace.StopProcessRunRequest() # StopProcessRunRequest | Set whether or not to set the remaining work items as done or terminating the ongoing activity runs, as well as the reason for stopping the process run.
+    stop_process_run_request = robocorp.workspace.StopProcessRunRequest() # StopProcessRunRequest | Set whether or not to set the remaining work items as done or terminating the ongoing activity runs, as well as the reason for stopping the process run.
 
     try:
         # Stop process run

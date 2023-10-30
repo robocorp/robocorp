@@ -20,9 +20,9 @@ import re  # noqa: F401
 
 from typing import Any, List, Optional
 from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
-from workspace.models.asset_upload_completed_resource import AssetUploadCompletedResource
-from workspace.models.asset_upload_failed_resource import AssetUploadFailedResource
-from workspace.models.asset_upload_pending_resource import AssetUploadPendingResource
+from robocorp.workspace.models.asset_upload_completed_resource import AssetUploadCompletedResource
+from robocorp.workspace.models.asset_upload_failed_resource import AssetUploadFailedResource
+from robocorp.workspace.models.asset_upload_pending_resource import AssetUploadPendingResource
 from typing import Union, Any, List, TYPE_CHECKING
 from pydantic import StrictStr, Field
 

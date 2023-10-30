@@ -20,7 +20,7 @@ import json
 
 from typing import Optional
 from pydantic import BaseModel, Field, StrictStr, validator
-from workspace.models.process_run_resource_started_by_details import ProcessRunResourceStartedByDetails
+from robocorp.workspace.models.process_run_resource_started_by_details import ProcessRunResourceStartedByDetails
 
 class ProcessRunResourceStartedBy(BaseModel):
     """

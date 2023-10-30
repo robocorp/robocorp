@@ -20,8 +20,8 @@ import json
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
-from workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 
 class WorkerToGroupLinkListing(BaseModel):
     """

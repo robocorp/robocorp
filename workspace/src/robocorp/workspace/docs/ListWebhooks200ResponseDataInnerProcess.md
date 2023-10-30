@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
+from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
 
 # TODO update the JSON string below
 json = "{}"

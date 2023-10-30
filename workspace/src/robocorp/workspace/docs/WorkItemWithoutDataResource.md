@@ -17,7 +17,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.work_item_without_data_resource import WorkItemWithoutDataResource
+from robocorp.workspace.models.work_item_without_data_resource import WorkItemWithoutDataResource
 
 # TODO update the JSON string below
 json = "{}"

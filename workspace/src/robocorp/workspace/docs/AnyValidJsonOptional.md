@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.any_valid_json_optional import AnyValidJsonOptional
+from robocorp.workspace.models.any_valid_json_optional import AnyValidJsonOptional
 
 # TODO update the JSON string below
 json = "{}"

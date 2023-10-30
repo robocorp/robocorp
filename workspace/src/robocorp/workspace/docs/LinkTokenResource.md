@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.link_token_resource import LinkTokenResource
+from robocorp.workspace.models.link_token_resource import LinkTokenResource
 
 # TODO update the JSON string below
 json = "{}"

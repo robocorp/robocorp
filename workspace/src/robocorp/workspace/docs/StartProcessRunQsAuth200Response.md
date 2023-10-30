@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
+from robocorp.workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
 
 # TODO update the JSON string below
 json = "{}"

@@ -20,12 +20,12 @@ import json
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field, StrictStr, conlist
-from workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
-from workspace.models.any_valid_json import AnyValidJson
-from workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
-from workspace.models.work_item_exception import WorkItemException
-from workspace.models.work_item_file import WorkItemFile
-from workspace.models.work_item_state import WorkItemState
+from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
+from robocorp.workspace.models.any_valid_json import AnyValidJson
+from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
+from robocorp.workspace.models.work_item_exception import WorkItemException
+from robocorp.workspace.models.work_item_file import WorkItemFile
+from robocorp.workspace.models.work_item_state import WorkItemState
 
 class WorkItemResource(BaseModel):
     """

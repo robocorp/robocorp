@@ -19,20 +19,22 @@ import warnings
 from pydantic import validate_arguments, ValidationError
 
 from typing_extensions import Annotated
-from pydantic import Field, StrictStr
+from pydantic import Field, StrictFloat, StrictInt, StrictStr
 
-from workspace.models.asset_details_resource import AssetDetailsResource
-from workspace.models.asset_upload_resource import AssetUploadResource
-from workspace.models.create_asset_upload200_response import CreateAssetUpload200Response
-from workspace.models.create_asset_upload_request import CreateAssetUploadRequest
-from workspace.models.delete_worker200_response import DeleteWorker200Response
-from workspace.models.empty_asset_details_resource import EmptyAssetDetailsResource
-from workspace.models.list_assets200_response import ListAssets200Response
-from workspace.models.update_worker_request import UpdateWorkerRequest
+from typing import Optional, Union
 
-from workspace.api_client import ApiClient
-from workspace.api_response import ApiResponse
-from workspace.exceptions import (  # noqa: F401
+from robocorp.workspace.models.asset_details_resource import AssetDetailsResource
+from robocorp.workspace.models.asset_upload_resource import AssetUploadResource
+from robocorp.workspace.models.create_asset_upload200_response import CreateAssetUpload200Response
+from robocorp.workspace.models.create_asset_upload_request import CreateAssetUploadRequest
+from robocorp.workspace.models.delete_worker200_response import DeleteWorker200Response
+from robocorp.workspace.models.empty_asset_details_resource import EmptyAssetDetailsResource
+from robocorp.workspace.models.list_assets200_response import ListAssets200Response
+from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
+
+from robocorp.workspace.api_client import ApiClient
+from robocorp.workspace.api_response import ApiResponse
+from robocorp.workspace.exceptions import (  # noqa: F401
     ApiTypeError,
     ApiValueError
 )
@@ -832,18 +834,20 @@ class AssetApi:
             _request_auth=_params.get('_request_auth'))
 
     @validate_arguments
-    def list_assets(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], **kwargs) -> ListAssets200Response:  # noqa: E501
+    def list_assets(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListAssets200Response:  # noqa: E501
         """List assets  # noqa: E501
 
         Returns a list of all assets linked to the requested workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_assets(workspace_id, async_req=True)
+        >>> thread = api.list_assets(workspace_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: Workspace ID (required)
         :type workspace_id: str
+        :param limit: Limit for paginated response
+        :type limit: float
         :param async_req: Whether to execute the request asynchronously.
         :type async_req: bool, optional
         :param _request_timeout: timeout setting for this request.
@@ -859,21 +863,23 @@ class AssetApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_assets_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_assets_with_http_info(workspace_id, **kwargs)  # noqa: E501
+        return self.list_assets_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
     @validate_arguments
-    def list_assets_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], **kwargs) -> ApiResponse:  # noqa: E501
+    def list_assets_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
         """List assets  # noqa: E501
 
         Returns a list of all assets linked to the requested workspace.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
 
-        >>> thread = api.list_assets_with_http_info(workspace_id, async_req=True)
+        >>> thread = api.list_assets_with_http_info(workspace_id, limit, async_req=True)
         >>> result = thread.get()
 
         :param workspace_id: Workspace ID (required)
         :type workspace_id: str
+        :param limit: Limit for paginated response
+        :type limit: float
         :param async_req: Whether to execute the request asynchronously.
         :type async_req: bool, optional
         :param _preload_content: if False, the ApiResponse.data will
@@ -902,7 +908,8 @@ class AssetApi:
         _params = locals()
 
         _all_params = [
-            'workspace_id'
+            'workspace_id',
+            'limit'
         ]
         _all_params.extend(
             [
@@ -936,6 +943,9 @@ class AssetApi:
 
         # process the query parameters
         _query_params = []
+        if _params.get('limit') is not None:  # noqa: E501
+            _query_params.append(('limit', _params['limit']))
+
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters

@@ -16,7 +16,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.process_run_resource import ProcessRunResource
+from robocorp.workspace.models.process_run_resource import ProcessRunResource
 
 # TODO update the JSON string below
 json = "{}"

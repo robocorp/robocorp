@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from workspace.models.step_run_resource_error import StepRunResourceError
+from robocorp.workspace.models.step_run_resource_error import StepRunResourceError
 
 # TODO update the JSON string below
 json = "{}"
