@@ -87,6 +87,7 @@ def _raise_window_not_found(
     locator: Locator, timeout, root_element: Optional[_UIAutomationControlWrapper]
 ):
     from . import config as windows_config
+    from ._match_ast import _build_locator_match
 
     config = windows_config()
 
@@ -94,6 +95,12 @@ def _raise_window_not_found(
         f"Could not locate window with locator: {locator!r} "
         f"(timeout: {timeout if timeout is not None else config.timeout})"
     )
+
+    locator_match = _build_locator_match(locator)
+    msg += f"\nLocator internal representation: {locator_match}"
+    for warning in locator_match.warnings:
+        msg += f"\nLocator warning: {warning}"
+
     if config.verbose_errors:
         windows_msg = ["\nFound Windows:"]
         for w in find_windows(root_element, locator="regex:.*"):
