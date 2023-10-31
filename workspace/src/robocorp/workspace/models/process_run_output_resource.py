@@ -17,6 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
+import pydantic
 from datetime import datetime
 from typing import Any, Dict, List
 from pydantic import BaseModel, Field, StrictStr, conlist

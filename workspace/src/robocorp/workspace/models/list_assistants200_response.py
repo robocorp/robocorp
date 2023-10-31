@@ -17,6 +17,7 @@ import pprint
 import re  # noqa: F401
 import json
 
+import pydantic
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
@@ -26,8 +27,8 @@ class ListAssistants200Response(BaseModel):
     """
     ListAssistants200Response
     """
-    next: Next = Field(...)
-    has_more: HasMore = Field(...)
+    next: pydantic.StrictStr = Field(...)
+    has_more: pydantic.StrictBool = Field(...)
     data: conlist(AssistantResource) = Field(...)
     __properties = ["next", "has_more", "data"]
 
@@ -80,8 +81,8 @@ class ListAssistants200Response(BaseModel):
             return ListAssistants200Response.parse_obj(obj)
 
         _obj = ListAssistants200Response.parse_obj({
-            "next": Next.from_dict(obj.get("next")) if obj.get("next") is not None else None,
-            "has_more": HasMore.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
+            "next": pydantic.StrictStr.from_dict(obj.get("next")) if obj.get("next") is not None else None,
+            "has_more": pydantic.StrictBool.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
             "data": [AssistantResource.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
         })
         return _obj
