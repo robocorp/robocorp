@@ -5,8 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data** | [**List[ListWebhooks200ResponseDataInner]**](ListWebhooks200ResponseDataInner.md) |  | 
-**next** | [**pydantic.StrictStr**](Next.md) |  | 
-**has_more** | [**pydantic.StrictBool**](HasMore.md) |  | 
+**next** | [**Next**](Next.md) |  | 
+**has_more** | [**HasMore**](HasMore.md) |  | 
 
 ## Example
 

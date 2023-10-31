@@ -29,7 +29,7 @@ def generate_api_client(ctx, minimal_update: bool = True, dry_run: bool = False)
         "--skip-validate-spec",
         "-o src",
         "-t templates",
-        f"--type-mappings {types_mapping}",
+        # f"--type-mappings {types_mapping}",
     ]
     if minimal_update:
         opts_list.append("--minimal-update")

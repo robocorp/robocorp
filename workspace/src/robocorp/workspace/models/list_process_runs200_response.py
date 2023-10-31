@@ -17,7 +17,6 @@ import pprint
 import re  # noqa: F401
 import json
 
-import pydantic
 
 from typing import List
 from pydantic import BaseModel, Field, conlist
@@ -27,8 +26,8 @@ class ListProcessRuns200Response(BaseModel):
     """
     ListProcessRuns200Response
     """
-    next: pydantic.StrictStr = Field(...)
-    has_more: pydantic.StrictBool = Field(...)
+    next: Next = Field(...)
+    has_more: HasMore = Field(...)
     data: conlist(ProcessRunResource) = Field(...)
     __properties = ["next", "has_more", "data"]
 
@@ -81,8 +80,8 @@ class ListProcessRuns200Response(BaseModel):
             return ListProcessRuns200Response.parse_obj(obj)
 
         _obj = ListProcessRuns200Response.parse_obj({
-            "next": pydantic.StrictStr.from_dict(obj.get("next")) if obj.get("next") is not None else None,
-            "has_more": pydantic.StrictBool.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
+            "next": Next.from_dict(obj.get("next")) if obj.get("next") is not None else None,
+            "has_more": HasMore.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
             "data": [ProcessRunResource.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
         })
         return _obj

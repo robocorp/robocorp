@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**next** | [**pydantic.StrictStr**](Next.md) |  | 
-**has_more** | [**pydantic.StrictBool**](HasMore.md) |  | 
+**next** | [**Next**](Next.md) |  | 
+**has_more** | [**HasMore**](HasMore.md) |  | 
 **data** | [**List[WorkItemWithoutDataResource]**](WorkItemWithoutDataResource.md) |  | 
 
 ## Example

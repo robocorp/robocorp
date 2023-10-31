@@ -17,7 +17,6 @@ import pprint
 import re  # noqa: F401
 import json
 
-import pydantic
 
 from typing import Optional
 from pydantic import BaseModel
