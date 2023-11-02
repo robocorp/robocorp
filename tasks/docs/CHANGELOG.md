@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.4.0 - 2023-11-02
+
+- `RC_DUMP_THREADS_AFTER_RUN` may be set to "0" or "false" to prevent threads from being dumped after the teardown
+  (by default it'll dump threads 40 seconds after the tasks finish running, `RC_DUMP_THREADS_AFTER_RUN_TIMEOUT` may
+  be used to configure a different timeout).
+  
+- Created an option to do an early `os._exit` after running all the tasks. It's possible to do
+  an early exit with or without running the tasks teardown. When used the subprocesses are
+  killed and an `os._exit` is issued with a returncode based on whether the tasks 
+  failed (returncode=1) or not (returncode=0).
+  To exit after all tasks finished running and after doing the teardown use: `--os-exit=after-teardown` in
+  the command line or `RC_OS_EXIT=after-teardown` as an environment variable.
+  To exit without doing the teardown after all tasks finished running: `--os-exit=before-teardown` in
+  the command line or `RC_OS_EXIT=before-teardown` as an environment variable.
+  
 ## 2.3.0 - 2023-10-27
 
 - Use `truststore` for native system certificates, if available in environment

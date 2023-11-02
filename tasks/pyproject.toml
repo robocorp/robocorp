@@ -20,9 +20,11 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 robocorp-log = ">=2.4,<3"
+psutil = "^5.9"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
+types-psutil = "^5.9"
 
 [tool.isort]
 profile = "black"

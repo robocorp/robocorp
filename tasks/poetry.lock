@@ -855,6 +855,17 @@ files = [
 ]
 
 [[package]]
+name = "types-psutil"
+version = "5.9.5.17"
+description = "Typing stubs for psutil"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "types-psutil-5.9.5.17.tar.gz", hash = "sha256:f7d8769812d72a4b513d7ec9eb5580fe2f6013fc270394a603cb6534811f3e4d"},
+    {file = "types_psutil-5.9.5.17-py3-none-any.whl", hash = "sha256:2161d166256084acf629d30aaf6bda8bee726ae1fea530559650281056b491fc"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.8.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -981,4 +992,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "9e58ded29aa3124bed2a7eefaeb9957c3e30aa66918ac18ea0526fbbd4e17cad"
+content-hash = "01b0a74c0948078df1e705ae58237c6df7e9caf5023dec48275001c372883fa3"
