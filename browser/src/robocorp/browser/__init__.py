@@ -58,6 +58,13 @@ def configure(**kwargs) -> None:
 
         viewport_size: Size to be set for the viewport. Specified as tuple(width, height).
 
+        skip_playwright_stop:
+            Can be used to skip the playwright stop. Not recommended in general,
+            only meant to be used to diagnose and workaround specific issues on
+            the playwright stop coupled with an early os._exit shutdown in
+            `robocorp-tasks`. Can cause a process leak and even a shutdown
+            deadlock if used alone.
+
     Note:
         See also: `robocorp.browser.configure_context` to change other
         arguments related to the browser context creation.

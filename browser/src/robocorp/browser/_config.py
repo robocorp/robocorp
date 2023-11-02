@@ -15,6 +15,7 @@ class _BrowserConfig:
         "_screenshot",
         "_isolated",
         "_persistent_context_directory",
+        "skip_playwright_stop",
         "__weakref__",
     ]
 
@@ -27,6 +28,7 @@ class _BrowserConfig:
         screenshot: str = "only-on-failure",
         isolated: bool = False,
         persistent_context_directory: Optional[Union[str, Path]] = None,
+        skip_playwright_stop: bool = False,
     ):
         """
         Args:
@@ -63,6 +65,13 @@ class _BrowserConfig:
                 stored/loaded from (it can be used to store the state of the
                 automation to allow for sessions and cookies to be reused in a
                 new automation).
+
+            skip_playwright_stop:
+                Can be used to skip the playwright stop. Not recommended in
+                general, only meant to be used to diagnose and workaround
+                specific issues on the playwright stop coupled with an early
+                os._exit shutdown in `robocorp-tasks`. Can cause a process leak
+                and even a shutdown deadlock if used alone.
         """  # noqa
         self.browser_engine = browser_engine
         self.install = install
@@ -71,6 +80,7 @@ class _BrowserConfig:
         self.screenshot = screenshot
         self.isolated = isolated
         self.persistent_context_directory = persistent_context_directory
+        self.skip_playwright_stop = skip_playwright_stop
 
     @property
     def browser_engine(self) -> BrowserEngine:
