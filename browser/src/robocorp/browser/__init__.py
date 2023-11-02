@@ -11,7 +11,7 @@ from playwright.sync_api import (
 
 from ._types import BrowserEngine, BrowserNotFound, InstallError
 
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 version_info = [int(x) for x in __version__.split(".")]
 
 
