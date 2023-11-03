@@ -2,8 +2,7 @@
 
 ## Unreleased
 
-- Fix `list_assets` response parsing and support pagination size control with
-  the `page_limit` parameter.
+- Fix `list_assets` response parsing.
 
 ## 1.0.1 - 2023-10-13
 
