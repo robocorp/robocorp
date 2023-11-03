@@ -11,14 +11,10 @@ ______________________________________________________________________
 **Source:** [`__init__.py:45`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L45)
 
 ```python
-list_assets(page_limit: Optional[int] = 100) → List[str]
+list_assets() → List[str]
 ```
 
 List all the existing assets.
-
-**Args:**
-
-- <b>`page_limit`</b>:  How many assets to retrieve per request
 
 **Returns:**
 A list of available assets' names
@@ -27,7 +23,7 @@ ______________________________________________________________________
 
 ## function `delete_asset`
 
-**Source:** [`__init__.py:77`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L77)
+**Source:** [`__init__.py:74`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L74)
 
 ```python
 delete_asset(name: str)
@@ -49,7 +45,7 @@ ______________________________________________________________________
 
 ## function `get_text`
 
-**Source:** [`__init__.py:117`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L117)
+**Source:** [`__init__.py:114`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L114)
 
 ```python
 get_text(name: str) → str
@@ -72,7 +68,7 @@ ______________________________________________________________________
 
 ## function `get_json`
 
-**Source:** [`__init__.py:133`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L133)
+**Source:** [`__init__.py:130`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L130)
 
 ```python
 get_json(
@@ -100,7 +96,7 @@ ______________________________________________________________________
 
 ## function `get_file`
 
-**Source:** [`__init__.py:151`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L151)
+**Source:** [`__init__.py:148`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L148)
 
 ```python
 get_file(name: str, path: Union[PathLike, str], exist_ok=False) → Path
@@ -126,7 +122,7 @@ ______________________________________________________________________
 
 ## function `get_bytes`
 
-**Source:** [`__init__.py:176`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L176)
+**Source:** [`__init__.py:173`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L173)
 
 ```python
 get_bytes(name: str) → bytes
@@ -149,7 +145,7 @@ ______________________________________________________________________
 
 ## function `set_text`
 
-**Source:** [`__init__.py:207`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L207)
+**Source:** [`__init__.py:204`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L204)
 
 ```python
 set_text(name: str, text: str, wait: bool = True)
@@ -167,7 +163,7 @@ ______________________________________________________________________
 
 ## function `set_json`
 
-**Source:** [`__init__.py:220`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L220)
+**Source:** [`__init__.py:217`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L217)
 
 ```python
 set_json(
@@ -191,7 +187,7 @@ ______________________________________________________________________
 
 ## function `set_file`
 
-**Source:** [`__init__.py:234`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L234)
+**Source:** [`__init__.py:231`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L231)
 
 ```python
 set_file(
@@ -215,7 +211,7 @@ ______________________________________________________________________
 
 ## function `set_bytes`
 
-**Source:** [`__init__.py:264`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L264)
+**Source:** [`__init__.py:261`](https://github.com/robocorp/robo/tree/master/storage/src/robocorp/storage/__init__.py#L261)
 
 ```python
 set_bytes(

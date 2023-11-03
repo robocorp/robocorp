@@ -69,7 +69,7 @@ class AssetsClient:
         return _handle_error
 
     def list_assets(
-        self, *, limit: Optional[int], page: Optional[str]
+        self, limit: Optional[int] = None, page: Optional[str] = None
     ) -> AssetsResponse:
         """Retrieve list of assets."""
         if limit and page:

@@ -42,17 +42,14 @@ def _get_client() -> "AssetsClient":
     return AssetsClient(workspace, endpoint, token)
 
 
-def list_assets(page_limit: Optional[int] = 100) -> List[str]:
+def list_assets() -> List[str]:
     """List all the existing assets.
-
-    Args:
-        page_limit: How many assets to retrieve per request
 
     Returns:
         A list of available assets' names
     """
     client = _get_client()
-    page = client.list_assets(limit=page_limit, page=None)
+    page = client.list_assets()
     assets = [asset["name"] for asset in page["data"]]
     page_count = 1
 
@@ -61,12 +58,12 @@ def list_assets(page_limit: Optional[int] = 100) -> List[str]:
         next_page = page["next"]
         if not next_page:
             LOGGER.warning(
-                "'List assets' endpoint is not yet ready for pagination, use a higher"
-                " limit with `page_limit` to retrieve all of them in one go"
+                "'List assets' endpoint is not yet ready for pagination, contact"
+                " support if the issue persists"
             )
             break
 
-        page = client.list_assets(page=next_page, limit=None)
+        page = client.list_assets(page=next_page)
         data = page["data"]
         LOGGER.debug("Retrieved %d assets from page no. %d", len(data), page_count)
         assets.extend([asset["name"] for asset in data])

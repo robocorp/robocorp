@@ -39,13 +39,6 @@ class TestLibrary:
         assets = storage.list_assets()
         assert ensured_asset in assets
 
-    @pytest.mark.xfail(reason="full API pagination not ready yet")
-    def test_list_assets_with_limit(self, ensured_asset):
-        # Should request multiple pages until all the assets are returned, but if the
-        #  API isn't ready for pagination yet, we might miss the rest of the pages.
-        assets = storage.list_assets(page_limit=1)
-        assert ensured_asset in assets
-
     def test_delete_asset(self, ensured_asset):
         storage.delete_asset(ensured_asset)
         with pytest.raises(storage.AssetNotFound):
