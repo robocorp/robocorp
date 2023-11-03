@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._client import AssetsClient
     from ._requests import Response
 
-__version__ = "1.0.1"
+__version__ = "1.2.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -42,13 +42,36 @@ def _get_client() -> "AssetsClient":
     return AssetsClient(workspace, endpoint, token)
 
 
-def list_assets() -> List[str]:
+def list_assets(page_limit: Optional[int] = 100) -> List[str]:
     """List all the existing assets.
+
+    Args:
+        page_limit: How many assets to retrieve per request
 
     Returns:
         A list of available assets' names
     """
-    return [asset["name"] for asset in _get_client().list_assets()]
+    client = _get_client()
+    page = client.list_assets(limit=page_limit, next_page=None)
+    assets = [asset["name"] for asset in page["data"]]
+    page_count = 1
+
+    while page["has_more"]:
+        page_count += 1
+        next_page = page["next"]
+        if not next_page:
+            LOGGER.warning(
+                "'List assets' endpoint is not yet ready for pagination, use a higher"
+                " limit with `page_limit` to retrieve all of them in one go"
+            )
+            break
+
+        page = client.list_assets(next_page=next_page, limit=None)
+        data = page["data"]
+        LOGGER.debug("Retrieved %d assets from page no. %d", len(data), page_count)
+        assets.extend([asset["name"] for asset in data])
+
+    return assets
 
 
 def delete_asset(name: str):
