@@ -298,7 +298,7 @@ class WindowElement(ControlElement):
             True if the pid associated to this window is still running and False
             otherwise.
         """
-        from _ctypes import COMError
+        from ._com_error import COMError
 
         try:
             pid = self.pid
@@ -337,7 +337,7 @@ class WindowElement(ControlElement):
         Returns:
             True if the window was closed by this function and False otherwise.
         """
-        from _ctypes import COMError
+        from ._com_error import COMError
 
         if not self.is_running():
             return False  # It was closed by someone else in the meanwhile.
