@@ -28,9 +28,6 @@ tomlkit = "^0.11.8"
 semver = "^3.0.0"
 pylint = "^2.17.4"
 
-[tool.poetry.group.dev.dependencies]
-mdformat = "^0.7.17"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
