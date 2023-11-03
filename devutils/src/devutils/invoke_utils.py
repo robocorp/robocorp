@@ -321,15 +321,6 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
             sys.exit(1)
 
     @task
-    def set_version_in_deps(ctx, version):
-        """Sets a new version of this project in the project dependencies"""
-        root_pyproject = root / "pyproject.toml"
-        assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
-
-        all_pyprojects = list(collect_deps_pyprojects(root_pyproject))
-        all_pyprojects.append(root_pyproject)
-
-    @task
     def set_version(ctx, version):
         """Sets a new version for the project in all the needed files"""
         import re
