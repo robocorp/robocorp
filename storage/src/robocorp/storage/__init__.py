@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._client import AssetsClient
     from ._requests import Response
 
-__version__ = "1.2.0"
+__version__ = "1.1.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -52,7 +52,7 @@ def list_assets(page_limit: Optional[int] = 100) -> List[str]:
         A list of available assets' names
     """
     client = _get_client()
-    page = client.list_assets(limit=page_limit, next_page=None)
+    page = client.list_assets(limit=page_limit, page=None)
     assets = [asset["name"] for asset in page["data"]]
     page_count = 1
 
@@ -66,7 +66,7 @@ def list_assets(page_limit: Optional[int] = 100) -> List[str]:
             )
             break
 
-        page = client.list_assets(next_page=next_page, limit=None)
+        page = client.list_assets(page=next_page, limit=None)
         data = page["data"]
         LOGGER.debug("Retrieved %d assets from page no. %d", len(data), page_count)
         assets.extend([asset["name"] for asset in data])

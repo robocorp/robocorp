@@ -69,10 +69,10 @@ class AssetsClient:
         return _handle_error
 
     def list_assets(
-        self, *, limit: Optional[int], next_page: Optional[str]
+        self, *, limit: Optional[int], page: Optional[str]
     ) -> AssetsResponse:
         """Retrieve list of assets."""
-        if limit and next_page:
+        if limit and page:
             raise ValueError(
                 "Choose between a limit (for the initial request) or the next page URL"
                 " (for any subsequent request)"
@@ -81,8 +81,8 @@ class AssetsClient:
         url = ""
         if limit:
             params = {"limit": limit}
-        elif next_page:
-            url = next_page
+        elif page:
+            url = page
         return self._client.get(url, params=params).json()
 
     def create_asset(self, name: str) -> AssetDetails:
