@@ -813,7 +813,7 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "robocorp-devutils"
-version = "0.0.2"
+version = "0.0.1"
 description = "Utilities for development in monorepo."
 optional = false
 python-versions = "^3.8"

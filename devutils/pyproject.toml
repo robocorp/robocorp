@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-devutils"
-version = "0.0.2"
+version = "0.0.1"
 description = "Utilities for development in monorepo."
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
