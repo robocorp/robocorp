@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ._client import AssetsClient
     from ._requests import Response
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 JSON = Union[Dict[str, "JSON"], List["JSON"], str, int, float, bool, None]
@@ -48,7 +48,27 @@ def list_assets() -> List[str]:
     Returns:
         A list of available assets' names
     """
-    return [asset["name"] for asset in _get_client().list_assets()]
+    client = _get_client()
+    page = client.list_assets()
+    assets = [asset["name"] for asset in page["data"]]
+    page_count = 1
+
+    while page["has_more"]:
+        page_count += 1
+        next_page = page["next"]
+        if not next_page:
+            LOGGER.warning(
+                "'List assets' endpoint is not yet ready for pagination, contact"
+                " support if the issue persists"
+            )
+            break
+
+        page = client.list_assets(page=next_page)
+        data = page["data"]
+        LOGGER.debug("Retrieved %d assets from page no. %d", len(data), page_count)
+        assets.extend([asset["name"] for asset in data])
+
+    return assets
 
 
 def delete_asset(name: str):
