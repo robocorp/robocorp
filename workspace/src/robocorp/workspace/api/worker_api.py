@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -50,8 +52,13 @@ class WorkerApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def create_link_token(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker should reside.")], create_link_token_request : CreateLinkTokenRequest, **kwargs) -> LinkTokenResource:  # noqa: E501
+    @validate_call
+    def create_link_token(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker should reside.")],
+        create_link_token_request: CreateLinkTokenRequest,
+        **kwargs,
+    ) -> LinkTokenResource:
         """Create worker link token  # noqa: E501
 
         Generates and returns a link token used to link a new worker to the requested workspace.  # noqa: E501
@@ -80,10 +87,20 @@ class WorkerApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_link_token_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_link_token_with_http_info(workspace_id, create_link_token_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_link_token_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker should reside.")], create_link_token_request : CreateLinkTokenRequest, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_link_token_with_http_info.raw_function(
+            workspace_id,
+            create_link_token_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_link_token_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker should reside.")],
+        create_link_token_request: CreateLinkTokenRequest,
+        **kwargs,
+    ) -> ApiResponse:
         """Create worker link token  # noqa: E501
 
         Generates and returns a link token used to link a new worker to the requested workspace.  # noqa: E501
@@ -150,21 +167,21 @@ class WorkerApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['create_link_token_request'] is not None:
@@ -182,9 +199,9 @@ class WorkerApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "LinkTokenResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -207,8 +224,13 @@ class WorkerApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def delete_worker(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to delete.")], **kwargs) -> DeleteWorker200Response:  # noqa: E501
+    @validate_call
+    def delete_worker(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to delete.")],
+        **kwargs,
+    ) -> DeleteWorker200Response:
         """Delete worker  # noqa: E501
 
         Deletes the requested worker. This action is irreversible!  # noqa: E501
@@ -237,10 +259,20 @@ class WorkerApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the delete_worker_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.delete_worker_with_http_info(workspace_id, worker_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def delete_worker_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to delete.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.delete_worker_with_http_info.raw_function(
+            workspace_id,
+            worker_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def delete_worker_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to delete.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Delete worker  # noqa: E501
 
         Deletes the requested worker. This action is irreversible!  # noqa: E501
@@ -307,24 +339,24 @@ class WorkerApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_id']:
+        if _params['worker_id'] is not None:
             _path_params['worker_id'] = _params['worker_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -332,9 +364,9 @@ class WorkerApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "DeleteWorker200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -357,8 +389,13 @@ class WorkerApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_worker(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to retrieve.")], **kwargs) -> WorkerResource:  # noqa: E501
+    @validate_call
+    def get_worker(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to retrieve.")],
+        **kwargs,
+    ) -> WorkerResource:
         """Get worker  # noqa: E501
 
         Returns a worker linked to the requested workspace.  # noqa: E501
@@ -387,10 +424,20 @@ class WorkerApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_worker_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_worker_with_http_info(workspace_id, worker_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_worker_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to retrieve.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_worker_with_http_info.raw_function(
+            workspace_id,
+            worker_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_worker_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to retrieve.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get worker  # noqa: E501
 
         Returns a worker linked to the requested workspace.  # noqa: E501
@@ -457,24 +504,24 @@ class WorkerApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_id']:
+        if _params['worker_id'] is not None:
             _path_params['worker_id'] = _params['worker_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -482,9 +529,9 @@ class WorkerApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerResource",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -507,8 +554,13 @@ class WorkerApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_workers(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListWorkers200Response:  # noqa: E501
+    @validate_call
+    def list_workers(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListWorkers200Response:
         """List workers  # noqa: E501
 
         Returns a list of all workers linked to the requested workspace.  # noqa: E501
@@ -537,10 +589,20 @@ class WorkerApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_workers_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_workers_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_workers_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_workers_with_http_info.raw_function(
+            workspace_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_workers_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List workers  # noqa: E501
 
         Returns a list of all workers linked to the requested workspace.  # noqa: E501
@@ -607,24 +669,24 @@ class WorkerApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -632,9 +694,9 @@ class WorkerApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListWorkers200Response",
             '403': "GenericErrorResponse",
         }
@@ -656,8 +718,14 @@ class WorkerApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def update_worker(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to update.")], update_worker_request : Annotated[UpdateWorkerRequest, Field(..., description="The worker details to update.")], **kwargs) -> WorkerResource:  # noqa: E501
+    @validate_call
+    def update_worker(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to update.")],
+        update_worker_request: Annotated[UpdateWorkerRequest, Field(description="The worker details to update.")],
+        **kwargs,
+    ) -> WorkerResource:
         """Update worker  # noqa: E501
 
         Updates the requested worker by setting only the values defined in the request body.  # noqa: E501
@@ -688,10 +756,22 @@ class WorkerApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the update_worker_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.update_worker_with_http_info(workspace_id, worker_id, update_worker_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def update_worker_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker resides.")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to update.")], update_worker_request : Annotated[UpdateWorkerRequest, Field(..., description="The worker details to update.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.update_worker_with_http_info.raw_function(
+            workspace_id,
+            worker_id,
+            update_worker_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def update_worker_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker resides.")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to update.")],
+        update_worker_request: Annotated[UpdateWorkerRequest, Field(description="The worker details to update.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Update worker  # noqa: E501
 
         Updates the requested worker by setting only the values defined in the request body.  # noqa: E501
@@ -761,24 +841,24 @@ class WorkerApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_id']:
+        if _params['worker_id'] is not None:
             _path_params['worker_id'] = _params['worker_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['update_worker_request'] is not None:
@@ -796,9 +876,9 @@ class WorkerApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",

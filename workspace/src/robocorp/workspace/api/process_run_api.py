@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr, field_validator
 
 from typing import Optional, Union
 
@@ -54,8 +56,13 @@ class ProcessRunApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def delete_process_run(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the robot resides.")], process_run_id : Annotated[StrictStr, Field(..., description="The id of the process run to delete.")], **kwargs) -> DeleteWorker200Response:  # noqa: E501
+    @validate_call
+    def delete_process_run(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the robot resides.")],
+        process_run_id: Annotated[StrictStr, Field(description="The id of the process run to delete.")],
+        **kwargs,
+    ) -> DeleteWorker200Response:
         """Delete process run  # noqa: E501
 
         Deletes a process run. This action is irreversible!  # noqa: E501
@@ -84,10 +91,20 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the delete_process_run_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.delete_process_run_with_http_info(workspace_id, process_run_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def delete_process_run_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the robot resides.")], process_run_id : Annotated[StrictStr, Field(..., description="The id of the process run to delete.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.delete_process_run_with_http_info.raw_function(
+            workspace_id,
+            process_run_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def delete_process_run_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the robot resides.")],
+        process_run_id: Annotated[StrictStr, Field(description="The id of the process run to delete.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Delete process run  # noqa: E501
 
         Deletes a process run. This action is irreversible!  # noqa: E501
@@ -154,24 +171,24 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['process_run_id']:
+        if _params['process_run_id'] is not None:
             _path_params['process_run_id'] = _params['process_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -179,9 +196,9 @@ class ProcessRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "DeleteWorker200Response",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -206,8 +223,13 @@ class ProcessRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_process_run(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="ID of the process run")], **kwargs) -> ProcessRunResource:  # noqa: E501
+    @validate_call
+    def get_process_run(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_run_id: Annotated[StrictStr, Field(description="ID of the process run")],
+        **kwargs,
+    ) -> ProcessRunResource:
         """Get process run  # noqa: E501
 
         Returns a process run  # noqa: E501
@@ -236,10 +258,20 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_process_run_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_process_run_with_http_info(workspace_id, process_run_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_process_run_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="ID of the process run")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_process_run_with_http_info.raw_function(
+            workspace_id,
+            process_run_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_process_run_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_run_id: Annotated[StrictStr, Field(description="ID of the process run")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get process run  # noqa: E501
 
         Returns a process run  # noqa: E501
@@ -306,24 +338,24 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['process_run_id']:
+        if _params['process_run_id'] is not None:
             _path_params['process_run_id'] = _params['process_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -331,9 +363,9 @@ class ProcessRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ProcessRunResource",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -356,8 +388,14 @@ class ProcessRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_process_run_outputs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="Process Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListProcessRunOutputs200Response:  # noqa: E501
+    @validate_call
+    def list_process_run_outputs(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_run_id: Annotated[StrictStr, Field(description="Process Run ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListProcessRunOutputs200Response:
         """List process run outputs  # noqa: E501
 
         Returns a list of process run outputs.  # noqa: E501
@@ -388,10 +426,22 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_process_run_outputs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_process_run_outputs_with_http_info(workspace_id, process_run_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_process_run_outputs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="Process Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_process_run_outputs_with_http_info.raw_function(
+            workspace_id,
+            process_run_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_process_run_outputs_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_run_id: Annotated[StrictStr, Field(description="Process Run ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List process run outputs  # noqa: E501
 
         Returns a list of process run outputs.  # noqa: E501
@@ -461,16 +511,16 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('process_run_id') is not None:  # noqa: E501
             _query_params.append(('process_run_id', _params['process_run_id']))
 
@@ -480,8 +530,8 @@ class ProcessRunApi:
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -489,9 +539,9 @@ class ProcessRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListProcessRunOutputs200Response",
             '403': "GenericErrorResponse",
         }
@@ -513,8 +563,15 @@ class ProcessRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_process_runs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_id : Annotated[Optional[StrictStr], Field(description="Process ID, if specified, the response will only contain the process runs from this process")] = None, state : Annotated[Optional[StrictStr], Field(description="State of process runs")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListProcessRuns200Response:  # noqa: E501
+    @validate_call
+    def list_process_runs(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_id: Annotated[Optional[StrictStr], Field(description="Process ID, if specified, the response will only contain the process runs from this process")] = None,
+        state: Annotated[Optional[StrictStr], Field(description="State of process runs")] = None,
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListProcessRuns200Response:
         """List process runs  # noqa: E501
 
         Returns a paginated list of process runs. If a process id is specified in the query parameters, the response will only contain process runs from that process. If not, the response will contain the process runs of the workspace in the path.  # noqa: E501
@@ -547,10 +604,24 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_process_runs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_process_runs_with_http_info(workspace_id, process_id, state, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_process_runs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_id : Annotated[Optional[StrictStr], Field(description="Process ID, if specified, the response will only contain the process runs from this process")] = None, state : Annotated[Optional[StrictStr], Field(description="State of process runs")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_process_runs_with_http_info.raw_function(
+            workspace_id,
+            process_id,
+            state,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_process_runs_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_id: Annotated[Optional[StrictStr], Field(description="Process ID, if specified, the response will only contain the process runs from this process")] = None,
+        state: Annotated[Optional[StrictStr], Field(description="State of process runs")] = None,
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List process runs  # noqa: E501
 
         Returns a paginated list of process runs. If a process id is specified in the query parameters, the response will only contain process runs from that process. If not, the response will contain the process runs of the workspace in the path.  # noqa: E501
@@ -623,16 +694,16 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('process_id') is not None:  # noqa: E501
             _query_params.append(('process_id', _params['process_id']))
 
@@ -645,8 +716,8 @@ class ProcessRunApi:
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -654,9 +725,9 @@ class ProcessRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListProcessRuns200Response",
             '403': "GenericErrorResponse",
         }
@@ -678,8 +749,14 @@ class ProcessRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def start_process_run(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the process resides.")], process_id : Annotated[StrictStr, Field(..., description="The id of the process to start.")], start_process_run_request : Annotated[Optional[StartProcessRunRequest], Field(description="Omitting the request body will start a process run with either the default work item, if configured, or an empty work item. ")] = None, **kwargs) -> StartProcessRun200Response:  # noqa: E501
+    @validate_call
+    def start_process_run(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the process resides.")],
+        process_id: Annotated[StrictStr, Field(description="The id of the process to start.")],
+        start_process_run_request: Annotated[Optional[StartProcessRunRequest], Field(description="Omitting the request body will start a process run with either the default work item, if configured, or an empty work item. ")] = None,
+        **kwargs,
+    ) -> StartProcessRun200Response:
         """Start process run  # noqa: E501
 
         Starts a process run for the requested process. You may choose to start a process run without work items, with specified work items, or with the work items that are waiting in the input queue of the specified process.   # noqa: E501
@@ -710,10 +787,22 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the start_process_run_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.start_process_run_with_http_info(workspace_id, process_id, start_process_run_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def start_process_run_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the process resides.")], process_id : Annotated[StrictStr, Field(..., description="The id of the process to start.")], start_process_run_request : Annotated[Optional[StartProcessRunRequest], Field(description="Omitting the request body will start a process run with either the default work item, if configured, or an empty work item. ")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.start_process_run_with_http_info.raw_function(
+            workspace_id,
+            process_id,
+            start_process_run_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def start_process_run_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the process resides.")],
+        process_id: Annotated[StrictStr, Field(description="The id of the process to start.")],
+        start_process_run_request: Annotated[Optional[StartProcessRunRequest], Field(description="Omitting the request body will start a process run with either the default work item, if configured, or an empty work item. ")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """Start process run  # noqa: E501
 
         Starts a process run for the requested process. You may choose to start a process run without work items, with specified work items, or with the work items that are waiting in the input queue of the specified process.   # noqa: E501
@@ -783,24 +872,24 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['process_id']:
+        if _params['process_id'] is not None:
             _path_params['process_id'] = _params['process_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['start_process_run_request'] is not None:
@@ -818,9 +907,9 @@ class ProcessRunApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "StartProcessRun200Response",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -844,8 +933,16 @@ class ProcessRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def start_process_run_qs_auth(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_id : Annotated[StrictStr, Field(..., description="Process ID")], token : Annotated[StrictStr, Field(..., description="Authorization token")], any_valid_json : Annotated[Optional[AnyValidJson], Field(..., description="Any valid JSON payload. The full request body is passed as a work item to the process run input. ")], with_handshake : Annotated[Optional[StrictStr], Field(description="Handshake type")] = None, **kwargs) -> StartProcessRunQsAuth200Response:  # noqa: E501
+    @validate_call
+    def start_process_run_qs_auth(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_id: Annotated[StrictStr, Field(description="Process ID")],
+        token: Annotated[StrictStr, Field(description="Authorization token")],
+        any_valid_json: Annotated[Optional[AnyValidJson], Field(description="Any valid JSON payload. The full request body is passed as a work item to the process run input. ")],
+        with_handshake: Annotated[Optional[StrictStr], Field(description="Handshake type")] = None,
+        **kwargs,
+    ) -> StartProcessRunQsAuth200Response:
         """Start process run (for integrations)  # noqa: E501
 
         Starts a process run for the requested process. This endpoint is useful when you don't have control over the **headers** and / or **request body** of the caller and need a plain URL. This includes e.g. certain integration cases. The **full request body** will be provided as the input work item for the process run. The **API Key** must be provided as the value of the `token` query-string parameter. This endpoint supports **webhook handshakes** for added security. Currently we support the protocol employed by [Asana](https://asana.com/). If you are using Asana, use the `with_handshake=asana` query string parameter when constructing the URL to enable Asana webhook handshakes.   # noqa: E501
@@ -880,10 +977,26 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the start_process_run_qs_auth_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.start_process_run_qs_auth_with_http_info(workspace_id, process_id, token, any_valid_json, with_handshake, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def start_process_run_qs_auth_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_id : Annotated[StrictStr, Field(..., description="Process ID")], token : Annotated[StrictStr, Field(..., description="Authorization token")], any_valid_json : Annotated[Optional[AnyValidJson], Field(..., description="Any valid JSON payload. The full request body is passed as a work item to the process run input. ")], with_handshake : Annotated[Optional[StrictStr], Field(description="Handshake type")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.start_process_run_qs_auth_with_http_info.raw_function(
+            workspace_id,
+            process_id,
+            token,
+            any_valid_json,
+            with_handshake,
+            **kwargs,
+        )
+
+    @validate_call
+    def start_process_run_qs_auth_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_id: Annotated[StrictStr, Field(description="Process ID")],
+        token: Annotated[StrictStr, Field(description="Authorization token")],
+        any_valid_json: Annotated[Optional[AnyValidJson], Field(description="Any valid JSON payload. The full request body is passed as a work item to the process run input. ")],
+        with_handshake: Annotated[Optional[StrictStr], Field(description="Handshake type")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """Start process run (for integrations)  # noqa: E501
 
         Starts a process run for the requested process. This endpoint is useful when you don't have control over the **headers** and / or **request body** of the caller and need a plain URL. This includes e.g. certain integration cases. The **full request body** will be provided as the input work item for the process run. The **API Key** must be provided as the value of the `token` query-string parameter. This endpoint supports **webhook handshakes** for added security. Currently we support the protocol employed by [Asana](https://asana.com/). If you are using Asana, use the `with_handshake=asana` query string parameter when constructing the URL to enable Asana webhook handshakes.   # noqa: E501
@@ -959,19 +1072,19 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['process_id']:
+        if _params['process_id'] is not None:
             _path_params['process_id'] = _params['process_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('token') is not None:  # noqa: E501
             _query_params.append(('token', _params['token']))
 
@@ -981,8 +1094,8 @@ class ProcessRunApi:
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['any_valid_json'] is not None:
@@ -1000,9 +1113,9 @@ class ProcessRunApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "StartProcessRunQsAuth200Response",
             '400': "GenericErrorResponse",
         }
@@ -1024,8 +1137,14 @@ class ProcessRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def stop_process_run(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the process run resides.")], process_run_id : Annotated[StrictStr, Field(..., description="The id of the process run to stop.")], stop_process_run_request : Annotated[StopProcessRunRequest, Field(..., description="Set whether or not to set the remaining work items as done or terminating the ongoing activity runs, as well as the reason for stopping the process run.")], **kwargs) -> StopProcessRun200Response:  # noqa: E501
+    @validate_call
+    def stop_process_run(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the process run resides.")],
+        process_run_id: Annotated[StrictStr, Field(description="The id of the process run to stop.")],
+        stop_process_run_request: Annotated[StopProcessRunRequest, Field(description="Set whether or not to set the remaining work items as done or terminating the ongoing activity runs, as well as the reason for stopping the process run.")],
+        **kwargs,
+    ) -> StopProcessRun200Response:
         """Stop process run  # noqa: E501
 
         Stops the process run.  # noqa: E501
@@ -1056,10 +1175,22 @@ class ProcessRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the stop_process_run_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.stop_process_run_with_http_info(workspace_id, process_run_id, stop_process_run_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def stop_process_run_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the process run resides.")], process_run_id : Annotated[StrictStr, Field(..., description="The id of the process run to stop.")], stop_process_run_request : Annotated[StopProcessRunRequest, Field(..., description="Set whether or not to set the remaining work items as done or terminating the ongoing activity runs, as well as the reason for stopping the process run.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.stop_process_run_with_http_info.raw_function(
+            workspace_id,
+            process_run_id,
+            stop_process_run_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def stop_process_run_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the process run resides.")],
+        process_run_id: Annotated[StrictStr, Field(description="The id of the process run to stop.")],
+        stop_process_run_request: Annotated[StopProcessRunRequest, Field(description="Set whether or not to set the remaining work items as done or terminating the ongoing activity runs, as well as the reason for stopping the process run.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Stop process run  # noqa: E501
 
         Stops the process run.  # noqa: E501
@@ -1129,24 +1260,24 @@ class ProcessRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['process_run_id']:
+        if _params['process_run_id'] is not None:
             _path_params['process_run_id'] = _params['process_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['stop_process_run_request'] is not None:
@@ -1164,9 +1295,9 @@ class ProcessRunApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "StopProcessRun200Response",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",

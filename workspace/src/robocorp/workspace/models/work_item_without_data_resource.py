@@ -19,51 +19,68 @@ import json
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import BaseModel, StrictStr
 from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
 from robocorp.workspace.models.work_item_exception import WorkItemException
 from robocorp.workspace.models.work_item_state import WorkItemState
+from typing import Dict, Any
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 class WorkItemWithoutDataResource(BaseModel):
     """
     WorkItemWithoutDataResource
     """
-    id: StrictStr = Field(...)
-    created_at: datetime = Field(...)
-    state: WorkItemState = Field(...)
-    state_updated_at: Optional[datetime] = Field(...)
-    process: AddWorkerToGroupRequestWorker = Field(...)
-    process_run: Optional[ListWebhooks200ResponseDataInnerProcess] = Field(...)
-    step: Optional[ListWebhooks200ResponseDataInnerProcess] = Field(...)
-    step_run: Optional[ListWebhooks200ResponseDataInnerProcess] = Field(...)
-    exception: Optional[WorkItemException] = Field(...)
-    __properties = ["id", "created_at", "state", "state_updated_at", "process", "process_run", "step", "step_run", "exception"]
+    id: StrictStr
+    created_at: datetime
+    state: WorkItemState
+    state_updated_at: Optional[datetime]
+    process: AddWorkerToGroupRequestWorker
+    process_run: Optional[ListWebhooks200ResponseDataInnerProcess]
+    step: Optional[ListWebhooks200ResponseDataInnerProcess]
+    step_run: Optional[ListWebhooks200ResponseDataInnerProcess]
+    exception: Optional[WorkItemException]
+    __properties: ClassVar[List[str]] = ["id", "created_at", "state", "state_updated_at", "process", "process_run", "step", "step_run", "exception"]
 
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = {
+        "populate_by_name": True,
+        "validate_assignment": True
+    }
+
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.dict(by_alias=True))
+        return pprint.pformat(self.model_dump(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
+        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> WorkItemWithoutDataResource:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of WorkItemWithoutDataResource from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self):
-        """Returns the dictionary representation of the model using alias"""
-        _dict = self.dict(by_alias=True,
-                          exclude={
-                          },
-                          exclude_none=True)
+    def to_dict(self) -> Dict[str, Any]:
+        """Return the dictionary representation of the model using alias.
+
+        This has the following differences from calling pydantic's
+        `self.model_dump(by_alias=True)`:
+
+        * `None` is only added to the output dict for nullable fields that
+          were set at model initialization. Other fields with value `None`
+          are ignored.
+        """
+        _dict = self.model_dump(
+            by_alias=True,
+            exclude={
+            },
+            exclude_none=True,
+        )
         # override the default output from pydantic by calling `to_dict()` of process
         if self.process:
             _dict['process'] = self.process.to_dict()
@@ -80,42 +97,42 @@ class WorkItemWithoutDataResource(BaseModel):
         if self.exception:
             _dict['exception'] = self.exception.to_dict()
         # set to None if state_updated_at (nullable) is None
-        # and __fields_set__ contains the field
-        if self.state_updated_at is None and "state_updated_at" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.state_updated_at is None and "state_updated_at" in self.model_fields_set:
             _dict['state_updated_at'] = None
 
         # set to None if process_run (nullable) is None
-        # and __fields_set__ contains the field
-        if self.process_run is None and "process_run" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.process_run is None and "process_run" in self.model_fields_set:
             _dict['process_run'] = None
 
         # set to None if step (nullable) is None
-        # and __fields_set__ contains the field
-        if self.step is None and "step" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.step is None and "step" in self.model_fields_set:
             _dict['step'] = None
 
         # set to None if step_run (nullable) is None
-        # and __fields_set__ contains the field
-        if self.step_run is None and "step_run" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.step_run is None and "step_run" in self.model_fields_set:
             _dict['step_run'] = None
 
         # set to None if exception (nullable) is None
-        # and __fields_set__ contains the field
-        if self.exception is None and "exception" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.exception is None and "exception" in self.model_fields_set:
             _dict['exception'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> WorkItemWithoutDataResource:
+    def from_dict(cls, obj: dict) -> Self:
         """Create an instance of WorkItemWithoutDataResource from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return WorkItemWithoutDataResource.parse_obj(obj)
+            return cls.model_validate(obj)
 
-        _obj = WorkItemWithoutDataResource.parse_obj({
+        _obj = cls.model_validate({
             "id": obj.get("id"),
             "created_at": obj.get("created_at"),
             "state": obj.get("state"),

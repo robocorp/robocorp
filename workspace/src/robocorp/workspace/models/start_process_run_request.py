@@ -19,13 +19,18 @@ import pprint
 import re  # noqa: F401
 
 from typing import Any, List, Optional
-from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
+from pydantic import BaseModel, Field, StrictStr, ValidationError, field_validator
 from robocorp.workspace.models.start_process_run_request_one_of import StartProcessRunRequestOneOf
 from robocorp.workspace.models.start_process_run_request_one_of1 import StartProcessRunRequestOneOf1
 from robocorp.workspace.models.start_process_run_request_one_of2 import StartProcessRunRequestOneOf2
 from robocorp.workspace.models.start_process_run_request_one_of3 import StartProcessRunRequestOneOf3
-from typing import Union, Any, List, TYPE_CHECKING
+from typing import Union, Any, List, TYPE_CHECKING, Optional, Dict
+from typing_extensions import Literal
 from pydantic import StrictStr, Field
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 STARTPROCESSRUNREQUEST_ONE_OF_SCHEMAS = ["StartProcessRunRequestOneOf", "StartProcessRunRequestOneOf1", "StartProcessRunRequestOneOf2", "StartProcessRunRequestOneOf3"]
 
@@ -41,14 +46,13 @@ class StartProcessRunRequest(BaseModel):
     oneof_schema_3_validator: Optional[StartProcessRunRequestOneOf2] = None
     # data type: StartProcessRunRequestOneOf3
     oneof_schema_4_validator: Optional[StartProcessRunRequestOneOf3] = None
-    if TYPE_CHECKING:
-        actual_instance: Union[StartProcessRunRequestOneOf, StartProcessRunRequestOneOf1, StartProcessRunRequestOneOf2, StartProcessRunRequestOneOf3]
-    else:
-        actual_instance: Any
-    one_of_schemas: List[str] = Field(STARTPROCESSRUNREQUEST_ONE_OF_SCHEMAS, const=True)
+    actual_instance: Optional[Union[StartProcessRunRequestOneOf, StartProcessRunRequestOneOf1, StartProcessRunRequestOneOf2, StartProcessRunRequestOneOf3]] = None
+    one_of_schemas: List[str] = Literal["StartProcessRunRequestOneOf", "StartProcessRunRequestOneOf1", "StartProcessRunRequestOneOf2", "StartProcessRunRequestOneOf3"]
 
-    class Config:
-        validate_assignment = True
+    model_config = {
+        "validate_assignment": True
+    }
+
 
     def __init__(self, *args, **kwargs) -> None:
         if args:
@@ -60,9 +64,9 @@ class StartProcessRunRequest(BaseModel):
         else:
             super().__init__(**kwargs)
 
-    @validator('actual_instance')
+    @field_validator('actual_instance')
     def actual_instance_must_validate_oneof(cls, v):
-        instance = StartProcessRunRequest.construct()
+        instance = StartProcessRunRequest.model_construct()
         error_messages = []
         match = 0
         # validate data type: StartProcessRunRequestOneOf
@@ -95,13 +99,13 @@ class StartProcessRunRequest(BaseModel):
             return v
 
     @classmethod
-    def from_dict(cls, obj: dict) -> StartProcessRunRequest:
+    def from_dict(cls, obj: dict) -> Self:
         return cls.from_json(json.dumps(obj))
 
     @classmethod
-    def from_json(cls, json_str: str) -> StartProcessRunRequest:
+    def from_json(cls, json_str: str) -> Self:
         """Returns the object represented by the json string"""
-        instance = StartProcessRunRequest.construct()
+        instance = cls.model_construct()
         error_messages = []
         match = 0
 
@@ -164,6 +168,6 @@ class StartProcessRunRequest(BaseModel):
 
     def to_str(self) -> str:
         """Returns the string representation of the actual instance"""
-        return pprint.pformat(self.dict())
+        return pprint.pformat(self.model_dump())
 
 

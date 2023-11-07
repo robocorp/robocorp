@@ -19,55 +19,72 @@ import json
 
 from datetime import datetime
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, validator
+from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr, field_validator
 from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 from robocorp.workspace.models.step_run_resource_error import StepRunResourceError
+from typing import Dict, Any
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 class StepRunResource(BaseModel):
     """
     StepRunResource
     """
-    id: StrictStr = Field(...)
-    state: StrictStr = Field(...)
-    state_updated_at: datetime = Field(...)
-    error: Optional[StepRunResourceError] = Field(...)
-    started_at: Optional[datetime] = Field(...)
-    ended_at: Optional[datetime] = Field(...)
-    duration: Optional[Union[StrictFloat, StrictInt]] = Field(...)
-    step: ListAssets200ResponseDataInner = Field(...)
-    __properties = ["id", "state", "state_updated_at", "error", "started_at", "ended_at", "duration", "step"]
+    id: StrictStr
+    state: StrictStr
+    state_updated_at: datetime
+    error: Optional[StepRunResourceError]
+    started_at: Optional[datetime]
+    ended_at: Optional[datetime]
+    duration: Optional[Union[StrictFloat, StrictInt]]
+    step: ListAssets200ResponseDataInner
+    __properties: ClassVar[List[str]] = ["id", "state", "state_updated_at", "error", "started_at", "ended_at", "duration", "step"]
 
-    @validator('state')
+    @field_validator('state')
     def state_validate_enum(cls, value):
         """Validates the enum"""
         if value not in ('new', 'awaiting_worker', 'in_progress', 'completed', 'failed'):
             raise ValueError("must be one of enum values ('new', 'awaiting_worker', 'in_progress', 'completed', 'failed')")
         return value
 
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = {
+        "populate_by_name": True,
+        "validate_assignment": True
+    }
+
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.dict(by_alias=True))
+        return pprint.pformat(self.model_dump(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
+        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> StepRunResource:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of StepRunResource from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self):
-        """Returns the dictionary representation of the model using alias"""
-        _dict = self.dict(by_alias=True,
-                          exclude={
-                          },
-                          exclude_none=True)
+    def to_dict(self) -> Dict[str, Any]:
+        """Return the dictionary representation of the model using alias.
+
+        This has the following differences from calling pydantic's
+        `self.model_dump(by_alias=True)`:
+
+        * `None` is only added to the output dict for nullable fields that
+          were set at model initialization. Other fields with value `None`
+          are ignored.
+        """
+        _dict = self.model_dump(
+            by_alias=True,
+            exclude={
+            },
+            exclude_none=True,
+        )
         # override the default output from pydantic by calling `to_dict()` of error
         if self.error:
             _dict['error'] = self.error.to_dict()
@@ -75,37 +92,37 @@ class StepRunResource(BaseModel):
         if self.step:
             _dict['step'] = self.step.to_dict()
         # set to None if error (nullable) is None
-        # and __fields_set__ contains the field
-        if self.error is None and "error" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.error is None and "error" in self.model_fields_set:
             _dict['error'] = None
 
         # set to None if started_at (nullable) is None
-        # and __fields_set__ contains the field
-        if self.started_at is None and "started_at" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.started_at is None and "started_at" in self.model_fields_set:
             _dict['started_at'] = None
 
         # set to None if ended_at (nullable) is None
-        # and __fields_set__ contains the field
-        if self.ended_at is None and "ended_at" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.ended_at is None and "ended_at" in self.model_fields_set:
             _dict['ended_at'] = None
 
         # set to None if duration (nullable) is None
-        # and __fields_set__ contains the field
-        if self.duration is None and "duration" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.duration is None and "duration" in self.model_fields_set:
             _dict['duration'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> StepRunResource:
+    def from_dict(cls, obj: dict) -> Self:
         """Create an instance of StepRunResource from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return StepRunResource.parse_obj(obj)
+            return cls.model_validate(obj)
 
-        _obj = StepRunResource.parse_obj({
+        _obj = cls.model_validate({
             "id": obj.get("id"),
             "state": obj.get("state"),
             "state_updated_at": obj.get("state_updated_at"),

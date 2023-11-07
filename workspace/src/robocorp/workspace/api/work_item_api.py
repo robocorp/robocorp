@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -53,8 +55,13 @@ class WorkItemApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def create_work_item(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], create_work_item_request : Annotated[CreateWorkItemRequest, Field(..., description="Process work item payload")], **kwargs) -> WorkItemResource:  # noqa: E501
+    @validate_call
+    def create_work_item(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        create_work_item_request: Annotated[CreateWorkItemRequest, Field(description="Process work item payload")],
+        **kwargs,
+    ) -> WorkItemResource:
         """Create work item  # noqa: E501
 
         Create a work item for the requested process.  # noqa: E501
@@ -83,10 +90,20 @@ class WorkItemApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_work_item_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_work_item_with_http_info(workspace_id, create_work_item_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_work_item_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], create_work_item_request : Annotated[CreateWorkItemRequest, Field(..., description="Process work item payload")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_work_item_with_http_info.raw_function(
+            workspace_id,
+            create_work_item_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_work_item_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        create_work_item_request: Annotated[CreateWorkItemRequest, Field(description="Process work item payload")],
+        **kwargs,
+    ) -> ApiResponse:
         """Create work item  # noqa: E501
 
         Create a work item for the requested process.  # noqa: E501
@@ -153,21 +170,21 @@ class WorkItemApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['create_work_item_request'] is not None:
@@ -185,9 +202,9 @@ class WorkItemApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkItemResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -211,8 +228,14 @@ class WorkItemApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def create_work_item_file(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], create_work_item_file_request : Annotated[CreateWorkItemFileRequest, Field(..., description="The name and size of work item file to create")], **kwargs) -> CreateWorkItemFile200Response:  # noqa: E501
+    @validate_call
+    def create_work_item_file(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        work_item_id: Annotated[StrictStr, Field(description="Work Item ID")],
+        create_work_item_file_request: Annotated[CreateWorkItemFileRequest, Field(description="The name and size of work item file to create")],
+        **kwargs,
+    ) -> CreateWorkItemFile200Response:
         """Create work item file  # noqa: E501
 
         Request to upload a work item file.  # noqa: E501
@@ -243,10 +266,22 @@ class WorkItemApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_work_item_file_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_work_item_file_with_http_info(workspace_id, work_item_id, create_work_item_file_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_work_item_file_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], create_work_item_file_request : Annotated[CreateWorkItemFileRequest, Field(..., description="The name and size of work item file to create")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_work_item_file_with_http_info.raw_function(
+            workspace_id,
+            work_item_id,
+            create_work_item_file_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_work_item_file_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        work_item_id: Annotated[StrictStr, Field(description="Work Item ID")],
+        create_work_item_file_request: Annotated[CreateWorkItemFileRequest, Field(description="The name and size of work item file to create")],
+        **kwargs,
+    ) -> ApiResponse:
         """Create work item file  # noqa: E501
 
         Request to upload a work item file.  # noqa: E501
@@ -316,24 +351,24 @@ class WorkItemApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['work_item_id']:
+        if _params['work_item_id'] is not None:
             _path_params['work_item_id'] = _params['work_item_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['create_work_item_file_request'] is not None:
@@ -351,9 +386,9 @@ class WorkItemApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "CreateWorkItemFile200Response",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -376,8 +411,13 @@ class WorkItemApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_work_item(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], **kwargs) -> WorkItemResource:  # noqa: E501
+    @validate_call
+    def get_work_item(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        work_item_id: Annotated[StrictStr, Field(description="Work Item ID")],
+        **kwargs,
+    ) -> WorkItemResource:
         """Get work item  # noqa: E501
 
         Returns a work item for the requested process. You can specify whether you want to also retrieve the work item's data (payload and/or files) by supplying the `include_data` query parameter.   # noqa: E501
@@ -406,10 +446,20 @@ class WorkItemApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_work_item_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_work_item_with_http_info(workspace_id, work_item_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_work_item_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_work_item_with_http_info.raw_function(
+            workspace_id,
+            work_item_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_work_item_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        work_item_id: Annotated[StrictStr, Field(description="Work Item ID")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get work item  # noqa: E501
 
         Returns a work item for the requested process. You can specify whether you want to also retrieve the work item's data (payload and/or files) by supplying the `include_data` query parameter.   # noqa: E501
@@ -476,24 +526,24 @@ class WorkItemApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['work_item_id']:
+        if _params['work_item_id'] is not None:
             _path_params['work_item_id'] = _params['work_item_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -501,9 +551,9 @@ class WorkItemApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkItemResource",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -526,8 +576,16 @@ class WorkItemApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_work_items(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_id : Annotated[Optional[StrictStr], Field(description="Process ID")] = None, process_run_id : Annotated[Optional[StrictStr], Field(description="Process Run ID")] = None, state : Annotated[Optional[WorkItemState], Field(description="Work item state filter")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListWorkItems200Response:  # noqa: E501
+    @validate_call
+    def list_work_items(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_id: Annotated[Optional[StrictStr], Field(description="Process ID")] = None,
+        process_run_id: Annotated[Optional[StrictStr], Field(description="Process Run ID")] = None,
+        state: Annotated[Optional[WorkItemState], Field(description="Work item state filter")] = None,
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListWorkItems200Response:
         """List work items  # noqa: E501
 
         Returns a paginated list of work items. You can specify filtering work item by state, process_id and process_run_id using the query parameters.   # noqa: E501
@@ -562,10 +620,26 @@ class WorkItemApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_work_items_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_work_items_with_http_info(workspace_id, process_id, process_run_id, state, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_work_items_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_id : Annotated[Optional[StrictStr], Field(description="Process ID")] = None, process_run_id : Annotated[Optional[StrictStr], Field(description="Process Run ID")] = None, state : Annotated[Optional[WorkItemState], Field(description="Work item state filter")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_work_items_with_http_info.raw_function(
+            workspace_id,
+            process_id,
+            process_run_id,
+            state,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_work_items_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_id: Annotated[Optional[StrictStr], Field(description="Process ID")] = None,
+        process_run_id: Annotated[Optional[StrictStr], Field(description="Process Run ID")] = None,
+        state: Annotated[Optional[WorkItemState], Field(description="Work item state filter")] = None,
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List work items  # noqa: E501
 
         Returns a paginated list of work items. You can specify filtering work item by state, process_id and process_run_id using the query parameters.   # noqa: E501
@@ -641,16 +715,16 @@ class WorkItemApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('process_id') is not None:  # noqa: E501
             _query_params.append(('process_id', _params['process_id']))
 
@@ -666,8 +740,8 @@ class WorkItemApi:
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -675,9 +749,9 @@ class WorkItemApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListWorkItems200Response",
             '403': "GenericErrorResponse",
         }
@@ -699,8 +773,13 @@ class WorkItemApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def run_work_item_batch_operation(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], run_work_item_batch_operation_request : Annotated[RunWorkItemBatchOperationRequest, Field(..., description="Work item batch operation")], **kwargs) -> StopProcessRun200Response:  # noqa: E501
+    @validate_call
+    def run_work_item_batch_operation(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        run_work_item_batch_operation_request: Annotated[RunWorkItemBatchOperationRequest, Field(description="Work item batch operation")],
+        **kwargs,
+    ) -> StopProcessRun200Response:
         """Retry, delete or mark work items as done  # noqa: E501
 
         Run a batch operation on one or more work items. You can retry, delete or mark failed work items as done.   # noqa: E501
@@ -729,10 +808,20 @@ class WorkItemApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the run_work_item_batch_operation_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.run_work_item_batch_operation_with_http_info(workspace_id, run_work_item_batch_operation_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def run_work_item_batch_operation_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], run_work_item_batch_operation_request : Annotated[RunWorkItemBatchOperationRequest, Field(..., description="Work item batch operation")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.run_work_item_batch_operation_with_http_info.raw_function(
+            workspace_id,
+            run_work_item_batch_operation_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def run_work_item_batch_operation_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        run_work_item_batch_operation_request: Annotated[RunWorkItemBatchOperationRequest, Field(description="Work item batch operation")],
+        **kwargs,
+    ) -> ApiResponse:
         """Retry, delete or mark work items as done  # noqa: E501
 
         Run a batch operation on one or more work items. You can retry, delete or mark failed work items as done.   # noqa: E501
@@ -799,21 +888,21 @@ class WorkItemApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['run_work_item_batch_operation_request'] is not None:
@@ -831,9 +920,9 @@ class WorkItemApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "StopProcessRun200Response",
         }
 
@@ -854,8 +943,14 @@ class WorkItemApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def update_work_item_payload(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], update_work_item_payload_request : Annotated[UpdateWorkItemPayloadRequest, Field(..., description="The updated payload of work item")], **kwargs) -> UpdateWorkItemPayloadRequest:  # noqa: E501
+    @validate_call
+    def update_work_item_payload(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        work_item_id: Annotated[StrictStr, Field(description="Work Item ID")],
+        update_work_item_payload_request: Annotated[UpdateWorkItemPayloadRequest, Field(description="The updated payload of work item")],
+        **kwargs,
+    ) -> UpdateWorkItemPayloadRequest:
         """Update work item payload  # noqa: E501
 
         Update the payload for the requested work item.  # noqa: E501
@@ -886,10 +981,22 @@ class WorkItemApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the update_work_item_payload_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.update_work_item_payload_with_http_info(workspace_id, work_item_id, update_work_item_payload_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def update_work_item_payload_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], work_item_id : Annotated[StrictStr, Field(..., description="Work Item ID")], update_work_item_payload_request : Annotated[UpdateWorkItemPayloadRequest, Field(..., description="The updated payload of work item")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.update_work_item_payload_with_http_info.raw_function(
+            workspace_id,
+            work_item_id,
+            update_work_item_payload_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def update_work_item_payload_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        work_item_id: Annotated[StrictStr, Field(description="Work Item ID")],
+        update_work_item_payload_request: Annotated[UpdateWorkItemPayloadRequest, Field(description="The updated payload of work item")],
+        **kwargs,
+    ) -> ApiResponse:
         """Update work item payload  # noqa: E501
 
         Update the payload for the requested work item.  # noqa: E501
@@ -959,24 +1066,24 @@ class WorkItemApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['work_item_id']:
+        if _params['work_item_id'] is not None:
             _path_params['work_item_id'] = _params['work_item_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['update_work_item_payload_request'] is not None:
@@ -994,9 +1101,9 @@ class WorkItemApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "UpdateWorkItemPayloadRequest",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",

@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -50,8 +52,13 @@ class StepRunApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def get_step_run(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="ID of the step run")], **kwargs) -> StepRunResource:  # noqa: E501
+    @validate_call
+    def get_step_run(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="ID of the step run")],
+        **kwargs,
+    ) -> StepRunResource:
         """Get step run  # noqa: E501
 
         Returns a specific step run from a process run.  # noqa: E501
@@ -80,10 +87,20 @@ class StepRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_step_run_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_step_run_with_http_info(workspace_id, step_run_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_step_run_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="ID of the step run")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_step_run_with_http_info.raw_function(
+            workspace_id,
+            step_run_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_step_run_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="ID of the step run")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get step run  # noqa: E501
 
         Returns a specific step run from a process run.  # noqa: E501
@@ -150,24 +167,24 @@ class StepRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['step_run_id']:
+        if _params['step_run_id'] is not None:
             _path_params['step_run_id'] = _params['step_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -175,9 +192,9 @@ class StepRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "StepRunResource",
             '403': "GenericErrorResponse",
         }
@@ -199,8 +216,14 @@ class StepRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_step_run_artifact(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="ID of the step run")], artifact_id : Annotated[StrictStr, Field(..., description="ID of the artifact to retrieve")], **kwargs) -> GetStepRunArtifact200Response:  # noqa: E501
+    @validate_call
+    def get_step_run_artifact(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="ID of the step run")],
+        artifact_id: Annotated[StrictStr, Field(description="ID of the artifact to retrieve")],
+        **kwargs,
+    ) -> GetStepRunArtifact200Response:
         """Get step run artifact  # noqa: E501
 
         Returns a step run artifact.  # noqa: E501
@@ -231,10 +254,22 @@ class StepRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_step_run_artifact_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_step_run_artifact_with_http_info(workspace_id, step_run_id, artifact_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_step_run_artifact_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="ID of the step run")], artifact_id : Annotated[StrictStr, Field(..., description="ID of the artifact to retrieve")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_step_run_artifact_with_http_info.raw_function(
+            workspace_id,
+            step_run_id,
+            artifact_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_step_run_artifact_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="ID of the step run")],
+        artifact_id: Annotated[StrictStr, Field(description="ID of the artifact to retrieve")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get step run artifact  # noqa: E501
 
         Returns a step run artifact.  # noqa: E501
@@ -304,27 +339,27 @@ class StepRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['step_run_id']:
+        if _params['step_run_id'] is not None:
             _path_params['step_run_id'] = _params['step_run_id']
 
-        if _params['artifact_id']:
+        if _params['artifact_id'] is not None:
             _path_params['artifact_id'] = _params['artifact_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -332,9 +367,9 @@ class StepRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetStepRunArtifact200Response",
             '403': "GenericErrorResponse",
         }
@@ -356,8 +391,14 @@ class StepRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_step_run_artifacts(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="Step Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListStepRunArtifacts200Response:  # noqa: E501
+    @validate_call
+    def list_step_run_artifacts(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="Step Run ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListStepRunArtifacts200Response:
         """List step run artifacts  # noqa: E501
 
         Returns the list of all artifacts for a step run.  # noqa: E501
@@ -388,10 +429,22 @@ class StepRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_step_run_artifacts_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_step_run_artifacts_with_http_info(workspace_id, step_run_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_step_run_artifacts_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="Step Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_step_run_artifacts_with_http_info.raw_function(
+            workspace_id,
+            step_run_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_step_run_artifacts_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="Step Run ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List step run artifacts  # noqa: E501
 
         Returns the list of all artifacts for a step run.  # noqa: E501
@@ -461,27 +514,27 @@ class StepRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['step_run_id']:
+        if _params['step_run_id'] is not None:
             _path_params['step_run_id'] = _params['step_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -489,9 +542,9 @@ class StepRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListStepRunArtifacts200Response",
             '403': "GenericErrorResponse",
         }
@@ -513,8 +566,13 @@ class StepRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_step_run_console_messages(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="Step Run ID")], **kwargs) -> ListStepRunConsoleMessages200Response:  # noqa: E501
+    @validate_call
+    def list_step_run_console_messages(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="Step Run ID")],
+        **kwargs,
+    ) -> ListStepRunConsoleMessages200Response:
         """List step run console messages  # noqa: E501
 
         Returns a paginated list of console messages for the step run.  # noqa: E501
@@ -543,10 +601,20 @@ class StepRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_step_run_console_messages_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_step_run_console_messages_with_http_info(workspace_id, step_run_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_step_run_console_messages_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="Step Run ID")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_step_run_console_messages_with_http_info.raw_function(
+            workspace_id,
+            step_run_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_step_run_console_messages_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="Step Run ID")],
+        **kwargs,
+    ) -> ApiResponse:
         """List step run console messages  # noqa: E501
 
         Returns a paginated list of console messages for the step run.  # noqa: E501
@@ -613,24 +681,24 @@ class StepRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['step_run_id']:
+        if _params['step_run_id'] is not None:
             _path_params['step_run_id'] = _params['step_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -638,9 +706,9 @@ class StepRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListStepRunConsoleMessages200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -663,8 +731,14 @@ class StepRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_step_run_events(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="ID of the step run")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListStepRunEvents200Response:  # noqa: E501
+    @validate_call
+    def list_step_run_events(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="ID of the step run")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListStepRunEvents200Response:
         """List step run events  # noqa: E501
 
         Returns the events of a step run.  # noqa: E501
@@ -695,10 +769,22 @@ class StepRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_step_run_events_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_step_run_events_with_http_info(workspace_id, step_run_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_step_run_events_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], step_run_id : Annotated[StrictStr, Field(..., description="ID of the step run")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_step_run_events_with_http_info.raw_function(
+            workspace_id,
+            step_run_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_step_run_events_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        step_run_id: Annotated[StrictStr, Field(description="ID of the step run")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List step run events  # noqa: E501
 
         Returns the events of a step run.  # noqa: E501
@@ -768,27 +854,27 @@ class StepRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['step_run_id']:
+        if _params['step_run_id'] is not None:
             _path_params['step_run_id'] = _params['step_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -796,9 +882,9 @@ class StepRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListStepRunEvents200Response",
             '403': "GenericErrorResponse",
         }
@@ -820,8 +906,14 @@ class StepRunApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_step_runs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="Process Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListStepRuns200Response:  # noqa: E501
+    @validate_call
+    def list_step_runs(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_run_id: Annotated[StrictStr, Field(description="Process Run ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListStepRuns200Response:
         """List step runs  # noqa: E501
 
         Returns a paginated list of step runs.  # noqa: E501
@@ -852,10 +944,22 @@ class StepRunApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_step_runs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_step_runs_with_http_info(workspace_id, process_run_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_step_runs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], process_run_id : Annotated[StrictStr, Field(..., description="Process Run ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_step_runs_with_http_info.raw_function(
+            workspace_id,
+            process_run_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_step_runs_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        process_run_id: Annotated[StrictStr, Field(description="Process Run ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List step runs  # noqa: E501
 
         Returns a paginated list of step runs.  # noqa: E501
@@ -925,16 +1029,16 @@ class StepRunApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('process_run_id') is not None:  # noqa: E501
             _query_params.append(('process_run_id', _params['process_run_id']))
 
@@ -944,8 +1048,8 @@ class StepRunApi:
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -953,9 +1057,9 @@ class StepRunApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListStepRuns200Response",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",

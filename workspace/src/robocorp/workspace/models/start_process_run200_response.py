@@ -19,11 +19,16 @@ import pprint
 import re  # noqa: F401
 
 from typing import Any, List, Optional
-from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
+from pydantic import BaseModel, Field, StrictStr, ValidationError, field_validator
 from robocorp.workspace.models.start_process_run200_response_one_of import StartProcessRun200ResponseOneOf
 from robocorp.workspace.models.start_process_run_qs_auth200_response import StartProcessRunQsAuth200Response
-from typing import Union, Any, List, TYPE_CHECKING
+from typing import Union, Any, List, TYPE_CHECKING, Optional, Dict
+from typing_extensions import Literal
 from pydantic import StrictStr, Field
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 STARTPROCESSRUN200RESPONSE_ONE_OF_SCHEMAS = ["StartProcessRun200ResponseOneOf", "StartProcessRunQsAuth200Response"]
 
@@ -35,14 +40,13 @@ class StartProcessRun200Response(BaseModel):
     oneof_schema_1_validator: Optional[StartProcessRun200ResponseOneOf] = None
     # data type: StartProcessRunQsAuth200Response
     oneof_schema_2_validator: Optional[StartProcessRunQsAuth200Response] = None
-    if TYPE_CHECKING:
-        actual_instance: Union[StartProcessRun200ResponseOneOf, StartProcessRunQsAuth200Response]
-    else:
-        actual_instance: Any
-    one_of_schemas: List[str] = Field(STARTPROCESSRUN200RESPONSE_ONE_OF_SCHEMAS, const=True)
+    actual_instance: Optional[Union[StartProcessRun200ResponseOneOf, StartProcessRunQsAuth200Response]] = None
+    one_of_schemas: List[str] = Literal["StartProcessRun200ResponseOneOf", "StartProcessRunQsAuth200Response"]
 
-    class Config:
-        validate_assignment = True
+    model_config = {
+        "validate_assignment": True
+    }
+
 
     def __init__(self, *args, **kwargs) -> None:
         if args:
@@ -54,9 +58,9 @@ class StartProcessRun200Response(BaseModel):
         else:
             super().__init__(**kwargs)
 
-    @validator('actual_instance')
+    @field_validator('actual_instance')
     def actual_instance_must_validate_oneof(cls, v):
-        instance = StartProcessRun200Response.construct()
+        instance = StartProcessRun200Response.model_construct()
         error_messages = []
         match = 0
         # validate data type: StartProcessRun200ResponseOneOf
@@ -79,13 +83,13 @@ class StartProcessRun200Response(BaseModel):
             return v
 
     @classmethod
-    def from_dict(cls, obj: dict) -> StartProcessRun200Response:
+    def from_dict(cls, obj: dict) -> Self:
         return cls.from_json(json.dumps(obj))
 
     @classmethod
-    def from_json(cls, json_str: str) -> StartProcessRun200Response:
+    def from_json(cls, json_str: str) -> Self:
         """Returns the object represented by the json string"""
-        instance = StartProcessRun200Response.construct()
+        instance = cls.model_construct()
         error_messages = []
         match = 0
 
@@ -136,6 +140,6 @@ class StartProcessRun200Response(BaseModel):
 
     def to_str(self) -> str:
         """Returns the string representation of the actual instance"""
-        return pprint.pformat(self.dict())
+        return pprint.pformat(self.model_dump())
 
 

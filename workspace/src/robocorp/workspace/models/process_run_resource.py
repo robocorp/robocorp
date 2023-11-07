@@ -19,55 +19,73 @@ import json
 
 from datetime import datetime
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, validator
+from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr, field_validator
+from pydantic import Field
 from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 from robocorp.workspace.models.process_run_resource_started_by import ProcessRunResourceStartedBy
+from typing import Dict, Any
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 class ProcessRunResource(BaseModel):
     """
     ProcessRunResource
     """
-    id: StrictStr = Field(...)
-    state: StrictStr = Field(...)
-    created_at: datetime = Field(...)
-    started_at: Optional[datetime] = Field(...)
-    ended_at: Optional[datetime] = Field(...)
-    process: ListAssets200ResponseDataInner = Field(...)
-    started_by: ProcessRunResourceStartedBy = Field(...)
-    duration: Optional[Union[StrictFloat, StrictInt]] = Field(..., description="Process run duration in seconds")
-    __properties = ["id", "state", "created_at", "started_at", "ended_at", "process", "started_by", "duration"]
+    id: StrictStr
+    state: StrictStr
+    created_at: datetime
+    started_at: Optional[datetime]
+    ended_at: Optional[datetime]
+    process: ListAssets200ResponseDataInner
+    started_by: ProcessRunResourceStartedBy
+    duration: Optional[Union[StrictFloat, StrictInt]] = Field(description="Process run duration in seconds")
+    __properties: ClassVar[List[str]] = ["id", "state", "created_at", "started_at", "ended_at", "process", "started_by", "duration"]
 
-    @validator('state')
+    @field_validator('state')
     def state_validate_enum(cls, value):
         """Validates the enum"""
         if value not in ('new', 'in_progress', 'completed', 'unresolved', 'stopping'):
             raise ValueError("must be one of enum values ('new', 'in_progress', 'completed', 'unresolved', 'stopping')")
         return value
 
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = {
+        "populate_by_name": True,
+        "validate_assignment": True
+    }
+
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.dict(by_alias=True))
+        return pprint.pformat(self.model_dump(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
+        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> ProcessRunResource:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of ProcessRunResource from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self):
-        """Returns the dictionary representation of the model using alias"""
-        _dict = self.dict(by_alias=True,
-                          exclude={
-                          },
-                          exclude_none=True)
+    def to_dict(self) -> Dict[str, Any]:
+        """Return the dictionary representation of the model using alias.
+
+        This has the following differences from calling pydantic's
+        `self.model_dump(by_alias=True)`:
+
+        * `None` is only added to the output dict for nullable fields that
+          were set at model initialization. Other fields with value `None`
+          are ignored.
+        """
+        _dict = self.model_dump(
+            by_alias=True,
+            exclude={
+            },
+            exclude_none=True,
+        )
         # override the default output from pydantic by calling `to_dict()` of process
         if self.process:
             _dict['process'] = self.process.to_dict()
@@ -75,32 +93,32 @@ class ProcessRunResource(BaseModel):
         if self.started_by:
             _dict['started_by'] = self.started_by.to_dict()
         # set to None if started_at (nullable) is None
-        # and __fields_set__ contains the field
-        if self.started_at is None and "started_at" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.started_at is None and "started_at" in self.model_fields_set:
             _dict['started_at'] = None
 
         # set to None if ended_at (nullable) is None
-        # and __fields_set__ contains the field
-        if self.ended_at is None and "ended_at" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.ended_at is None and "ended_at" in self.model_fields_set:
             _dict['ended_at'] = None
 
         # set to None if duration (nullable) is None
-        # and __fields_set__ contains the field
-        if self.duration is None and "duration" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.duration is None and "duration" in self.model_fields_set:
             _dict['duration'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> ProcessRunResource:
+    def from_dict(cls, obj: dict) -> Self:
         """Create an instance of ProcessRunResource from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return ProcessRunResource.parse_obj(obj)
+            return cls.model_validate(obj)
 
-        _obj = ProcessRunResource.parse_obj({
+        _obj = cls.model_validate({
             "id": obj.get("id"),
             "state": obj.get("state"),
             "created_at": obj.get("created_at"),

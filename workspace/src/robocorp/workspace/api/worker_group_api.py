@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -53,8 +55,14 @@ class WorkerGroupApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def add_worker_to_group(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to add the worker to")], add_worker_to_group_request : Annotated[AddWorkerToGroupRequest, Field(..., description="The id of the worker to add to the worker group ")], **kwargs) -> WorkerToGroupLinkListing:  # noqa: E501
+    @validate_call
+    def add_worker_to_group(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to add the worker to")],
+        add_worker_to_group_request: Annotated[AddWorkerToGroupRequest, Field(description="The id of the worker to add to the worker group ")],
+        **kwargs,
+    ) -> WorkerToGroupLinkListing:
         """Add worker to worker group  # noqa: E501
 
         Adds an existing worker to the requested worker group.  # noqa: E501
@@ -85,10 +93,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the add_worker_to_group_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.add_worker_to_group_with_http_info(workspace_id, worker_group_id, add_worker_to_group_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def add_worker_to_group_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to add the worker to")], add_worker_to_group_request : Annotated[AddWorkerToGroupRequest, Field(..., description="The id of the worker to add to the worker group ")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.add_worker_to_group_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            add_worker_to_group_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def add_worker_to_group_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to add the worker to")],
+        add_worker_to_group_request: Annotated[AddWorkerToGroupRequest, Field(description="The id of the worker to add to the worker group ")],
+        **kwargs,
+    ) -> ApiResponse:
         """Add worker to worker group  # noqa: E501
 
         Adds an existing worker to the requested worker group.  # noqa: E501
@@ -158,24 +178,24 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['add_worker_to_group_request'] is not None:
@@ -193,9 +213,9 @@ class WorkerGroupApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerToGroupLinkListing",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -218,8 +238,13 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def create_worker_group(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace under which the worker group should be created.")], update_worker_request : Annotated[UpdateWorkerRequest, Field(..., description="The name of the worker group to create")], **kwargs) -> WorkerGroupResource:  # noqa: E501
+    @validate_call
+    def create_worker_group(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace under which the worker group should be created.")],
+        update_worker_request: Annotated[UpdateWorkerRequest, Field(description="The name of the worker group to create")],
+        **kwargs,
+    ) -> WorkerGroupResource:
         """Create worker group  # noqa: E501
 
         Creates a new worker group linked to the requested workspace.  # noqa: E501
@@ -248,10 +273,20 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_worker_group_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_worker_group_with_http_info(workspace_id, update_worker_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_worker_group_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace under which the worker group should be created.")], update_worker_request : Annotated[UpdateWorkerRequest, Field(..., description="The name of the worker group to create")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_worker_group_with_http_info.raw_function(
+            workspace_id,
+            update_worker_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_worker_group_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace under which the worker group should be created.")],
+        update_worker_request: Annotated[UpdateWorkerRequest, Field(description="The name of the worker group to create")],
+        **kwargs,
+    ) -> ApiResponse:
         """Create worker group  # noqa: E501
 
         Creates a new worker group linked to the requested workspace.  # noqa: E501
@@ -318,21 +353,21 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['update_worker_request'] is not None:
@@ -350,9 +385,9 @@ class WorkerGroupApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerGroupResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -375,8 +410,14 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def create_worker_group_link_token(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], create_worker_group_link_token_request : Annotated[CreateWorkerGroupLinkTokenRequest, Field(..., description="The name of the worker group link token to create ")], **kwargs) -> WorkerGroupLinkTokenResource:  # noqa: E501
+    @validate_call
+    def create_worker_group_link_token(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        create_worker_group_link_token_request: Annotated[CreateWorkerGroupLinkTokenRequest, Field(description="The name of the worker group link token to create ")],
+        **kwargs,
+    ) -> WorkerGroupLinkTokenResource:
         """Create worker group link token  # noqa: E501
 
         Generates and returns a link token used to link a worker to the requested worker group. **Note:** For security reasons, the link token value can be retrieved in Control Room only.   # noqa: E501
@@ -407,10 +448,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_worker_group_link_token_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_worker_group_link_token_with_http_info(workspace_id, worker_group_id, create_worker_group_link_token_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_worker_group_link_token_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], create_worker_group_link_token_request : Annotated[CreateWorkerGroupLinkTokenRequest, Field(..., description="The name of the worker group link token to create ")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_worker_group_link_token_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            create_worker_group_link_token_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_worker_group_link_token_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        create_worker_group_link_token_request: Annotated[CreateWorkerGroupLinkTokenRequest, Field(description="The name of the worker group link token to create ")],
+        **kwargs,
+    ) -> ApiResponse:
         """Create worker group link token  # noqa: E501
 
         Generates and returns a link token used to link a worker to the requested worker group. **Note:** For security reasons, the link token value can be retrieved in Control Room only.   # noqa: E501
@@ -480,24 +533,24 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['create_worker_group_link_token_request'] is not None:
@@ -515,9 +568,9 @@ class WorkerGroupApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerGroupLinkTokenResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -540,8 +593,13 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def delete_worker_group(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to delete.")], **kwargs) -> DeleteWorker200Response:  # noqa: E501
+    @validate_call
+    def delete_worker_group(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to delete.")],
+        **kwargs,
+    ) -> DeleteWorker200Response:
         """Delete worker group  # noqa: E501
 
         Deletes the requested worker group. This action is irreversible!  # noqa: E501
@@ -570,10 +628,20 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the delete_worker_group_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.delete_worker_group_with_http_info(workspace_id, worker_group_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def delete_worker_group_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to delete.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.delete_worker_group_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def delete_worker_group_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to delete.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Delete worker group  # noqa: E501
 
         Deletes the requested worker group. This action is irreversible!  # noqa: E501
@@ -640,24 +708,24 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -665,9 +733,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "DeleteWorker200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -690,8 +758,14 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def delete_worker_group_link_token(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], link_token_id : Annotated[StrictStr, Field(..., description="The id of the worker group link token to delete.")], **kwargs) -> DeleteWorker200Response:  # noqa: E501
+    @validate_call
+    def delete_worker_group_link_token(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        link_token_id: Annotated[StrictStr, Field(description="The id of the worker group link token to delete.")],
+        **kwargs,
+    ) -> DeleteWorker200Response:
         """Delete worker group link token  # noqa: E501
 
         Deletes the requested link token. This action is irreversible!  # noqa: E501
@@ -722,10 +796,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the delete_worker_group_link_token_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.delete_worker_group_link_token_with_http_info(workspace_id, worker_group_id, link_token_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def delete_worker_group_link_token_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], link_token_id : Annotated[StrictStr, Field(..., description="The id of the worker group link token to delete.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.delete_worker_group_link_token_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            link_token_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def delete_worker_group_link_token_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        link_token_id: Annotated[StrictStr, Field(description="The id of the worker group link token to delete.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Delete worker group link token  # noqa: E501
 
         Deletes the requested link token. This action is irreversible!  # noqa: E501
@@ -795,27 +881,27 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
-        if _params['link_token_id']:
+        if _params['link_token_id'] is not None:
             _path_params['link_token_id'] = _params['link_token_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -823,9 +909,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "DeleteWorker200Response",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -849,8 +935,13 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_worker_group(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to retrieve.")], **kwargs) -> WorkerGroupResource:  # noqa: E501
+    @validate_call
+    def get_worker_group(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to retrieve.")],
+        **kwargs,
+    ) -> WorkerGroupResource:
         """Get worker group  # noqa: E501
 
         Returns a worker group linked to the requested workspace.  # noqa: E501
@@ -879,10 +970,20 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_worker_group_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_worker_group_with_http_info(workspace_id, worker_group_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_worker_group_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to retrieve.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_worker_group_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_worker_group_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to retrieve.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get worker group  # noqa: E501
 
         Returns a worker group linked to the requested workspace.  # noqa: E501
@@ -949,24 +1050,24 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -974,9 +1075,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerGroupResource",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -999,8 +1100,14 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_worker_group_link_token(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], link_token_id : Annotated[StrictStr, Field(..., description="The id of the worker group link token to retrieve.")], **kwargs) -> WorkerGroupLinkTokenResource:  # noqa: E501
+    @validate_call
+    def get_worker_group_link_token(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        link_token_id: Annotated[StrictStr, Field(description="The id of the worker group link token to retrieve.")],
+        **kwargs,
+    ) -> WorkerGroupLinkTokenResource:
         """Get worker group link token  # noqa: E501
 
         Returns a link token for the requested work group. **Note**: For security reasons, the Link Token value can be retrieved in Control Room only.   # noqa: E501
@@ -1031,10 +1138,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_worker_group_link_token_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_worker_group_link_token_with_http_info(workspace_id, worker_group_id, link_token_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_worker_group_link_token_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], link_token_id : Annotated[StrictStr, Field(..., description="The id of the worker group link token to retrieve.")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_worker_group_link_token_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            link_token_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_worker_group_link_token_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        link_token_id: Annotated[StrictStr, Field(description="The id of the worker group link token to retrieve.")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get worker group link token  # noqa: E501
 
         Returns a link token for the requested work group. **Note**: For security reasons, the Link Token value can be retrieved in Control Room only.   # noqa: E501
@@ -1104,27 +1223,27 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
-        if _params['link_token_id']:
+        if _params['link_token_id'] is not None:
             _path_params['link_token_id'] = _params['link_token_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -1132,9 +1251,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerGroupLinkTokenResource",
             '403': "GenericErrorResponse",
         }
@@ -1156,8 +1275,14 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_worker_group_link_tokens(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link tokens belong.")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListWorkerGroupLinkTokens200Response:  # noqa: E501
+    @validate_call
+    def list_worker_group_link_tokens(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link tokens belong.")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListWorkerGroupLinkTokens200Response:
         """List worker group link tokens  # noqa: E501
 
         Returns a list of all link tokens for the requested worker group. **Note:** For security reasons, the link token value can be retrieved in Control Room only.   # noqa: E501
@@ -1188,10 +1313,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_worker_group_link_tokens_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_worker_group_link_tokens_with_http_info(workspace_id, worker_group_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_worker_group_link_tokens_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link tokens belong.")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_worker_group_link_tokens_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_worker_group_link_tokens_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link tokens belong.")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List worker group link tokens  # noqa: E501
 
         Returns a list of all link tokens for the requested worker group. **Note:** For security reasons, the link token value can be retrieved in Control Room only.   # noqa: E501
@@ -1261,27 +1398,27 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -1289,9 +1426,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListWorkerGroupLinkTokens200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -1314,8 +1451,13 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_worker_groups(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace to list worker groups for")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListWorkerGroups200Response:  # noqa: E501
+    @validate_call
+    def list_worker_groups(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace to list worker groups for")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListWorkerGroups200Response:
         """List worker groups  # noqa: E501
 
         Returns a list of all worker groups linked to the requested workspace.  # noqa: E501
@@ -1344,10 +1486,20 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_worker_groups_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_worker_groups_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_worker_groups_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace to list worker groups for")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_worker_groups_with_http_info.raw_function(
+            workspace_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_worker_groups_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace to list worker groups for")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List worker groups  # noqa: E501
 
         Returns a list of all worker groups linked to the requested workspace.  # noqa: E501
@@ -1414,24 +1566,24 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -1439,9 +1591,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListWorkerGroups200Response",
             '403': "GenericErrorResponse",
         }
@@ -1463,8 +1615,14 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def remove_worker_from_group(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to remove the worker from")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to remove from the worker group")], **kwargs) -> WorkerToGroupLinkListing:  # noqa: E501
+    @validate_call
+    def remove_worker_from_group(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to remove the worker from")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to remove from the worker group")],
+        **kwargs,
+    ) -> WorkerToGroupLinkListing:
         """Remove worker from worker group  # noqa: E501
 
         Removes an existing worker from the requested worker group.  # noqa: E501
@@ -1495,10 +1653,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the remove_worker_from_group_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.remove_worker_from_group_with_http_info(workspace_id, worker_group_id, worker_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def remove_worker_from_group_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to remove the worker from")], worker_id : Annotated[StrictStr, Field(..., description="The id of the worker to remove from the worker group")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.remove_worker_from_group_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            worker_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def remove_worker_from_group_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to remove the worker from")],
+        worker_id: Annotated[StrictStr, Field(description="The id of the worker to remove from the worker group")],
+        **kwargs,
+    ) -> ApiResponse:
         """Remove worker from worker group  # noqa: E501
 
         Removes an existing worker from the requested worker group.  # noqa: E501
@@ -1568,27 +1738,27 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
-        if _params['worker_id']:
+        if _params['worker_id'] is not None:
             _path_params['worker_id'] = _params['worker_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -1596,9 +1766,9 @@ class WorkerGroupApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerToGroupLinkListing",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -1621,8 +1791,14 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def update_worker_group(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to update.")], update_worker_request : Annotated[UpdateWorkerRequest, Field(..., description="The worker group details to update")], **kwargs) -> WorkerGroupResource:  # noqa: E501
+    @validate_call
+    def update_worker_group(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to update.")],
+        update_worker_request: Annotated[UpdateWorkerRequest, Field(description="The worker group details to update")],
+        **kwargs,
+    ) -> WorkerGroupResource:
         """Update worker group  # noqa: E501
 
         Updates the requested worker group by setting only the values defined in the request body.  # noqa: E501
@@ -1653,10 +1829,22 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the update_worker_group_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.update_worker_group_with_http_info(workspace_id, worker_group_id, update_worker_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def update_worker_group_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to update.")], update_worker_request : Annotated[UpdateWorkerRequest, Field(..., description="The worker group details to update")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.update_worker_group_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            update_worker_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def update_worker_group_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to update.")],
+        update_worker_request: Annotated[UpdateWorkerRequest, Field(description="The worker group details to update")],
+        **kwargs,
+    ) -> ApiResponse:
         """Update worker group  # noqa: E501
 
         Updates the requested worker group by setting only the values defined in the request body.  # noqa: E501
@@ -1726,24 +1914,24 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['update_worker_request'] is not None:
@@ -1761,9 +1949,9 @@ class WorkerGroupApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerGroupResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -1787,8 +1975,15 @@ class WorkerGroupApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def update_worker_group_link_token(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], link_token_id : Annotated[StrictStr, Field(..., description="The id of the worker group link token to update.")], create_worker_group_link_token_request : Annotated[CreateWorkerGroupLinkTokenRequest, Field(..., description="The name of the worker group link token to update")], **kwargs) -> WorkerGroupLinkTokenResource:  # noqa: E501
+    @validate_call
+    def update_worker_group_link_token(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        link_token_id: Annotated[StrictStr, Field(description="The id of the worker group link token to update.")],
+        create_worker_group_link_token_request: Annotated[CreateWorkerGroupLinkTokenRequest, Field(description="The name of the worker group link token to update")],
+        **kwargs,
+    ) -> WorkerGroupLinkTokenResource:
         """Update worker group link token  # noqa: E501
 
         Updates a link token by setting only the values defined in the request body.  # noqa: E501
@@ -1821,10 +2016,24 @@ class WorkerGroupApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the update_worker_group_link_token_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.update_worker_group_link_token_with_http_info(workspace_id, worker_group_id, link_token_id, create_worker_group_link_token_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def update_worker_group_link_token_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The id of the workspace on which the worker group resides.")], worker_group_id : Annotated[StrictStr, Field(..., description="The id of the worker group to which the link token belongs.")], link_token_id : Annotated[StrictStr, Field(..., description="The id of the worker group link token to update.")], create_worker_group_link_token_request : Annotated[CreateWorkerGroupLinkTokenRequest, Field(..., description="The name of the worker group link token to update")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.update_worker_group_link_token_with_http_info.raw_function(
+            workspace_id,
+            worker_group_id,
+            link_token_id,
+            create_worker_group_link_token_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def update_worker_group_link_token_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The id of the workspace on which the worker group resides.")],
+        worker_group_id: Annotated[StrictStr, Field(description="The id of the worker group to which the link token belongs.")],
+        link_token_id: Annotated[StrictStr, Field(description="The id of the worker group link token to update.")],
+        create_worker_group_link_token_request: Annotated[CreateWorkerGroupLinkTokenRequest, Field(description="The name of the worker group link token to update")],
+        **kwargs,
+    ) -> ApiResponse:
         """Update worker group link token  # noqa: E501
 
         Updates a link token by setting only the values defined in the request body.  # noqa: E501
@@ -1897,27 +2106,27 @@ class WorkerGroupApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['worker_group_id']:
+        if _params['worker_group_id'] is not None:
             _path_params['worker_group_id'] = _params['worker_group_id']
 
-        if _params['link_token_id']:
+        if _params['link_token_id'] is not None:
             _path_params['link_token_id'] = _params['link_token_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['create_worker_group_link_token_request'] is not None:
@@ -1935,9 +2144,9 @@ class WorkerGroupApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WorkerGroupLinkTokenResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",

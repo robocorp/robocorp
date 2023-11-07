@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -50,8 +52,13 @@ class AssistantApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def create_assistant(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], create_assistant_request : CreateAssistantRequest, **kwargs) -> ListAssets200ResponseDataInner:  # noqa: E501
+    @validate_call
+    def create_assistant(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        create_assistant_request: CreateAssistantRequest,
+        **kwargs,
+    ) -> ListAssets200ResponseDataInner:
         """Create assistant  # noqa: E501
 
         Creates a new assistant with the given name and for the specified task inside a task package.  # noqa: E501
@@ -80,10 +87,20 @@ class AssistantApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_assistant_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_assistant_with_http_info(workspace_id, create_assistant_request, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_assistant_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], create_assistant_request : CreateAssistantRequest, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_assistant_with_http_info.raw_function(
+            workspace_id,
+            create_assistant_request,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_assistant_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        create_assistant_request: CreateAssistantRequest,
+        **kwargs,
+    ) -> ApiResponse:
         """Create assistant  # noqa: E501
 
         Creates a new assistant with the given name and for the specified task inside a task package.  # noqa: E501
@@ -150,21 +167,21 @@ class AssistantApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['create_assistant_request'] is not None:
@@ -182,9 +199,9 @@ class AssistantApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListAssets200ResponseDataInner",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -209,8 +226,13 @@ class AssistantApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_assistant(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[StrictStr, Field(..., description="Assistant ID")], **kwargs) -> GetAssistant200Response:  # noqa: E501
+    @validate_call
+    def get_assistant(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        assistant_id: Annotated[StrictStr, Field(description="Assistant ID")],
+        **kwargs,
+    ) -> GetAssistant200Response:
         """Get assistant  # noqa: E501
 
         Returns an assistant  # noqa: E501
@@ -239,10 +261,20 @@ class AssistantApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_assistant_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_assistant_with_http_info(workspace_id, assistant_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_assistant_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[StrictStr, Field(..., description="Assistant ID")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_assistant_with_http_info.raw_function(
+            workspace_id,
+            assistant_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_assistant_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        assistant_id: Annotated[StrictStr, Field(description="Assistant ID")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get assistant  # noqa: E501
 
         Returns an assistant  # noqa: E501
@@ -309,24 +341,24 @@ class AssistantApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['assistant_id']:
+        if _params['assistant_id'] is not None:
             _path_params['assistant_id'] = _params['assistant_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -334,9 +366,9 @@ class AssistantApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "GetAssistant200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -359,8 +391,13 @@ class AssistantApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_assistant_run(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_run_id : Annotated[StrictStr, Field(..., description="Assistant Run ID")], **kwargs) -> AssistantRunResource:  # noqa: E501
+    @validate_call
+    def get_assistant_run(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        assistant_run_id: Annotated[StrictStr, Field(description="Assistant Run ID")],
+        **kwargs,
+    ) -> AssistantRunResource:
         """Get assistant run  # noqa: E501
 
         Returns an assistant run for the requested assistant.  # noqa: E501
@@ -389,10 +426,20 @@ class AssistantApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_assistant_run_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_assistant_run_with_http_info(workspace_id, assistant_run_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_assistant_run_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_run_id : Annotated[StrictStr, Field(..., description="Assistant Run ID")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_assistant_run_with_http_info.raw_function(
+            workspace_id,
+            assistant_run_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_assistant_run_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        assistant_run_id: Annotated[StrictStr, Field(description="Assistant Run ID")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get assistant run  # noqa: E501
 
         Returns an assistant run for the requested assistant.  # noqa: E501
@@ -459,24 +506,24 @@ class AssistantApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['assistant_run_id']:
+        if _params['assistant_run_id'] is not None:
             _path_params['assistant_run_id'] = _params['assistant_run_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -484,9 +531,9 @@ class AssistantApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "AssistantRunResource",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -509,8 +556,14 @@ class AssistantApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_assistant_runs(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[Optional[StrictStr], Field(description="Assistant ID. If specified, the response will only contain assistant runs for that assistant.")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListAssistantRuns200Response:  # noqa: E501
+    @validate_call
+    def list_assistant_runs(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        assistant_id: Annotated[Optional[StrictStr], Field(description="Assistant ID. If specified, the response will only contain assistant runs for that assistant.")] = None,
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListAssistantRuns200Response:
         """List assistant runs  # noqa: E501
 
         Returns a paginated list of assistant runs. If an assistant id is specified, the response will only contain assistant runs for that assistant, otherwise it will return the assistant runs for all assistants in the workspace.  # noqa: E501
@@ -541,10 +594,22 @@ class AssistantApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_assistant_runs_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_assistant_runs_with_http_info(workspace_id, assistant_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_assistant_runs_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], assistant_id : Annotated[Optional[StrictStr], Field(description="Assistant ID. If specified, the response will only contain assistant runs for that assistant.")] = None, limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_assistant_runs_with_http_info.raw_function(
+            workspace_id,
+            assistant_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_assistant_runs_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        assistant_id: Annotated[Optional[StrictStr], Field(description="Assistant ID. If specified, the response will only contain assistant runs for that assistant.")] = None,
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List assistant runs  # noqa: E501
 
         Returns a paginated list of assistant runs. If an assistant id is specified, the response will only contain assistant runs for that assistant, otherwise it will return the assistant runs for all assistants in the workspace.  # noqa: E501
@@ -614,16 +679,16 @@ class AssistantApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('assistant_id') is not None:  # noqa: E501
             _query_params.append(('assistant_id', _params['assistant_id']))
 
@@ -633,8 +698,8 @@ class AssistantApi:
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -642,9 +707,9 @@ class AssistantApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListAssistantRuns200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -667,8 +732,13 @@ class AssistantApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_assistants(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListAssistants200Response:  # noqa: E501
+    @validate_call
+    def list_assistants(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListAssistants200Response:
         """List assistants  # noqa: E501
 
         Returns a paginated list of assistants for the workspace.  # noqa: E501
@@ -697,10 +767,20 @@ class AssistantApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_assistants_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_assistants_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_assistants_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_assistants_with_http_info.raw_function(
+            workspace_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_assistants_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List assistants  # noqa: E501
 
         Returns a paginated list of assistants for the workspace.  # noqa: E501
@@ -767,24 +847,24 @@ class AssistantApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -792,9 +872,9 @@ class AssistantApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListAssistants200Response",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",

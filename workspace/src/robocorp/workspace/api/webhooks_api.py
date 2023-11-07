@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -48,8 +50,13 @@ class WebhooksApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def create_webhook(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], process_webhook_payload : ProcessWebhookPayload, **kwargs) -> WebhookResource:  # noqa: E501
+    @validate_call
+    def create_webhook(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        process_webhook_payload: ProcessWebhookPayload,
+        **kwargs,
+    ) -> WebhookResource:
         """Create Process webhook  # noqa: E501
 
         Creates a process webhook for the requested workspace.  # noqa: E501
@@ -78,10 +85,20 @@ class WebhooksApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the create_webhook_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.create_webhook_with_http_info(workspace_id, process_webhook_payload, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def create_webhook_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], process_webhook_payload : ProcessWebhookPayload, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.create_webhook_with_http_info.raw_function(
+            workspace_id,
+            process_webhook_payload,
+            **kwargs,
+        )
+
+    @validate_call
+    def create_webhook_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        process_webhook_payload: ProcessWebhookPayload,
+        **kwargs,
+    ) -> ApiResponse:
         """Create Process webhook  # noqa: E501
 
         Creates a process webhook for the requested workspace.  # noqa: E501
@@ -148,21 +165,21 @@ class WebhooksApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         if _params['process_webhook_payload'] is not None:
@@ -180,9 +197,9 @@ class WebhooksApi:
                 _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WebhookResource",
             '400': "GenericErrorResponse",
             '403': "GenericErrorResponse",
@@ -205,8 +222,13 @@ class WebhooksApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def delete_webhook(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], webhook_id : Annotated[StrictStr, Field(..., description="The ID of the webhook")], **kwargs) -> DeleteWorker200Response:  # noqa: E501
+    @validate_call
+    def delete_webhook(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        webhook_id: Annotated[StrictStr, Field(description="The ID of the webhook")],
+        **kwargs,
+    ) -> DeleteWorker200Response:
         """Delete webhook  # noqa: E501
 
         Deletes the requested webhook. This action is irreversible!  # noqa: E501
@@ -235,10 +257,20 @@ class WebhooksApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the delete_webhook_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.delete_webhook_with_http_info(workspace_id, webhook_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def delete_webhook_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], webhook_id : Annotated[StrictStr, Field(..., description="The ID of the webhook")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.delete_webhook_with_http_info.raw_function(
+            workspace_id,
+            webhook_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def delete_webhook_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        webhook_id: Annotated[StrictStr, Field(description="The ID of the webhook")],
+        **kwargs,
+    ) -> ApiResponse:
         """Delete webhook  # noqa: E501
 
         Deletes the requested webhook. This action is irreversible!  # noqa: E501
@@ -305,24 +337,24 @@ class WebhooksApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['webhook_id']:
+        if _params['webhook_id'] is not None:
             _path_params['webhook_id'] = _params['webhook_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -330,9 +362,9 @@ class WebhooksApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "DeleteWorker200Response",
             '403': "GenericErrorResponse",
         }
@@ -354,8 +386,13 @@ class WebhooksApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def get_webhook(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], webhook_id : Annotated[StrictStr, Field(..., description="The ID of the webhook")], **kwargs) -> WebhookResource:  # noqa: E501
+    @validate_call
+    def get_webhook(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        webhook_id: Annotated[StrictStr, Field(description="The ID of the webhook")],
+        **kwargs,
+    ) -> WebhookResource:
         """Get Webhook  # noqa: E501
 
         Returns a webhook for the requested workspace.  # noqa: E501
@@ -384,10 +421,20 @@ class WebhooksApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the get_webhook_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.get_webhook_with_http_info(workspace_id, webhook_id, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def get_webhook_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], webhook_id : Annotated[StrictStr, Field(..., description="The ID of the webhook")], **kwargs) -> ApiResponse:  # noqa: E501
+        return self.get_webhook_with_http_info.raw_function(
+            workspace_id,
+            webhook_id,
+            **kwargs,
+        )
+
+    @validate_call
+    def get_webhook_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        webhook_id: Annotated[StrictStr, Field(description="The ID of the webhook")],
+        **kwargs,
+    ) -> ApiResponse:
         """Get Webhook  # noqa: E501
 
         Returns a webhook for the requested workspace.  # noqa: E501
@@ -454,24 +501,24 @@ class WebhooksApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
-        if _params['webhook_id']:
+        if _params['webhook_id'] is not None:
             _path_params['webhook_id'] = _params['webhook_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -479,9 +526,9 @@ class WebhooksApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "WebhookResource",
             '403': "GenericErrorResponse",
             '404': "GenericErrorResponse",
@@ -504,8 +551,13 @@ class WebhooksApi:
             collection_formats=_collection_formats,
             _request_auth=_params.get('_request_auth'))
 
-    @validate_arguments
-    def list_webhooks(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListWebhooks200Response:  # noqa: E501
+    @validate_call
+    def list_webhooks(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListWebhooks200Response:
         """List Webhooks  # noqa: E501
 
         Retrieves a list of all webhooks for the requested workspace.  # noqa: E501
@@ -534,10 +586,20 @@ class WebhooksApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_webhooks_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_webhooks_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_webhooks_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="The ID of the workspace")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_webhooks_with_http_info.raw_function(
+            workspace_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_webhooks_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="The ID of the workspace")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List Webhooks  # noqa: E501
 
         Retrieves a list of all webhooks for the requested workspace.  # noqa: E501
@@ -604,24 +666,24 @@ class WebhooksApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -629,9 +691,9 @@ class WebhooksApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListWebhooks200Response",
             '403': "GenericErrorResponse",
         }

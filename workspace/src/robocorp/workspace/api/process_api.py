@@ -16,10 +16,12 @@ import re  # noqa: F401
 import io
 import warnings
 
-from pydantic import validate_arguments, ValidationError
+from pydantic import validate_call, ValidationError
+from typing import Dict, List, Optional, Tuple
 
+from pydantic import Field
 from typing_extensions import Annotated
-from pydantic import Field, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictFloat, StrictInt, StrictStr
 
 from typing import Optional, Union
 
@@ -45,8 +47,13 @@ class ProcessApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
-    @validate_arguments
-    def list_processes(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ListProcesses200Response:  # noqa: E501
+    @validate_call
+    def list_processes(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ListProcesses200Response:
         """List processes  # noqa: E501
 
         Returns a list of all processes linked to the requested workspace.  # noqa: E501
@@ -75,10 +82,20 @@ class ProcessApi:
         if '_preload_content' in kwargs:
             message = "Error! Please call the list_processes_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
             raise ValueError(message)
-        return self.list_processes_with_http_info(workspace_id, limit, **kwargs)  # noqa: E501
 
-    @validate_arguments
-    def list_processes_with_http_info(self, workspace_id : Annotated[StrictStr, Field(..., description="Workspace ID")], limit : Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        return self.list_processes_with_http_info.raw_function(
+            workspace_id,
+            limit,
+            **kwargs,
+        )
+
+    @validate_call
+    def list_processes_with_http_info(
+        self,
+        workspace_id: Annotated[StrictStr, Field(description="Workspace ID")],
+        limit: Annotated[Optional[Union[StrictFloat, StrictInt]], Field(description="Limit for paginated response")] = None,
+        **kwargs,
+    ) -> ApiResponse:
         """List processes  # noqa: E501
 
         Returns a list of all processes linked to the requested workspace.  # noqa: E501
@@ -145,24 +162,24 @@ class ProcessApi:
             _params[_key] = _val
         del _params['kwargs']
 
-        _collection_formats = {}
+        _collection_formats: Dict[str, str] = {}
 
         # process the path parameters
-        _path_params = {}
-        if _params['workspace_id']:
+        _path_params: Dict[str, str] = {}
+        if _params['workspace_id'] is not None:
             _path_params['workspace_id'] = _params['workspace_id']
 
 
         # process the query parameters
-        _query_params = []
+        _query_params: List[Tuple[str, str]] = []
         if _params.get('limit') is not None:  # noqa: E501
             _query_params.append(('limit', _params['limit']))
 
         # process the header parameters
         _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
-        _form_params = []
-        _files = {}
+        _form_params: List[Tuple[str, str]] = []
+        _files: Dict[str, str] = {}
         # process the body parameter
         _body_params = None
         # set the HTTP header `Accept`
@@ -170,9 +187,9 @@ class ProcessApi:
             ['application/json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings = ['API Key with permissions']  # noqa: E501
+        _auth_settings: List[str] = ['API Key with permissions']  # noqa: E501
 
-        _response_types_map = {
+        _response_types_map: Dict[str, Optional[str]] = {
             '200': "ListProcesses200Response",
             '403': "GenericErrorResponse",
         }

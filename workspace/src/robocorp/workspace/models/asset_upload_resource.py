@@ -19,12 +19,17 @@ import pprint
 import re  # noqa: F401
 
 from typing import Any, List, Optional
-from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
+from pydantic import BaseModel, Field, StrictStr, ValidationError, field_validator
 from robocorp.workspace.models.asset_upload_completed_resource import AssetUploadCompletedResource
 from robocorp.workspace.models.asset_upload_failed_resource import AssetUploadFailedResource
 from robocorp.workspace.models.asset_upload_pending_resource import AssetUploadPendingResource
-from typing import Union, Any, List, TYPE_CHECKING
+from typing import Union, Any, List, TYPE_CHECKING, Optional, Dict
+from typing_extensions import Literal
 from pydantic import StrictStr, Field
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 ASSETUPLOADRESOURCE_ONE_OF_SCHEMAS = ["AssetUploadCompletedResource", "AssetUploadFailedResource", "AssetUploadPendingResource"]
 
@@ -38,14 +43,13 @@ class AssetUploadResource(BaseModel):
     oneof_schema_2_validator: Optional[AssetUploadCompletedResource] = None
     # data type: AssetUploadFailedResource
     oneof_schema_3_validator: Optional[AssetUploadFailedResource] = None
-    if TYPE_CHECKING:
-        actual_instance: Union[AssetUploadCompletedResource, AssetUploadFailedResource, AssetUploadPendingResource]
-    else:
-        actual_instance: Any
-    one_of_schemas: List[str] = Field(ASSETUPLOADRESOURCE_ONE_OF_SCHEMAS, const=True)
+    actual_instance: Optional[Union[AssetUploadCompletedResource, AssetUploadFailedResource, AssetUploadPendingResource]] = None
+    one_of_schemas: List[str] = Literal["AssetUploadCompletedResource", "AssetUploadFailedResource", "AssetUploadPendingResource"]
 
-    class Config:
-        validate_assignment = True
+    model_config = {
+        "validate_assignment": True
+    }
+
 
     def __init__(self, *args, **kwargs) -> None:
         if args:
@@ -57,9 +61,9 @@ class AssetUploadResource(BaseModel):
         else:
             super().__init__(**kwargs)
 
-    @validator('actual_instance')
+    @field_validator('actual_instance')
     def actual_instance_must_validate_oneof(cls, v):
-        instance = AssetUploadResource.construct()
+        instance = AssetUploadResource.model_construct()
         error_messages = []
         match = 0
         # validate data type: AssetUploadPendingResource
@@ -87,13 +91,13 @@ class AssetUploadResource(BaseModel):
             return v
 
     @classmethod
-    def from_dict(cls, obj: dict) -> AssetUploadResource:
+    def from_dict(cls, obj: dict) -> Self:
         return cls.from_json(json.dumps(obj))
 
     @classmethod
-    def from_json(cls, json_str: str) -> AssetUploadResource:
+    def from_json(cls, json_str: str) -> Self:
         """Returns the object represented by the json string"""
-        instance = AssetUploadResource.construct()
+        instance = cls.model_construct()
         error_messages = []
         match = 0
 
@@ -150,6 +154,6 @@ class AssetUploadResource(BaseModel):
 
     def to_str(self) -> str:
         """Returns the string representation of the actual instance"""
-        return pprint.pformat(self.dict())
+        return pprint.pformat(self.model_dump())
 
 

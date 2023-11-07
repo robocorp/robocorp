@@ -19,64 +19,81 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist
+from pydantic import BaseModel, StrictStr
 from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
+from typing import Dict, Any
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 
 class WebhookResource(BaseModel):
     """
     WebhookResource
     """
-    id: StrictStr = Field(...)
-    process: Optional[ListWebhooks200ResponseDataInnerProcess] = Field(...)
-    enabled_events: conlist(StrictStr) = Field(...)
-    secret: StrictStr = Field(...)
-    endpoint: StrictStr = Field(...)
-    __properties = ["id", "process", "enabled_events", "secret", "endpoint"]
+    id: StrictStr
+    process: Optional[ListWebhooks200ResponseDataInnerProcess]
+    enabled_events: List[StrictStr]
+    secret: StrictStr
+    endpoint: StrictStr
+    __properties: ClassVar[List[str]] = ["id", "process", "enabled_events", "secret", "endpoint"]
 
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = {
+        "populate_by_name": True,
+        "validate_assignment": True
+    }
+
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.dict(by_alias=True))
+        return pprint.pformat(self.model_dump(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
+        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> WebhookResource:
+    def from_json(cls, json_str: str) -> Self:
         """Create an instance of WebhookResource from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self):
-        """Returns the dictionary representation of the model using alias"""
-        _dict = self.dict(by_alias=True,
-                          exclude={
-                          },
-                          exclude_none=True)
+    def to_dict(self) -> Dict[str, Any]:
+        """Return the dictionary representation of the model using alias.
+
+        This has the following differences from calling pydantic's
+        `self.model_dump(by_alias=True)`:
+
+        * `None` is only added to the output dict for nullable fields that
+          were set at model initialization. Other fields with value `None`
+          are ignored.
+        """
+        _dict = self.model_dump(
+            by_alias=True,
+            exclude={
+            },
+            exclude_none=True,
+        )
         # override the default output from pydantic by calling `to_dict()` of process
         if self.process:
             _dict['process'] = self.process.to_dict()
         # set to None if process (nullable) is None
-        # and __fields_set__ contains the field
-        if self.process is None and "process" in self.__fields_set__:
+        # and model_fields_set contains the field
+        if self.process is None and "process" in self.model_fields_set:
             _dict['process'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> WebhookResource:
+    def from_dict(cls, obj: dict) -> Self:
         """Create an instance of WebhookResource from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return WebhookResource.parse_obj(obj)
+            return cls.model_validate(obj)
 
-        _obj = WebhookResource.parse_obj({
+        _obj = cls.model_validate({
             "id": obj.get("id"),
             "process": ListWebhooks200ResponseDataInnerProcess.from_dict(obj.get("process")) if obj.get("process") is not None else None,
             "enabled_events": obj.get("enabled_events"),
