@@ -36,6 +36,7 @@ def generate_api_client(ctx, minimal_update: bool = True, dry_run: bool = False)
     if dry_run:
         opts_list.append("--dry-run")
     opts = " ".join(opts_list)
-    # FIXME(cmin764, 31 Oct 2023): Get back to PIP provided `openapi-generator` script
-    #  once we fork the project to update to the latest CLI JAR wrapped binary version.
-    poetry(ctx, f"run openapi-generator-cli generate {opts}")
+    # NOTE(cmin764, 07 Nov 2023): We're using the latest "openapi-generator-cli" tool
+    #  pre-compiled and under our control. (as the one provided by PyPI is obsolete)
+    binary = Path("bin") / "openapi-generator-cli.jar"
+    poetry(ctx, f"run javac -jar {binary} generate {opts}")
