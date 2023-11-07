@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.2 - 2023-11-06
+
+- Fix `list_assets` response parsing.
+
 ## 1.0.1 - 2023-10-13
 
 - Fix support for Python 3.8

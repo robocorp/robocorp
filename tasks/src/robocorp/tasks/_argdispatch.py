@@ -126,6 +126,14 @@ class _ArgDispatcher:
             help="The timeout (in seconds) to interrupt the teardown process  (if not specified the RC_TEARDOWN_INTERRUPT_TIMEOUT is also queried).",
         )
 
+        run_parser.add_argument(
+            "--os-exit",
+            dest="os_exit",
+            type=str,
+            choices=["no", "before-teardown", "after-teardown"],
+            help="Can be used to do an early os._exit to avoid the tasks session teardown or the interpreter teardown. Not recommended in general.",
+        )
+
         # List tasks
         list_parser = subparsers.add_parser(
             "list",

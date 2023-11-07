@@ -1,6 +1,8 @@
+import enum
 import json
 import os
 import sys
+import time
 import traceback
 from pathlib import Path
 from typing import List, Literal, Optional, Sequence, Union
@@ -60,6 +62,59 @@ def list_tasks(
     return 0
 
 
+def _os_exit(retcode: int):
+    """
+    Kills subprocesses and exits with the given returncode.
+    """
+    from robocorp import log
+
+    try:
+        import psutil
+
+        curr_process = psutil.Process()
+        try:
+            try:
+                children_processes = list(curr_process.children(recursive=True))
+            except Exception:
+                # Retry once
+                children_processes = list(curr_process.children(recursive=True))
+
+            log.info(
+                f"robocorp-tasks killing processes after run: {children_processes}"
+            )
+            for p in children_processes:
+                try:
+                    p.kill()
+                except Exception as e:
+                    log.debug(f"Exception when terminating process: {p.pid}: {e}")
+
+            # Give processes 2 seconds to exit cleanly and force-kill afterwards
+            _gone, alive = psutil.wait_procs(children_processes, 2)
+            for p in alive:
+                try:
+                    p.terminate()
+                except Exception as e:
+                    # Expected: process no longer exists.
+                    log.debug(f"Exception when killing process: {p.pid}: {e}")
+                # Wait a bit more after terminate.
+                psutil.wait_procs(alive, 5)
+        except Exception as e:
+            log.debug(f"Exception when listing/killing processes: {e}")
+
+        sys.stdout.flush()
+        sys.stderr.flush()
+        # Give some time for other threads to run just a little bit more.
+        time.sleep(0.2)
+    finally:
+        os._exit(retcode)
+
+
+class _OsExit(enum.Enum):
+    NO = 0
+    BEFORE_TEARDOWN = 1
+    AFTER_TEARDOWN = 2
+
+
 # Note: the args must match the 'dest' on the configured argparser.
 @_arg_dispatch.register()
 def run(
@@ -73,6 +128,7 @@ def run(
     no_status_rc: bool = False,
     teardown_dump_threads_timeout: Optional[float] = None,
     teardown_interrupt_timeout: Optional[float] = None,
+    os_exit: Optional[str] = None,
 ) -> int:
     """
     Runs a task.
@@ -106,6 +162,17 @@ def run(
             It's also possible to specify it with the
             RC_TEARDOWN_INTERRUPT_TIMEOUT environment variable.
             Defaults to not interrupting.
+        os_exit: Can be used to exit the process early, without going through
+            the regular process teardown. In general it's not recommended, but
+            it can be used as a workaround to avoid crashes or deadlocks under
+            specific situations found either during the tasks session teardown
+            or during the interpreter exit.
+            Note that subprocesses will be force-killed before exiting.
+            Accepted values: 'before-teardown', 'after-teardown'.
+            'before-teardown' means that the process will exit without running
+                the tasks session teardown.
+            'after-teardown' means that the process will exit right after the
+                tasks session teardown takes place.
 
     Returns:
         0 if everything went well.
@@ -174,6 +241,26 @@ def run(
             )
             sys.exit(1)
 
+    os_exit_enum = _OsExit.NO
+    used_env = False
+    if not os_exit:
+        os_exit = os.getenv("RC_OS_EXIT", "")
+        used_env = True
+
+    if os_exit:
+        if os_exit == "before-teardown":
+            os_exit_enum = _OsExit.BEFORE_TEARDOWN
+        elif os_exit == "after-teardown":
+            os_exit_enum = _OsExit.AFTER_TEARDOWN
+        else:
+            if used_env:
+                context.show_error(f"Error: RC_OS_EXIT invalid value: {os_exit}")
+            else:
+                context.show_error(
+                    f"Error: --os-exit argument invalid value: {os_exit}"
+                )
+            sys.exit(1)
+
     # Enable faulthandler (writing to sys.stderr) early on in the
     # task execution process.
     import faulthandler
@@ -236,7 +323,7 @@ def run(
         # TODO: Replace with enum
         run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
         log.start_run(run_name)
-
+        retcode = 22  # Something went off if this was kept until the end.
         try:
             setup_message = ""
             log.start_task("Collect tasks", "setup", "", 0)
@@ -264,7 +351,8 @@ def run(
                 else:
                     context.show_error(setup_message)
 
-                return 1
+                retcode = 1
+                return retcode
             finally:
                 log.end_task("Collect tasks", "setup", run_status, setup_message)
 
@@ -307,42 +395,62 @@ def run(
                         "--teardown-interrupt-timeout",
                         "RC_TEARDOWN_INTERRUPT_TIMEOUT",
                     ):
-                        after_all_tasks_run(tasks)
+                        if os_exit_enum == _OsExit.BEFORE_TEARDOWN:
+                            log.info(
+                                "The tasks teardown was skipped due to option to os._exit before teardown."
+                            )
+                        else:
+                            after_all_tasks_run(tasks)
                     # Always do a process snapshot as the process is about to finish.
                     log.process_snapshot()
                 finally:
                     log.end_task("Teardown tasks", "teardown", Status.PASS, "")
 
             if no_status_rc:
-                return 0
+                retcode = 0
+                return retcode
             else:
-                return int(any(task.failed for task in tasks))
+                retcode = int(any(task.failed for task in tasks))
+                return retcode
         finally:
             log.end_run(run_name, run_status)
+            if os_exit_enum != _OsExit.NO:
+                # Either before or after will exit here (the difference is that
+                # if before teardown was requested the teardown is skipped).
+                log.info(f"robocorp-tasks: os._exit option: {os_exit}")
+                _os_exit(retcode)
 
             # After the run is finished, start a timer which will print the
             # current threads if the process doesn't exit after a given timeout.
             from threading import Timer
 
-            var_name = "RC_DUMP_THREADS_AFTER_RUN_TIMEOUT"
-            try:
-                timeout = float(os.environ.get(var_name, "40"))
-            except Exception:
-                sys.stderr.write(
-                    f"Invalid value for: {var_name} environment value. Cannot convert to float."
-                )
-                timeout = 40
-
-            from robocorp.tasks._interrupts import dump_threads
-
-            def on_timeout():
-                dump_threads(
-                    message=(
-                        f"All tasks have run but the process still hasn't exited "
-                        f"after {timeout} seconds. Showing threads found:"
+            teardown_time = time.monotonic()
+            var_name_dump_threads = "RC_DUMP_THREADS_AFTER_RUN"
+            if os.environ.get(var_name_dump_threads, "1").lower() not in (
+                "",
+                "0",
+                "f",
+                "false",
+            ):
+                var_name_dump_threads_timeout = "RC_DUMP_THREADS_AFTER_RUN_TIMEOUT"
+                try:
+                    timeout = float(os.environ.get(var_name_dump_threads_timeout, "40"))
+                except Exception:
+                    sys.stderr.write(
+                        f"Invalid value for: {var_name_dump_threads_timeout} environment value. Cannot convert to float."
                     )
-                )
+                    timeout = 40
 
-            t = Timer(timeout, on_timeout)
-            t.daemon = True
-            t.start()
+                from robocorp.tasks._interrupts import dump_threads
+
+                def on_timeout():
+                    dump_threads(
+                        message=(
+                            f"All tasks have run but the process still hasn't exited "
+                            f"elapsed {time.monotonic() - teardown_time:.2f} seconds after teardown end. Showing threads found:"
+                        )
+                    )
+
+                t = Timer(timeout, on_timeout)
+                t.daemon = True
+                t.start()

@@ -35,6 +35,8 @@ persistent_context_directory: If a persistent context should be used, this shoul
 
 - <b>`viewport_size`</b>:  Size to be set for the viewport. Specified as tuple(width, height).
 
+skip_playwright_stop: Can be used to skip the playwright stop. Not recommended in general, only meant to be used to diagnose and workaround specific issues on the playwright stop coupled with an early os.\_exit shutdown in `robocorp-tasks`. Can cause a process leak and even a shutdown deadlock if used alone.
+
 **Note:**
 
 > See also: `robocorp.browser.configure_context` to change other arguments related to the browser context creation.
@@ -43,7 +45,7 @@ ______________________________________________________________________
 
 ## function `configure_context`
 
-**Source:** [`__init__.py:80`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L80)
+**Source:** [`__init__.py:87`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L87)
 
 ```python
 configure_context(**kwargs) → None
@@ -68,7 +70,7 @@ ______________________________________________________________________
 
 ## function `page`
 
-**Source:** [`__init__.py:108`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L108)
+**Source:** [`__init__.py:115`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L115)
 
 ```python
 page() → Page
@@ -92,7 +94,7 @@ ______________________________________________________________________
 
 ## function `browser`
 
-**Source:** [`__init__.py:130`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L130)
+**Source:** [`__init__.py:137`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L137)
 
 ```python
 browser() → Browser
@@ -116,7 +118,7 @@ ______________________________________________________________________
 
 ## function `playwright`
 
-**Source:** [`__init__.py:158`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L158)
+**Source:** [`__init__.py:165`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L165)
 
 ```python
 playwright() → Playwright
@@ -137,7 +139,7 @@ ______________________________________________________________________
 
 ## function `context`
 
-**Source:** [`__init__.py:179`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L179)
+**Source:** [`__init__.py:186`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L186)
 
 ```python
 context(**kwargs) → BrowserContext
@@ -161,7 +163,7 @@ ______________________________________________________________________
 
 ## function `goto`
 
-**Source:** [`__init__.py:205`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L205)
+**Source:** [`__init__.py:212`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L212)
 
 ```python
 goto(url: str) → Page
@@ -180,7 +182,7 @@ ______________________________________________________________________
 
 ## function `screenshot`
 
-**Source:** [`__init__.py:221`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L221)
+**Source:** [`__init__.py:228`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L228)
 
 ```python
 screenshot(
@@ -206,7 +208,7 @@ ______________________________________________________________________
 
 ## function `install`
 
-**Source:** [`__init__.py:264`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L264)
+**Source:** [`__init__.py:271`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L271)
 
 ```python
 install(browser_engine: BrowserEngine, force: bool = False)

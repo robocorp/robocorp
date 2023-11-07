@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.1 - 2023-11-02
+
+- Reverted change to issue on playwright shutdown and added option to skip
+  the playwright stop and do an early os._exit on `robocorp-tasks` as 
+  the previous fix didn't address the issue as expected.
+
 ## 2.2.0 - 2023-10-27
 
 - When browsers are installed with playwright additional logging is added.

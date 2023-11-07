@@ -42,15 +42,14 @@ def find_window(
     wait_time: Optional[float] = None,
     foreground: bool = True,
 ) -> WindowElement:
-    from robocorp import windows
-
+    from . import config as windows_config
     from ._find_ui_automation import (
         LocatorStrAndOrSearchParams,
         find_ui_automation_wrapper,
     )
     from ._match_ast import collect_search_params
 
-    config = windows.config()
+    config = windows_config()
     or_search_params = collect_search_params(locator)
     restrict_to_window_locators(or_search_params)
 
@@ -87,14 +86,21 @@ def find_window(
 def _raise_window_not_found(
     locator: Locator, timeout, root_element: Optional[_UIAutomationControlWrapper]
 ):
-    from robocorp import windows
+    from . import config as windows_config
+    from ._match_ast import _build_locator_match
 
-    config = windows.config()
+    config = windows_config()
 
     msg = (
         f"Could not locate window with locator: {locator!r} "
         f"(timeout: {timeout if timeout is not None else config.timeout})"
     )
+
+    locator_match = _build_locator_match(locator)
+    msg += f"\nLocator internal representation: {locator_match}"
+    for warning in locator_match.warnings:
+        msg += f"\nLocator warning: {warning}"
+
     if config.verbose_errors:
         windows_msg = ["\nFound Windows:"]
         for w in find_windows(root_element, locator="regex:.*"):
@@ -112,8 +118,7 @@ def find_windows(
     wait_for_window: bool = False,
     search_strategy: Literal["siblings", "all"] = "all",
 ) -> List[WindowElement]:
-    from robocorp import windows
-
+    from . import config as windows_config
     from ._find_ui_automation import (
         LocatorStrAndOrSearchParams,
         TimeoutMonitor,
@@ -121,7 +126,7 @@ def find_windows(
     )
     from ._match_ast import collect_search_params
 
-    config = windows.config()
+    config = windows_config()
     window_element: WindowElement
 
     if timeout is None:

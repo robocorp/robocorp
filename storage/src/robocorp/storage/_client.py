@@ -2,13 +2,13 @@ import base64
 import logging
 import math
 import time
-from typing import List, Optional, cast
+from typing import Optional, cast
 from urllib.parse import quote as sanitize_id
 
 from ._requests import HTTPError, Requests, Response
 from ._types import (
-    Asset,
     AssetDetails,
+    AssetsResponse,
     AssetUploadResponse,
     AssetUploadState,
     ContentType,
@@ -68,9 +68,22 @@ class AssetsClient:
 
         return _handle_error
 
-    def list_assets(self) -> List[Asset]:
+    def list_assets(
+        self, limit: Optional[int] = None, page: Optional[str] = None
+    ) -> AssetsResponse:
         """Retrieve list of assets."""
-        return self._client.get("").json()
+        if limit and page:
+            raise ValueError(
+                "Choose between a limit (for the initial request) or the next page URL"
+                " (for any subsequent request)"
+            )
+        params = None
+        url = ""
+        if limit:
+            params = {"limit": limit}
+        elif page:
+            url = page
+        return self._client.get(url, params=params).json()
 
     def create_asset(self, name: str) -> AssetDetails:
         """Create a new asset."""

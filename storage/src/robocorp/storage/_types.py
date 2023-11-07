@@ -1,5 +1,5 @@
 import sys
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
 if sys.version_info >= (3, 8):
     from typing import TypedDict
@@ -14,6 +14,15 @@ Asset = TypedDict(
     {
         "id": str,
         "name": str,
+    },
+)
+
+AssetsResponse = TypedDict(
+    "AssetsResponse",
+    {
+        "has_more": bool,
+        "next": str,
+        "data": List[Asset],
     },
 )
 
