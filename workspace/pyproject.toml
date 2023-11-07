@@ -19,10 +19,9 @@ profile = "black"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-openapi-generator-cli = "^4.3.1"
 urllib3 = "^2.0.7"
 python-dateutil = "^2.8.2"
-pydantic = "^1.10.5"  # FIXME(cmin764, 30 Oct 2023): Update to 2.x and fix templates.
+pydantic = "^2.4.2"  # FIXME(cmin764, 30 Oct 2023): Update to 2.x and fix templates.
 aenum = "^3.1.15"
 
 [tool.poetry.group.dev.dependencies]

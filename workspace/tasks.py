@@ -39,4 +39,4 @@ def generate_api_client(ctx, minimal_update: bool = True, dry_run: bool = False)
     # NOTE(cmin764, 07 Nov 2023): We're using the latest "openapi-generator-cli" tool
     #  pre-compiled and under our control. (as the one provided by PyPI is obsolete)
     binary = Path("bin") / "openapi-generator-cli.jar"
-    poetry(ctx, f"run javac -jar {binary} generate {opts}")
+    poetry(ctx, f"run java -jar {binary} generate {opts}")
