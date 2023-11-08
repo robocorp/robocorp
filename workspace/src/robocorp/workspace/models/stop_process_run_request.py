@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional
 from pydantic import BaseModel, StrictBool, StrictStr
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class StopProcessRunRequest(BaseModel):
     """
     StopProcessRunRequest
-    """
+    """ # noqa: E501
     set_remaining_work_items_as_done: StrictBool
     terminate_ongoing_activity_runs: StrictBool
     reason: Optional[StrictStr] = None
@@ -74,7 +75,7 @@ class StopProcessRunRequest(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of StopProcessRunRequest from a dict"""
         if obj is None:
             return None

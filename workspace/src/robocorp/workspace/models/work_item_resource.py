@@ -18,15 +18,16 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 from robocorp.workspace.models.any_valid_json import AnyValidJson
 from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
 from robocorp.workspace.models.work_item_exception import WorkItemException
 from robocorp.workspace.models.work_item_file import WorkItemFile
 from robocorp.workspace.models.work_item_state import WorkItemState
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -35,7 +36,7 @@ except ImportError:
 class WorkItemResource(BaseModel):
     """
     WorkItemResource
-    """
+    """ # noqa: E501
     id: StrictStr
     created_at: datetime
     state: WorkItemState
@@ -138,7 +139,7 @@ class WorkItemResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of WorkItemResource from a dict"""
         if obj is None:
             return None

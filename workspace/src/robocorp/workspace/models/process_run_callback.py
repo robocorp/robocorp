@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
-from typing import List
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel, StrictStr, field_validator
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class ProcessRunCallback(BaseModel):
     """
     ProcessRunCallback
-    """
+    """ # noqa: E501
     url: StrictStr
     secret: StrictStr
     callback_events: List[StrictStr]
@@ -82,7 +83,7 @@ class ProcessRunCallback(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of ProcessRunCallback from a dict"""
         if obj is None:
             return None

@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.generic_error_response_error import GenericErrorResponseError
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class GenericErrorResponse(BaseModel):
     """
     GenericErrorResponse
-    """
+    """ # noqa: E501
     error: GenericErrorResponseError
     __properties: ClassVar[List[str]] = ["error"]
 
@@ -76,7 +77,7 @@ class GenericErrorResponse(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of GenericErrorResponse from a dict"""
         if obj is None:
             return None

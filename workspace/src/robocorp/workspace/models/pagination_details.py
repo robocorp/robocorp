@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional
 from pydantic import BaseModel, StrictBool, StrictStr
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class PaginationDetails(BaseModel):
     """
     PaginationDetails
-    """
+    """ # noqa: E501
     next: Optional[StrictStr] = Field(description="The full URL to access the next set of results. Null if there are no next set of results.")
     has_more: StrictBool = Field(description="Whether or not there are more elements available after this set. If false, this set comprises the end of the list.")
     __properties: ClassVar[List[str]] = ["next", "has_more"]
@@ -79,7 +80,7 @@ class PaginationDetails(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of PaginationDetails from a dict"""
         if obj is None:
             return None

@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class WorkspaceResource(BaseModel):
     """
     WorkspaceResource
-    """
+    """ # noqa: E501
     id: StrictStr
     name: StrictStr
     organization: ListAssets200ResponseDataInner
@@ -78,7 +79,7 @@ class WorkspaceResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of WorkspaceResource from a dict"""
         if obj is None:
             return None

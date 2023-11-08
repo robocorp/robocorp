@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class WorkItemFileDownload(BaseModel):
     """
     WorkItemFileDownload
-    """
+    """ # noqa: E501
     url: StrictStr = Field(description="File download URL. The URL is valid for **one hour**.")
     __properties: ClassVar[List[str]] = ["url"]
 
@@ -73,7 +74,7 @@ class WorkItemFileDownload(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of WorkItemFileDownload from a dict"""
         if obj is None:
             return None

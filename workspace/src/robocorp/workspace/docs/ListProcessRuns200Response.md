@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**next** | [**Next**](Next.md) |  | 
-**has_more** | [**HasMore**](HasMore.md) |  | 
+**next** | [**Optional[StrictStr]**](Next.md) |  | 
+**has_more** | [**StrictBool**](HasMore.md) |  | 
 **data** | [**List[ProcessRunResource]**](ProcessRunResource.md) |  | 
 
 ## Example

@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
 from robocorp.workspace.models.any_valid_json import AnyValidJson
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class CreateWorkItemRequest(BaseModel):
     """
     CreateWorkItemRequest
-    """
+    """ # noqa: E501
     process: AddWorkerToGroupRequestWorker
     payload: AnyValidJson
     __properties: ClassVar[List[str]] = ["process", "payload"]
@@ -81,7 +82,7 @@ class CreateWorkItemRequest(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of CreateWorkItemRequest from a dict"""
         if obj is None:
             return None

@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-from typing import List
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.list_step_run_artifacts200_response_data_inner import ListStepRunArtifacts200ResponseDataInner
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,9 +31,9 @@ except ImportError:
 class ListStepRunArtifacts200Response(BaseModel):
     """
     ListStepRunArtifacts200Response
-    """
-    next: Next
-    has_more: HasMore
+    """ # noqa: E501
+    next: Optional[StrictStr]
+    has_more: StrictBool
     data: List[ListStepRunArtifacts200ResponseDataInner]
     __properties: ClassVar[List[str]] = ["next", "has_more", "data"]
 
@@ -88,7 +89,7 @@ class ListStepRunArtifacts200Response(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of ListStepRunArtifacts200Response from a dict"""
         if obj is None:
             return None
@@ -97,8 +98,8 @@ class ListStepRunArtifacts200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "next": Next.from_dict(obj.get("next")) if obj.get("next") is not None else None,
-            "has_more": HasMore.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
+            "next": Optional[StrictStr].from_dict(obj.get("next")) if obj.get("next") is not None else None,
+            "has_more": StrictBool.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
             "data": [ListStepRunArtifacts200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
         })
         return _obj

@@ -18,12 +18,13 @@ import re  # noqa: F401
 import json
 
 
-from typing import List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+from typing import Optional
 from pydantic import BaseModel, StrictStr, field_validator
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
 from robocorp.workspace.models.task_package_resource_download import TaskPackageResourceDownload
 from robocorp.workspace.models.update_worker_request import UpdateWorkerRequest
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -32,7 +33,7 @@ except ImportError:
 class TaskPackageResource(BaseModel):
     """
     TaskPackageResource
-    """
+    """ # noqa: E501
     id: StrictStr
     name: StrictStr
     type: StrictStr
@@ -101,7 +102,7 @@ class TaskPackageResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of TaskPackageResource from a dict"""
         if obj is None:
             return None

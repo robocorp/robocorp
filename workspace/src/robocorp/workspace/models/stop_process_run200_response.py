@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel, StrictBool
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class StopProcessRun200Response(BaseModel):
     """
     StopProcessRun200Response
-    """
+    """ # noqa: E501
     accepted: StrictBool
     __properties: ClassVar[List[str]] = ["accepted"]
 
@@ -72,7 +73,7 @@ class StopProcessRun200Response(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of StopProcessRun200Response from a dict"""
         if obj is None:
             return None

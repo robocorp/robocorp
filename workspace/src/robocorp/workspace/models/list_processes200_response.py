@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-from typing import List
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.list_processes200_response_data_inner import ListProcesses200ResponseDataInner
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,9 +31,9 @@ except ImportError:
 class ListProcesses200Response(BaseModel):
     """
     ListProcesses200Response
-    """
-    next: Next
-    has_more: HasMore
+    """ # noqa: E501
+    next: Optional[StrictStr]
+    has_more: StrictBool
     data: List[ListProcesses200ResponseDataInner]
     __properties: ClassVar[List[str]] = ["next", "has_more", "data"]
 
@@ -88,7 +89,7 @@ class ListProcesses200Response(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of ListProcesses200Response from a dict"""
         if obj is None:
             return None
@@ -97,10 +98,8 @@ class ListProcesses200Response(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "next": Next.from_dict(obj.get("next")) if obj.get("next") is not None else None,
-            "has_more": HasMore.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None,
+            "next": obj.get("next"),
+            "has_more": obj.get("has_more"),
             "data": [ListProcesses200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None
         })
         return _obj
-
-

@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel, StrictBool, StrictStr
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class StartProcessRunQsAuth200Response(BaseModel):
     """
     StartProcessRunQsAuth200Response
-    """
+    """ # noqa: E501
     started: StrictBool
     id: StrictStr
     __properties: ClassVar[List[str]] = ["started", "id"]
@@ -73,7 +74,7 @@ class StartProcessRunQsAuth200Response(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of StartProcessRunQsAuth200Response from a dict"""
         if obj is None:
             return None

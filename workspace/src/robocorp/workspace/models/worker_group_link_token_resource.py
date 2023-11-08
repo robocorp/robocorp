@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.add_worker_to_group_request_worker import AddWorkerToGroupRequestWorker
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class WorkerGroupLinkTokenResource(BaseModel):
     """
     WorkerGroupLinkTokenResource
-    """
+    """ # noqa: E501
     id: StrictStr
     name: StrictStr
     expires_at: Optional[datetime]
@@ -84,7 +85,7 @@ class WorkerGroupLinkTokenResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of WorkerGroupLinkTokenResource from a dict"""
         if obj is None:
             return None

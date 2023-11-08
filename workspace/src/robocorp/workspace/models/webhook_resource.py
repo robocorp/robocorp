@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-from typing import List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.list_webhooks200_response_data_inner_process import ListWebhooks200ResponseDataInnerProcess
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class WebhookResource(BaseModel):
     """
     WebhookResource
-    """
+    """ # noqa: E501
     id: StrictStr
     process: Optional[ListWebhooks200ResponseDataInnerProcess]
     enabled_events: List[StrictStr]
@@ -85,7 +86,7 @@ class WebhookResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of WebhookResource from a dict"""
         if obj is None:
             return None

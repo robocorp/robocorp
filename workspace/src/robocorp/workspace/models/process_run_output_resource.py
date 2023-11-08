@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, ClassVar, Dict, List, Union
+from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.any_valid_json import AnyValidJson
 from robocorp.workspace.models.work_item_file import WorkItemFile
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class ProcessRunOutputResource(BaseModel):
     """
     ProcessRunOutputResource
-    """
+    """ # noqa: E501
     id: StrictStr
     created_at: datetime
     process: Union[str, Any]
@@ -95,7 +96,7 @@ class ProcessRunOutputResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of ProcessRunOutputResource from a dict"""
         if obj is None:
             return None

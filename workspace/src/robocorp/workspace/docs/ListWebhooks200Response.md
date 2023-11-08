@@ -5,8 +5,8 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data** | [**List[ListWebhooks200ResponseDataInner]**](ListWebhooks200ResponseDataInner.md) |  | 
-**next** | [**Next**](Next.md) |  | 
-**has_more** | [**HasMore**](HasMore.md) |  | 
+**next** | [**Optional[StrictStr]**](Next.md) |  | 
+**has_more** | [**StrictBool**](HasMore.md) |  | 
 
 ## Example
 

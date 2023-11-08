@@ -18,10 +18,11 @@ import re  # noqa: F401
 import json
 
 
-from typing import Any, Dict, Union
+from typing import Any, ClassVar, Dict, List, Union
+from typing import Optional
 from pydantic import BaseModel, StrictStr
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -30,7 +31,7 @@ except ImportError:
 class CreateWorkItemFile200ResponseUpload(BaseModel):
     """
     CreateWorkItemFile200ResponseUpload
-    """
+    """ # noqa: E501
     url: StrictStr
     form_data: Union[str, Any] = Field(description="The form data fields you must include when uploading the file")
     __properties: ClassVar[List[str]] = ["url", "form_data"]
@@ -74,7 +75,7 @@ class CreateWorkItemFile200ResponseUpload(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of CreateWorkItemFile200ResponseUpload from a dict"""
         if obj is None:
             return None

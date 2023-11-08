@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
-from typing import Union
+from typing import Any, ClassVar, Dict, List, Union
+from typing import Optional
 from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class ListStepRunArtifacts200ResponseDataInner(BaseModel):
     """
     ListStepRunArtifacts200ResponseDataInner
-    """
+    """ # noqa: E501
     id: StrictStr
     name: StrictStr
     size: Union[StrictFloat, StrictInt]
@@ -74,7 +75,7 @@ class ListStepRunArtifacts200ResponseDataInner(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of ListStepRunArtifacts200ResponseDataInner from a dict"""
         if obj is None:
             return None

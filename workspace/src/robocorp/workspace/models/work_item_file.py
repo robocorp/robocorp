@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 
-from typing import Union
+from typing import Any, ClassVar, Dict, List, Union
+from typing import Optional
 from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
 from robocorp.workspace.models.work_item_file_download import WorkItemFileDownload
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class WorkItemFile(BaseModel):
     """
     WorkItemFile
-    """
+    """ # noqa: E501
     id: StrictStr
     size: Union[StrictFloat, StrictInt] = Field(description="File size in bytes")
     name: StrictStr = Field(description="File name")
@@ -80,7 +81,7 @@ class WorkItemFile(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of WorkItemFile from a dict"""
         if obj is None:
             return None

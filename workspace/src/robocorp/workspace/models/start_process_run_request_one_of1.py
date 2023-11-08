@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 
-from typing import List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+from typing import Optional
 from pydantic import BaseModel, StrictStr, field_validator
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
 from robocorp.workspace.models.process_run_callback import ProcessRunCallback
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class StartProcessRunRequestOneOf1(BaseModel):
     """
     StartProcessRunRequestOneOf1
-    """
+    """ # noqa: E501
     type: StrictStr
     work_item_ids: List[StrictStr] = Field(description="Work item ids to start the run with.")
     callback: Optional[ProcessRunCallback] = None
@@ -40,8 +41,8 @@ class StartProcessRunRequestOneOf1(BaseModel):
     @field_validator('type')
     def type_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in ('with_work_item_ids', 'with_inputs', 'with_payloads'):
-            raise ValueError("must be one of enum values ('with_work_item_ids', 'with_inputs', 'with_payloads')")
+        if value not in ('with_work_item_ids'):
+            raise ValueError("must be one of enum values ('with_work_item_ids')")
         return value
 
     model_config = {
@@ -86,7 +87,7 @@ class StartProcessRunRequestOneOf1(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of StartProcessRunRequestOneOf1 from a dict"""
         if obj is None:
             return None

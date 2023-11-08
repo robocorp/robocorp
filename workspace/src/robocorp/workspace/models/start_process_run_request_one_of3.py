@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 
-from typing import List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+from typing import Optional
 from pydantic import BaseModel, StrictStr, field_validator
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.any_valid_json import AnyValidJson
 from robocorp.workspace.models.process_run_callback import ProcessRunCallback
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class StartProcessRunRequestOneOf3(BaseModel):
     """
     StartProcessRunRequestOneOf3
-    """
+    """ # noqa: E501
     type: StrictStr
     payloads: List[AnyValidJson]
     callback: Optional[ProcessRunCallback] = None
@@ -93,7 +94,7 @@ class StartProcessRunRequestOneOf3(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of StartProcessRunRequestOneOf3 from a dict"""
         if obj is None:
             return None

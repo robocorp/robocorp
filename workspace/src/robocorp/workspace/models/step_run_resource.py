@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from typing import Optional, Union
+from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Optional
 from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr, field_validator
+from pydantic import StrictStr, StrictBool
 from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
 from robocorp.workspace.models.step_run_resource_error import StepRunResourceError
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class StepRunResource(BaseModel):
     """
     StepRunResource
-    """
+    """ # noqa: E501
     id: StrictStr
     state: StrictStr
     state_updated_at: datetime
@@ -114,7 +115,7 @@ class StepRunResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of StepRunResource from a dict"""
         if obj is None:
             return None

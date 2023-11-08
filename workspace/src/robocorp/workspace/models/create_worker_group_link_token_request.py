@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional
 from pydantic import BaseModel, StrictStr
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class CreateWorkerGroupLinkTokenRequest(BaseModel):
     """
     CreateWorkerGroupLinkTokenRequest
-    """
+    """ # noqa: E501
     name: StrictStr
     expires_at: Optional[datetime]
     __properties: ClassVar[List[str]] = ["name", "expires_at"]
@@ -78,7 +79,7 @@ class CreateWorkerGroupLinkTokenRequest(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of CreateWorkerGroupLinkTokenRequest from a dict"""
         if obj is None:
             return None

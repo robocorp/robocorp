@@ -18,11 +18,12 @@ import re  # noqa: F401
 import json
 
 
-from typing import List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
+from typing import Optional
 from pydantic import BaseModel, StrictBool, StrictStr
+from pydantic import StrictStr, StrictBool
 from pydantic import Field
 from robocorp.workspace.models.list_assets200_response_data_inner import ListAssets200ResponseDataInner
-from typing import Dict, Any
 try:
     from typing import Self
 except ImportError:
@@ -31,7 +32,7 @@ except ImportError:
 class ListAssets200Response(BaseModel):
     """
     ListAssets200Response
-    """
+    """ # noqa: E501
     data: List[ListAssets200ResponseDataInner]
     has_more: StrictBool = Field(description="Whether or not there are more elements available after this set. If false, this set comprises the end of the list.")
     next: Optional[StrictStr] = Field(description="The full URL to access the next set of results. Null if there are no next set of results.")
@@ -88,7 +89,7 @@ class ListAssets200Response(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of ListAssets200Response from a dict"""
         if obj is None:
             return None

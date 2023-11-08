@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
-
+from typing import Any, ClassVar, Dict, List
+from typing import Optional
 from pydantic import BaseModel, StrictStr, field_validator
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,15 +30,15 @@ except ImportError:
 class AssetPayloadEmptyResource(BaseModel):
     """
     AssetPayloadEmptyResource
-    """
+    """ # noqa: E501
     type: StrictStr
     __properties: ClassVar[List[str]] = ["type"]
 
     @field_validator('type')
     def type_validate_enum(cls, value):
         """Validates the enum"""
-        if value not in ('empty', 'url'):
-            raise ValueError("must be one of enum values ('empty', 'url')")
+        if value not in ('empty'):
+            raise ValueError("must be one of enum values ('empty')")
         return value
 
     model_config = {
@@ -79,7 +80,7 @@ class AssetPayloadEmptyResource(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of AssetPayloadEmptyResource from a dict"""
         if obj is None:
             return None

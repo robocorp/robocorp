@@ -18,9 +18,10 @@ import re  # noqa: F401
 import json
 
 
+from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional
 from pydantic import BaseModel, StrictStr
-from typing import Dict, Any
+from pydantic import StrictStr, StrictBool
 try:
     from typing import Self
 except ImportError:
@@ -29,7 +30,7 @@ except ImportError:
 class CreateAssetUploadRequest(BaseModel):
     """
     CreateAssetUploadRequest
-    """
+    """ # noqa: E501
     content_type: StrictStr
     data: Optional[StrictStr] = None
     __properties: ClassVar[List[str]] = ["content_type", "data"]
@@ -73,7 +74,7 @@ class CreateAssetUploadRequest(BaseModel):
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: dict) -> Self:
+    def from_dict(cls, obj: Dict) -> Self:
         """Create an instance of CreateAssetUploadRequest from a dict"""
         if obj is None:
             return None
