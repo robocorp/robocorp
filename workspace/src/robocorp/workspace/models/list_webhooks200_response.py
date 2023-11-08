@@ -99,8 +99,8 @@ class ListWebhooks200Response(BaseModel):
 
         _obj = cls.model_validate({
             "data": [ListWebhooks200ResponseDataInner.from_dict(_item) for _item in obj.get("data")] if obj.get("data") is not None else None,
-            "next": Optional[StrictStr].from_dict(obj.get("next")) if obj.get("next") is not None else None,
-            "has_more": StrictBool.from_dict(obj.get("has_more")) if obj.get("has_more") is not None else None
+            "next": obj.get("next"),
+            "has_more": obj.get("has_more")
         })
         return _obj
 
