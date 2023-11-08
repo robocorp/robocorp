@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1 - 2023-11-08
+
+- Setting CoInitEx initialization parameters to prevent issue where `asyncio` would fail to shutdown.
+
 ## 2.4.0 - 2023-11-02
 
 - `RC_DUMP_THREADS_AFTER_RUN` may be set to "0" or "false" to prevent threads from being dumped after the teardown
