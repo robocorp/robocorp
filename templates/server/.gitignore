@@ -18,3 +18,4 @@ testrun/*
 
 # Created by server for storing history, etc.
 .robocorp
+!*.whl
