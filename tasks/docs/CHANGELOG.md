@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.2 - 2023-11-09
+
+- On early exit with `RC_OS_EXIT`, make sure that the logs are written prior to exiting.
+
 ## 2.4.1 - 2023-11-08
 
 - Setting CoInitEx initialization parameters to prevent issue where `asyncio` would fail to shutdown.

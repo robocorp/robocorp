@@ -306,70 +306,87 @@ def run(
         pyproject_toml_contents,
     )
 
-    with set_config(run_config), setup_cli_auto_logging(
-        # Note: we can't customize what's a "project" file or a "library" file,
-        # right now the customizations are all based on module names.
-        config
-    ), redirect.setup_stdout_logging(log_output_to_stdout), setup_log_output(
-        output_dir=output_dir_path,
-        max_files=max_log_files,
-        max_file_size=max_log_file_size,
-    ), setup_log_output_to_port(), context.register_lifecycle_prints():
-        run_name = os.path.basename(p)
-        if task_name:
-            run_name += f" - {task_name}"
+    retcode = 22  # Something went off if this was kept until the end.
+    try:
+        with set_config(run_config), setup_cli_auto_logging(
+            # Note: we can't customize what's a "project" file or a "library" file,
+            # right now the customizations are all based on module names.
+            config
+        ), redirect.setup_stdout_logging(log_output_to_stdout), setup_log_output(
+            output_dir=output_dir_path,
+            max_files=max_log_files,
+            max_file_size=max_log_file_size,
+        ), setup_log_output_to_port(), context.register_lifecycle_prints():
+            run_name = os.path.basename(p)
+            if task_name:
+                run_name += f" - {task_name}"
 
-        # Status string from `log` module
-        # TODO: Replace with enum
-        run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
-        log.start_run(run_name)
-        retcode = 22  # Something went off if this was kept until the end.
-        try:
-            setup_message = ""
-            log.start_task("Collect tasks", "setup", "", 0)
+            # Status string from `log` module
+            # TODO: Replace with enum
+            run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
+            log.start_run(run_name)
             try:
-                if not task_name:
-                    context.show(f"\nCollecting tasks from: {path}")
-                else:
-                    context.show(
-                        f"\nCollecting {task_or_tasks} {task_name} from: {path}"
-                    )
+                setup_message = ""
+                log.start_task("Collect tasks", "setup", "", 0)
+                try:
+                    if not task_name:
+                        context.show(f"\nCollecting tasks from: {path}")
+                    else:
+                        context.show(
+                            f"\nCollecting {task_or_tasks} {task_name} from: {path}"
+                        )
 
-                tasks: List[ITask] = list(collect_tasks(p, task_names))
+                    tasks: List[ITask] = list(collect_tasks(p, task_names))
 
-                if not tasks:
-                    raise RobocorpTasksCollectError(
-                        f"Did not find any tasks in: {path}"
-                    )
-            except Exception as e:
-                run_status = "ERROR"
-                setup_message = str(e)
+                    if not tasks:
+                        raise RobocorpTasksCollectError(
+                            f"Did not find any tasks in: {path}"
+                        )
+                except Exception as e:
+                    run_status = "ERROR"
+                    setup_message = str(e)
 
-                log.exception()
-                if not isinstance(e, RobocorpTasksCollectError):
-                    traceback.print_exc()
-                else:
-                    context.show_error(setup_message)
+                    log.exception()
+                    if not isinstance(e, RobocorpTasksCollectError):
+                        traceback.print_exc()
+                    else:
+                        context.show_error(setup_message)
 
-                retcode = 1
-                return retcode
-            finally:
-                log.end_task("Collect tasks", "setup", run_status, setup_message)
+                    retcode = 1
+                    return retcode
+                finally:
+                    log.end_task("Collect tasks", "setup", run_status, setup_message)
 
-            before_all_tasks_run(tasks)
+                before_all_tasks_run(tasks)
 
-            try:
-                for task in tasks:
-                    set_current_task(task)
-                    before_task_run(task)
+                try:
+                    for task in tasks:
+                        set_current_task(task)
+                        before_task_run(task)
+                        try:
+                            task.run()
+                            task.status = Status.PASS
+                        except Exception as e:
+                            task.status = Status.FAIL
+                            task.message = str(e)
+                            task.exc_info = sys.exc_info()
+                        finally:
+                            with interrupt_on_timeout(
+                                teardown_dump_threads_timeout,
+                                teardown_interrupt_timeout,
+                                "Teardown",
+                                "--teardown-dump-threads-timeout",
+                                "RC_TEARDOWN_DUMP_THREADS_TIMEOUT",
+                                "--teardown-interrupt-timeout",
+                                "RC_TEARDOWN_INTERRUPT_TIMEOUT",
+                            ):
+                                after_task_run(task)
+                            set_current_task(None)
+                            if task.failed:
+                                run_status = "ERROR"
+                finally:
+                    log.start_task("Teardown tasks", "teardown", "", 0)
                     try:
-                        task.run()
-                        task.status = Status.PASS
-                    except Exception as e:
-                        task.status = Status.FAIL
-                        task.message = str(e)
-                        task.exc_info = sys.exc_info()
-                    finally:
                         with interrupt_on_timeout(
                             teardown_dump_threads_timeout,
                             teardown_interrupt_timeout,
@@ -379,78 +396,72 @@ def run(
                             "--teardown-interrupt-timeout",
                             "RC_TEARDOWN_INTERRUPT_TIMEOUT",
                         ):
-                            after_task_run(task)
-                        set_current_task(None)
-                        if task.failed:
-                            run_status = "ERROR"
+                            if os_exit_enum == _OsExit.BEFORE_TEARDOWN:
+                                log.info(
+                                    "The tasks teardown was skipped due to option to os._exit before teardown."
+                                )
+                            else:
+                                after_all_tasks_run(tasks)
+                        # Always do a process snapshot as the process is about to finish.
+                        log.process_snapshot()
+                    finally:
+                        log.end_task("Teardown tasks", "teardown", Status.PASS, "")
+
+                if no_status_rc:
+                    retcode = 0
+                    return retcode
+                else:
+                    retcode = int(any(task.failed for task in tasks))
+                    return retcode
             finally:
-                log.start_task("Teardown tasks", "teardown", "", 0)
-                try:
-                    with interrupt_on_timeout(
-                        teardown_dump_threads_timeout,
-                        teardown_interrupt_timeout,
-                        "Teardown",
-                        "--teardown-dump-threads-timeout",
-                        "RC_TEARDOWN_DUMP_THREADS_TIMEOUT",
-                        "--teardown-interrupt-timeout",
-                        "RC_TEARDOWN_INTERRUPT_TIMEOUT",
-                    ):
-                        if os_exit_enum == _OsExit.BEFORE_TEARDOWN:
-                            log.info(
-                                "The tasks teardown was skipped due to option to os._exit before teardown."
-                            )
-                        else:
-                            after_all_tasks_run(tasks)
-                    # Always do a process snapshot as the process is about to finish.
-                    log.process_snapshot()
-                finally:
-                    log.end_task("Teardown tasks", "teardown", Status.PASS, "")
+                log.end_run(run_name, run_status)
+    except:
+        # This means we had an error in the framework (as user errors should
+        # be handled on the parts that call user code).
+        if os_exit_enum != _OsExit.NO:
+            # Show the exception if we'll do an early exit, otherwise
+            # let Python itself print it.
+            retcode = 23
+            traceback.print_exc()
+        raise
+    finally:
+        if os_exit_enum != _OsExit.NO:
+            # Either before or after will exit here (the difference is that
+            # if before teardown was requested the teardown is skipped).
+            log.info(f"robocorp-tasks: os._exit option: {os_exit}")
+            _os_exit(retcode)
 
-            if no_status_rc:
-                retcode = 0
-                return retcode
-            else:
-                retcode = int(any(task.failed for task in tasks))
-                return retcode
-        finally:
-            log.end_run(run_name, run_status)
-            if os_exit_enum != _OsExit.NO:
-                # Either before or after will exit here (the difference is that
-                # if before teardown was requested the teardown is skipped).
-                log.info(f"robocorp-tasks: os._exit option: {os_exit}")
-                _os_exit(retcode)
+        # After the run is finished, start a timer which will print the
+        # current threads if the process doesn't exit after a given timeout.
+        from threading import Timer
 
-            # After the run is finished, start a timer which will print the
-            # current threads if the process doesn't exit after a given timeout.
-            from threading import Timer
+        teardown_time = time.monotonic()
+        var_name_dump_threads = "RC_DUMP_THREADS_AFTER_RUN"
+        if os.environ.get(var_name_dump_threads, "1").lower() not in (
+            "",
+            "0",
+            "f",
+            "false",
+        ):
+            var_name_dump_threads_timeout = "RC_DUMP_THREADS_AFTER_RUN_TIMEOUT"
+            try:
+                timeout = float(os.environ.get(var_name_dump_threads_timeout, "40"))
+            except Exception:
+                sys.stderr.write(
+                    f"Invalid value for: {var_name_dump_threads_timeout} environment value. Cannot convert to float."
+                )
+                timeout = 40
 
-            teardown_time = time.monotonic()
-            var_name_dump_threads = "RC_DUMP_THREADS_AFTER_RUN"
-            if os.environ.get(var_name_dump_threads, "1").lower() not in (
-                "",
-                "0",
-                "f",
-                "false",
-            ):
-                var_name_dump_threads_timeout = "RC_DUMP_THREADS_AFTER_RUN_TIMEOUT"
-                try:
-                    timeout = float(os.environ.get(var_name_dump_threads_timeout, "40"))
-                except Exception:
-                    sys.stderr.write(
-                        f"Invalid value for: {var_name_dump_threads_timeout} environment value. Cannot convert to float."
+            from robocorp.tasks._interrupts import dump_threads
+
+            def on_timeout():
+                dump_threads(
+                    message=(
+                        f"All tasks have run but the process still hasn't exited "
+                        f"elapsed {time.monotonic() - teardown_time:.2f} seconds after teardown end. Showing threads found:"
                     )
-                    timeout = 40
+                )
 
-                from robocorp.tasks._interrupts import dump_threads
-
-                def on_timeout():
-                    dump_threads(
-                        message=(
-                            f"All tasks have run but the process still hasn't exited "
-                            f"elapsed {time.monotonic() - teardown_time:.2f} seconds after teardown end. Showing threads found:"
-                        )
-                    )
-
-                t = Timer(timeout, on_timeout)
-                t.daemon = True
-                t.start()
+            t = Timer(timeout, on_timeout)
+            t.daemon = True
+            t.start()

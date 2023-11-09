@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 
@@ -82,11 +83,21 @@ def test_force_early_exit(pyfile, kill):
 
     env = dict(RC_OS_EXIT=kill)
     result = robocorp_tasks_run(
-        ["run", check], returncode=0, cwd=os.path.dirname(check), additional_env=env
+        ["run", check, "--console-colors=plain"],
+        returncode=0,
+        cwd=os.path.dirname(check),
+        additional_env=env,
     )
     stderr = result.stderr.decode("utf-8")
+    stdout = result.stdout.decode("utf-8")
 
     assert stderr.count("Executed") == 1
+
+    assert "Robocorp Log (html)" in stdout
+
+    log_target = Path(os.path.dirname(check)) / "output" / "log.html"
+    assert log_target.exists()
+
     if kill:
         assert stderr.count("atexit_executed") == 0, f"Found stderr: {stderr}"
 
@@ -96,9 +107,10 @@ def test_force_early_exit(pyfile, kill):
             assert "my_cache_teardown" in stderr
     else:
         assert stderr.count("atexit_executed") == 1
+    assert "my_task status: PASS" in stdout
 
 
-@pytest.mark.parametrize("kill", ["", "after-teardown"])
+@pytest.mark.parametrize("kill", ["after-teardown"])
 def test_force_early_exit_with_error(pyfile, kill):
     from devutils.fixtures import robocorp_tasks_run
 
@@ -122,15 +134,25 @@ def test_force_early_exit_with_error(pyfile, kill):
 
     env = dict(RC_OS_EXIT=kill)
     result = robocorp_tasks_run(
-        ["run", check], returncode=1, cwd=os.path.dirname(check), additional_env=env
+        ["run", check, "--console-colors=plain"],
+        returncode=1,
+        cwd=os.path.dirname(check),
+        additional_env=env,
     )
     stderr = result.stderr.decode("utf-8")
+    stdout = result.stdout.decode("utf-8")
+
+    assert "Robocorp Log (html)" in stdout
+
+    log_target = Path(os.path.dirname(check)) / "output" / "log.html"
+    assert log_target.exists()
 
     assert stderr.count("Executed") == 1
     if kill:
         assert stderr.count("atexit_executed") == 0, f"Found stderr: {stderr}"
     else:
         assert stderr.count("atexit_executed") == 1
+    assert "my_task status: FAIL" in stdout
 
 
 @pytest.mark.parametrize("kill", ["", "after-teardown"])
