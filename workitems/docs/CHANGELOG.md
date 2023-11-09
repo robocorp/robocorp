@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.4.1 - 2023-11-09
+
+- Upgrades `dataclasses-json` dependency to at least **0.6.1**
 - Prevent invalid operations on released work items with `FileAdapter`
 
 ## 1.4.0 - 2023-09-07
