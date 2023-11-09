@@ -1,7 +1,7 @@
 import typing
 from typing import Generic, Iterator, Optional, Set, TypeVar
 
-from _ctypes import COMError
+from ._com_error import COMError
 
 if typing.TYPE_CHECKING:
     from ._vendored.uiautomation import Control

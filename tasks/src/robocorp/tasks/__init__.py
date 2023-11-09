@@ -37,7 +37,7 @@ from typing import Optional
 from ._fixtures import setup, teardown
 from ._protocols import ITask, Status
 
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 version_info = [int(x) for x in __version__.split(".")]
 
 

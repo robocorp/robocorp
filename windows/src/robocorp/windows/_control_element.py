@@ -8,7 +8,7 @@ import typing
 from pathlib import Path
 from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union
 
-from _ctypes import COMError
+from ._com_error import COMError
 
 from ._errors import ActionNotPossible, ElementNotFound
 from ._find_ui_automation import LocatorStrAndOrSearchParams

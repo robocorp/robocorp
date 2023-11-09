@@ -19,7 +19,7 @@ from typing import (
 )
 
 import _ctypes
-from _ctypes import COMError
+from ._com_error import COMError
 
 from ._control_element import ControlElement
 from ._errors import ElementNotFound

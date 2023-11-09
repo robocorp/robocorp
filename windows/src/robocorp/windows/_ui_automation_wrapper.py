@@ -2,7 +2,7 @@ import typing
 from dataclasses import dataclass
 from typing import Optional
 
-from _ctypes import COMError
+from ._com_error import COMError
 
 from .protocols import Locator
 

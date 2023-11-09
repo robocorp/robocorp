@@ -1,3 +1,4 @@
+# ruff: noqa: E402
 """Main entry point for running tasks from robocorp-tasks.
 
 Note that it's usually preferable to use `robocorp-tasks` as a command line
@@ -19,6 +20,13 @@ if sys.version_info >= (3, 10):
         truststore.inject_into_ssl()
     except ModuleNotFoundError:
         pass
+
+if sys.platform == "win32":
+    # Apply workaround where `asyncio` would halt forever when windows UIAutomation.dll
+    # is used with comtypes.
+    # see: https://github.com/python/cpython/issues/111604
+    COINIT_MULTITHREADED = 0x0
+    sys.coinit_flags = COINIT_MULTITHREADED  # type:ignore
 
 # Just importing is enough to register the commands
 from . import _commands  # @UnusedImport

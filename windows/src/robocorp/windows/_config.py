@@ -22,7 +22,7 @@ class Config:
         self.wait_time: float = 0.5
 
         # Defines whether mouse movement should be simulated in
-        # the related actiosn (such as mouse clicking).
+        # the related actions (such as mouse clicking).
         self.simulate_mouse_movement: bool = False
 
         # When True, errors will be more verbose (this means that execution
@@ -46,7 +46,7 @@ class Config:
     @timeout.setter
     def timeout(self, timeout: float) -> None:
         # This value can change based on `auto.SetGlobalSearchTimeout(...)` calls.
-        import robocorp.windows._vendored.uiautomation as auto
+        from ._vendored import uiautomation as auto
 
         auto.uiautomation.TIME_OUT_SECOND = timeout
 
