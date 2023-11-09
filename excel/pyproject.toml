@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-excel"
-version = "0.4.0"
+version = "0.4.1"
 description = "Robocorp Excel automation library"
 authors = [
 	"Ossi R. <ossi@robocorp.com>",

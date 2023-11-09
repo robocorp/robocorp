@@ -137,7 +137,7 @@ ______________________________________________________________________
 
 ### method `get_value`
 
-**Source:** [`get_value:130`](https://github.com/robocorp/robo/tree/master/excel/robocorp/excel/worksheet/get_value#L130)
+**Source:** [`typing_extensions.py:130`](https://github.com/robocorp/robo/tree/master/excel/.venv/lib/python3.9/site-packages/typing_extensions.py#L130)
 
 ```python
 get_value(row, column) → Any
