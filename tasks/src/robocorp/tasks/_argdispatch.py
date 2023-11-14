@@ -17,6 +17,7 @@ class _ArgDispatcher:
         method = self._name_to_func[parsed.command]
         dct = parsed.__dict__.copy()
         dct.pop("command")
+
         return method(**dct)
 
     def register(self, name=None):
@@ -34,7 +35,7 @@ class _ArgDispatcher:
 
         parser = argparse.ArgumentParser(
             prog="robocorp.tasks",
-            description="Robocorp framework for RPA development using Python.",
+            description="Robocorp framework for Python automations.",
             epilog="View https://github.com/robocorp/robo for more information",
         )
 
@@ -148,14 +149,33 @@ class _ArgDispatcher:
 
         return parser
 
+    def parse_args(self, args: List[str]):
+        log.debug("Processing args: %s", " ".join(args))
+        additional_args = []
+        new_args = []
+        for i, arg in enumerate(args):
+            if arg == "--":
+                # argparse.REMAINDER is buggy:
+                # https://bugs.python.org/issue17050
+                # So, remove '--' and everything after from what's passed to
+                # argparser.
+                additional_args.extend(args[i + 1 :])
+                break
+            new_args.append(arg)
+
+        parser = self._create_argparser()
+        parsed = parser.parse_args(new_args)
+
+        if additional_args:
+            parsed.additional_arguments = additional_args
+        return parsed
+
     def process_args(self, args: List[str]) -> int:
         """
         Processes the arguments and return the returncode.
         """
-        log.debug("Processing args: %s", " ".join(args))
-        parser = self._create_argparser()
         try:
-            parsed = parser.parse_args(args)
+            parsed = self.parse_args(args)
         except SystemExit as e:
             code = e.code
             if isinstance(code, int):

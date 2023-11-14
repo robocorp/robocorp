@@ -1,11 +1,14 @@
 import enum
+import inspect
 import json
 import os
 import sys
 import time
 import traceback
+from argparse import ArgumentParser, ArgumentTypeError
+from io import StringIO
 from pathlib import Path
-from typing import List, Literal, Optional, Sequence, Union
+from typing import Any, List, Literal, Optional, Sequence, Union
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
@@ -129,6 +132,7 @@ def run(
     teardown_dump_threads_timeout: Optional[float] = None,
     teardown_interrupt_timeout: Optional[float] = None,
     os_exit: Optional[str] = None,
+    additional_arguments: Optional[list[str]] = None,
 ) -> int:
     """
     Runs a task.
@@ -173,6 +177,7 @@ def run(
                 the tasks session teardown.
             'after-teardown' means that the process will exit right after the
                 tasks session teardown takes place.
+        additional_arguments: The arguments passed to the task.
 
     Returns:
         0 if everything went well.
@@ -364,7 +369,10 @@ def run(
                         set_current_task(task)
                         before_task_run(task)
                         try:
-                            task.run()
+                            args, kwargs = _normalize_arguments(
+                                task.method, additional_arguments or []
+                            )
+                            task.run(*args, **kwargs)
                             task.status = Status.PASS
                         except Exception as e:
                             task.status = Status.FAIL
@@ -465,3 +473,101 @@ def run(
             t = Timer(timeout, on_timeout)
             t.daemon = True
             t.start()
+
+
+class _CustomArgumentParser(ArgumentParser):
+    def error(self, msg):
+        raise RuntimeError(msg)
+
+    def exit(self, status=0, message=None):
+        raise RuntimeError(message or "")
+
+
+def str_to_bool(s):
+    # Convert string to boolean
+    return s.lower() in ["true", "t", "yes", "1"]
+
+
+def check_boolean(value):
+    if value.lower() not in ["true", "false", "t", "f", "yes", "no", "1", "0"]:
+        raise ArgumentTypeError(f"Invalid value for boolean flag: {value}")
+    return str_to_bool(value)
+
+
+def _normalize_arguments(
+    target_method, args: list[str]
+) -> tuple[list[Any], dict[str, Any]]:
+    from typing import get_type_hints
+
+    from robocorp.tasks._exceptions import InvalidArgumentsError
+
+    sig = inspect.signature(target_method)
+    type_hints = get_type_hints(target_method)
+    method_name = target_method.__code__.co_name
+
+    # Prepare the argument parser
+    parser = _CustomArgumentParser(
+        prog=f"python -m robocorp.tasks {method_name} --",
+        description=f"{method_name} task.",
+        add_help=False,
+    )
+
+    # Add arguments to the parser based on the function signature and type hints
+    for param_name, param in sig.parameters.items():
+        param_type = type_hints.get(param_name)
+
+        if param_type:
+            if param_type not in (str, int, float, bool):
+                raise InvalidArgumentsError(
+                    f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool."
+                )
+
+            if param_type == bool:
+                param_type = check_boolean
+            if param.default is not inspect.Parameter.empty:
+                parser.add_argument(
+                    f"--{param_name}", type=param_type, default=param.default
+                )
+            else:
+                parser.add_argument(f"--{param_name}", type=param_type, required=True)
+        else:
+            parser.add_argument(f"--{param_name}", required=True)
+
+    error_message = None
+    try:
+        parsed_args, argv = parser.parse_known_args(args)
+    except (Exception, SystemExit) as e:
+        error_message = f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\n{_get_usage(parser)}.\nError: {str(e)}."
+
+    if error_message:
+        raise InvalidArgumentsError(error_message)
+
+    if argv:
+        msg = "Unrecognized arguments: %s" % " ".join(argv)
+        raise InvalidArgumentsError(
+            f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\n{_get_usage(parser)}.\n{msg}"
+        )
+
+    # Call the user function with the parsed arguments.
+    kwargs = {
+        param_name: getattr(parsed_args, param_name) for param_name in sig.parameters
+    }
+
+    try:
+        sig.bind(**kwargs)
+    except Exception as e:
+        error_message = f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\n{_get_usage(parser)}.\nError: {e}"
+
+    if error_message:
+        raise InvalidArgumentsError(error_message)
+
+    return ([], kwargs)
+
+
+def _get_usage(parser) -> str:
+    f = StringIO()
+    parser.print_usage(f)
+    usage = f.getvalue().strip()
+    if usage:
+        usage = usage[0].upper() + usage[1:]
+    return usage

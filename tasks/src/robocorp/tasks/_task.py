@@ -1,3 +1,4 @@
+import inspect
 import typing
 from contextlib import contextmanager
 from types import ModuleType
@@ -26,8 +27,15 @@ class Task:
     def lineno(self):
         return self.method.__code__.co_firstlineno
 
-    def run(self):
-        self.method()
+    def run(self, *args, **kwargs):
+        sig = inspect.signature(self.method)
+        try:
+            sig.bind(*args, **kwargs)
+        except Exception as e:
+            raise RuntimeError(
+                f"It's not possible to call the task: '{self.name}' because the passed arguments don't match the task signature.\nError: {e}"
+            )
+        return self.method(*args, **kwargs)
 
     @property
     def status(self) -> Status:

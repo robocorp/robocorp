@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+
+- Methods decorated with `@task` now can accept parameters. 
+    - If the parameters have types declared, those are respected (but only str, bool, int and float are accepted).
+    - If the type is not specified, it's considered a string.
+    - Arguments passed to the task must be separated by a `--` and all arguments must be named.
+
+Example:
+
+Given a task such as:
+
+```python
+from robocorp.tasks import task
+
+@task
+def convert_to_int(value:str) -> int:
+    return int(value)
+```
+
+It can be called as:
+
+```python
+python -m robocorp.tasks -- --value=2
+```
+
 ## 2.4.2 - 2023-11-09
 
 - On early exit with `RC_OS_EXIT`, make sure that the logs are written prior to exiting.
