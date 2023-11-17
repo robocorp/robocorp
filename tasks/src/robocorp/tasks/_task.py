@@ -2,12 +2,45 @@ import inspect
 import typing
 from contextlib import contextmanager
 from types import ModuleType
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple, get_type_hints
 
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
 
+from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
 from robocorp.tasks._protocols import IContext, ITask, Status
+
+
+def _build_properties(
+    method_name: str,
+    name_for_title: str,
+    param_type: Any,
+    description: str,
+    kind: Literal["parameter", "return"],
+) -> Dict[str, Any]:
+    if not param_type:
+        param_type_clsname = "string"
+    else:
+        if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+            param_type_clsname = f"Error. The {kind} type '{param_type.__name__}' in '{method_name}' is not supported. Supported {kind} types: str, int, float, bool."
+        else:
+            if param_type == str:
+                param_type_clsname = "string"
+            elif param_type == int:
+                param_type_clsname = "integer"
+            elif param_type == float:
+                param_type_clsname = "number"
+            elif param_type == bool:
+                param_type_clsname = "boolean"
+
+    properties = {
+        "type": param_type_clsname,
+        "description": description,
+    }
+
+    if name_for_title:
+        properties["title"] = name_for_title.replace("_", " ").title()
+    return properties
 
 
 class Task:
@@ -18,6 +51,7 @@ class Task:
         self.message = ""
         self.exc_info: Optional[OptExcInfo] = None
         self._status = Status.NOT_RUN
+        self.result = None
 
     @property
     def name(self):
@@ -36,6 +70,79 @@ class Task:
                 f"It's not possible to call the task: '{self.name}' because the passed arguments don't match the task signature.\nError: {e}"
             )
         return self.method(*args, **kwargs)
+
+    @property
+    def input_schema(self) -> dict[str, Any]:
+        import docstring_parser
+
+        sig = inspect.signature(self.method)
+        method_name = self.method.__code__.co_name
+        type_hints = get_type_hints(self.method)
+
+        param_name_to_description: Dict[str, str] = {}
+
+        doc = getattr(self.method, "__doc__", "")
+        if doc:
+            contents = docstring_parser.parse(doc)
+            for docparam in contents.params:
+                if docparam.description:
+                    param_name_to_description[docparam.arg_name] = docparam.description
+
+        properties: Dict[str, Any] = {}
+        required: List[str] = []
+
+        schema = {
+            "additionalProperties": False,
+            "properties": properties,
+            "type": "object",
+        }
+
+        for param in sig.parameters.values():
+            param_type = type_hints.get(param.name)
+            description = param_name_to_description.get(param.name, "")
+            param_properties = _build_properties(
+                method_name, param.name, param_type, description, "parameter"
+            )
+            properties[param.name] = param_properties
+
+            if param.default is inspect.Parameter.empty:
+                required.append(param.name)
+            else:
+                param_properties["default"] = str(param.default)
+
+        if required:
+            schema["required"] = required
+
+        return schema
+
+    @property
+    def output_schema(self) -> dict[str, Any]:
+        import docstring_parser
+
+        method_name = self.method.__code__.co_name
+        type_hints = get_type_hints(self.method)
+
+        doc = getattr(self.method, "__doc__", "")
+        description = ""
+        if doc:
+            contents = docstring_parser.parse(doc)
+            returns = contents.returns
+            if returns and returns.description:
+                description = returns.description
+
+        schema = _build_properties(
+            method_name, "", type_hints.get("return"), description, "return"
+        )
+        return schema
+
+        # We could use pydantic, but then adding the info from
+        # the docstring is harder...
+        # from pydantic.json_schema import GenerateJsonSchema
+        # from pydantic.validate_call import validate_call
+        #
+        # m = validate_call(validate_return=True)(self.method)
+        # schema = m.__return_pydantic_core_schema__
+        # return GenerateJsonSchema().generate(schema) or {}
 
     @property
     def status(self) -> Status:
@@ -171,8 +278,8 @@ class Context:
 
         show = self.show
         show(f"{task.name}", end="", kind=self.KIND_TASK_NAME)
-        show(f" status: ", end="")
-        show(f"{task.status}", kind=status_kind)
+        show(" status: ", end="")
+        show(f"{task.status.value}", kind=status_kind)
         if msg:
             show(f"{msg}", kind=status_kind)
 

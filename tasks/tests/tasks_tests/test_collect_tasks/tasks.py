@@ -22,3 +22,8 @@ def raise_an_error():
 @task
 def main_errors():
     raise_an_error()
+
+
+@task
+def task_with_args(my_input_arg: str, multiplier: int) -> str:
+    return my_input_arg * multiplier

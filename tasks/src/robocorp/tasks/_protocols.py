@@ -3,7 +3,17 @@ from contextlib import contextmanager
 from enum import Enum
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Callable, Iterator, Optional, Sequence, Set, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    Optional,
+    Sequence,
+    Set,
+    TypeVar,
+    Union,
+)
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
@@ -47,6 +57,18 @@ class ITask(typing.Protocol):
     message: str
     exc_info: Optional[OptExcInfo]
 
+    # If the task completed successfully, this will be
+    # the value returned by the task.
+    result: Any
+
+    @property
+    def input_schema(self) -> Dict[str, Any]:
+        pass
+
+    @property
+    def output_schema(self) -> Dict[str, Any]:
+        pass
+
     @property
     def name(self) -> str:
         pass
@@ -55,7 +77,7 @@ class ITask(typing.Protocol):
     def lineno(self) -> int:
         pass
 
-    def run(self) -> None:
+    def run(self) -> Any:
         pass
 
     @property

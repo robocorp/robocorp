@@ -25,6 +25,12 @@ It can be called as:
 python -m robocorp.tasks -- --value=2
 ```
 
+- Methods can now return a value and if the task passes the returned value will be available at `task.result`.
+
+- When listing the tasks, the `input_schema` and `output_schema` of the task will be available
+  (as such, if values have arguments or outputs in the type definition, they'll be present according
+  to the schema). Right now the schema only supports `int`, `float`, `string` and `bool`.
+
 ## 2.4.2 - 2023-11-09
 
 - On early exit with `RC_OS_EXIT`, make sure that the logs are written prior to exiting.

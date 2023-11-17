@@ -29,13 +29,14 @@ def test_colect_tasks(datadir):
     assert len(tasks) == 1
 
     tasks = tuple(collect_tasks(datadir, ""))
-    assert len(tasks) == 3
-    assert {t.name for t in tasks} == {"main", "sub", "main_errors"}
+    assert len(tasks) == 4
+    assert {t.name for t in tasks} == {"main", "sub", "main_errors", "task_with_args"}
     name_to_task = dict((t.name, f"{t.module_name}.{t.name}") for t in tasks)
     assert name_to_task == {
         "main": "tasks.main",
         "sub": "sub.sub_task.sub",
         "main_errors": "tasks.main_errors",
+        "task_with_args": "tasks.task_with_args",
     }
 
     tasks = tuple(collect_tasks(datadir, "not_there"))
@@ -90,7 +91,7 @@ def test_list_tasks_api(datadir, tmpdir, data_regression):
     def check(result):
         output = result.stdout.decode("utf-8")
         loaded = json.loads(output)
-        assert len(loaded) == 3
+        assert len(loaded) == 4
         for entry in loaded:
             entry["file"] = os.path.basename(entry["file"])
         data_regression.check(loaded)

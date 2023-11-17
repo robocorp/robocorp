@@ -21,6 +21,7 @@ classifiers = [
 python = "^3.9"
 robocorp-log = ">=2.4,<3"
 psutil = "^5.9"
+docstring_parser_fork = "^0.0.5"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}

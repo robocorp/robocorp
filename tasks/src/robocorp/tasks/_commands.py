@@ -10,6 +10,8 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, List, Literal, Optional, Sequence, Union
 
+from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
+
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
 
@@ -57,6 +59,8 @@ def list_tasks(
                     "line": task.lineno,
                     "file": task.filename,
                     "docs": getattr(task.method, "__doc__") or "",
+                    "input_schema": task.input_schema,
+                    "output_schema": task.output_schema,
                 }
             )
 
@@ -372,7 +376,8 @@ def run(
                             args, kwargs = _normalize_arguments(
                                 task.method, additional_arguments or []
                             )
-                            task.run(*args, **kwargs)
+                            result = task.run(*args, **kwargs)
+                            task.result = result
                             task.status = Status.PASS
                         except Exception as e:
                             task.status = Status.FAIL
@@ -517,7 +522,8 @@ def _normalize_arguments(
         param_type = type_hints.get(param_name)
 
         if param_type:
-            if param_type not in (str, int, float, bool):
+            if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+                # TODO: Support array and object.
                 raise InvalidArgumentsError(
                     f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool."
                 )
