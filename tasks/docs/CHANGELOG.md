@@ -25,11 +25,27 @@ It can be called as:
 python -m robocorp.tasks -- --value=2
 ```
 
-- Methods can now return a value and if the task passes the returned value will be available at `task.result`.
+- Methods that return a will now have the returned value saved in `task.result`.
+  Note: the result is not directly used anywhere else inside the framework, but it's accessible to other
+  code using `@teardown` in the task level so it can be manipulated (so it could be streamed to
+  disk, some web-server, etc).
 
 - When listing the tasks, the `input_schema` and `output_schema` of the task will be available
   (as such, if values have arguments or outputs in the type definition, they'll be present according
-  to the schema). Right now the schema only supports `int`, `float`, `string` and `bool`.
+  to the schema). Right now the schema only supports `int`, `float`, `str` and `bool`.
+  
+- It's possible to specify modules to be pre-loaded when running tasks (meaning that they'll
+  be imported as the first step before collecting tasks).
+  This enables the usage of `@setup` and `@teardown` in different modules (as `@setup` and
+  `@teardown` need to be in the same module where `@task` is defined to work right now). 
+
+Example:
+
+The command line below will pre-load the module `my_setup` and `my_teardown`
+
+```python
+python -m robocorp.tasks --preload-module=my_setup --preload-module=my_teardown
+```
 
 ## 2.4.2 - 2023-11-09
 

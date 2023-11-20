@@ -136,7 +136,8 @@ def run(
     teardown_dump_threads_timeout: Optional[float] = None,
     teardown_interrupt_timeout: Optional[float] = None,
     os_exit: Optional[str] = None,
-    additional_arguments: Optional[list[str]] = None,
+    additional_arguments: Optional[List[str]] = None,
+    preload_module: Optional[List[str]] = None,
 ) -> int:
     """
     Runs a task.
@@ -182,6 +183,8 @@ def run(
             'after-teardown' means that the process will exit right after the
                 tasks session teardown takes place.
         additional_arguments: The arguments passed to the task.
+        preload_module: The modules which should be pre-loaded (i.e.: loaded
+            after the logging is in place but before any other task is collected).
 
     Returns:
         0 if everything went well.
@@ -330,14 +333,19 @@ def run(
             if task_name:
                 run_name += f" - {task_name}"
 
-            # Status string from `log` module
-            # TODO: Replace with enum
             run_status: Union[Literal["PASS"], Literal["ERROR"]] = "PASS"
             log.start_run(run_name)
             try:
                 setup_message = ""
                 log.start_task("Collect tasks", "setup", "", 0)
                 try:
+                    if preload_module:
+                        import importlib
+
+                        for module in preload_module:
+                            context.show(f"\nPre-loading module: {module}")
+                            importlib.import_module(module)
+
                     if not task_name:
                         context.show(f"\nCollecting tasks from: {path}")
                     else:

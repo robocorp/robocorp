@@ -107,6 +107,13 @@ class _ArgDispatcher:
         )
 
         run_parser.add_argument(
+            "--preload-module",
+            action="append",
+            help="May be used to load a module(s) as the first step when collecting tasks.",
+            dest="preload_module",
+        )
+
+        run_parser.add_argument(
             "--no-status-rc",
             help="When set, if running tasks has an error inside the task the return code of the process is 0.",
             dest="no_status_rc",

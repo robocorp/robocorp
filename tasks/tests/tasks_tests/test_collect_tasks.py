@@ -146,8 +146,12 @@ def test_error_in_stdout(datadir, tmpdir):
             dict(message_type="STB"),
         ],
     )
+    count = 0
+    for msg in msgs:
+        if msg["message_type"] == "STB":
+            count += 1
 
-    assert str(msgs).count("STB") == 1, "Only one Start Traceback message expected."
+    assert count == 1, "Only one Start Traceback message expected."
 
 
 def test_collect_duplicated_tasks(datadir, tmpdir):
