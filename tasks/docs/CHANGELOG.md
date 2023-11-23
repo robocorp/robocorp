@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.5.0 - 2023-11-23
 
 - Methods decorated with `@task` now can accept parameters. 
     - If the parameters have types declared, those are respected (but only str, bool, int and float are accepted).

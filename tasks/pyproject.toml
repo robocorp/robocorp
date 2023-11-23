@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-tasks"
-version = "2.4.2"
+version = "2.5.0"
 description = "The automation framework for Python"
 authors = [
 	"Fabio Zadrozny <fabio@robocorp.com>",
@@ -10,11 +10,12 @@ repository = "https://github.com/robocorp/robo/"
 license = "Apache-2.0"
 packages = [{include = "robocorp/tasks", from = "src"}]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 [tool.poetry.dependencies]

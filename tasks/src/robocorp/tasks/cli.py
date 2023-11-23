@@ -25,8 +25,8 @@ if sys.platform == "win32":
     # Apply workaround where `asyncio` would halt forever when windows UIAutomation.dll
     # is used with comtypes.
     # see: https://github.com/python/cpython/issues/111604
-    COINIT_MULTITHREADED = 0x0
-    sys.coinit_flags = COINIT_MULTITHREADED  # type:ignore
+    _COINIT_MULTITHREADED = 0x0
+    sys.coinit_flags = _COINIT_MULTITHREADED  # type:ignore
 
 # Just importing is enough to register the commands
 from . import _commands  # @UnusedImport

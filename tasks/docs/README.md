@@ -3,8 +3,6 @@
 `robocorp-tasks` is a Python framework designed to simplify the development 
 of Python automations.
 
-> Note: The current version (2.0.0) is now in beta. Semantic versioning is used in the project.
-
 ## Why
 
 While Python is widely used in the automation world, many solutions end up being 
@@ -31,7 +29,6 @@ from robocorp.tasks import task
 @task
 def my_task():
     ...
-    
 ```
 
 2. Call your task using the command line below, customizing the directory and task name as needed:

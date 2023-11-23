@@ -238,31 +238,35 @@ ______________________________________________________________________
 
 ## class `ITask`
 
-**Source:** [`_protocols.py:41`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L41)
+**Source:** [`_protocols.py:51`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L51)
 
 #### property `failed`
 
 Returns true if the task failed. (in which case usually exc_info is not None).
 
+#### property `input_schema`
+
 #### property `lineno`
 
 #### property `name`
+
+#### property `output_schema`
 
 ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`_protocols.py:58`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L58)
+**Source:** [`_protocols.py:80`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L80)
 
 ```python
-run() → None
+run() → Any
 ```
 
 ______________________________________________________________________
 
 ## enum `Status`
 
-**Source:** [`_protocols.py:33`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L33)
+**Source:** [`_protocols.py:43`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L43)
 
 Task state
 
