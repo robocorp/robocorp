@@ -268,11 +268,23 @@ def robocorp_tasks_run(
     additional_env: Optional[Dict[str, str]] = None,
     timeout=None,
 ) -> CompletedProcess:
+    return python_run(
+        ["-m", "robocorp.tasks"] + cmdline, returncode, cwd, additional_env, timeout
+    )
+
+
+def python_run(
+    cmdline,
+    returncode: Union[Literal["error"], int],
+    cwd=None,
+    additional_env: Optional[Dict[str, str]] = None,
+    timeout=None,
+) -> CompletedProcess:
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
     if additional_env:
         cp.update(additional_env)
-    args = [sys.executable, "-m", "robocorp.tasks"] + cmdline
+    args = [sys.executable] + cmdline
     result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd, timeout=timeout)
 
     if returncode == "error" and result.returncode:

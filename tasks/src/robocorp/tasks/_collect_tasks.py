@@ -4,7 +4,7 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, Dict, Iterator, List, Sequence
+from typing import Callable, Dict, Iterator, List, Optional, Sequence
 
 from robocorp.tasks._protocols import ITask
 
@@ -112,11 +112,13 @@ def _add_to_sys_path_0(root: Path):
             pass
 
 
-def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]:
+def collect_tasks(
+    path: Path, task_names: Sequence[str] = (), glob: Optional[str] = None
+) -> Iterator[ITask]:
     """
     Note: collecting tasks is not thread-safe.
     """
-    from robocorp.tasks import _hooks
+    from robocorp.tasks import _constants, _hooks
     from robocorp.tasks._task import Task
 
     task_names_as_set = set(task_names)
@@ -155,7 +157,23 @@ def collect_tasks(path: Path, task_names: Sequence[str] = ()) -> Iterator[ITask]
                 if package_init.exists():
                     lst.append(package_init)
 
-                for path_with_task in itertools.chain(lst, path.rglob("*task*.py")):
+                use_glob = glob or _constants.DEFAULT_TASK_SEARCH_GLOB
+
+                # We want to accept '|' in glob.
+                globs = use_glob.split("|")
+
+                # Use dict to make unique keeping order.
+                glob_paths = dict()
+                for g in globs:
+                    for p in path.rglob(g):
+                        glob_paths[p] = 1
+
+                for path_with_task in itertools.chain(lst, tuple(glob_paths.keys())):
+                    if path_with_task.is_dir() or not path_with_task.name.endswith(
+                        ".py"
+                    ):
+                        continue
+
                     module = import_path(path_with_task, root=root)
 
                     for method in methods_marked_as_tasks_found:

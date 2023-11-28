@@ -7,7 +7,7 @@ import pytest
 def test_argparse():
     from robocorp.tasks._argdispatch import arg_dispatch
 
-    parser = arg_dispatch.argparser
+    parser = arg_dispatch._create_argparser()
 
     s = io.StringIO()
     with redirect_stdout(s):

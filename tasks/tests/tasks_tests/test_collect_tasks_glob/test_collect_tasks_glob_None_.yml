@@ -1,0 +1,11 @@
+- docs: ''
+  file: my_task.py
+  input_schema:
+    additionalProperties: false
+    properties: {}
+    type: object
+  line: 4
+  name: task_on_my_task
+  output_schema:
+    description: ''
+    type: string

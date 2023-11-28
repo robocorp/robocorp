@@ -1,17 +1,18 @@
 from logging import getLogger
 from typing import List
 
+from robocorp.tasks import _constants
+
 log = getLogger(__name__)
 
 
 class _ArgDispatcher:
     def __init__(self):
         self._name_to_func = {}
-        self.argparser = self._create_argparser()
 
     def _dispatch(self, parsed) -> int:
         if not parsed.command:
-            self.argparser.print_help()
+            self._create_argparser().print_help()
             return 1
 
         method = self._name_to_func[parsed.command]
@@ -30,12 +31,28 @@ class _ArgDispatcher:
 
         return do_register
 
-    def _create_argparser(self):
+    def _get_description(self):
+        return "Robocorp framework for Python automations."
+
+    def _add_task_argument(self, run_parser):
+        run_parser.add_argument(
+            "-t",
+            "--task",
+            dest="task_name",
+            help="The name of the task that should be run.",
+            action="append",
+        )
+
+    def _get_argument_parser_class(self):
         import argparse
 
-        parser = argparse.ArgumentParser(
-            prog="robocorp.tasks",
-            description="Robocorp framework for Python automations.",
+        return argparse.ArgumentParser
+
+    def _create_argparser(self):
+        cls = self._get_argument_parser_class()
+        parser = cls(
+            prog=_constants.MODULE_ENTRY_POINT,
+            description=self._get_description(),
             epilog="View https://github.com/robocorp/robo for more information",
         )
 
@@ -44,7 +61,7 @@ class _ArgDispatcher:
         # Run
         run_parser = subparsers.add_parser(
             "run",
-            help="run will collect tasks with the @task decorator and run the first that matches based on the task name filter.",
+            help="Collects tasks with the @task decorator and all tasks that matches based on the task name filter.",
         )
         run_parser.add_argument(
             dest="path",
@@ -53,12 +70,10 @@ class _ArgDispatcher:
             default=".",
         )
         run_parser.add_argument(
-            "-t",
-            "--task",
-            dest="task_name",
-            help="The name of the task that should be run.",
-            action="append",
+            "--glob",
+            help="May be used to specify a glob to select from which files tasks should be searched (default '*task*.py')",
         )
+        self._add_task_argument(run_parser)
         run_parser.add_argument(
             "-o",
             "--output-dir",
@@ -152,6 +167,12 @@ class _ArgDispatcher:
             help="The directory or file from where the tasks should be listed (default is the current directory).",
             nargs="?",
             default=".",
+        )
+        list_parser.add_argument(
+            "--glob",
+            help=(
+                "May be used to specify a glob to select from which files tasks should be searched (default '*task*.py')"
+            ),
         )
 
         return parser

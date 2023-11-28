@@ -1,0 +1,11 @@
+- docs: ''
+  file: my_module.py
+  input_schema:
+    additionalProperties: false
+    properties: {}
+    type: object
+  line: 4
+  name: task_on_my_module
+  output_schema:
+    description: ''
+    type: string

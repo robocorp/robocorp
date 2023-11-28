@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- It's now possible to define `--glob` to define which files should be searched for `@task`s.
+    - The default is `*task*.py` (which was hard-coded in previous versions).
+    - `|` can be used to specify multiple glob matches.
+    - The search is always recursive (thus `**/` does not need to be added to the glob as it's redundant).
+    - Example `task.py|my_entry_point.py|*case.py`.
+
 ## 2.5.0 - 2023-11-23
 
 - Methods decorated with `@task` now can accept parameters. 

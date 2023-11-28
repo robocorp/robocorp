@@ -10,6 +10,7 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, List, Literal, Optional, Sequence, Union
 
+from robocorp.tasks import _constants
 from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
 
 from ._argdispatch import arg_dispatch as _arg_dispatch
@@ -17,9 +18,7 @@ from ._argdispatch import arg_dispatch as _arg_dispatch
 
 # Note: the args must match the 'dest' on the configured argparser.
 @_arg_dispatch.register(name="list")
-def list_tasks(
-    path: str,
-) -> int:
+def list_tasks(path: str, glob: Optional[str] = None) -> int:
     """
     Prints the tasks available at a given path to the stdout in json format.
 
@@ -52,7 +51,7 @@ def list_tasks(
     with redirect_stdout(sys.stderr):
         task: ITask
         tasks_found = []
-        for task in collect_tasks(p):
+        for task in collect_tasks(p, glob=glob):
             tasks_found.append(
                 {
                     "name": task.name,
@@ -138,6 +137,7 @@ def run(
     os_exit: Optional[str] = None,
     additional_arguments: Optional[List[str]] = None,
     preload_module: Optional[List[str]] = None,
+    glob: Optional[str] = None,
 ) -> int:
     """
     Runs a task.
@@ -185,6 +185,7 @@ def run(
         additional_arguments: The arguments passed to the task.
         preload_module: The modules which should be pre-loaded (i.e.: loaded
             after the logging is in place but before any other task is collected).
+        glob: A glob to define from which module names the tasks should be loaded.
 
     Returns:
         0 if everything went well.
@@ -353,7 +354,7 @@ def run(
                             f"\nCollecting {task_or_tasks} {task_name} from: {path}"
                         )
 
-                    tasks: List[ITask] = list(collect_tasks(p, task_names))
+                    tasks: List[ITask] = list(collect_tasks(p, task_names, glob))
 
                     if not tasks:
                         raise RobocorpTasksCollectError(
@@ -520,7 +521,7 @@ def _normalize_arguments(
 
     # Prepare the argument parser
     parser = _CustomArgumentParser(
-        prog=f"python -m robocorp.tasks {method_name} --",
+        prog=f"python -m {_constants.MODULE_ENTRY_POINT} {method_name} --",
         description=f"{method_name} task.",
         add_help=False,
     )
