@@ -3,7 +3,7 @@ name: Action Server Release
 on:
   push:
     tags:
-      - "robocorp-action-server-*"
+      - "robocorp-action_server-*"
 
 defaults:
   run:
