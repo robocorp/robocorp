@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "robocorp-action-server"
+version = "0.0.1"
+description = "Robocorp local task server"
+authors = [
+    "Fabio Zadrozny <fabiofz@gmail.com>",
+]
+readme = "README.md"
+repository = "https://github.com/robocorp/robo/"
+license = "Apache-2.0"
+packages = [{include = "robocorp", from="src"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.104.1"
+uvicorn = "^0.23.2"
+pydantic = "^2.4.2"
+jsonschema = "^4.19.2"
+PyYAML = "^6"
+robocorp-actions = "^0.0.1"
+
+[tool.poetry.group.dev.dependencies]
+robocorp-devutils = {path = "../devutils/", develop = true}
+requests = "^2"
+types-requests = "^2"
+types-PyYAML = "^6"
+robocorp-log-pytest = "^0.0.1"
+
+
+[tool.mypy]
+mypy_path = "src:tests"
+
+[tool.black]
+skip-string-normalization = false
+skip-magic-trailing-comma = false
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

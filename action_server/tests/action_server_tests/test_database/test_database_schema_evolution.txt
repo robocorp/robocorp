@@ -1,0 +1,38 @@
+
+CREATE TABLE IF NOT EXISTS action_package(
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    directory TEXT NOT NULL,
+    conda_hash TEXT NOT NULL,
+    env_json TEXT NOT NULL  
+)
+        
+
+
+CREATE TABLE IF NOT EXISTS action(
+    id TEXT NOT NULL PRIMARY KEY,
+    action_package_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    docs TEXT NOT NULL,
+    file TEXT NOT NULL,
+    lineno INTEGER NOT NULL,
+    input_schema TEXT NOT NULL,
+    output_schema TEXT NOT NULL,
+    FOREIGN KEY (action_package_id) REFERENCES action_package(id)  
+)
+        
+
+
+CREATE TABLE IF NOT EXISTS run(
+    id TEXT NOT NULL PRIMARY KEY,
+    status INTEGER NOT NULL,
+    action_id TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    run_time REAL,
+    inputs TEXT NOT NULL,
+    result TEXT,
+    error_message TEXT,
+    relative_artifacts_dir TEXT,
+    FOREIGN KEY (action_id) REFERENCES action(id)  
+)
+        

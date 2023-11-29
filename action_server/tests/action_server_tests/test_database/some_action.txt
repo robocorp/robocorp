@@ -1,0 +1,13 @@
+
+CREATE TABLE IF NOT EXISTS some_action(
+    id INTEGER NOT NULL PRIMARY KEY,
+    some_action_package_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    docs TEXT NOT NULL,
+    file TEXT NOT NULL,
+    lineno INTEGER NOT NULL,
+    input_schema TEXT NOT NULL,
+    output_schema TEXT NOT NULL,
+    FOREIGN KEY (some_action_package_id) REFERENCES some_action_package(id)  
+)
+        

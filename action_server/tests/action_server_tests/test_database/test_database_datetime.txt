@@ -1,0 +1,30 @@
+{
+    "some_action_package": [
+        {
+            "id": 1,
+            "name": "my_name",
+            "condayaml": "conda contents"
+        }
+    ],
+    "some_action": [
+        {
+            "id": 1,
+            "some_action_package_id": 1,
+            "name": "action",
+            "docs": "docs",
+            "file": "file",
+            "lineno": 22,
+            "input_schema": "{}",
+            "output_schema": "{}"
+        }
+    ],
+    "some_run": [
+        {
+            "id": 1,
+            "status": 1,
+            "some_action_id": 1,
+            "start_time": "2023-11-22T13:50:37.457881+00:00",
+            "end_time": null
+        }
+    ]
+}
