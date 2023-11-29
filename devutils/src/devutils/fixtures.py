@@ -273,6 +273,18 @@ def robocorp_tasks_run(
     )
 
 
+def robocorp_actions_run(
+    cmdline,
+    returncode: Union[Literal["error"], int],
+    cwd=None,
+    additional_env: Optional[Dict[str, str]] = None,
+    timeout=None,
+) -> CompletedProcess:
+    return python_run(
+        ["-m", "robocorp.actions"] + cmdline, returncode, cwd, additional_env, timeout
+    )
+
+
 def python_run(
     cmdline,
     returncode: Union[Literal["error"], int],

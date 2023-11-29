@@ -1,4 +1,4 @@
-name: Tasks Tests
+name: Actions Tests
 
 on:
   push:
@@ -6,20 +6,20 @@ on:
       - "master"
       - "wip"
     paths:
-      - "tasks/**"
+      - "actions/**"
       - "log/**"
-      - ".github/workflows/tasks_tests.yml"
+      - ".github/workflows/actions_tests.yml"
   pull_request:
     branches:
       - "master"
     paths:
-      - "tasks/**"
+      - "actions/**"
       - "log/**"
-      - ".github/workflows/tasks_tests.yml"
+      - ".github/workflows/actions_tests.yml"
 
 defaults:
   run:
-    working-directory: './tasks'
+    working-directory: './actions'
 
 jobs:
   build:
@@ -29,13 +29,13 @@ jobs:
       fail-fast: false
       matrix:
         name: [
-          "ubuntu-py39-devmode",
+          "ubuntu-py310-devmode",
 #           "windows-py310",
         ]
 
         include:
-          - name: "ubuntu-py39-devmode"
-            python: "3.9"
+          - name: "ubuntu-py310-devmode"
+            python: "3.10"
             os: ubuntu-latest
             PATH_SEPARATOR: ":"
 #           - name: "windows-py310"
@@ -101,18 +101,20 @@ jobs:
       run: |
         poetry run black --check src tests
     
-    - name: mypy robocorp-tasks
+    - name: mypy robocorp-actions
+      if: always()
       run: |
         poetry run mypy --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases src tests
         
     # Note: the env for dev mode or not is already setup at this point.
     - name: Test
+      if: always()
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
-        # We need to access robocorp_log_tests.fixtures in tasks tests.
+        # We need to access robocorp_log_tests.fixtures in actions tests.
         PYTHONPATH: '../log/tests'
       run: |
-        poetry run pytest -rfE -vv tests/tasks_tests
+        poetry run pytest -rfE -vv tests/actions_tests
         
 
 

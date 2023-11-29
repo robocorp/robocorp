@@ -1,0 +1,15 @@
+usage: robocorp.actions [-h] {run,list} ...
+
+Robocorp Actions library
+
+positional arguments:
+  {run,list}
+    run       Collects actions with the @action decorator and all actions that
+              matches based on the action name filter.
+    list      Provides output to stdout with json contents of the actions
+              available.
+
+options:
+  -h, --help  show this help message and exit
+
+View https://github.com/robocorp/robo for more information

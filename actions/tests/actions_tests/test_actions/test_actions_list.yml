@@ -1,0 +1,58 @@
+- docs: "\n    This always raises an error.\n    "
+  file: calculator_actions.py
+  input_schema:
+    additionalProperties: false
+    properties: {}
+    type: object
+  line: 19
+  name: broken_task
+  output_schema:
+    description: ''
+    type: integer
+- docs: "\n    Sums 2 numbers and returns them.\n\n    Args:\n        v1: First number.\n\
+    \        v2: Second number.\n\n    Returns:\n        The sum of v1 + v2.\n    "
+  file: calculator_actions.py
+  input_schema:
+    additionalProperties: false
+    properties:
+      v1:
+        description: First number.
+        title: V1
+        type: number
+      v2:
+        description: Second number.
+        title: V2
+        type: number
+    required:
+    - v1
+    - v2
+    type: object
+  line: 4
+  name: calculator_sum
+  output_schema:
+    description: The sum of v1 + v2.
+    type: number
+- docs: "\n    Provides a greeting for a person.\n\n    Args:\n        name: The name\
+    \ of the person to greet.\n        title: The title for the persor (Mr., Mrs.,\
+    \ ...).\n\n    Returns:\n        The greeting for the person.\n    "
+  file: greeter_actions.py
+  input_schema:
+    additionalProperties: false
+    properties:
+      name:
+        description: The name of the person to greet.
+        title: Name
+        type: string
+      title:
+        default: Mr.
+        description: The title for the persor (Mr., Mrs., ...).
+        title: Title
+        type: string
+    required:
+    - name
+    type: object
+  line: 34
+  name: greet
+  output_schema:
+    description: The greeting for the person.
+    type: string
