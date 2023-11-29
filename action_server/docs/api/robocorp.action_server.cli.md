@@ -8,7 +8,7 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`cli.py:105`](https://github.com/robocorp/robo/tree/master/action_server/src/robocorp/action_server/cli.py#L105)
+**Source:** [`cli.py:157`](https://github.com/robocorp/robo/tree/master/action_server/src/robocorp/action_server/cli.py#L157)
 
 ```python
 main() → None

@@ -35,7 +35,7 @@ CURDIR = Path(__file__).parent.absolute()
 #             json.dump(schema, file, indent=4)
 
 
-def add_data_args(parser, defaults):
+def _add_data_args(parser, defaults):
     parser.add_argument(
         "-d",
         "--datadir",
@@ -56,7 +56,7 @@ def add_data_args(parser, defaults):
     )
 
 
-def add_verbose_args(parser, defaults):
+def _add_verbose_args(parser, defaults):
     parser.add_argument(
         "-v",
         "--verbose",
@@ -94,8 +94,8 @@ def _create_parser():
         default=defaults["port"],
         help="Server port (default: %(default)s)",
     )
-    add_data_args(start_parser, defaults)
-    add_verbose_args(start_parser, defaults)
+    _add_data_args(start_parser, defaults)
+    _add_verbose_args(start_parser, defaults)
 
     # Import
     import_parser = subparsers.add_parser(
@@ -110,8 +110,8 @@ def _create_parser():
         action="append",
     )
 
-    add_data_args(import_parser, defaults)
-    add_verbose_args(import_parser, defaults)
+    _add_data_args(import_parser, defaults)
+    _add_verbose_args(import_parser, defaults)
 
     # Download RCC
     rcc_parser = subparsers.add_parser(
