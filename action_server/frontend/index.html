@@ -3,27 +3,13 @@
 
 <head>
   <meta charset="utf-8" />
-  <title>Log</title>
+  <title>Robocorp Action Server</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 
 <body>
   <div id="root" />
   <script type="module" src="/src/index.tsx"></script>
-  <script>
-    window.addEventListener('load', function () {
-      try {
-        const vscode = acquireVsCodeApi();
-        window.setVSCodeAPI(vscode);
-      } catch (err) {
-        // That's ok (not running in VSCode).
-        window.setContents({
-          "initialContents": window.getSampleContents(),
-        });
-      }
-    })
-  </script>
 </body>
-
 
 </html>

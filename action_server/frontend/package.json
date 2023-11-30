@@ -1,8 +1,8 @@
 {
   "name": "robocorp-action-server-frontend",
   "description": "",
-  "version": "0.1.0",
-  "copyright": "Copyright 2021 Robocorp Technologies, Inc.",
+  "version": "0.0.1",
+  "copyright": "Copyright 2023 Robocorp Technologies, Inc.",
   "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
   "author": {
@@ -23,9 +23,9 @@
     "test": "jest"
   },
   "dependencies": {
-    "@robocorp/components": "1.0.2-RC1",
-    "@robocorp/icons": "^1.0.0",
-    "@robocorp/theme": "^1.0.0",
+    "@robocorp/components": "1.3.2",
+    "@robocorp/icons": "^2.1.2",
+    "@robocorp/theme": "^1.0.1",
     "date-fns": "^2.30.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
