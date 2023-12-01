@@ -1,6 +1,6 @@
 import { SideNavigation, Menu, Box, Link } from '@robocorp/components';
 import { IconActivity } from '@robocorp/icons';
-import { FC, StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
+import { StrictMode, useCallback, useMemo, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
 import {
@@ -8,7 +8,6 @@ import {
   ActionServerContextType,
   ViewSettings,
   defaultActionServerState,
-  defaultTheme,
 } from '../lib/actionServerContext';
 import { HeaderAndMenu } from './HeaderAndMenu';
 import { Outlet, RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
@@ -72,9 +71,18 @@ const Root = () => {
     defaultActionServerState.viewSettings,
   );
   const [loadedRuns, setLoadedRuns] = useState<LoadedRuns>(defaultActionServerState.loadedRuns);
-  const [loadedActions, setLoadedActions] = useState<LoadedActions>(defaultActionServerState.loadedActions);
+  const [loadedActions, setLoadedActions] = useState<LoadedActions>(
+    defaultActionServerState.loadedActions,
+  );
 
-  const ctx: ActionServerContextType = { viewSettings, setViewSettings, loadedRuns, setLoadedRuns, loadedActions, setLoadedActions };
+  const ctx: ActionServerContextType = {
+    viewSettings,
+    setViewSettings,
+    loadedRuns,
+    setLoadedRuns,
+    loadedActions,
+    setLoadedActions,
+  };
 
   const actionServerContextValue = useMemo(
     () => ctx,
@@ -103,6 +111,7 @@ const Root = () => {
             <Menu.Item
               icon={<IconActivity size="small" />}
               onClick={() => {
+                refreshActions(loadedActions, setLoadedActions);
                 refreshRuns(loadedRuns, setLoadedRuns);
                 navigate('/runs');
               }}

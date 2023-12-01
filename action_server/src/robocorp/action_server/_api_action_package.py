@@ -15,7 +15,7 @@ class ActionPackageApi:
     actions: List[Action]
 
 
-@action_package_api_router.get("/", response_model=List[ActionPackageApi])
+@action_package_api_router.get("", response_model=List[ActionPackageApi])
 def list_action_packages():
     from robocorp.action_server._models import get_db
 

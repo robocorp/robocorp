@@ -212,7 +212,11 @@ class ActionServerClient:
         return self.get_str("openapi.json")
 
     def get_json(self, url):
-        return json.loads(self.get_str(url))
+        contents = self.get_str(url)
+        try:
+            return json.loads(contents)
+        except Exception:
+            raise AssertionError(f"Unable to load: {contents!r}")
 
     def post_get_str(self, url, data):
         import requests

@@ -10,7 +10,7 @@ from robocorp.action_server._models import Run
 run_api_router = APIRouter(prefix="/api/runs")
 
 
-@run_api_router.get("/", response_model=List[Run])
+@run_api_router.get("", response_model=List[Run])
 def list_runs(
     page: Annotated[int, Query(description="The page to be gotten")] = 1,
     limit: Annotated[

@@ -1,9 +1,9 @@
 import { Badge, BadgeVariant, Box, Link, Panel, Table } from '@robocorp/components';
 import { FC, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Run } from '~/lib/types';
+import { Run, RunTableEntry } from '~/lib/types';
 import { useActionServerContext } from '~/lib/actionServerContext';
-import { refreshRuns } from '~/lib/requestData';
+import { refreshActions, refreshRuns } from '~/lib/requestData';
 
 const NOT_RUN = 0;
 const RUNNING = 1;
@@ -47,7 +47,7 @@ export const ActionRuns: FC<{}> = () => {
     },
   ];
 
-  const runRow: FC<{ rowData: Run }> = ({ rowData }) => {
+  const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
     const navigate = useNavigate();
 
     let result;
@@ -65,7 +65,7 @@ export const ActionRuns: FC<{}> = () => {
               navigate(`/runs/${rowData.id}`);
             }}
           >
-            {rowData.id}
+            {rowData.action_name}
           </Link>
         </Table.Cell>
         <Table.Cell>
@@ -76,11 +76,12 @@ export const ActionRuns: FC<{}> = () => {
     );
   };
 
-  const { loadedRuns, setLoadedRuns } = useActionServerContext();
+  const { loadedRuns, setLoadedRuns, loadedActions, setLoadedActions } = useActionServerContext();
   useEffect(() => {
+    refreshActions(loadedActions, setLoadedActions);
     refreshRuns(loadedRuns, setLoadedRuns);
   }, []);
-  
+
   if (loadedRuns.errorMessage) {
     return (
       <Panel header={'Runs'} loading={true} empty={true} divider={false}>
@@ -91,16 +92,30 @@ export const ActionRuns: FC<{}> = () => {
     );
   }
 
-  const isPending = loadedRuns.isPending;
-  let data: Run[];
-  if (isPending) {
-    data = [];
-  } else {
-    data = loadedRuns.data || [];
+  const isPending = loadedRuns.isPending || loadedActions.isPending;
+  let runTableData: RunTableEntry[] = [];
+  if (!isPending) {
+    const loadedRunsData = loadedRuns.data || [];
+
+    const actionIdToName: Map<string, string> = new Map();
+    if (loadedRunsData.length > 0) {
+      // Create dict of action id -> action name
+      for (const actionPackage of loadedActions.data || []) {
+        for (const action of actionPackage.actions) {
+          actionIdToName.set(action.id, action.name);
+        }
+      }
+
+      for (const run of loadedRunsData) {
+        const actionName = actionIdToName.get(run.action_id) || '<unable to get>';
+        runTableData.push({ ...run, action_name: actionName });
+      }
+    }
+
   }
   return (
-    <Panel header={'Runs'} loading={isPending} empty={data.length === 0} divider={false}>
-      <Table columns={columns} data={data} row={runRow} rowCount={10} />
+    <Panel header={'Runs'} loading={isPending} empty={runTableData.length === 0} divider={false}>
+      <Table columns={columns} data={runTableData} row={runRow} rowCount={10} />
     </Panel>
   );
 };

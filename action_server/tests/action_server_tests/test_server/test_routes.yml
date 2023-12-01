@@ -140,9 +140,20 @@ info:
   version: 0.1.0
 openapi: 3.1.0
 paths:
-  /api/actionPackages/:
+  /:
     get:
-      operationId: list_action_packages_api_actionPackages__get
+      operationId: serve_index__get
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Successful Response
+      summary: Serve Index
+  /api/actionPackages:
+    get:
+      operationId: list_action_packages_api_actionPackages_get
       responses:
         '200':
           content:
@@ -150,7 +161,7 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/ActionPackageApi'
-                title: Response List Action Packages Api Actionpackages  Get
+                title: Response List Action Packages Api Actionpackages Get
                 type: array
           description: Successful Response
       summary: List Action Packages
@@ -191,9 +202,9 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Greet
-  /api/runs/:
+  /api/runs:
     get:
-      operationId: list_runs_api_runs__get
+      operationId: list_runs_api_runs_get
       parameters:
       - description: The page to be gotten
         in: query
@@ -221,7 +232,7 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/Run'
-                title: Response List Runs Api Runs  Get
+                title: Response List Runs Api Runs Get
                 type: array
           description: Successful Response
         '422':
@@ -255,3 +266,27 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Show Run
+  /{full_path}:
+    get:
+      operationId: serve_index_catch_all__full_path__get
+      parameters:
+      - in: path
+        name: full_path
+        required: true
+        schema:
+          title: Full Path
+          type: string
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Serve Index Catch All
