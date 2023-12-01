@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { isDocumentDefined, isWindowDefined, logError } from './helpers';
+import { LoadedActions, LoadedRuns, Run } from './types';
 
 export let defaultTheme: 'light' | 'dark' = 'light';
 try {
@@ -32,6 +33,10 @@ export type ViewSettings = {
 export type ActionServerContextType = {
   viewSettings: ViewSettings;
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
+  loadedRuns: LoadedRuns;
+  setLoadedRuns: Dispatch<SetStateAction<LoadedRuns>>;
+  loadedActions: LoadedActions;
+  setLoadedActions: Dispatch<SetStateAction<LoadedActions>>;
 };
 
 export const defaultActionServerState: ActionServerContextType = {
@@ -39,7 +44,26 @@ export const defaultActionServerState: ActionServerContextType = {
     theme: defaultTheme,
   },
   setViewSettings: () => null,
+
+  // Runs
+  loadedRuns: {
+    isPending: true,
+    requestedOnce: false,
+    data: [],
+    errorMessage: undefined,
+  },
+  setLoadedRuns: () => null,
+
+  // Actions
+  loadedActions: {
+    isPending: true,
+    requestedOnce: false,
+    data: [],
+    errorMessage: undefined,
+  },
+  setLoadedActions: () => null,
 };
+
 export const ActionServerContext = createContext<ActionServerContextType>(defaultActionServerState);
 
 export const useActionServerContext = () => {

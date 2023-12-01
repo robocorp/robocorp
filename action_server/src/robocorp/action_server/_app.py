@@ -29,6 +29,4 @@ def get_app():
     app.add_exception_handler(RequestValidationError, _errors.http422_error_handler)
     app.add_exception_handler(Exception, _errors.http500_error_handler)
 
-    # app.include_router(api_router)
-
     return app

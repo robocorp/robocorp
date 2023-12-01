@@ -1,10 +1,14 @@
 import logging
+from pathlib import Path
 from typing import Dict, Optional
 
 import uvicorn
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
 log = logging.getLogger(__name__)
+
+CURDIR = Path(__file__).parent.absolute()
 
 
 def _name_as_summary(name):
@@ -17,8 +21,11 @@ def _name_to_url(name):
 
 def start_server() -> None:
     import docstring_parser
+    from starlette.requests import Request
+    from starlette.responses import HTMLResponse
 
     from . import _actions_run
+    from ._api_action_package import action_package_api_router
     from ._api_run import run_api_router
     from ._app import get_app
     from ._models import Action, ActionPackage, get_db
@@ -45,12 +52,6 @@ def start_server() -> None:
         StaticFiles(directory=artifacts_dir),
         name="artifacts",
     )
-    # This has the nasty side-effect of not allowing further routes to work!
-    # app.mount(
-    #     "/",
-    #     StaticFiles(packages=[("robocorp.action_server", "_static")], html=True),
-    #     name="static",
-    # )
 
     db = get_db()
     action: Action
@@ -89,6 +90,16 @@ def start_server() -> None:
         )
 
     app.include_router(run_api_router)
+    app.include_router(action_package_api_router)
+
+    @app.get("/", response_class=HTMLResponse)
+    async def serve_spa(request: Request):
+        return FileResponse(CURDIR / "_static" / "index.html")
+
+    # Define a catch-all route to handle client-side routing in the SPA
+    @app.get("/{full_path:path}", response_class=HTMLResponse)
+    async def spa_catch_all(full_path: str, request: Request):
+        return FileResponse(CURDIR / "_static" / "index.html")
 
     kwargs = settings.to_uvicorn()
     uvicorn.run(app, **kwargs)

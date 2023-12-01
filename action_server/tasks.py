@@ -1,5 +1,4 @@
 import os
-import platform
 import shutil
 import sys
 from contextlib import contextmanager

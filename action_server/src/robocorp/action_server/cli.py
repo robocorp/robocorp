@@ -1,12 +1,10 @@
 import argparse
-import json
 import logging
 import sys
 from pathlib import Path
 from typing import Union
 
 from . import __version__
-from ._server import start_server
 from ._settings import Settings, get_settings
 
 log = logging.getLogger(__name__)
@@ -232,6 +230,8 @@ def main() -> None:
             return
 
         if command == "start":
+            from ._server import start_server
+
             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
             start_server()
             return

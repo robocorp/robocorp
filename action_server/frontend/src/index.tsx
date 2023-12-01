@@ -5,6 +5,5 @@ const container = document.getElementById('root');
 
 if (container) {
   const root = createRoot(container);
-  // root.render(<p>Add content here</p>);
   root.render(<ActionServer/>);
 }

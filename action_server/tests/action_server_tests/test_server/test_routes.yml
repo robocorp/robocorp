@@ -1,5 +1,61 @@
 components:
   schemas:
+    Action:
+      properties:
+        action_package_id:
+          title: Action Package Id
+          type: string
+        docs:
+          title: Docs
+          type: string
+        file:
+          title: File
+          type: string
+        id:
+          title: Id
+          type: string
+        input_schema:
+          title: Input Schema
+          type: string
+        lineno:
+          title: Lineno
+          type: integer
+        name:
+          title: Name
+          type: string
+        output_schema:
+          title: Output Schema
+          type: string
+      required:
+      - id
+      - action_package_id
+      - name
+      - docs
+      - file
+      - lineno
+      - input_schema
+      - output_schema
+      title: Action
+      type: object
+    ActionPackageApi:
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/Action'
+          title: Actions
+          type: array
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+      required:
+      - id
+      - name
+      - actions
+      title: ActionPackageApi
+      type: object
     HTTPValidationError:
       properties:
         errors:
@@ -84,6 +140,20 @@ info:
   version: 0.1.0
 openapi: 3.1.0
 paths:
+  /api/actionPackages/:
+    get:
+      operationId: list_action_packages_api_actionPackages__get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ActionPackageApi'
+                title: Response List Action Packages Api Actionpackages  Get
+                type: array
+          description: Successful Response
+      summary: List Action Packages
   /api/actions/greeter/greet/run:
     post:
       description: Provides a greeting for a person.
