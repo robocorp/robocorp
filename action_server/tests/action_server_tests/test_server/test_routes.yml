@@ -140,17 +140,6 @@ info:
   version: 0.1.0
 openapi: 3.1.0
 paths:
-  /:
-    get:
-      operationId: serve_index__get
-      responses:
-        '200':
-          content:
-            text/html:
-              schema:
-                type: string
-          description: Successful Response
-      summary: Serve Index
   /api/actionPackages:
     get:
       operationId: list_action_packages_api_actionPackages_get
@@ -266,27 +255,3 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Show Run
-  /{full_path}:
-    get:
-      operationId: serve_index_catch_all__full_path__get
-      parameters:
-      - in: path
-        name: full_path
-        required: true
-        schema:
-          title: Full Path
-          type: string
-      responses:
-        '200':
-          content:
-            text/html:
-              schema:
-                type: string
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      summary: Serve Index Catch All

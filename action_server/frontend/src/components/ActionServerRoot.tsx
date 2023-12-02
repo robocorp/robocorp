@@ -132,7 +132,7 @@ const Root = () => {
   );
 };
 
-export const ActionServer = () => {
+export const ActionServerRoot = () => {
   const router = createBrowserRouter([
     {
       path: '/',

@@ -92,14 +92,17 @@ def start_server() -> None:
     app.include_router(run_api_router)
     app.include_router(action_package_api_router)
 
-    @app.get("/", response_class=HTMLResponse)
     async def serve_index(request: Request):
         return FileResponse(CURDIR / "_static" / "index.html")
 
-    # Define a catch-all route to handle client-side routing in the SPA
-    @app.get("/{full_path:path}", response_class=HTMLResponse)
-    async def serve_index_catch_all(full_path: str, request: Request):
-        return FileResponse(CURDIR / "_static" / "index.html")
+    index_routes = ["/", "/runs/{full_path:path}", "/actions/{full_path:path}"]
+    for index_route in index_routes:
+        app.add_api_route(
+            index_route,
+            serve_index,
+            response_class=HTMLResponse,
+            include_in_schema=False,
+        )
 
     kwargs = settings.to_uvicorn()
     uvicorn.run(app, **kwargs)

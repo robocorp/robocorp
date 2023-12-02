@@ -62,7 +62,7 @@ const createFunc = (url: string, method = 'GET'): any => {
   return ret;
 };
 
-const debouncedLoadRuns = debounce(createFunc(baseUrl + '/api/runs/', 'GET'), 300);
+const debouncedLoadRuns = debounce(createFunc(baseUrl + '/api/runs', 'GET'), 300);
 
 export const refreshRuns = async (
   loadedRuns: LoadedRuns,
@@ -71,7 +71,7 @@ export const refreshRuns = async (
   debouncedLoadRuns(loadedRuns, setLoadedRuns);
 };
 
-const debouncedLoadActions = debounce(createFunc(baseUrl + '/api/actionPackages/', 'GET'), 300);
+const debouncedLoadActions = debounce(createFunc(baseUrl + '/api/actionPackages', 'GET'), 300);
 
 export const refreshActions = async (
   loadedActions: LoadedActions,

@@ -1,12 +1,43 @@
-import { Badge, Box, Header, Panel } from '@robocorp/components';
-import { useEffect } from 'react';
+import { Badge, Box, Header, Link, Panel } from '@robocorp/components';
+import {
+  Dispatch,
+  FC,
+  MouseEvent,
+  SetStateAction,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { refreshActions } from '~/lib/requestData';
-import { ActionPackage } from '~/lib/types';
+import { Action, ActionPackage } from '~/lib/types';
+import { ActionDetails } from './ActionDetails';
+
+const ActionComponent: FC<{ action: Action }> = ({ action }) => {
+  const { setShowAction } = useActionsContext();
+
+  const onClickAction = useCallback(
+    (event: MouseEvent) => {
+      // navigate(`/runs/${rowData.id}`);
+      setShowAction(action);
+      event.stopPropagation();
+    },
+    [action],
+  );
+  return (
+    <Box p={20} key={action.id} style={{ marginLeft: 25 }}>
+      <Link onClick={onClickAction}>{action.name}</Link>
+    </Box>
+  );
+};
 
 export const ActionPackages = () => {
   const { loadedActions, setLoadedActions } = useActionServerContext();
-  
+  const [showAction, setShowAction] = useState<Action | undefined>(undefined);
+
   useEffect(() => {
     refreshActions(loadedActions, setLoadedActions);
   }, []);
@@ -33,11 +64,7 @@ export const ActionPackages = () => {
   for (const actionPackage of data) {
     const children = [];
     for (const action of actionPackage.actions) {
-      children.push(
-        <Box p={20} key={action.id} style={{marginLeft:25}}>
-          {action.name}
-        </Box>,
-      );
+      children.push(<ActionComponent key={action.id} action={action} />);
     }
     const header = <strong>{actionPackage.name}</strong>;
     contents.push(
@@ -47,13 +74,38 @@ export const ActionPackages = () => {
     );
   }
 
+  const ctx: ActionsContextType = {
+    showAction,
+    setShowAction,
+  };
+
+  const contextMemoized = useMemo(() => ctx, [showAction, setShowAction]);
+
   return (
     <div>
-      <Header>
-        <Header.Title title="Action Packages">
-        </Header.Title>
-      </Header>
-      {contents}
+      <ActionsContext.Provider value={contextMemoized}>
+        <Header>
+          <Header.Title title="Action Packages"></Header.Title>
+        </Header>
+        {contents}
+        <ActionDetails />
+      </ActionsContext.Provider>
     </div>
   );
+};
+
+export type ActionsContextType = {
+  showAction: Action | undefined;
+  setShowAction: Dispatch<SetStateAction<Action | undefined>>;
+};
+
+const ActionsContext = createContext<ActionsContextType>({
+  showAction: undefined,
+  setShowAction: () => {
+    return null;
+  },
+});
+
+export const useActionsContext = () => {
+  return useContext(ActionsContext);
 };

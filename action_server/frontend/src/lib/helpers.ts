@@ -1,4 +1,5 @@
 import * as DOMPurify from 'dompurify';
+import parseISO from 'date-fns/parseISO';
 
 export function entryIdDepth(id: string) {
   return id.split('-').length - 1;
@@ -125,3 +126,21 @@ export const isDocumentDefined = () => {
   }
   return true;
 };
+
+let parseDate = parseISO;
+if (parseDate === undefined) {
+  // Note (fabioz): when running npm test the import is returning an undefined,
+  // yet a require works (why? no idea...)
+  parseDate = require('date-fns/parseISO');
+}
+
+export function parseDateisoformatToLocalTimezoneDate(time: string) {
+  return parseDate(time);
+}
+
+export function parseDateisoformatToLocalTimezoneStr(time: string) {
+  const parsedTime = parseDate(time);
+  // Note: doing toString() in an utc time (which ends with +00:00)
+  // will convert it to the local timezone.
+  return parsedTime.toString();
+}
