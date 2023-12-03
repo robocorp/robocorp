@@ -56,6 +56,19 @@ components:
       - actions
       title: ActionPackageApi
       type: object
+    ArtifactInfo:
+      properties:
+        name:
+          title: Name
+          type: string
+        size_in_bytes:
+          title: Size In Bytes
+          type: integer
+      required:
+      - name
+      - size_in_bytes
+      title: ArtifactInfo
+      type: object
     GreetInput:
       properties:
         name:
@@ -97,10 +110,8 @@ components:
           title: Inputs
           type: string
         relative_artifacts_dir:
-          anyOf:
-          - type: string
-          - type: 'null'
           title: Relative Artifacts Dir
+          type: string
         result:
           anyOf:
           - type: string
@@ -259,3 +270,98 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Show Run
+  /api/runs/{run_id}/artifacts:
+    get:
+      operationId: get_run_artifacts_api_runs__run_id__artifacts_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: 'Provides a list with the artifacts available
+
+                  for a given run (i.e.: [{''name'': ''__action_server_output.txt'',
+                  ''size_in_bytes'': 22}])
+
+                  '
+                items:
+                  $ref: '#/components/schemas/ArtifactInfo'
+                title: Response Get Run Artifacts Api Runs  Run Id  Artifacts Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Artifacts
+  /api/runs/{run_id}/artifacts/binary-content:
+    get:
+      operationId: get_run_artifact_binary_api_runs__run_id__artifacts_binary_content_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      - in: query
+        name: artifact_name
+        required: true
+        schema:
+          title: Artifact name for which the content should be gotten.
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Artifact Binary
+  /api/runs/{run_id}/artifacts/text-content:
+    get:
+      operationId: get_run_artifact_text_api_runs__run_id__artifacts_text_content_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      - in: query
+        name: artifact_names
+        required: true
+        schema:
+          items:
+            type: string
+          title: Artifact names for which the content should be gotten.
+          type: array
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Get Run Artifact Text Api Runs  Run Id  Artifacts
+                  Text Content Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Artifact Text

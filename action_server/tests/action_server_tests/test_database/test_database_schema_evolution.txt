@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS run(
     inputs TEXT NOT NULL,
     result TEXT,
     error_message TEXT,
-    relative_artifacts_dir TEXT,
+    relative_artifacts_dir TEXT NOT NULL,
     FOREIGN KEY (action_id) REFERENCES action(id)  
 )
         

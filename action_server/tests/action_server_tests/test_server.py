@@ -125,13 +125,57 @@ def check_runs_after_import_db(client: ActionServerClient, db_path):
                 # Just check that it works.
                 str_to_datetime(run.start_time)
 
+            # Check for the first run (where we write a custom artifact).
+            run = runs[0]
+
+            found = client.get_json(f"api/runs/{run.id}/artifacts")
+            assert sorted(x["name"] for x in found) == sorted(
+                (
+                    "__action_server_inputs.json",
+                    "log.html",
+                    "output.robolog",
+                    "__action_server_output.txt",
+                    "__action_server_result.json",
+                    "subdir/myfile.txt",
+                )
+            )
+
+            # Multiple text files
+            found = client.get_json(
+                f"api/runs/{run.id}/artifacts/text-content",
+                params={
+                    "artifact_names": [
+                        "__action_server_output.txt",
+                        "output.robolog",
+                    ]
+                },
+            )
+
+            assert len(found) == 2
+            assert (
+                "Collecting task greet from: greeter_task.py"
+                in found["__action_server_output.txt"]
+            )
+            assert '"PASS"' in found["output.robolog"]
+
+            # Just a single binary artifact
+            found = client.get_str(
+                f"api/runs/{run.id}/artifacts/binary-content",
+                params={
+                    "artifact_name": [
+                        "__action_server_output.txt",
+                    ]
+                },
+            )
+
+            assert "Collecting task greet from: greeter_task.py" in found
+
 
 def test_fast(action_server_process: ActionServerProcess, db_from_test_import):
     action_server_process.start(("--db-file=server.db",))
 
-    check_runs_after_import_db(
-        ActionServerClient(action_server_process), db_from_test_import
-    )
+    client = ActionServerClient(action_server_process)
+    check_runs_after_import_db(client, db_from_test_import)
 
 
 @pytest.fixture(scope="session")

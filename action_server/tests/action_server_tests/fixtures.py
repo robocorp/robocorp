@@ -201,18 +201,18 @@ class ActionServerClient:
             url = url[1:]
         return f"http://{host}:{port}/{url}"
 
-    def get_str(self, url) -> str:
+    def get_str(self, url, params: Optional[dict] = None) -> str:
         import requests
 
-        result = requests.get(self.build_full_url(url))
+        result = requests.get(self.build_full_url(url), params=(params or {}))
         assert result.status_code == 200
         return result.text
 
     def get_openapi_json(self):
         return self.get_str("openapi.json")
 
-    def get_json(self, url):
-        contents = self.get_str(url)
+    def get_json(self, url, params: Optional[dict] = None):
+        contents = self.get_str(url, params=params)
         try:
             return json.loads(contents)
         except Exception:

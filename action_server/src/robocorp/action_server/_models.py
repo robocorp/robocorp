@@ -56,7 +56,7 @@ class Run:
     error_message: Optional[str]  # If the status=failed, this may have an error message
 
     # The path (relative to the datadir) of the artifacts generated in the run
-    relative_artifacts_dir: Optional[str]
+    relative_artifacts_dir: str
 
 
 class RunStatus:

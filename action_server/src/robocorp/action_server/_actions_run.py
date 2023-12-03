@@ -166,17 +166,23 @@ def _run_action_in_thread(
             )
 
             result_json = env["RC_ACTION_RESULT_LOCATION"] = str(
-                settings.artifacts_dir / relative_artifacts_path / "result.json"
+                settings.artifacts_dir
+                / relative_artifacts_path
+                / "__action_server_result.json"
             )
 
             (
-                settings.artifacts_dir / relative_artifacts_path / "inputs.json"
+                settings.artifacts_dir
+                / relative_artifacts_path
+                / "__action_server_inputs.json"
             ).write_text(json.dumps(inputs))
 
             process = Process(cmdline, cwd=directory, env=env)
 
             output_file = (
-                settings.artifacts_dir / relative_artifacts_path / "output.txt"
+                settings.artifacts_dir
+                / relative_artifacts_path
+                / "__action_server_output.txt"
             )
             with output_file.open("w") as stream:
 
