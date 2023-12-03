@@ -40,16 +40,12 @@ export interface RunTableEntry {
   error_message?: string | null; // If the status=failed, this may have an error message
 }
 
-export interface LoadedRuns {
-  data?: Run[];
+export interface AsyncLoaded<T> {
+  data?: T;
   isPending?: boolean;
   errorMessage?: string;
   requestedOnce?: boolean;
 }
 
-export interface LoadedActions {
-  data?: ActionPackage[];
-  isPending?: boolean;
-  errorMessage?: string;
-  requestedOnce?: boolean;
-}
+export type LoadedRuns = AsyncLoaded<Run[]>;
+export type LoadedActionsPackages = AsyncLoaded<ActionPackage[]>;

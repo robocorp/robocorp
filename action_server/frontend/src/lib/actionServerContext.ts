@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
 import { isDocumentDefined, isWindowDefined, logError } from './helpers';
-import { LoadedActions, LoadedRuns, Run } from './types';
+import { LoadedActionsPackages, LoadedRuns, Run } from './types';
 
 export let defaultTheme: 'light' | 'dark' = 'light';
 try {
@@ -35,8 +35,8 @@ export type ActionServerContextType = {
   setViewSettings: Dispatch<SetStateAction<ViewSettings>>;
   loadedRuns: LoadedRuns;
   setLoadedRuns: Dispatch<SetStateAction<LoadedRuns>>;
-  loadedActions: LoadedActions;
-  setLoadedActions: Dispatch<SetStateAction<LoadedActions>>;
+  loadedActions: LoadedActionsPackages;
+  setLoadedActions: Dispatch<SetStateAction<LoadedActionsPackages>>;
 };
 
 export const defaultActionServerState: ActionServerContextType = {

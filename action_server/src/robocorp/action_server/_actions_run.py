@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Annotated, List
 
 from fastapi.params import Param
+from pydantic import BaseModel
 
 if typing.TYPE_CHECKING:
     from ._models import Action, Run
@@ -216,6 +217,10 @@ def _run_action_in_thread(
             raise
 
 
+def _name_as_class_name(name):
+    return name.replace("_", " ").title().replace(" ", "")
+
+
 def generate_func_from_action(action: "Action"):
     """
     This function generates a method from the given action.
@@ -223,6 +228,15 @@ def generate_func_from_action(action: "Action"):
     def method(
         name: Annotated[str, Param(description="This is the name")],
         title: Annotated[str, Param(description="This is the title")] = None,
+    ) -> int:
+        pass
+
+    class MethodInput(BaseModel):
+        name: Annotated[str, Param(description="This is the name")]
+        title: Annotated[str, Param(description="This is the title")] = None
+
+    def method(
+        args: MethodInput
     ) -> int:
         return 1
     """
@@ -233,7 +247,7 @@ def generate_func_from_action(action: "Action"):
     argument_names = []
     for param_name, param_data in properties.items():
         desc = param_data.get("description", "")
-        argument_names.append(param_name)
+        argument_names.append(f"args.{param_name}")
         param_type = param_data.get("type", "string")
         argument = f"""
     {param_name}: Annotated[{_spec_api_type_to_python_type[param_type]}, 
@@ -248,17 +262,26 @@ def generate_func_from_action(action: "Action"):
         Param(description={ret_desc!r})]"""
 
     code = f"""
-import inspect
-def {action.name}({', '.join(arguments)}){ret}:
+class {_name_as_class_name(action.name)}Input(BaseModel):
+    pass
+{''.join(arguments)}
+    
+def {action.name}_as_params({', '.join(arguments)}){ret}:
+    pass
+
+def {action.name}(args:{_name_as_class_name(action.name)}Input){ret}:
     return _run_action_in_thread(action, signature, {', '.join(argument_names)})
-signature = inspect.signature({action.name})
+
+signature = inspect.signature({action.name}_as_params)
 """
 
     compiled = compile(code, "<string>", "exec")
     ctx: dict = {
         "Annotated": Annotated,
         "Param": Param,
+        "BaseModel": BaseModel,
         "action": action,
+        "inspect": inspect,
         "_run_action_in_thread": _run_action_in_thread,
     }
     exec(compiled, ctx)

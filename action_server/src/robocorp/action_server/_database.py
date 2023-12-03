@@ -235,6 +235,10 @@ VALUES
         self, cls: Type[T], offset: Optional[int] = None, limit: Optional[int] = None
     ) -> List[T]:
         table_name = _make_table_name(cls.__name__)
+        if limit is not None:
+            assert isinstance(limit, int)
+        if offset is not None:
+            assert isinstance(offset, int)
 
         sql = f"SELECT * FROM {table_name}"
 

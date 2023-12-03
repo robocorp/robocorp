@@ -1,4 +1,4 @@
-import { Badge, Box, Header, Link, Panel } from '@robocorp/components';
+import { Badge, Box, Button, Grid, Header, Link, Panel } from '@robocorp/components';
 import {
   Dispatch,
   FC,
@@ -15,42 +15,48 @@ import { useActionServerContext } from '~/lib/actionServerContext';
 import { refreshActions } from '~/lib/requestData';
 import { Action, ActionPackage } from '~/lib/types';
 import { ActionDetails } from './ActionDetails';
+import { IconPlay } from '@robocorp/icons';
 
-const ActionComponent: FC<{ action: Action }> = ({ action }) => {
+const ActionComponent: FC<{ action: Action, actionPackage: ActionPackage }> = ({ action, actionPackage }) => {
   const { setShowAction } = useActionsContext();
 
   const onClickAction = useCallback(
     (event: MouseEvent) => {
       // navigate(`/runs/${rowData.id}`);
-      setShowAction(action);
+      setShowAction({ action, actionPackage, showRunControls: false });
       event.stopPropagation();
     },
     [action],
   );
+
+  const onClickActionShowRunControls = useCallback(
+    (event: MouseEvent) => {
+      // navigate(`/runs/${rowData.id}`);
+      setShowAction({ action, actionPackage, showRunControls: true });
+      event.stopPropagation();
+    },
+    [action],
+  );
+
   return (
     <Box p={20} key={action.id} style={{ marginLeft: 25 }}>
-      <Link onClick={onClickAction}>{action.name}</Link>
+      <Grid columns={2} gap={10}>
+        <Link onClick={onClickAction}>{action.name}</Link>
+        <Button variant="secondary" onClick={onClickActionShowRunControls}>
+          <IconPlay size={'small'} />
+        </Button>
+      </Grid>
     </Box>
   );
 };
 
 export const ActionPackages = () => {
   const { loadedActions, setLoadedActions } = useActionServerContext();
-  const [showAction, setShowAction] = useState<Action | undefined>(undefined);
+  const [showAction, setShowAction] = useState<ShowActionInfo | undefined>(undefined);
 
   useEffect(() => {
     refreshActions(loadedActions, setLoadedActions);
   }, []);
-
-  if (loadedActions.errorMessage) {
-    return (
-      <Panel header={'Actions'} loading={true} empty={true} divider={false}>
-        <Box
-          p={20}
-        >{`It was not possible to load the data. Error: ${loadedActions.errorMessage}`}</Box>
-      </Panel>
-    );
-  }
 
   const isPending = loadedActions.isPending;
   let data: ActionPackage[];
@@ -64,7 +70,7 @@ export const ActionPackages = () => {
   for (const actionPackage of data) {
     const children = [];
     for (const action of actionPackage.actions) {
-      children.push(<ActionComponent key={action.id} action={action} />);
+      children.push(<ActionComponent key={action.id} action={action} actionPackage={actionPackage} />);
     }
     const header = <strong>{actionPackage.name}</strong>;
     contents.push(
@@ -81,6 +87,18 @@ export const ActionPackages = () => {
 
   const contextMemoized = useMemo(() => ctx, [showAction, setShowAction]);
 
+  if (loadedActions.isPending) {
+    return <Panel header={'Actions'} loading={true} empty={true} divider={true}></Panel>;
+  }
+  if (loadedActions.errorMessage) {
+    return (
+      <Panel header={'Actions'} loading={false} empty={false} divider={true}>
+        <Box p={20}>{`It was not possible to load the data. `}</Box>
+        <Box p={20}>{`Error: ${loadedActions.errorMessage}`}</Box>
+      </Panel>
+    );
+  }
+
   return (
     <div>
       <ActionsContext.Provider value={contextMemoized}>
@@ -94,9 +112,15 @@ export const ActionPackages = () => {
   );
 };
 
+interface ShowActionInfo {
+  action: Action;
+  actionPackage: ActionPackage;
+  showRunControls: boolean;
+}
+
 export type ActionsContextType = {
-  showAction: Action | undefined;
-  setShowAction: Dispatch<SetStateAction<Action | undefined>>;
+  showAction: ShowActionInfo | undefined;
+  setShowAction: Dispatch<SetStateAction<ShowActionInfo | undefined>>;
 };
 
 const ActionsContext = createContext<ActionsContextType>({

@@ -56,6 +56,21 @@ components:
       - actions
       title: ActionPackageApi
       type: object
+    GreetInput:
+      properties:
+        name:
+          description: The name of the person to greet.
+          title: Name
+          type: string
+        title:
+          description: The title for the persor (Mr., Mrs., ...).
+          title: Title
+          type: string
+      required:
+      - name
+      - title
+      title: GreetInput
+      type: object
     HTTPValidationError:
       properties:
         errors:
@@ -158,23 +173,12 @@ paths:
     post:
       description: Provides a greeting for a person.
       operationId: greet
-      parameters:
-      - description: The name of the person to greet.
-        in: query
-        name: name
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GreetInput'
         required: true
-        schema:
-          description: The name of the person to greet.
-          title: Name
-          type: string
-      - description: The title for the persor (Mr., Mrs., ...).
-        in: query
-        name: title
-        required: true
-        schema:
-          description: The title for the persor (Mr., Mrs., ...).
-          title: Title
-          type: string
       responses:
         '200':
           content:

@@ -1,13 +1,16 @@
 import { Dispatch, SetStateAction } from 'react';
 import { debounce } from './debounce';
-import { LoadedActions, LoadedRuns, Run } from './types';
+import { AsyncLoaded, LoadedActionsPackages, LoadedRuns, Run } from './types';
 import { logError } from './helpers';
 
 const baseUrl = '';
-// const baseUrl = 'http://localhost:8090'
+// const baseUrl = 'http://localhost:8090';
 
-const createFunc = (url: string, method = 'GET'): any => {
-  const ret = async (loaded: any, setterFromReact: Dispatch<SetStateAction<any>>) => {
+const createFunc = (url: string, method = 'GET', body: string | undefined = undefined): any => {
+  const ret = async (
+    loaded: AsyncLoaded<any>,
+    setterFromReact: Dispatch<SetStateAction<AsyncLoaded<any>>>,
+  ) => {
     try {
       if (loaded.requestedOnce) {
         return;
@@ -20,22 +23,24 @@ const createFunc = (url: string, method = 'GET'): any => {
         };
       });
 
-      //   await new Promise(r => setTimeout(r, 3000));
-
-      const res = await fetch(url, {
+      const fetchArgs: RequestInit = {
         method: method,
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        // body: '', // JSON.stringify({a: 1, b: 2})
-      });
+      };
+      if (body !== undefined) {
+        fetchArgs['body'] = body;
+      }
+      const res = await fetch(url, fetchArgs);
+
       if (!res.ok) {
         setterFromReact(() => {
           return {
             isPending: false,
             data: [],
-            errorMessage: res.statusText,
+            errorMessage: `${res.status} (${res.statusText})`,
             requestedOnce: true,
           };
         });
@@ -51,12 +56,14 @@ const createFunc = (url: string, method = 'GET'): any => {
       }
     } catch (err) {
       logError(err);
-      return {
-        isPending: false,
-        data: [],
-        errorMessage: JSON.stringify(err),
-        requestedOnce: true,
-      };
+      setterFromReact(() => {
+        return {
+          isPending: false,
+          data: [],
+          errorMessage: JSON.stringify(err),
+          requestedOnce: true,
+        };
+      });
     }
   };
   return ret;
@@ -74,8 +81,26 @@ export const refreshRuns = async (
 const debouncedLoadActions = debounce(createFunc(baseUrl + '/api/actionPackages', 'GET'), 300);
 
 export const refreshActions = async (
-  loadedActions: LoadedActions,
-  setLoadedActions: Dispatch<SetStateAction<LoadedActions>>,
+  loadedActions: LoadedActionsPackages,
+  setLoadedActions: Dispatch<SetStateAction<LoadedActionsPackages>>,
 ) => {
   debouncedLoadActions(loadedActions, setLoadedActions);
+};
+
+/**
+ * Runs the backend action and calls the `setLoaded` depending on the current state.
+ */
+export const runAction = (
+  actionPackageName: string,
+  actionName: string,
+  args: object,
+  loaded: AsyncLoaded<any>,
+  setLoaded: Dispatch<SetStateAction<AsyncLoaded<any>>>,
+) => {
+  const func = createFunc(
+    baseUrl + `/api/actions/${actionPackageName}/${actionName}/run`,
+    'POST',
+    JSON.stringify(args),
+  );
+  return func(loaded, setLoaded);
 };

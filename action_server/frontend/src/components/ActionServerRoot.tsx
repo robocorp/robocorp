@@ -13,7 +13,7 @@ import { HeaderAndMenu } from './HeaderAndMenu';
 import { Outlet, RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
 import { ActionPackages } from './ActionPackages';
 import { ActionRuns } from './ActionRuns';
-import { LoadedActions, LoadedRuns } from '~/lib/types';
+import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
 import { refreshActions, refreshRuns } from '~/lib/requestData';
 import { Welcome } from './Welcome';
 
@@ -71,7 +71,7 @@ const Root = () => {
     defaultActionServerState.viewSettings,
   );
   const [loadedRuns, setLoadedRuns] = useState<LoadedRuns>(defaultActionServerState.loadedRuns);
-  const [loadedActions, setLoadedActions] = useState<LoadedActions>(
+  const [loadedActions, setLoadedActions] = useState<LoadedActionsPackages>(
     defaultActionServerState.loadedActions,
   );
 

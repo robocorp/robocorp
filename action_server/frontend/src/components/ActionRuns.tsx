@@ -55,7 +55,7 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
   }
 
   const { setShowRun } = useActionRunsContext();
-  
+
   const onClickRun = useCallback(
     (event: MouseEvent) => {
       // navigate(`/runs/${rowData.id}`);
@@ -103,16 +103,6 @@ export const ActionRuns: FC<{}> = () => {
     refreshRuns(loadedRuns, setLoadedRuns);
   }, []);
 
-  if (loadedRuns.errorMessage) {
-    return (
-      <Panel header={'Runs'} loading={true} empty={true} divider={false}>
-        <Box
-          p={20}
-        >{`It was not possible to load the data. Error: ${loadedRuns.errorMessage}`}</Box>
-      </Panel>
-    );
-  }
-
   const isPending = loadedRuns.isPending || loadedActions.isPending;
   let runTableData: RunTableEntry[] = [];
   if (!isPending) {
@@ -140,6 +130,18 @@ export const ActionRuns: FC<{}> = () => {
   };
 
   const contextMemoized = useMemo(() => ctx, [showRun, setShowRun]);
+
+  if (loadedRuns.isPending || loadedActions.isPending) {
+    return <Panel header={'Runs'} loading={true} empty={true} divider={true}></Panel>;
+  }
+  if (loadedRuns.errorMessage || loadedActions.errorMessage) {
+    return (
+      <Panel header={'Runs'} loading={false} empty={false} divider={true}>
+        <Box p={20}>{`It was not possible to load the data. `}</Box>
+        <Box p={20}>{`Error: ${loadedActions.errorMessage || loadedRuns.errorMessage}`}</Box>
+      </Panel>
+    );
+  }
 
   return (
     <>
