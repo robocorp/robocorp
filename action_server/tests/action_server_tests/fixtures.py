@@ -122,7 +122,7 @@ class ActionServerProcess:
         from concurrent.futures import Future
 
         new_args = (
-            "python",
+            sys.executable,
             "-m",
             "robocorp.action_server",
             "start",

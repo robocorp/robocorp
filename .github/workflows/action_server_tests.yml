@@ -30,7 +30,7 @@ jobs:
       matrix:
         name: [
           "ubuntu-py310-devmode",
-#           "windows-py310",
+          "windows-py310-devmode",
         ]
 
         include:
@@ -38,10 +38,10 @@ jobs:
             python: "3.10"
             os: ubuntu-latest
             PATH_SEPARATOR: ":"
-#           - name: "windows-py310"
-#             python: "3.10"
-#             os: windows-latest
-#             PATH_SEPARATOR: ";"
+          - name: "windows-py310-devmode"
+            python: "3.10"
+            os: windows-latest
+            PATH_SEPARATOR: ";"
 
 
     steps:

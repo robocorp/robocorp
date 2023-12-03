@@ -83,9 +83,9 @@ def _collect_mutex_allocation_msg(mutex_name):
     try:
         write_contents = []
         try:
-            write_contents.append(str(os.getpid()))
+            write_contents.append(f"PID: {os.getpid()}")
         except Exception:
-            write_contents.append("unable to get pid")
+            write_contents.append("PID: unable to get pid")
 
         write_contents.append("\nMutex name:")
         write_contents.append(mutex_name)
@@ -213,6 +213,8 @@ else:  # Linux
                 handle = open(filename, "a+")
                 fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
                 contents = _collect_mutex_allocation_msg(mutex_name)
+                handle.seek(0)
+                handle.truncate()
                 handle.write(contents)
                 handle.flush()
             except Exception:

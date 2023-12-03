@@ -152,7 +152,9 @@ def _create_parser():
     return base_parser
 
 
-def main() -> None:
+def main() -> int:
+    from robocorp.action_server._robo_utils.system_mutex import SystemMutex
+
     from ._rcc import initialize_rcc
 
     parser = _create_parser()
@@ -161,11 +163,11 @@ def main() -> None:
     command = base_args.command
     if not command:
         parser.print_help()
-        return
+        return 0
 
     if command == "version":
         print(__version__)
-        return
+        return 0
 
     # if command == "schema":
     # This doesn't work at this point because we have to register the
@@ -179,13 +181,14 @@ def main() -> None:
         from . import _download_rcc
 
         _download_rcc.download_rcc(target=base_args.file)
-        return
+        return 0
 
     if command not in (
         "import",
         "start",
     ):
-        raise RuntimeError(f"Unexpected command: {command}.")
+        print(f"Unexpected command: {command}.", file=sys.stderr)
+        return 1
 
     settings = get_settings()
     settings.from_args(base_args)
@@ -201,41 +204,60 @@ def main() -> None:
 
     from ._models import initialize_db
 
-    db_path: Union[Path, str]
-    if settings.db_file != ":memory:":
-        db_path = settings.datadir / settings.db_file
-    else:
-        db_path = settings.db_file
+    mutex = SystemMutex("action_server", base_dir=str(settings.datadir))
+    if not mutex.get_mutex_aquired():
+        print(
+            f"An action server is already started in this datadir ({settings.datadir})."
+            f"\nPlease exit it before starting a new one."
+            f"\nInformation on mutex holder:\n"
+            f"{mutex.mutex_creation_info}",
+            file=sys.stderr,
+        )
+        return 1
 
-    if sys.platform == "win32":
-        rcc_location = CURDIR / "bin" / "rcc.exe"
-    else:
-        rcc_location = CURDIR / "bin" / "rcc"
+    try:
+        db_path: Union[Path, str]
+        if settings.db_file != ":memory:":
+            db_path = settings.datadir / settings.db_file
+        else:
+            db_path = settings.db_file
 
-    if not rcc_location.exists():
-        # Download RCC.
-        log.info(f"RCC not available at: {rcc_location}. Downloading.")
-        from . import _download_rcc  # noqa
+        if sys.platform == "win32":
+            rcc_location = CURDIR / "bin" / "rcc.exe"
+        else:
+            rcc_location = CURDIR / "bin" / "rcc"
 
-        _download_rcc.download_rcc()
+        if not rcc_location.exists():
+            # Download RCC.
+            log.info(f"RCC not available at: {rcc_location}. Downloading.")
+            from . import _download_rcc  # noqa
 
-    with initialize_db(db_path), initialize_rcc(rcc_location, robocorp_home):
-        if command == "import":
-            from . import _actions_import
+            _download_rcc.download_rcc()
 
-            for action_package_dir in base_args.dir:
-                _actions_import.import_action_package(
-                    settings.datadir, action_package_dir
-                )
-            return
+        with initialize_db(db_path), initialize_rcc(rcc_location, robocorp_home):
+            if command == "import":
+                from . import _actions_import
 
-        if command == "start":
-            from ._server import start_server
+                for action_package_dir in base_args.dir:
+                    _actions_import.import_action_package(
+                        settings.datadir, action_package_dir
+                    )
+                return 0
 
-            settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-            start_server()
-            return
+            elif command == "start":
+                from ._server import start_server
+
+                settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+                start_server()
+                return 0
+
+            else:
+                print(f"Unexpected command: {command}.", file=sys.stderr)
+                return 1
+    finally:
+        mutex.release_mutex()
 
 
 if __name__ == "__main__":
-    main()
+    retcode = main()
+    sys.exit(retcode)
