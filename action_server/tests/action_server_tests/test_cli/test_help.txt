@@ -1,13 +1,14 @@
-usage: __main__.py [-h] {start,import,download-rcc,version} ...
+usage: __main__.py [-h] {start,import,download-rcc,version,migrate} ...
 
 Robocorp Action Server
 
 positional arguments:
-  {start,import,download-rcc,version}
+  {start,import,download-rcc,version,migrate}
     start               Starts the Robocorp Action Server
     import              Imports an Action Package and exits
     download-rcc        Downloads RCC (by default to the location required by the Robocorp Action Server)
     version             Prints the version and exits
+    migrate             Makes a database migration (if needed) and exits
 
 options:
   -h, --help            show this help message and exit

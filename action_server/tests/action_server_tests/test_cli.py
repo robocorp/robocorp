@@ -37,3 +37,19 @@ def test_help(str_regression):
 
     result = robocorp_action_server_run(["-h"], returncode=0)
     str_regression.check(result.stdout)
+
+
+def test_migrate(database_v0):
+    from action_server_tests.fixtures import robocorp_action_server_run
+
+    from robocorp.action_server.migrations import db_migration_pending
+
+    db_path = database_v0
+    assert db_migration_pending(db_path)
+
+    robocorp_action_server_run(
+        ["migrate", "--datadir", str(db_path.parent), "--db-file", str(db_path.name)],
+        returncode=0,
+    )
+
+    assert not db_migration_pending(db_path)

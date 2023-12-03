@@ -56,14 +56,17 @@ class Database:
         if not db_path:
             from ._settings import get_settings
 
-            self._db_path = db_path or get_settings().datadir / "server.db"
+            self._db_path = get_settings().datadir / "server.db"
         else:
-            self._db_path = db_path
+            self._db_path = Path(db_path)
 
         self._table_name_to_cls: Dict[str, type] = {}
         self._tlocal = threading.local()
         self._counter = itertools.count(0)
         self._write_lock = threading.RLock()
+
+    def db_path(self) -> Path:
+        return self._db_path
 
     def _get_type_hints(self, cls) -> dict:
         try:

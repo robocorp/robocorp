@@ -241,3 +241,60 @@ class ActionServerClient:
 @pytest.fixture
 def client(action_server_process: ActionServerProcess) -> Iterator[ActionServerClient]:
     yield ActionServerClient(action_server_process)
+
+
+@pytest.fixture
+def database_v0(tmpdir):
+    from robocorp.action_server._database import Database
+    from robocorp.action_server.migrations import db_migration_pending
+
+    db_path = Path(tmpdir) / "temp.db"
+    initial_sql = [
+        """
+CREATE TABLE IF NOT EXISTS action_package(
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    directory TEXT NOT NULL,
+    conda_hash TEXT NOT NULL,
+    env_json TEXT NOT NULL  
+)
+""",
+        """
+        
+CREATE TABLE IF NOT EXISTS action(
+    id TEXT NOT NULL PRIMARY KEY,
+    action_package_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    docs TEXT NOT NULL,
+    file TEXT NOT NULL,
+    lineno INTEGER NOT NULL,
+    input_schema TEXT NOT NULL,
+    output_schema TEXT NOT NULL,
+    FOREIGN KEY (action_package_id) REFERENCES action_package(id)  
+)
+""",
+        """
+CREATE TABLE IF NOT EXISTS run(
+    id TEXT NOT NULL PRIMARY KEY,
+    status INTEGER NOT NULL,
+    action_id TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    run_time REAL,
+    inputs TEXT NOT NULL,
+    result TEXT,
+    error_message TEXT,
+    relative_artifacts_dir TEXT NOT NULL,
+    FOREIGN KEY (action_id) REFERENCES action(id)  
+)
+""",
+    ]
+
+    assert not db_migration_pending(db_path)
+
+    db = Database(db_path)
+    with db.connect():
+        with db.transaction():
+            db.execute("PRAGMA foreign_keys = ON")
+            for sql in initial_sql:
+                db.execute(sql)
+    return db_path

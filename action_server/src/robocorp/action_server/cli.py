@@ -149,6 +149,14 @@ def _create_parser():
         help="Prints the version and exits",
     )
 
+    # Migration
+    migration_parser = subparsers.add_parser(
+        "migrate",
+        help="Makes a database migration (if needed) and exits",
+    )
+    _add_data_args(migration_parser, defaults)
+    _add_verbose_args(migration_parser, defaults)
+
     return base_parser
 
 
@@ -184,6 +192,7 @@ def main() -> int:
         return 0
 
     if command not in (
+        "migrate",
         "import",
         "start",
     ):
@@ -233,6 +242,37 @@ def main() -> int:
             from . import _download_rcc  # noqa
 
             _download_rcc.download_rcc()
+
+        from robocorp.action_server.migrations import (
+            create_db,
+            db_migration_pending,
+            migrate_db,
+        )
+
+        path = Path(db_path)
+        if not path.exists():
+            log.info("Database file does not exist. Creating it at: %s", db_path)
+            create_db(db_path)
+
+        if command == "migrate":
+            if not migrate_db(db_path):
+                return 1
+            return 0
+        else:
+            if db_migration_pending(db_path):
+                print(
+                    """It was not possible to start the server because a 
+database migration is required to use with this version of the
+Robocorp Action Server.
+
+Please run the command:
+
+python -m robocorp.action_server migrate
+
+To migrate to the database to the current version.
+"""
+                )
+                return 1
 
         with initialize_db(db_path), initialize_rcc(rcc_location, robocorp_home):
             if command == "import":

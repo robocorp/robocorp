@@ -210,10 +210,12 @@ def test_routes(action_server_process: ActionServerProcess, data_regression):
 
     from robocorp.action_server._database import Database
     from robocorp.action_server._models import initialize_db
+    from robocorp.action_server.migrations import create_db
 
     action_server_process.datadir.mkdir(parents=True, exist_ok=True)
     db_path = action_server_process.datadir / "server.db"
     db: Database
+    create_db(db_path)
     with initialize_db(db_path) as db:
         with db.transaction():
             db.insert(ACTION_PACKAGE)

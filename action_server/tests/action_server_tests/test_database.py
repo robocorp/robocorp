@@ -1,4 +1,5 @@
 import datetime
+from pathlib import Path
 from typing import Optional
 
 import pytest
@@ -41,11 +42,33 @@ def test_database_schema_evolution(str_regression) -> None:
     db = Database(":memory:")
     all_model_classes = get_all_model_classes()
     db.register_classes(all_model_classes)
-    s = []
+    s = ["IMPORTANT: If this file changes a new migration must be put in place!"]
     for cls in all_model_classes:
         s.append(db.create_table_sql(cls))
 
     str_regression.check("\n\n".join(s))
+
+
+def test_migrate(database_v0: Path) -> None:
+    from robocorp.action_server.migrations import (
+        MIGRATION_ID_TO_NAME,
+        Migration,
+        db_migration_pending,
+        migrate_db,
+    )
+
+    db_path = database_v0
+    assert db_migration_pending(db_path)
+    assert migrate_db(db_path, 1)
+    assert not db_migration_pending(db_path)
+    db = Database(db_path)
+    with db.connect():
+        assert sorted(db.list_table_names()) == sorted(
+            ["action", "action_package", "run", "migration"]
+        )
+        assert db.all(Migration) == [
+            Migration(*x) for x in MIGRATION_ID_TO_NAME.items()
+        ]
 
 
 def test_database_create_table(str_regression) -> None:
