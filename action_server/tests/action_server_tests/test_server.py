@@ -81,7 +81,6 @@ def test_import(
                 json.dumps(db.list_whole_db(), indent=4)
             )
 
-    return
     action_server_process.start(
         ("--db-file=server.db",),
         timeout=500,
@@ -103,7 +102,7 @@ def check_runs_after_import_db(client: ActionServerClient, db_path):
     assert found == '"Hello Mr. Foo."', f"{found} != '\"Hello Mr. Foo.\"'"
 
     # 500 seems appropriate here as the user task didn't complete properly.
-    client.post_error("api/actions/calculator/broken-task/run", 500)
+    client.post_error("api/actions/calculator/broken-action/run", 500)
 
     db: Database
     with initialize_db(db_path) as db:

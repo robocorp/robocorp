@@ -221,14 +221,14 @@ class ActionServerClient:
     def post_get_str(self, url, data):
         import requests
 
-        result = requests.post(self.build_full_url(url), params=data)
+        result = requests.post(self.build_full_url(url), json=data)
         assert result.status_code == 200
         return result.text
 
     def post_error(self, url, status_code, data=None):
         import requests
 
-        result = requests.post(self.build_full_url(url), params=data or {})
+        result = requests.post(self.build_full_url(url), json=data or {})
         assert result.status_code == status_code
 
     def get_error(self, url, status_code):

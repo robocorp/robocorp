@@ -1,5 +1,95 @@
 components:
   schemas:
+    Action:
+      properties:
+        action_package_id:
+          title: Action Package Id
+          type: string
+        docs:
+          title: Docs
+          type: string
+        file:
+          title: File
+          type: string
+        id:
+          title: Id
+          type: string
+        input_schema:
+          title: Input Schema
+          type: string
+        lineno:
+          title: Lineno
+          type: integer
+        name:
+          title: Name
+          type: string
+        output_schema:
+          title: Output Schema
+          type: string
+      required:
+      - id
+      - action_package_id
+      - name
+      - docs
+      - file
+      - lineno
+      - input_schema
+      - output_schema
+      title: Action
+      type: object
+    ActionPackageApi:
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/Action'
+          title: Actions
+          type: array
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+      required:
+      - id
+      - name
+      - actions
+      title: ActionPackageApi
+      type: object
+    BrokenActionInput:
+      properties: {}
+      title: BrokenActionInput
+      type: object
+    CalculatorSumInput:
+      properties:
+        v1:
+          description: First number.
+          title: V1
+          type: number
+        v2:
+          description: Second number.
+          title: V2
+          type: number
+      required:
+      - v1
+      - v2
+      title: CalculatorSumInput
+      type: object
+    GreetInput:
+      properties:
+        name:
+          description: The name of the person to greet.
+          title: Name
+          type: string
+        title:
+          description: The title for the persor (Mr., Mrs., ...).
+          title: Title
+          type: string
+      required:
+      - name
+      - title
+      title: GreetInput
+      type: object
     HTTPValidationError:
       properties:
         errors:
@@ -84,40 +174,55 @@ info:
   version: 0.1.0
 openapi: 3.1.0
 paths:
-  /api/actions/calculator/broken-task/run:
-    post:
-      description: This always raises an error.
-      operationId: broken_task
+  /api/actionPackages:
+    get:
+      operationId: list_action_packages_api_actionPackages_get
       responses:
         '200':
           content:
             application/json:
               schema:
-                title: Response Broken Task
+                items:
+                  $ref: '#/components/schemas/ActionPackageApi'
+                title: Response List Action Packages Api Actionpackages Get
+                type: array
+          description: Successful Response
+      summary: List Action Packages
+  /api/actions/calculator/broken-action/run:
+    post:
+      description: This always raises an error.
+      operationId: broken_action
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrokenActionInput'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                title: Response Broken Action
                 type: integer
           description: Successful Response
-      summary: Broken Task
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Broken Action
   /api/actions/calculator/calculator-sum/run:
     post:
       description: Sums 2 numbers and returns them.
       operationId: calculator_sum
-      parameters:
-      - description: First number.
-        in: query
-        name: v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculatorSumInput'
         required: true
-        schema:
-          description: First number.
-          title: V1
-          type: number
-      - description: Second number.
-        in: query
-        name: v2
-        required: true
-        schema:
-          description: Second number.
-          title: V2
-          type: number
       responses:
         '200':
           content:
@@ -138,23 +243,12 @@ paths:
     post:
       description: Provides a greeting for a person.
       operationId: greet
-      parameters:
-      - description: The name of the person to greet.
-        in: query
-        name: name
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GreetInput'
         required: true
-        schema:
-          description: The name of the person to greet.
-          title: Name
-          type: string
-      - description: The title for the persor (Mr., Mrs., ...).
-        in: query
-        name: title
-        required: true
-        schema:
-          description: The title for the persor (Mr., Mrs., ...).
-          title: Title
-          type: string
       responses:
         '200':
           content:
@@ -171,9 +265,9 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Greet
-  /api/runs/:
+  /api/runs:
     get:
-      operationId: list_runs_api_runs__get
+      operationId: list_runs_api_runs_get
       parameters:
       - description: The page to be gotten
         in: query
@@ -201,7 +295,7 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/Run'
-                title: Response List Runs Api Runs  Get
+                title: Response List Runs Api Runs Get
                 type: array
           description: Successful Response
         '422':

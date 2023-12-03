@@ -161,6 +161,9 @@ def _run_action_in_thread(
                 env["PYTHONPATH"] = str(p)
             else:
                 env["PYTHONPATH"] = f"{p}{os.pathsep}{curr_pythonpath}"
+            env["ROBOT_ARTIFACTS"] = str(
+                settings.artifacts_dir / relative_artifacts_path
+            )
 
             result_json = env["RC_ACTION_RESULT_LOCATION"] = str(
                 settings.artifacts_dir / relative_artifacts_path / "result.json"
