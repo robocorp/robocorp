@@ -28,7 +28,7 @@ export const ActionRunConsole: FC<{}> = () => {
 
   let output = loadedArtifacts?.data['__action_server_output.txt'];
   if (output === undefined) {
-    output = '<output not available>';
+    output = '<unable to get output>';
   }
 
   return (
