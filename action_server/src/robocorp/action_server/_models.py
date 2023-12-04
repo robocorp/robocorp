@@ -5,14 +5,22 @@ from typing import Iterator, Optional, Union
 
 from pydantic.dataclasses import dataclass
 
+from robocorp.action_server._database import DBRules
+
 if typing.TYPE_CHECKING:
     from robocorp.action_server._database import Database
+
+
+_db_rules = DBRules()
 
 
 @dataclass
 class ActionPackage:  # Table name: action_package
     id: str  # primary key (uuid)
+    _db_rules.unique_indexes.add("ActionPackage.id")
+
     name: str  # The name for the action package
+    _db_rules.unique_indexes.add("ActionPackage.name")
 
     # The directory where the action package is (may be stored relative
     # to the datadir or as an absolute path).
@@ -30,7 +38,12 @@ class ActionPackage:  # Table name: action_package
 @dataclass
 class Action:
     id: str  # primary key (uuid)
+    _db_rules.unique_indexes.add("Action.id")
+
     action_package_id: str  # foreign key to the action package
+    _db_rules.foreign_keys.add("Action.action_package_id")
+    _db_rules.indexes.add("Action.action_package_id")
+
     name: str  # The action name
     docs: str  # Docs for the action
 
@@ -42,11 +55,30 @@ class Action:
     output_schema: str  # The json content for the schema output
 
 
+RUN_ID_COUNTER = "run_id"
+ALL_COUNTERS = (RUN_ID_COUNTER,)
+
+
+@dataclass
+class Counter:
+    id: str  # primary key (counter name -- i.e.: RUN_ID_COUNTER)
+    _db_rules.unique_indexes.add("Counter.id")
+
+    value: int  # current value
+
+
 @dataclass
 class Run:
     id: str  # primary key (uuid)
+    _db_rules.unique_indexes.add("Run.id")
+
     status: int  # 0=not run, 1=running, 2=passed, 3=failed
+    _db_rules.indexes.add("Run.status")
+
     action_id: str  # foreign key to the action
+    _db_rules.foreign_keys.add("Run.action_id")
+    _db_rules.indexes.add("Run.action_id")
+
     start_time: str  # The time of the run creation.
     run_time: Optional[
         float
@@ -58,6 +90,12 @@ class Run:
     # The path (relative to the datadir) of the artifacts generated in the run
     relative_artifacts_dir: str
 
+    # We could've made this the primary key, but in theory when (if)
+    # we ever have workspaces then this id would need to be scoped to the
+    # workspace while the other one would be global.
+    numbered_id: int
+    _db_rules.unique_indexes.add("Run.numbered_id")
+
 
 class RunStatus:
     NOT_RUN = 0
@@ -67,14 +105,25 @@ class RunStatus:
 
 
 def get_all_model_classes():
-    return [ActionPackage, Action, Run]
+    from robocorp.action_server.migrations import Migration
+
+    return [Migration, ActionPackage, Action, Run, Counter]
+
+
+def get_model_db_rules() -> DBRules:
+    return _db_rules
 
 
 _global_db: Optional["Database"] = None
 
 
 @contextmanager
-def initialize_db(db_path: Union[Path, str]) -> Iterator["Database"]:
+def load_db(db_path: Union[Path, str]) -> Iterator["Database"]:
+    """
+    Loads the database from the given path and initializes the internal
+    models, besides setting this db as the global db for the duration
+    of the context manager.
+    """
     from robocorp.action_server._database import Database
 
     global _global_db
@@ -90,6 +139,28 @@ def initialize_db(db_path: Union[Path, str]) -> Iterator["Database"]:
             yield db
         finally:
             _global_db = None
+
+
+@contextmanager
+def create_db(db_path: Union[Path, str]) -> Iterator["Database"]:
+    """
+    Creates the database and sets this db as the global db for the duration
+    of the context manager.
+    """
+    from robocorp.action_server.migrations import (
+        CURRENT_VERSION,
+        MIGRATION_ID_TO_NAME,
+        Migration,
+    )
+
+    with load_db(db_path) as db:
+        with db.transaction():
+            db.create_tables(get_model_db_rules())
+            current_migration = MIGRATION_ID_TO_NAME[CURRENT_VERSION]
+            db.insert(Migration(CURRENT_VERSION, current_migration))
+            for counter in ALL_COUNTERS:
+                db.insert(Counter(counter, 0))
+        yield db
 
 
 def get_db() -> "Database":

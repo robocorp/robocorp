@@ -3,11 +3,12 @@ import itertools
 import logging
 import re
 import sqlite3
+import sys
 import threading
 from contextlib import closing, contextmanager
 from pathlib import Path
 from types import NoneType
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Type, TypeVar, Union
+from typing import Any, Dict, Iterator, List, Optional, Set, Tuple, Type, TypeVar, Union
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +40,21 @@ class DBError(Exception):
     pass
 
 
+class DBRules:
+    def __init__(self) -> None:
+        # Fields which should have unique indexes in the format:
+        # "Class.field_name"
+        self.unique_indexes: Set[str] = set()
+
+        # Fields which should have indexes in the format:
+        # "Class.field_name"
+        self.indexes: Set[str] = set()
+
+        # Fields which are foreign keys in the format:
+        # "Class.field_name"
+        self.foreign_keys: Set[str] = set()
+
+
 class Database:
     """
     Some notes:
@@ -50,6 +66,8 @@ class Database:
 
         This class makes it so that there's only one connection per thread.
     """
+
+    verbose = 0
 
     def __init__(self, db_path: Optional[Union[Path, str]] = None):
         self._cls_to_type_hint: Dict[type, dict] = {}
@@ -64,7 +82,9 @@ class Database:
         self._tlocal = threading.local()
         self._counter = itertools.count(0)
         self._write_lock = threading.RLock()
+        self._classes: List[type] = []
 
+    @property
     def db_path(self) -> Path:
         return self._db_path
 
@@ -96,6 +116,7 @@ class Database:
             return
 
         with closing(sqlite3.connect(self._db_path, isolation_level=None)) as conn:
+            conn.execute("PRAGMA foreign_keys = ON")
             self._tlocal.conn = conn
             try:
                 yield
@@ -309,6 +330,59 @@ WHERE
             )
             return [x[0] for x in cursor.fetchall()]
 
+    def list_table_and_columns(self) -> Dict[str, List[str]]:
+        with self.cursor() as cursor:
+            self.execute_query(
+                cursor,
+                """
+SELECT m.name as tableName, 
+       p.name as columnName
+FROM sqlite_master m
+left outer join pragma_table_info((m.name)) p
+     on m.name <> p.name
+order by tableName, columnName;
+""",
+            )
+            found: Dict[str, List[str]] = {}
+            for table_name, column_name in cursor.fetchall():
+                columns = found.get(table_name)
+                if not columns:
+                    columns = found[table_name] = []
+                columns.append(column_name)
+            return found
+
+    def list_indexes(self) -> List[List[str]]:
+        with self.cursor() as cursor:
+            self.execute_query(
+                cursor,
+                """
+SELECT 
+    m.tbl_name as table_name,
+    il.name as index_name,
+    ii.name as column_name,
+    CASE il.origin when 'pk' then 1 else 0 END as is_primary_key,
+    CASE il.[unique] when 1 then 0 else 1 END as non_unique,
+    il.[unique] as is_unique,
+    il.partial,
+    il.seq as sequence_in_index,
+    ii.seqno as sequence_in_column
+FROM sqlite_master AS m,
+    pragma_index_list(m.name) AS il,
+    pragma_index_info(il.name) AS ii
+WHERE 
+    m.type = 'table'
+    and m.tbl_name = 'YOUR TABLENAME HERE'
+GROUP BY
+    m.tbl_name,
+    il.name,
+    ii.name,
+    il.origin,
+    il.partial,
+    il.seq
+ORDER BY index_name,il.seq,ii.seqno""",
+            )
+            return [x for x in cursor.fetchall()]
+
     def list_whole_db(self) -> Dict[str, List[Dict[str, Any]]]:
         table_to_contents: Dict[str, List[Dict[str, Any]]] = {}
         for table, cls in self._table_name_to_cls.items():
@@ -332,6 +406,15 @@ WHERE
                     instance = cls(**row)
                     self.insert(instance)
 
+    def _print_sql(self, sql: str, values: Optional[list] = None):
+        func_name = sys._getframe(1).f_code.co_name
+        print(f"db.{func_name}('''\n{sql.strip()}\n''', {values!r})\n")
+
+    def _raise_execute_error(self, msg):
+        if self.verbose:
+            print(msg, file=sys.stderr)
+        raise DBError(msg)
+
     def execute_query(
         self, cursor: sqlite3.Cursor, sql: str, values: Optional[list] = None
     ):
@@ -340,13 +423,44 @@ WHERE
 
         No write-lock needed.
         """
+        if self.verbose:
+            self._print_sql(sql, values)
+
         try:
             if values:
                 cursor.execute(sql, values)
             else:
                 cursor.execute(sql)
         except Exception:
-            raise DBError(f"Error running sql query: {sql!r} with values: {values!r}")
+            self._raise_execute_error(
+                f"Error running sql query: {sql!r} with values: {values!r}"
+            )
+
+    def execute_update_returning(
+        self, cursor: sqlite3.Cursor, sql: str, values: Optional[list] = None
+    ):
+        """
+        Executes a query which will NOT change the database (and should return values).
+
+        No write-lock needed.
+        """
+        if self.verbose:
+            self._print_sql(sql, values)
+        try:
+            if not self.in_transaction():
+                raise DBError(
+                    "When running an sql that changes the DB, it's expected that "
+                    "a transaction is in place."
+                )
+            with self._write_lock:
+                if values:
+                    cursor.execute(sql, values)
+                else:
+                    cursor.execute(sql)
+        except Exception:
+            self._raise_execute_error(
+                f"Error running sql: {sql!r} with values: {values!r}"
+            )
 
     def execute(self, sql: str, values: Optional[list] = None) -> None:
         """
@@ -356,6 +470,8 @@ WHERE
         writes in multiple threads concurrently.
         """
 
+        if self.verbose:
+            self._print_sql(sql, values)
         try:
             if not self.in_transaction():
                 raise DBError(
@@ -370,7 +486,9 @@ WHERE
                 else:
                     conn.execute(sql)
         except Exception:
-            raise DBError(f"Error running sql: {sql!r} with values: {values!r}")
+            self._raise_execute_error(
+                f"Error running sql: {sql!r} with values: {values!r}"
+            )
 
     def register_classes(self, classes: List[Type]) -> None:
         if self._table_name_to_cls:
@@ -383,40 +501,65 @@ WHERE
             # i.e.: they were already registered.
             return
 
+        self._classes = classes
         for cls in classes:
             self._table_name_to_cls[_make_table_name(cls.__name__)] = cls
 
     def initialize(self, classes: List[Type]) -> None:
         """
-        Initializes the tables as needed.
+        Initializes the internal structure of the tables as needed
+        (but doesn't really create the db -- use 'create_tables'
+        if needed).
         """
         self.register_classes(classes)
 
+    def create_tables(self, db_rules: Optional[DBRules] = None):
+        if db_rules is None:
+            db_rules = DBRules()
+
         sqls = []
-        for cls in classes:
-            sql = self.create_table_sql(cls)
+        for cls in self._classes:
+            sql = self.create_table_sql(cls, db_rules)
             sqls.append(sql)
+
+            sqls.extend(self.create_indexes_sql(cls, db_rules))
 
         with self.connect():
             with self.transaction():
-                self.execute("PRAGMA foreign_keys = ON")
-
-            with self.transaction():
                 for sql in sqls:
-                    try:
-                        self.execute(sql)
-                    except sqlite3.OperationalError:
-                        raise RuntimeError(f"Error with sql:\n{sql}")
+                    self.execute(sql)
 
-    def create_table_sql(self, cls: Type) -> str:
+    def create_indexes_sql(self, cls: Type, db_rules: DBRules) -> List[str]:
+        table_name = _make_table_name(cls.__name__)
+
+        columns: List[str] = []
+        for name in self._iter_name_fields(cls):
+            field_full_name = f"{cls.__name__}.{name}"
+            if field_full_name in db_rules.unique_indexes:
+                columns.append(name)
+
+        ret: List[str] = []
+        for column in columns:
+            sql = f"""
+CREATE UNIQUE INDEX {table_name}_{column}_index ON {table_name}({column});
+"""
+            ret.append(sql)
+        return ret
+
+    def create_table_sql(self, cls: Type, db_rules: DBRules) -> str:
         table_name = _make_table_name(cls.__name__)
 
         fields = []
         foreign_keys = []
         for name, name_cls in self._iter_name_and_name_cls_fields(cls):
-            fields.append(self._get_field_create_sql(name, name_cls))
+            field_full_name = f"{cls.__name__}.{name}"
+            fields.append(
+                self._get_field_create_sql(field_full_name, name, name_cls, db_rules)
+            )
 
-            if name.endswith("_id"):
+            if field_full_name in db_rules.foreign_keys:
+                assert name.endswith("_id")
+
                 foreign_table = name[:-3]
                 if foreign_table not in self._table_name_to_cls:
                     raise RuntimeError(
@@ -438,12 +581,12 @@ CREATE TABLE IF NOT EXISTS {table_name}(
 
     def _get_field_create_sql(
         self,
+        field_full_name: str,
         name: str,
         cls: Type,
-        primary_key: Optional[bool] = None,
+        db_rules: DBRules,
     ) -> str:
-        if primary_key is None:
-            primary_key = name == "id"
+        primary_key = name == "id"
 
         if cls.__name__ == "Optional":
             not_none = [x for x in cls.__args__ if x != NoneType]

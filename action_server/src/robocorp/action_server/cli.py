@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os.path
 import sys
 from pathlib import Path
 from typing import Union
@@ -211,8 +212,6 @@ def main() -> int:
         datefmt="[%X]",
     )
 
-    from ._models import initialize_db
-
     mutex = SystemMutex("action_server", base_dir=str(settings.datadir))
     if not mutex.get_mutex_aquired():
         print(
@@ -243,25 +242,28 @@ def main() -> int:
 
             _download_rcc.download_rcc()
 
-        from robocorp.action_server.migrations import (
-            create_db,
-            db_migration_pending,
-            migrate_db,
-        )
+        from robocorp.action_server._models import create_db, load_db
+        from robocorp.action_server.migrations import db_migration_pending, migrate_db
 
-        path = Path(db_path)
-        if not path.exists():
+        is_new = db_path == ":memory:" or not os.path.exists(db_path)
+
+        if is_new:
             log.info("Database file does not exist. Creating it at: %s", db_path)
-            create_db(db_path)
+            use_db_ctx = create_db
+        else:
+            use_db_ctx = load_db
 
         if command == "migrate":
+            if db_path == ":memory:":
+                print("Cannot do migration of in-memory databases", file=sys.stderr)
+                return 1
             if not migrate_db(db_path):
                 return 1
             return 0
         else:
-            if db_migration_pending(db_path):
+            if not is_new and db_migration_pending(db_path):
                 print(
-                    """It was not possible to start the server because a 
+                    f"""It was not possible to start the server because a 
 database migration is required to use with this version of the
 Robocorp Action Server.
 
@@ -269,12 +271,14 @@ Please run the command:
 
 python -m robocorp.action_server migrate
 
-To migrate to the database to the current version.
+To migrate to the database to the current version
+-- or start from scratch by erasing the file: 
+{db_path}
 """
                 )
                 return 1
 
-        with initialize_db(db_path), initialize_rcc(rcc_location, robocorp_home):
+        with use_db_ctx(db_path), initialize_rcc(rcc_location, robocorp_home):
             if command == "import":
                 from . import _actions_import
 

@@ -94,6 +94,9 @@ components:
         inputs:
           title: Inputs
           type: string
+        numbered_id:
+          title: Numbered Id
+          type: integer
         relative_artifacts_dir:
           title: Relative Artifacts Dir
           type: string
@@ -123,6 +126,7 @@ components:
       - result
       - error_message
       - relative_artifacts_dir
+      - numbered_id
       title: Run
       type: object
     ValidationError:

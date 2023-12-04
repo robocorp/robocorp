@@ -94,7 +94,7 @@ def test_import(
 
 def check_runs_after_import_db(client: ActionServerClient, db_path):
     from robocorp.action_server._database import Database, str_to_datetime
-    from robocorp.action_server._models import Run, RunStatus, initialize_db
+    from robocorp.action_server._models import Run, RunStatus, load_db
 
     found = client.post_get_str(
         "api/actions/greeter/greet/run", {"name": "Foo", "title": "Mr."}
@@ -105,7 +105,7 @@ def check_runs_after_import_db(client: ActionServerClient, db_path):
     client.post_error("api/actions/calculator/broken-action/run", 500)
 
     db: Database
-    with initialize_db(db_path) as db:
+    with load_db(db_path) as db:
         with db.connect():
             runs = db.all(Run)
             assert len(runs) == 2
@@ -194,12 +194,12 @@ def db_from_test_import(
         pytest.skip(reason="Requires --path-to-store-json-db in the command line")
     # Initialize the db from what was saved in the 'FAST_LOCAL_TEST_PATH'.
     from robocorp.action_server._database import Database
-    from robocorp.action_server._models import initialize_db
+    from robocorp.action_server._models import load_db
 
     action_server_process.datadir.mkdir(parents=True, exist_ok=True)
     db_path = action_server_process.datadir / "server.db"
     db: Database
-    with initialize_db(db_path) as db:
+    with load_db(db_path) as db:
         data = json.loads(Path(fast_local_test_path).read_text())
         db.load_whole_db(data)
     return db_path
@@ -209,14 +209,12 @@ def test_routes(action_server_process: ActionServerProcess, data_regression):
     from action_server_tests.sample_data import ACTION, ACTION_PACKAGE, RUN, RUN2
 
     from robocorp.action_server._database import Database
-    from robocorp.action_server._models import initialize_db
-    from robocorp.action_server.migrations import create_db
+    from robocorp.action_server._models import create_db
 
     action_server_process.datadir.mkdir(parents=True, exist_ok=True)
     db_path = action_server_process.datadir / "server.db"
     db: Database
-    create_db(db_path)
-    with initialize_db(db_path) as db:
+    with create_db(db_path) as db:
         with db.transaction():
             db.insert(ACTION_PACKAGE)
             db.insert(ACTION)

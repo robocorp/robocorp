@@ -246,10 +246,15 @@ def client(action_server_process: ActionServerProcess) -> Iterator[ActionServerC
 @pytest.fixture
 def database_v0(tmpdir):
     from robocorp.action_server._database import Database
-    from robocorp.action_server.migrations import db_migration_pending
 
     db_path = Path(tmpdir) / "temp.db"
     initial_sql = [
+        """
+CREATE TABLE IF NOT EXISTS migration(
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL  
+)
+""",
         """
 CREATE TABLE IF NOT EXISTS action_package(
     id TEXT NOT NULL PRIMARY KEY,
@@ -260,7 +265,12 @@ CREATE TABLE IF NOT EXISTS action_package(
 )
 """,
         """
-        
+CREATE UNIQUE INDEX action_package_id_index ON action_package(id);
+""",
+        """
+CREATE UNIQUE INDEX action_package_name_index ON action_package(name);
+""",
+        """
 CREATE TABLE IF NOT EXISTS action(
     id TEXT NOT NULL PRIMARY KEY,
     action_package_id TEXT NOT NULL,
@@ -274,6 +284,9 @@ CREATE TABLE IF NOT EXISTS action(
 )
 """,
         """
+CREATE UNIQUE INDEX action_id_index ON action(id);
+""",
+        """
 CREATE TABLE IF NOT EXISTS run(
     id TEXT NOT NULL PRIMARY KEY,
     status INTEGER NOT NULL,
@@ -284,12 +297,26 @@ CREATE TABLE IF NOT EXISTS run(
     result TEXT,
     error_message TEXT,
     relative_artifacts_dir TEXT NOT NULL,
+    numbered_id INTEGER NOT NULL,
     FOREIGN KEY (action_id) REFERENCES action(id)  
 )
 """,
+        """
+CREATE UNIQUE INDEX run_id_index ON run(id);
+""",
+        """
+CREATE UNIQUE INDEX run_numbered_id_index ON run(numbered_id);
+""",
+        """
+CREATE TABLE IF NOT EXISTS counter(
+    id TEXT NOT NULL PRIMARY KEY,
+    value INTEGER NOT NULL  
+)
+""",
+        """
+CREATE UNIQUE INDEX counter_id_index ON counter(id);
+""",
     ]
-
-    assert not db_migration_pending(db_path)
 
     db = Database(db_path)
     with db.connect():
@@ -297,4 +324,83 @@ CREATE TABLE IF NOT EXISTS run(
             db.execute("PRAGMA foreign_keys = ON")
             for sql in initial_sql:
                 db.execute(sql)
+
+            db.execute(
+                "INSERT INTO action_package\n    (id, name, directory, conda_hash, env_json)\nVALUES\n    (?, ?, ?, ?, ?)\n",
+                [
+                    "ap-001-e8efd343-ccd5-470c-84bf-a32b9752e324",
+                    "greeter",
+                    "C:/temp/greeter",
+                    "7c7a3dc1af2ba64fd30b9512f8e9c44405f57be8b609de9859173bf55f28b943",
+                    '{"PYTHON_EXE": "c:/temp/python.exe"}',
+                ],
+            )
+            db.execute(
+                "INSERT INTO action\n    (id, action_package_id, name, docs, file, lineno, input_schema, output_schema)\nVALUES\n    (?, ?, ?, ?, ?, ?, ?, ?)\n",
+                [
+                    "act-001-bed9c7fd-9615-4bbe-a59a-5f35cb1c0f11",
+                    "ap-001-e8efd343-ccd5-470c-84bf-a32b9752e324",
+                    "greet",
+                    "Provides a greeting for a person.",
+                    "greeter_task.py",
+                    4,
+                    '{"additionalProperties": false, "properties": {"name": {"type": "string", "description": "The name of the person to greet.", "title": "Name"},"title": {"type": "string", "description": "The title for the persor (Mr., Mrs., ...).", "title": "Title", "default": "Mr."}}, "type": "object", "required": ["name"]}',
+                    '{"type": "string", "description": "The greeting for the person."}',
+                ],
+            )
+            db.execute(
+                (
+                    "INSERT INTO run "
+                    "    (id, status, action_id, start_time, run_time, inputs, result, error_message, relative_artifacts_dir, numbered_id)"
+                    "    VALUES\n    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                ),
+                [
+                    "run-001-usanoth-uosnthuo-uneothu-usneoth",
+                    0,
+                    "act-001-bed9c7fd-9615-4bbe-a59a-5f35cb1c0f11",
+                    "2023-11-25T00:00:00+00:00",
+                    None,
+                    '{"name": "foo", "title": "Mr."}',
+                    '"Hello Mr. foo."',
+                    None,
+                    "artifacts-dir-run1",
+                    1,
+                ],
+            )
+            db.execute(
+                (
+                    "INSERT INTO run "
+                    "    (id, status, action_id, start_time, run_time, inputs, result, error_message, relative_artifacts_dir, numbered_id)"
+                    "    VALUES\n    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                ),
+                [
+                    "run-002-usanoth-uosnthuo-uneothu-usneoth",
+                    0,
+                    "act-001-bed9c7fd-9615-4bbe-a59a-5f35cb1c0f11",
+                    "2023-11-26T00:00:00+00:00",
+                    None,
+                    '{"name": "bar", "title": "Mr."}',
+                    '"Hello Mr. bar."',
+                    None,
+                    "artifacts-dir-run2",
+                    2,
+                ],
+            )
+
+            db.execute(
+                ("INSERT INTO counter     (id, value)    VALUES\n    (?, ?)"),
+                [
+                    "run_id",
+                    2,
+                ],
+            )
+
+            db.execute(
+                ("INSERT INTO migration     (id, name)    VALUES\n    (?, ?)"),
+                [
+                    1,
+                    "initial",
+                ],
+            )
+
     return db_path

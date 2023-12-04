@@ -8,10 +8,11 @@ Then, we apply each pending migration since the last version.
 """
 
 import logging
+import os.path
 import typing
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, Optional, Union
 
 log = logging.getLogger(__name__)
 
@@ -39,11 +40,18 @@ def _migrate_to(db: "Database", db_migration_version: int) -> None:
     mod.migrate(db)
 
 
-def migrate_db(db_path: Union[Path, str], to_version=CURRENT_VERSION) -> bool:
+def migrate_db(
+    db_path: Union[Path, str],
+    to_version=CURRENT_VERSION,
+    database: Optional["Database"] = None,
+) -> bool:
     """
     Returns true if the migration worked properly or if the migration was not needed
     and false if the migration could not be done for some reason.
+
+    :param database: Expected to be passed when dealing with an in-memory database.
     """
+    assert os.path.exists(db_path), f"Unable to do migration. {db_path} does not exist."
 
     if not db_migration_pending(db_path):
         return True  # It's already correct
@@ -68,15 +76,24 @@ def migrate_db(db_path: Union[Path, str], to_version=CURRENT_VERSION) -> bool:
     db = Database(db_path)
     with db.connect():
         with db.transaction():
-            db.initialize([Migration] + get_all_model_classes())
-            migrations = db.all(Migration)
-            if not migrations:
-                # Ok, we just initialized (or this was a *REALLY* old version before
-                # migrations were in place).
-                db_migration_version = 0
-
+            db.initialize(get_all_model_classes())
+            if "migrations" not in db.list_table_names():
+                raise RuntimeError(
+                    f"""Error: 
+It seems that this version of the database ({db.db_path}) is too old.
+Please erase it and recreate it from scratch."""
+                )
             else:
-                db_migration_version = max(x.id for x in migrations)
+                migrations = db.all(Migration)
+                if not migrations:
+                    raise RuntimeError(
+                        f"""Error: 
+It seems that this version of the database ({db.db_path}) is too old.
+Please erase it and recreate it from scratch."""
+                    )
+
+                else:
+                    db_migration_version = max(x.id for x in migrations)
 
             while db_migration_version < to_version:
                 db_migration_version += 1
@@ -91,11 +108,13 @@ def migrate_db(db_path: Union[Path, str], to_version=CURRENT_VERSION) -> bool:
 
 
 def _db_migration_pending(db: "Database") -> bool:
+    if "migration" not in db.list_table_names():
+        return True
+
     db.initialize([Migration])
     migrations = db.all(Migration)
     if not migrations:
-        # Ok, we just initialized (or this was a *REALLY* old version before
-        # migrations were in place).
+        # No migrations applied, do it now.
         return True
 
     latest_migration_applied = max(x.id for x in migrations)
@@ -106,24 +125,17 @@ def _db_migration_pending(db: "Database") -> bool:
     return True
 
 
-def create_db(db_path: Union[Path, str]) -> None:
-    from robocorp.action_server._database import Database
-    from robocorp.action_server._models import get_all_model_classes
-
-    db = Database(db_path)
-    with db.connect():
-        db.initialize([Migration] + get_all_model_classes())
-        current_migration = MIGRATION_ID_TO_NAME[CURRENT_VERSION]
-        with db.transaction():
-            db.insert(Migration(CURRENT_VERSION, current_migration))
-
-
 def db_migration_pending(db_path: Union[Path, str]) -> bool:
     from robocorp.action_server._database import Database
 
+    if db_path == ":memory:":
+        raise RuntimeError("Migration support not available for in-memory database.")
+
     path = Path(db_path)
     if not path.exists():
-        return False
+        raise RuntimeError(
+            f"Unable to check if migration is pending because file: {db_path} does not exist."
+        )
 
     # Ok, it already exists. Check if it's pending a migration.
     db = Database(db_path)

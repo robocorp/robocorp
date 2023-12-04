@@ -6,7 +6,7 @@ import os
 import time
 import typing
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Dict, List
 
 from fastapi.params import Param
 from pydantic import BaseModel
@@ -44,11 +44,13 @@ def _create_run_artifacts_dir(action: "Action", run_id: str) -> str:
 def _create_run(
     action: "Action", run_id: str, inputs: dict, relative_artifacts_dir: str
 ) -> "Run":
+    from robocorp.action_server._models import RUN_ID_COUNTER, Counter
+
     from ._database import datetime_to_str
     from ._models import Run, RunStatus, get_db
 
     db = get_db()
-    run = Run(
+    run_kwargs: Dict[str, Any] = dict(
         id=run_id,
         status=RunStatus.NOT_RUN,
         action_id=action.id,
@@ -60,6 +62,20 @@ def _create_run(
         relative_artifacts_dir=relative_artifacts_dir,
     )
     with db.transaction():
+        with db.cursor() as cursor:
+            db.execute_update_returning(
+                cursor,
+                "UPDATE counter SET value=value+1 WHERE id=? RETURNING value",
+                [RUN_ID_COUNTER],
+            )
+            counter_record = cursor.fetchall()
+            if not counter_record:
+                raise RuntimeError(
+                    f"Error. No counter found for run_id. Counters in db: {db.all(Counter)}"
+                )
+            run_kwargs["numbered_id"] = counter_record[0][0]
+
+        run = Run(**run_kwargs)
         db.insert(run)
 
     return run

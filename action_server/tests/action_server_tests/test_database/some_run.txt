@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS some_run(
     some_action_id INTEGER NOT NULL,
     start_time TEXT NOT NULL,
     end_time TEXT,
+    numbered_id INTEGER NOT NULL,
     FOREIGN KEY (some_action_id) REFERENCES some_action(id)  
 )
         

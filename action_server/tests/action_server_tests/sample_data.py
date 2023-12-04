@@ -46,6 +46,7 @@ RUN = Run(
     result=json.dumps("Hello Mr. foo."),
     error_message=None,
     relative_artifacts_dir="run-001-usanoth-uosnthuo-uneothu-usneoth",
+    numbered_id=1,
 )
 
 RUN2 = Run(
@@ -60,4 +61,5 @@ RUN2 = Run(
     result=json.dumps("Hello Mr. bar."),
     error_message=None,
     relative_artifacts_dir="run-001-usanoth-uosnthuo-uneothu-usneoth",
+    numbered_id=2,
 )

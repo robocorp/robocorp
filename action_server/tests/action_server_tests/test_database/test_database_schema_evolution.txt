@@ -1,6 +1,15 @@
 IMPORTANT: If this file changes a new migration must be put in place!
 
+[
+'''
+CREATE TABLE IF NOT EXISTS migration(
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL  
+)
+''',
 
+
+'''
 CREATE TABLE IF NOT EXISTS action_package(
     id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
@@ -8,9 +17,20 @@ CREATE TABLE IF NOT EXISTS action_package(
     conda_hash TEXT NOT NULL,
     env_json TEXT NOT NULL  
 )
-        
+''',
 
 
+'''
+CREATE UNIQUE INDEX action_package_id_index ON action_package(id);
+''',
+
+
+'''
+CREATE UNIQUE INDEX action_package_name_index ON action_package(name);
+''',
+
+
+'''
 CREATE TABLE IF NOT EXISTS action(
     id TEXT NOT NULL PRIMARY KEY,
     action_package_id TEXT NOT NULL,
@@ -22,9 +42,15 @@ CREATE TABLE IF NOT EXISTS action(
     output_schema TEXT NOT NULL,
     FOREIGN KEY (action_package_id) REFERENCES action_package(id)  
 )
-        
+''',
 
 
+'''
+CREATE UNIQUE INDEX action_id_index ON action(id);
+''',
+
+
+'''
 CREATE TABLE IF NOT EXISTS run(
     id TEXT NOT NULL PRIMARY KEY,
     status INTEGER NOT NULL,
@@ -35,6 +61,31 @@ CREATE TABLE IF NOT EXISTS run(
     result TEXT,
     error_message TEXT,
     relative_artifacts_dir TEXT NOT NULL,
+    numbered_id INTEGER NOT NULL,
     FOREIGN KEY (action_id) REFERENCES action(id)  
 )
-        
+''',
+
+
+'''
+CREATE UNIQUE INDEX run_id_index ON run(id);
+''',
+
+
+'''
+CREATE UNIQUE INDEX run_numbered_id_index ON run(numbered_id);
+''',
+
+
+'''
+CREATE TABLE IF NOT EXISTS counter(
+    id TEXT NOT NULL PRIMARY KEY,
+    value INTEGER NOT NULL  
+)
+''',
+
+
+'''
+CREATE UNIQUE INDEX counter_id_index ON counter(id);
+''',
+]

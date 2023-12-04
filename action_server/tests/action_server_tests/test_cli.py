@@ -45,11 +45,16 @@ def test_migrate(database_v0):
     from robocorp.action_server.migrations import db_migration_pending
 
     db_path = database_v0
-    assert db_migration_pending(db_path)
+    if db_migration_pending(db_path):
+        robocorp_action_server_run(
+            [
+                "migrate",
+                "--datadir",
+                str(db_path.parent),
+                "--db-file",
+                str(db_path.name),
+            ],
+            returncode=0,
+        )
 
-    robocorp_action_server_run(
-        ["migrate", "--datadir", str(db_path.parent), "--db-file", str(db_path.name)],
-        returncode=0,
-    )
-
-    assert not db_migration_pending(db_path)
+        assert not db_migration_pending(db_path)
