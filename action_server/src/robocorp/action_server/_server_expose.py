@@ -4,7 +4,6 @@ import json
 import websockets
 from fastapi import FastAPI
 from pydantic import BaseModel
-from xkcdpass import xkcd_password as xp
 
 
 class SessionPayload(BaseModel):
