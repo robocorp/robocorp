@@ -256,7 +256,11 @@ VALUES
         )
 
     def all(
-        self, cls: Type[T], offset: Optional[int] = None, limit: Optional[int] = None
+        self,
+        cls: Type[T],
+        offset: Optional[int] = None,
+        limit: Optional[int] = None,
+        order_by: Optional[str] = None,
     ) -> List[T]:
         table_name = _make_table_name(cls.__name__)
         if limit is not None:
@@ -266,14 +270,20 @@ VALUES
 
         sql = f"SELECT * FROM {table_name}"
 
+        if order_by:
+            sql += f" ORDER BY {order_by}"
+
         if limit:
             sql += f" LIMIT {limit}"
 
         if offset:
             sql += f" OFFSET {offset}"
 
+        return self.select(cls, sql)
+
+    def select(self, cls: Type[T], sql: str, values: Optional[list] = None):
         with self.cursor() as cursor:
-            self.execute_query(cursor, sql)
+            self.execute_query(cursor, sql, values)
             return [cls(*x) for x in cursor.fetchall()]
 
     def first(

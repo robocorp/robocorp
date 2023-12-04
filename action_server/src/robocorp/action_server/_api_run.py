@@ -2,7 +2,7 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Dict, List, Optional
+from typing import Annotated, Dict, List
 
 import fastapi
 from fastapi.params import Param, Query
@@ -31,7 +31,7 @@ def list_runs(
         # We're running in the threadpool used by fast api, so, we need
         # to make a new connection (maybe it'd make sense to create a
         # connection pool instead of always creating a new connection...).
-        return db.all(Run, offset=offset, limit=limit)
+        return db.all(Run, offset=offset, limit=limit, order_by="numbered_id DESC")
 
 
 def get_run_by_id(run_id: str) -> Run:

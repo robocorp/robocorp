@@ -1,5 +1,5 @@
 import { Content } from '@robocorp/components';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { Box } from '@robocorp/components';
 import styled from 'styled-components';
 
@@ -49,14 +49,14 @@ export const VariableHeaderContent = styled(Box)`
   border-bottom: 1px solid rgba(var(--color-border-accent));
 `;
 
-export const Variable: FC<{ name: string; value: any }> = ({ name, value }) => {
+export const Variable: FC<{ name: string; value: ReactNode }> = ({ name, value }) => {
   return (
     <Content>
       <VariableHeader>
         <VariableHeaderContent>{name}</VariableHeaderContent>
       </VariableHeader>
       <VariableContent>
-        <PreBox>{'' + value}</PreBox>
+        <PreBox>{value}</PreBox>
       </VariableContent>
     </Content>
   );

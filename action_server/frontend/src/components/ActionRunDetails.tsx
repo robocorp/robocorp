@@ -37,7 +37,7 @@ export const ActionRunDetails: FC<{}> = ({}) => {
       contents.push(<Variable key={counter.next()} name={'Inputs'} value={'No inputs sent'} />);
     } else {
       for (const [key, value] of inputs) {
-        contents.push(<Variable key={counter.next()} name={`Input: ${key}`} value={value} />);
+        contents.push(<Variable key={counter.next()} name={`Input: ${key}`} value={'' + value} />);
       }
     }
   } catch (err) {
@@ -47,24 +47,56 @@ export const ActionRunDetails: FC<{}> = ({}) => {
 
   if (showRun.status == NOT_RUN) {
     contents.push(
-      <Variable key={counter.next()} name={`State`} value={'Run still not running.'} />,
+      <Variable
+        key={counter.next()}
+        name={`State`}
+        value={
+          <>
+            <StatusBadge rowData={showRun}></StatusBadge>
+            {' Run still not running.'}
+          </>
+        }
+      />,
     );
   } else if (showRun.status == RUNNING) {
     contents.push(
       <Variable
         key={counter.next()}
         name={`State`}
-        value={'Run is currently running and still has not finished.'}
+        value={
+          <>
+            <StatusBadge rowData={showRun}></StatusBadge>
+            {' Run is currently running and still has not finished.'}
+          </>
+        }
       />,
     );
   } else if (showRun.status == PASSED) {
     contents.push(
-      <Variable key={counter.next()} name={`State`} value={'Run finished successfully.'} />,
+      <Variable
+        key={counter.next()}
+        name={`State`}
+        value={
+          <>
+            <StatusBadge rowData={showRun}></StatusBadge>
+            {' Run finished successfully.'}
+          </>
+        }
+      />,
     );
     contents.push(<Variable key={counter.next()} name={`Result`} value={showRun.result} />);
   } else if (showRun.status == FAILED) {
     contents.push(
-      <Variable key={counter.next()} name={`State`} value={'Run finished with some error.'} />,
+      <Variable
+        key={counter.next()}
+        name={`State`}
+        value={
+          <>
+            <StatusBadge rowData={showRun}></StatusBadge>
+            {' Run finished with some error.'}
+          </>
+        }
+      />,
     );
     contents.push(<Variable key={counter.next()} name={`Result`} value={showRun.error_message} />);
   }
@@ -97,7 +129,10 @@ export const ActionRunDetails: FC<{}> = ({}) => {
         <Drawer.Header.Title title={title} />
         <Drawer.Header.Description>{`Run started at: ${startTime}  ${finishedTimeInfo}`}</Drawer.Header.Description>
       </Drawer.Header>
-      <Drawer.Content>{contents}<MarginBotton/></Drawer.Content>
+      <Drawer.Content>
+        {contents}
+        <MarginBotton />
+      </Drawer.Content>
     </Drawer>
   );
 };

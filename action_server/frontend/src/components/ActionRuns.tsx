@@ -84,17 +84,14 @@ export const ActionRuns: FC<{}> = () => {
     {
       title: 'Run #',
       id: 'run_number',
-      maxWidth: 40,
     },
     {
       title: 'State',
       id: 'state',
-      maxWidth: 40,
     },
     {
       title: 'Action',
       id: 'action',
-      maxWidth: 40,
     },
     {
       title: 'Result',
