@@ -50,17 +50,17 @@ async def expose_server(app: FastAPI):
         retries = 0
 
         session_payload: SessionPayload | None = None
-        headers = (
-            {
-                "x-session-id": session_payload.sessionId,
-                "x-session-secret": session_payload.sessionSecret,
-            }
-            if session_payload
-            else {}
-        )
-
         while retries < max_retries:
             try:
+                headers = (
+                    {
+                        "x-session-id": session_payload.sessionId,
+                        "x-session-secret": session_payload.sessionSecret,
+                    }
+                    if session_payload
+                    else {}
+                )
+
                 async with websockets.connect(
                     f"wss://client.{settings.expose_url}", extra_headers=headers
                 ) as ws:
