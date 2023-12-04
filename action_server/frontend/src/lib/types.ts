@@ -26,6 +26,7 @@ export interface Run {
   inputs: string; // The json content with the variables used as an input
   result?: string | null; // The json content of the output that the run generated
   error_message?: string | null; // If the status=failed, this may have an error message
+  numbered_id: number;
 }
 
 export interface RunTableEntry {
@@ -38,6 +39,7 @@ export interface RunTableEntry {
   inputs: string; // The json content with the variables used as an input
   result?: string | null; // The json content of the output that the run generated
   error_message?: string | null; // If the status=failed, this may have an error message
+  numbered_id: number;
 }
 
 export interface AsyncLoaded<T> {

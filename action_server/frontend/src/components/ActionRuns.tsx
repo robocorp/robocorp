@@ -45,8 +45,6 @@ export const StatusBadge: FC<{ rowData: Run }> = ({ rowData }) => {
 };
 
 const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
-  const navigate = useNavigate();
-
   let result;
   if (rowData.status === PASSED) {
     result = rowData.result;
@@ -68,10 +66,13 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
   return (
     <Table.Row>
       <Table.Cell>
-        <Link onClick={onClickRun}>{rowData.action?.name}</Link>
+        <Link onClick={onClickRun}>{`Run #${rowData.numbered_id}`}</Link>
       </Table.Cell>
       <Table.Cell>
         <StatusBadge rowData={rowData}></StatusBadge>
+      </Table.Cell>
+      <Table.Cell>
+        <Link onClick={onClickRun}>{rowData.action?.name}</Link>
       </Table.Cell>
       <Table.Cell>{result}</Table.Cell>
     </Table.Row>
@@ -81,12 +82,19 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
 export const ActionRuns: FC<{}> = () => {
   const columns = [
     {
-      title: 'Name',
-      id: 'name',
+      title: 'Run #',
+      id: 'run_number',
+      maxWidth: 40,
     },
     {
       title: 'State',
       id: 'state',
+      maxWidth: 40,
+    },
+    {
+      title: 'Action',
+      id: 'action',
+      maxWidth: 40,
     },
     {
       title: 'Result',
