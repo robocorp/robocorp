@@ -45,42 +45,69 @@ async def expose_server(app: FastAPI):
     settings = get_settings()
 
     async def listen_for_requests():
-        async with websockets.connect(f"wss://client.{settings.expose_url}") as ws:
-            while True:
-                message = await ws.recv()
+        max_retries = 3
+        retry_delay = 1
+        retries = 0
 
-                data = json.loads(message)
+        session_payload: SessionPayload | None = None
+        headers = (
+            {
+                "x-session-id": session_payload.sessionId,
+                "x-session-secret": session_payload.sessionSecret,
+            }
+            if session_payload
+            else {}
+        )
 
-                try:
-                    payload = SessionPayload(**data)
-                    log.info(
-                        f"🌍 Exposed URL - https://{payload.sessionId}.{settings.expose_url}/openapi.json"
-                    )
-                    continue
-                except Exception:
-                    pass
+        while retries < max_retries:
+            try:
+                async with websockets.connect(
+                    f"wss://client.{settings.expose_url}", extra_headers=headers
+                ) as ws:
+                    while True:
+                        message = await ws.recv()
 
-                try:
-                    payload = BodyPayload(**data)
-                    # might be a bit hacky, but works elegantly
-                    client = TestClient(
-                        app, base_url=f"http://{settings.address}:{settings.port}"
-                    )
-                    response = forward_request(client=client, payload=payload)
-                    await ws.send(
-                        json.dumps(
-                            {
-                                "requestId": payload.requestId,
-                                "response": json.dumps(
-                                    response.json(),
-                                    indent=2,
-                                ),
-                            }
-                        )
-                    )
+                        data = json.loads(message)
 
-                except Exception as e:
-                    log.error("Error forwarding request", e)
-                    pass
+                        try:
+                            session_payload = SessionPayload(**data)
+                            log.info(
+                                f"🌍 URL: https://{session_payload.sessionId}.{settings.expose_url}/openapi.json"
+                            )
+                            continue
+                        except Exception:
+                            pass
+
+                        try:
+                            payload = BodyPayload(**data)
+                            # might be a bit hacky, but works elegantly
+                            client = TestClient(
+                                app,
+                                base_url=f"http://{settings.address}:{settings.port}",
+                            )
+                            response = forward_request(client=client, payload=payload)
+                            await ws.send(
+                                json.dumps(
+                                    {
+                                        "requestId": payload.requestId,
+                                        "response": json.dumps(
+                                            response.json(),
+                                            indent=2,
+                                        ),
+                                    }
+                                )
+                            )
+
+                        except Exception as e:
+                            log.error("Error forwarding request", e)
+                            pass
+            except websockets.exceptions.ConnectionClosed:
+                log.info("Connection closed, attempting to reconnect...")
+                retries += 1
+                # sleep with exponential backoff
+                await asyncio.sleep(retry_delay * retries)
+            except Exception as e:
+                log.error(f"An error occurred: {e}")
+                break
 
     asyncio.create_task(listen_for_requests())
