@@ -42,7 +42,7 @@ def start_server(expose: bool) -> None:
     async def _on_startup():
         log.info("Documentation in /docs")
         if expose:
-            await expose_server(app=app, url=settings.expose_url)
+            await expose_server(app=app)
 
     def _on_shutdown():
         pass

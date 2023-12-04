@@ -3,7 +3,9 @@ import json
 
 import websockets
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 from pydantic import BaseModel
+from ._settings import get_settings
 
 
 class SessionPayload(BaseModel):
@@ -16,13 +18,15 @@ class BodyPayload(BaseModel):
     path: str
 
 
-async def expose_server(app: FastAPI, url: str):
+async def expose_server(app: FastAPI):
     """
     Exposes the server to the world.
     """
 
+    settings = get_settings()
+
     async def listen_for_requests():
-        async with websockets.connect(f"wss://client.{url}") as ws:
+        async with websockets.connect(f"wss://client.{settings.expose_url}") as ws:
             while True:
                 message = await ws.recv()
 
@@ -30,7 +34,9 @@ async def expose_server(app: FastAPI, url: str):
 
                 try:
                     payload = SessionPayload(**data)
-                    print(f"🌍 https://{payload.sessionId}.{url}/openapi.json")
+                    print(
+                        f"🌍 https://{payload.sessionId}.{settings.expose_url}/openapi.json"
+                    )
                     continue
                 except Exception:
                     pass
@@ -38,19 +44,23 @@ async def expose_server(app: FastAPI, url: str):
                 try:
                     payload = BodyPayload(**data)
 
-                    if payload.path == "/openapi.json":
-                        await ws.send(
-                            json.dumps(
-                                {
-                                    "requestId": payload.requestId,
-                                    "response": json.dumps(
-                                        app.openapi(),
-                                        indent=2,
-                                    ),
-                                }
-                            )
+                    # might be a bit hacky, but works elegantly
+                    client = TestClient(
+                        app, base_url=f"http://{settings.address}:{settings.port}"
+                    )
+                    response = client.get(payload.path)
+                    await ws.send(
+                        json.dumps(
+                            {
+                                "requestId": payload.requestId,
+                                "response": json.dumps(
+                                    response.json(),
+                                    indent=2,
+                                ),
+                            }
                         )
-                        continue
+                    )
+
                 except Exception:
                     pass
 
