@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional
 
+from ._server_expose import expose_server
+
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
@@ -19,7 +21,7 @@ def _name_to_url(name):
     return name.replace("_", "-")
 
 
-def start_server() -> None:
+def start_server(expose: bool) -> None:
     import docstring_parser
     from starlette.requests import Request
     from starlette.responses import HTMLResponse
@@ -35,8 +37,12 @@ def start_server() -> None:
 
     log.debug("Starting server (settings: %s)", settings)
 
-    def _on_startup():
+    async def _on_startup():
         log.info("Documentation in /docs")
+        if not expose:
+            return
+
+        await expose_server(settings.expose_url)
 
     def _on_shutdown():
         pass
