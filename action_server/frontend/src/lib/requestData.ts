@@ -6,11 +6,23 @@ import { logError } from './helpers';
 const baseUrl = '';
 // const baseUrl = 'http://localhost:8090';
 
-const createFunc = (url: string, method = 'GET', body: string | undefined = undefined): any => {
+interface Opts {
+  body: string;
+  params: Record<string, string>;
+}
+
+const createFunc = (url: string, method = 'GET'): any => {
   const ret = async (
     loaded: AsyncLoaded<any>,
     setterFromReact: Dispatch<SetStateAction<AsyncLoaded<any>>>,
+    opts: Opts | undefined,
   ) => {
+    const body: string | undefined = opts?.body;
+    const params: Record<string, string> | undefined = opts?.params;
+    if (params) {
+      url += `?${new URLSearchParams(params)}`;
+    }
+
     try {
       if (loaded.requestedOnce) {
         return;
@@ -87,6 +99,16 @@ export const refreshActions = async (
   debouncedLoadActions(loadedActions, setLoadedActions);
 };
 
+export const collectRunArtifacts = (
+  runId: string,
+  artifactNames: string[],
+  loaded: AsyncLoaded<any>,
+  setLoaded: Dispatch<SetStateAction<AsyncLoaded<any>>>,
+) => {
+  const func = createFunc(baseUrl + `/api/runs/${runId}/artifacts/text-content`, 'GET');
+  return func(loaded, setLoaded, { params: { artifact_names: artifactNames} });
+};
+
 /**
  * Runs the backend action and calls the `setLoaded` depending on the current state.
  */
@@ -97,10 +119,6 @@ export const runAction = (
   loaded: AsyncLoaded<any>,
   setLoaded: Dispatch<SetStateAction<AsyncLoaded<any>>>,
 ) => {
-  const func = createFunc(
-    baseUrl + `/api/actions/${actionPackageName}/${actionName}/run`,
-    'POST',
-    JSON.stringify(args),
-  );
-  return func(loaded, setLoaded);
+  const func = createFunc(baseUrl + `/api/actions/${actionPackageName}/${actionName}/run`, 'POST');
+  return func(loaded, setLoaded, { body: JSON.stringify(args) });
 };

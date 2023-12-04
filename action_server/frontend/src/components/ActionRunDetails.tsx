@@ -1,4 +1,4 @@
-import { Divider, Drawer, Header } from '@robocorp/components';
+import {Drawer } from '@robocorp/components';
 import { FC, useCallback } from 'react';
 import { Box } from '@robocorp/components';
 import { NOT_RUN, RUNNING, PASSED, FAILED, StatusBadge, useActionRunsContext } from './ActionRuns';

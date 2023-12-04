@@ -16,6 +16,7 @@ import { ActionRuns } from './ActionRuns';
 import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
 import { refreshActions, refreshRuns } from '~/lib/requestData';
 import { Welcome } from './Welcome';
+import { ActionRunConsole, actionRunConsoleLoader } from './ActionRunConsole';
 
 const Main = styled.main<{ isCollapsed: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary.color};
@@ -150,6 +151,11 @@ export const ActionServerRoot = () => {
         {
           path: 'runs',
           element: <ActionRuns />,
+        },
+        {
+          path: 'runs/:id/console',
+          element: <ActionRunConsole />,
+          loader: actionRunConsoleLoader
         },
         {
           path: '*',

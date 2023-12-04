@@ -1,4 +1,13 @@
-import { Badge, BadgeVariant, Box, Link, Panel, Table } from '@robocorp/components';
+import {
+  Badge,
+  BadgeVariant,
+  Box,
+  Button,
+  Link,
+  Panel,
+  Table,
+  Tooltip,
+} from '@robocorp/components';
 import {
   Dispatch,
   FC,
@@ -12,11 +21,12 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Action, Run, RunTableEntry } from '~/lib/types';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { refreshActions, refreshRuns } from '~/lib/requestData';
 import { ActionRunDetails } from './ActionRunDetails';
+import { IconCode } from '@robocorp/icons/iconic';
+import { useNavigate } from 'react-router-dom';
 
 export const NOT_RUN = 0;
 export const RUNNING = 1;
@@ -53,11 +63,19 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
   }
 
   const { setShowRun } = useActionRunsContext();
+  const navigate = useNavigate();
 
   const onClickRun = useCallback(
     (event: MouseEvent) => {
-      // navigate(`/runs/${rowData.id}`);
       setShowRun(rowData);
+      event.stopPropagation();
+    },
+    [rowData],
+  );
+
+  const onClickConsole = useCallback(
+    (event: MouseEvent) => {
+      navigate(`/runs/${rowData.id}/console`);
       event.stopPropagation();
     },
     [rowData],
@@ -66,7 +84,17 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
   return (
     <Table.Row>
       <Table.Cell>
-        <Link onClick={onClickRun}>{`Run #${rowData.numbered_id}`}</Link>
+        <Tooltip text="Console Output">
+          <Link onClick={onClickRun}>{`Run #${rowData.numbered_id}`}</Link>{' '}
+          <Button
+            icon={IconCode}
+            aria-label="Console"
+            size="small"
+            variant="secondary"
+            style={{ marginLeft: 5 }}
+            onClick={onClickConsole}
+          ></Button>
+        </Tooltip>
       </Table.Cell>
       <Table.Cell>
         <StatusBadge rowData={rowData}></StatusBadge>

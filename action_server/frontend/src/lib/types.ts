@@ -51,3 +51,4 @@ export interface AsyncLoaded<T> {
 
 export type LoadedRuns = AsyncLoaded<Run[]>;
 export type LoadedActionsPackages = AsyncLoaded<ActionPackage[]>;
+export type LoadedArtifacts = AsyncLoaded<any>;
