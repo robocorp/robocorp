@@ -1,28 +1,58 @@
-import websockets
 import asyncio
 import json
 
+import websockets
+from fastapi import FastAPI
+from pydantic import BaseModel
+from xkcdpass import xkcd_password as xp
 
-async def listen_for_requests(session_id: str, session_secret: str, url: str):
-    async with websockets.connect(
-        f"wss://{url}",
-        extra_headers={"x-session-id": session_id, "x-session-secret": session_secret},
-    ) as websocket:
+
+class SessionPayload(BaseModel):
+    sessionId: str
+    sessionSecret: str
+
+
+class BodyPayload(BaseModel):
+    requestId: str
+    path: str
+
+
+async def listen_for_requests(app: FastAPI, url: str):
+    async with websockets.connect(f"wss://client.{url}") as ws:
         while True:
-            message = await websocket.recv()
+            message = await ws.recv()
+
             data = json.loads(message)
-            print("THIS IS DATA", data)
+
+            try:
+                payload = SessionPayload(**data)
+                print(f"🌍 https://{payload.sessionId}.{url}/openapi.json")
+                continue
+            except Exception:
+                pass
+
+            try:
+                payload = BodyPayload(**data)
+
+                if payload.path == "/openapi.json":
+                    await ws.send(
+                        json.dumps(
+                            {
+                                "requestId": payload.requestId,
+                                "response": json.dumps(
+                                    app.openapi(),
+                                    indent=2,
+                                ),
+                            }
+                        )
+                    )
+                    continue
+            except Exception:
+                pass
 
 
-async def expose_server(url: str):
+async def expose_server(app: FastAPI, url: str):
     """
     Exposes the server to the world.
     """
-    print("🌊 exposing server", url)
-    session_id = "your_session_id"
-    session_secret = "your_session_secret"
-    asyncio.create_task(
-        listen_for_requests(
-            session_id=session_id, session_secret=session_secret, url=url
-        )
-    )
+    asyncio.create_task(listen_for_requests(app=app, url=url))

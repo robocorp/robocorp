@@ -37,17 +37,16 @@ def start_server(expose: bool) -> None:
 
     log.debug("Starting server (settings: %s)", settings)
 
+    app = get_app()
+
     async def _on_startup():
         log.info("Documentation in /docs")
-        if not expose:
-            return
-
-        await expose_server(settings.expose_url)
+        if expose:
+            await expose_server(app=app, url=settings.expose_url)
 
     def _on_shutdown():
         pass
 
-    app = get_app()
     app.add_event_handler("startup", _on_startup)
     app.add_event_handler("shutdown", _on_shutdown)
 
