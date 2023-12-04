@@ -1,11 +1,15 @@
 import asyncio
+import logging
 import json
+import httpx
 
 import websockets
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
 from ._settings import get_settings
+
+log = logging.getLogger(__name__)
 
 
 class SessionPayload(BaseModel):
@@ -16,6 +20,21 @@ class SessionPayload(BaseModel):
 class BodyPayload(BaseModel):
     requestId: str
     path: str
+    method: str = "GET"
+    body: dict | None = None
+
+
+def forward_request(client: TestClient, payload: BodyPayload) -> httpx.Response:
+    if payload.method == "GET":
+        return client.get(payload.path)
+    elif payload.method == "POST":
+        return client.post(payload.path, json=payload.body)
+    elif payload.method == "PUT":
+        return client.put(payload.path, json=payload.body)
+    elif payload.method == "DELETE":
+        return client.delete(payload.path)
+    else:
+        raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
 async def expose_server(app: FastAPI):
@@ -34,8 +53,8 @@ async def expose_server(app: FastAPI):
 
                 try:
                     payload = SessionPayload(**data)
-                    print(
-                        f"🌍 https://{payload.sessionId}.{settings.expose_url}/openapi.json"
+                    log.info(
+                        f"🌍 Exposed URL - https://{payload.sessionId}.{settings.expose_url}/openapi.json"
                     )
                     continue
                 except Exception:
@@ -43,12 +62,11 @@ async def expose_server(app: FastAPI):
 
                 try:
                     payload = BodyPayload(**data)
-
                     # might be a bit hacky, but works elegantly
                     client = TestClient(
                         app, base_url=f"http://{settings.address}:{settings.port}"
                     )
-                    response = client.get(payload.path)
+                    response = forward_request(client=client, payload=payload)
                     await ws.send(
                         json.dumps(
                             {
@@ -61,7 +79,8 @@ async def expose_server(app: FastAPI):
                         )
                     )
 
-                except Exception:
+                except Exception as e:
+                    log.error("Error forwarding request", e)
                     pass
 
     asyncio.create_task(listen_for_requests())
