@@ -42,9 +42,6 @@ def start_server(expose: bool) -> None:
 
     app = get_app()
 
-    app.add_event_handler("startup", _on_startup)
-    app.add_event_handler("shutdown", _on_shutdown)
-
     artifacts_dir = settings.artifacts_dir
 
     app.mount(
