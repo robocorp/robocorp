@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import socket
 import subprocess
 import sys
 from functools import partial
@@ -108,7 +109,12 @@ def start_server(expose: bool) -> None:
 
         port = settings.port if settings.port != 0 else None
         if port is None:
-            port = server.servers[0].sockets[0].getsockname()[1]
+            sockets_ipv4 = [
+                s for s in server.servers[0].sockets if s.family == socket.AF_INET
+            ]
+            if len(sockets_ipv4) == 0:
+                raise Exception("Unable to find a port to expose")
+            port = sockets_ipv4[0].getsockname()[1]
 
         if expose:
             parent_pid = os.getpid()
