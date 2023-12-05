@@ -1,13 +1,23 @@
+import sys
+import json
 import asyncio
 import logging
-import json
-import httpx
 
+import requests
 import websockets
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
 from pydantic import BaseModel
-from ._settings import get_settings
+
+from robocorp.action_server._app import get_app
+from robocorp.action_server._settings import get_settings
+from robocorp.action_server._robo_utils.process import exit_when_pid_exists
+
+settings = get_settings()
+
+logging.basicConfig(
+    level=logging.DEBUG if settings.verbose else logging.INFO,
+    format="%(message)s",
+    datefmt="[%X]",
+)
 
 log = logging.getLogger(__name__)
 
@@ -24,25 +34,25 @@ class BodyPayload(BaseModel):
     body: dict | None = None
 
 
-def forward_request(client: TestClient, payload: BodyPayload) -> httpx.Response:
+def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
+    url = base_url.rstrip("/") + "/" + payload.path.lstrip("/")
+
     if payload.method == "GET":
-        return client.get(payload.path)
+        return requests.get(url)
     elif payload.method == "POST":
-        return client.post(payload.path, json=payload.body)
+        return requests.post(url, json=payload.body)
     elif payload.method == "PUT":
-        return client.put(payload.path, json=payload.body)
+        return requests.put(url, json=payload.body)
     elif payload.method == "DELETE":
-        return client.delete(payload.path)
+        return requests.delete(url)
     else:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-async def expose_server(app: FastAPI):
+async def expose_server():
     """
     Exposes the server to the world.
     """
-
-    settings = get_settings()
 
     async def listen_for_requests():
         max_retries = 3
@@ -62,7 +72,9 @@ async def expose_server(app: FastAPI):
                 )
 
                 async with websockets.connect(
-                    f"wss://client.{settings.expose_url}", extra_headers=headers
+                    f"wss://client.{settings.expose_url}",
+                    extra_headers=headers,
+                    logger=log,
                 ) as ws:
                     while True:
                         message = await ws.recv()
@@ -72,20 +84,21 @@ async def expose_server(app: FastAPI):
                         try:
                             session_payload = SessionPayload(**data)
                             log.info(
-                                f"🌍 URL: https://{session_payload.sessionId}.{settings.expose_url}/openapi.json"
+                                f"🌍 URL: https://{session_payload.sessionId}.{settings.expose_url}"
                             )
                             continue
                         except Exception:
+                            if not session_payload:
+                                log.error("Unable to get session payload, exiting...")
+                                raise
                             pass
 
                         try:
                             payload = BodyPayload(**data)
-                            # might be a bit hacky, but works elegantly
-                            client = TestClient(
-                                app,
-                                base_url=f"http://{settings.address}:{settings.port}",
+                            base_url = f"http://{settings.address}:{settings.port}"
+                            response: requests.Response = forward_request(
+                                base_url=base_url, payload=payload
                             )
-                            response = forward_request(client=client, payload=payload)
                             await ws.send(
                                 json.dumps(
                                     {
@@ -110,4 +123,13 @@ async def expose_server(app: FastAPI):
                 log.error(f"An error occurred: {e}")
                 break
 
-    asyncio.create_task(listen_for_requests())
+    task = asyncio.create_task(listen_for_requests())
+    await task  # Wait for listen_for_requests to complete
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        parent_pid = sys.argv[1]
+        exit_when_pid_exists(int(parent_pid))
+
+    asyncio.run(expose_server())

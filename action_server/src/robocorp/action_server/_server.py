@@ -1,12 +1,14 @@
+import os
+import sys
+import subprocess
 import logging
 from pathlib import Path
 from typing import Dict, Optional
 
-from ._server_expose import expose_server
-
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
+
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +44,10 @@ def start_server(expose: bool) -> None:
     async def _on_startup():
         log.info("Documentation in /docs")
         if expose:
-            await expose_server(app=app)
+            parent_pid = os.getpid()
+            subprocess.Popen(
+                [sys.executable, CURDIR / "_server_expose.py", str(parent_pid)]
+            )
 
     def _on_shutdown():
         pass

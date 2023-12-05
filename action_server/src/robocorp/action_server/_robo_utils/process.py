@@ -544,3 +544,33 @@ def check_output_interactive(
             )
 
         return b"".join(stdout_contents)
+
+
+_track_pids_to_exit = set()
+_watching_thread_global = None
+PARENT_PROCESS_WATCH_INTERVAL = 1
+
+
+def exit_when_pid_exists(pid, interval=PARENT_PROCESS_WATCH_INTERVAL):
+    _track_pids_to_exit.add(pid)
+    global _watching_thread_global
+    if _watching_thread_global is None:
+        import time
+
+        def watch_parent_process():
+            # exit when any of the ids we're tracking exit.
+            while True:
+                for pid in _track_pids_to_exit:
+                    if not is_process_alive(pid):
+                        # Note: just exit since the parent process already
+                        # exited.
+                        log.debug(
+                            f"Force-quit process: {os.getpid()} because parent: {pid} exited"
+                        )
+                        os._exit(0)
+
+                time.sleep(interval)
+
+        _watching_thread_global = threading.Thread(target=watch_parent_process, args=())
+        _watching_thread_global.daemon = True
+        _watching_thread_global.start()
