@@ -1,14 +1,15 @@
-import os
-import sys
-import subprocess
+import asyncio
 import logging
+import os
+import subprocess
+import sys
+from functools import partial
 from pathlib import Path
 from typing import Dict, Optional
 
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
-
 
 log = logging.getLogger(__name__)
 
@@ -40,17 +41,6 @@ def start_server(expose: bool) -> None:
     log.debug("Starting server (settings: %s)", settings)
 
     app = get_app()
-
-    async def _on_startup():
-        log.info("Documentation in /docs")
-        if expose:
-            parent_pid = os.getpid()
-            subprocess.Popen(
-                [sys.executable, CURDIR / "_server_expose.py", str(parent_pid)]
-            )
-
-    def _on_shutdown():
-        pass
 
     app.add_event_handler("startup", _on_startup)
     app.add_event_handler("shutdown", _on_shutdown)
@@ -114,5 +104,33 @@ def start_server(expose: bool) -> None:
             include_in_schema=False,
         )
 
+    def check_port(loop):
+        if not server.started:
+            loop.call_later(1 / 15.0, partial(check_port, loop))
+
+        for s in server.servers:
+            for socket in s.sockets:
+                sock_name = socket.getsockname()
+                # TODO: GET PORT HERE!
+                print(sock_name)
+        if expose:
+            parent_pid = os.getpid()
+            subprocess.Popen(
+                [sys.executable, CURDIR / "_server_expose.py", str(parent_pid)]
+            )
+
+    async def _on_startup():
+        log.info("Documentation in /docs")
+        loop = asyncio.get_event_loop()
+        loop.call_later(1 / 15.0, partial(check_port, loop))
+
+    def _on_shutdown():
+        pass
+
+    app.add_event_handler("startup", _on_startup)
+    app.add_event_handler("shutdown", _on_shutdown)
+
     kwargs = settings.to_uvicorn()
-    uvicorn.run(app, **kwargs)
+    config = uvicorn.Config(app=app, **kwargs)
+    server = uvicorn.Server(config)
+    asyncio.run(server.serve())
