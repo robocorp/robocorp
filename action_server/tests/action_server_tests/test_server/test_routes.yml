@@ -379,3 +379,37 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Get Run Artifact Text
+  /api/runs/{run_id}/log.html:
+    get:
+      operationId: get_run_log_html_api_runs__run_id__log_html_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Log Html
+  /base_log.html:
+    get:
+      operationId: serve_log_html_base_log_html_get
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Successful Response
+      summary: Serve Log Html
