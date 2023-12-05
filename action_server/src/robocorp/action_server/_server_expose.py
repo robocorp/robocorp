@@ -7,7 +7,6 @@ import requests
 import websockets
 from pydantic import BaseModel
 
-from robocorp.action_server._app import get_app
 from robocorp.action_server._settings import get_settings
 from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
@@ -49,7 +48,7 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-async def expose_server():
+async def expose_server(port: int):
     """
     Exposes the server to the world.
     """
@@ -97,7 +96,7 @@ async def expose_server():
 
                         try:
                             payload = BodyPayload(**data)
-                            base_url = f"http://{settings.address}:{settings.port}"
+                            base_url = f"http://{settings.address}:{port}"
                             response: requests.Response = forward_request(
                                 base_url=base_url, payload=payload
                             )
@@ -130,8 +129,5 @@ async def expose_server():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        parent_pid = sys.argv[1]
-        exit_when_pid_exists(int(parent_pid))
-
-    asyncio.run(expose_server())
+    exit_when_pid_exists(int(sys.argv[1]))
+    asyncio.run(expose_server(port=int(sys.argv[2])))

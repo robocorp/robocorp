@@ -106,15 +106,19 @@ def start_server(expose: bool) -> None:
             loop.call_later(1 / 15.0, partial(check_port, loop))
             return
 
-        for s in server.servers:
-            for socket in s.sockets:
-                sock_name = socket.getsockname()
-                # TODO: GET PORT HERE!
-                print(sock_name)
+        port = settings.port if settings.port != 0 else None
+        if port is None:
+            port = server.servers[0].sockets[0].getsockname()[1]
+
         if expose:
             parent_pid = os.getpid()
             subprocess.Popen(
-                [sys.executable, CURDIR / "_server_expose.py", str(parent_pid)]
+                [
+                    sys.executable,
+                    CURDIR / "_server_expose.py",
+                    str(parent_pid),
+                    str(port),
+                ]
             )
 
     async def _on_startup():
