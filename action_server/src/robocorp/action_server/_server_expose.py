@@ -1,22 +1,14 @@
-import sys
-import json
 import asyncio
+import json
 import logging
+import sys
+from typing import Optional
 
 import requests
 import websockets
 from pydantic import BaseModel
 
-from robocorp.action_server._settings import get_settings
 from robocorp.action_server._robo_utils.process import exit_when_pid_exists
-
-settings = get_settings()
-
-logging.basicConfig(
-    level=logging.DEBUG if settings.verbose else logging.INFO,
-    format="%(message)s",
-    datefmt="[%X]",
-)
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +40,7 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-async def expose_server(port: int):
+async def expose_server(port: int, host: str, expose_url: str):
     """
     Exposes the server to the world.
     """
@@ -58,7 +50,7 @@ async def expose_server(port: int):
         retry_delay = 1
         retries = 0
 
-        session_payload: SessionPayload | None = None
+        session_payload: Optional[SessionPayload] = None
         while retries < max_retries:
             try:
                 headers = (
@@ -71,7 +63,7 @@ async def expose_server(port: int):
                 )
 
                 async with websockets.connect(
-                    f"wss://client.{settings.expose_url}",
+                    f"wss://client.{expose_url}",
                     extra_headers=headers,
                     logger=log,
                 ) as ws:
@@ -83,7 +75,7 @@ async def expose_server(port: int):
                         try:
                             session_payload = SessionPayload(**data)
                             log.info(
-                                f"🌍 URL: https://{session_payload.sessionId}.{settings.expose_url}"
+                                f"🌍 URL: https://{session_payload.sessionId}.{expose_url}"
                             )
                             continue
                         except Exception:
@@ -96,7 +88,7 @@ async def expose_server(port: int):
 
                         try:
                             payload = BodyPayload(**data)
-                            base_url = f"http://{settings.address}:{port}"
+                            base_url = f"http://{host}:{port}"
                             response: requests.Response = forward_request(
                                 base_url=base_url, payload=payload
                             )
@@ -129,5 +121,13 @@ async def expose_server(port: int):
 
 
 if __name__ == "__main__":
-    exit_when_pid_exists(int(sys.argv[1]))
-    asyncio.run(expose_server(port=int(sys.argv[2])))
+    parent_pid, port, verbose, host, expose_url = sys.argv[1:]
+
+    logging.basicConfig(
+        level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
+        format="%(message)s",
+        datefmt="[%X]",
+    )
+
+    exit_when_pid_exists(int(parent_pid))
+    asyncio.run(expose_server(port=int(port), host=host, expose_url=expose_url))

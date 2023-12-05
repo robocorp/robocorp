@@ -102,38 +102,55 @@ def start_server(expose: bool) -> None:
             include_in_schema=False,
         )
 
-    def check_port(loop):
+    expose_subprocess = None
+
+    def expose_later(loop):
+        nonlocal expose_subprocess
+
         if not server.started:
-            loop.call_later(1 / 15.0, partial(check_port, loop))
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
             return
 
         port = settings.port if settings.port != 0 else None
+        host = settings.address
         if port is None:
             sockets_ipv4 = [
                 s for s in server.servers[0].sockets if s.family == socket.AF_INET
             ]
             if len(sockets_ipv4) == 0:
                 raise Exception("Unable to find a port to expose")
-            port = sockets_ipv4[0].getsockname()[1]
+            sockname = sockets_ipv4[0].getsockname()
+            host = sockname[0]
+            port = sockname[1]
 
-        if expose:
-            parent_pid = os.getpid()
-            subprocess.Popen(
-                [
-                    sys.executable,
-                    CURDIR / "_server_expose.py",
-                    str(parent_pid),
-                    str(port),
-                ]
-            )
+        parent_pid = os.getpid()
+
+        expose_subprocess = subprocess.Popen(
+            [
+                sys.executable,
+                CURDIR / "_server_expose.py",
+                str(parent_pid),
+                str(port),
+                "" if not settings.verbose else "v",
+                host,
+                settings.expose_url,
+            ]
+        )
 
     async def _on_startup():
         log.info("Documentation in /docs")
-        loop = asyncio.get_event_loop()
-        loop.call_later(1 / 15.0, partial(check_port, loop))
+        if expose:
+            loop = asyncio.get_event_loop()
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
 
     def _on_shutdown():
-        pass
+        from robocorp.action_server._robo_utils.process import (
+            kill_process_and_subprocesses,
+        )
+
+        if expose_subprocess is not None:
+            log.info("Shutting down expose subprocess: %s", expose_subprocess.pid)
+            kill_process_and_subprocesses(expose_subprocess.pid)
 
     app.add_event_handler("startup", _on_startup)
     app.add_event_handler("shutdown", _on_shutdown)
