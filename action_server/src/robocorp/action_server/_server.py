@@ -107,6 +107,7 @@ def start_server(expose: bool) -> None:
     def check_port(loop):
         if not server.started:
             loop.call_later(1 / 15.0, partial(check_port, loop))
+            return
 
         for s in server.servers:
             for socket in s.sockets:
