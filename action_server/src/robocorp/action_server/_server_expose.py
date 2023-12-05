@@ -45,7 +45,7 @@ async def expose_server(port: int, host: str, expose_url: str):
     Exposes the server to the world.
     """
 
-    async def listen_for_requests():
+    async def listen_for_requests() -> None:
         max_retries = 3
         retry_delay = 1
         retries = 0

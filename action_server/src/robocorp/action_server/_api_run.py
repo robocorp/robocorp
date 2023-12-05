@@ -210,7 +210,7 @@ def get_run_artifact_text(
                 "Unable to get artifact (%s) because it does not point to a folder "
                 "inside of the artifacts dir (%s).",
                 f,
-                artifacts_dir,
+                artifacts_in,
             )
             continue
 
