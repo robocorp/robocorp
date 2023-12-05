@@ -17,10 +17,11 @@ import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
 import { refreshActions, refreshRuns } from '~/lib/requestData';
 import { Welcome } from './Welcome';
 import { ActionRunConsole, actionRunConsoleLoader } from './ActionRunConsole';
+import { ActionRunLog, actionRunLogLoader } from './ActionRunLog';
 
 const Main = styled.main<{ isCollapsed: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary.color};
-  height: 100%;
+  /*height: 100%;*/
   display: grid;
   grid-template-columns: ${({ isCollapsed }) => (isCollapsed ? 0 : 240)}px 1fr;
   grid-template-rows: auto 1fr;
@@ -155,13 +156,18 @@ export const ActionServerRoot = () => {
         {
           path: 'runs/:id/console',
           element: <ActionRunConsole />,
-          loader: actionRunConsoleLoader
+          loader: actionRunConsoleLoader,
         },
         {
           path: '*',
           element: <ErrorPage />,
         },
       ],
+    },
+    {
+      path: 'runs/:id/log.html',
+      element: <ActionRunLog />,
+      loader: actionRunLogLoader,
     },
   ]);
 

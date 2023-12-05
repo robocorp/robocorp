@@ -101,12 +101,12 @@ export const refreshActions = async (
 
 export const collectRunArtifacts = (
   runId: string,
-  artifactNames: string[],
   loaded: AsyncLoaded<any>,
   setLoaded: Dispatch<SetStateAction<AsyncLoaded<any>>>,
+  params: any
 ) => {
   const func = createFunc(baseUrl + `/api/runs/${runId}/artifacts/text-content`, 'GET');
-  return func(loaded, setLoaded, { params: { artifact_names: artifactNames} });
+  return func(loaded, setLoaded, { params: params });
 };
 
 /**

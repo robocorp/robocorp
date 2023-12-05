@@ -25,7 +25,7 @@ import { Action, Run, RunTableEntry } from '~/lib/types';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { refreshActions, refreshRuns } from '~/lib/requestData';
 import { ActionRunDetails } from './ActionRunDetails';
-import { IconCode } from '@robocorp/icons/iconic';
+import { IconCode, IconFileText } from '@robocorp/icons/iconic';
 import { useNavigate } from 'react-router-dom';
 
 export const NOT_RUN = 0;
@@ -81,6 +81,14 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
     [rowData],
   );
 
+  const onClickLog = useCallback(
+    (event: MouseEvent) => {
+      navigate(`/runs/${rowData.id}/log.html`);
+      event.stopPropagation();
+    },
+    [rowData],
+  );
+
   return (
     <Table.Row>
       <Table.Cell>
@@ -93,6 +101,14 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
             variant="secondary"
             style={{ marginLeft: 5 }}
             onClick={onClickConsole}
+          ></Button>
+          <Button
+            icon={IconFileText}
+            aria-label="Log"
+            size="small"
+            variant="secondary"
+            style={{ marginLeft: 5 }}
+            onClick={onClickLog}
           ></Button>
         </Tooltip>
       </Table.Cell>

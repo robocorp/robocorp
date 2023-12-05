@@ -150,13 +150,19 @@ def check_runs_after_import_db(client: ActionServerClient, db_path):
                     ]
                 },
             )
-
             assert len(found) == 2
             assert (
                 "Collecting task greet from: greeter_task.py"
                 in found["__action_server_output.txt"]
             )
             assert '"PASS"' in found["output.robolog"]
+
+            # Multiple given regexp
+            found = client.get_json(
+                f"api/runs/{run.id}/artifacts/text-content",
+                params={"artifact_name_regexp": "__action_server.*"},
+            )
+            assert len(found) == 3
 
             # Just a single binary artifact
             found = client.get_str(

@@ -1,14 +1,15 @@
 import logging
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated, Dict, List
+from typing import Annotated, Dict, List, Optional
 
 import fastapi
 from fastapi.params import Param, Query
 from fastapi.routing import APIRouter
 from starlette import status
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, HTMLResponse
 
 from robocorp.action_server._models import Run
 
@@ -122,13 +123,24 @@ for a given run (i.e.: [{'name': '__action_server_output.txt', 'size_in_bytes': 
     return _get_file_info_in_path(artifacts_in)
 
 
-@run_api_router.get("/{run_id}/artifacts/text-content")
-def get_run_artifact_text(
-    run_id: str = fastapi.Path(title="ID for run"),
-    artifact_names: List[str] = fastapi.Query(
-        title="Artifact names for which the content should be gotten."
-    ),
-) -> Dict[str, str]:
+@run_api_router.get("/{run_id}/log.html")
+def get_run_log_html(run_id: str = fastapi.Path(title="ID for run")):
+    from fastapi.exceptions import HTTPException
+
+    artifacts_in = _get_artifacts_dir_for_run_id(run_id)
+    if artifacts_in is None:
+        raise HTTPException(
+            status_code=404, detail="log.html not available for requested run."
+        )
+    log_html = artifacts_in / "log.html"
+    if not os.path.exists(log_html):
+        raise HTTPException(
+            status_code=404, detail="log.html not available for requested run."
+        )
+    return FileResponse(log_html)
+
+
+def _get_artifacts_dir_for_run_id(run_id: str) -> Optional[Path]:
     from robocorp.action_server._settings import get_settings
 
     settings = get_settings()
@@ -139,7 +151,7 @@ def get_run_artifact_text(
         log.critical(
             "Unable to get artifacts because the settings artifacts_dir is not defined."
         )
-        return {}
+        return None
 
     artifacts_in = (artifacts_dir / run.relative_artifacts_dir).absolute()
     if not artifacts_in.exists():
@@ -147,10 +159,45 @@ def get_run_artifact_text(
             f"Unable to get artifacts because the artifacts_dir ({artifacts_in}) "
             "does not exist."
         )
+        return None
+
+    return artifacts_in
+
+
+@run_api_router.get("/{run_id}/artifacts/text-content")
+def get_run_artifact_text(
+    run_id: str = fastapi.Path(title="ID for run"),
+    artifact_names: Optional[List[str]] = fastapi.Query(
+        default=None, title="Artifact names for which the content should be gotten."
+    ),
+    artifact_name_regexp: Optional[str] = fastapi.Query(
+        default=None,
+        title="A regexp to match artifact names.",
+    ),
+) -> Dict[str, str]:
+    artifacts_in = _get_artifacts_dir_for_run_id(run_id)
+    if artifacts_in is None:
         return {}
+    if artifact_names is None:
+        artifact_names = []
+
+    checked = set()
+
+    if artifact_name_regexp:
+        pattern = re.compile(artifact_name_regexp)
+
+        # We can't use glob directly because users would be able to get contents
+        # out of the artifacts dir with that.
+        for artifact_info in _get_file_info_in_path(artifacts_in):
+            if pattern.match(artifact_info.name):
+                artifact_names.append(artifact_info.name)
 
     ret: Dict[str, str] = {}
     for name in artifact_names:
+        if name in checked:
+            continue
+        checked.add(name)
+
         f = (artifacts_in / name).absolute()
         if not f.exists():
             log.critical(f"Unable to get artifact because it does not exist: {f}")

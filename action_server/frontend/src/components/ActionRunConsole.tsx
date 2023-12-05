@@ -22,8 +22,7 @@ export const ActionRunConsole: FC<{}> = () => {
   });
 
   if (!loadedArtifacts.requestedOnce) {
-    console.log('request artifacts for run', runId);
-    collectRunArtifacts(runId, ['__action_server_output.txt'], loadedArtifacts, setLoadedActions);
+    collectRunArtifacts(runId, loadedArtifacts, setLoadedActions, {artifact_names: ['__action_server_output.txt']});
   }
 
   let output = loadedArtifacts?.data['__action_server_output.txt'];

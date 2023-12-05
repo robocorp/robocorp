@@ -8,10 +8,6 @@ from functools import partial
 from pathlib import Path
 from typing import Dict, Optional
 
-import uvicorn
-from fastapi.staticfiles import StaticFiles
-from starlette.responses import FileResponse
-
 log = logging.getLogger(__name__)
 
 CURDIR = Path(__file__).parent.absolute()
@@ -27,8 +23,10 @@ def _name_to_url(name):
 
 def start_server(expose: bool) -> None:
     import docstring_parser
+    import uvicorn
+    from fastapi.staticfiles import StaticFiles
     from starlette.requests import Request
-    from starlette.responses import HTMLResponse
+    from starlette.responses import FileResponse, HTMLResponse
 
     from . import _actions_run
     from ._api_action_package import action_package_api_router
@@ -89,6 +87,12 @@ def start_server(expose: bool) -> None:
 
     app.include_router(run_api_router)
     app.include_router(action_package_api_router)
+
+    @app.get("/base_log.html", response_class=HTMLResponse)
+    async def serve_log_html(request: Request):
+        from robocorp.log import _index_v3 as index
+
+        return HTMLResponse(index.FILE_CONTENTS["index.html"])
 
     async def serve_index(request: Request):
         return FileResponse(CURDIR / "_static" / "index.html")

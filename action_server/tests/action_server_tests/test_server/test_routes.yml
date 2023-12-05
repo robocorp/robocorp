@@ -345,12 +345,22 @@ paths:
           type: string
       - in: query
         name: artifact_names
-        required: true
+        required: false
         schema:
-          items:
-            type: string
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
           title: Artifact names for which the content should be gotten.
-          type: array
+      - in: query
+        name: artifact_name_regexp
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: A regexp to match artifact names.
       responses:
         '200':
           content:

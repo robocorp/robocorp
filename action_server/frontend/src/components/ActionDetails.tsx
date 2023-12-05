@@ -83,7 +83,7 @@ export const ActionRunControls: FC<{
       }
     }
     return initialFormData;
-  }, [action, actionPackage]);
+  }, [action, actionPackage, properties]);
 
   const [formData, setFormData] = useState(initialFormData);
   const [result, setResult] = useState<AsyncLoaded<any>>(dataLoadedInitial);
@@ -141,7 +141,7 @@ export const ActionRunControls: FC<{
       }
     }
     return fields;
-  }, [action, actionPackage, formData]);
+  }, [action, actionPackage, inputSchema, handleInputChange, properties]);
 
   const onSubmit = useCallback(
     (e: FormEvent) => {
@@ -161,7 +161,7 @@ export const ActionRunControls: FC<{
         );
       }
     },
-    [formData, action, actionPackage],
+    [formData, action, actionPackage, inputSchema, result, setResult],
   );
 
   let resultComponent = <></>;
