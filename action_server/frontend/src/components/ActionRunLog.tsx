@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import { useLoaderData } from 'react-router-dom';
-import { baseUrl, collectRunArtifacts } from '~/lib/requestData';
+import { baseUrl } from '~/lib/requestData';
 import { LoadedArtifacts } from '~/lib/types';
 
 export async function actionRunLogLoader(args: any) {

@@ -3,8 +3,8 @@ import { debounce } from './debounce';
 import { AsyncLoaded, LoadedActionsPackages, LoadedRuns, Run } from './types';
 import { logError } from './helpers';
 
-const baseUrl = '';
-// const baseUrl = 'http://localhost:8090';
+export const baseUrl = '';
+// export const baseUrl = 'http://localhost:8090';
 
 interface Opts {
   body: string;
