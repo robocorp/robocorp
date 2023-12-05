@@ -13,6 +13,7 @@ class Settings(BaseModel):
     datadir: Path = Path("~/.robocorp_action_server")
     db_file: str = "server.db"
     artifacts_dir: Path = Path(".robocorp_action_server") / "artifacts"
+    expose_url: str = "robocorp.link"
 
     class Config:
         # pylint: disable=too-few-public-methods

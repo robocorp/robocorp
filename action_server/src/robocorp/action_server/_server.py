@@ -1,4 +1,10 @@
+import asyncio
 import logging
+import os
+import socket
+import subprocess
+import sys
+from functools import partial
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -19,7 +25,7 @@ def _name_to_url(name):
     return name.replace("_", "-")
 
 
-def start_server() -> None:
+def start_server(expose: bool) -> None:
     import docstring_parser
     from starlette.requests import Request
     from starlette.responses import HTMLResponse
@@ -35,15 +41,7 @@ def start_server() -> None:
 
     log.debug("Starting server (settings: %s)", settings)
 
-    def _on_startup():
-        log.info("Documentation in /docs")
-
-    def _on_shutdown():
-        pass
-
     app = get_app()
-    app.add_event_handler("startup", _on_startup)
-    app.add_event_handler("shutdown", _on_shutdown)
 
     artifacts_dir = settings.artifacts_dir
 
@@ -104,5 +102,60 @@ def start_server() -> None:
             include_in_schema=False,
         )
 
+    expose_subprocess = None
+
+    def expose_later(loop):
+        nonlocal expose_subprocess
+
+        if not server.started:
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
+            return
+
+        port = settings.port if settings.port != 0 else None
+        host = settings.address
+        if port is None:
+            sockets_ipv4 = [
+                s for s in server.servers[0].sockets if s.family == socket.AF_INET
+            ]
+            if len(sockets_ipv4) == 0:
+                raise Exception("Unable to find a port to expose")
+            sockname = sockets_ipv4[0].getsockname()
+            host = sockname[0]
+            port = sockname[1]
+
+        parent_pid = os.getpid()
+
+        expose_subprocess = subprocess.Popen(
+            [
+                sys.executable,
+                CURDIR / "_server_expose.py",
+                str(parent_pid),
+                str(port),
+                "" if not settings.verbose else "v",
+                host,
+                settings.expose_url,
+            ]
+        )
+
+    async def _on_startup():
+        log.info("Documentation in /docs")
+        if expose:
+            loop = asyncio.get_event_loop()
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
+
+    def _on_shutdown():
+        from robocorp.action_server._robo_utils.process import (
+            kill_process_and_subprocesses,
+        )
+
+        if expose_subprocess is not None:
+            log.info("Shutting down expose subprocess: %s", expose_subprocess.pid)
+            kill_process_and_subprocesses(expose_subprocess.pid)
+
+    app.add_event_handler("startup", _on_startup)
+    app.add_event_handler("shutdown", _on_shutdown)
+
     kwargs = settings.to_uvicorn()
-    uvicorn.run(app, **kwargs)
+    config = uvicorn.Config(app=app, **kwargs)
+    server = uvicorn.Server(config)
+    asyncio.run(server.serve())

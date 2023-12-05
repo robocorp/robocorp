@@ -93,6 +93,11 @@ def _create_parser():
         default=defaults["port"],
         help="Server port (default: %(default)s)",
     )
+    start_parser.add_argument(
+        "--expose",
+        action="store_true",
+        help="Expose the server to the world",
+    )
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
 
@@ -292,7 +297,7 @@ To migrate to the database to the current version
                 from ._server import start_server
 
                 settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-                start_server()
+                start_server(expose=base_args.expose)
                 return 0
 
             else:
