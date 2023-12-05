@@ -89,7 +89,9 @@ async def expose_server():
                             continue
                         except Exception:
                             if not session_payload:
-                                log.error("Unable to get session payload, exiting...")
+                                log.error(
+                                    "Unable to get session payload. Exposing the local server failed. Try again."
+                                )
                                 raise
                             pass
 
