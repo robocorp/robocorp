@@ -287,8 +287,9 @@ def generate_func_from_action(action: "Action"):
         Param(description={desc!r})]"""
         arguments.append(argument)
 
+    # Note: Headers are explicitly hidden from spec to make the OpenAPI schema compatible with OpenAI
     headers = {
-        "x_action_trace": "Optional[str] = Header(None, description='Client application run trace reference', alias='X-action-trace')"
+        "x_action_trace": "Optional[str] = Header(None, description='Client application run trace reference', alias='X-action-trace', include_in_schema=False)"
     }
     headers_as_params = [f"{key}: {value}" for key, value in headers.items()]
     headers_as_values = [f"'{key}': {key}" for key, _ in headers.items()]
