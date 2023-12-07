@@ -167,9 +167,9 @@ def _create_parser():
 
 
 def main() -> int:
-    from robocorp.action_server._robo_utils.system_mutex import SystemMutex
-
     from ._rcc import initialize_rcc
+    from ._robo_utils.system_mutex import SystemMutex
+    from ._runs_state_cache import use_runs_state_ctx
 
     parser = _create_parser()
     base_args = parser.parse_args()
@@ -276,14 +276,14 @@ Please run the command:
 
 python -m robocorp.action_server migrate
 
-To migrate to the database to the current version
+To migrate the database to the current version
 -- or start from scratch by erasing the file: 
 {db_path}
 """
                 )
                 return 1
 
-        with use_db_ctx(db_path), initialize_rcc(rcc_location, robocorp_home):
+        with use_db_ctx(db_path) as db, initialize_rcc(rcc_location, robocorp_home):
             if command == "import":
                 from . import _actions_import
 
@@ -294,11 +294,12 @@ To migrate to the database to the current version
                 return 0
 
             elif command == "start":
-                from ._server import start_server
+                with use_runs_state_ctx(db):
+                    from ._server import start_server
 
-                settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-                start_server(expose=base_args.expose)
-                return 0
+                    settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+                    start_server(expose=base_args.expose)
+                    return 0
 
             else:
                 print(f"Unexpected command: {command}.", file=sys.stderr)

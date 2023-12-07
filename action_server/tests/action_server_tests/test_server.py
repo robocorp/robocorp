@@ -34,67 +34,17 @@ def test_schema_request_no_actions_registered(
 
 def test_import(
     action_server_process: ActionServerProcess,
-    datadir,
-    tmpdir,
     data_regression,
-    fast_local_test_path,
+    base_case,
 ) -> None:
-    from action_server_tests.fixtures import robocorp_action_server_run
+    from robocorp.action_server._database import Database, str_to_datetime
+    from robocorp.action_server._models import Run, RunStatus, load_db
 
-    from robocorp.action_server._database import Database
-    from robocorp.action_server._models import (
-        Action,
-        ActionPackage,
-        get_all_model_classes,
-    )
-
-    p = Path(str(tmpdir)) / ".robocorp_action_server"
-    db_path = p / "server.db"
-    assert not db_path.exists()
-
-    pack1 = datadir / "calculator"
-    pack2 = datadir / "greeter"
-    # Will have to generate the environment...
-
-    robocorp_action_server_run(
-        [
-            "import",
-            f"--dir={pack1}",
-            f"--dir={pack2}",
-            "--db-file=server.db",
-            "-v",
-            "--datadir",
-            p,
-        ],
-        returncode=0,
-    )
-
-    assert db_path.exists()
-    db = Database(db_path)
-    db.register_classes(get_all_model_classes())
-    with db.connect():
-        assert set(x.name for x in db.all(ActionPackage)) == {"calculator", "greeter"}
-        found = set(x.name for x in db.all(Action))
-        assert found == {"calculator_sum", "greet", "broken_action"}
-        if fast_local_test_path:
-            Path(fast_local_test_path).write_text(
-                json.dumps(db.list_whole_db(), indent=4)
-            )
-
-    action_server_process.start(
-        ("--db-file=server.db",),
-        timeout=500,
-    )
     client = ActionServerClient(action_server_process)
     openapi_json = client.get_openapi_json()
     data_regression.check(json.loads(openapi_json))
 
-    check_runs_after_import_db(client, db_path)
-
-
-def check_runs_after_import_db(client: ActionServerClient, db_path):
-    from robocorp.action_server._database import Database, str_to_datetime
-    from robocorp.action_server._models import Run, RunStatus, load_db
+    db_path = base_case.db_path
 
     found = client.post_get_str(
         "api/actions/greeter/greet/run", {"name": "Foo", "title": "Mr."}
@@ -175,40 +125,6 @@ def check_runs_after_import_db(client: ActionServerClient, db_path):
             )
 
             assert "Collecting task greet from: greeter_task.py" in found
-
-
-def test_fast(action_server_process: ActionServerProcess, db_from_test_import):
-    action_server_process.start(("--db-file=server.db",))
-
-    client = ActionServerClient(action_server_process)
-    check_runs_after_import_db(client, db_from_test_import)
-
-
-@pytest.fixture(scope="session")
-def fast_local_test_path(pytestconfig):
-    # When `test_import` is executed, if `FAST_LOCAL_TEST_PATH` is defined,
-    # it'll dump the database to it. In this case we can do just the part
-    # of the test with the database loaded here.
-    return pytestconfig.getoption("path_to_store_json_db")
-
-
-@pytest.fixture
-def db_from_test_import(
-    action_server_process: ActionServerProcess, fast_local_test_path
-):
-    if not fast_local_test_path:
-        pytest.skip(reason="Requires --path-to-store-json-db in the command line")
-    # Initialize the db from what was saved in the 'FAST_LOCAL_TEST_PATH'.
-    from robocorp.action_server._database import Database
-    from robocorp.action_server._models import load_db
-
-    action_server_process.datadir.mkdir(parents=True, exist_ok=True)
-    db_path = action_server_process.datadir / "server.db"
-    db: Database
-    with load_db(db_path) as db:
-        data = json.loads(Path(fast_local_test_path).read_text())
-        db.load_whole_db(data)
-    return db_path
 
 
 def test_routes(action_server_process: ActionServerProcess, data_regression):

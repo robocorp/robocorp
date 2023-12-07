@@ -1,15 +1,14 @@
 import logging
 import os
-import re
+import typing
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Dict, List, Optional
 
 import fastapi
-from fastapi.params import Param, Query
+from fastapi.params import Param
 from fastapi.routing import APIRouter
-from starlette import status
-from starlette.responses import FileResponse, HTMLResponse
+from starlette.responses import FileResponse
 
 from robocorp.action_server._models import Run
 
@@ -17,38 +16,27 @@ log = logging.getLogger(__name__)
 run_api_router = APIRouter(prefix="/api/runs")
 
 
-@run_api_router.get("", response_model=List[Run])
-def list_runs(
-    page: Annotated[int, Query(description="The page to be gotten")] = 1,
-    limit: Annotated[
-        int, Query(description="The limit of runs to be gotten", le=200)
-    ] = 50,
-):
-    from robocorp.action_server._models import get_db
+@run_api_router.get("", response_model=list[Run])
+def list_runs():
+    from ._runs_state_cache import get_global_runs_state
 
-    offset = (page - 1) * limit
-    db = get_db()
-    with db.connect():
-        # We're running in the threadpool used by fast api, so, we need
-        # to make a new connection (maybe it'd make sense to create a
-        # connection pool instead of always creating a new connection...).
-        return db.all(Run, offset=offset, limit=limit, order_by="numbered_id DESC")
+    global_runs_state = get_global_runs_state()
+    with global_runs_state.semaphore:
+        ret = global_runs_state.get_current_run_state()
+        return tuple(reversed(sorted(ret, key=lambda run: run.numbered_id)))
 
 
 def get_run_by_id(run_id: str) -> Run:
-    from fastapi.exceptions import HTTPException
-
-    from robocorp.action_server._models import get_db
-
     try:
-        db = get_db()
-        with db.connect():
-            return db.first(
-                Run,
-                "SELECT * FROM run WHERE id = ?",
-                [run_id],
-            )
+        from ._runs_state_cache import get_global_runs_state
+
+        global_runs_state = get_global_runs_state()
+        with global_runs_state.semaphore:
+            return global_runs_state.get_run_from_id(run_id)
     except KeyError as err:
+        from fastapi.exceptions import HTTPException
+        from starlette import status
+
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Unknown run id: {run_id}",
@@ -184,6 +172,8 @@ def get_run_artifact_text(
     checked = set()
 
     if artifact_name_regexp:
+        import re
+
         pattern = re.compile(artifact_name_regexp)
 
         # We can't use glob directly because users would be able to get contents

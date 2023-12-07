@@ -213,26 +213,6 @@ paths:
   /api/runs:
     get:
       operationId: list_runs_api_runs_get
-      parameters:
-      - description: The page to be gotten
-        in: query
-        name: page
-        required: false
-        schema:
-          default: 1
-          description: The page to be gotten
-          title: Page
-          type: integer
-      - description: The limit of runs to be gotten
-        in: query
-        name: limit
-        required: false
-        schema:
-          default: 50
-          description: The limit of runs to be gotten
-          maximum: 200
-          title: Limit
-          type: integer
       responses:
         '200':
           content:
@@ -243,12 +223,6 @@ paths:
                 title: Response List Runs Api Runs Get
                 type: array
           description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
       summary: List Runs
   /api/runs/{run_id}:
     get:

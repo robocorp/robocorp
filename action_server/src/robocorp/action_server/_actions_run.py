@@ -48,6 +48,7 @@ def _create_run(
 
     from ._database import datetime_to_str
     from ._models import Run, RunStatus, get_db
+    from ._runs_state_cache import get_global_runs_state
 
     db = get_db()
     run_kwargs: Dict[str, Any] = dict(
@@ -78,36 +79,50 @@ def _create_run(
         run = Run(**run_kwargs)
         db.insert(run)
 
+    # Ok, transaction finished properly. Let's add it to our in-memory cache.
+    global_runs_state = get_global_runs_state()
+    global_runs_state.on_run_inserted(run)
+
     return run
 
 
-def _update_run(run: "Run", initial_time: float, **kwargs):
+def _update_run(run: "Run", initial_time: float, run_finished: bool, **changes):
     from ._models import get_db
+    from ._runs_state_cache import get_global_runs_state
 
-    kwargs["run_time"] = time.monotonic() - initial_time
+    if run_finished:
+        changes["run_time"] = time.monotonic() - initial_time
+
     db = get_db()
-    for k, v in kwargs.items():
+    for k, v in changes.items():
         setattr(run, k, v)
+    fields_changed = tuple(changes.keys())
     with db.transaction():
-        db.update(run, *list(kwargs.keys()))
+        db.update(run, *fields_changed)
+
+    # Ok, transaction finished properly. Let's update our in-memory cache.
+    global_runs_state = get_global_runs_state()
+    global_runs_state.on_run_changed(run, changes)
 
 
 def _set_run_as_finished_ok(run: "Run", result: str, initial_time: float):
     from ._models import RunStatus
 
-    _update_run(run, initial_time, result=result, status=RunStatus.PASSED)
+    _update_run(run, initial_time, True, result=result, status=RunStatus.PASSED)
 
 
 def _set_run_as_finished_failed(run: "Run", error_message: str, initial_time: float):
     from ._models import RunStatus
 
-    _update_run(run, initial_time, status=RunStatus.FAILED, error_message=error_message)
+    _update_run(
+        run, initial_time, True, status=RunStatus.FAILED, error_message=error_message
+    )
 
 
 def _set_run_as_running(run: "Run", initial_time: float):
     from ._models import RunStatus
 
-    _update_run(run, initial_time, status=RunStatus.RUNNING)
+    _update_run(run, initial_time, False, status=RunStatus.RUNNING)
 
 
 def _run_action_in_thread(

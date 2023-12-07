@@ -271,6 +271,8 @@ VALUES
         sql = f"SELECT * FROM {table_name}"
 
         if order_by:
+            # Careful: users cannot provide this as it's susceptible to
+            # sql injection.
             sql += f" ORDER BY {order_by}"
 
         if limit:

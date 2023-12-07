@@ -1,11 +1,13 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
 import typing
 from concurrent.futures import TimeoutError
+from dataclasses import dataclass
 from pathlib import Path
 from subprocess import CompletedProcess
 from typing import Dict, Iterator, Literal, Optional, Tuple, Union
@@ -188,6 +190,83 @@ def action_server_process(tmpdir) -> Iterator[ActionServerProcess]:
     ret = ActionServerProcess(Path(str(tmpdir)) / ".robocorp_action_server")
     yield ret
     ret.stop()
+
+
+CURDIR = Path(__file__).parent.absolute()
+
+
+@dataclass
+class CaseInfo:
+    action_server_process: ActionServerProcess
+    db_path: Path
+
+
+@pytest.fixture(scope="session")
+def temp_directory_session(tmp_path_factory):
+    temp_dir = tmp_path_factory.mktemp("temp_dir")
+
+    # Can be used to customize a directory that's always the same across runs
+    # (this way some tests can be speed-up by not having to recreate the db from
+    # scratch).
+    # temp_dir = Path("c:/temp")
+
+    yield temp_dir
+
+
+@pytest.fixture
+def base_case(
+    action_server_process: ActionServerProcess, tmpdir, temp_directory_session
+) -> Iterator[CaseInfo]:
+    from robocorp.action_server._database import Database
+    from robocorp.action_server._models import (
+        Action,
+        ActionPackage,
+        get_all_model_classes,
+    )
+
+    p = Path(str(tmpdir)) / ".robocorp_action_server"
+    p.mkdir(parents=True, exist_ok=True)
+    db_path = p / "server.db"
+    assert not db_path.exists()
+
+    persistent_dir = Path(temp_directory_session) / ".robocorp_action_server"
+    persistent_dir.mkdir(parents=True, exist_ok=True)
+
+    initial_db_version = persistent_dir / "initial.db"
+    if not os.path.exists(initial_db_version):
+        pack1 = CURDIR / "resources" / "calculator"
+        pack2 = CURDIR / "resources" / "greeter"
+        # Will have to generate the environment...
+
+        robocorp_action_server_run(
+            [
+                "import",
+                f"--dir={pack1}",
+                f"--dir={pack2}",
+                "--db-file=server.db",
+                "-v",
+                "--datadir",
+                p,
+            ],
+            returncode=0,
+        )
+        shutil.copy(db_path, initial_db_version)
+    else:
+        shutil.copy(initial_db_version, db_path)
+
+    assert db_path.exists()
+    db = Database(db_path)
+    db.register_classes(get_all_model_classes())
+    with db.connect():
+        assert set(x.name for x in db.all(ActionPackage)) == {"calculator", "greeter"}
+        found = set(x.name for x in db.all(Action))
+        assert found == {"calculator_sum", "greet", "broken_action"}
+
+    action_server_process.start(
+        ("--db-file=server.db",),
+        timeout=500,
+    )
+    yield CaseInfo(action_server_process, db_path)
 
 
 class ActionServerClient:
