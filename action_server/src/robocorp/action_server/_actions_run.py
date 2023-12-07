@@ -6,9 +6,9 @@ import os
 import time
 import typing
 from pathlib import Path
-from typing import Annotated, Any, Dict, List
+from typing import Annotated, Any, Dict, List, Optional
 
-from fastapi.params import Param
+from fastapi.params import Param, Header
 from pydantic import BaseModel
 
 if typing.TYPE_CHECKING:
@@ -111,7 +111,11 @@ def _set_run_as_running(run: "Run", initial_time: float):
 
 
 def _run_action_in_thread(
-    action: "Action", signature: inspect.Signature, *args, **kwargs
+    action: "Action",
+    signature: inspect.Signature,
+    headers: Dict[str, str],
+    *args,
+    **kwargs,
 ):
     """
     This is where the user actually runs something.
@@ -192,6 +196,10 @@ def _run_action_in_thread(
                 / relative_artifacts_path
                 / "__action_server_inputs.json"
             ).write_text(json.dumps(inputs))
+
+            for key, value in headers.items():
+                if value:
+                    env[key.upper()] = value
 
             process = Process(cmdline, cwd=directory, env=env)
 
@@ -279,6 +287,13 @@ def generate_func_from_action(action: "Action"):
         Param(description={desc!r})]"""
         arguments.append(argument)
 
+    # Note: Headers are explicitly hidden from spec to make the OpenAPI schema compatible with OpenAI
+    headers = {
+        "x_action_trace": "Optional[str] = Header(None, description='Client application run trace reference', alias='X-action-trace', include_in_schema=False)"
+    }
+    headers_as_params = [f"{key}: {value}" for key, value in headers.items()]
+    headers_as_values = [f"'{key}': {key}" for key, _ in headers.items()]
+
     ret_type = output_schema_dict.get("type", "")
     ret = ""
     if ret_type:
@@ -294,8 +309,9 @@ class {_name_as_class_name(action.name)}Input(BaseModel):
 def {action.name}_as_params({', '.join(arguments)}){ret}:
     pass
 
-def {action.name}(args:{_name_as_class_name(action.name)}Input){ret}:
-    return _run_action_in_thread(action, signature, {', '.join(argument_names)})
+def {action.name}(args:{_name_as_class_name(action.name)}Input, {", ".join(headers_as_params)}){ret}:
+    headers = {{{", ".join(headers_as_values)}}}
+    return _run_action_in_thread(action, signature, headers, {', '.join(argument_names)})
 
 signature = inspect.signature({action.name}_as_params)
 """
@@ -304,7 +320,9 @@ signature = inspect.signature({action.name}_as_params)
     ctx: dict = {
         "Annotated": Annotated,
         "Param": Param,
+        "Header": Header,
         "BaseModel": BaseModel,
+        "Optional": Optional,
         "action": action,
         "inspect": inspect,
         "_run_action_in_thread": _run_action_in_thread,

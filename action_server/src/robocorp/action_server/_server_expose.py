@@ -23,19 +23,20 @@ class BodyPayload(BaseModel):
     path: str
     method: str = "GET"
     body: dict | None = None
+    headers: dict | None = None
 
 
 def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
     url = base_url.rstrip("/") + "/" + payload.path.lstrip("/")
 
     if payload.method == "GET":
-        return requests.get(url)
+        return requests.get(url, headers=payload.headers)
     elif payload.method == "POST":
-        return requests.post(url, json=payload.body)
+        return requests.post(url, json=payload.body, headers=payload.headers)
     elif payload.method == "PUT":
-        return requests.put(url, json=payload.body)
+        return requests.put(url, json=payload.body, headers=payload.headers)
     elif payload.method == "DELETE":
-        return requests.delete(url)
+        return requests.delete(url, headers=payload.headers)
     else:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
