@@ -1,4 +1,7 @@
 if __name__ == "__main__":
     from robocorp.action_server.cli import main
 
-    main()
+    args = None
+    # args = "start -v -p 8090".split()
+
+    main(args)

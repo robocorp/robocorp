@@ -16,7 +16,6 @@ interface Value {
 const dataLoadedInitial: AsyncLoaded<any> = {
   data: undefined,
   isPending: false,
-  requestedOnce: false,
 };
 
 const nameToUrl = (name: string): string => {
@@ -119,6 +118,7 @@ export const ActionRunControls: FC<{
         if (valueType === 'string') {
           fields.push(
             <Input
+              key={key}
               label={title}
               rows={5}
               placeholder={undefined}
@@ -130,6 +130,7 @@ export const ActionRunControls: FC<{
         } else {
           fields.push(
             <Input
+              key={key}
               label={title}
               placeholder={undefined}
               description={description}
@@ -152,13 +153,7 @@ export const ActionRunControls: FC<{
         useData[key] = convertType(val as string, valueType);
       }
       if (action?.name && actionPackage?.name) {
-        runAction(
-          nameToUrl(actionPackage.name),
-          nameToUrl(action.name),
-          useData,
-          result,
-          setResult,
-        );
+        runAction(nameToUrl(actionPackage.name), nameToUrl(action.name), useData, setResult);
       }
     },
     [formData, action, actionPackage, inputSchema, result, setResult],

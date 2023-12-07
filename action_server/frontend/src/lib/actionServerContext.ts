@@ -48,7 +48,6 @@ export const defaultActionServerState: ActionServerContextType = {
   // Runs
   loadedRuns: {
     isPending: true,
-    requestedOnce: false,
     data: [],
     errorMessage: undefined,
   },
@@ -57,7 +56,6 @@ export const defaultActionServerState: ActionServerContextType = {
   // Actions
   loadedActions: {
     isPending: true,
-    requestedOnce: false,
     data: [],
     errorMessage: undefined,
   },

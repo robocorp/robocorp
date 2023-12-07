@@ -3,7 +3,7 @@ import logging
 import os.path
 import sys
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 from . import __version__
 from ._settings import Settings, get_settings
@@ -166,13 +166,15 @@ def _create_parser():
     return base_parser
 
 
-def main() -> int:
+def main(args: Optional[list[str]] = None) -> int:
     from ._rcc import initialize_rcc
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
 
+    if args is None:
+        args = sys.argv[1:]
     parser = _create_parser()
-    base_args = parser.parse_args()
+    base_args = parser.parse_args(args)
 
     command = base_args.command
     if not command:
@@ -185,8 +187,7 @@ def main() -> int:
 
     # if command == "schema":
     # This doesn't work at this point because we have to register the
-    # actions first for it to work, so, the server needs
-    # the routes to be registered
+    # actions first for it to work.
     #     file = base_args.file
     #     _write_schema(file)
     #     return

@@ -46,7 +46,6 @@ export interface AsyncLoaded<T> {
   data?: T;
   isPending?: boolean;
   errorMessage?: string;
-  requestedOnce?: boolean;
 }
 
 export type LoadedRuns = AsyncLoaded<Run[]>;

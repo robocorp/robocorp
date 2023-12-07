@@ -1,6 +1,6 @@
 import { SideNavigation, Menu, Box, Link } from '@robocorp/components';
 import { IconActivity } from '@robocorp/icons';
-import { StrictMode, useCallback, useMemo, useState } from 'react';
+import { StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
 import {
@@ -14,10 +14,15 @@ import { Outlet, RouterProvider, createBrowserRouter, useNavigate } from 'react-
 import { ActionPackages } from './ActionPackages';
 import { ActionRuns } from './ActionRuns';
 import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
-import { refreshActions, refreshRuns } from '~/lib/requestData';
 import { Welcome } from './Welcome';
 import { ActionRunConsole, actionRunConsoleLoader } from './ActionRunConsole';
 import { ActionRunLog, actionRunLogLoader } from './ActionRunLog';
+import {
+  startTrackActions,
+  startTrackRuns,
+  stopTrackActions,
+  stopTrackRuns,
+} from '~/lib/requestData';
 
 const Main = styled.main<{ isCollapsed: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary.color};
@@ -95,6 +100,16 @@ const Root = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    startTrackActions(setLoadedActions);
+    startTrackRuns(setLoadedRuns);
+
+    return () => {
+      stopTrackActions(setLoadedActions);
+      stopTrackRuns(setLoadedRuns);
+    };
+  }, []);
+
   return (
     <ThemeProvider name={viewSettings.theme}>
       <ActionServerContext.Provider value={actionServerContextValue}>
@@ -104,7 +119,6 @@ const Root = () => {
             <Menu.Item
               icon={<IconActivity size="small" />}
               onClick={() => {
-                refreshActions(loadedActions, setLoadedActions);
                 navigate('/actions');
               }}
             >
@@ -113,8 +127,6 @@ const Root = () => {
             <Menu.Item
               icon={<IconActivity size="small" />}
               onClick={() => {
-                refreshActions(loadedActions, setLoadedActions);
-                refreshRuns(loadedRuns, setLoadedRuns);
                 navigate('/runs');
               }}
             >
@@ -172,8 +184,8 @@ export const ActionServerRoot = () => {
   ]);
 
   return (
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>
+    // <StrictMode>
+    <RouterProvider router={router} />
+    // </StrictMode>
   );
 };

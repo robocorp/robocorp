@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Grid, Header, Link, Panel } from '@robocorp/components';
+import { Box, Button, Grid, Header, Link, Panel } from '@robocorp/components';
 import {
   Dispatch,
   FC,
@@ -7,17 +7,18 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
 import { useActionServerContext } from '~/lib/actionServerContext';
-import { refreshActions } from '~/lib/requestData';
 import { Action, ActionPackage } from '~/lib/types';
 import { ActionDetails } from './ActionDetails';
 import { IconPlay } from '@robocorp/icons';
 
-const ActionComponent: FC<{ action: Action, actionPackage: ActionPackage }> = ({ action, actionPackage }) => {
+const ActionComponent: FC<{ action: Action; actionPackage: ActionPackage }> = ({
+  action,
+  actionPackage,
+}) => {
   const { setShowAction } = useActionsContext();
 
   const onClickAction = useCallback(
@@ -54,10 +55,6 @@ export const ActionPackages = () => {
   const { loadedActions, setLoadedActions } = useActionServerContext();
   const [showAction, setShowAction] = useState<ShowActionInfo | undefined>(undefined);
 
-  useEffect(() => {
-    refreshActions(loadedActions, setLoadedActions);
-  }, []);
-
   const isPending = loadedActions.isPending;
   let data: ActionPackage[];
   if (isPending) {
@@ -70,7 +67,9 @@ export const ActionPackages = () => {
   for (const actionPackage of data) {
     const children = [];
     for (const action of actionPackage.actions) {
-      children.push(<ActionComponent key={action.id} action={action} actionPackage={actionPackage} />);
+      children.push(
+        <ActionComponent key={action.id} action={action} actionPackage={actionPackage} />,
+      );
     }
     const header = <strong>{actionPackage.name}</strong>;
     contents.push(

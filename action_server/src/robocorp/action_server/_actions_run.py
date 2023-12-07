@@ -8,7 +8,7 @@ import typing
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Optional
 
-from fastapi.params import Param, Header
+from fastapi.params import Header, Param
 from pydantic import BaseModel
 
 if typing.TYPE_CHECKING:
@@ -185,6 +185,17 @@ def _run_action_in_thread(
 
         initial_time = time.monotonic()
         try:
+            if not directory.exists():
+                raise RuntimeError(
+                    f"""Error. Unable to run the action: {action} because its directory:
+{directory} 
+does not exist.
+This usually happens because the action was moved to a different
+location. To fix please move it back to the original location or
+import it again from the new location.
+"""
+                )
+
             # Add the module to preload to the PYTHONPATH
             from robocorp.action_server import _preload_actions
 

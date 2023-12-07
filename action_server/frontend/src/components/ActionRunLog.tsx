@@ -1,7 +1,6 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC } from 'react';
 import { useLoaderData } from 'react-router-dom';
 import { baseUrl } from '~/lib/requestData';
-import { LoadedArtifacts } from '~/lib/types';
 
 export async function actionRunLogLoader(args: any) {
   const params = args.params;
@@ -14,11 +13,10 @@ export const ActionRunLog: FC<{}> = () => {
 
   // const [loadedArtifacts, setLoadedActions] = useState<LoadedArtifacts>({
   //   isPending: true,
-  //   requestedOnce: false,
   //   data: [],
   //   errorMessage: undefined,
   // });
-// 
+  //
   // Commented code would be a path forward to doing on-the-fly updates
   // of what's happening in the server or work on crashed cases where
   // the log.html is not produced (left as future work for now).
@@ -42,15 +40,12 @@ export const ActionRunLog: FC<{}> = () => {
   //   };
   // }, []);
   //
-  // if (!loadedArtifacts.requestedOnce) {
   //   console.log('request artifacts for run', runId);
   //   collectRunArtifacts(runId, loadedArtifacts, setLoadedActions, {
   //     artifact_name_regexp: '.*\\.robolog',
   //   });
-  // }
   //
   // return <iframe src={`${baseUrl}/base_log.html`} id="logIframe" ref={iframeRef} />;
-  
-  
+
   return <iframe src={`${baseUrl}/api/runs/${runId}/log.html`} id="logIframe" />;
 };
