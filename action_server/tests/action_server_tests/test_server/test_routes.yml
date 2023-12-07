@@ -188,6 +188,17 @@ paths:
     post:
       description: Provides a greeting for a person.
       operationId: greet
+      parameters:
+      - description: Client application run trace reference
+        in: header
+        name: X-action-trace
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          description: Client application run trace reference
+          title: X-Action-Trace
       requestBody:
         content:
           application/json:
