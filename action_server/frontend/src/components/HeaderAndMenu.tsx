@@ -1,12 +1,23 @@
 import { FC, useCallback } from 'react';
-import { Box, Button, Header as BaseHeader, Menu, Header, Link } from '@robocorp/components';
-
+import { Box, Button, Header as BaseHeader, Menu, Link } from '@robocorp/components';
+import { styled } from '@robocorp/theme';
+import { IconMenu } from '@robocorp/icons/iconic';
 import { IconSettings } from '@robocorp/icons';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useNavigate } from 'react-router-dom';
+import { CustomActions } from './CustomActions';
 
-type Props = {};
-export const HeaderAndMenu: FC<Props> = () => {
+const StyledTopNavigationButton = styled(Button)`
+  display: none;
+
+  ${({ theme }) => theme.screen.m} {
+    display: inline-flex;
+  }
+`;
+
+type Props = { onClickMenuButton: () => void };
+
+export const HeaderAndMenu: FC<Props> = ({ onClickMenuButton }) => {
   let px = '$24';
   let pt = '$32';
 
@@ -26,16 +37,24 @@ export const HeaderAndMenu: FC<Props> = () => {
       <BaseHeader className="base-header-container" size="medium">
         <BaseHeader.Title
           title={
-            <Link
-              onClick={() => {
-                navigate('/');
-              }}
-            >
-              Robocorp Action Server
-            </Link>
+            <div style={{ display: 'flex' }}>
+              <Link
+                onClick={() => {
+                  navigate('/');
+                }}
+              >
+                Robocorp Action Server
+              </Link>
+            </div>
           }
         ></BaseHeader.Title>
-        <Header.Actions>
+        <CustomActions>
+          <StyledTopNavigationButton
+            aria-label={'toggleMainMenu'}
+            variant="ghost"
+            icon={IconMenu}
+            onClick={onClickMenuButton}
+          />
           <Menu
             trigger={
               <Button
@@ -55,7 +74,7 @@ export const HeaderAndMenu: FC<Props> = () => {
               Light
             </Menu.Checkbox>
           </Menu>
-        </Header.Actions>
+        </CustomActions>
       </BaseHeader>
     </Box>
   );

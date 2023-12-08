@@ -95,8 +95,9 @@ const Root = () => {
     () => ctx,
     [viewSettings, setViewSettings, loadedRuns, setLoadedRuns, loadedActions, setLoadedActions],
   );
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
-  const onClose = useCallback(() => setIsCollapsed(false), []);
+  const [showNavInSmallMode, setNavInSmallMode] = useState<boolean>(false);
+  const onClose = useCallback(() => setNavInSmallMode(false), []);
+  const onClickMenuButton = useCallback(() => setNavInSmallMode(true), []);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -112,13 +113,32 @@ const Root = () => {
   return (
     <ThemeProvider name={viewSettings.theme}>
       <ActionServerContext.Provider value={actionServerContextValue}>
-        <HeaderAndMenu />
-        <Main isCollapsed={isCollapsed}>
-          <SideNavigation aria-label="Navigation" open={isCollapsed} onClose={onClose}>
+        <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
+        <Main isCollapsed={false}>
+          <SideNavigation aria-label="Navigation" open={showNavInSmallMode} onClose={onClose}>
+            {/* 
+            Hack so that the X button to close is properly shown. 
+            Otherwise the menu appears on top of it.
+            */}
+            {showNavInSmallMode ? <div style={{ height: '3em' }} /> : <></>}
+            {showNavInSmallMode ? (
+              <Menu.Item
+                icon={<IconActivity size="small" />}
+                onClick={() => {
+                  navigate('/');
+                  onClose();
+                }}
+              >
+                Main
+              </Menu.Item>
+            ) : (
+              <></>
+            )}
             <Menu.Item
               icon={<IconActivity size="small" />}
               onClick={() => {
                 navigate('/actions');
+                onClose();
               }}
             >
               Action Packages
@@ -127,6 +147,7 @@ const Root = () => {
               icon={<IconActivity size="small" />}
               onClick={() => {
                 navigate('/runs');
+                onClose();
               }}
             >
               Action Runs
