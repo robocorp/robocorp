@@ -93,7 +93,7 @@ jobs:
         poetry run python -c "from robocorp import log;print(log.__file__)"
         cd ../log
         poetry run inv build-output-view-react
-        poetry inv build-frontend
+        poetry run inv build-frontend
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}

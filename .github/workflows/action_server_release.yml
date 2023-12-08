@@ -44,7 +44,7 @@ jobs:
 
     - name: Build with poetry
       run: |
-        poetry inv build-frontend
+        poetry run inv build-frontend
         poetry build
       env:
         CI: true
