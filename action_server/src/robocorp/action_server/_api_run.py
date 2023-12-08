@@ -1,6 +1,5 @@
 import logging
 import os
-import typing
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Dict, List, Optional
@@ -22,8 +21,7 @@ def list_runs():
 
     global_runs_state = get_global_runs_state()
     with global_runs_state.semaphore:
-        ret = global_runs_state.get_current_run_state()
-        return tuple(reversed(sorted(ret, key=lambda run: run.numbered_id)))
+        return global_runs_state.get_current_run_state()
 
 
 def get_run_by_id(run_id: str) -> Run:

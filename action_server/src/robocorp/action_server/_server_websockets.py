@@ -56,13 +56,27 @@ class RunNotificationsThread(threading.Thread):
         if self._disposed.is_set():
             return
 
-        await self.websocket.send_json(
-            {
-                "message_type": "run_change",
-                "run_id": run_change_event.run.id,
-                "changes": run_change_event.changes,
-            }
-        )
+        try:
+            if run_change_event.ev == "added":
+                await self.websocket.send_json(
+                    {
+                        "message_type": "run_added",
+                        "run": asdict(run_change_event.run),
+                    }
+                )
+            elif run_change_event.ev == "changed":
+                await self.websocket.send_json(
+                    {
+                        "message_type": "run_changed",
+                        "run_id": run_change_event.run.id,
+                        "changes": run_change_event.changes,
+                    }
+                )
+            else:
+                log.critical(f"Unexpected run change event: {run_change_event}.")
+        except Exception:
+            log.exception("Error reporting change event to json.")
+            raise
 
     async def _report_runs(self, runs: list["Run"]):
         """

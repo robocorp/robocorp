@@ -99,7 +99,6 @@ const Root = () => {
   const onClose = useCallback(() => setIsCollapsed(false), []);
 
   const navigate = useNavigate();
-
   useEffect(() => {
     startTrackActions(setLoadedActions);
     startTrackRuns(setLoadedRuns);
@@ -183,9 +182,11 @@ export const ActionServerRoot = () => {
     },
   ]);
 
+  // Note: strict mode makes rendering twice, so, beware of duplicate network requests
+  // due to the additional mount/unmount.
   return (
-    // <StrictMode>
-    <RouterProvider router={router} />
-    // </StrictMode>
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>
   );
 };

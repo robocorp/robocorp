@@ -82,4 +82,8 @@ export class ModelContainer {
       }
     }
   }
+
+  public getCurrentModel(type: ModelType): CachedModel | undefined {
+    return this.models.get(type);
+  }
 }

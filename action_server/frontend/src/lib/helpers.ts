@@ -144,3 +144,21 @@ export function parseDateisoformatToLocalTimezoneStr(time: string) {
   // will convert it to the local timezone.
   return parsedTime.toString();
 }
+
+export function copyArrayAndInsertElement(array: any[], element: any, position: number): any[] {
+  if (position < 0 || position > array.length) {
+    throw new Error('Invalid position');
+  }
+
+  const newArray = array.slice(0, position); // creates copy
+
+  // add new item in array copy
+  newArray.push(element);
+
+  // add remaining items to it
+  for (let i = position; i < array.length; i++) {
+    newArray.push(array[i]);
+  }
+
+  return newArray;
+}

@@ -94,12 +94,12 @@ async def check_websocket(
             # Run was created
             current_run_events = json.loads(await ws.recv())
             print(current_run_events)
-            assert current_run_events["message_type"] == "run_change"
+            assert current_run_events["message_type"] == "run_added"
 
             # Run was changed (running -> complete)
             current_run_events = json.loads(await ws.recv())
             print(current_run_events)
-            assert current_run_events["message_type"] == "run_change"
+            assert current_run_events["message_type"] == "run_changed"
             queue.put("worked")
 
     except Exception as e:

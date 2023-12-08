@@ -7,7 +7,7 @@ way to synchronize state across multiple processes.
 import threading
 import typing
 from contextlib import contextmanager
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, Literal, Optional
 
 if typing.TYPE_CHECKING:
@@ -15,18 +15,11 @@ if typing.TYPE_CHECKING:
     from ._models import Run
 
 
+@dataclass(slots=True)
 class RunChangeEvent:
-    __slots__ = ["ev", "run", "changes"]
-
-    def __init__(
-        self,
-        ev: Literal["added", "changed"],
-        run: "Run",
-        changes: Optional[dict[str, Any]] = None,
-    ):
-        self.ev = ev
-        self.run = run
-        self.changes = changes
+    ev: Literal["added", "changed"]
+    run: "Run"
+    changes: Optional[dict[str, Any]] = None
 
 
 class RunsState:
@@ -55,9 +48,11 @@ class RunsState:
         # This is an in-memory view of the runs available to be seen by clients.
         # Older runs are in the db, but we don't provide them for the time being.
 
-        # Note: we limit to 200 Runs for now... could be tweaked in the future.
+        # Note: we limit to the latest 200 Runs for now...
+        # could be tweaked in the future.
         run_id_to_run = {}
-        for run in db.all(Run, offset=0, limit=200):
+        # order by is important so that we get the latest ones.
+        for run in db.all(Run, offset=0, limit=200, order_by="numbered_id DESC"):
             run_id_to_run[run.id] = run
 
         self._run_id_to_run = run_id_to_run

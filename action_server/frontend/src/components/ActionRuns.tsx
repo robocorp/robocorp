@@ -141,8 +141,7 @@ export const ActionRuns: FC<{}> = () => {
     },
   ];
 
-  const { loadedRuns, setLoadedRuns, loadedActions, setLoadedActions } = useActionServerContext();
-
+  const { loadedRuns, loadedActions } = useActionServerContext();
   const [showRun, setShowRun] = useState<RunTableEntry | undefined>(undefined);
 
   const isPending = loadedRuns.isPending || loadedActions.isPending;
