@@ -91,23 +91,28 @@ const runRow: FC<{ rowData: RunTableEntry }> = ({ rowData }) => {
     <Table.Row>
       <Table.Cell>
         <Tooltip text="Console Output">
-          <Link onClick={onClickRun}>{`Run #${rowData.numbered_id}`}</Link>{' '}
-          <Button
-            icon={IconCode}
-            aria-label="Console"
-            size="small"
-            variant="secondary"
-            style={{ marginLeft: 5 }}
-            onClick={onClickConsole}
-          ></Button>
-          <Button
-            icon={IconFileText}
-            aria-label="Log"
-            size="small"
-            variant="secondary"
-            style={{ marginLeft: 5 }}
-            onClick={onClickLog}
-          ></Button>
+          <div className="runsLine">
+            <Link
+              style={{ whiteSpace: 'nowrap', marginRight: 5 }}
+              onClick={onClickRun}
+            >{`Run #${rowData.numbered_id}`}</Link>{' '}
+            <Button
+              icon={IconCode}
+              aria-label="Console"
+              size="small"
+              variant="secondary"
+              className="runsButton"
+              onClick={onClickConsole}
+            ></Button>
+            <Button
+              icon={IconFileText}
+              aria-label="Log"
+              size="small"
+              variant="secondary"
+              className="runsButton"
+              onClick={onClickLog}
+            ></Button>
+          </div>
         </Tooltip>
       </Table.Cell>
       <Table.Cell>
