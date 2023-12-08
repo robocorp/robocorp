@@ -97,7 +97,9 @@ def start_server(expose: bool) -> None:
         return HTMLResponse(index.FILE_CONTENTS["index.html"])
 
     async def serve_index(request: Request):
-        return FileResponse(CURDIR / "_static" / "index.html")
+        from ._static_contents import FILE_CONTENTS
+
+        return HTMLResponse(FILE_CONTENTS["index.html"])
 
     index_routes = ["/", "/runs/{full_path:path}", "/actions/{full_path:path}"]
     for index_route in index_routes:
