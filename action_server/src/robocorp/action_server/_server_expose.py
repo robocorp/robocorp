@@ -23,7 +23,7 @@ class BodyPayload(BaseModel):
     path: str
     method: str = "GET"
     body: dict | None = None
-    headers: dict | None = None
+    headers: dict
 
 
 def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
