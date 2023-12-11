@@ -103,7 +103,7 @@ def _create_parser():
     start_parser.add_argument(
         "--api-key",
         dest="api_key",
-        help="""Adds authentication. Pass it as `{"Authorization": "Bearer <secret>"}` header. 
+        help="""Adds authentication. Pass it as `{"Authorization": "Bearer <API_KEY>"}` header. 
         Pass `--api-key None` to disable authentication.""",
         default=generate_api_key(),
     )
