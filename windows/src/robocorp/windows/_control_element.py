@@ -431,11 +431,50 @@ class ControlElement:
     def __repr__(self):
         return f"""{self.__class__.__name__}({self.__str__()})"""
 
+    def _raise_or_warn_control_not_found(
+            self,
+            locator: Locator,
+            search_depth: int,
+            timeout: Optional[float],
+            raise_error: Optional[type],  # to raise or not and with what class
+            exception: Exception,  # previous original raised exception
+    ):
+        from . import config as windows_config
+
+        config = windows_config()
+        if not config.verbose_errors:
+            # Verbose errors were disabled, so no fancy messages with suggestions will
+            #  be applied.
+            if raise_error:
+                # Just re-raise the same error if raising is ON.
+                raise exception
+            else:
+                # Or log instead without raising.
+                self.logger.warning(exception)
+                return
+
+        # Verbose error message with suggestions.
+        msg = (
+            f"Could not locate control with locator: {locator!r} "
+            f"(timeout: {timeout if timeout is not None else config.timeout})"
+        )
+        if not raise_error:
+            # Verbosity not needed anymore when raising was disabled.
+            self.logger.warning(msg)
+            return
+
+        child_elements_msg = ["\nChild Elements Found:"]
+        for child in self._iter_children_nodes(max_depth=search_depth):
+            child_elements_msg.append(str(child))
+        msg += "\n".join(child_elements_msg)
+        raise raise_error(msg) from exception
+
     def find(
         self,
         locator: Locator,
         search_depth: int = 8,
         timeout: Optional[float] = None,
+        raise_error: Optional[type] = ElementNotFound,
     ) -> "ControlElement":
         """
         This method may be used to find a control in the descendants of this
@@ -471,24 +510,9 @@ class ControlElement:
                     timeout=timeout,
                 )
             )
-        except ElementNotFound as e:
-            from . import config as windows_config
+        except ElementNotFound as exc:
+            self._raise_or_warn_control_not_found(locator, search_depth, timeout, raise_error, exception=exc)
 
-            config = windows_config()
-            if not config.verbose_errors:
-                raise
-
-            # Verbose error
-            msg = (
-                f"Could not locate control with locator: {locator!r} "
-                f"(timeout: {timeout if timeout is not None else config.timeout})"
-            )
-            child_elements_msg = ["\nChild Elements Found:"]
-            for w in self._iter_children_nodes(max_depth=search_depth):
-                child_elements_msg.append(str(w))
-
-            msg += "\n".join(child_elements_msg)
-            raise ElementNotFound(msg) from e
 
     def find_many(
         self,
