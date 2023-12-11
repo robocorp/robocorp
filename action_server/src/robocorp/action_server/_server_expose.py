@@ -74,7 +74,6 @@ async def expose_server(
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
         )
-        print(session_payload)
         while retries < max_retries:
             try:
                 headers = (
@@ -108,7 +107,7 @@ async def expose_server(
                                 )
                             new_expose_session = get_expose_session(session_payload)
                             log.info(
-                                f"🔄 Add following argument to restart with same expose URL: --expose-session {new_expose_session} " # noqa
+                                f"🔄 Add following argument to restart with same expose URL: --expose-session {new_expose_session}  " # noqa
                             )
                             continue
                         except Exception:
