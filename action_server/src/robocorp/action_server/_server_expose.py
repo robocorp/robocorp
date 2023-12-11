@@ -81,6 +81,10 @@ async def expose_server(
                             log.info(
                                 f"🌍 URL: https://{session_payload.sessionId}.{expose_url}"
                             )
+                            if api_key is not None:
+                                log.info(
+                                    f'🔑 Use {{ "Authorization": "Bearer {api_key}" }} to authorize api requests'
+                                )
                             continue
                         except Exception:
                             if not session_payload:
