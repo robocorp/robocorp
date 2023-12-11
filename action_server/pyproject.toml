@@ -10,6 +10,10 @@ repository = "https://github.com/robocorp/robo/"
 license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 
+[tool.poetry.scripts]
+action-server = "robocorp.action_server.cli:main"
+
+
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = "^0.104.1"

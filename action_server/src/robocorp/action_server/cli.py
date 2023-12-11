@@ -175,7 +175,14 @@ def _create_parser():
     return base_parser
 
 
-def main(args: Optional[list[str]] = None) -> int:
+def main(args: Optional[list[str]] = None, *, exit=True) -> int:
+    retcode = _main_retcode(args, exit=exit)
+    if exit:
+        sys.exit(retcode)
+    return retcode
+
+
+def _main_retcode(args: Optional[list[str]], exit) -> int:
     from ._rcc import initialize_rcc
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
@@ -319,5 +326,4 @@ To migrate the database to the current version
 
 
 if __name__ == "__main__":
-    retcode = main()
-    sys.exit(retcode)
+    main()
