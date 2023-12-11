@@ -2,7 +2,7 @@
   <img src="./docs/include/logo.svg" alt="Robo Logo" width="100%">
 </a>
 
-## Robo is an all-in-one Python automation framework
+## Robocorp is an all-in-one Python automation framework
 
 ### Create, develop, run, and deploy your automation code with Robo - and operate it all with [Control Room](https://robocorp.com/products/control-room)
 
