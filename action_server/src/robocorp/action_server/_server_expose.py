@@ -112,6 +112,7 @@ async def expose_server(
                                                         },
                                                     }
                                                 ),
+                                                "status": 403,
                                             }
                                         )
                                     )
@@ -129,6 +130,7 @@ async def expose_server(
                                             response.json(),
                                             indent=2,
                                         ),
+                                        "status": response.status_code,
                                     }
                                 )
                             )
