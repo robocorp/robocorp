@@ -23,7 +23,7 @@ class BodyPayload(BaseModel):
     path: str
     method: str = "GET"
     body: dict | None = None
-    headers: dict | None = None
+    headers: dict
 
 
 def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
@@ -41,7 +41,9 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-async def expose_server(port: int, host: str, expose_url: str):
+async def expose_server(
+    port: int, host: str, expose_url: str, api_key: str | None = None
+):
     """
     Exposes the server to the world.
     """
@@ -75,9 +77,14 @@ async def expose_server(port: int, host: str, expose_url: str):
 
                         try:
                             session_payload = SessionPayload(**data)
+
                             log.info(
                                 f"🌍 URL: https://{session_payload.sessionId}.{expose_url}"
                             )
+                            if api_key is not None:
+                                log.info(
+                                    f'🔑 Use {{ "Authorization": "Bearer {api_key}" }} to authorize api requests'
+                                )
                             continue
                         except Exception:
                             if not session_payload:
@@ -89,6 +96,32 @@ async def expose_server(port: int, host: str, expose_url: str):
 
                         try:
                             payload = BodyPayload(**data)
+                            if payload.path != "/openapi.json" and api_key is not None:
+                                if (
+                                    payload.headers.get("authorization")
+                                    != f"Bearer {api_key}"
+                                ):
+                                    log.error(
+                                        "Request failed because the API key is invalid."
+                                    )
+                                    await ws.send(
+                                        json.dumps(
+                                            {
+                                                "requestId": payload.requestId,
+                                                "response": json.dumps(
+                                                    {
+                                                        "error": {
+                                                            "code": "INVALID_API_KEY",
+                                                            "message": "The API key is invalid.",
+                                                        },
+                                                    }
+                                                ),
+                                                "status": 403,
+                                            }
+                                        )
+                                    )
+                                    continue
+
                             base_url = f"http://{host}:{port}"
                             response: requests.Response = forward_request(
                                 base_url=base_url, payload=payload
@@ -101,6 +134,7 @@ async def expose_server(port: int, host: str, expose_url: str):
                                             response.json(),
                                             indent=2,
                                         ),
+                                        "status": response.status_code,
                                     }
                                 )
                             )
@@ -122,7 +156,7 @@ async def expose_server(port: int, host: str, expose_url: str):
 
 
 if __name__ == "__main__":
-    parent_pid, port, verbose, host, expose_url = sys.argv[1:]
+    parent_pid, port, verbose, host, expose_url, api_key = sys.argv[1:]
 
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
@@ -131,4 +165,11 @@ if __name__ == "__main__":
     )
 
     exit_when_pid_exists(int(parent_pid))
-    asyncio.run(expose_server(port=int(port), host=host, expose_url=expose_url))
+    asyncio.run(
+        expose_server(
+            port=int(port),
+            host=host,
+            expose_url=expose_url,
+            api_key=api_key if api_key != "None" else None,
+        )
+    )
