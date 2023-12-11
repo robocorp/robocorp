@@ -5,7 +5,6 @@ from re import Pattern
 from typing import Dict, Iterator, List, Literal, Optional, Protocol, Set, Tuple, Union
 
 from ._com_error import COMError
-
 from ._errors import ElementNotFound
 from ._iter_tree import ControlTreeNode
 from ._match_ast import OrSearchParams, SearchParams

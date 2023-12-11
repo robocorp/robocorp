@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Optional
 
 from ._com_error import COMError
-
 from .protocols import Locator
 
 if typing.TYPE_CHECKING:
