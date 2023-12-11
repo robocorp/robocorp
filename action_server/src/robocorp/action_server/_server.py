@@ -21,7 +21,9 @@ def _name_to_url(name):
     return name.replace("_", "-")
 
 
-def start_server(expose: bool, api_key: str | None = None) -> None:
+def start_server(
+    expose: bool, api_key: str | None = None, expose_session: str | None = None
+) -> None:
     import docstring_parser
     import uvicorn
     from fastapi.staticfiles import StaticFiles
@@ -143,6 +145,7 @@ def start_server(expose: bool, api_key: str | None = None) -> None:
                 host,
                 settings.expose_url,
                 str(api_key),
+                str(expose_session),
             ]
         )
 
