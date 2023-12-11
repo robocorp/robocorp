@@ -6,10 +6,9 @@ import re
 import sys
 import typing
 from pathlib import Path
-from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union
+from typing import Callable, Iterator, List, Literal, Optional, Tuple, Union, overload
 
 from ._com_error import COMError
-
 from ._errors import ActionNotPossible, ElementNotFound
 from ._find_ui_automation import LocatorStrAndOrSearchParams
 from .protocols import Locator
@@ -432,12 +431,12 @@ class ControlElement:
         return f"""{self.__class__.__name__}({self.__str__()})"""
 
     def _raise_or_warn_control_not_found(
-            self,
-            locator: Locator,
-            search_depth: int,
-            timeout: Optional[float],
-            raise_error: Optional[type],  # to raise or not and with what class
-            exception: Exception,  # previous original raised exception
+        self,
+        locator: Locator,
+        search_depth: int,
+        timeout: Optional[float],
+        raise_error: bool,  # to raise or not
+        exception: Exception,  # previous original raised exception
     ):
         from . import config as windows_config
 
@@ -467,15 +466,35 @@ class ControlElement:
         for child in self._iter_children_nodes(max_depth=search_depth):
             child_elements_msg.append(str(child))
         msg += "\n".join(child_elements_msg)
-        raise raise_error(msg) from exception
+        raise ElementNotFound(msg) from exception
+
+    @overload
+    def find(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        raise_error: Literal[True] = ...,
+    ) -> "ControlElement":
+        ...
+
+    @overload
+    def find(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        raise_error: Literal[False] = ...,
+    ) -> Optional["ControlElement"]:
+        ...
 
     def find(
         self,
         locator: Locator,
         search_depth: int = 8,
         timeout: Optional[float] = None,
-        raise_error: Optional[type] = ElementNotFound,
-    ) -> "ControlElement":
+        raise_error: bool = True,
+    ) -> Optional["ControlElement"]:
         """
         This method may be used to find a control in the descendants of this
         control.
@@ -511,8 +530,10 @@ class ControlElement:
                 )
             )
         except ElementNotFound as exc:
-            self._raise_or_warn_control_not_found(locator, search_depth, timeout, raise_error, exception=exc)
-
+            self._raise_or_warn_control_not_found(
+                locator, search_depth, timeout, raise_error, exception=exc
+            )
+            return None
 
     def find_many(
         self,
