@@ -98,6 +98,12 @@ def _create_parser():
         action="store_true",
         help="Expose the server to the world",
     )
+    start_parser.add_argument(
+        "--api-key",
+        dest="api_key",
+        help="""Adds authentication. Pass it as `{"Authorization": "Bearer <secret>"}` header""",
+        default=None,
+    )
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
 
@@ -298,8 +304,10 @@ To migrate the database to the current version
                 with use_runs_state_ctx(db):
                     from ._server import start_server
 
+                    print("args", base_args.api_key)
+
                     settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-                    start_server(expose=base_args.expose)
+                    start_server(expose=base_args.expose, api_key=base_args.api_key)
                     return 0
 
             else:
