@@ -58,6 +58,7 @@ def test_find(tk_process) -> None:
     with pytest.raises(ElementNotFound):
         window.find("class:Invalid path:1|5", timeout=1)
     assert window.find("class:Button path:1|5", timeout=1) is not None
+    assert window.find("class:Invalid path:1|5", timeout=1, raise_error=False) is None
 
     all_buttons = window.find_many(
         "class:Button", search_depth=8, search_strategy="all"
