@@ -96,9 +96,9 @@ async def expose_server(
 
                         try:
                             payload = BodyPayload(**data)
-                            if api_key is not None:
+                            if payload.path != "/openapi.json" and api_key is not None:
                                 if (
-                                    payload.headers.get("Authorization")
+                                    payload.headers.get("authorization")
                                     != f"Bearer {api_key}"
                                 ):
                                     log.error(
