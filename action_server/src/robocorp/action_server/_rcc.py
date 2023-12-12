@@ -249,6 +249,13 @@ class Rcc(object):
 
         return ActionResult(True, None, EnvInfo(environ))
 
+    def pull(self, url: str, directory: str) -> ActionResult[str]:
+        args = ["pull", url, "--directory", directory]
+        ret = self._run_rcc(args, mutex_name=RCC_CLOUD_ROBOT_MUTEX_NAME)
+        if not ret.success:
+            return ActionResult(False, ret.message, None)
+        return ActionResult(True, None, ret.result)
+
 
 _rcc: Optional["Rcc"] = None
 
