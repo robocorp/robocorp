@@ -1,14 +1,20 @@
+import logging
 from ._rcc import get_rcc
 
 
 TEMPLATE_URL = "github.com/robocorp/example-action-server-starter"
 
+log = logging.getLogger(__name__)
+
 
 def create_new_project():
-    directory = input("Enter path to create the project: ")
+    try:
+        directory = input("Enter path to create the project: ")
 
-    rcc = get_rcc()
+        rcc = get_rcc()
 
-    rcc.pull(url=TEMPLATE_URL, directory=directory)
+        rcc.pull(url=TEMPLATE_URL, directory=directory)
 
-    print("✅ Project created")
+        log.info("✅ Project created")
+    except KeyboardInterrupt:
+        log.debug("Operation cancelled")
