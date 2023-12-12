@@ -35,9 +35,9 @@ jobs:
     steps:
     - name: Checkout repository and submodules
       uses: actions/checkout@v3
-      
+
     - name: Set up chrome for tests
-      run: choco install googlechrome
+      run: choco install googlechrome --ignore-checksums
 
     - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v4
