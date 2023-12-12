@@ -21,6 +21,6 @@ X_ACTION_TRACE = os.environ.get("X_ACTION_TRACE", "")
 
 if X_ACTION_TRACE:
     html(
-        f'<p style="line-height:34px">View <a href="{X_ACTION_TRACE}"'
-        'style="color:rgb(var(--color-content-accent))">Client Application Trace</a></p>'
+        f'<p style="line-height:34px">External <a href="{X_ACTION_TRACE}"'
+        'style="color:rgb(var(--color-content-accent))">Client Application Trace</a> reported</p>'
     )
