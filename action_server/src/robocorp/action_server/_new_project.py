@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 def create_new_project():
     try:
-        directory = input("Enter path to create the project: ")
+        directory = input("Name of the project: ")
 
         rcc = get_rcc()
 
