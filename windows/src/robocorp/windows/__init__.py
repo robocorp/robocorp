@@ -167,13 +167,10 @@ def find_window(
         search_depth: The search depth to find the window (by default == 1, meaning
             that only top-level windows will be found).
 
-        timeout:
-            The search for a child with the given locator will be retried
-            until the given timeout elapses.
-
+        timeout: The search for a child with the given locator will be retried
+            until the given timeout (in **seconds**) elapses.
             At least one full search up to the given depth will always be done
             and the timeout will only take place afterwards.
-
             If not given the global config timeout will be used.
 
         wait_time: The time to wait after finding the window. If not passed the
@@ -218,15 +215,11 @@ def find_windows(
         search_depth: The search depth to be used to find windows (by default
             equals 1, meaning that only top-level windows will be found).
 
-        timeout:
-            The search for a child with the given locator will be retried
-            until the given timeout elapses.
-
+        timeout: The search for a child with the given locator will be retried
+            until the given timeout (in **seconds**) elapses.
             At least one full search up to the given depth will always be done
             and the timeout will only take place afterwards.
-
             If not given the global config timeout will be used.
-
             Only used if `wait_for_window` is True.
 
         wait_for_window: Defines whether the search should keep on searching

@@ -807,7 +807,7 @@ class ElementInspector:
         Args:
             locator: If passed, entries matching the given locator will be highlighted.
             search_depth: Up to which depth entries should be highlighted.
-            timeout: Timeout to find a locator.
+            timeout: Timeout (in **seconds**) to find a locator.
             search_strategy: After finding a locator, should only siblings be found
               or should a full tree traversal be done?
 

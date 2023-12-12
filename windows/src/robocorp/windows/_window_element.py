@@ -174,13 +174,10 @@ class WindowElement(ControlElement):
 
             search_depth: The search depth to be used to find the window.
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
 
             wait_time:

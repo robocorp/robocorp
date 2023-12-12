@@ -170,13 +170,10 @@ class Desktop(ControlElement):
             search_depth: The search depth to be used to find the window (by default
                 equals 1, meaning that only top-level windows will be found).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
 
             wait_time:
@@ -216,15 +213,11 @@ class Desktop(ControlElement):
             search_depth: The search depth to be used to find windows (by default
                 equals 1, meaning that only top-level windows will be found).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `wait_for_window` is True.
 
             wait_for_window: Defines whether the search should keep on searching
@@ -277,14 +270,12 @@ class Desktop(ControlElement):
                 Note that windows are closed by force-killing the pid related
                 to the window.
 
-            timeout:
-                The search for a window with the given locator will be retried
-                until the given timeout elapses. At least one full search up to
+            timeout: The search for a window with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
+                At least one full search up to
                 the given depth will always be done and the timeout will only
                 take place afterwards (if `wait_for_window` is True).
-
                 Only used if `wait_for_window` is True.
-
                 If not given the global config timeout will be used.
 
             wait_for_window: If True windows this method will keep searching for
@@ -396,8 +387,8 @@ class Desktop(ControlElement):
 
         Args:
             locator: The locator that the active window must match.
-            timeout: Timeout to wait for a window with the given locator to be
-                made active.
+            timeout: Timeout (in **seconds**) to wait for a window with the given
+                locator to be made active.
             wait_time: A time to wait after the active window is found.
 
         Raises:

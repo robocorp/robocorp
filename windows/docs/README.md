@@ -28,7 +28,7 @@ Below is an example using the windows calculator:
 from robocorp import windows
 
 # Get the calculator window
-calc = find_window("name:Calculator")
+calc = windows.find_window("name:Calculator")
 
 # Press button 0 (the locator is dependent on the windows version).
 button0 = calc.find('(name:Zero or name:0) and class:Button')

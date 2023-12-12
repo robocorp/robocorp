@@ -1145,15 +1145,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is passed.
 
         Returns:
@@ -1234,15 +1230,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is passed.
 
             wait_time: The time to wait after sending the keys to the element. If not passed the
@@ -1311,15 +1303,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Returns:
@@ -1373,15 +1361,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Returns:
@@ -1524,15 +1508,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Note:
@@ -1644,15 +1624,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Example:
@@ -1707,15 +1683,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Example:
@@ -1765,15 +1737,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Returns:
@@ -1829,15 +1797,11 @@ class ControlElement:
             search_depth: Used as the depth to search for the locator (only
                 used if the `locator` is specified).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `locator` is given.
 
         Example:
