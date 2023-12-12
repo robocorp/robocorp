@@ -46,7 +46,7 @@ def test_print(tk_process, str_regression):
     str_regression.check(result)
 
 
-def test_find(tk_process) -> None:
+def test_find(tk_process):
     from robocorp.windows import find_window
     from robocorp.windows._control_element import ControlElement
     from robocorp.windows._errors import ElementNotFound
@@ -124,3 +124,12 @@ def test_find(tk_process) -> None:
                         found = True
 
                 assert found, f"Did not find expected.\n{check_bts}\n{at_depth}"
+
+
+def test_find_by_executable(notepad_window):
+    from robocorp import windows
+
+    notepad_exe_win = windows.find_window("executable:Notepad.exe")
+    print(f"Notepad window process ID: {notepad_exe_win.pid}")
+    assert notepad_exe_win.is_same_as(notepad_window)
+    assert notepad_exe_win.close_window(use_close_button=True) is True

@@ -85,3 +85,17 @@ def calculator_window_element(calc_process) -> Iterator[WindowElement]:
     )
     assert calculator_window_element
     yield calculator_window_element
+
+
+@pytest.fixture
+def notepad_window():
+    """Opens a Notepad window using Windows search and closes it by process."""
+    from robocorp import windows
+
+    desktop = windows.Desktop()
+    desktop.windows_run("notepad")
+    notepad_win = windows.find_window("class:Notepad subname:Notepad")
+
+    yield notepad_win
+
+    notepad_win.close_window()
