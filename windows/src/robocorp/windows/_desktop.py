@@ -178,7 +178,6 @@ class Desktop(ControlElement):
 
             wait_time:
                 The time to wait after the windows was found.
-
                 If not given the global config wait_time will be used.
 
             foreground:

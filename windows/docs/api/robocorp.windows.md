@@ -361,7 +361,7 @@ ______________________________________________________________________
 
 ### method `close_windows`
 
-**Source:** [`_desktop.py:247`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L247)
+**Source:** [`_desktop.py:246`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L246)
 
 ```python
 close_windows(
@@ -408,7 +408,7 @@ ______________________________________________________________________
 
 ### method `drag_and_drop`
 
-**Source:** [`_desktop.py:495`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L495)
+**Source:** [`_desktop.py:494`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L494)
 
 ```python
 drag_and_drop(
@@ -472,9 +472,7 @@ Finds windows matching the given locator.
 
 - <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-wait_time: The time to wait after the windows was found.
-
-If not given the global config wait_time will be used.
+wait_time: The time to wait after the windows was found. If not given the global config wait_time will be used.
 
 foreground: If True the matched window will be made the foreground window.
 
@@ -487,7 +485,7 @@ ______________________________________________________________________
 
 ### method `find_windows`
 
-**Source:** [`_desktop.py:199`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L199)
+**Source:** [`_desktop.py:198`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L198)
 
 ```python
 find_windows(
@@ -527,7 +525,7 @@ ______________________________________________________________________
 
 ### method `get_win_version`
 
-**Source:** [`_desktop.py:361`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L361)
+**Source:** [`_desktop.py:360`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L360)
 
 ```python
 get_win_version() → str
@@ -614,7 +612,7 @@ ______________________________________________________________________
 
 ### method `wait_for_active_window`
 
-**Source:** [`_desktop.py:379`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L379)
+**Source:** [`_desktop.py:378`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L378)
 
 ```python
 wait_for_active_window(
@@ -641,7 +639,7 @@ ______________________________________________________________________
 
 ### method `windows_run`
 
-**Source:** [`_desktop.py:323`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L323)
+**Source:** [`_desktop.py:322`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L322)
 
 ```python
 windows_run(text: str, wait_time: float = 1) → None
@@ -660,7 +658,7 @@ ______________________________________________________________________
 
 ### method `windows_search`
 
-**Source:** [`_desktop.py:343`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L343)
+**Source:** [`_desktop.py:342`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L342)
 
 ```python
 windows_search(text: str, wait_time: float = 3.0) → None
@@ -1271,7 +1269,7 @@ ______________________________________________________________________
 
 ### method `click`
 
-**Source:** [`_control_element.py:803`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L803)
+**Source:** [`_control_element.py:799`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L799)
 
 ```python
 click(
@@ -1288,13 +1286,8 @@ Clicks an element using the mouse.
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be clicked.
 - <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
-- <b>`wait_time`</b>:  The time to wait after clicking the element. If not passed the default value found in the config is used.timeout: The search for a child with the given locator will be retried until the given timeout elapses.
-
-At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
-
-If not given the global config timeout will be used.
-
-Only used if `locator` is passed.
+- <b>`wait_time`</b>:  The time to wait after clicking the element. If not passed the default value found in the config is used.
+- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 **Example:**
 
@@ -1335,7 +1328,7 @@ ______________________________________________________________________
 
 ### method `double_click`
 
-**Source:** [`_control_element.py:868`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L868)
+**Source:** [`_control_element.py:860`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L860)
 
 ```python
 double_click(
@@ -1351,13 +1344,10 @@ Double-clicks an element using the mouse.
 **Args:**
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be double-clicked.
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).timeout: The search for a child with the given locator will be retried until the given timeout elapses.
 
-At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
+- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
-If not given the global config timeout will be used.
-
-Only used if `locator` is passed.
+- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 - <b>`wait_time`</b>:  The time to wait after double-clicking the element. If not passed the default value found in the config is used.
 
@@ -1421,14 +1411,12 @@ The first matching element is returned.
 
 - <b>`search_depth`</b>:  Up to which depth the hierarchy should be searched.
 
-timeout: The search for a child with the given locator will be retried until the given timeout elapses.
+- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
-
-If not given the global config timeout will be used.
+- <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
 **Raises:**
-ElementNotFound if an element with the given locator could not befound.
+`ElementNotFound` if an element with the given locator could not befound.
 
 ______________________________________________________________________
 
@@ -1454,13 +1442,7 @@ This method may be used to find multiple descendants of the current element matc
 
 - <b>`search_depth`</b>:  Up to which depth the tree will be traversed.
 
-timeout: The search for a child with the given locator will be retried until the given timeout elapses.
-
-At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
-
-If not given the global config timeout will be used.
-
-Only used if `wait_for_element` is True.
+- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_element` is True.
 
 search_strategy: The search strategy to be used to find elements.
 
@@ -1491,7 +1473,7 @@ ______________________________________________________________________
 
 ### method `get_text`
 
-**Source:** [`_control_element.py:1290`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1290)
+**Source:** [`_control_element.py:1274`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1274)
 
 ```python
 get_text(
@@ -1529,7 +1511,7 @@ ______________________________________________________________________
 
 ### method `get_value`
 
-**Source:** [`_control_element.py:1348`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1348)
+**Source:** [`_control_element.py:1332`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1332)
 
 ```python
 get_value(
@@ -1646,7 +1628,7 @@ ______________________________________________________________________
 
 ### method `iter_children`
 
-**Source:** [`_control_element.py:644`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L644)
+**Source:** [`_control_element.py:640`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L640)
 
 ```python
 iter_children(max_depth: int = 8) → Iterator[ForwardRef('ControlElement')]
@@ -1669,7 +1651,7 @@ ______________________________________________________________________
 
 ### method `log_screenshot`
 
-**Source:** [`_control_element.py:1720`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1720)
+**Source:** [`_control_element.py:1704`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1704)
 
 ```python
 log_screenshot(
@@ -1709,7 +1691,7 @@ ______________________________________________________________________
 
 ### method `middle_click`
 
-**Source:** [`_control_element.py:1003`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1003)
+**Source:** [`_control_element.py:990`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L990)
 
 ```python
 middle_click(
@@ -1728,13 +1710,7 @@ Middle-clicks an element using the mouse.
 
 - <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
 
-timeout: The search for a child with the given locator will be retried until the given timeout elapses.
-
-At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
-
-If not given the global config timeout will be used.
-
-Only used if `locator` is passed.
+- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 - <b>`wait_time`</b>:  The time to wait after middle-clicking the element. If not passed the default value found in the config is used.
 
@@ -1777,7 +1753,7 @@ ______________________________________________________________________
 
 ### method `mouse_hover`
 
-**Source:** [`_control_element.py:790`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L790)
+**Source:** [`_control_element.py:786`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L786)
 
 ```python
 mouse_hover() → None
@@ -1789,7 +1765,7 @@ ______________________________________________________________________
 
 ### method `print_tree`
 
-**Source:** [`_control_element.py:672`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L672)
+**Source:** [`_control_element.py:668`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L668)
 
 ```python
 print_tree(
@@ -1837,7 +1813,7 @@ ______________________________________________________________________
 
 ### method `right_click`
 
-**Source:** [`_control_element.py:936`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L936)
+**Source:** [`_control_element.py:927`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L927)
 
 ```python
 right_click(
@@ -1854,13 +1830,8 @@ Right-clicks an element using the mouse.
 
 - <b>`locator`</b>:  If given the child element which matches this locator will be right-clicked.
 - <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
-- <b>`wait_time`</b>:  The time to wait after right-clicking the element. If not passed the default value found in the config is used.timeout: The search for a child with the given locator will be retried until the given timeout elapses.
-
-At least one full search up to the given depth will always be done and the timeout will only take place afterwards.
-
-If not given the global config timeout will be used.
-
-Only used if `locator` is passed.
+- <b>`wait_time`</b>:  The time to wait after right-clicking the element. If not passed the default value found in the config is used.
+- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 **Example:**
 
@@ -1901,7 +1872,7 @@ ______________________________________________________________________
 
 ### method `screenshot`
 
-**Source:** [`_control_element.py:1662`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1662)
+**Source:** [`_control_element.py:1646`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1646)
 
 ```python
 screenshot(
@@ -1945,7 +1916,7 @@ ______________________________________________________________________
 
 ### method `screenshot_pil`
 
-**Source:** [`_control_element.py:1611`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1611)
+**Source:** [`_control_element.py:1595`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1595)
 
 ```python
 screenshot_pil(
@@ -1984,7 +1955,7 @@ ______________________________________________________________________
 
 ### method `select`
 
-**Source:** [`_control_element.py:1128`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1128)
+**Source:** [`_control_element.py:1112`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1112)
 
 ```python
 select(
@@ -2027,7 +1998,7 @@ ______________________________________________________________________
 
 ### method `send_keys`
 
-**Source:** [`_control_element.py:1188`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1188)
+**Source:** [`_control_element.py:1172`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1172)
 
 ```python
 send_keys(
@@ -2095,7 +2066,7 @@ ______________________________________________________________________
 
 ### method `set_focus`
 
-**Source:** [`_control_element.py:1784`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1784)
+**Source:** [`_control_element.py:1768`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1768)
 
 ```python
 set_focus(
@@ -2127,7 +2098,7 @@ ______________________________________________________________________
 
 ### method `set_value`
 
-**Source:** [`_control_element.py:1469`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1469)
+**Source:** [`_control_element.py:1453`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1453)
 
 ```python
 set_value(
@@ -2136,7 +2107,7 @@ set_value(
     enter: bool = False,
     newline: bool = False,
     send_keys_fallback: bool = True,
-    validator: Optional[Callable] = <function set_value_validator at 0x000001C90B5D05E0>,
+    validator: Optional[Callable] = <function set_value_validator at 0x00000248C4797EB0>,
     locator: Optional[str] = None,
     search_depth: int = 8,
     timeout: Optional[float] = None
