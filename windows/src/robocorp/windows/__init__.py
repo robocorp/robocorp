@@ -6,7 +6,7 @@ with native widgets on the Windows OS.
 import time
 import typing
 from functools import lru_cache
-from typing import Callable, List, Optional
+from typing import Callable, List, Literal, Optional, overload
 
 from ._config import Config
 from ._control_element import ControlElement
@@ -25,7 +25,7 @@ from .protocols import Locator
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
@@ -114,13 +114,50 @@ def config() -> "Config":
     return __get_cache_mod().config()
 
 
+@overload
+def find_window(
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: Literal[True] = ...,
+) -> "WindowElement":
+    ...
+
+
+@overload
+def find_window(
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: Literal[False] = ...,
+) -> Optional["WindowElement"]:
+    ...
+
+
+@overload
+def find_window(
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: bool = ...,
+) -> Optional["WindowElement"]:
+    ...
+
+
 def find_window(
     locator: Locator,
     search_depth: int = 1,
     timeout: Optional[float] = None,
     wait_time: Optional[float] = None,
     foreground: bool = True,
-) -> "WindowElement":
+    raise_error: bool = True,
+) -> Optional["WindowElement"]:
     """
     Finds the first window matching the passed locator.
 
@@ -130,19 +167,19 @@ def find_window(
         search_depth: The search depth to find the window (by default == 1, meaning
             that only top-level windows will be found).
 
-        timeout:
-            The search for a child with the given locator will be retried
-            until the given timeout elapses.
-
+        timeout: The search for a child with the given locator will be retried
+            until the given timeout (in **seconds**) elapses.
             At least one full search up to the given depth will always be done
             and the timeout will only take place afterwards.
-
             If not given the global config timeout will be used.
 
         wait_time: The time to wait after finding the window. If not passed the
             default value found in the config is used.
 
         foreground: Whether the found window should be made top-level when found.
+
+        raise_error: Do not raise and return `None` when this is set to `True` and such
+            a window isn't found.
 
     Returns:
         The `WindowElement` which should be used to interact with the window.
@@ -157,7 +194,9 @@ def find_window(
         window = find_window('executable:Spotify.exe')
         ```
     """
-    return desktop().find_window(locator, search_depth, timeout, wait_time, foreground)
+    return desktop().find_window(
+        locator, search_depth, timeout, wait_time, foreground, raise_error
+    )
 
 
 def find_windows(
@@ -176,15 +215,11 @@ def find_windows(
         search_depth: The search depth to be used to find windows (by default
             equals 1, meaning that only top-level windows will be found).
 
-        timeout:
-            The search for a child with the given locator will be retried
-            until the given timeout elapses.
-
+        timeout: The search for a child with the given locator will be retried
+            until the given timeout (in **seconds**) elapses.
             At least one full search up to the given depth will always be done
             and the timeout will only take place afterwards.
-
             If not given the global config timeout will be used.
-
             Only used if `wait_for_window` is True.
 
         wait_for_window: Defines whether the search should keep on searching

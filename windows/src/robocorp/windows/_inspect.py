@@ -19,8 +19,8 @@ from typing import (
 )
 
 import _ctypes
-from ._com_error import COMError
 
+from ._com_error import COMError
 from ._control_element import ControlElement
 from ._errors import ElementNotFound
 from ._window_element import WindowElement
@@ -807,7 +807,7 @@ class ElementInspector:
         Args:
             locator: If passed, entries matching the given locator will be highlighted.
             search_depth: Up to which depth entries should be highlighted.
-            timeout: Timeout to find a locator.
+            timeout: Timeout (in **seconds**) to find a locator.
             search_strategy: After finding a locator, should only siblings be found
               or should a full tree traversal be done?
 

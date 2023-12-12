@@ -7,9 +7,13 @@ def test_find_windows():
     from robocorp_windows_tests.fixtures import wait_for_condition
 
     from robocorp import windows
+    from robocorp.windows._errors import ElementNotFound
 
     windows.desktop().close_windows("name:Calculator")
     assert len(windows.find_windows("name:Calculator")) == 0
+    with pytest.raises(ElementNotFound):
+        windows.find_window("name:Calculator")
+    assert windows.find_window("name:Calculator", raise_error=False) is None
     try:
         windows.desktop().windows_run("calc.exe")
         assert windows.find_window("name:Calculator") is not None
@@ -42,7 +46,7 @@ def test_print(tk_process, str_regression):
     str_regression.check(result)
 
 
-def test_find(tk_process) -> None:
+def test_find(tk_process):
     from robocorp.windows import find_window
     from robocorp.windows._control_element import ControlElement
     from robocorp.windows._errors import ElementNotFound
@@ -58,6 +62,7 @@ def test_find(tk_process) -> None:
     with pytest.raises(ElementNotFound):
         window.find("class:Invalid path:1|5", timeout=1)
     assert window.find("class:Button path:1|5", timeout=1) is not None
+    assert window.find("class:Invalid path:1|5", timeout=1, raise_error=False) is None
 
     all_buttons = window.find_many(
         "class:Button", search_depth=8, search_strategy="all"
@@ -119,3 +124,12 @@ def test_find(tk_process) -> None:
                         found = True
 
                 assert found, f"Did not find expected.\n{check_bts}\n{at_depth}"
+
+
+def test_find_by_executable(notepad_window):
+    from robocorp import windows
+
+    notepad_exe_win = windows.find_window("executable:Notepad.exe")
+    print(f"Notepad window process ID: {notepad_exe_win.pid}")
+    assert notepad_exe_win.is_same_as(notepad_window)
+    assert notepad_exe_win.close_window(use_close_button=True) is True

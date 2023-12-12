@@ -1,6 +1,6 @@
 import time
 import typing
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Literal, Optional, overload
 
 from ._control_element import ControlElement
 from .protocols import Locator
@@ -116,6 +116,42 @@ class Desktop(ControlElement):
         """
         return ControlElement.iter_children(self, max_depth=max_depth)
 
+    @overload
+    def find_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        wait_time: Optional[float] = ...,
+        foreground: bool = ...,
+        raise_error: Literal[True] = ...,
+    ) -> "WindowElement":
+        ...
+
+    @overload
+    def find_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        wait_time: Optional[float] = ...,
+        foreground: bool = ...,
+        raise_error: Literal[False] = ...,
+    ) -> Optional["WindowElement"]:
+        ...
+
+    @overload
+    def find_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        wait_time: Optional[float] = ...,
+        foreground: bool = ...,
+        raise_error: bool = ...,
+    ) -> Optional["WindowElement"]:
+        ...
+
     def find_window(
         self,
         locator: Locator,
@@ -123,7 +159,8 @@ class Desktop(ControlElement):
         timeout: Optional[float] = None,
         wait_time: Optional[float] = None,
         foreground: bool = True,
-    ) -> "WindowElement":
+        raise_error: bool = True,
+    ) -> Optional["WindowElement"]:
         """
         Finds windows matching the given locator.
 
@@ -133,13 +170,10 @@ class Desktop(ControlElement):
             search_depth: The search depth to be used to find the window (by default
                 equals 1, meaning that only top-level windows will be found).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
 
             wait_time:
@@ -150,14 +184,16 @@ class Desktop(ControlElement):
             foreground:
                 If True the matched window will be made the foreground window.
 
+            raise_error: Do not raise and return `None` when this is set to `True` and
+                such a window isn't found.
+
         Raises:
-            ElementNotFound if a window with the given locator could not be
-            found.
+            `ElementNotFound` if a window with the given locator could not be found.
         """
         from . import _find_window
 
         return _find_window.find_window(
-            None, locator, search_depth, timeout, wait_time, foreground
+            None, locator, search_depth, timeout, wait_time, foreground, raise_error
         )
 
     def find_windows(
@@ -177,15 +213,11 @@ class Desktop(ControlElement):
             search_depth: The search depth to be used to find windows (by default
                 equals 1, meaning that only top-level windows will be found).
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
-
                 Only used if `wait_for_window` is True.
 
             wait_for_window: Defines whether the search should keep on searching
@@ -238,14 +270,12 @@ class Desktop(ControlElement):
                 Note that windows are closed by force-killing the pid related
                 to the window.
 
-            timeout:
-                The search for a window with the given locator will be retried
-                until the given timeout elapses. At least one full search up to
+            timeout: The search for a window with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
+                At least one full search up to
                 the given depth will always be done and the timeout will only
                 take place afterwards (if `wait_for_window` is True).
-
                 Only used if `wait_for_window` is True.
-
                 If not given the global config timeout will be used.
 
             wait_for_window: If True windows this method will keep searching for
@@ -357,8 +387,8 @@ class Desktop(ControlElement):
 
         Args:
             locator: The locator that the active window must match.
-            timeout: Timeout to wait for a window with the given locator to be
-                made active.
+            timeout: Timeout (in **seconds**) to wait for a window with the given
+                locator to be made active.
             wait_time: A time to wait after the active window is found.
 
         Raises:

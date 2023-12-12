@@ -1,6 +1,6 @@
 import logging
 import typing
-from typing import Any, Optional, Union
+from typing import Any, Literal, Optional, Union, overload
 
 import psutil
 
@@ -121,6 +121,42 @@ class WindowElement(ControlElement):
                 self._executable = None
         return self._executable
 
+    @overload
+    def find_child_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        foreground: bool = ...,
+        wait_time: Optional[float] = ...,
+        timeout: Optional[float] = ...,
+        raise_error: Literal[True] = ...,
+    ) -> "WindowElement":
+        ...
+
+    @overload
+    def find_child_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        foreground: bool = ...,
+        wait_time: Optional[float] = ...,
+        timeout: Optional[float] = ...,
+        raise_error: Literal[False] = ...,
+    ) -> Optional["WindowElement"]:
+        ...
+
+    @overload
+    def find_child_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        foreground: bool = ...,
+        wait_time: Optional[float] = ...,
+        timeout: Optional[float] = ...,
+        raise_error: bool = ...,
+    ) -> Optional["WindowElement"]:
+        ...
+
     def find_child_window(
         self,
         locator: Locator,
@@ -128,7 +164,8 @@ class WindowElement(ControlElement):
         foreground: bool = True,
         wait_time: Optional[float] = None,
         timeout: Optional[float] = None,
-    ) -> "WindowElement":
+        raise_error: bool = True,
+    ) -> Optional["WindowElement"]:
         """
         Find a child window of this window given its locator.
 
@@ -137,25 +174,25 @@ class WindowElement(ControlElement):
 
             search_depth: The search depth to be used to find the window.
 
-            timeout:
-                The search for a child with the given locator will be retried
-                until the given timeout elapses.
-
+            timeout: The search for a child with the given locator will be retried
+                until the given timeout (in **seconds**) elapses.
                 At least one full search up to the given depth will always be done
                 and the timeout will only take place afterwards.
-
                 If not given the global config timeout will be used.
 
             wait_time:
-                The time to wait after the windows was found.
+                The time to wait after the window was found.
 
                 If not given the global config wait_time will be used.
 
             foreground:
                 If True the matched window will be made the foreground window.
 
+            raise_error: Do not raise and return `None` when this is set to `True` and
+                such a window isn't found.
+
         Raises:
-            ElementNotFound if a window with the given locator could not be
+            `ElementNotFound` if a window with the given locator could not be
             found.
 
         Example:
@@ -179,6 +216,7 @@ class WindowElement(ControlElement):
             timeout,
             wait_time,
             foreground,
+            raise_error,
         )
 
     def foreground_window(self) -> "WindowElement":
