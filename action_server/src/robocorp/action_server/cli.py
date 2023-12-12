@@ -101,6 +101,12 @@ def _create_parser():
         help="Expose the server to the world",
     )
     start_parser.add_argument(
+        "--expose-session",
+        dest="expose_session",
+        help="Restart action server with existing expose session",
+        default=None,
+    )
+    start_parser.add_argument(
         "--api-key",
         dest="api_key",
         help="""Adds authentication. Pass it as `{"Authorization": "Bearer <API_KEY>"}` header. 
@@ -315,7 +321,11 @@ To migrate the database to the current version
                     from ._server import start_server
 
                     settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-                    start_server(expose=base_args.expose, api_key=base_args.api_key)
+                    start_server(
+                        expose=base_args.expose,
+                        api_key=base_args.api_key,
+                        expose_session=base_args.expose_session,
+                    )
                     return 0
 
             else:
