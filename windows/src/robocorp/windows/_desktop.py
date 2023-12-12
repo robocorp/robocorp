@@ -1,6 +1,6 @@
 import time
 import typing
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Literal, Optional, overload
 
 from ._control_element import ControlElement
 from .protocols import Locator
@@ -116,6 +116,42 @@ class Desktop(ControlElement):
         """
         return ControlElement.iter_children(self, max_depth=max_depth)
 
+    @overload
+    def find_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        wait_time: Optional[float] = ...,
+        foreground: bool = ...,
+        raise_error: Literal[True] = ...,
+    ) -> "WindowElement":
+        ...
+
+    @overload
+    def find_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        wait_time: Optional[float] = ...,
+        foreground: bool = ...,
+        raise_error: Literal[False] = ...,
+    ) -> Optional["WindowElement"]:
+        ...
+
+    @overload
+    def find_window(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        wait_time: Optional[float] = ...,
+        foreground: bool = ...,
+        raise_error: bool = ...,
+    ) -> Optional["WindowElement"]:
+        ...
+
     def find_window(
         self,
         locator: Locator,
@@ -123,7 +159,8 @@ class Desktop(ControlElement):
         timeout: Optional[float] = None,
         wait_time: Optional[float] = None,
         foreground: bool = True,
-    ) -> "WindowElement":
+        raise_error: bool = True,
+    ) -> Optional["WindowElement"]:
         """
         Finds windows matching the given locator.
 
@@ -150,14 +187,16 @@ class Desktop(ControlElement):
             foreground:
                 If True the matched window will be made the foreground window.
 
+            raise_error: Do not raise and return `None` when this is set to `True` and
+                such a window isn't found.
+
         Raises:
-            ElementNotFound if a window with the given locator could not be
-            found.
+            `ElementNotFound` if a window with the given locator could not be found.
         """
         from . import _find_window
 
         return _find_window.find_window(
-            None, locator, search_depth, timeout, wait_time, foreground
+            None, locator, search_depth, timeout, wait_time, foreground, raise_error
         )
 
     def find_windows(

@@ -6,7 +6,7 @@ with native widgets on the Windows OS.
 import time
 import typing
 from functools import lru_cache
-from typing import Callable, List, Optional
+from typing import Callable, List, Literal, Optional, overload
 
 from ._config import Config
 from ._control_element import ControlElement
@@ -114,13 +114,50 @@ def config() -> "Config":
     return __get_cache_mod().config()
 
 
+@overload
+def find_window(
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: Literal[True] = ...,
+) -> "WindowElement":
+    ...
+
+
+@overload
+def find_window(
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: Literal[False] = ...,
+) -> Optional["WindowElement"]:
+    ...
+
+
+@overload
+def find_window(
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: bool = ...,
+) -> Optional["WindowElement"]:
+    ...
+
+
 def find_window(
     locator: Locator,
     search_depth: int = 1,
     timeout: Optional[float] = None,
     wait_time: Optional[float] = None,
     foreground: bool = True,
-) -> "WindowElement":
+    raise_error: bool = True,
+) -> Optional["WindowElement"]:
     """
     Finds the first window matching the passed locator.
 
@@ -144,6 +181,9 @@ def find_window(
 
         foreground: Whether the found window should be made top-level when found.
 
+        raise_error: Do not raise and return `None` when this is set to `True` and such
+            a window isn't found.
+
     Returns:
         The `WindowElement` which should be used to interact with the window.
 
@@ -157,7 +197,9 @@ def find_window(
         window = find_window('executable:Spotify.exe')
         ```
     """
-    return desktop().find_window(locator, search_depth, timeout, wait_time, foreground)
+    return desktop().find_window(
+        locator, search_depth, timeout, wait_time, foreground, raise_error
+    )
 
 
 def find_windows(

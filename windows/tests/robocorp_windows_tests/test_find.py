@@ -7,9 +7,13 @@ def test_find_windows():
     from robocorp_windows_tests.fixtures import wait_for_condition
 
     from robocorp import windows
+    from robocorp.windows._errors import ElementNotFound
 
     windows.desktop().close_windows("name:Calculator")
     assert len(windows.find_windows("name:Calculator")) == 0
+    with pytest.raises(ElementNotFound):
+        windows.find_window("name:Calculator")
+    assert windows.find_window("name:Calculator", raise_error=False) is None
     try:
         windows.desktop().windows_run("calc.exe")
         assert windows.find_window("name:Calculator") is not None

@@ -1,11 +1,14 @@
+import logging
 import time
-from typing import List, Literal, Optional, Tuple
+from typing import List, Literal, Optional, Tuple, overload
 
 from ._errors import ElementNotFound
 from ._match_ast import OrSearchParams, SearchParams
 from ._ui_automation_wrapper import _UIAutomationControlWrapper
 from ._window_element import WindowElement
 from .protocols import Locator
+
+logger = logging.getLogger(__name__)
 
 
 def restrict_to_window_locators(
@@ -34,6 +37,45 @@ def restrict_to_window_locators(
     return or_search_params
 
 
+@overload
+def find_window(
+    root_element: Optional[_UIAutomationControlWrapper],
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: Literal[True] = ...,
+) -> WindowElement:
+    ...
+
+
+@overload
+def find_window(
+    root_element: Optional[_UIAutomationControlWrapper],
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: Literal[False] = ...,
+) -> Optional[WindowElement]:
+    ...
+
+
+@overload
+def find_window(
+    root_element: Optional[_UIAutomationControlWrapper],
+    locator: Locator,
+    search_depth: int = ...,
+    timeout: Optional[float] = ...,
+    wait_time: Optional[float] = ...,
+    foreground: bool = ...,
+    raise_error: bool = ...,
+) -> Optional[WindowElement]:
+    ...
+
+
 def find_window(
     root_element: Optional[_UIAutomationControlWrapper],
     locator: Locator,
@@ -41,7 +83,8 @@ def find_window(
     timeout: Optional[float] = None,
     wait_time: Optional[float] = None,
     foreground: bool = True,
-) -> WindowElement:
+    raise_error: bool = True,
+) -> Optional[WindowElement]:
     from . import config as windows_config
     from ._find_ui_automation import (
         LocatorStrAndOrSearchParams,
@@ -77,10 +120,13 @@ def find_window(
         if wait_time:
             time.sleep(wait_time)
         return window_element
-    except ElementNotFound:
+    except ElementNotFound as exc:
         # No matches.
-        _raise_window_not_found(locator, timeout, root_element)
-    raise AssertionError("Should never get here.")  # Just to satisfy typing.
+        if raise_error:
+            _raise_window_not_found(locator, timeout, root_element)
+        else:
+            logger.warning(exc)
+        return None
 
 
 def _raise_window_not_found(

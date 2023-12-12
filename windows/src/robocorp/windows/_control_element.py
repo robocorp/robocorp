@@ -488,6 +488,16 @@ class ControlElement:
     ) -> Optional["ControlElement"]:
         ...
 
+    @overload
+    def find(
+        self,
+        locator: Locator,
+        search_depth: int = ...,
+        timeout: Optional[float] = ...,
+        raise_error: bool = ...,
+    ) -> Optional["ControlElement"]:
+        ...
+
     def find(
         self,
         locator: Locator,
