@@ -9,6 +9,7 @@ from robocorp.action_server._robo_utils.auth import generate_api_key
 
 from . import __version__
 from ._settings import Settings, get_settings
+from ._new_project import create_new_project
 
 log = logging.getLogger(__name__)
 
@@ -148,6 +149,14 @@ def _create_parser():
         nargs="?",
     )
 
+    # New project from template
+    new_parser = subparsers.add_parser(
+        "new",
+        help="Bootstrap new project from template",
+    )
+    _add_data_args(new_parser, defaults)
+    _add_verbose_args(new_parser, defaults)
+
     # Schema
     # schema_parser = subparsers.add_parser(
     #     "schema",
@@ -224,6 +233,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         "migrate",
         "import",
         "start",
+        "new",
     ):
         print(f"Unexpected command: {command}.", file=sys.stderr)
         return 1
@@ -327,6 +337,10 @@ To migrate the database to the current version
                         expose_session=base_args.expose_session,
                     )
                     return 0
+
+            elif command == "new":
+                create_new_project()
+                return 0
 
             else:
                 print(f"Unexpected command: {command}.", file=sys.stderr)
