@@ -5,8 +5,11 @@ import sys
 from pathlib import Path
 from typing import Optional, Union
 
+from robocorp.action_server._robo_utils.auth import generate_api_key
+
 from . import __version__
 from ._settings import Settings, get_settings
+from ._new_project import create_new_project
 
 log = logging.getLogger(__name__)
 
@@ -98,6 +101,19 @@ def _create_parser():
         action="store_true",
         help="Expose the server to the world",
     )
+    start_parser.add_argument(
+        "--expose-session",
+        dest="expose_session",
+        help="Restart action server with existing expose session",
+        default=None,
+    )
+    start_parser.add_argument(
+        "--api-key",
+        dest="api_key",
+        help="""Adds authentication. Pass it as `{"Authorization": "Bearer <API_KEY>"}` header. 
+        Pass `--api-key None` to disable authentication.""",
+        default=generate_api_key(),
+    )
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
 
@@ -133,6 +149,14 @@ def _create_parser():
         nargs="?",
     )
 
+    # New project from template
+    new_parser = subparsers.add_parser(
+        "new",
+        help="Bootstrap new project from template",
+    )
+    _add_data_args(new_parser, defaults)
+    _add_verbose_args(new_parser, defaults)
+
     # Schema
     # schema_parser = subparsers.add_parser(
     #     "schema",
@@ -166,7 +190,14 @@ def _create_parser():
     return base_parser
 
 
-def main(args: Optional[list[str]] = None) -> int:
+def main(args: Optional[list[str]] = None, *, exit=True) -> int:
+    retcode = _main_retcode(args, exit=exit)
+    if exit:
+        sys.exit(retcode)
+    return retcode
+
+
+def _main_retcode(args: Optional[list[str]], exit) -> int:
     from ._rcc import initialize_rcc
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
@@ -202,6 +233,7 @@ def main(args: Optional[list[str]] = None) -> int:
         "migrate",
         "import",
         "start",
+        "new",
     ):
         print(f"Unexpected command: {command}.", file=sys.stderr)
         return 1
@@ -299,8 +331,16 @@ To migrate the database to the current version
                     from ._server import start_server
 
                     settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-                    start_server(expose=base_args.expose)
+                    start_server(
+                        expose=base_args.expose,
+                        api_key=base_args.api_key,
+                        expose_session=base_args.expose_session,
+                    )
                     return 0
+
+            elif command == "new":
+                create_new_project()
+                return 0
 
             else:
                 print(f"Unexpected command: {command}.", file=sys.stderr)
@@ -310,5 +350,4 @@ To migrate the database to the current version
 
 
 if __name__ == "__main__":
-    retcode = main()
-    sys.exit(retcode)
+    main()

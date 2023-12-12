@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import sys
+import codecs
 from typing import Optional
 
 import requests
@@ -23,7 +24,20 @@ class BodyPayload(BaseModel):
     path: str
     method: str = "GET"
     body: dict | None = None
-    headers: dict | None = None
+    headers: dict
+
+
+def get_expose_session(payload: SessionPayload) -> str:
+    return f"{payload.sessionId}:{payload.sessionSecret}".encode("ascii").hex()
+
+
+def get_expose_session_payload(expose_session: str) -> SessionPayload:
+    session_id, session_secret = codecs.decode(
+        expose_session.encode("ascii"), "hex"
+    ).split(b":")
+    return SessionPayload(
+        sessionId=session_id.decode(), sessionSecret=session_secret.decode()
+    )
 
 
 def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
@@ -41,7 +55,13 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-async def expose_server(port: int, host: str, expose_url: str):
+async def expose_server(
+    port: int,
+    host: str,
+    expose_url: str,
+    api_key: str | None = None,
+    expose_session: str | None = None,
+):
     """
     Exposes the server to the world.
     """
@@ -51,7 +71,9 @@ async def expose_server(port: int, host: str, expose_url: str):
         retry_delay = 1
         retries = 0
 
-        session_payload: Optional[SessionPayload] = None
+        session_payload: Optional[SessionPayload] = (
+            get_expose_session_payload(expose_session) if expose_session else None
+        )
         while retries < max_retries:
             try:
                 headers = (
@@ -75,8 +97,17 @@ async def expose_server(port: int, host: str, expose_url: str):
 
                         try:
                             session_payload = SessionPayload(**data)
+
                             log.info(
                                 f"🌍 URL: https://{session_payload.sessionId}.{expose_url}"
+                            )
+                            if api_key is not None:
+                                log.info(
+                                    f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
+                                )
+                            new_expose_session = get_expose_session(session_payload)
+                            log.info(
+                                f"🔄 Add following argument to restart with same expose URL: --expose-session {new_expose_session}  "  # noqa
                             )
                             continue
                         except Exception:
@@ -89,6 +120,32 @@ async def expose_server(port: int, host: str, expose_url: str):
 
                         try:
                             payload = BodyPayload(**data)
+                            if payload.path != "/openapi.json" and api_key is not None:
+                                if (
+                                    payload.headers.get("authorization")
+                                    != f"Bearer {api_key}"
+                                ):
+                                    log.error(
+                                        "Request failed because the API key is invalid."
+                                    )
+                                    await ws.send(
+                                        json.dumps(
+                                            {
+                                                "requestId": payload.requestId,
+                                                "response": json.dumps(
+                                                    {
+                                                        "error": {
+                                                            "code": "INVALID_API_KEY",
+                                                            "message": "The API key is invalid.",
+                                                        },
+                                                    }
+                                                ),
+                                                "status": 403,
+                                            }
+                                        )
+                                    )
+                                    continue
+
                             base_url = f"http://{host}:{port}"
                             response: requests.Response = forward_request(
                                 base_url=base_url, payload=payload
@@ -101,6 +158,7 @@ async def expose_server(port: int, host: str, expose_url: str):
                                             response.json(),
                                             indent=2,
                                         ),
+                                        "status": response.status_code,
                                     }
                                 )
                             )
@@ -122,7 +180,7 @@ async def expose_server(port: int, host: str, expose_url: str):
 
 
 if __name__ == "__main__":
-    parent_pid, port, verbose, host, expose_url = sys.argv[1:]
+    parent_pid, port, verbose, host, expose_url, api_key, expose_session = sys.argv[1:]
 
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
@@ -131,4 +189,12 @@ if __name__ == "__main__":
     )
 
     exit_when_pid_exists(int(parent_pid))
-    asyncio.run(expose_server(port=int(port), host=host, expose_url=expose_url))
+    asyncio.run(
+        expose_server(
+            port=int(port),
+            host=host,
+            expose_url=expose_url,
+            api_key=api_key if api_key != "None" else None,
+            expose_session=expose_session if expose_session != "None" else None,
+        )
+    )
