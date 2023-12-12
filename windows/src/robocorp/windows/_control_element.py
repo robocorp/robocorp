@@ -569,13 +569,10 @@ class ControlElement:
                 If not given the global config timeout will be used.
                 Only used if `wait_for_element` is True.
 
-            search_strategy:
-                The search strategy to be used to find elements.
-
+            search_strategy: The search strategy to be used to find elements.
                 `siblings` means that after the first element is found, the tree
                     traversal should be stopped and only sibling elements will be
                     searched.
-
                 `all` means that all the elements up to the given search depth
                     will be searched.
 

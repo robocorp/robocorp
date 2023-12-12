@@ -361,7 +361,7 @@ ______________________________________________________________________
 
 ### method `close_windows`
 
-**Source:** [`_desktop.py:246`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L246)
+**Source:** [`_desktop.py:244`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L244)
 
 ```python
 close_windows(
@@ -408,7 +408,7 @@ ______________________________________________________________________
 
 ### method `drag_and_drop`
 
-**Source:** [`_desktop.py:494`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L494)
+**Source:** [`_desktop.py:492`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L492)
 
 ```python
 drag_and_drop(
@@ -472,9 +472,9 @@ Finds windows matching the given locator.
 
 - <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-wait_time: The time to wait after the windows was found. If not given the global config wait_time will be used.
+- <b>`wait_time`</b>:  The time to wait after the windows was found. If not given the global config wait_time will be used.
 
-foreground: If True the matched window will be made the foreground window.
+- <b>`foreground`</b>:  If True the matched window will be made the foreground window.
 
 - <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
@@ -485,7 +485,7 @@ ______________________________________________________________________
 
 ### method `find_windows`
 
-**Source:** [`_desktop.py:198`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L198)
+**Source:** [`_desktop.py:196`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L196)
 
 ```python
 find_windows(
@@ -525,7 +525,7 @@ ______________________________________________________________________
 
 ### method `get_win_version`
 
-**Source:** [`_desktop.py:360`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L360)
+**Source:** [`_desktop.py:358`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L358)
 
 ```python
 get_win_version() → str
@@ -612,7 +612,7 @@ ______________________________________________________________________
 
 ### method `wait_for_active_window`
 
-**Source:** [`_desktop.py:378`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L378)
+**Source:** [`_desktop.py:376`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L376)
 
 ```python
 wait_for_active_window(
@@ -639,7 +639,7 @@ ______________________________________________________________________
 
 ### method `windows_run`
 
-**Source:** [`_desktop.py:322`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L322)
+**Source:** [`_desktop.py:320`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L320)
 
 ```python
 windows_run(text: str, wait_time: float = 1) → None
@@ -658,7 +658,7 @@ ______________________________________________________________________
 
 ### method `windows_search`
 
-**Source:** [`_desktop.py:342`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L342)
+**Source:** [`_desktop.py:340`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_desktop.py#L340)
 
 ```python
 windows_search(text: str, wait_time: float = 3.0) → None
@@ -901,7 +901,7 @@ ______________________________________________________________________
 
 ### method `close_window`
 
-**Source:** [`_window_element.py:353`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L353)
+**Source:** [`_window_element.py:350`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L350)
 
 ```python
 close_window(
@@ -952,11 +952,9 @@ Find a child window of this window given its locator.
 
 - <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-wait_time: The time to wait after the window was found.
+- <b>`wait_time`</b>:  The time to wait after the window was found. If not given the global config wait_time will be used.
 
-If not given the global config wait_time will be used.
-
-foreground: If True the matched window will be made the foreground window.
+- <b>`foreground`</b>:  If True the matched window will be made the foreground window.
 
 - <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
@@ -979,7 +977,7 @@ ______________________________________________________________________
 
 ### method `foreground_window`
 
-**Source:** [`_window_element.py:222`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L222)
+**Source:** [`_window_element.py:219`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L219)
 
 ```python
 foreground_window() → WindowElement
@@ -1013,7 +1011,7 @@ ______________________________________________________________________
 
 ### method `is_running`
 
-**Source:** [`_window_element.py:333`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L333)
+**Source:** [`_window_element.py:330`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L330)
 
 ```python
 is_running() → bool
@@ -1026,7 +1024,7 @@ ______________________________________________________________________
 
 ### method `maximize_window`
 
-**Source:** [`_window_element.py:273`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L273)
+**Source:** [`_window_element.py:270`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L270)
 
 ```python
 maximize_window() → bool
@@ -1048,7 +1046,7 @@ ______________________________________________________________________
 
 ### method `minimize_window`
 
-**Source:** [`_window_element.py:257`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L257)
+**Source:** [`_window_element.py:254`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L254)
 
 ```python
 minimize_window() → bool
@@ -1070,7 +1068,7 @@ ______________________________________________________________________
 
 ### method `restore_window`
 
-**Source:** [`_window_element.py:289`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L289)
+**Source:** [`_window_element.py:286`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L286)
 
 ```python
 restore_window() → bool
@@ -1092,7 +1090,7 @@ ______________________________________________________________________
 
 ### method `set_window_pos`
 
-**Source:** [`_window_element.py:305`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L305)
+**Source:** [`_window_element.py:302`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_window_element.py#L302)
 
 ```python
 set_window_pos(x: int, y: int, width: int, height: int) → WindowElement
@@ -1269,7 +1267,7 @@ ______________________________________________________________________
 
 ### method `click`
 
-**Source:** [`_control_element.py:799`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L799)
+**Source:** [`_control_element.py:796`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L796)
 
 ```python
 click(
@@ -1328,7 +1326,7 @@ ______________________________________________________________________
 
 ### method `double_click`
 
-**Source:** [`_control_element.py:860`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L860)
+**Source:** [`_control_element.py:857`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L857)
 
 ```python
 double_click(
@@ -1444,11 +1442,7 @@ This method may be used to find multiple descendants of the current element matc
 
 - <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_element` is True.
 
-search_strategy: The search strategy to be used to find elements.
-
-`siblings` means that after the first element is found, the tree traversal should be stopped and only sibling elements will be searched.
-
-`all` means that all the elements up to the given search depth will be searched.
+- <b>`search_strategy`</b>:  The search strategy to be used to find elements. `siblings` means that after the first element is found, the tree traversal should be stopped and only sibling elements will be searched. `all` means that all the elements up to the given search depth will be searched.
 
 - <b>`wait_for_element`</b>:  Defines whether the search should keep on searching until an element with the given locator is found (note that if True and no element was found an ElementNotFound is raised).
 
@@ -1473,7 +1467,7 @@ ______________________________________________________________________
 
 ### method `get_text`
 
-**Source:** [`_control_element.py:1274`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1274)
+**Source:** [`_control_element.py:1271`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1271)
 
 ```python
 get_text(
@@ -1511,7 +1505,7 @@ ______________________________________________________________________
 
 ### method `get_value`
 
-**Source:** [`_control_element.py:1332`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1332)
+**Source:** [`_control_element.py:1329`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1329)
 
 ```python
 get_value(
@@ -1628,7 +1622,7 @@ ______________________________________________________________________
 
 ### method `iter_children`
 
-**Source:** [`_control_element.py:640`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L640)
+**Source:** [`_control_element.py:637`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L637)
 
 ```python
 iter_children(max_depth: int = 8) → Iterator[ForwardRef('ControlElement')]
@@ -1651,7 +1645,7 @@ ______________________________________________________________________
 
 ### method `log_screenshot`
 
-**Source:** [`_control_element.py:1704`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1704)
+**Source:** [`_control_element.py:1701`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1701)
 
 ```python
 log_screenshot(
@@ -1691,7 +1685,7 @@ ______________________________________________________________________
 
 ### method `middle_click`
 
-**Source:** [`_control_element.py:990`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L990)
+**Source:** [`_control_element.py:987`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L987)
 
 ```python
 middle_click(
@@ -1753,7 +1747,7 @@ ______________________________________________________________________
 
 ### method `mouse_hover`
 
-**Source:** [`_control_element.py:786`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L786)
+**Source:** [`_control_element.py:783`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L783)
 
 ```python
 mouse_hover() → None
@@ -1765,7 +1759,7 @@ ______________________________________________________________________
 
 ### method `print_tree`
 
-**Source:** [`_control_element.py:668`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L668)
+**Source:** [`_control_element.py:665`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L665)
 
 ```python
 print_tree(
@@ -1813,7 +1807,7 @@ ______________________________________________________________________
 
 ### method `right_click`
 
-**Source:** [`_control_element.py:927`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L927)
+**Source:** [`_control_element.py:924`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L924)
 
 ```python
 right_click(
@@ -1872,7 +1866,7 @@ ______________________________________________________________________
 
 ### method `screenshot`
 
-**Source:** [`_control_element.py:1646`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1646)
+**Source:** [`_control_element.py:1643`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1643)
 
 ```python
 screenshot(
@@ -1916,7 +1910,7 @@ ______________________________________________________________________
 
 ### method `screenshot_pil`
 
-**Source:** [`_control_element.py:1595`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1595)
+**Source:** [`_control_element.py:1592`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1592)
 
 ```python
 screenshot_pil(
@@ -1955,7 +1949,7 @@ ______________________________________________________________________
 
 ### method `select`
 
-**Source:** [`_control_element.py:1112`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1112)
+**Source:** [`_control_element.py:1109`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1109)
 
 ```python
 select(
@@ -1998,7 +1992,7 @@ ______________________________________________________________________
 
 ### method `send_keys`
 
-**Source:** [`_control_element.py:1172`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1172)
+**Source:** [`_control_element.py:1169`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1169)
 
 ```python
 send_keys(
@@ -2066,7 +2060,7 @@ ______________________________________________________________________
 
 ### method `set_focus`
 
-**Source:** [`_control_element.py:1768`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1768)
+**Source:** [`_control_element.py:1765`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1765)
 
 ```python
 set_focus(
@@ -2098,7 +2092,7 @@ ______________________________________________________________________
 
 ### method `set_value`
 
-**Source:** [`_control_element.py:1453`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1453)
+**Source:** [`_control_element.py:1450`](https://github.com/robocorp/robo/tree/master/windows/src/robocorp/windows/_control_element.py#L1450)
 
 ```python
 set_value(
@@ -2107,7 +2101,7 @@ set_value(
     enter: bool = False,
     newline: bool = False,
     send_keys_fallback: bool = True,
-    validator: Optional[Callable] = <function set_value_validator at 0x00000248C4797EB0>,
+    validator: Optional[Callable] = <function set_value_validator at 0x0000022BAE677EB0>,
     locator: Optional[str] = None,
     search_depth: int = 8,
     timeout: Optional[float] = None

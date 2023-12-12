@@ -180,13 +180,10 @@ class WindowElement(ControlElement):
                 and the timeout will only take place afterwards.
                 If not given the global config timeout will be used.
 
-            wait_time:
-                The time to wait after the window was found.
-
+            wait_time: The time to wait after the window was found.
                 If not given the global config wait_time will be used.
 
-            foreground:
-                If True the matched window will be made the foreground window.
+            foreground: If True the matched window will be made the foreground window.
 
             raise_error: Do not raise and return `None` when this is set to `True` and
                 such a window isn't found.
