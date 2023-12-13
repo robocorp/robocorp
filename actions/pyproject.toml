@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-actions"
-version = "0.0.1"
+version = "0.0.2"
 description = "Robocorp Actions"
 authors = [
 	"Fabio Zadrozny <fabiofz@gmail.com>",
@@ -12,7 +12,7 @@ packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-tasks = "^2.5.0"
+robocorp-tasks = "^2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}

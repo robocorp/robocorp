@@ -4,7 +4,7 @@ from typing import Optional
 from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 
