@@ -8,6 +8,10 @@ components:
         docs:
           title: Docs
           type: string
+        enabled:
+          default: true
+          title: Enabled
+          type: boolean
         file:
           title: File
           type: string

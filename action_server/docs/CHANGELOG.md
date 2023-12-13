@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.0.4 - 2023-12-13
+
+- `action-server` is not defined as an entry point (so, after installing it,
+  an `action-server` executable will be available to execute it instead of having
+  to use `python -m robocorp-action-server`).
+- Instead of just a text showing the trace header a hyperlink to the trace is also available.
+- It's possible to bootstrap a project with `action-server new`.
+- Improvements when exposing a server with `--expose`:
+    - It's now possible to reuse a previously exposed session with `--expose-session`
+    - An API key may be used with `--api-key` for authentication (`--api-key=None` can
+      be used to disable authentication).
+- By default, when the action server is started with `action-server start`, the
+  current directory will be searched for actions and only those actions will be
+  served (metadata will be stored in a datadir linked to the current folder).
+- For more advanced cases, it's still possible to import actions specifying a
+  custom datadir and then start the action server with `--actions-sync=false`
+  specifying the proper datadir).
+  
+i.e.:
+
+```
+action-server import --dir=c:/temp=action-package1 --datadir=c:/temp/datadir
+action-server import --dir=c:/temp=action-package2 --datadir=c:/temp/datadir
+action-server start --actions-sync=false --datadir=c:/temp/datadir
+```   
+
 ## 0.0.3 - 2023-12-08
 
 - UI now uses websockets to provide updates on runs in real-time.

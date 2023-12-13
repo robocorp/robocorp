@@ -20,7 +20,10 @@ if typing.TYPE_CHECKING:
     from robocorp.action_server._database import Database
 
 MIGRATION_ID_TO_NAME: Dict[int, str] = {
-    1: "initial"  # we'll look for a 'migration_initial' module based on this.
+    # we'll look for a 'migration_initial' module based on this.
+    1: "initial",
+    # we'll look for a 'migration_add_action_enabled' module based on this.
+    2: "add_action_enabled",
 }
 
 CURRENT_VERSION: int = max(MIGRATION_ID_TO_NAME.keys())
@@ -77,7 +80,7 @@ def migrate_db(
     with db.connect():
         with db.transaction():
             db.initialize(get_all_model_classes())
-            if "migrations" not in db.list_table_names():
+            if "migration" not in db.list_table_names():
                 raise RuntimeError(
                     f"""Error: 
 It seems that this version of the database ({db.db_path}) is too old.

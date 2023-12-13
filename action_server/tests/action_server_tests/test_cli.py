@@ -58,3 +58,39 @@ def test_migrate(database_v0):
         )
 
         assert not db_migration_pending(db_path)
+
+
+def test_default_datadir(tmpdir):
+    from pathlib import Path
+
+    from robocorp.action_server._settings import setup_settings
+    from robocorp.action_server.cli import _create_parser
+
+    use_dir = Path(tmpdir) / "foobar"
+    curdir = Path(".").absolute()
+
+    try:
+        use_dir.mkdir(parents=True, exist_ok=True)
+        os.chdir(str(use_dir.absolute()))
+        parser = _create_parser()
+        base_args = parser.parse_args(["start"])
+
+        with setup_settings(base_args) as settings:
+            assert settings.datadir.name.startswith("foobar_")
+    finally:
+        os.chdir(str(curdir))
+
+
+def test_datadir_user_specified(tmpdir):
+    from pathlib import Path
+
+    from robocorp.action_server._settings import setup_settings
+    from robocorp.action_server.cli import _create_parser
+
+    use_dir = Path(tmpdir) / "foobar"
+
+    parser = _create_parser()
+    base_args = parser.parse_args(["start", "--datadir", str(use_dir)])
+
+    with setup_settings(base_args) as settings:
+        assert Path(settings.datadir) == use_dir

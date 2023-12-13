@@ -18,6 +18,15 @@ if typing.TYPE_CHECKING:
     from robocorp.action_server._robo_utils.process import Process
 
 
+def is_debugger_active() -> bool:
+    try:
+        import pydevd
+    except ImportError:
+        return False
+
+    return bool(pydevd.get_global_debugger())
+
+
 def robocorp_action_server_run(
     cmdline,
     returncode: Union[Literal["error"], int],
@@ -114,7 +123,14 @@ class ActionServerProcess:
         ), "The action server was not properly started (process is None)."
         return self._process
 
-    def start(self, args=("--db-file=:memory:",), timeout=10) -> None:
+    def start(
+        self,
+        *,
+        timeout: int = 10,
+        db_file=":memory:",
+        actions_sync=False,
+        cwd: Optional[Path | str] = None,
+    ) -> None:
         from robocorp.action_server._robo_utils.process import Process
 
         if self.started:
@@ -123,16 +139,21 @@ class ActionServerProcess:
         self.started = True
         from concurrent.futures import Future
 
+        if actions_sync:
+            assert cwd, "cwd must be passed when synchronizing the actions."
+
         new_args = (
             sys.executable,
             "-m",
             "robocorp.action_server",
             "start",
+            "--actions-sync=false" if not actions_sync else "--actions-sync=true",
             "--port=0",
             "--verbose",
             f"--datadir={str(self._datadir)}",
-        ) + args
-        process = self._process = Process(new_args)
+            f"--db-file={db_file}",
+        )
+        process = self._process = Process(new_args, cwd=cwd)
 
         compiled = re.compile(r"http://([\w.-]+):(\d+)")
         future: Future[Tuple[str, str]] = Future()
@@ -165,6 +186,8 @@ class ActionServerProcess:
                         host, port = future.result(1)
                         break
                     except TimeoutError:
+                        if is_debugger_active():
+                            continue
                         if time.monotonic() - initial_time >= timeout:
                             raise TimeoutError()
                         if not process.is_alive():
@@ -186,13 +209,25 @@ class ActionServerProcess:
 
 
 @pytest.fixture
-def action_server_process(tmpdir) -> Iterator[ActionServerProcess]:
-    ret = ActionServerProcess(Path(str(tmpdir)) / ".robocorp_action_server")
+def action_server_datadir(tmpdir) -> Path:
+    return Path(str(tmpdir)) / ".robocorp_action_server"
+
+
+@pytest.fixture
+def action_server_process(action_server_datadir) -> Iterator[ActionServerProcess]:
+    ret = ActionServerProcess(action_server_datadir)
     yield ret
     ret.stop()
 
 
 CURDIR = Path(__file__).parent.absolute()
+
+
+def get_in_resources(*parts):
+    curr = CURDIR / "resources"
+    for part in parts:
+        curr = curr / part
+    return curr
 
 
 @dataclass
@@ -234,8 +269,8 @@ def base_case(
 
     initial_db_version = persistent_dir / "initial.db"
     if not os.path.exists(initial_db_version):
-        pack1 = CURDIR / "resources" / "calculator"
-        pack2 = CURDIR / "resources" / "greeter"
+        pack1 = get_in_resources("calculator")
+        pack2 = get_in_resources("greeter")
         # Will have to generate the environment...
 
         robocorp_action_server_run(
@@ -263,7 +298,7 @@ def base_case(
         assert found == {"calculator_sum", "greet", "broken_action"}
 
     action_server_process.start(
-        ("--db-file=server.db",),
+        db_file="server.db",
         timeout=500,
     )
     yield CaseInfo(action_server_process, db_path)

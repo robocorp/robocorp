@@ -36,7 +36,7 @@ class ActionPackage:  # Table name: action_package
 
 
 @dataclass
-class Action:
+class Action:  # Table name: action
     id: str  # primary key (uuid)
     _db_rules.unique_indexes.add("Action.id")
 
@@ -53,6 +53,8 @@ class Action:
     lineno: int  # Line for the action
     input_schema: str  # The json content for the schema input
     output_schema: str  # The json content for the schema output
+
+    enabled: bool = True
 
 
 RUN_ID_COUNTER = "run_id"

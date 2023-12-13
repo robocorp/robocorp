@@ -59,6 +59,10 @@ def start_server(
     )
 
     for action in db.all(Action):
+        if not action.enabled:
+            # Disabled actions should not be registered.
+            continue
+
         doc_desc: Optional[str] = ""
         if action.docs:
             try:

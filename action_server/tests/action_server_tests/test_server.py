@@ -1,12 +1,11 @@
 import json
 from pathlib import Path
 
-import pytest
 from action_server_tests.fixtures import ActionServerClient, ActionServerProcess
 
 
 def test_action_server_starts(action_server_process: ActionServerProcess, tmpdir):
-    action_server_process.start(("--db-file=server.db",))
+    action_server_process.start(db_file="server.db")
     assert action_server_process.port > 0
     assert action_server_process.host == "localhost"
 
@@ -32,15 +31,133 @@ def test_schema_request_no_actions_registered(
     data_regression.check(json.loads(openapi_json))
 
 
+def test_import_no_conda(
+    action_server_process: ActionServerProcess,
+    data_regression,
+    str_regression,
+    tmpdir,
+    action_server_datadir: Path,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import robocorp_action_server_run
+
+    from robocorp.action_server._database import Database
+    from robocorp.action_server._models import Action, load_db
+
+    action_server_datadir.mkdir(parents=True, exist_ok=True)
+    db_path = action_server_datadir / "server.db"
+    assert not db_path.exists()
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    db: Database
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 1
+
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action
+def calculator_sum(v1: str, v2: str) -> str:
+    return v1 + v2
+    
+@action
+def another_action(a1: str, a2: str) -> str:
+    return a1 + a2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    with load_db(db_path) as db:
+        action_name_to_schema = {}
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 2
+            for action in actions:
+                action_name_to_schema[action.name] = action.input_schema
+                assert action.enabled
+
+    data_regression.check(
+        action_name_to_schema, basename="test_import_no_conda_schema1"
+    )
+
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+"""
+    )
+
+    action_server_process.start(
+        actions_sync=True, cwd=calculator.parent, db_file="server.db"
+    )
+    # At this point the `another_action` is in the db, but it should be
+    # disabled.
+
+    # Check that it doesn't appear in the open api spec.
+    str_regression.check(json.dumps(json.loads(client.get_openapi_json()), indent=4))
+
+    action_server_process.stop()
+
+    with load_db(db_path) as db:
+        action_name_to_enabled = {}
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 2
+            for action in actions:
+                action_name_to_enabled[action.name] = action.enabled
+
+    assert action_name_to_enabled == {"calculator_sum": True, "another_action": False}
+
+
 def test_import(
     action_server_process: ActionServerProcess,
     data_regression,
     base_case,
+    client: ActionServerClient,
 ) -> None:
     from robocorp.action_server._database import Database, str_to_datetime
     from robocorp.action_server._models import Run, RunStatus, load_db
 
-    client = ActionServerClient(action_server_process)
     openapi_json = client.get_openapi_json()
     data_regression.check(json.loads(openapi_json))
 
@@ -143,7 +260,7 @@ def test_routes(action_server_process: ActionServerProcess, data_regression):
             db.insert(RUN)
             db.insert(RUN2)
 
-    action_server_process.start(("--db-file=server.db",))
+    action_server_process.start(db_file="server.db")
 
     client = ActionServerClient(action_server_process)
     openapi_json = client.get_openapi_json()

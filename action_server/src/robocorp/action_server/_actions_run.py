@@ -3,6 +3,7 @@ import inspect
 import json
 import logging
 import os
+import sys
 import time
 import typing
 from pathlib import Path
@@ -157,13 +158,13 @@ def _run_action_in_thread(
             directory = (settings.datadir / directory).absolute()
 
         cmdline: List[str] = [
-            env["PYTHON_EXE"],
+            env.get("PYTHON_EXE", sys.executable),
             "-m",
             "robocorp.actions",
             "run",
             "--preload-module",
             "preload_actions",
-            "-t",
+            "-a",
             action.name,
         ]
 

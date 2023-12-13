@@ -175,8 +175,9 @@ def test_counters(tmpdir) -> None:
 
 
 def test_migrate(database_v0: Path, tmpdir) -> None:
-    from robocorp.action_server._models import create_db
+    from robocorp.action_server._models import Action, create_db
     from robocorp.action_server.migrations import (
+        CURRENT_VERSION,
         MIGRATION_ID_TO_NAME,
         Migration,
         db_migration_pending,
@@ -191,7 +192,7 @@ def test_migrate(database_v0: Path, tmpdir) -> None:
 
     db_path = database_v0
     if db_migration_pending(db_path):
-        assert migrate_db(db_path, 1)
+        assert migrate_db(db_path, CURRENT_VERSION)
 
     assert not db_migration_pending(db_path)
     db = Database(db_path)
@@ -205,6 +206,12 @@ def test_migrate(database_v0: Path, tmpdir) -> None:
 
         assert base_table_and_columns == db.list_table_and_columns()
         assert base_indexes == db.list_indexes()
+
+        # V2 added an 'enabled' column in actions (default=True)
+        actions = db.all(Action)
+        assert len(actions) > 0
+        for action in actions:
+            assert action.enabled
 
 
 def test_database_create_table(str_regression) -> None:

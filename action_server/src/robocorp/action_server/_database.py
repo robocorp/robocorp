@@ -213,18 +213,27 @@ class Database:
                 self._tlocal.in_transaction == 0
             ), "Error transaction nesting logic not correct!"
 
-    def update(self, instance, *fields):
+    def update(self, instance, *fields: str):
         """
         Updates database values from some instance given its id.
         """
-        table_name = _make_table_name(instance.__class__.__name__)
+        fields_dict: dict[str, Any] = {}
+        for field in fields:
+            fields_dict[field] = getattr(instance, field)
+        self.update_by_id(instance.__class__, instance.id, fields_dict)
+
+    def update_by_id(self, cls: Type, id: Any, fields: dict[str, Any]):
+        """
+        Updates database values from some instance given its id.
+        """
+        table_name = _make_table_name(cls.__name__)
         set_fields = []
         values = []
-        for field in fields:
-            set_fields.append(f"{field}=?")
-            values.append(getattr(instance, field))
+        for name, value in fields.items():
+            set_fields.append(f"{name}=?")
+            values.append(value)
 
-        values.append(instance.id)
+        values.append(id)
         sql = f"UPDATE {table_name} SET {', '.join(set_fields)} WHERE id=?"
         self.execute(sql, values)
 
@@ -563,10 +572,12 @@ CREATE UNIQUE INDEX {table_name}_{column}_index ON {table_name}({column});
 
         fields = []
         foreign_keys = []
-        for name, name_cls in self._iter_name_and_name_cls_fields(cls):
+        for name, field_cls in self._iter_name_and_name_cls_fields(cls):
             field_full_name = f"{cls.__name__}.{name}"
             fields.append(
-                self._get_field_create_sql(field_full_name, name, name_cls, db_rules)
+                self._get_field_create_sql(
+                    cls, field_full_name, name, field_cls, db_rules
+                )
             )
 
             if field_full_name in db_rules.foreign_keys:
@@ -593,45 +604,50 @@ CREATE TABLE IF NOT EXISTS {table_name}(
 
     def _get_field_create_sql(
         self,
+        cls,
         field_full_name: str,
         name: str,
-        cls: Type,
+        field_cls: Type,
         db_rules: DBRules,
     ) -> str:
         primary_key = name == "id"
 
-        if cls.__name__ == "Optional":
-            not_none = [x for x in cls.__args__ if x != NoneType]
-            assert len(not_none) == 1, f"Expected one not none in: {cls.__args__}"
-            cls = not_none[0]
+        if field_cls.__name__ == "Optional":
+            not_none = [x for x in field_cls.__args__ if x != NoneType]
+            assert len(not_none) == 1, f"Expected one not none in: {field_cls.__args__}"
+            field_cls = not_none[0]
             not_null = False
         else:
             not_null = True
 
-        if cls == int:
+        if field_cls == int:
             use = "INTEGER"
 
-        elif cls == str:
+        elif field_cls == str:
             use = "TEXT"
 
-        elif cls == bool:
-            use = f"INTEGER CHECK({name} IN (0, 1)))"
+        elif field_cls == bool:
+            default_value = getattr(cls, name)
+            if default_value:
+                use = f"INTEGER CHECK({name} IN (0, 1)) NOT NULL DEFAULT 1"
+            else:
+                use = f"INTEGER CHECK({name} IN (0, 1)) NOT NULL DEFAULT 0"
 
-        elif cls == datetime.datetime:
+        elif field_cls == datetime.datetime:
             raise RuntimeError(
                 f"Datetime not supported (field: {name}). Please "
                 "use str and use utility functions to convert back and forth."
             )
 
-        elif cls == float:
+        elif field_cls == float:
             use = "REAL"
 
         else:
-            raise RuntimeError(f"Unsupported type: {cls}")
+            raise RuntimeError(f"Unsupported type: {field_cls}")
 
         use = f"{name} {use}"
 
-        if not_null:
+        if not_null and field_cls != bool:
             use = f"{use} NOT NULL"
 
         if primary_key:

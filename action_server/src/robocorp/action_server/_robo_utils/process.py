@@ -153,7 +153,13 @@ def build_subprocess_kwargs(cwd, env, **kwargs) -> dict:
     return kwargs
 
 
-def build_python_launch_env(new_env_vars):
+def build_python_launch_env(new_env_vars: dict[str, str]) -> dict[str, str]:
+    """
+    Args:
+        new_env_vars: If empty this means that this is an unmanaged env. In this
+            case the environment used will be the same one used to run the
+            action server itself.
+    """
     if sys.platform == "win32":
         env = {}
         for k, v in os.environ.items():
@@ -161,9 +167,11 @@ def build_python_launch_env(new_env_vars):
     else:
         env = dict(os.environ)
 
-    env.pop("PYTHONPATH", "")
-    env.pop("PYTHONHOME", "")
-    env.pop("VIRTUAL_ENV", "")
+    if new_env_vars:
+        env.pop("PYTHONPATH", "")
+        env.pop("PYTHONHOME", "")
+        env.pop("VIRTUAL_ENV", "")
+
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONUNBUFFERED"] = "1"
     env.update(new_env_vars)
