@@ -50,9 +50,13 @@ i.e.:
 
 If a file such as tasks.py has the contents below:
 
-.. from robocorp.tasks import task
+```python
+from robocorp.tasks import task
 
-@taskdef enter_user():...
+@task
+def enter_user():
+    ...
+```
 
 It'll be executable by robocorp tasks as:
 
