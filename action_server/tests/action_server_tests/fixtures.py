@@ -20,7 +20,7 @@ if typing.TYPE_CHECKING:
 
 def is_debugger_active() -> bool:
     try:
-        import pydevd
+        import pydevd  # type:ignore
     except ImportError:
         return False
 
@@ -142,7 +142,7 @@ class ActionServerProcess:
         if actions_sync:
             assert cwd, "cwd must be passed when synchronizing the actions."
 
-        new_args = (
+        new_args = [
             sys.executable,
             "-m",
             "robocorp.action_server",
@@ -152,7 +152,7 @@ class ActionServerProcess:
             "--verbose",
             f"--datadir={str(self._datadir)}",
             f"--db-file={db_file}",
-        )
+        ]
         process = self._process = Process(new_args, cwd=cwd)
 
         compiled = re.compile(r"http://([\w.-]+):(\d+)")
