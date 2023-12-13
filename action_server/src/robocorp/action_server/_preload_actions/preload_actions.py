@@ -1,6 +1,6 @@
 import json
 import os
-from robocorp.log import info
+from robocorp.log import html
 
 RC_ACTION_RESULT_LOCATION = os.environ.get("RC_ACTION_RESULT_LOCATION", "")
 
@@ -20,4 +20,7 @@ if RC_ACTION_RESULT_LOCATION:
 X_ACTION_TRACE = os.environ.get("X_ACTION_TRACE", "")
 
 if X_ACTION_TRACE:
-    info(f"Client application trace: {X_ACTION_TRACE}")
+    html(
+        f'<p style="line-height:34px">External <a href="{X_ACTION_TRACE}"'
+        'style="color:rgb(var(--color-content-accent))">Client Application Trace</a> reported</p>'
+    )
