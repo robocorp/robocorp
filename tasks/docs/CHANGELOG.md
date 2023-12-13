@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.6.0 - 2023-12-13
 
 - It's now possible to define `--glob` to define which files should be searched for `@task`s.
     - The default is `*task*.py` (which was hard-coded in previous versions).
