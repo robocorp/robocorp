@@ -154,7 +154,6 @@ def start_server(
         )
 
     async def _on_startup():
-        log.info("Documentation in /docs")
         if expose:
             loop = asyncio.get_event_loop()
             loop.call_later(1 / 15.0, partial(expose_later, loop))

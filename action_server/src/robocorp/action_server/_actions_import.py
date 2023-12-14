@@ -64,8 +64,7 @@ def import_action_package(
     if not conda_yaml.exists():
         log.info(
             """Adding action without a managed environment (conda.yaml unavailable).
-Note: no virtual environment will be used for the imported actions, they'll be
-run in the same environment used to run the action server."""
+Note: no virtual environment will be used for the imported actions, they'll be run in the same environment used to run the action server."""
         )
         condahash = "<unmanaged>"
         use_env = {}

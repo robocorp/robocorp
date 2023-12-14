@@ -235,6 +235,39 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:
     return retcode
 
 
+def _setup_stdout_logging(log_level):
+    from logging import StreamHandler
+
+    stream_handler = StreamHandler()
+    stream_handler.setLevel(log_level)
+    if log_level == logging.DEBUG:
+        formatter = logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
+        )
+    else:
+        formatter = logging.Formatter("%(message)s", datefmt="[%X]")
+
+    stream_handler.setFormatter(formatter)
+    logger = logging.root
+    logger.addHandler(stream_handler)
+
+
+def _setup_logging(datadir: Path, log_level):
+    from logging.handlers import RotatingFileHandler
+
+    log_file = str(datadir / "server_log.txt")
+    log.info(f"Logs may be found at: {log_file}.")
+    rotating_handler = RotatingFileHandler(log_file, maxBytes=1_000_000, backupCount=3)
+    rotating_handler.setLevel(log_level)
+    rotating_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
+        )
+    )
+    logger = logging.root
+    logger.addHandler(rotating_handler)
+
+
 def _main_retcode(args: Optional[list[str]], exit) -> int:
     from ._download_rcc import download_rcc
     from ._rcc import initialize_rcc
@@ -276,11 +309,13 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         print(f"Unexpected command: {command}.", file=sys.stderr)
         return 1
 
-    logging.basicConfig(
-        level=logging.DEBUG if base_args.verbose else logging.INFO,
-        format="%(message)s",
-        datefmt="[%X]",
-    )
+    # Log to stdout.
+    log_level = logging.DEBUG if base_args.verbose else logging.INFO
+
+    logger = logging.root
+    logger.setLevel(log_level)
+
+    _setup_stdout_logging(log_level)
 
     with setup_settings(base_args) as settings:
         settings.datadir.mkdir(parents=True, exist_ok=True)
@@ -294,7 +329,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
                 create_new_project(directory=base_args.name)
                 return 0
 
-            mutex = SystemMutex("action_server", base_dir=str(settings.datadir))
+            mutex = SystemMutex("action_server.lock", base_dir=str(settings.datadir))
             if not mutex.get_mutex_aquired():
                 print(
                     f"An action server is already started in this datadir ({settings.datadir})."
@@ -304,6 +339,11 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
                     file=sys.stderr,
                 )
                 return 1
+
+            # Log to file in datadir, always in debug mode
+            # (only after lock is in place as multiple loggers to the same
+            # file would be troublesome).
+            _setup_logging(settings.datadir, log_level)
 
             try:
                 db_path: Union[Path, str]
