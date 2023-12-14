@@ -1,8 +1,11 @@
+import logging
 import os
 import platform
 import sys
 from pathlib import Path
 from typing import Optional
+
+log = logging.getLogger(__name__)
 
 RCC_VERSION = "17.11.0"
 RCC_URLS = {
@@ -14,7 +17,9 @@ RCC_URLS = {
 CURDIR = Path(__file__).parent.absolute()
 
 
-def download_rcc(system: Optional[str] = None, target: Optional[str] = None) -> Path:
+def download_rcc(
+    system: Optional[str] = None, target: Optional[str] = None, force=False
+) -> Path:
     """
     Downloads RCC in the place where the action server expects it.
     """
@@ -28,6 +33,12 @@ def download_rcc(system: Optional[str] = None, target: Optional[str] = None) -> 
             rcc_path = CURDIR / "bin" / "rcc.exe"
         else:
             rcc_path = CURDIR / "bin" / "rcc"
+
+    if not force:
+        if rcc_path.exists():
+            return rcc_path
+
+        log.info(f"RCC not available at: {rcc_path}. Downloading.")
 
     rcc_url = RCC_URLS[system or platform.system()]
 

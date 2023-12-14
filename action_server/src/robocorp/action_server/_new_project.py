@@ -1,15 +1,16 @@
 import logging
-from ._rcc import get_rcc
 
+from ._rcc import get_rcc
 
 TEMPLATE_URL = "github.com/robocorp/example-action-server-starter"
 
 log = logging.getLogger(__name__)
 
 
-def create_new_project():
+def create_new_project(directory: str = ""):
     try:
-        directory = input("Name of the project: ")
+        if not directory:
+            directory = input("Name of the project: ")
 
         rcc = get_rcc()
 

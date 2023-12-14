@@ -188,6 +188,11 @@ def _create_parser():
         "new",
         help="Bootstrap new project from template",
     )
+    new_parser.add_argument(
+        "--name",
+        help="Name for the project",
+    )
+    _add_data_args(new_parser, defaults)
     _add_verbose_args(new_parser, defaults)
 
     # Schema
@@ -231,6 +236,7 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:
 
 
 def _main_retcode(args: Optional[list[str]], exit) -> int:
+    from ._download_rcc import download_rcc
     from ._rcc import initialize_rcc
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
@@ -258,21 +264,14 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     #     return
 
     if command == "download-rcc":
-        from . import _download_rcc
-
-        _download_rcc.download_rcc(target=base_args.file)
-        return 0
-
-    elif command == "new":
-        from ._new_project import create_new_project
-
-        create_new_project()
+        download_rcc(target=base_args.file, force=True)
         return 0
 
     if command not in (
         "migrate",
         "import",
         "start",
+        "new",
     ):
         print(f"Unexpected command: {command}.", file=sys.stderr)
         return 1
@@ -288,61 +287,61 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         robocorp_home = settings.datadir / ".robocorp_home"
         robocorp_home.mkdir(parents=True, exist_ok=True)
 
-        mutex = SystemMutex("action_server", base_dir=str(settings.datadir))
-        if not mutex.get_mutex_aquired():
-            print(
-                f"An action server is already started in this datadir ({settings.datadir})."
-                f"\nPlease exit it before starting a new one."
-                f"\nInformation on mutex holder:\n"
-                f"{mutex.mutex_creation_info}",
-                file=sys.stderr,
-            )
-            return 1
+        with initialize_rcc(download_rcc(force=False), robocorp_home):
+            if command == "new":
+                from ._new_project import create_new_project
 
-        try:
-            db_path: Union[Path, str]
-            if settings.db_file != ":memory:":
-                db_path = settings.datadir / settings.db_file
-            else:
-                db_path = settings.db_file
-
-            if sys.platform == "win32":
-                rcc_location = CURDIR / "bin" / "rcc.exe"
-            else:
-                rcc_location = CURDIR / "bin" / "rcc"
-
-            if not rcc_location.exists():
-                # Download RCC.
-                log.info(f"RCC not available at: {rcc_location}. Downloading.")
-                from . import _download_rcc  # noqa
-
-                _download_rcc.download_rcc()
-
-            from robocorp.action_server._models import create_db, load_db
-            from robocorp.action_server.migrations import (
-                db_migration_pending,
-                migrate_db,
-            )
-
-            is_new = db_path == ":memory:" or not os.path.exists(db_path)
-
-            if is_new:
-                log.info("Database file does not exist. Creating it at: %s", db_path)
-                use_db_ctx = create_db
-            else:
-                use_db_ctx = load_db
-
-            if command == "migrate":
-                if db_path == ":memory:":
-                    print("Cannot do migration of in-memory databases", file=sys.stderr)
-                    return 1
-                if not migrate_db(db_path):
-                    return 1
+                create_new_project(directory=base_args.name)
                 return 0
-            else:
-                if not is_new and db_migration_pending(db_path):
-                    print(
-                        f"""It was not possible to start the server because a 
+
+            mutex = SystemMutex("action_server", base_dir=str(settings.datadir))
+            if not mutex.get_mutex_aquired():
+                print(
+                    f"An action server is already started in this datadir ({settings.datadir})."
+                    f"\nPlease exit it before starting a new one."
+                    f"\nInformation on mutex holder:\n"
+                    f"{mutex.mutex_creation_info}",
+                    file=sys.stderr,
+                )
+                return 1
+
+            try:
+                db_path: Union[Path, str]
+                if settings.db_file != ":memory:":
+                    db_path = settings.datadir / settings.db_file
+                else:
+                    db_path = settings.db_file
+
+                from robocorp.action_server._models import create_db, load_db
+                from robocorp.action_server.migrations import (
+                    db_migration_pending,
+                    migrate_db,
+                )
+
+                is_new = db_path == ":memory:" or not os.path.exists(db_path)
+
+                if is_new:
+                    log.info(
+                        "Database file does not exist. Creating it at: %s", db_path
+                    )
+                    use_db_ctx = create_db
+                else:
+                    use_db_ctx = load_db
+
+                if command == "migrate":
+                    if db_path == ":memory:":
+                        print(
+                            "Cannot do migration of in-memory databases",
+                            file=sys.stderr,
+                        )
+                        return 1
+                    if not migrate_db(db_path):
+                        return 1
+                    return 0
+                else:
+                    if not is_new and db_migration_pending(db_path):
+                        print(
+                            f"""It was not possible to start the server because a 
 database migration is required to use with this version of the
 Robocorp Action Server.
 
@@ -354,54 +353,54 @@ To migrate the database to the current version
 -- or start from scratch by erasing the file: 
 {db_path}
 """
-                    )
-                    return 1
-
-            with use_db_ctx(db_path) as db, initialize_rcc(rcc_location, robocorp_home):
-                from . import _actions_import
-
-                if command == "import":
-                    if not base_args.dir:
-                        base_args.dir = ["."]
-
-                    for action_package_dir in base_args.dir:
-                        _actions_import.import_action_package(
-                            settings.datadir, action_package_dir
                         )
-                    return 0
+                        return 1
 
-                elif command == "start":
-                    # start imports the current directory by default
-                    # (unless --actions-sync=false is specified).
-                    log.info("Synchronize actions: %s", base_args.actions_sync)
+                with use_db_ctx(db_path) as db:
+                    from . import _actions_import
 
-                    if base_args.actions_sync:
+                    if command == "import":
                         if not base_args.dir:
                             base_args.dir = ["."]
 
                         for action_package_dir in base_args.dir:
                             _actions_import.import_action_package(
-                                settings.datadir,
-                                action_package_dir,
-                                disable_not_imported=base_args.actions_sync,
+                                settings.datadir, action_package_dir
                             )
-
-                    with use_runs_state_ctx(db):
-                        from ._server import start_server
-
-                        settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-                        start_server(
-                            expose=base_args.expose,
-                            api_key=base_args.api_key,
-                            expose_session=base_args.expose_session,
-                        )
                         return 0
 
-                else:
-                    print(f"Unexpected command: {command}.", file=sys.stderr)
-                    return 1
-        finally:
-            mutex.release_mutex()
+                    elif command == "start":
+                        # start imports the current directory by default
+                        # (unless --actions-sync=false is specified).
+                        log.info("Synchronize actions: %s", base_args.actions_sync)
+
+                        if base_args.actions_sync:
+                            if not base_args.dir:
+                                base_args.dir = ["."]
+
+                            for action_package_dir in base_args.dir:
+                                _actions_import.import_action_package(
+                                    settings.datadir,
+                                    action_package_dir,
+                                    disable_not_imported=base_args.actions_sync,
+                                )
+
+                        with use_runs_state_ctx(db):
+                            from ._server import start_server
+
+                            settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+                            start_server(
+                                expose=base_args.expose,
+                                api_key=base_args.api_key,
+                                expose_session=base_args.expose_session,
+                            )
+                            return 0
+
+                    else:
+                        print(f"Unexpected command: {command}.", file=sys.stderr)
+                        return 1
+            finally:
+                mutex.release_mutex()
 
 
 if __name__ == "__main__":

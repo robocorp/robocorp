@@ -19,7 +19,7 @@ const dataLoadedInitial: AsyncLoaded<any> = {
 };
 
 const nameToUrl = (name: string): string => {
-  return name.replace('_', '-');
+  return name.replaceAll('_', '-');
 };
 
 const convertType = (v: string, valueType: string): string | number | boolean => {

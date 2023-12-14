@@ -28,7 +28,7 @@ def start_server(
     import uvicorn
     from fastapi.staticfiles import StaticFiles
     from starlette.requests import Request
-    from starlette.responses import FileResponse, HTMLResponse
+    from starlette.responses import HTMLResponse
 
     from . import _actions_run
     from ._api_action_package import action_package_api_router

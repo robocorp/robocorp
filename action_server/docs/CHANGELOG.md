@@ -1,6 +1,15 @@
 # Changelog
 
+## 0.0.5 - 2023-12-14
+
+- Fixed issues in deployment:
+    - `requests` is now a required dep (for --expose to work).
+    - _static_contents now properly added by poetry (because it was in .gitignore it was not added to the distribution).
+    - "new" command properly checks that RCC is downloaded.
+- Running an action with multiple `_` now works from the UI.
+
 ## 0.0.4 - 2023-12-13
+
 
 - `action-server` is not defined as an entry point (so, after installing it,
   an `action-server` executable will be available to execute it instead of having

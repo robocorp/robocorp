@@ -19,6 +19,18 @@ def test_download_rcc(tmpdir) -> None:
     assert os.path.exists(rcc_location)
 
 
+def test_new(tmpdir) -> None:
+    from action_server_tests.fixtures import robocorp_action_server_run
+
+    curdir = os.path.abspath(".")
+    try:
+        os.chdir(str(tmpdir))
+        robocorp_action_server_run(["new", "--name=my_project"], returncode=0)
+        assert os.path.exists(str(tmpdir / "my_project" / "conda.yaml"))
+    finally:
+        os.chdir(curdir)
+
+
 # def test_schema(str_regression, tmpdir) -> None:
 #     from action_server_tests.fixtures import robocorp_action_server_run
 #

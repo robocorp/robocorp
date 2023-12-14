@@ -90,7 +90,10 @@ run in the same environment used to run the action server."""
         # contents per se (so, changing comments or spaces is ok).
         condahash = create_hash(repr(contents))
 
-        log.info("Action package seems ok. Bootstrapping RCC environment.")
+        log.info(
+            "Action package seems ok. "
+            "Bootstrapping RCC environment (please wait, this can take a long time)."
+        )
         rcc = get_rcc()
         env_info = rcc.create_env_and_get_vars(conda_yaml, condahash)
         if not env_info.success:
