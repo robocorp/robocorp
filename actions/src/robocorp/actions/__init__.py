@@ -8,7 +8,7 @@ __version__ = "0.0.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 
-def action(func):
+def action(is_consequential: bool = False):
     """
     Decorator for actions (entry points) which can be executed by `robocorp.actions`.
 
@@ -32,11 +32,16 @@ def action(func):
         func: A function which is a action to `robocorp.actions`.
     """
 
-    # i.e.: This is just a thin layer for the task decorator at this point
-    # (it may be extended in the future...).
-    from robocorp.tasks import task
+    def decorator(func):
 
-    return task(func)
+        # i.e.: This is just a thin layer for the task decorator at this point
+        # (it may be extended in the future...).
+        from robocorp.tasks import task
+
+        return task(func)
+
+
+    return decorator
 
 
 def session_cache(func):
