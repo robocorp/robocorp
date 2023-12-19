@@ -29,12 +29,14 @@ PyYAML = "^6"
 robocorp-actions = "^0.0.2"
 websockets = "^12.0"
 requests = "^2"
+psutil = "^5"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
 types-requests = "^2"
 types-PyYAML = "^6"
 robocorp-log-pytest = "^0.0.1"
+types-psutil = "^5"
 
 
 [tool.mypy]

@@ -135,6 +135,10 @@ class Process:
         log.debug("Subprocess kill [pid=%s,uid=%d]", self._proc.pid, self._uid)
         kill_process_and_subprocesses(self._proc.pid)
 
+    @property
+    def pid(self):
+        return self._proc.pid
+
 
 def build_subprocess_kwargs(cwd, env, **kwargs) -> dict:
     startupinfo = None

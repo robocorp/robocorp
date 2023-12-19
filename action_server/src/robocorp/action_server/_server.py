@@ -92,6 +92,25 @@ def start_server(
             methods=["POST"],
         )
 
+    if os.getenv("RC_ADD_SHUTDOWN_API", "").lower() in ("1", "true"):
+
+        def shutdown(timeout: int = -1):
+            import _thread
+            import time
+
+            from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
+
+            _thread.interrupt_main()
+
+            def interrupt_again():
+                time.sleep(timeout)
+                _thread.interrupt_main()
+
+            if timeout > 0:
+                run_in_thread(interrupt_again, daemon=True)
+
+        app.add_api_route("/api/shutdown/", shutdown, methods=["POST"])
+
     app.include_router(run_api_router)
     app.include_router(action_package_api_router)
     app.include_router(websocket_api_router)
@@ -159,13 +178,32 @@ def start_server(
             loop.call_later(1 / 15.0, partial(expose_later, loop))
 
     def _on_shutdown():
+        import psutil
+
+        log.info("Stopping action server...")
         from robocorp.action_server._robo_utils.process import (
             kill_process_and_subprocesses,
         )
 
+        expose_pid = None
         if expose_subprocess is not None:
             log.info("Shutting down expose subprocess: %s", expose_subprocess.pid)
-            kill_process_and_subprocesses(expose_subprocess.pid)
+            expose_pid = expose_subprocess.pid
+            kill_process_and_subprocesses(expose_pid)
+
+        p = psutil.Process(os.getpid())
+        try:
+            children_processes = list(p.children(recursive=True))
+        except Exception:
+            log.exception("Error listing subprocesses.")
+
+        for child in children_processes:
+            if child.pid != expose_pid:  # If it's still around, don't kill it again.
+                log.info("Killing sub-process when exiting action server: %s", child)
+                try:
+                    kill_process_and_subprocesses(child.pid)
+                except Exception:
+                    log.exception("Error killing subprocess: %s", child.pid)
 
     app.add_event_handler("startup", _on_startup)
     app.add_event_handler("shutdown", _on_shutdown)
