@@ -1,14 +1,14 @@
-import logging
 import os
 import platform
 import sys
 from pathlib import Path
 from typing import Optional
 
-log = logging.getLogger(__name__)
+# No real build, just download RCC at this point.
 
-# Note: also referenced in action_server/build.py
+# Note: referenced here and in robocorp.action_server._download_rcc
 RCC_VERSION = "17.12.1"
+
 RCC_URLS = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
     "Darwin": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/macos64/rcc",
@@ -18,9 +18,7 @@ RCC_URLS = {
 CURDIR = Path(__file__).parent.absolute()
 
 
-def download_rcc(
-    system: Optional[str] = None, target: Optional[str] = None, force=False
-) -> Path:
+def _download_rcc(system: Optional[str] = None, target: Optional[str] = None):
     """
     Downloads RCC in the place where the action server expects it.
     """
@@ -31,15 +29,9 @@ def download_rcc(
         rcc_path = Path(target)
     else:
         if sys.platform == "win32":
-            rcc_path = CURDIR / "bin" / "rcc.exe"
+            rcc_path = CURDIR / "src" / "robocorp" / "action_server" / "bin" / "rcc.exe"
         else:
-            rcc_path = CURDIR / "bin" / "rcc"
-
-    if not force:
-        if rcc_path.exists():
-            return rcc_path
-
-        log.info(f"RCC not available at: {rcc_path}. Downloading.")
+            rcc_path = CURDIR / "src" / "robocorp" / "action_server" / "bin" / "rcc"
 
     rcc_url = RCC_URLS[system or platform.system()]
 
@@ -58,3 +50,11 @@ def download_rcc(
     os.chmod(rcc_path, st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     return rcc_path
+
+
+def build(*args, **kwarg):
+    _download_rcc()
+
+
+if __name__ == "__main__":
+    build()

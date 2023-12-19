@@ -11,6 +11,8 @@ license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 include = [
     "src/robocorp/action_server/_static_contents.py",
+    "src/robocorp/action_server/bin/rcc.exe",
+    "src/robocorp/action_server/bin/rcc",
 ]
 
 [tool.poetry.scripts]
@@ -46,5 +48,9 @@ skip-magic-trailing-comma = false
 profile = "black"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "setuptools"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true

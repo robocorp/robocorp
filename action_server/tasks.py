@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import sys
 from contextlib import contextmanager
@@ -8,20 +9,27 @@ from typing import Optional
 # Add the devutils even if the poetry env isn't setup (to do a 'inv devinstall').
 try:
     import devutils
+
+    devutils_found = True
 except ImportError:
     devutils_src = Path(__file__).absolute().parent.parent / "devutils" / "src"
-    assert devutils_src.exists(), f"{devutils_src} does not exist."
-    sys.path.append(str(devutils_src))
+    devutils_found = devutils_src.exists()
 
-from devutils.invoke_utils import build_common_tasks
+    if not devutils_found:
+        print(f"{devutils_src} does not exist.", file=sys.stderr)
+    else:
+        sys.path.append(str(devutils_src))
+
+if devutils_found:
+    from devutils.invoke_utils import build_common_tasks
+
+    globals().update(
+        build_common_tasks(Path(__file__).absolute().parent, "robocorp.action_server")
+    )
+
 from invoke import Context, task
 
 CURDIR = Path(__file__).parent.absolute()
-
-
-globals().update(
-    build_common_tasks(Path(__file__).absolute().parent, "robocorp.action_server")
-)
 
 
 @contextmanager
