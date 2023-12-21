@@ -200,7 +200,6 @@ def _add_actions_to_db(
         shell=False,
     )
     stdout, stderr = popen.communicate()
-    print(stdout, stderr)
     if popen.poll() != 0:
         raise RuntimeError(
             f"It was not possible to list the actions.\n"
