@@ -200,6 +200,7 @@ def _add_actions_to_db(
         shell=False,
     )
     stdout, stderr = popen.communicate()
+    print(stdout, stderr)
     if popen.poll() != 0:
         raise RuntimeError(
             f"It was not possible to list the actions.\n"
@@ -234,6 +235,9 @@ def _add_actions_to_db(
                     input_schema=json.dumps(action_fields["input_schema"]),
                     output_schema=json.dumps(action_fields["output_schema"]),
                     enabled=True,
+                    is_consequential=action_fields.get("options", {}).get(
+                        "is_consequential", False
+                    ),
                 )
             )
 
