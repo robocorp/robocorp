@@ -6,6 +6,7 @@ from pathlib import Path
 from types import ModuleType
 from typing import Callable, Dict, Iterator, List, Optional, Sequence
 
+from robocorp import log
 from robocorp.tasks._protocols import ITask
 
 
@@ -78,6 +79,8 @@ def import_path(
     if not path.exists():
         raise ImportError(path)
 
+    path = path.absolute()
+    root = root.absolute()
     module_name = module_name_from_path(path, root)
 
     for meta_importer in sys.meta_path:
@@ -88,10 +91,16 @@ def import_path(
         spec = importlib.util.spec_from_file_location(module_name, str(path))
 
     if spec is None:
-        raise ImportError(f"Can't find module {module_name} at location {path}")
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = mod
-    spec.loader.exec_module(mod)  # type: ignore[union-attr]
+        raise ImportError(f"Can't find module '{module_name}' at location '{path}'")
+    try:
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = mod
+        spec.loader.exec_module(mod)  # type: ignore[union-attr]
+    except Exception:
+        log.critical(
+            f"Error when importing module '{module_name}' at location '{path}'."
+        )
+        raise
     insert_missing_modules(sys.modules, module_name)
     return mod
 
@@ -121,6 +130,7 @@ def collect_tasks(
     from robocorp.tasks import _constants, _hooks
     from robocorp.tasks._task import Task
 
+    path = path.absolute()
     task_names_as_set = set(task_names)
 
     _hooks.before_collect_tasks(path, task_names_as_set)
@@ -213,15 +223,15 @@ def _get_root(path: Path, is_dir: bool) -> Path:
         for p in pythonpath_entries:
             try:
                 if os.path.samefile(p, path):
-                    return p
+                    return p.absolute()
             except OSError:
                 pass
 
         new_path = path.parent
         if not new_path or new_path == path:
             if is_dir:
-                return initial
+                return initial.absolute()
             else:
-                return initial.parent
+                return initial.parent.absolute()
 
         path = new_path
