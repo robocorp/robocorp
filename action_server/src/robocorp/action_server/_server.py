@@ -90,6 +90,9 @@ def start_server(
             description=doc_desc,
             operation_id=action.name,
             methods=["POST"],
+            openapi_extra={
+                "x-openai-isConsequential": action.is_consequential,
+            },
         )
 
     app.include_router(run_api_router)
