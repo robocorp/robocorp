@@ -91,14 +91,16 @@ def import_path(
         spec = importlib.util.spec_from_file_location(module_name, str(path))
 
     if spec is None:
-        raise ImportError(f"Can't find module '{module_name}' at location '{path}'")
+        raise ImportError(
+            f"Can't find module '{module_name}'\n  at location '{path}'\n  (with root: '{root}')."
+        )
     try:
         mod = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = mod
         spec.loader.exec_module(mod)  # type: ignore[union-attr]
     except Exception:
         log.critical(
-            f"Error when importing module '{module_name}' at location '{path}'."
+            f"Error when importing module '{module_name}'\n  at location '{path}'\n  (with root: '{root}')."
         )
         raise
     insert_missing_modules(sys.modules, module_name)

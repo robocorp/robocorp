@@ -3,6 +3,7 @@ import logging
 import threading
 import typing
 from dataclasses import asdict
+from functools import partial
 
 from fastapi.routing import APIRouter
 from starlette.websockets import WebSocket, WebSocketDisconnect
@@ -78,14 +79,20 @@ class RunNotificationsThread(threading.Thread):
             log.exception("Error reporting change event to json.")
             raise
 
-    async def _report_runs(self, runs: list["Run"]):
+    async def send_json(self, data: list[dict] | dict):
         """
         This is run in asyncio, not in this thread.
         """
         if self._disposed.is_set():
             return
 
-        await self.websocket.send_json(
+        await self.websocket.send_json(data)
+
+    async def _report_runs(self, runs: list["Run"]):
+        """
+        This is run in asyncio, not in this thread.
+        """
+        await self.send_json(
             {
                 "message_type": "runs_collected",
                 "runs": [asdict(run) for run in runs],
@@ -99,8 +106,33 @@ class RunNotificationsThread(threading.Thread):
         self._disposed.set()
 
 
+def _list_actions_in_threadpool(run_notifications, message_id):
+    from robocorp.action_server._api_action_package import list_action_packages
+
+    try:
+        action_packages = list_action_packages()
+    except Exception:
+        log.exception("Error collection action packages.")
+        action_packages = []
+
+    asyncio.run_coroutine_threadsafe(
+        run_notifications.send_json(
+            {
+                "message_type": "response",
+                "data": {
+                    "message_id": message_id,
+                    "result": [asdict(p) for p in action_packages],
+                },
+            }
+        ),
+        run_notifications.loop,
+    )
+
+
 @websocket_api_router.websocket("")
 async def websocket_endpoint(websocket: WebSocket):
+    from starlette.concurrency import run_in_threadpool
+
     loop = asyncio.get_running_loop()
 
     await websocket.accept()
@@ -111,6 +143,28 @@ async def websocket_endpoint(websocket: WebSocket):
             message_type = data.get("message_type")
             if message_type == "ping":
                 await websocket.send_json({"message_type": "pong"})
+
+            elif message_type == "request":
+                # We received some request from the UI, let's handle it.
+                try:
+                    request_data = data.get("data")
+                    method = request_data.get("method")
+                    if method == "GET":
+                        message_id = request_data.get("message_id")
+                        url = request_data.get("url")
+                        if url == "/api/actionPackages":
+                            loop.create_task(
+                                run_in_threadpool(
+                                    partial(
+                                        _list_actions_in_threadpool,
+                                        run_notifications,
+                                        message_id,
+                                    )
+                                )
+                            )
+
+                except Exception:
+                    log.exception("Unexpected exception handling a request")
 
             elif message_type == "start_listen_run_events":
                 # In this case we have to:
