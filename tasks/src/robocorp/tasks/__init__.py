@@ -33,15 +33,17 @@ automatically logged is not imported prior the the `cli.main` call.
 """
 from pathlib import Path
 from typing import Optional
+from functools import wraps
 
 from ._fixtures import setup, teardown
 from ._protocols import ITask, Status
+from ._schemas import TaskOptions
 
 __version__ = "2.6.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
-def task(func):
+def task(*args, **kwargs):
     """
     Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
 
@@ -64,12 +66,25 @@ def task(func):
     Args:
         func: A function which is a task to `robocorp.tasks`.
     """
-    from . import _hooks
 
-    # When a task is found, register it in the framework as a target for execution.
-    _hooks.on_task_func_found(func)
+    def decorator(func, options: Optional[TaskOptions] = None):
+        from . import _hooks
 
-    return func
+        # When a task is found, register it in the framework as a target for execution.
+        _hooks.on_task_func_found(func, options=options)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    options = TaskOptions(**kwargs)
+
+    if args and callable(args[0]):
+        return decorator(args[0], options=options)
+
+    return lambda func: decorator(func, options=options)
 
 
 def session_cache(func):

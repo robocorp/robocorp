@@ -4,9 +4,10 @@ import sys
 from contextlib import contextmanager
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, Dict, Iterator, List, Optional, Sequence
+from typing import Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 from robocorp.tasks._protocols import ITask
+from robocorp.tasks._schemas import TaskOptions
 
 
 def module_name_from_path(path: Path, root: Path) -> str:
@@ -131,10 +132,10 @@ def collect_tasks(
 
         return task.name in task_names
 
-    methods_marked_as_tasks_found: List[Callable] = []
+    methods_marked_as_tasks_found: List[Tuple[Callable, TaskOptions]] = []
     found_as_set = set()
 
-    def on_func_found(func):
+    def on_func_found(func, options: TaskOptions):
         from robocorp.tasks._exceptions import RobocorpTasksError
 
         key = (func.__code__.co_name, func.__code__.co_filename)
@@ -145,7 +146,12 @@ def collect_tasks(
             )
         found_as_set.add(key)
 
-        methods_marked_as_tasks_found.append(func)
+        methods_marked_as_tasks_found.append(
+            (
+                func,
+                options,
+            )
+        )
 
     with _hooks.on_task_func_found.register(on_func_found):
         if path.is_dir():
@@ -176,8 +182,8 @@ def collect_tasks(
 
                     module = import_path(path_with_task, root=root)
 
-                    for method in methods_marked_as_tasks_found:
-                        task = Task(module, method)
+                    for method, options in methods_marked_as_tasks_found:
+                        task = Task(module, method, options=options)
                         if accept_task(task):
                             yield task
 
@@ -187,8 +193,8 @@ def collect_tasks(
             root = _get_root(path, is_dir=False)
             with _add_to_sys_path_0(root):
                 module = import_path(path, root=root)
-                for method in methods_marked_as_tasks_found:
-                    task = Task(module, method)
+                for method, options in methods_marked_as_tasks_found:
+                    task = Task(module, method, options=options)
                     if accept_task(task):
                         yield task
 

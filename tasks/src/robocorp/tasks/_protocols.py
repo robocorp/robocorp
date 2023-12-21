@@ -15,6 +15,8 @@ from typing import (
     Union,
 )
 
+from robocorp.tasks._schemas import TaskOptions
+
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]
 
@@ -60,6 +62,8 @@ class ITask(typing.Protocol):
     # If the task completed successfully, this will be
     # the value returned by the task.
     result: Any
+
+    options: TaskOptions
 
     @property
     def input_schema(self) -> Dict[str, Any]:

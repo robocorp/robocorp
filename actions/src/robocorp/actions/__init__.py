@@ -1,3 +1,4 @@
+from functools import wraps
 from pathlib import Path
 from typing import Optional
 
@@ -8,7 +9,7 @@ __version__ = "0.0.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 
-def action(is_consequential: bool = False):
+def action(*args, **kwargs):
     """
     Decorator for actions (entry points) which can be executed by `robocorp.actions`.
 
@@ -32,16 +33,17 @@ def action(is_consequential: bool = False):
         func: A function which is a action to `robocorp.actions`.
     """
 
-    def decorator(func):
-
+    def decorator(func, **kwargs):
         # i.e.: This is just a thin layer for the task decorator at this point
         # (it may be extended in the future...).
         from robocorp.tasks import task
 
-        return task(func)
+        return task(func, **kwargs)
 
+    if args and callable(args[0]):
+        return decorator(args[0], **kwargs)
 
-    return decorator
+    return lambda func: decorator(func, **kwargs)
 
 
 def session_cache(func):
