@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from typing import Optional
 
 
-class TaskOptions(BaseModel):
+@dataclass
+class TaskOptions:
     is_consequential: Optional[bool] = False

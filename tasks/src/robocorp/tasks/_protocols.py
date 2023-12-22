@@ -15,7 +15,7 @@ from typing import (
     Union,
 )
 
-from robocorp.tasks._schemas import TaskOptions
+from robocorp.tasks._task_options import TaskOptions
 
 ExcInfo = tuple[type[BaseException], BaseException, TracebackType]
 OptExcInfo = Union[ExcInfo, tuple[None, None, None]]

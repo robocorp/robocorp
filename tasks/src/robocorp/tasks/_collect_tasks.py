@@ -8,7 +8,7 @@ from typing import Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 from robocorp import log
 from robocorp.tasks._protocols import ITask
-from robocorp.tasks._schemas import TaskOptions
+from robocorp.tasks._task_options import TaskOptions
 
 
 def module_name_from_path(path: Path, root: Path) -> str:

@@ -9,7 +9,7 @@ from robocorp.log.protocols import OptExcInfo
 
 from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
 from robocorp.tasks._protocols import IContext, ITask, Status
-from robocorp.tasks._schemas import TaskOptions
+from robocorp.tasks._task_options import TaskOptions
 
 
 def _build_properties(

@@ -6,7 +6,6 @@ from typing import Iterator, Optional, Union
 from pydantic.dataclasses import dataclass
 
 from robocorp.action_server._database import DBRules
-from robocorp.tasks._schemas import TaskOptions
 
 if typing.TYPE_CHECKING:
     from robocorp.action_server._database import Database

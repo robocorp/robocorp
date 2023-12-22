@@ -9,6 +9,7 @@ from argparse import ArgumentParser, ArgumentTypeError
 from io import StringIO
 from pathlib import Path
 from typing import Any, List, Literal, Optional, Sequence, Union
+from dataclasses import asdict
 
 from robocorp.tasks import _constants
 from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
@@ -60,7 +61,7 @@ def list_tasks(path: str, glob: Optional[str] = None) -> int:
                     "docs": getattr(task.method, "__doc__") or "",
                     "input_schema": task.input_schema,
                     "output_schema": task.output_schema,
-                    "options": task.options.model_dump(),
+                    "options": asdict(task.options),
                 }
             )
 

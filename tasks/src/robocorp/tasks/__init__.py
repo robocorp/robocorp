@@ -37,7 +37,7 @@ from functools import wraps
 
 from ._fixtures import setup, teardown
 from ._protocols import ITask, Status
-from ._schemas import TaskOptions
+from ._task_options import TaskOptions
 
 __version__ = "2.6.0"
 version_info = [int(x) for x in __version__.split(".")]
