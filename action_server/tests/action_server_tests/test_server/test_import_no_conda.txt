@@ -386,6 +386,11 @@
                         "type": "boolean",
                         "title": "Enabled",
                         "default": true
+                    },
+                    "is_consequential": {
+                        "type": "boolean",
+                        "title": "Is Consequential",
+                        "default": false
                     }
                 },
                 "type": "object",

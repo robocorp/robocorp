@@ -91,8 +91,10 @@ def start_server(
             operation_id=action.name,
             methods=["POST"],
             openapi_extra={
-                "x-openai-isConsequential": action.is_consequential,
-            },
+                "x-openai-isConsequential": True,
+            }
+            if action.is_consequential
+            else None,
         )
 
     if os.getenv("RC_ADD_SHUTDOWN_API", "").lower() in ("1", "true"):
