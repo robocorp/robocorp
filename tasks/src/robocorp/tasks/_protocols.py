@@ -127,7 +127,7 @@ class IAutoUnregisterContextManager(typing.Protocol):
 
 
 class IOnTaskFuncFoundCallback(ICallback, typing.Protocol):
-    def __call__(self, func: Callable):
+    def __call__(self, func: Callable, *args, **kwargs):
         pass
 
     def register(self, callback: Callable) -> IAutoUnregisterContextManager:
