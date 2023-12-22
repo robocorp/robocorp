@@ -1,0 +1,71 @@
+# Nice reference: https://github.com/tornadoweb/tornado/blob/master/.github/workflows/build.yml
+# Docs: https://cibuildwheel.readthedocs.io/en/stable/options/
+# Configurations are here and in pyproject.toml.
+name: Action Server [MANYLINUX] Release
+
+on:
+  push:
+#     branches:
+#       - "wip-manylinux"
+
+    tags:
+      - "robocorp-action_server-*"
+
+
+defaults:
+  run:
+    working-directory: './action_server'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, windows-2019, macos-11]
+    steps:
+      - uses: actions/checkout@v4
+
+      # Used to host cibuildwheel
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+  
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@robocorp"
+
+
+      - name: Install cibuildwheel
+        run: |
+            python -m pip install cibuildwheel==2.16.2
+            python -m pip install invoke
+            python -m invoke build-frontend
+        env:
+           CI: true
+           NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+        
+        
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_SKIP: pp*
+          CIBW_BUILD: cp31*-*macos*x86_64 cp31*-*manylinux*x86_64 cp31*-*win*amd64
+          CIBW_BUILD_VERBOSITY: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-wheels
+          path: "action_server/wheelhouse/*"
+          
+      - name: Upload to PyPI .whl
+        run: |
+            pip install twine
+            twine upload wheelhouse/*.whl
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN_ROBOCORP_ACTION_SERVER }}

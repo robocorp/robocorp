@@ -1,5 +1,10 @@
 # Changelog
 
+## UNRELEASED
+
+- `rcc` is now bundled in the action server wheel.
+- When the action server is stopped, any subprocess is also killed.
+
 ## 0.0.5 - 2023-12-14
 
 - Fixed issues in deployment:

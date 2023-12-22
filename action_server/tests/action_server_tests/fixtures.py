@@ -130,6 +130,7 @@ class ActionServerProcess:
         db_file=":memory:",
         actions_sync=False,
         cwd: Optional[Path | str] = None,
+        add_shutdown_api: bool = False,
     ) -> None:
         from robocorp.action_server._robo_utils.process import Process
 
@@ -153,7 +154,10 @@ class ActionServerProcess:
             f"--datadir={str(self._datadir)}",
             f"--db-file={db_file}",
         ]
-        process = self._process = Process(new_args, cwd=cwd)
+        env = {}
+        if add_shutdown_api:
+            env["RC_ADD_SHUTDOWN_API"] = "1"
+        process = self._process = Process(new_args, cwd=cwd, env=env)
 
         compiled = re.compile(r"http://([\w.-]+):(\d+)")
         future: Future[Tuple[str, str]] = Future()

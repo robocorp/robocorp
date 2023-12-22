@@ -7,7 +7,11 @@ readme = "README.md"
 repository = "https://github.com/robocorp/robo/"
 license = "Apache-2.0"
 packages = [{ include = "robocorp", from = "src" }]
-include = ["src/robocorp/action_server/_static_contents.py"]
+include = [
+	"src/robocorp/action_server/_static_contents.py",
+	"src/robocorp/action_server/bin/rcc.exe",
+	"src/robocorp/action_server/bin/rcc",
+]
 
 [tool.poetry.scripts]
 action-server = "robocorp.action_server.cli:main"
@@ -24,12 +28,14 @@ PyYAML = "^6"
 robocorp-actions = { path = "../actions", develop = true }
 websockets = "^12.0"
 requests = "^2"
+psutil = "^5"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = { path = "../devutils/", develop = true }
 types-requests = "^2"
 types-PyYAML = "^6"
 robocorp-log-pytest = "^0.0.1"
+types-psutil = "^5"
 
 
 [tool.mypy]
@@ -43,5 +49,9 @@ skip-magic-trailing-comma = false
 profile = "black"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core", "setuptools"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true

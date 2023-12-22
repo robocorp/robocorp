@@ -30,10 +30,10 @@ jobs:
         registry-url: "https://npm.pkg.github.com"
         scope: "@robocorp"
 
-    - name: Set up Python 3.9
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: "3.10"
         cache: 'poetry'
 
     - name: Install project
@@ -45,7 +45,8 @@ jobs:
     - name: Build with poetry
       run: |
         poetry run inv build-frontend
-        poetry build
+        # Just sdist here, wheels are built in the manylinux job.
+        poetry build -f sdist
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}

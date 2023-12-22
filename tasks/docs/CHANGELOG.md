@@ -1,5 +1,9 @@
 # Changelog
 
+## UNRELEASED
+
+- Fixed issue where imports would fail when collecting tasks because the path being used wasn't absolute. 
+
 ## 2.6.0 - 2023-12-13
 
 - It's now possible to define `--glob` to define which files should be searched for `@task`s.

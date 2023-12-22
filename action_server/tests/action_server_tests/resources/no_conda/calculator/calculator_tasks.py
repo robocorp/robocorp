@@ -22,3 +22,11 @@ def broken_action() -> int:
     This always raises an error.
     """
     raise RuntimeError("This is broken")
+
+
+@action
+def neverending_action() -> str:
+    import time
+
+    time.sleep(500)
+    raise RuntimeError("Should never get here...")

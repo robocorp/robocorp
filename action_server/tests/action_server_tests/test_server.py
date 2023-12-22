@@ -1,6 +1,8 @@
 import json
+import time
 from pathlib import Path
 
+import pytest
 from action_server_tests.fixtures import ActionServerClient, ActionServerProcess
 
 
@@ -273,3 +275,67 @@ def test_routes(action_server_process: ActionServerProcess, data_regression):
     assert run0["id"] == runs[0]["id"]
 
     client.get_error("/api/runs/bad-run-id", 404)
+
+
+def test_subprocesses_killed(
+    action_server_process: ActionServerProcess, client: ActionServerClient
+):
+    from concurrent.futures import TimeoutError
+
+    import requests
+    from action_server_tests.fixtures import get_in_resources
+
+    from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
+
+    no_conda_dir = get_in_resources("no_conda")
+    action_server_process.start(
+        cwd=no_conda_dir, actions_sync=True, db_file="server.db", add_shutdown_api=True
+    )
+
+    def request_in_thread():
+        return requests.post(
+            client.build_full_url("api/actions/no-conda/neverending-action/run"),
+            json={},
+        )
+
+    fut = run_in_thread(request_in_thread)
+    with pytest.raises(TimeoutError):
+        fut.result(0.5)
+
+    import psutil
+
+    p = psutil.Process(action_server_process.process.pid)
+    children_processes = list(p.children(recursive=True))
+
+    # The first shutdown will not really shutdown while there are connections
+    # open, so, a timeout is given to forcefully do the shutdown.
+    requests.post(client.build_full_url("api/shutdown/"), params={"timeout": 5})
+    request_result = fut.result(10)
+    assert request_result.status_code == 500
+
+    times = 4
+    for i in range(times):
+
+        def is_process_alive(pid):
+            # Note: the process may be a zombie process in Linux
+            # (althought it's killed it remains in that state
+            # because we're monitoring it).
+            try:
+                proc = psutil.Process(pid)
+                if proc.status() == psutil.STATUS_ZOMBIE:
+                    return False
+            except psutil.NoSuchProcess:
+                return False
+            return True
+
+        for process in children_processes:
+            if is_process_alive(process.pid):
+                if i == times - 1:
+                    raise AssertionError(
+                        f"Process: {process} - {process.cmdline()} is still running."
+                    )
+                else:
+                    time.sleep(0.2)
+                    break
+        else:
+            return  # Ok, everything worked
