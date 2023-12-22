@@ -189,10 +189,7 @@ def _add_actions_to_db(
             "Expected it to be 0.0.2 or higher"
         )
 
-    # FIXME: PYTHON_EXE will use robocorp.actions from holotree env.
-    #        Why? IMHO, we need to use the same python here as the action-server is using.
-    # python = env.get("PYTHON_EXE", sys.executable)
-    python = sys.executable
+    python = env.get("PYTHON_EXE", sys.executable)
     cmdline = [python, "-m", "robocorp.actions", "list"]
 
     popen = subprocess.Popen(
