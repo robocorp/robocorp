@@ -33,12 +33,12 @@ def action(*args, **kwargs):
         func: A function which is a action to `robocorp.actions`.
     """
 
-    def decorator(func, **kwargs):
+    def decorator(*args, **kwargs):
         # i.e.: This is just a thin layer for the task decorator at this point
         # (it may be extended in the future...).
         from robocorp.tasks import task
 
-        return task(func, **kwargs)
+        return task(*args, **kwargs)
 
     if args and callable(args[0]):
         return decorator(args[0], **kwargs)
