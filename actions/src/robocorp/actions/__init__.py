@@ -1,12 +1,17 @@
 from functools import wraps
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional, overload
 
 from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
 
 __version__ = "0.0.2"
 version_info = [int(x) for x in __version__.split(".")]
+
+
+@overload
+def action(func: Callable, is_consequental: bool = False) -> Callable:
+    ...
 
 
 def action(*args, **kwargs):
