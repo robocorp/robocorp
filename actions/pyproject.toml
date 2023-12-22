@@ -10,8 +10,7 @@ packages = [{ include = "robocorp", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-# robocorp-tasks = "^2.6.0"
-robocorp-tasks = { path = "../tasks", develop = true }
+robocorp-tasks = "^2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = { path = "../devutils/", develop = true }
