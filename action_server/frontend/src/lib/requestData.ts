@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
-import { AsyncLoaded, LoadedActionsPackages, LoadedRuns, Run } from './types';
-import { copyArrayAndInsertElement, logError } from './helpers';
+import { ActionPackage, AsyncLoaded, LoadedActionsPackages, LoadedRuns, Run } from './types';
+import { Counter, copyArrayAndInsertElement, logError } from './helpers';
 import { CachedModel, ModelContainer, ModelType } from './modelContainer';
 
 export const baseUrl = '';
@@ -155,9 +155,21 @@ const sortRuns = (runs: Run[]): void => {
   runs.sort((a: Run, b: Run) => b.numbered_id - a.numbered_id);
 };
 
+const globalCounter = new Counter();
+
+interface IRequest {
+  method: 'POST' | 'GET';
+  url: string;
+}
+
+interface IResponse<T> {
+  result: T;
+}
+
 class ModelUpdater {
   private modelContainer: ModelContainer;
   private conn: WebsocketConn;
+  private messageIdToHandler = new Map();
 
   constructor(modelContainer: ModelContainer) {
     this.modelContainer = modelContainer;
@@ -199,6 +211,16 @@ class ModelUpdater {
             data: newRunData,
           });
         }
+      } else if (messageType === 'response') {
+        const responseData = data.data;
+        const messageId = responseData.message_id;
+        const handler = this.messageIdToHandler.get(messageId);
+        if (handler !== undefined) {
+          this.messageIdToHandler.delete(messageId);
+          handler(responseData);
+        } else {
+          console.log(`Error: no handler for response: ${JSON.stringify(data)}`);
+        }
       } else if (messageType === 'run_changed') {
         const runId = data.run_id;
         const changes = data.changes;
@@ -229,6 +251,32 @@ class ModelUpdater {
     }
   }
 
+  private async request<T>(req: IRequest): Promise<IResponse<T>> {
+    let onResolve: any = undefined;
+    let onReject = undefined;
+    const promise: Promise<IResponse<T>> = new Promise((resolve, reject) => {
+      onResolve = resolve;
+      onReject = reject;
+    });
+
+    const messageHandler = (response: IResponse<T>) => {
+      // TODO: See what'd be a response error.
+      onResolve(response);
+    };
+
+    const messageId = globalCounter.next();
+    this.messageIdToHandler.set(messageId, messageHandler);
+
+    const msg = JSON.stringify({
+      message_type: 'request',
+      data: { method: req.method, url: req.url, message_id: messageId },
+    });
+    console.log(`Request: ${msg}`);
+    this.conn.send(msg);
+
+    return promise;
+  }
+
   public async startUpdating() {
     if (!this.conn.isConnected() && !this.conn.isConnecting()) {
       const connectPromise = this.conn.connect();
@@ -247,10 +295,21 @@ class ModelUpdater {
       // Use websocket when we can.
       this.conn.send(JSON.stringify({ message_type: 'start_listen_run_events' }));
 
-      // TODO: provide actions in the websocket too.
-      const loadActionsPromise = _loadAsync(baseUrl + '/api/actionPackages', 'GET');
-      const actions = await loadActionsPromise;
-      this.modelContainer.onModelUpdated(ModelType.ACTIONS, actions);
+      // Everything available through a regular connection is also available through
+      // the websocket (that is better when available).
+      // this.modelContainer.onModelUpdated(ModelType.ACTIONS, await _loadAsync(baseUrl + '/api/actionPackages', 'GET'));
+
+      const loadActionsPromise = this.request<ActionPackage[]>({
+        method: 'GET',
+        url: '/api/actionPackages',
+      });
+
+      loadActionsPromise.then((actions) => {
+        this.modelContainer.onModelUpdated(ModelType.ACTIONS, {
+          isPending: false,
+          data: actions.result,
+        });
+      });
     } else {
       console.log(
         'Unable to use websockets (no connection was made in 5 seconds). Proceeding with regular http.',

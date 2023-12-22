@@ -405,7 +405,7 @@ To migrate the database to the current version
 
                         for action_package_dir in base_args.dir:
                             _actions_import.import_action_package(
-                                settings.datadir, action_package_dir
+                                settings.datadir, os.path.abspath(action_package_dir)
                             )
                         return 0
 
@@ -421,7 +421,7 @@ To migrate the database to the current version
                             for action_package_dir in base_args.dir:
                                 _actions_import.import_action_package(
                                     settings.datadir,
-                                    action_package_dir,
+                                    os.path.abspath(action_package_dir),
                                     disable_not_imported=base_args.actions_sync,
                                 )
 

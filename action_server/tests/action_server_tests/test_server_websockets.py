@@ -62,7 +62,7 @@ def build_ws_url(action_server_process, url):
     return f"ws://{host}:{port}/{url}"
 
 
-async def check_websocket(
+async def check_websocket_runs(
     action_server_process: ActionServerProcess, queue: Queue[Any]
 ):
     try:
@@ -93,15 +93,60 @@ async def check_websocket(
 
             # Run was created
             current_run_events = json.loads(await ws.recv())
-            print(current_run_events)
             assert current_run_events["message_type"] == "run_added"
 
             # Run was changed (running -> complete)
             current_run_events = json.loads(await ws.recv())
-            print(current_run_events)
             assert current_run_events["message_type"] == "run_changed"
-            queue.put("worked")
 
+    except Exception as e:
+        queue.put(e)
+    else:
+        queue.put("worked")
+
+
+async def check_websocket_action_package(
+    action_server_process: ActionServerProcess, queue: Queue[Any]
+):
+    try:
+        url = build_ws_url(action_server_process, "api/ws")
+
+        import websockets
+
+        async with websockets.connect(
+            url,
+            logger=log,
+        ) as ws:
+            await ws.send(
+                json.dumps(
+                    {
+                        "message_type": "request",
+                        "data": {
+                            "method": "GET",
+                            "url": "/api/actionPackages",
+                            "message_id": 22,
+                        },
+                    }
+                )
+            )
+
+            received = json.loads(await ws.recv())
+            {
+                "message_type": "response",
+                "data": {
+                    "message_id": 22,
+                    "result": [],
+                },
+            }
+            assert (
+                received["message_type"] == "response"
+            ), f"Received unexpected: {received!r}"
+            assert (
+                received["data"]["message_id"] == 22
+            ), f"Received unexpected: {received!r}"
+            assert (
+                len(received["data"]["result"]) == 2
+            ), f"Received unexpected: {received!r}"
     except Exception as e:
         queue.put(e)
     else:
@@ -115,7 +160,7 @@ def test_server_websockets(
     client,
 ) -> None:
     queue: Queue[Any] = Queue()
-    asyncio_thread.submit_async(check_websocket(action_server_process, queue))
+    asyncio_thread.submit_async(check_websocket_runs(action_server_process, queue))
     while True:
         curr = queue.get(timeout=20)
         if curr == "worked":
@@ -125,5 +170,16 @@ def test_server_websockets(
             client.post_get_str(
                 "api/actions/greeter/greet/run", {"name": "Foo", "title": "Mr."}
             )
+        else:
+            raise AssertionError(curr)
+
+    asyncio_thread.submit_async(
+        check_websocket_action_package(action_server_process, queue)
+    )
+    while True:
+        curr = queue.get(timeout=20)
+        if curr == "worked":
+            break
+
         else:
             raise AssertionError(curr)
