@@ -12,8 +12,6 @@ from ._settings import Settings
 
 log = logging.getLogger(__name__)
 
-CURDIR = Path(__file__).parent.absolute()
-
 
 # def _write_schema(path: Optional[str]):
 #     from fastapi.openapi.utils import get_openapi
@@ -81,6 +79,7 @@ def str2bool(v):
 def _create_parser():
     defaults = Settings.defaults()
     base_parser = argparse.ArgumentParser(
+        prog="action-server",
         description="Robocorp Action Server",
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -277,6 +276,16 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
 
     if args is None:
         args = sys.argv[1:]
+
+    if args and args[0] == "server-expose":
+        # The process is being called by to make the server expose.
+        # Internal usage only, so, don't even do argument parsing
+        # for it.
+        from . import _server_expose
+
+        _server_expose.main(*args[1:])
+        return 0
+
     parser = _create_parser()
     base_args = parser.parse_args(args)
 

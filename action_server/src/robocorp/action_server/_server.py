@@ -10,8 +10,6 @@ from typing import Dict, Optional
 
 log = logging.getLogger(__name__)
 
-CURDIR = Path(__file__).parent.absolute()
-
 
 def _name_as_summary(name):
     return name.replace("_", " ").title()
@@ -143,6 +141,8 @@ def start_server(
     expose_subprocess = None
 
     def expose_later(loop):
+        from robocorp.action_server._settings import is_frozen
+
         nonlocal expose_subprocess
 
         if not server.started:
@@ -163,19 +163,28 @@ def start_server(
 
         parent_pid = os.getpid()
 
-        expose_subprocess = subprocess.Popen(
-            [
+        if is_frozen():
+            # The executable is 'action-server.exe'.
+            args = [sys.executable]
+        else:
+            # The executable is 'python'.
+            args = [
                 sys.executable,
-                CURDIR / "_server_expose.py",
-                str(parent_pid),
-                str(port),
-                "" if not settings.verbose else "v",
-                host,
-                settings.expose_url,
-                str(api_key),
-                str(expose_session),
+                "-m",
+                "robocorp.action_server",
             ]
-        )
+
+        args += [
+            "server-expose",
+            str(parent_pid),
+            str(port),
+            "" if not settings.verbose else "v",
+            host,
+            settings.expose_url,
+            str(api_key),
+            str(expose_session),
+        ]
+        expose_subprocess = subprocess.Popen(args)
 
     async def _on_startup():
         if expose:

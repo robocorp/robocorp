@@ -1,8 +1,8 @@
 import asyncio
+import codecs
 import json
 import logging
 import sys
-import codecs
 from typing import Optional
 
 import requests
@@ -179,9 +179,7 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-if __name__ == "__main__":
-    parent_pid, port, verbose, host, expose_url, api_key, expose_session = sys.argv[1:]
-
+def main(parent_pid, port, verbose, host, expose_url, api_key, expose_session):
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
         format="%(message)s",
@@ -198,3 +196,7 @@ if __name__ == "__main__":
             expose_session=expose_session if expose_session != "None" else None,
         )
     )
+
+
+if __name__ == "__main__":
+    main(*sys.argv[1:])
