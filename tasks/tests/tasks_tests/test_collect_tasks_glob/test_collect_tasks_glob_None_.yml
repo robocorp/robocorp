@@ -6,6 +6,7 @@
     type: object
   line: 4
   name: task_on_my_task
+  options: null
   output_schema:
     description: ''
     type: string
