@@ -15,6 +15,7 @@ version_info = [int(x) for x in __version__.split(".")]
 def action(func: Callable) -> Callable:
     ...
 
+
 @overload
 def action(func: Callable, **kwargs: Optional[ActionOptions]) -> Callable:
     ...
