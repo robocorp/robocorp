@@ -4,13 +4,14 @@ from typing import Callable, Optional, overload
 
 from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
+from ._action_options import ActionOptions
 
 __version__ = "0.0.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 
 @overload
-def action(func: Callable, is_consequental: bool = False) -> Callable:
+def action(func: Callable, **kwargs: Optional[ActionOptions]) -> Callable:
     ...
 
 
@@ -43,7 +44,9 @@ def action(*args, **kwargs):
         # (it may be extended in the future...).
         from robocorp.tasks import task
 
-        return task(*args, **kwargs)
+        options = ActionOptions(**kwargs)
+
+        return task(*args, options=options)
 
     if args and callable(args[0]):
         return decorator(args[0], **kwargs)

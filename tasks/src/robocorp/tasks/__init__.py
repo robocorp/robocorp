@@ -32,12 +32,11 @@ clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
 """
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 from functools import wraps
 
 from ._fixtures import setup, teardown
 from ._protocols import ITask, Status
-from ._task_options import TaskOptions
 
 __version__ = "2.6.0"
 version_info = [int(x) for x in __version__.split(".")]
@@ -67,7 +66,7 @@ def task(*args, **kwargs):
         func: A function which is a task to `robocorp.tasks`.
     """
 
-    def decorator(func, options: Optional[TaskOptions] = None):
+    def decorator(func, options: Optional[Dict] = None):
         from . import _hooks
 
         # When a task is found, register it in the framework as a target for execution.
@@ -79,12 +78,10 @@ def task(*args, **kwargs):
 
         return wrapper
 
-    options = TaskOptions(**kwargs)
-
     if args and callable(args[0]):
-        return decorator(args[0], options=options)
+        return decorator(args[0], options=kwargs)
 
-    return lambda func: decorator(func, options=options)
+    return lambda func: decorator(func, options=kwargs)
 
 
 def session_cache(func):

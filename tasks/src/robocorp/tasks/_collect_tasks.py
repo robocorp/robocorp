@@ -8,7 +8,6 @@ from typing import Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 from robocorp import log
 from robocorp.tasks._protocols import ITask
-from robocorp.tasks._task_options import TaskOptions
 
 
 def module_name_from_path(path: Path, root: Path) -> str:
@@ -144,10 +143,10 @@ def collect_tasks(
 
         return task.name in task_names
 
-    methods_marked_as_tasks_found: List[Tuple[Callable, TaskOptions]] = []
+    methods_marked_as_tasks_found: List[Tuple[Callable, Dict]] = []
     found_as_set = set()
 
-    def on_func_found(func, options: TaskOptions):
+    def on_func_found(func, options: Dict):
         from robocorp.tasks._exceptions import RobocorpTasksError
 
         key = (func.__code__.co_name, func.__code__.co_filename)

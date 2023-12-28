@@ -9,7 +9,6 @@ from robocorp.log.protocols import OptExcInfo
 
 from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
 from robocorp.tasks._protocols import IContext, ITask, Status
-from robocorp.tasks._task_options import TaskOptions
 
 
 def _build_properties(
@@ -49,7 +48,7 @@ class Task:
         self,
         module: ModuleType,
         method: typing.Callable,
-        options: Optional[TaskOptions] = None,
+        options: Optional[Dict] = None,
     ):
         self.module_name = module.__name__
         self.filename = module.__file__ or "<filename unavailable>"
@@ -58,7 +57,7 @@ class Task:
         self.exc_info: Optional[OptExcInfo] = None
         self._status = Status.NOT_RUN
         self.result = None
-        self.options = options or TaskOptions()
+        self.options = options or None
 
     @property
     def name(self):
