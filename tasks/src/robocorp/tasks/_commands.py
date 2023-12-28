@@ -9,7 +9,6 @@ from argparse import ArgumentParser, ArgumentTypeError
 from io import StringIO
 from pathlib import Path
 from typing import Any, List, Literal, Optional, Sequence, Union
-from dataclasses import asdict
 
 from robocorp.tasks import _constants
 from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
