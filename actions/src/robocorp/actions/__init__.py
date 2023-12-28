@@ -12,6 +12,10 @@ version_info = [int(x) for x in __version__.split(".")]
 
 
 @overload
+def action(func: Callable) -> Callable:
+    ...
+
+@overload
 def action(func: Callable, **kwargs: Optional[ActionOptions]) -> Callable:
     ...
 
@@ -47,7 +51,7 @@ def action(*args, **kwargs):
 
         options = ActionOptions(**kwargs)
 
-        return task(*args, options=asdict(options))
+        return task(*args, **asdict(options))
 
     if args and callable(args[0]):
         return decorator(args[0], **kwargs)
