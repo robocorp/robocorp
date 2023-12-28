@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from functools import wraps
 from pathlib import Path
 from typing import Callable, Optional, overload
@@ -46,7 +47,7 @@ def action(*args, **kwargs):
 
         options = ActionOptions(**kwargs)
 
-        return task(*args, options=options)
+        return task(*args, options=asdict(options))
 
     if args and callable(args[0]):
         return decorator(args[0], **kwargs)

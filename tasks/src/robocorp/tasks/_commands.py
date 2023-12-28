@@ -61,7 +61,7 @@ def list_tasks(path: str, glob: Optional[str] = None) -> int:
                     "docs": getattr(task.method, "__doc__") or "",
                     "input_schema": task.input_schema,
                     "output_schema": task.output_schema,
-                    "options": asdict(task.options),
+                    "options": task.options,
                 }
             )
 
