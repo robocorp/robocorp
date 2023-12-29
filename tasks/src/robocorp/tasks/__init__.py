@@ -58,12 +58,23 @@ def task(*args, **kwargs):
         ...
     ```
 
+    It's also possible to pass options to the task decorator that can then be introspected by `task.options`:
+
+    ```python
+    from robocorp.tasks import task
+
+    @task(this_is_option="option")
+    def enter_user():
+        ...
+    ```
+
     It'll be executable by robocorp tasks as:
 
     python -m robocorp.tasks run tasks.py -t enter_user
 
     Args:
         func: A function which is a task to `robocorp.tasks`.
+        **kwargs: Options to be introspected by `task.options`.
     """
 
     def decorator(func, options: Optional[Dict] = None):

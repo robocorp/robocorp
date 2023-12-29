@@ -43,6 +43,7 @@ def action(*args, **kwargs):
 
     Args:
         func: A function which is a action to `robocorp.actions`.
+        is_consequential: Whether the action is consequential or not. This will add `x-openai-isConsequential: true` to the action metadata and shown in OpenApi spec.
     """
 
     def decorator(*args, **kwargs):
