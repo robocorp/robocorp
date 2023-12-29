@@ -4,6 +4,7 @@
 
 - `rcc` is now bundled in the action server wheel.
 - When the action server is stopped, any subprocess is also killed.
+- Pass `@action(is_consequential=True)` to add `x-openai-isConsequential` option to action openapi spec.
 
 ## 0.0.5 - 2023-12-14
 
