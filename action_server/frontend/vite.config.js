@@ -7,6 +7,13 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   server: {
     port: 8080,
+    proxy: {
+      '/api': 'http://localhost:8090',
+      '/api/ws': {
+        target: 'ws://localhost:8090//api/ws',
+        ws: true,
+      },
+    },
   },
   resolve: {
     alias: {

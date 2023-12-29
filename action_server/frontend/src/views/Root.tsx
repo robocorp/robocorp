@@ -1,32 +1,38 @@
-import { SideNavigation, Menu, Box, Link } from '@robocorp/components';
-import { IconActivity } from '@robocorp/icons';
+import { SideNavigation, Menu, Box, Link, Scroll, useSystemTheme } from '@robocorp/components';
 import { StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
+import { HeaderAndMenu } from '~/components/Header';
 import {
-  ActionServerContext,
-  ActionServerContextType,
-  ViewSettings,
-  defaultActionServerState,
-} from '../lib/actionServerContext';
-import { HeaderAndMenu } from './HeaderAndMenu';
-import { Outlet, RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
-import { ActionPackages } from './ActionPackages';
-import { ActionRuns } from './ActionRuns';
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
-import { Welcome } from './Welcome';
-import { ActionRunConsole, actionRunConsoleLoader } from './ActionRunConsole';
-import { ActionRunLog, actionRunLogLoader } from './ActionRunLog';
 import {
   startTrackActions,
   startTrackRuns,
   stopTrackActions,
   stopTrackRuns,
 } from '~/lib/requestData';
+import { IconAnnotationDots, IconBolt, IconPlay, IconUnorderedList } from '@robocorp/icons/iconic';
+import { useLocalStorage } from '~/lib/useLocalStorage';
+import { ActionRuns } from './runs';
+import { ActionPackages } from './actions';
+import {
+  ActionServerContext,
+  ActionServerContextType,
+  ViewSettings,
+  defaultActionServerState,
+} from '../lib/actionServerContext';
+import { Redirect } from '~/components';
+import { Welcome } from './welcome';
 
 const Main = styled.main<{ isCollapsed: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary.color};
-  /*height: 100%;*/
+  height: 100%;
   display: grid;
   grid-template-columns: ${({ isCollapsed }) => (isCollapsed ? 0 : 240)}px 1fr;
   grid-template-rows: auto 1fr;
@@ -40,9 +46,13 @@ const Main = styled.main<{ isCollapsed: boolean }>`
     grid-area: header;
   }
 
+  > aside {
+    grid-area: aside;
+  }
+
   > section {
     grid-area: section;
-    padding: 2px calc(5rem - var(--scrollbar-width)) 3rem 5rem;
+    padding: 0 calc(5rem - var(--scrollbar-width)) 3rem 5rem;
 
     ${({ theme }) => theme.screen.m} {
       padding: 0 ${({ theme }) => theme.space.$32};
@@ -54,29 +64,34 @@ const Main = styled.main<{ isCollapsed: boolean }>`
   }
 `;
 
-function ErrorPage() {
-  const navigate = useNavigate();
+const ContentScroll = styled(Scroll)`
+  min-height: 0px;
+
+  > div {
+    padding: 0 ${({ theme }) => theme.space.$8};
+    border-radius: ${({ theme }) => theme.radii.$8};
+  }
+`;
+
+const ErrorPage = () => {
   return (
     <div>
       <h4>Error: no content found at this url...</h4>
       <p>
         <br />
-        <Link
-          onClick={() => {
-            navigate('/');
-          }}
-        >
-          Navigate back to the Robocorp Action Server root url.
-        </Link>
+        <Link href="/">Navigate back to the Robocorp Action Server root url.</Link>
       </p>
     </div>
   );
-}
+};
 
 const Root = () => {
-  const [viewSettings, setViewSettings] = useState<ViewSettings>(
-    defaultActionServerState.viewSettings,
-  );
+  const navigate = useNavigate();
+  const location = useLocation();
+  const systemTheme = useSystemTheme();
+  const [viewSettings, setViewSettings] = useLocalStorage<ViewSettings>('view-settings', {
+    theme: systemTheme,
+  });
   const [loadedRuns, setLoadedRuns] = useState<LoadedRuns>(defaultActionServerState.loadedRuns);
   const [loadedActions, setLoadedActions] = useState<LoadedActionsPackages>(
     defaultActionServerState.loadedActions,
@@ -99,7 +114,6 @@ const Root = () => {
   const onClose = useCallback(() => setNavInSmallMode(false), []);
   const onClickMenuButton = useCallback(() => setNavInSmallMode(true), []);
 
-  const navigate = useNavigate();
   useEffect(() => {
     startTrackActions(setLoadedActions);
     startTrackRuns(setLoadedRuns);
@@ -113,45 +127,27 @@ const Root = () => {
   return (
     <ThemeProvider name={viewSettings.theme}>
       <ActionServerContext.Provider value={actionServerContextValue}>
-        <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
         <Main isCollapsed={false}>
+          <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
           <SideNavigation aria-label="Navigation" open={showNavInSmallMode} onClose={onClose}>
-            {/* 
-            Hack so that the X button to close is properly shown. 
-            Otherwise the menu appears on top of it.
-            */}
-            {showNavInSmallMode ? <div style={{ height: '3em' }} /> : <></>}
-            {showNavInSmallMode ? (
-              <Menu.Item
-                icon={<IconActivity size="small" />}
-                onClick={() => {
-                  navigate('/');
-                  onClose();
-                }}
+            <SideNavigation.Header placeholder="⚡️">Action Server</SideNavigation.Header>
+            <ContentScroll>
+              <SideNavigation.Link
+                aria-current={location.pathname.startsWith('/actions')}
+                href="/actions"
+                icon={<IconBolt />}
               >
-                Main
-              </Menu.Item>
-            ) : (
-              <></>
-            )}
-            <Menu.Item
-              icon={<IconActivity size="small" />}
-              onClick={() => {
-                navigate('/actions');
-                onClose();
-              }}
-            >
-              Action Packages
-            </Menu.Item>
-            <Menu.Item
-              icon={<IconActivity size="small" />}
-              onClick={() => {
-                navigate('/runs');
-                onClose();
-              }}
-            >
-              Action Runs
-            </Menu.Item>
+                Actions
+              </SideNavigation.Link>
+              <SideNavigation.Link
+                aria-current={location.pathname.startsWith('/runs')}
+                href="/runs"
+                icon={<IconUnorderedList />}
+              >
+                Runs
+              </SideNavigation.Link>
+            </ContentScroll>
+
             <Box display="flex" alignItems="center" ml={24} mt={8} color="content.subtle.light">
               <IconLogoRobocorp size={24} />
               <Box ml={8} fontSize={12}>
@@ -159,7 +155,9 @@ const Root = () => {
               </Box>
             </Box>
           </SideNavigation>
-          <Outlet />
+          <section>
+            <Outlet />
+          </section>
         </Main>
       </ActionServerContext.Provider>
     </ThemeProvider>
@@ -175,10 +173,10 @@ export const ActionServerRoot = () => {
       children: [
         {
           path: '',
-          element: <Welcome />,
+          element: <Redirect path="/actions" />,
         },
         {
-          path: 'actions',
+          path: '/actions/:actionId?',
           element: <ActionPackages />,
         },
         {
@@ -186,20 +184,10 @@ export const ActionServerRoot = () => {
           element: <ActionRuns />,
         },
         {
-          path: 'runs/:id/console',
-          element: <ActionRunConsole />,
-          loader: actionRunConsoleLoader,
-        },
-        {
           path: '*',
           element: <ErrorPage />,
         },
       ],
-    },
-    {
-      path: 'runs/:id/log.html',
-      element: <ActionRunLog />,
-      loader: actionRunLogLoader,
     },
   ]);
 
