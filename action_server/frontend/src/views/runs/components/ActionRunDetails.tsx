@@ -1,9 +1,7 @@
 import { Drawer, Header } from '@robocorp/components';
 import { FC, useCallback, useMemo } from 'react';
 import { logError } from '~/lib/helpers';
-import { StatusBadge } from '~/components/StatusBadge';
-import { Duration, Timestamp, Code } from '~/components';
-import { DefinitionList } from '~/components/definitionList/DefinitionList';
+import { DefinitionList, Duration, StatusBadge, Timestamp, Code } from '~/components';
 import { useActionRunsContext } from './context';
 import { ActionRunConsole } from './Console';
 

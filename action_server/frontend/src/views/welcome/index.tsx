@@ -1,9 +1,9 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { Box, Grid, Typography, useTheme } from '@robocorp/components';
 import { Color, styled } from '@robocorp/theme';
 
-import { OnboardingCard } from './components/Card';
 import { Code } from '~/components';
+import { OnboardingCard } from './components/Card';
 import { IconPython } from './components/Icons';
 
 const Container = styled.div`
@@ -24,6 +24,13 @@ export const Welcome: FC = () => {
 
   const purple: Color = theme.name === 'light' ? 'purple20' : 'purple80';
   const orange: Color = theme.name === 'light' ? 'orange20' : 'orange80';
+
+  const onOpenTutorial = useCallback(
+    (url: string) => () => {
+      window.open(url, '_');
+    },
+    [],
+  );
 
   return (
     <Container>
@@ -51,18 +58,21 @@ export const Welcome: FC = () => {
         <Box maxWidth={720}>
           <Grid columns={[1, 2, 3]} gap="$24">
             <OnboardingCard
+              onClick={onOpenTutorial('https://robocorp.com/portal')}
               icon={<IconPython />}
               thumbnailColor={purple}
               title="Action example #1"
               description="A short action example on what it does and what libs it uses."
             />
             <OnboardingCard
+              onClick={onOpenTutorial('https://robocorp.com/portal')}
               icon={<IconPython />}
               thumbnailColor={orange}
               title="Action example #2"
               description="A short action example on what it does and what libs it uses."
             />
             <OnboardingCard
+              onClick={onOpenTutorial('https://robocorp.com/portal')}
               icon={<IconPython />}
               thumbnailColor="grey80"
               title="Action example #3"

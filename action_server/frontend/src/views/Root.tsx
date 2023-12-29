@@ -1,15 +1,12 @@
-import { SideNavigation, Menu, Box, Link, Scroll, useSystemTheme } from '@robocorp/components';
+import { SideNavigation, Box, Link, Scroll, useSystemTheme } from '@robocorp/components';
 import { StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, styled } from '@robocorp/theme';
+import { IconBolt, IconUnorderedList } from '@robocorp/icons/iconic';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
+import { Outlet, RouterProvider, createBrowserRouter, useLocation } from 'react-router-dom';
+
 import { HeaderAndMenu } from '~/components/Header';
-import {
-  Outlet,
-  RouterProvider,
-  createBrowserRouter,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+import { Redirect } from '~/components';
 import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
 import {
   startTrackActions,
@@ -17,8 +14,8 @@ import {
   stopTrackActions,
   stopTrackRuns,
 } from '~/lib/requestData';
-import { IconAnnotationDots, IconBolt, IconPlay, IconUnorderedList } from '@robocorp/icons/iconic';
 import { useLocalStorage } from '~/lib/useLocalStorage';
+
 import { ActionRuns } from './runs';
 import { ActionPackages } from './actions';
 import {
@@ -27,8 +24,6 @@ import {
   ViewSettings,
   defaultActionServerState,
 } from '../lib/actionServerContext';
-import { Redirect } from '~/components';
-import { Welcome } from './welcome';
 
 const Main = styled.main<{ isCollapsed: boolean }>`
   background: ${({ theme }) => theme.colors.background.primary.color};
@@ -86,7 +81,6 @@ const ErrorPage = () => {
 };
 
 const Root = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const systemTheme = useSystemTheme();
   const [viewSettings, setViewSettings] = useLocalStorage<ViewSettings>('view-settings', {
