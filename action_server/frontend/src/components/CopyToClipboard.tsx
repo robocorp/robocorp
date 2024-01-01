@@ -36,6 +36,7 @@ const CopyToClipboard: FC<Props> = ({ value, ...rest }) => {
         icon={clicked ? IconCheck2 : IconCopy}
         onClick={copyToClipboard}
         aria-label="copy to clipboard"
+        size="small"
         {...rest}
       />
     </Tooltip>
