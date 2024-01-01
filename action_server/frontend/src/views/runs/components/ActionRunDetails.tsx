@@ -60,12 +60,12 @@ export const ActionRunDetails: FC = () => {
         <Header size="small">
           <Header.Title title="Run input" />
         </Header>
-        <Code height={100} lang="json" aria-label="Run input" value={inputs} />
+        <Code lang="json" aria-label="Run input" value={inputs} />
 
         <Header size="small">
           <Header.Title title="Run result" />
         </Header>
-        <Code height={180} aria-label="Run input" value={run.result || ''} />
+        <Code aria-label="Run input" value={run.result || ''} />
 
         <Header size="small">
           <Header.Title title="Console output" />

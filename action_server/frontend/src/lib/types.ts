@@ -51,3 +51,16 @@ export interface AsyncLoaded<T> {
 export type LoadedRuns = AsyncLoaded<Run[]>;
 export type LoadedActionsPackages = AsyncLoaded<ActionPackage[]>;
 export type LoadedArtifacts = AsyncLoaded<Artifact>;
+
+export interface InputProperty {
+  type: InputPropertyType;
+  description: string;
+  title: string;
+}
+
+export enum InputPropertyType {
+  'STRING' = 'string',
+  'BOOLEAN' = 'boolean',
+  'NUMBER' = 'number',
+  'INTEGER' = 'integer',
+}

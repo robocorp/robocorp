@@ -91,17 +91,20 @@ const columns: Column[] = [
   {
     title: 'Status',
     id: 'status',
+    width: 150,
     sortable: true,
   },
   {
     title: 'Start Time',
     id: 'start_time',
     sortable: true,
+    width: 200,
   },
   {
     title: 'Run Time',
     id: 'run_time',
     sortable: true,
+    width: 200,
   },
   {
     title: '',

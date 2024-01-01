@@ -1,20 +1,14 @@
 import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Form, Header, Input } from '@robocorp/components';
+import { Button, Checkbox, Form, Header, Input } from '@robocorp/components';
 
 import { runAction } from '~/lib/requestData';
-import { Action, ActionPackage, AsyncLoaded } from '~/lib/types';
+import { Action, ActionPackage, AsyncLoaded, InputProperty, InputPropertyType } from '~/lib/types';
 import { Code } from '~/components';
 
 type Props = {
   action: Action;
   actionPackage: ActionPackage;
 };
-
-interface Value {
-  type: string;
-  description: string;
-  title: string;
-}
 
 const dataLoadedInitial: AsyncLoaded<unknown> = {
   data: undefined,
@@ -25,13 +19,13 @@ const nameToUrl = (name: string): string => {
   return name.replaceAll('_', '-');
 };
 
-const convertType = (v: string, valueType: string): string | number | boolean => {
+const convertType = (v: string, valueType: InputPropertyType): string | number | boolean => {
   switch (valueType) {
-    case 'number':
+    case InputPropertyType.NUMBER:
       return parseFloat(v);
-    case 'integer':
+    case InputPropertyType.INTEGER:
       return parseInt(v, 10);
-    case 'boolean':
+    case InputPropertyType.BOOLEAN:
       if (v === 'false') {
         return false;
       }
@@ -39,7 +33,7 @@ const convertType = (v: string, valueType: string): string | number | boolean =>
         return true;
       }
       throw new Error(`Unable to convert: ${v} to a boolean.`);
-    case 'string':
+    case InputPropertyType.STRING:
     default:
       return v;
   }
@@ -47,56 +41,54 @@ const convertType = (v: string, valueType: string): string | number | boolean =>
 
 type InputSchema = {
   required: string[];
-  properties: Record<string, Value>;
+  properties: Record<string, InputProperty>;
 };
 
+type FormDataEntry = [string, InputProperty, string];
+
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
+  const [formData, setFormData] = useState<FormDataEntry[]>([]);
+  const [result, setResult] = useState<AsyncLoaded<unknown>>(dataLoadedInitial);
+
   const inputSchema: InputSchema = useMemo(() => {
     return JSON.parse(action.input_schema);
   }, [action, actionPackage]);
 
-  const properties: [string, Value][] = useMemo(() => {
-    const found = inputSchema.properties;
-    if (found === undefined) {
-      return [];
-    }
-    return Object.entries(found);
-  }, [action, actionPackage]);
-
-  const [formData, setFormData] = useState<Record<string, string>>({});
-  const [result, setResult] = useState<AsyncLoaded<unknown>>(dataLoadedInitial);
-
   useEffect(() => {
-    if (inputSchema) {
+    if (inputSchema.properties) {
       const { required } = inputSchema;
-      const initialFormData = properties
+      const initialFormData = Object.entries(inputSchema.properties)
         .filter(([key]) => required.includes(key))
-        .map(([key, value]) => {
+        .map<FormDataEntry>(([key, value]) => {
           switch (value.type) {
-            case 'number':
-              return [key, '0.0'];
-            case 'boolean':
-              return [key, 'true'];
-            case 'integer':
-              return [key, '0'];
-            case 'string':
+            case InputPropertyType.NUMBER:
+              return [key, value, '0.0'];
+            case InputPropertyType.BOOLEAN:
+              return [key, value, 'true'];
+            case InputPropertyType.INTEGER:
+              return [key, value, '0'];
+            case InputPropertyType.STRING:
             default:
-              return [key, ''];
+              return [key, value, ''];
           }
         });
 
-      setFormData(Object.fromEntries(initialFormData));
+      setFormData(initialFormData);
     }
-  }, [inputSchema, actionPackage, properties]);
+  }, [inputSchema, actionPackage]);
 
   const handleInputChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>, propertyName: string) => {
-      const { value } = e.target;
+    (e: ChangeEvent<HTMLInputElement>, index: number) => {
       setFormData((curr) => {
-        return {
-          ...curr,
-          [propertyName]: value,
-        };
+        const output = [...curr];
+        const [, field] = output[index];
+
+        if (field.type === InputPropertyType.BOOLEAN) {
+          output[index][2] = e.target.checked ? 'true' : 'false';
+        } else {
+          output[index][2] = e.target.value;
+        }
+        return output;
       });
       setResult(dataLoadedInitial);
     },
@@ -104,55 +96,59 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   );
 
   const fields = useMemo(() => {
-    if (properties.length > 0) {
-      const { required } = inputSchema;
+    const { required } = inputSchema;
 
-      return properties.map(([key, value]) => {
-        const isRequired = required.includes(key);
-        const valueType = value.type;
-        const { description } = value;
-        let title = `${value.title} (${valueType})`;
-        if (isRequired) {
-          title += ' *';
-        }
+    return formData.map(([key, property, value], index) => {
+      const isRequired = required.includes(key);
+      const { description } = property;
+      const title = `${property.title}${isRequired ? ' *' : ''}`;
 
-        if (valueType === 'string') {
+      switch (property.type) {
+        case InputPropertyType.NUMBER:
+        case InputPropertyType.INTEGER:
           return (
             <Input
               key={key}
               label={title}
-              rows={5}
-              placeholder={undefined}
               description={description}
-              value={formData[key]}
-              onChange={(e) => handleInputChange(e, key)}
+              value={value}
+              type="number"
+              onChange={(e) => handleInputChange(e, index)}
             />
           );
-        }
-
-        return (
-          <Input
-            key={key}
-            label={title}
-            placeholder={undefined}
-            description={description}
-            value={formData[key]}
-            onChange={(e) => handleInputChange(e, key)}
-          />
-        );
-      });
-    }
-
-    return [];
-  }, [action, actionPackage, inputSchema, handleInputChange, properties]);
+        case InputPropertyType.BOOLEAN:
+          return (
+            <Checkbox
+              key={key}
+              label={title}
+              description={description}
+              checked={value === 'true'}
+              onChange={(e) => handleInputChange(e, index)}
+            />
+          );
+        case InputPropertyType.STRING:
+        default:
+          return (
+            <Input
+              key={key}
+              label={title}
+              description={description}
+              rows={2}
+              required={isRequired}
+              value={value}
+              onChange={(e) => handleInputChange(e, index)}
+            />
+          );
+      }
+    });
+  }, [action, actionPackage, inputSchema, handleInputChange]);
 
   const onSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
 
-      const useData = Object.entries(formData).map(([key, value]) => {
-        const valueType = inputSchema.properties[key].type;
-        return [key, convertType(value, valueType)];
+      const useData = formData.map(([key, field, value]) => {
+        return [key, convertType(value, field.type)];
       });
 
       if (action?.name && actionPackage?.name) {
