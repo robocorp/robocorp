@@ -7,7 +7,7 @@
   line: 6
   name: my_action
   options:
-    is_consequential: false
+    is_consequential: null
   output_schema:
     description: ''
     type: string

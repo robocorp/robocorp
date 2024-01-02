@@ -91,9 +91,9 @@ def start_server(
             operation_id=action.name,
             methods=["POST"],
             openapi_extra={
-                "x-openai-isConsequential": True,
+                "x-openai-isConsequential": action.is_consequential,
             }
-            if action.is_consequential
+            if action.is_consequential is not None
             else None,
         )
 

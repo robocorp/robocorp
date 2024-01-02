@@ -8,7 +8,7 @@ def migrate(db: Database) -> None:
     db.execute(
         """
 ALTER TABLE action
-ADD COLUMN is_consequential BOOLEAN NOT NULL DEFAULT 0;
+ADD COLUMN is_consequential INTEGER;
 """
     )
 
