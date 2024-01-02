@@ -9,7 +9,7 @@ const compoundComponents = {
 };
 
 const Container = styled(Grid)`
-  grid-template-columns: 20% 65%;
+  grid-template-columns: 25% 65%;
   background-color: ${({ theme }) => theme.color('background.subtle')};
   border-radius: ${({ theme }) => theme.radii.$16};
   margin-bottom: ${({ theme }) => theme.space.$24};

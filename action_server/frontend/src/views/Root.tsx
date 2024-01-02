@@ -1,12 +1,19 @@
-import { SideNavigation, Box, Link, Scroll, useSystemTheme } from '@robocorp/components';
+import {
+  SideNavigation,
+  Box,
+  Link,
+  Scroll,
+  useSystemTheme,
+  Typography,
+} from '@robocorp/components';
 import { StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
-import { ThemeProvider, styled } from '@robocorp/theme';
+import { ThemeOverrides, ThemeProvider, styled } from '@robocorp/theme';
 import { IconBolt, IconUnorderedList } from '@robocorp/icons/iconic';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
 import { Outlet, RouterProvider, createBrowserRouter, useLocation } from 'react-router-dom';
 
 import { HeaderAndMenu } from '~/components/Header';
-import { Redirect } from '~/components';
+import { ActionServerLogo, Redirect } from '~/components';
 import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
 import {
   startTrackActions,
@@ -58,6 +65,15 @@ const Main = styled.main<{ isCollapsed: boolean }>`
     }
   }
 `;
+
+const overrides: ThemeOverrides = {
+  fonts: {
+    title:
+      '-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol',
+    default:
+      '-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol',
+  },
+};
 
 const ContentScroll = styled(Scroll)`
   min-height: 0px;
@@ -119,12 +135,25 @@ const Root = () => {
   }, []);
 
   return (
-    <ThemeProvider name={viewSettings.theme}>
+    <ThemeProvider name={viewSettings.theme} overrides={overrides}>
       <ActionServerContext.Provider value={actionServerContextValue}>
         <Main isCollapsed={false}>
           <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
           <SideNavigation aria-label="Navigation" open={showNavInSmallMode} onClose={onClose}>
-            <SideNavigation.Header placeholder="⚡️">Action Server</SideNavigation.Header>
+            <Box display="flex" alignItems="center" gap="$8" height="$32" mb="$48" px="$8">
+              <Box
+                display="flex"
+                borderRadius="$8"
+                width="$32"
+                height="$32"
+                backgroundColor="blue70"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <ActionServerLogo size={20} />
+              </Box>
+              <Typography fontWeight={600}>Action Server</Typography>
+            </Box>
             <ContentScroll>
               <SideNavigation.Link
                 aria-current={location.pathname.startsWith('/actions')}
