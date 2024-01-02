@@ -386,6 +386,17 @@
                         "type": "boolean",
                         "title": "Enabled",
                         "default": true
+                    },
+                    "is_consequential": {
+                        "anyOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Is Consequential"
                     }
                 },
                 "type": "object",

@@ -61,6 +61,8 @@ class ITask(typing.Protocol):
     # the value returned by the task.
     result: Any
 
+    options: Optional[Dict]
+
     @property
     def input_schema(self) -> Dict[str, Any]:
         pass
@@ -123,7 +125,7 @@ class IAutoUnregisterContextManager(typing.Protocol):
 
 
 class IOnTaskFuncFoundCallback(ICallback, typing.Protocol):
-    def __call__(self, func: Callable):
+    def __call__(self, func: Callable, *args, **kwargs):
         pass
 
     def register(self, callback: Callable) -> IAutoUnregisterContextManager:

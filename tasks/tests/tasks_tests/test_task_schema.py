@@ -56,3 +56,7 @@ def test_task_schema():
     task = Task(sys.modules[__name__], methodb)
     output_schema = task.output_schema
     assert output_schema == {"type": "integer", "description": "The number 1."}
+
+    task = Task(sys.modules[__name__], methoda, options=dict(is_consequential=True))
+    options = task.options
+    assert options["is_consequential"] is True

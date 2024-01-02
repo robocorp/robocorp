@@ -189,7 +189,8 @@ def _add_actions_to_db(
             "Expected it to be 0.0.2 or higher"
         )
 
-    cmdline = [env.get("PYTHON_EXE", sys.executable), "-m", "robocorp.actions", "list"]
+    python = env.get("PYTHON_EXE", sys.executable)
+    cmdline = [python, "-m", "robocorp.actions", "list"]
 
     popen = subprocess.Popen(
         cmdline,
@@ -234,6 +235,9 @@ def _add_actions_to_db(
                     input_schema=json.dumps(action_fields["input_schema"]),
                     output_schema=json.dumps(action_fields["output_schema"]),
                     enabled=True,
+                    is_consequential=action_fields.get("options", {}).get(
+                        "is_consequential", None
+                    ),
                 )
             )
 
