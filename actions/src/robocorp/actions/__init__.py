@@ -1,5 +1,6 @@
 from dataclasses import asdict
 from functools import wraps
+import inspect
 from pathlib import Path
 from typing import Callable, Optional, overload
 

@@ -236,7 +236,7 @@ def _add_actions_to_db(
                     output_schema=json.dumps(action_fields["output_schema"]),
                     enabled=True,
                     is_consequential=action_fields.get("options", {}).get(
-                        "is_consequential", False
+                        "is_consequential", None
                     ),
                 )
             )

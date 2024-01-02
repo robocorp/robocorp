@@ -387,7 +387,7 @@ def calculator_sum(v1: float, v2: float) -> float:
         with db.connect():
             actions = db.all(Action)
             assert len(actions) == 1
-            assert actions[0].is_consequential is False
+            assert actions[0].is_consequential is None
 
     calculator.write_text(
         """
@@ -416,3 +416,31 @@ def calculator_sum(v1: str, v2: str) -> str:
             actions = db.all(Action)
             assert len(actions) == 1
             assert actions[0].is_consequential is True
+
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action(is_consequential=False)
+def calculator_sum(v1: str, v2: str) -> str:
+    return v1 + v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 1
+            assert actions[0].is_consequential is False
