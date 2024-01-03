@@ -2,6 +2,7 @@ import asyncio
 import codecs
 import json
 import logging
+import os
 import sys
 from typing import Optional
 
@@ -106,9 +107,19 @@ async def expose_server(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
-                            log.info(
-                                f"🔄 Add following argument to restart with same expose URL: --expose-session {new_expose_session}  "  # noqa
-                            )
+                            log.info("🔄 Writing session to .robocorp/expose_session.json")
+                            try:
+                                dir_path = os.path.join(os.getcwd(), ".robocorp")
+                                expose_session_path = os.path.join(dir_path, "expose_session.json")
+                                if not os.path.exists(expose_session_path):
+                                    log.info(f"📁 Creating .robocorp directory path={expose_session_path}")
+                                    os.makedirs(os.path.dirname(expose_session_path))
+                                with open(expose_session_path, "w") as f:
+                                    json.dump(
+                                        {"expose_session": new_expose_session}, f, indent=2
+                                    )
+                            except Exception:
+                                pass
                             continue
                         except Exception:
                             if not session_payload:

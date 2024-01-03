@@ -2,6 +2,7 @@ import argparse
 import logging
 import os.path
 import sys
+import json
 from pathlib import Path
 from typing import Optional, Union
 
@@ -438,10 +439,27 @@ To migrate the database to the current version
                             from ._server import start_server
 
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+                            # TODO: I will refactor this in its own function
+                            # but currently I want to
+                            # 1. if expose is true
+                            # 2. check if is existing .robocorp/expose_session.json
+                            # 3. if not, create a new one
+                            # 4. if there is one, read it and pass as expose_session
+
+                            if (base_args.expose):
+                                try:
+                                    expose_session_path = os.path.join(os.getcwd(), ".robocorp", "expose_session.json")
+                                    log.info(f"🗂️ Reading path={expose_session_path}")
+                                    with open(expose_session_path, "r") as f:
+                                        expose_session = json.load(f)
+                                except FileNotFoundError:
+                                    expose_session = None
+
                             start_server(
                                 expose=base_args.expose,
                                 api_key=base_args.api_key,
-                                expose_session=base_args.expose_session,
+                                expose_session=expose_session.get("expose_session") if expose_session else None,
                             )
                             return 0
 
