@@ -33,14 +33,14 @@ class ExposeSessionJson(BaseModel):
     url: str
 
 
-def get_expose_session_path() -> str:
-    return os.path.join(os.getcwd(), ".robocorp", "expose_session.json")
+def get_expose_session_path(datadir: str) -> str:
+    return os.path.join(datadir, "expose_session.json")
 
 
-def read_expose_session_json() -> None | ExposeSessionJson:
+def read_expose_session_json(datadir: str) -> None | ExposeSessionJson:
     session_json = None
     try:
-        expose_session_path = get_expose_session_path()
+        expose_session_path = get_expose_session_path(datadir)
         log.debug(f"🗂️ Reading expose_session.json path={expose_session_path}")
         with open(expose_session_path, "r") as f:
             session_json = ExposeSessionJson(**json.load(f))
@@ -49,13 +49,9 @@ def read_expose_session_json() -> None | ExposeSessionJson:
     return session_json
 
 
-def write_expose_session_json(expose_session: str, url: str) -> None:
-    dir_path = os.path.join(os.getcwd(), ".robocorp")
-    expose_session_path = get_expose_session_path()
+def write_expose_session_json(datadir: str, expose_session: str, url: str) -> None:
+    expose_session_path = get_expose_session_path(datadir)
     log.debug(f"🗂️ Writing expose_session.json path={expose_session_path}")
-    if not os.path.exists(dir_path):
-        log.debug(f"🗂️ Creating .robocorp directory path={dir_path}")
-        os.makedirs(os.path.dirname(expose_session_path))
     with open(expose_session_path, "w") as f:
         json.dump(
             ExposeSessionJson(expose_session=expose_session, url=url).model_dump(),
@@ -96,6 +92,7 @@ async def expose_server(
     port: int,
     host: str,
     expose_url: str,
+    datadir: str,
     api_key: str | None = None,
     expose_session: str | None = None,
 ):
@@ -142,9 +139,9 @@ async def expose_server(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
-                            write_expose_session_json(new_expose_session, url=url)
+                            write_expose_session_json(datadir=datadir, expose_session=new_expose_session, url=url)
                             continue
-                        except Exception:
+                        except Exception as e:
                             if not session_payload:
                                 log.error(
                                     "Unable to get session payload. Exposing the local server failed. Try again."
@@ -213,7 +210,7 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-def main(parent_pid, port, verbose, host, expose_url, api_key, expose_session):
+def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_session):
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
         format="%(message)s",
@@ -226,6 +223,7 @@ def main(parent_pid, port, verbose, host, expose_url, api_key, expose_session):
             port=int(port),
             host=host,
             expose_url=expose_url,
+            datadir=datadir,
             api_key=api_key if api_key != "None" else None,
             expose_session=expose_session if expose_session != "None" else None,
         )

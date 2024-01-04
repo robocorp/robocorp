@@ -442,7 +442,7 @@ To migrate the database to the current version
 
                             expose_session = None
                             if base_args.expose:
-                                expose_session = read_expose_session_json()
+                                expose_session = read_expose_session_json(settings.datadir)
                                 if expose_session and not base_args.expose_y:
                                     confirm = input(
                                         f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
