@@ -36,6 +36,7 @@ class ExposeSessionJson(BaseModel):
 def get_expose_session_path() -> str:
     return os.path.join(os.getcwd(), ".robocorp", "expose_session.json")
 
+
 def read_expose_session_json() -> None | ExposeSessionJson:
     session_json = None
     try:
@@ -56,7 +57,11 @@ def write_expose_session_json(expose_session: str, url: str) -> None:
         log.debug(f"🗂️ Creating .robocorp directory path={dir_path}")
         os.makedirs(os.path.dirname(expose_session_path))
     with open(expose_session_path, "w") as f:
-        json.dump(ExposeSessionJson(expose_session=expose_session, url=url).model_dump(), f, indent=2)
+        json.dump(
+            ExposeSessionJson(expose_session=expose_session, url=url).model_dump(),
+            f,
+            indent=2,
+        )
 
 
 def get_expose_session(payload: SessionPayload) -> str:
@@ -131,9 +136,7 @@ async def expose_server(
                             session_payload = SessionPayload(**data)
 
                             url = f"https://{session_payload.sessionId}.{expose_url}"
-                            log.info(
-                                f"🌍 URL: {url}"
-                            )
+                            log.info(f"🌍 URL: {url}")
                             if api_key is not None:
                                 log.info(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa

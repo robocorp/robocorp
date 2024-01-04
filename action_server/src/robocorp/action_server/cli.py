@@ -443,16 +443,20 @@ To migrate the database to the current version
                             if base_args.expose:
                                 expose_session = read_expose_session_json()
                                 if expose_session and not base_args.expose_y:
-                                    confirm = input(f"Resume previous expose URL {expose_session.url} Y/N? [Y] ")
+                                    confirm = input(
+                                        f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
+                                    )
                                     if confirm.lower() == "y" or confirm == "":
-                                        log.debug('Resuming previous expose session')
+                                        log.debug("Resuming previous expose session")
                                     else:
                                         expose_session = None
 
                             start_server(
                                 expose=base_args.expose,
                                 api_key=base_args.api_key,
-                                expose_session=expose_session.expose_session if expose_session else None,
+                                expose_session=expose_session.expose_session
+                                if expose_session
+                                else None,
                             )
                             return 0
 
