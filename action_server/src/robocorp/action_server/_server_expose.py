@@ -30,6 +30,7 @@ class BodyPayload(BaseModel):
 
 class ExposeSessionJson(BaseModel):
     expose_session: str
+    url: str
 
 
 def get_expose_session_path() -> str:
@@ -47,7 +48,7 @@ def read_expose_session_json() -> None | ExposeSessionJson:
     return session_json
 
 
-def write_expose_session_json(expose_session: str) -> None:
+def write_expose_session_json(expose_session: str, url: str) -> None:
     dir_path = os.path.join(os.getcwd(), ".robocorp")
     expose_session_path = get_expose_session_path()
     log.debug(f"🗂️ Writing expose_session.json path={expose_session_path}")
@@ -55,7 +56,7 @@ def write_expose_session_json(expose_session: str) -> None:
         log.debug(f"🗂️ Creating .robocorp directory path={dir_path}")
         os.makedirs(os.path.dirname(expose_session_path))
     with open(expose_session_path, "w") as f:
-        json.dump({"expose_session": expose_session}, f, indent=2)
+        json.dump(ExposeSessionJson(expose_session=expose_session, url=url).model_dump(), f, indent=2)
 
 
 def get_expose_session(payload: SessionPayload) -> str:
@@ -129,15 +130,16 @@ async def expose_server(
                         try:
                             session_payload = SessionPayload(**data)
 
+                            url = f"https://{session_payload.sessionId}.{expose_url}"
                             log.info(
-                                f"🌍 URL: https://{session_payload.sessionId}.{expose_url}"
+                                f"🌍 URL: {url}"
                             )
                             if api_key is not None:
                                 log.info(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
-                            write_expose_session_json(new_expose_session)
+                            write_expose_session_json(new_expose_session, url=url)
                             continue
                         except Exception:
                             if not session_payload:

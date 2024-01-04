@@ -2,7 +2,6 @@ import argparse
 import logging
 import os.path
 import sys
-import json
 from pathlib import Path
 from typing import Optional, Union
 
@@ -443,6 +442,12 @@ To migrate the database to the current version
 
                             if base_args.expose:
                                 expose_session = read_expose_session_json()
+                                if expose_session:
+                                    confirm = input(f"Resume previous expose URL {expose_session.url} Y/N? [Y] ")
+                                    if confirm.lower() == "y" or confirm == "":
+                                        log.debug('Resuming previous expose session')
+                                    else:
+                                        expose_session = None
 
                             start_server(
                                 expose=base_args.expose,
