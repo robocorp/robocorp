@@ -1,10 +1,8 @@
-import { FC, useCallback } from 'react';
-import { Box, Grid, Typography, useTheme } from '@robocorp/components';
-import { Color, styled } from '@robocorp/theme';
+import { FC } from 'react';
+import { Box, Typography } from '@robocorp/components';
+import { styled } from '@robocorp/theme';
 
 import { Code } from '~/components';
-import { OnboardingCard } from './components/Card';
-import { IconPython } from './components/Icons';
 
 const Container = styled.div`
   .cm-editor {
@@ -20,18 +18,6 @@ const getStarted = `#!/bin/bash
 action-server new  `;
 
 export const Welcome: FC = () => {
-  const theme = useTheme();
-
-  const purple: Color = theme.name === 'light' ? 'purple20' : 'purple80';
-  const orange: Color = theme.name === 'light' ? 'orange20' : 'orange80';
-
-  const onOpenTutorial = useCallback(
-    (url: string) => () => {
-      window.open(url, '_');
-    },
-    [],
-  );
-
   return (
     <Container>
       <Box display="flex" flexDirection="column" maxWidth={720} margin="0 auto" my={20}>
