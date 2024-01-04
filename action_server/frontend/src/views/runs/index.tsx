@@ -1,19 +1,27 @@
 import { FC, MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  Box,
   Button,
   Column,
+  EmptyState,
   Filter,
   FilterGroup,
   Header,
   Input,
+  Link,
   SortDirection,
   Table,
   TableRowProps,
   Tooltip,
 } from '@robocorp/components';
 import { IconExpand } from '@robocorp/icons';
-import { IconFileText, IconSearch } from '@robocorp/icons/iconic';
+import {
+  IconArrowUpRight,
+  IconFileText,
+  IconInformation,
+  IconSearch,
+} from '@robocorp/icons/iconic';
 
 import { RunStatus, RunTableEntry } from '~/lib/types';
 import { useActionServerContext } from '~/lib/actionServerContext';
@@ -114,6 +122,7 @@ const columns: Column[] = [
 ];
 
 export const ActionRuns: FC = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [sort, onSort] = useState<[string, SortDirection] | null>(['start_time', 'desc']);
   const [search, setSearch] = useState<string>(searchParams.get('search') || '');
@@ -129,23 +138,26 @@ export const ActionRuns: FC = () => {
     [showRun, setShowRun],
   );
 
-  const stateOptions = {
-    Status: {
-      label: 'Status',
-      permanent: true,
-      options: [
-        { label: 'Failed', value: `${RunStatus.FAILED}`, itemType: 'checkbox' },
-        { label: 'Not Run', value: `${RunStatus.NOT_RUN}`, itemType: 'checkbox' },
-        { label: 'Successful', value: `${RunStatus.PASSED}`, itemType: 'checkbox' },
-        { label: 'Running', value: `${RunStatus.RUNNING}`, itemType: 'checkbox' },
-      ],
-    } satisfies FilterGroup,
-  };
+  const stateOptions = useMemo(
+    () => ({
+      Status: {
+        label: 'Status',
+        permanent: true,
+        options: [
+          { label: 'Failed', value: `${RunStatus.FAILED}`, itemType: 'checkbox' },
+          { label: 'Not Run', value: `${RunStatus.NOT_RUN}`, itemType: 'checkbox' },
+          { label: 'Successful', value: `${RunStatus.PASSED}`, itemType: 'checkbox' },
+          { label: 'Running', value: `${RunStatus.RUNNING}`, itemType: 'checkbox' },
+        ],
+      } satisfies FilterGroup,
+    }),
+    [],
+  );
 
-  const data = useMemo(() => {
+  const runs = useMemo(() => {
     const actions = loadedActions.data?.flatMap((item) => item.actions) || [];
 
-    const runs =
+    const filteredRuns =
       loadedRuns.data
         ?.map(
           (run) =>
@@ -163,7 +175,7 @@ export const ActionRuns: FC = () => {
 
     const [id, direction] = sort ?? [];
 
-    runs.sort((a, b) => {
+    filteredRuns.sort((a, b) => {
       const aItem = a[id as keyof typeof a];
       const bItem = b[id as keyof typeof b];
 
@@ -179,8 +191,12 @@ export const ActionRuns: FC = () => {
       return 0;
     });
 
-    return runs;
+    return filteredRuns;
   }, [loadedRuns.data, loadedActions.data, sort, selectedStates, search]);
+
+  const onNavigateActions = useCallback(() => {
+    navigate('/actions');
+  }, []);
 
   if (loadedRuns.isPending) {
     return <ViewLoader />;
@@ -198,6 +214,38 @@ export const ActionRuns: FC = () => {
         <br />
         {`Error: ${loadedActions.errorMessage}`}
       </ViewError>
+    );
+  }
+
+  if (!loadedRuns.data.length) {
+    return (
+      <Box
+        display="flex"
+        flex="1"
+        justifyContent="center"
+        flexDirection="column"
+        minHeight="100%"
+        pb="$64"
+      >
+        <EmptyState
+          title="No action runs"
+          description="Once actions are run, the output will appear here."
+          action={<Button onClick={onNavigateActions}>Go to actions</Button>}
+          secondaryAction={
+            <Link
+              icon={IconInformation}
+              iconAfter={IconArrowUpRight}
+              href="https://github.com/robocorp/robocorp"
+              target="_blank"
+              rel="noopener"
+              variant="subtle"
+              fontWeight="medium"
+            >
+              Learn more
+            </Link>
+          }
+        />
+      </Box>
     );
   }
 
@@ -220,7 +268,7 @@ export const ActionRuns: FC = () => {
         values={selectedStates}
         onChange={setSelectedStates}
       />
-      <Table sort={sort} onSort={onSort} columns={columns} data={data} row={RunRow} rowCount={10} />
+      <Table sort={sort} onSort={onSort} columns={columns} data={runs} row={RunRow} rowCount={10} />
       <ActionRunDetails />
     </ActionRunsContext.Provider>
   );

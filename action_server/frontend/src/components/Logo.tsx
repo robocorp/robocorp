@@ -2,17 +2,10 @@ import { forwardRef, useMemo } from 'react';
 import { IconProps } from '@robocorp/icons';
 import { styled } from '@robocorp/theme';
 
-const IconStyled = styled('span')`
+const IconStyled = styled.span`
   display: inline-block;
   svg {
     display: block;
-  }
-  g.dark {
-    display: ${({ theme }) => (theme.name === 'dark' ? 'inline' : 'none')};
-  }
-
-  g.light {
-    display: ${({ theme }) => (theme.name === 'light' ? 'inline' : 'none')};
   }
 `;
 

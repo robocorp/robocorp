@@ -6,11 +6,17 @@ import {
   useSystemTheme,
   Typography,
 } from '@robocorp/components';
-import { StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeOverrides, ThemeProvider, styled } from '@robocorp/theme';
 import { IconBolt, IconUnorderedList } from '@robocorp/icons/iconic';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
-import { Outlet, RouterProvider, createBrowserRouter, useLocation } from 'react-router-dom';
+import {
+  Outlet,
+  RouterProvider,
+  createBrowserRouter,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 
 import { HeaderAndMenu } from '~/components/Header';
 import { ActionServerLogo, Redirect } from '~/components';
@@ -98,6 +104,7 @@ const ErrorPage = () => {
 
 const Root = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const systemTheme = useSystemTheme();
   const [viewSettings, setViewSettings] = useLocalStorage<ViewSettings>('view-settings', {
     theme: systemTheme,
@@ -123,6 +130,14 @@ const Root = () => {
   const [showNavInSmallMode, setNavInSmallMode] = useState<boolean>(false);
   const onClose = useCallback(() => setNavInSmallMode(false), []);
   const onClickMenuButton = useCallback(() => setNavInSmallMode(true), []);
+
+  const onNavigate = useCallback(
+    (path: string) => (e: MouseEvent) => {
+      e.preventDefault();
+      navigate(path);
+    },
+    [],
+  );
 
   useEffect(() => {
     startTrackActions(setLoadedActions);
@@ -158,6 +173,7 @@ const Root = () => {
               <SideNavigation.Link
                 aria-current={location.pathname.startsWith('/actions')}
                 href="/actions"
+                onClick={onNavigate('/actions')}
                 icon={<IconBolt />}
               >
                 Actions
@@ -165,6 +181,7 @@ const Root = () => {
               <SideNavigation.Link
                 aria-current={location.pathname.startsWith('/runs')}
                 href="/runs"
+                onClick={onNavigate('/runs')}
                 icon={<IconUnorderedList />}
               >
                 Runs

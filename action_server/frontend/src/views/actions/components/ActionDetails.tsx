@@ -29,7 +29,7 @@ export const ActionDetails: FC = () => {
   }, []);
 
   return (
-    <Drawer onClose={onClose} width={1024} open={!!action}>
+    <Drawer onClose={onClose} width={760} open={!!action}>
       {action && actionPackage && (
         <>
           <Drawer.Header>

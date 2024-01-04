@@ -49,37 +49,7 @@ export const Welcome: FC = () => {
           Looks like you do not have any actions created yet. You can get started by creating a
           template using Avtion Server itself:
         </Typography>
-        <Code value={getStarted} copyValue="action-server new" mode="sh" lineNumbers={false} />
-        <Typography fontSize="$16" lineHeight={1.4} mt="$16">
-          Or check out some of our examples:
-        </Typography>
-      </Box>
-      <Box display="flex" flexDirection="column" maxWidth={720} margin="0 auto">
-        <Box maxWidth={720}>
-          <Grid columns={[1, 2, 3]} gap="$24">
-            <OnboardingCard
-              onClick={onOpenTutorial('https://robocorp.com/portal')}
-              icon={<IconPython />}
-              thumbnailColor={purple}
-              title="Action example #1"
-              description="A short action example on what it does and what libs it uses."
-            />
-            <OnboardingCard
-              onClick={onOpenTutorial('https://robocorp.com/portal')}
-              icon={<IconPython />}
-              thumbnailColor={orange}
-              title="Action example #2"
-              description="A short action example on what it does and what libs it uses."
-            />
-            <OnboardingCard
-              onClick={onOpenTutorial('https://robocorp.com/portal')}
-              icon={<IconPython />}
-              thumbnailColor="grey80"
-              title="Action example #3"
-              description="A short action example on what it does and what libs it uses."
-            />
-          </Grid>
-        </Box>
+        <Code value={getStarted} copyValue="action-server new" mode="sh" />
       </Box>
     </Container>
   );

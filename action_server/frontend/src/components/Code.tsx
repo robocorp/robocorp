@@ -69,6 +69,7 @@ export const Code: FC<CodeProps> = ({
         value={value}
         toolbar={toolbar}
         readOnly
+        lineNumbers={false}
         {...restProps}
       />
     </Box>

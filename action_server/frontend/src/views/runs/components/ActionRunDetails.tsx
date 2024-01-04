@@ -35,7 +35,7 @@ export const ActionRunDetails: FC = () => {
   }
 
   return (
-    <Drawer onClose={onClose} width={560} open>
+    <Drawer onClose={onClose} width={760} open>
       <Drawer.Header>
         <Drawer.Header.Title title={run.action?.name} />
         <Drawer.Header.Description>
