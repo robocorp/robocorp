@@ -30,3 +30,6 @@ dist/
 # Removed old files
 /examples/
 /**/output/
+
+# Exclude VS Code settings until something is actually needed there
+.vscode/
