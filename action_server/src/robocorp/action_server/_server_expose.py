@@ -142,7 +142,11 @@ async def expose_server(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
-                            write_expose_session_json(datadir=datadir, expose_session=new_expose_session, url=url)
+                            write_expose_session_json(
+                                datadir=datadir,
+                                expose_session=new_expose_session,
+                                url=url,
+                            )
                             continue
                         except Exception as e:
                             if not session_payload:
