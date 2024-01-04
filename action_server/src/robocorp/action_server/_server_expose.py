@@ -8,7 +8,7 @@ from typing import Optional
 
 import requests
 import websockets
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
@@ -45,6 +45,9 @@ def read_expose_session_json(datadir: str) -> None | ExposeSessionJson:
         with open(expose_session_path, "r") as f:
             session_json = ExposeSessionJson(**json.load(f))
     except FileNotFoundError:
+        pass
+    except ValidationError as e:
+        log.error("Failed to load previous expose session", e)
         pass
     return session_json
 
