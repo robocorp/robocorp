@@ -115,10 +115,10 @@ def _create_parser():
         help="Expose the server to the world",
     )
     start_parser.add_argument(
-        "--expose-y",
-        dest="expose_y",
+        "--expose-allow-reuse",
+        dest="expose_allow_reuse",
         action="store_true",
-        help="Always answer yes to expose confirmation",
+        help="Always answer yes to expose reuse confirmation",
     )
     start_parser.add_argument(
         "--api-key",
@@ -443,7 +443,7 @@ To migrate the database to the current version
                             expose_session = None
                             if base_args.expose:
                                 expose_session = read_expose_session_json(settings.datadir)
-                                if expose_session and not base_args.expose_y:
+                                if expose_session and not base_args.expose_allow_reuse:
                                     confirm = input(
                                         f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
                                     )
