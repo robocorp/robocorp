@@ -32,18 +32,30 @@ class ExposeSessionJson(BaseModel):
     expose_session: str
 
 
+def get_expose_session_path() -> str:
+    return os.path.join(os.getcwd(), ".robocorp", "expose_session.json")
+
 def read_expose_session_json() -> None | ExposeSessionJson:
     session_json = None
     try:
-        expose_session_path = os.path.join(
-            os.getcwd(), ".robocorp", "expose_session.json"
-        )
-        log.info(f"🗂️ Reading path={expose_session_path}")
+        expose_session_path = get_expose_session_path()
+        log.debug(f"🗂️ Reading expose_session.json path={expose_session_path}")
         with open(expose_session_path, "r") as f:
             session_json = ExposeSessionJson(**json.load(f))
     except FileNotFoundError:
         pass
     return session_json
+
+
+def write_expose_session_json(expose_session: str) -> None:
+    dir_path = os.path.join(os.getcwd(), ".robocorp")
+    expose_session_path = get_expose_session_path()
+    log.debug(f"🗂️ Writing expose_session.json path={expose_session_path}")
+    if not os.path.exists(dir_path):
+        log.debug(f"🗂️ Creating .robocorp directory path={dir_path}")
+        os.makedirs(os.path.dirname(expose_session_path))
+    with open(expose_session_path, "w") as f:
+        json.dump({"expose_session": expose_session}, f, indent=2)
 
 
 def get_expose_session(payload: SessionPayload) -> str:
@@ -125,23 +137,7 @@ async def expose_server(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
-                            log.info("🔄 Writing session to .robocorp/expose_session.json")
-                            try:
-                                dir_path = os.path.join(os.getcwd(), ".robocorp")
-                                expose_session_path = os.path.join(
-                                    dir_path, "expose_session.json"
-                                )
-                                if not os.path.exists(expose_session_path):
-                                    log.info(f"📁 Creating .robocorp directory path={expose_session_path}")
-                                    os.makedirs(os.path.dirname(expose_session_path))
-                                with open(expose_session_path, "w") as f:
-                                    json.dump(
-                                        {"expose_session": new_expose_session},
-                                        f,
-                                        indent=2,
-                                    )
-                            except Exception:
-                                pass
+                            write_expose_session_json(new_expose_session)
                             continue
                         except Exception:
                             if not session_payload:
