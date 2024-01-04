@@ -28,6 +28,24 @@ class BodyPayload(BaseModel):
     headers: dict
 
 
+class ExposeSessionJson(BaseModel):
+    expose_session: str
+
+
+def read_expose_session_json() -> None | ExposeSessionJson:
+    session_json = None
+    try:
+        expose_session_path = os.path.join(
+            os.getcwd(), ".robocorp", "expose_session.json"
+        )
+        log.info(f"🗂️ Reading path={expose_session_path}")
+        with open(expose_session_path, "r") as f:
+            session_json = ExposeSessionJson(**json.load(f))
+    except FileNotFoundError:
+        pass
+    return session_json
+
+
 def get_expose_session(payload: SessionPayload) -> str:
     return f"{payload.sessionId}:{payload.sessionSecret}".encode("ascii").hex()
 
@@ -110,13 +128,17 @@ async def expose_server(
                             log.info("🔄 Writing session to .robocorp/expose_session.json")
                             try:
                                 dir_path = os.path.join(os.getcwd(), ".robocorp")
-                                expose_session_path = os.path.join(dir_path, "expose_session.json")
+                                expose_session_path = os.path.join(
+                                    dir_path, "expose_session.json"
+                                )
                                 if not os.path.exists(expose_session_path):
                                     log.info(f"📁 Creating .robocorp directory path={expose_session_path}")
                                     os.makedirs(os.path.dirname(expose_session_path))
                                 with open(expose_session_path, "w") as f:
                                     json.dump(
-                                        {"expose_session": new_expose_session}, f, indent=2
+                                        {"expose_session": new_expose_session},
+                                        f,
+                                        indent=2,
                                     )
                             except Exception:
                                 pass

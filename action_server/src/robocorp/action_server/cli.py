@@ -10,6 +10,7 @@ from robocorp.action_server._robo_utils.auth import generate_api_key
 
 from . import __version__
 from ._settings import Settings
+from ._server_expose import read_expose_session_json
 
 log = logging.getLogger(__name__)
 
@@ -440,26 +441,13 @@ To migrate the database to the current version
 
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
-                            # TODO: I will refactor this in its own function
-                            # but currently I want to
-                            # 1. if expose is true
-                            # 2. check if is existing .robocorp/expose_session.json
-                            # 3. if not, create a new one
-                            # 4. if there is one, read it and pass as expose_session
-
-                            if (base_args.expose):
-                                try:
-                                    expose_session_path = os.path.join(os.getcwd(), ".robocorp", "expose_session.json")
-                                    log.info(f"🗂️ Reading path={expose_session_path}")
-                                    with open(expose_session_path, "r") as f:
-                                        expose_session = json.load(f)
-                                except FileNotFoundError:
-                                    expose_session = None
+                            if base_args.expose:
+                                expose_session = read_expose_session_json()
 
                             start_server(
                                 expose=base_args.expose,
                                 api_key=base_args.api_key,
-                                expose_session=expose_session.get("expose_session") if expose_session else None,
+                                expose_session=expose_session.expose_session if expose_session else None,
                             )
                             return 0
 
