@@ -440,6 +440,7 @@ To migrate the database to the current version
 
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
+                            expose_session = None
                             if base_args.expose:
                                 expose_session = read_expose_session_json()
                                 if expose_session and not base_args.expose_y:
