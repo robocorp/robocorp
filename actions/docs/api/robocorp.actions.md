@@ -8,10 +8,10 @@ ______________________________________________________________________
 
 ## function `action`
 
-**Source:** [`__init__.py:11`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L11)
+**Source:** [`__init__.py:25`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L25)
 
 ```python
-action(func)
+action(*args, **kwargs)
 ```
 
 Decorator for actions (entry points) which can be executed by `robocorp.actions`.
@@ -20,9 +20,13 @@ i.e.:
 
 If a file such as actions.py has the contents below:
 
-.. from robocorp.actions import action
+```python
+from robocorp.actions import action
 
-@actiondef enter_user():...
+@action
+def enter_user() -> str:
+    ...
+```
 
 It'll be executable by robocorp actions as:
 
@@ -31,6 +35,7 @@ python -m robocorp.actions run actions.py -a enter_user
 **Args:**
 
 - <b>`func`</b>:  A function which is a action to `robocorp.actions`.
+- <b>`is_consequential`</b>:  Whether the action is consequential or not. This will add `x-openai-isConsequential: true` to the action metadata and shown in OpenApi spec.
 
 ______________________________________________________________________
 
@@ -144,7 +149,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`__init__.py:42`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L42)
+**Source:** [`__init__.py:65`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L65)
 
 ```python
 session_cache(func)
@@ -164,7 +169,7 @@ ______________________________________________________________________
 
 ## function `action_cache`
 
-**Source:** [`__init__.py:63`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L63)
+**Source:** [`__init__.py:86`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L86)
 
 ```python
 action_cache(func)
@@ -184,7 +189,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`__init__.py:84`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L84)
+**Source:** [`__init__.py:107`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L107)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -196,7 +201,7 @@ ______________________________________________________________________
 
 ## function `get_current_action`
 
-**Source:** [`__init__.py:94`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L94)
+**Source:** [`__init__.py:117`](https://github.com/robocorp/robo/tree/master/actions/src/robocorp/actions/__init__.py#L117)
 
 ```python
 get_current_action() → Optional[ITask]
@@ -226,7 +231,7 @@ ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`run:80`](https://github.com/robocorp/robo/tree/master/actions/robocorp/tasks/_protocols/run#L80)
+**Source:** [`run:82`](https://github.com/robocorp/robo/tree/master/actions/robocorp/tasks/_protocols/run#L82)
 
 ```python
 run() → Any
