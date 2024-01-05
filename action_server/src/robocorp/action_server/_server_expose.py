@@ -48,7 +48,8 @@ def read_expose_session_json(datadir: str) -> None | ExposeSessionJson:
         pass
     except ValidationError as e:
         log.error("Failed to load previous expose session", e)
-        pass
+    except json.JSONDecodeError as e:
+        log.error("Failed to decode exopse session json", e)
     return session_json
 
 
