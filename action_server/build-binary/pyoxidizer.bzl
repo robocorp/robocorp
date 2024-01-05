@@ -252,7 +252,7 @@ def make_exe():
 
     for resource in exe.pip_install(
         [
-            "robocorp-actions>=0.0.2",
+            "robocorp-actions>=0.0.3",
             "fastapi>=0.104.1",
             "uvicorn>=0.23.2",
             "pydantic>=2.4.2",

@@ -1,4 +1,8 @@
 
+## 0.0.3 - 2024-01-05
+
+- Pass `@action(is_consequential=True)` to add `x-openai-isConsequential` option to action openapi spec (when used with the action-server).
+
 ## 0.0.2 - 2023-12-13
 
 - Properly depend on `robocorp-tasks` version `2.6.0`.
