@@ -1,10 +1,12 @@
 # Changelog
 
-## UNRELEASED
+## 0.0.6 - 2024-01-05
 
 - `rcc` is now bundled in the action server wheel.
 - When the action server is stopped, any subprocess is also killed.
 - Pass `@action(is_consequential=True)` to add `x-openai-isConsequential` option to action openapi spec.
+- Can be started with `--expose-allow-reuse` to reuse the previously exposed url.
+
 
 ## 0.0.5 - 2023-12-14
 
@@ -14,8 +16,8 @@
     - "new" command properly checks that RCC is downloaded.
 - Running an action with multiple `_` now works from the UI.
 
-## 0.0.4 - 2023-12-13
 
+## 0.0.4 - 2023-12-13
 
 - `action-server` is not defined as an entry point (so, after installing it,
   an `action-server` executable will be available to execute it instead of having
