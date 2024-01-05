@@ -1,8 +1,9 @@
 # Changelog
 
-## UNRELEASED
+## 2.7.0 - 2024-01-5
 
 - Fixed issue where imports would fail when collecting tasks because the path being used wasn't absolute. 
+- The task may now have associated information passed as `**kwargs` in the task (available in `ITask.options`).
 
 ## 2.6.0 - 2023-12-13
 
