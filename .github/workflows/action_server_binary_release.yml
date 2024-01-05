@@ -55,6 +55,11 @@ jobs:
             cd build-binary
             pyoxidizer run
 
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-binaries
@@ -70,4 +75,28 @@ jobs:
         with:
           name: action-server-version
           path: "action_server/version.txt"
+
+      - name: Copy assets [Linux]
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+            cp -R build-binary/build/x86_64-unknown-linux-gnu/debug/install/* go-wrapper/assets
+      - name: Copy assets [Mac]
+        if: matrix.os == 'macos-11'
+        run: |
+            cp -R build-binary/build/x86_64-apple-darwin/debug/install/* go-wrapper/assets
+      - name: Copy assets [Windows]
+        if: matrix.os == 'windows-2011'
+        run: |
+            xcopy /e /k /h /i build-binary\\build\\x86_64-pc-windows-msvc\\debug\\install\\* go-wrapper\\assets
+      
+      - name: Build Go binary wrapper
+        run: |
+            cd go-wrapper
+            cp ../version.txt assets/
+            go build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-action-server-wrapper
+          path: "action_server/go-wrapper/action-server-wrapper"
           
