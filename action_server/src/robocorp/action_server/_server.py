@@ -181,6 +181,7 @@ def start_server(
             "" if not settings.verbose else "v",
             host,
             settings.expose_url,
+            settings.datadir,
             str(api_key),
             str(expose_session),
         ]
