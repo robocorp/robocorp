@@ -87,7 +87,7 @@ jobs:
       - name: Copy assets [Windows]
         if: matrix.os == 'windows-2019'
         run: |
-            xcopy /e /k /h /i build-binary\\build\\x86_64-pc-windows-msvc\\debug\\install\\* go-wrapper\\assets
+            xcopy /e /k /h /i build-binary\\build\\x86_64-pc-windows-msvc\\debug\\install go-wrapper\\assets
 
       - uses: actions/download-artifact@v4
         with:
