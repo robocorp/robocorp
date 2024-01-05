@@ -2,12 +2,13 @@ import asyncio
 import codecs
 import json
 import logging
+import os
 import sys
 from typing import Optional
 
 import requests
 import websockets
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
@@ -25,6 +26,42 @@ class BodyPayload(BaseModel):
     method: str = "GET"
     body: dict | None = None
     headers: dict
+
+
+class ExposeSessionJson(BaseModel):
+    expose_session: str
+    url: str
+
+
+def get_expose_session_path(datadir: str) -> str:
+    return os.path.join(datadir, "expose_session.json")
+
+
+def read_expose_session_json(datadir: str) -> None | ExposeSessionJson:
+    session_json = None
+    try:
+        expose_session_path = get_expose_session_path(datadir)
+        log.debug(f"🗂️ Reading expose_session.json path={expose_session_path}")
+        with open(expose_session_path, "r") as f:
+            session_json = ExposeSessionJson(**json.load(f))
+    except FileNotFoundError:
+        pass
+    except ValidationError as e:
+        log.error("Failed to load previous expose session", e)
+    except json.JSONDecodeError as e:
+        log.error("Failed to decode exopse session json", e)
+    return session_json
+
+
+def write_expose_session_json(datadir: str, expose_session: str, url: str) -> None:
+    expose_session_path = get_expose_session_path(datadir)
+    log.debug(f"🗂️ Writing expose_session.json path={expose_session_path}")
+    with open(expose_session_path, "w") as f:
+        json.dump(
+            ExposeSessionJson(expose_session=expose_session, url=url).model_dump(),
+            f,
+            indent=2,
+        )
 
 
 def get_expose_session(payload: SessionPayload) -> str:
@@ -59,6 +96,7 @@ async def expose_server(
     port: int,
     host: str,
     expose_url: str,
+    datadir: str,
     api_key: str | None = None,
     expose_session: str | None = None,
 ):
@@ -98,19 +136,20 @@ async def expose_server(
                         try:
                             session_payload = SessionPayload(**data)
 
-                            log.info(
-                                f"🌍 URL: https://{session_payload.sessionId}.{expose_url}"
-                            )
+                            url = f"https://{session_payload.sessionId}.{expose_url}"
+                            log.info(f"🌍 URL: {url}")
                             if api_key is not None:
                                 log.info(
                                     f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
-                            log.info(
-                                f"🔄 Add following argument to restart with same expose URL: --expose-session {new_expose_session}  "  # noqa
+                            write_expose_session_json(
+                                datadir=datadir,
+                                expose_session=new_expose_session,
+                                url=url,
                             )
                             continue
-                        except Exception:
+                        except Exception as e:
                             if not session_payload:
                                 log.error(
                                     "Unable to get session payload. Exposing the local server failed. Try again."
@@ -179,7 +218,7 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-def main(parent_pid, port, verbose, host, expose_url, api_key, expose_session):
+def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_session):
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
         format="%(message)s",
@@ -192,6 +231,7 @@ def main(parent_pid, port, verbose, host, expose_url, api_key, expose_session):
             port=int(port),
             host=host,
             expose_url=expose_url,
+            datadir=datadir,
             api_key=api_key if api_key != "None" else None,
             expose_session=expose_session if expose_session != "None" else None,
         )

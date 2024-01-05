@@ -9,6 +9,7 @@ from robocorp.action_server._robo_utils.auth import generate_api_key
 
 from . import __version__
 from ._settings import Settings
+from ._server_expose import read_expose_session_json
 
 log = logging.getLogger(__name__)
 
@@ -114,10 +115,10 @@ def _create_parser():
         help="Expose the server to the world",
     )
     start_parser.add_argument(
-        "--expose-session",
-        dest="expose_session",
-        help="Restart action server with existing expose session",
-        default=None,
+        "--expose-allow-reuse",
+        dest="expose_allow_reuse",
+        action="store_true",
+        help="Always answer yes to expose reuse confirmation",
     )
     start_parser.add_argument(
         "--api-key",
@@ -438,10 +439,27 @@ To migrate the database to the current version
                             from ._server import start_server
 
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+                            expose_session = None
+                            if base_args.expose:
+                                expose_session = read_expose_session_json(
+                                    datadir=str(settings.datadir)
+                                )
+                                if expose_session and not base_args.expose_allow_reuse:
+                                    confirm = input(
+                                        f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
+                                    )
+                                    if confirm.lower() == "y" or confirm == "":
+                                        log.debug("Resuming previous expose session")
+                                    else:
+                                        expose_session = None
+
                             start_server(
                                 expose=base_args.expose,
                                 api_key=base_args.api_key,
-                                expose_session=base_args.expose_session,
+                                expose_session=expose_session.expose_session
+                                if expose_session
+                                else None,
                             )
                             return 0
 
