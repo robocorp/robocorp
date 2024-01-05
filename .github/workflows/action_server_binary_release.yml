@@ -63,7 +63,7 @@ jobs:
       - name: Get version
         if: matrix.os == 'ubuntu-20.04'
         run: |
-            cd action-server
+            cd action_server
             poetry version | awk '{print $2}' > action_server/build-binary/build/version.txt
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'ubuntu-20.04'
