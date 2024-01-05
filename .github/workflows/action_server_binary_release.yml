@@ -85,7 +85,7 @@ jobs:
         run: |
             cp -R build-binary/build/x86_64-apple-darwin/debug/install/* go-wrapper/assets
       - name: Copy assets [Windows]
-        if: matrix.os == 'windows-2011'
+        if: matrix.os == 'windows-2019'
         run: |
             xcopy /e /k /h /i build-binary\\build\\x86_64-pc-windows-msvc\\debug\\install\\* go-wrapper\\assets
 
