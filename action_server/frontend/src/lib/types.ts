@@ -67,8 +67,4 @@ export enum InputPropertyType {
 
 export type ServerConfig = {
   expose_url: string;
-  expose_session?: {
-    sessionId: string;
-    sessionSecret: string;
-  };
 };

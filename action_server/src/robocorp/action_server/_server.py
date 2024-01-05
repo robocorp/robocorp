@@ -120,10 +120,10 @@ def start_server(
     app.include_router(action_package_api_router)
     app.include_router(websocket_api_router)
 
-    @app.get("/config")
+    @app.get("/config", include_in_schema=False)
     async def serve_config():
         payload = {
-            "expose_url": settings.expose_url,
+            "expose_url": False
         }
 
         if expose: 
@@ -131,13 +131,16 @@ def start_server(
                     datadir=str(settings.datadir)
                 )
             
-            payload["expose_session"] = get_expose_session_payload(
+            expose_session_payload = get_expose_session_payload(
                 current_expose_session.expose_session
-            ) if current_expose_session else False
+            ) if current_expose_session else None
+
+            if expose_session_payload:
+                payload["expose_url"] = f"https://{expose_session_payload.sessionId}.{settings.expose_url}"
                 
         return payload
 
-    @app.get("/base_log.html", response_class=HTMLResponse)
+    @app.get("/base_log.html", include_in_schema=False, response_class=HTMLResponse)
     async def serve_log_html(request: Request):
         from robocorp.log import _index_v3 as index
 

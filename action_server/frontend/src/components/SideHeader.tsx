@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { Box, Typography, usePopover } from '@robocorp/components';
-import { IconCode, IconGlobe, IconKey, IconLink } from '@robocorp/icons/iconic';
+import { IconGlobe, IconLink } from '@robocorp/icons/iconic';
 import { styled } from '@robocorp/theme';
 
 import { useActionServerContext } from '~/lib/actionServerContext';
@@ -39,7 +39,7 @@ export const SideHeader: FC = () => {
 
   const { referenceRef, referenceProps, PopoverContent, setOpen } = usePopover({
     placement: 'right',
-    width: 420,
+    width: 440,
     offset: 0,
   });
 
@@ -51,8 +51,7 @@ export const SideHeader: FC = () => {
     setOpen(false);
   }, []);
 
-  const isExposed = !!serverConfig?.expose_session;
-  const exposeURL = `https://${serverConfig?.expose_session?.sessionId}${serverConfig?.expose_url}`;
+  const isExposed = !!serverConfig?.expose_url;
 
   return (
     <Box onMouseLeave={onMouseLeave}>
@@ -91,22 +90,20 @@ export const SideHeader: FC = () => {
                 Action Server exposed
               </Typography>
               <Box mb="$16">
-                <InputCopy iconLeft={IconLink} label="Server URL" value={exposeURL} readOnly />
+                <InputCopy
+                  iconLeft={IconLink}
+                  label="Server URL"
+                  value={serverConfig.expose_url}
+                  readOnly
+                />
               </Box>
-              <InputCopy
-                iconLeft={IconKey}
-                type="password"
-                label="API Token"
-                value={serverConfig?.expose_session?.sessionSecret || ''}
-                readOnly
-              />
             </>
           ) : (
             <>
               <Typography fontWeight="bold" mb="$16">
                 Action Server not exposed
               </Typography>
-              <Typography mb="$8">
+              <Typography lineHeight="$16" mb="$12">
                 To serve a public URL for your ACtion Server, start it with the{' '}
                 <Typography as="span" color="content.accent">
                   --expose
@@ -114,7 +111,6 @@ export const SideHeader: FC = () => {
                 parameter set.
               </Typography>
               <InputCopy
-                iconLeft={IconCode}
                 aria-label="Expose command"
                 value="action-server start --expose"
                 readOnly
