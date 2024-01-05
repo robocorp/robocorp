@@ -2,3 +2,5 @@ src/robocorp/action_server/_static/
 src/robocorp/action_server/_static_contents.py
 .robocorp
 output
+build
+rcc

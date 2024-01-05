@@ -15,7 +15,14 @@ RCC_URLS = {
     "Linux": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/linux64/rcc",
 }
 
-CURDIR = Path(__file__).parent.absolute()
+
+def get_default_rcc_location() -> Path:
+    CURDIR = Path(__file__).parent.absolute()
+    if sys.platform == "win32":
+        rcc_path = CURDIR / "bin" / "rcc.exe"
+    else:
+        rcc_path = CURDIR / "bin" / "rcc"
+    return rcc_path
 
 
 def download_rcc(
@@ -30,16 +37,15 @@ def download_rcc(
     if target:
         rcc_path = Path(target)
     else:
-        if sys.platform == "win32":
-            rcc_path = CURDIR / "bin" / "rcc.exe"
-        else:
-            rcc_path = CURDIR / "bin" / "rcc"
+        rcc_path = get_default_rcc_location()
 
     if not force:
         if rcc_path.exists():
             return rcc_path
 
         log.info(f"RCC not available at: {rcc_path}. Downloading.")
+
+    rcc_path.parent.mkdir(parents=True, exist_ok=True)
 
     rcc_url = RCC_URLS[system or platform.system()]
 

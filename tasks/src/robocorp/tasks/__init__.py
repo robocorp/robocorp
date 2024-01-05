@@ -32,7 +32,8 @@ clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
 """
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
+from functools import wraps
 
 from ._fixtures import setup, teardown
 from ._protocols import ITask, Status
@@ -41,7 +42,7 @@ __version__ = "2.6.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
-def task(func):
+def task(*args, **kwargs):
     """
     Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
 
@@ -57,19 +58,41 @@ def task(func):
         ...
     ```
 
+    It's also possible to pass options to the task decorator that can then be introspected by `task.options`:
+
+    ```python
+    from robocorp.tasks import task
+
+    @task(this_is_option="option")
+    def enter_user():
+        ...
+    ```
+
     It'll be executable by robocorp tasks as:
 
     python -m robocorp.tasks run tasks.py -t enter_user
 
     Args:
         func: A function which is a task to `robocorp.tasks`.
+        **kwargs: Options to be introspected by `task.options`.
     """
-    from . import _hooks
 
-    # When a task is found, register it in the framework as a target for execution.
-    _hooks.on_task_func_found(func)
+    def decorator(func, options: Optional[Dict] = None):
+        from . import _hooks
 
-    return func
+        # When a task is found, register it in the framework as a target for execution.
+        _hooks.on_task_func_found(func, options=options)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    if args and callable(args[0]):
+        return decorator(args[0], options=kwargs)
+
+    return lambda func: decorator(func, options=kwargs)
 
 
 def session_cache(func):

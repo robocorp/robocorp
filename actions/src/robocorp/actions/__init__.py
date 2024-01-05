@@ -1,14 +1,28 @@
+from dataclasses import asdict
+from functools import wraps
+import inspect
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional, overload
 
 from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
+from ._action_options import ActionOptions
 
 __version__ = "0.0.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 
-def action(func):
+@overload
+def action(func: Callable) -> Callable:
+    ...
+
+
+@overload
+def action(func: Callable, **kwargs: Optional[ActionOptions]) -> Callable:
+    ...
+
+
+def action(*args, **kwargs):
     """
     Decorator for actions (entry points) which can be executed by `robocorp.actions`.
 
@@ -30,13 +44,22 @@ def action(func):
 
     Args:
         func: A function which is a action to `robocorp.actions`.
+        is_consequential: Whether the action is consequential or not. This will add `x-openai-isConsequential: true` to the action metadata and shown in OpenApi spec.
     """
 
-    # i.e.: This is just a thin layer for the task decorator at this point
-    # (it may be extended in the future...).
-    from robocorp.tasks import task
+    def decorator(*args, **kwargs):
+        # i.e.: This is just a thin layer for the task decorator at this point
+        # (it may be extended in the future...).
+        from robocorp.tasks import task
 
-    return task(func)
+        options = ActionOptions(**kwargs)
+
+        return task(*args, **asdict(options))
+
+    if args and callable(args[0]):
+        return decorator(args[0], **kwargs)
+
+    return lambda func: decorator(func, **kwargs)
 
 
 def session_cache(func):

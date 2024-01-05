@@ -9,10 +9,9 @@ from robocorp.action_server._robo_utils.auth import generate_api_key
 
 from . import __version__
 from ._settings import Settings
+from ._server_expose import read_expose_session_json
 
 log = logging.getLogger(__name__)
-
-CURDIR = Path(__file__).parent.absolute()
 
 
 # def _write_schema(path: Optional[str]):
@@ -81,6 +80,7 @@ def str2bool(v):
 def _create_parser():
     defaults = Settings.defaults()
     base_parser = argparse.ArgumentParser(
+        prog="action-server",
         description="Robocorp Action Server",
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -115,10 +115,10 @@ def _create_parser():
         help="Expose the server to the world",
     )
     start_parser.add_argument(
-        "--expose-session",
-        dest="expose_session",
-        help="Restart action server with existing expose session",
-        default=None,
+        "--expose-allow-reuse",
+        dest="expose_allow_reuse",
+        action="store_true",
+        help="Always answer yes to expose reuse confirmation",
     )
     start_parser.add_argument(
         "--api-key",
@@ -277,6 +277,16 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
 
     if args is None:
         args = sys.argv[1:]
+
+    if args and args[0] == "server-expose":
+        # The process is being called by to make the server expose.
+        # Internal usage only, so, don't even do argument parsing
+        # for it.
+        from . import _server_expose
+
+        _server_expose.main(*args[1:])
+        return 0
+
     parser = _create_parser()
     base_args = parser.parse_args(args)
 
@@ -429,10 +439,27 @@ To migrate the database to the current version
                             from ._server import start_server
 
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+                            expose_session = None
+                            if base_args.expose:
+                                expose_session = read_expose_session_json(
+                                    datadir=str(settings.datadir)
+                                )
+                                if expose_session and not base_args.expose_allow_reuse:
+                                    confirm = input(
+                                        f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
+                                    )
+                                    if confirm.lower() == "y" or confirm == "":
+                                        log.debug("Resuming previous expose session")
+                                    else:
+                                        expose_session = None
+
                             start_server(
                                 expose=base_args.expose,
                                 api_key=base_args.api_key,
-                                expose_session=base_args.expose_session,
+                                expose_session=expose_session.expose_session
+                                if expose_session
+                                else None,
                             )
                             return 0
 

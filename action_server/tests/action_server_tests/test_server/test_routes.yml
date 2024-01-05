@@ -21,6 +21,11 @@ components:
         input_schema:
           title: Input Schema
           type: string
+        is_consequential:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Consequential
         lineno:
           title: Lineno
           type: integer

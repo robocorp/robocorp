@@ -339,3 +339,108 @@ def test_subprocesses_killed(
                     break
         else:
             return  # Ok, everything worked
+
+
+def test_import_task_options(
+    action_server_process: ActionServerProcess,
+    data_regression,
+    str_regression,
+    tmpdir,
+    action_server_datadir: Path,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import robocorp_action_server_run
+
+    from robocorp.action_server._database import Database
+    from robocorp.action_server._models import Action, load_db
+
+    action_server_datadir.mkdir(parents=True, exist_ok=True)
+    db_path = action_server_datadir / "server.db"
+    assert not db_path.exists()
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    db: Database
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 1
+            assert actions[0].is_consequential is None
+
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action(is_consequential=True)
+def calculator_sum(v1: str, v2: str) -> str:
+    return v1 + v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 1
+            assert actions[0].is_consequential is True
+
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action(is_consequential=False)
+def calculator_sum(v1: str, v2: str) -> str:
+    return v1 + v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 1
+            assert actions[0].is_consequential is False

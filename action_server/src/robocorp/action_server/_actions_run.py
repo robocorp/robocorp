@@ -141,6 +141,8 @@ def _run_action_in_thread(
     We have to take care of making a run with the proper environment,
     creating the run, collecting output info, etc.
     """
+    from robocorp.action_server._settings import get_python_exe_from_env
+
     from ._gen_ids import gen_uuid
     from ._models import Run, get_action_package_from_action, get_db
     from ._robo_utils.process import Process, build_python_launch_env
@@ -157,8 +159,9 @@ def _run_action_in_thread(
         if not directory.is_absolute():
             directory = (settings.datadir / directory).absolute()
 
+        python = get_python_exe_from_env(env)
         cmdline: List[str] = [
-            env.get("PYTHON_EXE", sys.executable),
+            python,
             "-m",
             "robocorp.actions",
             "run",

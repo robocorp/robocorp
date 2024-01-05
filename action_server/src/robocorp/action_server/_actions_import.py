@@ -1,7 +1,6 @@
 import json
 import logging
 import subprocess
-import sys
 import typing
 from pathlib import Path
 from typing import Optional
@@ -141,7 +140,9 @@ Note: no virtual environment will be used for the imported actions, they'll be r
 
 
 def _get_robocorp_actions_version(env, cwd) -> tuple[int, ...]:
-    python = env.get("PYTHON_EXE", sys.executable)
+    from robocorp.action_server._settings import get_python_exe_from_env
+
+    python = get_python_exe_from_env(env)
     cmdline: list[str] = [
         python,
         "-c",
@@ -181,6 +182,7 @@ def _add_actions_to_db(
 
     from robocorp.action_server._gen_ids import gen_uuid
     from robocorp.action_server._models import Action, ActionPackage, get_db
+    from robocorp.action_server._settings import get_python_exe_from_env
 
     v = _get_robocorp_actions_version(env, import_path)
     if v < (0, 0, 2):
@@ -189,7 +191,9 @@ def _add_actions_to_db(
             "Expected it to be 0.0.2 or higher"
         )
 
-    cmdline = [env.get("PYTHON_EXE", sys.executable), "-m", "robocorp.actions", "list"]
+    python = get_python_exe_from_env(env)
+
+    cmdline = [python, "-m", "robocorp.actions", "list"]
 
     popen = subprocess.Popen(
         cmdline,
@@ -234,6 +238,9 @@ def _add_actions_to_db(
                     input_schema=json.dumps(action_fields["input_schema"]),
                     output_schema=json.dumps(action_fields["output_schema"]),
                     enabled=True,
+                    is_consequential=action_fields.get("options", {}).get(
+                        "is_consequential", None
+                    ),
                 )
             )
 

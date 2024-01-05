@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
@@ -7,6 +8,46 @@ from typing import Iterator, Optional
 from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
+
+
+def is_frozen():
+    if getattr(sys, "frozen", False):
+        return True
+    try:
+        __file__
+    except NameError:
+        return True
+
+    return False
+
+
+def get_python_exe_from_env(env):
+    python = env.get("PYTHON_EXE")
+    if not python:
+        if is_frozen():
+            raise RuntimeError(
+                "Unable to run because no 'conda.yaml' was present to bootstrap the environment\n"
+                "(note: when the action server is distributed without sources, a 'conda.yaml' for "
+                "the target environment is always required)."
+            )
+        else:
+            python = sys.executable
+
+    return python
+
+
+def get_default_settings_dir() -> Path:
+    if sys.platform == "win32":
+        localappdata = os.environ.get("LOCALAPPDATA")
+        if not localappdata:
+            raise RuntimeError("Error. LOCALAPPDATA not defined in environment!")
+        path = Path(localappdata) / "robocorp" / ".action_server"
+    else:
+        # Linux/Mac
+        path = Path("~/robocorp/.action_server").expanduser()
+
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 class Settings(BaseModel):
@@ -43,7 +84,7 @@ class Settings(BaseModel):
 
             # Not secure, but ok for our purposes
             short_hash = hashlib.sha256(as_posix.encode()).hexdigest()[:8]
-            datadir_name = f"~/.robocorp_action_server/{name}_{short_hash}"
+            datadir_name = f"{get_default_settings_dir()}/{name}_{short_hash}"
 
             log.info(f"Using datadir (scoped to the current directory): {datadir_name}")
             user_expanded_datadir = Path(datadir_name).expanduser()

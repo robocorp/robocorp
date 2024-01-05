@@ -6,6 +6,8 @@
     type: object
   line: 19
   name: broken_task
+  options:
+    is_consequential: null
   output_schema:
     description: ''
     type: integer
@@ -29,6 +31,8 @@
     type: object
   line: 4
   name: calculator_sum
+  options:
+    is_consequential: null
   output_schema:
     description: The sum of v1 + v2.
     type: number
@@ -53,6 +57,8 @@
     type: object
   line: 34
   name: greet
+  options:
+    is_consequential: null
   output_schema:
     description: The greeting for the person.
     type: string

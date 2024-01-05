@@ -626,7 +626,10 @@ CREATE TABLE IF NOT EXISTS {table_name}(
         elif field_cls == str:
             use = "TEXT"
 
-        elif field_cls == bool:
+        elif field_cls == bool and not not_null:
+            use = "INTEGER"
+
+        elif field_cls == bool and not_null:
             default_value = getattr(cls, name)
             if default_value:
                 use = f"INTEGER CHECK({name} IN (0, 1)) NOT NULL DEFAULT 1"

@@ -56,6 +56,8 @@ class Action:  # Table name: action
 
     enabled: bool = True
 
+    is_consequential: Optional[bool] = None
+
 
 RUN_ID_COUNTER = "run_id"
 ALL_COUNTERS = (RUN_ID_COUNTER,)
