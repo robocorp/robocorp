@@ -1,6 +1,9 @@
 name: Action Server [BINARY] Release
 
 on:
+  workflow_dispatch:
+    # Enables manual triggering via GitHub Actions
+
   push:
     branches:
       - "wip"
@@ -55,4 +58,16 @@ jobs:
         with:
           name: ${{ runner.os }}-binaries
           path: "action_server/build-binary/build/*"
+
+      # Having a separate artifact for version.txt helps downstream workflows
+      - name: Get version
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+            cd action-server
+            poetry version | awk '{print $2}' > action_server/build-binary/build/version.txt
+      - uses: actions/upload-artifact@v4
+        if: matrix.os == 'ubuntu-20.04'
+        with:
+          name: action-server-version
+          path: "action_server/build-binary/build/version.txt"
           
