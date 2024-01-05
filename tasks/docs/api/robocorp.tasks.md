@@ -38,10 +38,10 @@ ______________________________________________________________________
 
 ## function `task`
 
-**Source:** [`__init__.py:44`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L44)
+**Source:** [`__init__.py:45`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L45)
 
 ```python
-task(func)
+task(*args, **kwargs)
 ```
 
 Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
@@ -58,6 +58,16 @@ def enter_user():
     ...
 ```
 
+It's also possible to pass options to the task decorator that can then be introspected by `task.options`:
+
+```python
+from robocorp.tasks import task
+
+@task(this_is_option="option")
+def enter_user():
+    ...
+```
+
 It'll be executable by robocorp tasks as:
 
 python -m robocorp.tasks run tasks.py -t enter_user
@@ -65,6 +75,7 @@ python -m robocorp.tasks run tasks.py -t enter_user
 **Args:**
 
 - <b>`func`</b>:  A function which is a task to `robocorp.tasks`.
+- <b>`**kwargs`</b>:  Options to be introspected by `task.options`.
 
 ______________________________________________________________________
 
@@ -178,7 +189,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`__init__.py:75`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L75)
+**Source:** [`__init__.py:98`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L98)
 
 ```python
 session_cache(func)
@@ -198,7 +209,7 @@ ______________________________________________________________________
 
 ## function `task_cache`
 
-**Source:** [`__init__.py:97`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L97)
+**Source:** [`__init__.py:120`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L120)
 
 ```python
 task_cache(func)
@@ -218,7 +229,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`__init__.py:119`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L119)
+**Source:** [`__init__.py:142`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L142)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -230,7 +241,7 @@ ______________________________________________________________________
 
 ## function `get_current_task`
 
-**Source:** [`__init__.py:132`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L132)
+**Source:** [`__init__.py:155`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L155)
 
 ```python
 get_current_task() → Optional[ITask]
@@ -260,7 +271,7 @@ ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`_protocols.py:80`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L80)
+**Source:** [`_protocols.py:82`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L82)
 
 ```python
 run() → Any
