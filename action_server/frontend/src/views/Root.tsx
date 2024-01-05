@@ -5,10 +5,11 @@ import {
   Scroll,
   useSystemTheme,
   Typography,
+  Divider,
 } from '@robocorp/components';
 import { MouseEvent, StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeOverrides, ThemeProvider, styled } from '@robocorp/theme';
-import { IconBolt, IconUnorderedList } from '@robocorp/icons/iconic';
+import { IconBolt, IconShare, IconUnorderedList, IconWorld } from '@robocorp/icons/iconic';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
 import {
   Outlet,
@@ -185,6 +186,12 @@ const Root = () => {
                 icon={<IconUnorderedList />}
               >
                 Runs
+              </SideNavigation.Link>
+              <Box py="$8">
+                <Divider />
+              </Box>
+              <SideNavigation.Link href="/openapi.json" target="_blank" icon={<IconShare />}>
+                OpenAPI spec
               </SideNavigation.Link>
             </ContentScroll>
 
