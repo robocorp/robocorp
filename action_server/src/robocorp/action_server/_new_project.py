@@ -2,7 +2,7 @@ import logging
 
 from ._rcc import get_rcc
 
-TEMPLATE_URL = "github.com/robocorp/example-action-server-starter"
+TEMPLATE_URL = "github.com/robocorp/template-action"
 
 log = logging.getLogger(__name__)
 
