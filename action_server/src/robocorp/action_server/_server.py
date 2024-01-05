@@ -140,7 +140,7 @@ def start_server(
                 
         return payload
 
-    @app.get("/base_log.html", include_in_schema=False, response_class=HTMLResponse)
+    @app.get("/base_log.html", response_class=HTMLResponse)
     async def serve_log_html(request: Request):
         from robocorp.log import _index_v3 as index
 
