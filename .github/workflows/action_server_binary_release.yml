@@ -69,5 +69,5 @@ jobs:
         if: matrix.os == 'ubuntu-20.04'
         with:
           name: action-server-version
-          path: "version.txt"
+          path: "action_server/version.txt"
           
