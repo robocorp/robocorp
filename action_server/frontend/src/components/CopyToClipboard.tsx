@@ -1,13 +1,21 @@
 import { FC, useState, useEffect } from 'react';
-import { Button, ButtonProps, Tooltip } from '@robocorp/components';
+import {
+  Button,
+  ButtonProps,
+  Input,
+  InputProps,
+  Tooltip,
+  useClipboard,
+} from '@robocorp/components';
 import { IconCheck2, IconCopy } from '@robocorp/icons/iconic';
 
 type Props = {
   value: string;
 } & Pick<ButtonProps, 'disabled' | 'variant' | 'round' | 'flex'>;
 
-const CopyToClipboard: FC<Props> = ({ value, ...rest }) => {
+export const CopyToClipboard: FC<Props> = ({ value, ...rest }) => {
   const [clicked, setClicked] = useState(false);
+  const { onCopyToClipboard, copiedToClipboard } = useClipboard();
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -19,22 +27,11 @@ const CopyToClipboard: FC<Props> = ({ value, ...rest }) => {
     };
   }, [clicked, setClicked]);
 
-  const copyToClipboard = () => {
-    const dummy = document.createElement('textarea');
-    document.body.appendChild(dummy);
-    dummy.innerHTML = value;
-    dummy.select();
-    dummy.focus();
-    document.execCommand('copy');
-    document.body.removeChild(dummy);
-    setClicked(true);
-  };
-
   return (
     <Tooltip text="Copy to Clipboard" placement="top">
       <Button
-        icon={clicked ? IconCheck2 : IconCopy}
-        onClick={copyToClipboard}
+        icon={copiedToClipboard ? IconCheck2 : IconCopy}
+        onClick={onCopyToClipboard(value)}
         aria-label="copy to clipboard"
         size="small"
         {...rest}
@@ -43,4 +40,16 @@ const CopyToClipboard: FC<Props> = ({ value, ...rest }) => {
   );
 };
 
-export default CopyToClipboard;
+export const InputCopy: FC<InputProps & { value: string }> = ({ value, ...rest }) => {
+  const { onCopyToClipboard, copiedToClipboard } = useClipboard();
+
+  return (
+    <Input
+      value={value}
+      onIconRightClick={onCopyToClipboard(value)}
+      iconRight={copiedToClipboard ? IconCheck2 : IconCopy}
+      iconRightLabel="Copy value"
+      {...rest}
+    />
+  );
+};

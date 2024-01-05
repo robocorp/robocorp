@@ -10,6 +10,7 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:8080',
       '/openapi.json': 'http://localhost:8080',
+      '/config': 'http://localhost:8080',
       '/api/ws': {
         target: 'ws://localhost:8080',
         ws: true,

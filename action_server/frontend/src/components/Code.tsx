@@ -4,7 +4,7 @@ import { StreamLanguage } from '@codemirror/language';
 import { shell } from '@codemirror/legacy-modes/mode/shell';
 import { json } from '@codemirror/lang-json';
 
-import CopyToClipboard from './CopyToClipboard';
+import { CopyToClipboard } from '~/components';
 
 export const SUPPORTED_CODE_MODES = ['sh', 'json'] as const;
 

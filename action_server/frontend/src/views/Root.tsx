@@ -1,15 +1,7 @@
-import {
-  SideNavigation,
-  Box,
-  Link,
-  Scroll,
-  useSystemTheme,
-  Typography,
-  Divider,
-} from '@robocorp/components';
+import { SideNavigation, Box, Link, Scroll, useSystemTheme } from '@robocorp/components';
 import { MouseEvent, StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeOverrides, ThemeProvider, styled } from '@robocorp/theme';
-import { IconBolt, IconShare, IconUnorderedList, IconWorld } from '@robocorp/icons/iconic';
+import { IconBolt, IconShare, IconUnorderedList } from '@robocorp/icons/iconic';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
 import {
   Outlet,
@@ -20,8 +12,8 @@ import {
 } from 'react-router-dom';
 
 import { HeaderAndMenu } from '~/components/Header';
-import { ActionServerLogo, Redirect } from '~/components';
-import { LoadedActionsPackages, LoadedRuns } from '~/lib/types';
+import { Redirect, SideHeader } from '~/components';
+import { LoadedActionsPackages, LoadedRuns, ServerConfig } from '~/lib/types';
 import {
   startTrackActions,
   startTrackRuns,
@@ -114,19 +106,37 @@ const Root = () => {
   const [loadedActions, setLoadedActions] = useState<LoadedActionsPackages>(
     defaultActionServerState.loadedActions,
   );
+  const [serverConfig, setServerConfig] = useState<ServerConfig | undefined>(undefined);
 
-  const ctx: ActionServerContextType = {
-    viewSettings,
-    setViewSettings,
-    loadedRuns,
-    setLoadedRuns,
-    loadedActions,
-    setLoadedActions,
-  };
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const response = await fetch('/config');
+      const payload = await response.json();
+      setServerConfig(payload);
+    };
 
-  const actionServerContextValue = useMemo(
-    () => ctx,
-    [viewSettings, setViewSettings, loadedRuns, setLoadedRuns, loadedActions, setLoadedActions],
+    fetchConfig();
+  }, []);
+
+  const actionServerContextValue = useMemo<ActionServerContextType>(
+    () => ({
+      viewSettings,
+      setViewSettings,
+      loadedRuns,
+      setLoadedRuns,
+      loadedActions,
+      setLoadedActions,
+      serverConfig,
+    }),
+    [
+      viewSettings,
+      setViewSettings,
+      loadedRuns,
+      setLoadedRuns,
+      loadedActions,
+      setLoadedActions,
+      serverConfig,
+    ],
   );
   const [showNavInSmallMode, setNavInSmallMode] = useState<boolean>(false);
   const onClose = useCallback(() => setNavInSmallMode(false), []);
@@ -156,20 +166,7 @@ const Root = () => {
         <Main isCollapsed={false}>
           <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
           <SideNavigation aria-label="Navigation" open={showNavInSmallMode} onClose={onClose}>
-            <Box display="flex" alignItems="center" gap="$8" height="$32" mb="$48" px="$8">
-              <Box
-                display="flex"
-                borderRadius="$8"
-                width="$32"
-                height="$32"
-                backgroundColor="blue70"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <ActionServerLogo size={20} />
-              </Box>
-              <Typography fontWeight={600}>Action Server</Typography>
-            </Box>
+            <SideHeader />
             <ContentScroll>
               <SideNavigation.Link
                 aria-current={location.pathname.startsWith('/actions')}
@@ -187,9 +184,6 @@ const Root = () => {
               >
                 Runs
               </SideNavigation.Link>
-              <Box py="$8">
-                <Divider />
-              </Box>
               <SideNavigation.Link href="/openapi.json" target="_blank" icon={<IconShare />}>
                 OpenAPI spec
               </SideNavigation.Link>

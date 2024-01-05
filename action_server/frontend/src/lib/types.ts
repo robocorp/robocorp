@@ -64,3 +64,11 @@ export enum InputPropertyType {
   'NUMBER' = 'number',
   'INTEGER' = 'integer',
 }
+
+export type ServerConfig = {
+  expose_url: string;
+  expose_session?: {
+    sessionId: string;
+    sessionSecret: string;
+  };
+};

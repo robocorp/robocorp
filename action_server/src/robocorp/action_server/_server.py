@@ -8,6 +8,8 @@ from functools import partial
 from pathlib import Path
 from typing import Dict, Optional
 
+from ._server_expose import read_expose_session_json, get_expose_session_payload
+
 log = logging.getLogger(__name__)
 
 
@@ -117,6 +119,23 @@ def start_server(
     app.include_router(run_api_router)
     app.include_router(action_package_api_router)
     app.include_router(websocket_api_router)
+
+    @app.get("/config")
+    async def serve_config():
+        payload = {
+            "expose_url": settings.expose_url,
+        }
+
+        if expose: 
+            current_expose_session = read_expose_session_json(
+                    datadir=str(settings.datadir)
+                )
+            
+            payload["expose_session"] = get_expose_session_payload(
+                current_expose_session.expose_session
+            ) if current_expose_session else False
+                
+        return payload
 
     @app.get("/base_log.html", response_class=HTMLResponse)
     async def serve_log_html(request: Request):
