@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 //go:embed all:assets/*
@@ -58,12 +59,13 @@ func main() {
 		fmt.Println("Error reading version.txt:", err)
 		os.Exit(1)
 	}
+	version := strings.TrimSpace(string(versionData))
 
 	// Determine the appropriate path based on the operating system
 	switch runtime.GOOS {
 	case "windows":
 		appDataDir := os.Getenv("APPDATA")
-		actionServerPath = fmt.Sprintf("%s\\robocorp\\action-server\\%s", appDataDir, versionData)
+		actionServerPath = fmt.Sprintf("%s\\robocorp\\action-server\\%s", appDataDir, version)
 		executablePath = filepath.Join(actionServerPath, "action-server.exe")
 	case "linux", "darwin":
 		homeDir, err := os.UserHomeDir()
@@ -71,7 +73,7 @@ func main() {
 			fmt.Println("Error getting user home directory:", err)
 			os.Exit(1)
 		}
-		actionServerPath = fmt.Sprintf("%s/.robocorp/action-server/%s", homeDir, versionData)
+		actionServerPath = fmt.Sprintf("%s/.robocorp/action-server/%s", homeDir, version)
 		executablePath = filepath.Join(actionServerPath, "action-server")
 	default:
 		fmt.Println("Unsupported operating system")
