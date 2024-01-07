@@ -20,6 +20,7 @@ func copyFiles(src, dest string) error {
 	}
 
 	for _, file := range files {
+		// srcPath can't be constructed with filepath.Join because embed needs `/` as sep even on Windows
 		srcPath := fmt.Sprintf("%s/%s", src, file.Name())
 		destPath := filepath.Join(dest, file.Name())
 
