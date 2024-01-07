@@ -24,6 +24,10 @@ func copyFiles(src, dest string) error {
 		srcPath := fmt.Sprintf("%s/%s", src, file.Name())
 		destPath := filepath.Join(dest, file.Name())
 
+		if file.Name() == ".gitkeep" {
+			continue
+		}
+
 		if file.IsDir() {
 			err := copyFiles(srcPath, destPath)
 			if err != nil {
