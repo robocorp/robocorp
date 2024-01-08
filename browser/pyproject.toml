@@ -4,11 +4,10 @@ version = "2.2.1"
 description = "Robocorp browser automation library"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
-	"Kerkko P. <kerkko@robocorp.com>",
-	"Ossi R. <ossi@robocorp.com>",
+	"Cosmin P. <cosmin@robocorp.com>",
 ]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 

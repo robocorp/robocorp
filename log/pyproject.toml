@@ -3,10 +3,10 @@ name = "robocorp-log"
 version = "2.8.0"
 description = "Automatic trace logging for Python"
 authors = [
-    "Fabio Zadrozny <fabio@robocorp.com>",
+	"Fabio Z. <fabio@robocorp.com>",
 ]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{include = "robocorp/log", from = "src"}]
 include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]
