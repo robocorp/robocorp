@@ -104,7 +104,7 @@ export const SideHeader: FC = () => {
                 Action Server not exposed
               </Typography>
               <Typography lineHeight="$16" mb="$12">
-                To serve a public URL for your ACtion Server, start it with the{' '}
+                To serve a public URL for your Action Server, start it with the{' '}
                 <Typography as="span" color="content.accent">
                   --expose
                 </Typography>{' '}

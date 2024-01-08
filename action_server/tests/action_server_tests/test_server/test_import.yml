@@ -104,12 +104,12 @@ components:
           title: Name
           type: string
         title:
+          default: Mr.
           description: The title for the persor (Mr., Mrs., ...).
           title: Title
           type: string
       required:
       - name
-      - title
       title: GreetInput
       type: object
     HTTPValidationError:

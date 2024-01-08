@@ -5,10 +5,9 @@ import socket
 import subprocess
 import sys
 from functools import partial
-from pathlib import Path
 from typing import Dict, Optional
 
-from ._server_expose import read_expose_session_json, get_expose_session_payload
+from ._server_expose import get_expose_session_payload, read_expose_session_json
 
 log = logging.getLogger(__name__)
 
