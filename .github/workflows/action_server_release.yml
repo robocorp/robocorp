@@ -38,6 +38,8 @@ jobs:
 
     - name: Install project
       run: poetry install
+      env:
+        ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
 
     - name: Check tag version
       run: poetry run invoke check-tag-version
@@ -52,6 +54,7 @@ jobs:
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+        ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
         
     - uses: actions/upload-artifact@v4
       with:
@@ -62,3 +65,5 @@ jobs:
       run: |
         poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_ACTION_SERVER }}
         poetry publish
+      env:
+        ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
