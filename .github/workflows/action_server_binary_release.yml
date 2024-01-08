@@ -101,5 +101,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ runner.os }}-action-server-wrapper
+          name: ${{ runner.os }}-action-server-unsigned
           path: "action_server/go-wrapper/action-server-unsigned"
