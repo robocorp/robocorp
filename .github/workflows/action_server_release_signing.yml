@@ -1,4 +1,4 @@
-name: Action Server Release - Executable
+name: Action Server Release - Sign and Deploy
 
 on:
   workflow_dispatch:
