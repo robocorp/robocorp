@@ -23,7 +23,7 @@ mock = "^5.0"
 types-mock = "^5.0"
 types-pywin32 = "304.0.0.6"
 types-Pillow = "^10.0.1"
-robocorp-log-pytest = "^0.0.1"
+robocorp-log-pytest = "^0.0.2"
 types-psutil = "^5.9.0"
 
 [build-system]
