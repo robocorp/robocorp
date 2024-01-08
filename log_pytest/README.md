@@ -22,4 +22,4 @@ heuristics when removing old files to strip them instead of just remove them).
 ## Changelog
 
 A list of releases and corresponding changes can be found in the
-[changelog](https://github.com/robocorp/robo/blob/master/log_pytest/docs/CHANGELOG.md).
+[changelog](https://github.com/robocorp/robocorp/blob/master/log_pytest/docs/CHANGELOG.md).
