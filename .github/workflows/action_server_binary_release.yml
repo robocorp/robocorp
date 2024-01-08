@@ -114,7 +114,6 @@ jobs:
             go build -o action-server-unsigned
 
       - uses: actions/upload-artifact@v4
-        if: ${{ matrix.os == 'ubuntu-20.04' || matrix.os == 'macos-11'  }}
         with:
           name: ${{ runner.os }}-action-server-unsigned
           path: "action_server/go-wrapper/action-server-unsigned"
