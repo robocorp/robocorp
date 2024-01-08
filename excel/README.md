@@ -27,9 +27,9 @@ Further user guides and tutorials can be found in [Robocorp Docs](https://roboco
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.excel](https://github.com/robocorp/robo/blob/master/excel/docs/api/robocorp.excel.md)
+Information on specific functions or classes: [robocorp.excel](https://github.com/robocorp/robocorp/blob/master/excel/docs/api/robocorp.excel.md)
 
 ## Changelog
 
 A list of releases and corresponding changes can be found in the
-[changelog](https://github.com/robocorp/robo/blob/master/excel/docs/CHANGELOG.md).
+[changelog](https://github.com/robocorp/robocorp/blob/master/excel/docs/CHANGELOG.md).

@@ -39,3 +39,11 @@ python -m robocorp.actions -- --a=2 --b=3
 When used in the `Robocorp Action Server`, an Open API spec (`openapi.json`) 
 is provided to be comformat to these parameters (the `Robocorp Action Server` 
 manages passing the arguments accordingly and returning the result afterwards).
+
+## API Reference
+
+Information on specific functions or classes: [robocorp.actions](https://github.com/robocorp/robocorp/blob/master/actions/docs/api/README.md)
+
+## Changelog
+
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/actions/docs/CHANGELOG.md).

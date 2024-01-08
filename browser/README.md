@@ -53,13 +53,13 @@ def login():
 
 ## Guides
 
-- [Browser configuration](https://github.com/robocorp/robo/blob/master/browser/docs/guides/00-configuration.md)
-- [Persistent Context](https://github.com/robocorp/robo/blob/master/browser/docs/guides/01-persistent-context.md)
+- [Browser configuration](https://github.com/robocorp/robocorp/blob/master/browser/docs/guides/00-configuration.md)
+- [Persistent Context](https://github.com/robocorp/robocorp/blob/master/browser/docs/guides/01-persistent-context.md)
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.browser](https://github.com/robocorp/robo/blob/master/browser/docs/api/robocorp.browser.md)
+Information on specific functions or classes: [robocorp.browser](https://github.com/robocorp/robocorp/blob/master/browser/docs/api/robocorp.browser.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/browser/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/browser/docs/CHANGELOG.md).

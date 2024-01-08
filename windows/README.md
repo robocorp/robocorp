@@ -44,18 +44,18 @@ calc.send_keys(keys="96+4=")
 
 ## Guides
 
-- [Understanding Locators](https://github.com/robocorp/robo/blob/master/windows/docs/guides/00-locators.md)
-- [Building Locators using the builtin inspector](https://github.com/robocorp/robo/blob/master/windows/docs/guides/01-locator-inspecting.md)
-- [Special keys](https://github.com/robocorp/robo/blob/master/windows/docs/guides/02-special-keys.md)
+- [Understanding Locators](https://github.com/robocorp/robocorp/blob/master/windows/docs/guides/00-locators.md)
+- [Building Locators using the builtin inspector](https://github.com/robocorp/robocorp/blob/master/windows/docs/guides/01-locator-inspecting.md)
+- [Special keys](https://github.com/robocorp/robocorp/blob/master/windows/docs/guides/02-special-keys.md)
 
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.windows](https://github.com/robocorp/robo/blob/master/windows/docs/api/robocorp.windows.md)
+Information on specific functions or classes: [robocorp.windows](https://github.com/robocorp/robocorp/blob/master/windows/docs/api/robocorp.windows.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/windows/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/windows/docs/CHANGELOG.md).
 
 ## Versioning
 

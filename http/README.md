@@ -17,12 +17,3 @@ def download_file(url, local_filename):
         f.write(response.content)  # Write the content of the response to a file
     return local_filename
 ```
-
-## API Reference
-
-Information on specific functions or classes: [robocorp.http](https://github.com/robocorp/robo/blob/master/http/docs/api/robocorp.http.md)
-
-## Changelog
-
-A list of releases and corresponding changes can be found in the
-[changelog](https://github.com/robocorp/robo/blob/master/http/docs/CHANGELOG.md).

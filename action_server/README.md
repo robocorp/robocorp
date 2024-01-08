@@ -56,3 +56,12 @@ After it's started, it's possible to access the following urls:
 - `/index.html`: Page which allows interacting with the action server.
 - `/openapi.json`: Provides the openapi spec for the action server.
 - `/docs`: Provides access to the APIs available in the server and an UI to test it.
+
+
+## API Reference
+
+Information on specific functions or classes: [robocorp.action-server](https://github.com/robocorp/robocorp/blob/master/action_server/docs/api/README.md)
+
+## Changelog
+
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/action_server/docs/CHANGELOG.md).

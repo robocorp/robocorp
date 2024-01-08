@@ -69,13 +69,13 @@ be automatically logged.
 
 ## Guides
 
-- [Dealing with sensitive data](https://github.com/robocorp/robo/blob/master/log/docs/guides/00-sensitive-data.md)
-- [The `.robolog` format](https://github.com/robocorp/robo/blob/master/log/docs/guides/01-robolog-format.md)
+- [Dealing with sensitive data](https://github.com/robocorp/robocorp/blob/master/log/docs/guides/00-sensitive-data.md)
+- [The `.robolog` format](https://github.com/robocorp/robocorp/blob/master/log/docs/guides/01-robolog-format.md)
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.log](https://github.com/robocorp/robo/blob/master/log/docs/api/robocorp.log.md)
+Information on specific functions or classes: [robocorp.log](https://github.com/robocorp/robocorp/blob/master/log/docs/api/robocorp.log.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/log/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/log/docs/CHANGELOG.md).

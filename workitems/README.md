@@ -50,20 +50,20 @@ requires no additional setup from the user.
 
 ## Guides
 
-- [Reserving and releasing input items](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/00-reserving-inputs.md)
-- [Creating outputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/01-creating-outputs.md)
-- [Local development](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/02-local-development.md)
-- [Email triggering](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/03-email-triggering.md)
-- [Collecting all inputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/04-collecting-inputs.md)
-- [Flow control with exceptions](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/05-input-exceptions.md)
-- [Modifying inputs](https://github.com/robocorp/robo/blob/master/workitems/docs/guides/06-modifying-inputs.md)
+- [Reserving and releasing input items](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/00-reserving-inputs.md)
+- [Creating outputs](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/01-creating-outputs.md)
+- [Local development](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/02-local-development.md)
+- [Email triggering](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/03-email-triggering.md)
+- [Collecting all inputs](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/04-collecting-inputs.md)
+- [Flow control with exceptions](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/05-input-exceptions.md)
+- [Modifying inputs](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/06-modifying-inputs.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.workitems](https://github.com/robocorp/robo/blob/master/workitems/docs/api/robocorp.workitems.md)
+Information on specific functions or classes: [robocorp.workitems](https://github.com/robocorp/robocorp/blob/master/workitems/docs/api/robocorp.workitems.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/workitems/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/workitems/docs/CHANGELOG.md).

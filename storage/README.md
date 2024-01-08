@@ -1,7 +1,6 @@
 # robocorp-storage
 
-`robocorp-storage` is a library which provides read and write access to the
-*Asset Storage* in Robocorp Control Room.
+`robocorp-storage` is a library which provides read and write access to the [Asset Storage](https://robocorp.com/docs/control-room/asset-storage) in Robocorp Control Room.
 
 ## Getting started
 
@@ -16,14 +15,14 @@ def store_email():
 
 ## Guides
 
-- [Handling different asset types](https://github.com/robocorp/robo/blob/master/storage/docs/guides/00-asset-types.md)
+- [Handling different asset types](https://github.com/robocorp/robocorp/blob/master/storage/docs/guides/00-asset-types.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.storage](https://github.com/robocorp/robo/blob/master/storage/docs/api/robocorp.storage.md)
+Information on specific functions or classes: [robocorp.storage](https://github.com/robocorp/robocorp/blob/master/storage/docs/api/robocorp.storage.md)
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robo/blob/master/storage/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/storage/docs/CHANGELOG.md).
