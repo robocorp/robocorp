@@ -239,11 +239,7 @@ jobs:
           ls -l s3-drop/
           ver=`cat s3-drop/version.txt`
           echo "actionServerVersion=${ver}" >> $GITHUB_ENV
-<<<<<<< HEAD
       - uses: actions/upload-artifact@v4
-=======
-      - uses: actions/upload-artifact@v3
->>>>>>> 0465a8e (Move signing in binary build action)
         with:
           name: action-server-artifacts-for-s3-${{ env.actionServerVersion }}
           path: action_server/s3-drop
