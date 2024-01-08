@@ -107,7 +107,7 @@ jobs:
             path: action_server/build/macos64/
       - uses: actions/download-artifact@v3
         with:
-            name: Linux-action-server-wrapper
+            name: Linux-action-server-unsigned
             path: action_server/build/linux64/
       - uses: actions/download-artifact@v3
         with:
