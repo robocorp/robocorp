@@ -246,7 +246,10 @@ def pytest_runtestloop(*args, **kwargs):
 def pytest_runtest_logreport(report):
     if report.failed:
         # Update the status if the test failed.
-        _curr_stack = _State._func_stack[-1]
-        if _curr_stack[2] == Status.PASS:
-            _curr_stack[2] = Status.FAIL
-            _curr_stack[3] = report.longreprtext
+        if not _State._func_stack:
+            log.critical(f"{report.longreprtext}")
+        else:
+            _curr_stack = _State._func_stack[-1]
+            if _curr_stack[2] == Status.PASS:
+                _curr_stack[2] = Status.FAIL
+                _curr_stack[3] = report.longreprtext
