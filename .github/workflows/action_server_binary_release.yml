@@ -113,9 +113,9 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
             name: macOS-action-server-unsigned
             path: action_server/build
@@ -144,7 +144,7 @@ jobs:
           unzip -o action-server.zip -d build/
           mv build/action-server-unsigned build/action-server
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: action-server-signed-macos
           path: build/action-server
@@ -158,9 +158,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
             name: Windows-action-server-unsigned
             path: action_server/build
@@ -179,7 +179,7 @@ jobs:
           azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\action-server-unsigned.exe
         shell: powershell
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: action-server-signed-windows
           path: build/action-server/action-server.exe
@@ -193,20 +193,20 @@ jobs:
         working-directory: ./action_server
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
             name: action-server-signed-windows
             path: action_server/build/windows64/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
             name: action-server-signed-macos
             path: action_server/build/macos64/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
             name: Linux-action-server-unsigned
             path: action_server/build/linux64/
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
             name: action-server-version
             path: action_server/build/
@@ -224,7 +224,7 @@ jobs:
           ls -l s3-drop/
           ver=`cat s3-drop/version.txt`
           echo "actionServerVersion=${ver}" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: action-server-artifacts-for-s3-${{ env.actionServerVersion }}
           path: action_server/s3-drop
@@ -249,7 +249,7 @@ jobs:
         run:
           working-directory: ./action_server
       steps:
-          - uses: actions/checkout@v3
+          - uses: actions/checkout@v4
           - name: Generate the new index files
             run: |
               mkdir -p build/
