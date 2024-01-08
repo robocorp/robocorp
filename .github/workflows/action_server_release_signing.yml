@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-            name: action-server-unsigned-mac
+            name: macOS-action-server-unsigned
             path: action_server/build
 
       - name: Action Server Signing [macOS]
@@ -44,14 +44,15 @@ jobs:
           codesign --verify --deep --verbose=2 build/action-server
           codesign -v --verbose=4 --display build/action-server
           # notarize MacOS binary (zipped because notarization does not allow executable files)
-          zip action-server.zip build/action-server
+          zip action-server.zip build/action-server-unsigned
           xcrun notarytool submit --apple-id $APPLEID --team-id $APPLETEAMID --password $APPLEIDPASS action-server.zip
           unzip -o action-server.zip -d build/
+          mv build/action-server-unsigned build/action-server
 
       - uses: actions/upload-artifact@v3
         with:
           name: action-server-signed-macos
-          path: build/action-server/action-server
+          path: build/action-server
 
   sign-windows:
     defaults:
@@ -64,10 +65,10 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-            name: action-server-unsigned-windows
+            name: Windows-action-server-unsigned
             path: action_server/build
 
-      - name: Action Server Signing [macOS]
+      - name: Action Server Signing [Windows]
         env:
           NODE_AUTH_TOKEN: ${{secrets.CI_GITHUB_TOKEN}}
           VAULT_URL: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_URL}}
@@ -77,7 +78,8 @@ jobs:
           CERTIFICATE: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CERTIFICATE}}
         run: |
           dotnet tool install --global AzureSignTool --version 3.0.0
-          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\action-server.exe
+          mv build\action-server-unsigned build\action-server.exe
+          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\action-server-unsigned.exe
         shell: powershell
 
       - uses: actions/upload-artifact@v3
@@ -105,7 +107,7 @@ jobs:
             path: action_server/build/macos64/
       - uses: actions/download-artifact@v3
         with:
-            name: action-server-linux
+            name: Linux-action-server-wrapper
             path: action_server/build/linux64/
       - uses: actions/download-artifact@v3
         with:
@@ -116,6 +118,8 @@ jobs:
           pwd
           ls -l build
           mkdir s3-drop
+          # We need to rename the linux binary because the others are renamed during signing
+          mv build/linux64/action-server-unsigned build/linux64/action-server
           mv build/version.txt s3-drop/
           mv build/macos64 s3-drop/
           mv build/linux64 s3-drop/
