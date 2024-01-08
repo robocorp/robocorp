@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.0.9 - 2024-01-08
+
+- Fixed build issue (`rcc` should not be bundled in source release).
+
 ## 0.0.8 - 2024-01-08
 
 - Properly depend on node 20.x when doing build.
-- Fixed build issue.
+- Trying to fix build issue (`rcc` should not be bundled in source release).
 
 ## 0.0.7 - 2024-01-08
 

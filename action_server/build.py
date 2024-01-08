@@ -53,6 +53,12 @@ def _download_rcc(system: Optional[str] = None, target: Optional[str] = None):
 
 
 def build(*args, **kwarg):
+    if os.environ.get("ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD", "").lower().strip() in (
+        "1",
+        "true",
+    ):
+        return
+
     _download_rcc()
 
 
