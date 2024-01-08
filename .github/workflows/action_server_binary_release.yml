@@ -105,6 +105,8 @@ jobs:
           path: "action_server/go-wrapper/action-server-unsigned"
 
   sign-macos:
+    needs:
+      - build
     defaults:
       run:
         working-directory: ./action_server
@@ -148,6 +150,8 @@ jobs:
           path: build/action-server
 
   sign-windows:
+    needs:
+      - build
     defaults:
       run:
         working-directory: ./action_server
