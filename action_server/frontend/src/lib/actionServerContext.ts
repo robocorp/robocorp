@@ -1,30 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useContext } from 'react';
-import { isDocumentDefined, isWindowDefined, logError } from './helpers';
-import { LoadedActionsPackages, LoadedRuns, Run } from './types';
-
-export let defaultTheme: 'light' | 'dark' = 'light';
-try {
-  // User can specify log.html?theme=dark|light in url.
-  let s: string | null = '';
-  if (isDocumentDefined()) {
-    let params = new URLSearchParams(document?.location?.search);
-    s = params.get('theme');
-  }
-  if (s === 'light' || s === 'dark') {
-    defaultTheme = s;
-  } else {
-    // if not specified through url, use from color scheme match.
-    if (isWindowDefined() && window?.matchMedia) {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        defaultTheme = 'dark';
-      } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-        defaultTheme = 'light';
-      }
-    }
-  }
-} catch (err) {
-  logError(err);
-}
+import { LoadedActionsPackages, LoadedRuns, ServerConfig } from './types';
 
 export type ViewSettings = {
   theme: 'dark' | 'light';
@@ -37,11 +12,12 @@ export type ActionServerContextType = {
   setLoadedRuns: Dispatch<SetStateAction<LoadedRuns>>;
   loadedActions: LoadedActionsPackages;
   setLoadedActions: Dispatch<SetStateAction<LoadedActionsPackages>>;
+  serverConfig?: ServerConfig;
 };
 
 export const defaultActionServerState: ActionServerContextType = {
   viewSettings: {
-    theme: defaultTheme,
+    theme: 'dark',
   },
   setViewSettings: () => null,
 

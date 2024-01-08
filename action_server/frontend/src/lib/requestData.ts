@@ -1,41 +1,51 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-classes-per-file */
+
 import { Dispatch, SetStateAction } from 'react';
-import { ActionPackage, AsyncLoaded, LoadedActionsPackages, LoadedRuns, Run } from './types';
+import {
+  Action,
+  ActionPackage,
+  AsyncLoaded,
+  LoadedActionsPackages,
+  LoadedRuns,
+  Run,
+} from './types';
 import { Counter, copyArrayAndInsertElement, logError } from './helpers';
 import { CachedModel, ModelContainer, ModelType } from './modelContainer';
 
 export const baseUrl = '';
-export const baseUrlWs = 'ws://' + location.host;
-// export const baseUrl = 'http://localhost:8090';
-// export const baseUrlWs = 'ws://localhost:8090';
+export const baseUrlWs = `ws://${window.location.host}`;
 
 interface Opts {
   body?: string;
   params?: Record<string, string>;
 }
 
-const _loadAsync = async (
+const loadAsync = async <T>(
   url: string,
   method: 'POST' | 'GET',
   opts: Opts | undefined = undefined,
-): Promise<CachedModel> => {
+): Promise<CachedModel<T>> => {
   try {
     const body: string | undefined = opts?.body;
     const params: Record<string, string> | undefined = opts?.params;
+    let requestURL = url;
+
     if (params) {
-      url += `?${new URLSearchParams(params)}`;
+      requestURL += `?${new URLSearchParams(params)}`;
     }
 
     const fetchArgs: RequestInit = {
-      method: method,
+      method,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
     };
     if (body !== undefined) {
-      fetchArgs['body'] = body;
+      fetchArgs.body = body;
     }
-    const res = await fetch(url, fetchArgs);
+    const res = await fetch(requestURL, fetchArgs);
 
     if (!res.ok) {
       return {
@@ -43,19 +53,18 @@ const _loadAsync = async (
         data: undefined,
         errorMessage: `${res.status} (${res.statusText})`,
       };
-    } else {
-      const loadedResultAsJson = await res.json();
-      return {
-        isPending: false,
-        data: loadedResultAsJson,
-      };
     }
+    const loadedResultAsJson = await res.json();
+    return {
+      isPending: false,
+      data: loadedResultAsJson,
+    };
   } catch (err) {
     logError(err);
     return {
       isPending: false,
       data: undefined,
-      errorMessage: JSON.stringify(err),
+      errorMessage: err instanceof Error ? err.message : JSON.stringify(err),
     };
   }
 };
@@ -64,15 +73,24 @@ const globalModelContainer = new ModelContainer();
 
 export class WebsocketConn {
   private ws: WebSocket | null = null;
-  private connected: boolean = false;
-  private connecting: boolean = false;
+
+  private connected = false;
+
+  private connecting = false;
 
   // TODO: Make ping-pong to verify if it's still alive.
-  private lastPingTime: number = 0;
-  private lastPongTime: number = 0;
+  private lastPingTime = 0;
+
+  private lastPongTime = 0;
   // this.lastPingTime = performance.now();
 
-  constructor(private url: string, private onReceivedMessage: any) {}
+  constructor(
+    private url: string,
+    private onReceivedMessage: (event: MessageEvent) => void,
+  ) {
+    this.url = url;
+    this.onReceivedMessage = onReceivedMessage;
+  }
 
   public connect(): Promise<void> {
     this.connecting = true;
@@ -122,7 +140,7 @@ export class WebsocketConn {
     if (this.ws) {
       this.connected = false;
       this.connecting = false;
-      const ws = this.ws;
+      const { ws } = this;
       this.ws = null;
       ws.close();
     }
@@ -132,7 +150,7 @@ export class WebsocketConn {
     this.onReceivedMessage(message);
   };
 
-  private handleClose = (event: CloseEvent) => {
+  private handleClose = () => {
     this.connected = false;
     this.connecting = false;
 
@@ -168,12 +186,14 @@ interface IResponse<T> {
 
 class ModelUpdater {
   private modelContainer: ModelContainer;
+
   private conn: WebsocketConn;
+
   private messageIdToHandler = new Map();
 
   constructor(modelContainer: ModelContainer) {
     this.modelContainer = modelContainer;
-    this.conn = new WebsocketConn(baseUrlWs + '/api/ws', this.onReceivedMessage.bind(this));
+    this.conn = new WebsocketConn(`${baseUrlWs}/api/ws`, this.onReceivedMessage.bind(this));
   }
 
   public async onReceivedMessage(message: MessageEvent) {
@@ -181,21 +201,20 @@ class ModelUpdater {
     if (dataStr) {
       const data = JSON.parse(dataStr);
       const messageType = data.message_type;
+
       if (messageType === 'runs_collected') {
-        const runs = data.runs;
+        const { runs } = data;
         sortRuns(runs);
 
         this.modelContainer.onModelUpdated(ModelType.RUNS, { isPending: false, data: runs });
       } else if (messageType === 'run_added') {
-        const runsModel: CachedModel | undefined = this.modelContainer.getCurrentModel(
-          ModelType.RUNS,
-        );
+        const runsModel = this.modelContainer.getCurrentModel<Run>(ModelType.RUNS);
         // Runs should be reverse ordered by their id.
         if (runsModel !== undefined && runsModel.data !== undefined && !runsModel.isPending) {
-          const run = data.run;
+          const { run } = data;
           // Insert but make sure we keep the (reverse) order.
-          let newRunData = undefined;
-          for (let i = 0; i < runsModel.data.length - 1; i++) {
+          let newRunData;
+          for (let i = 0; i < runsModel.data.length - 1; i += 1) {
             if (run.numbered_id > runsModel.data[i].numbered_id) {
               newRunData = copyArrayAndInsertElement(runsModel.data, run, i);
               break;
@@ -219,21 +238,20 @@ class ModelUpdater {
           this.messageIdToHandler.delete(messageId);
           handler(responseData);
         } else {
+          // eslint-disable-next-line no-console
           console.log(`Error: no handler for response: ${JSON.stringify(data)}`);
         }
       } else if (messageType === 'run_changed') {
         const runId = data.run_id;
-        const changes = data.changes;
+        const { changes } = data;
 
-        const runsModel: CachedModel | undefined = this.modelContainer.getCurrentModel(
-          ModelType.RUNS,
-        );
+        const runsModel = this.modelContainer.getCurrentModel<Run>(ModelType.RUNS);
         if (runsModel !== undefined && runsModel.data !== undefined) {
           // Runs should be reverse ordered by their id and changes are
           // usually in the latest runs, so, just iterating to find
           // that should actually be fast as it should be one
           // of the first items.
-          for (let i = 0; i < runsModel.data.length; i++) {
+          for (let i = 0; i < runsModel.data.length; i += 1) {
             if (runId === runsModel.data[i].id) {
               const run = runsModel.data[i];
               const newRun = { ...run, ...changes };
@@ -252,11 +270,10 @@ class ModelUpdater {
   }
 
   private async request<T>(req: IRequest): Promise<IResponse<T>> {
-    let onResolve: any = undefined;
-    let onReject = undefined;
-    const promise: Promise<IResponse<T>> = new Promise((resolve, reject) => {
+    let onResolve: (value: IResponse<T>) => void;
+
+    const promise: Promise<IResponse<T>> = new Promise((resolve) => {
       onResolve = resolve;
-      onReject = reject;
     });
 
     const messageHandler = (response: IResponse<T>) => {
@@ -271,7 +288,7 @@ class ModelUpdater {
       message_type: 'request',
       data: { method: req.method, url: req.url, message_id: messageId },
     });
-    console.log(`Request: ${msg}`);
+
     this.conn.send(msg);
 
     return promise;
@@ -287,7 +304,7 @@ class ModelUpdater {
       try {
         await Promise.race([connectPromise, timeoutPromise]);
       } catch (error) {
-        //timed out, let's stop waiting and go without websockets
+        // timed out, let's stop waiting and go without websockets
       }
     }
 
@@ -297,7 +314,10 @@ class ModelUpdater {
 
       // Everything available through a regular connection is also available through
       // the websocket (that is better when available).
-      // this.modelContainer.onModelUpdated(ModelType.ACTIONS, await _loadAsync(baseUrl + '/api/actionPackages', 'GET'));
+      this.modelContainer.onModelUpdated(
+        ModelType.ACTIONS,
+        await loadAsync<Action>(`${baseUrl}/api/actionPackages`, 'GET'),
+      );
 
       const loadActionsPromise = this.request<ActionPackage[]>({
         method: 'GET',
@@ -311,13 +331,14 @@ class ModelUpdater {
         });
       });
     } else {
+      // eslint-disable-next-line no-console
       console.log(
         'Unable to use websockets (no connection was made in 5 seconds). Proceeding with regular http.',
       );
 
       // Approach not using websocket.
-      const loadActionsPromise = _loadAsync(baseUrl + '/api/actionPackages', 'GET');
-      const loadRunsPromise = _loadAsync(baseUrl + '/api/runs', 'GET');
+      const loadActionsPromise = loadAsync<Action>(`${baseUrl}/api/actionPackages`, 'GET');
+      const loadRunsPromise = loadAsync<Run>(`${baseUrl}/api/runs`, 'GET');
 
       const actions = await loadActionsPromise;
       const runs = await loadRunsPromise;
@@ -364,8 +385,8 @@ export const collectRunArtifacts = async (
     isPending: true,
     data: undefined,
   });
-  const data = await _loadAsync(baseUrl + `/api/runs/${runId}/artifacts/text-content`, 'GET', {
-    params: params,
+  const data = await loadAsync(`${baseUrl}/api/runs/${runId}/artifacts/text-content`, 'GET', {
+    params,
   });
   setLoaded(data);
 };
@@ -384,8 +405,8 @@ export const runAction = async (
     isPending: true,
     data: undefined,
   });
-  const data = await _loadAsync(
-    baseUrl + `/api/actions/${actionPackageName}/${actionName}/run`,
+  const data = await loadAsync(
+    `${baseUrl}/api/actions/${actionPackageName}/${actionName}/run`,
     'POST',
     { body: JSON.stringify(args) },
   );
