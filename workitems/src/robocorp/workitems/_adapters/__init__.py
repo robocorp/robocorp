@@ -13,7 +13,7 @@ GENERIC_MESSAGE = """\
 Access to work items is only available from inside Control Room.
 Using development-time simulated work items.
 
-To learn more, see this guide: https://github.com/robocorp/robo/blob/master/workitems/docs/guides/local-development.md#using-a-custom-editor
+To learn more, see this guide: https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/local-development.md#using-a-custom-editor
 To suppress this message, set the environment variable `RC_WORKITEM_ADAPTER`.
 """  # noqa
 
