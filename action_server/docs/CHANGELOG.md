@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.8 - 2024-01-08
+
+- Properly depend on node 20.x when doing build.
+- Fixed build issue.
+
 ## 0.0.7 - 2024-01-08
 
 - Make sure that `rcc` is not bundled when doing the source dist (otherwise the linux binary could be wrongly used in mac).

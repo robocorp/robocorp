@@ -26,7 +26,7 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v3
       with:
-        node-version: 16.x
+        node-version: 20.x
         registry-url: "https://npm.pkg.github.com"
         scope: "@robocorp"
 
@@ -46,8 +46,7 @@ jobs:
       run: |
         poetry run inv build-frontend
         # Make sure that we have no binaries present when doing the build.
-        rm src/robocorp/bin/rcc
-        rm src/robocorp/bin/rcc.exe
+        rm src/robocorp/bin/rcc src/robocorp/bin/rcc.exe -f
         # Just sdist here, wheels are built in the manylinux job.
         poetry build -f sdist
       env:
