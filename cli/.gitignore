@@ -1,8 +1,0 @@
-.DS_Store
-*.exe
-*.zip
-*.test
-*.out
-build/
-resources/
-/.timestamp
