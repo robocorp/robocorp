@@ -97,16 +97,9 @@ jobs:
       - name: Build Go binary wrapper
         run: |
             cd go-wrapper
-            go build
+            go build -o action-server-unsigned
 
       - uses: actions/upload-artifact@v4
-        if: ${{ matrix.os == 'ubuntu-20.04' || matrix.os == 'macos-11'  }}
         with:
           name: ${{ runner.os }}-action-server-wrapper
-          path: "action_server/go-wrapper/action-server-wrapper"
-
-      - uses: actions/upload-artifact@v4
-        if: matrix.os == 'windows-2019'
-        with:
-          name: ${{ runner.os }}-action-server-wrapper
-          path: "action_server/go-wrapper/action-server-wrapper.exe"
+          path: "action_server/go-wrapper/action-server-unsigned"
