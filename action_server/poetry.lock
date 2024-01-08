@@ -1066,13 +1066,13 @@ files = [
 
 [[package]]
 name = "referencing"
-version = "0.32.0"
+version = "0.32.1"
 description = "JSON Referencing + Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "referencing-0.32.0-py3-none-any.whl", hash = "sha256:bdcd3efb936f82ff86f993093f6da7435c7de69a3b3a5a06678a6050184bee99"},
-    {file = "referencing-0.32.0.tar.gz", hash = "sha256:689e64fe121843dcfd57b71933318ef1f91188ffb45367332700a86ac8fd6161"},
+    {file = "referencing-0.32.1-py3-none-any.whl", hash = "sha256:7e4dc12271d8e15612bfe35792f5ea1c40970dadf8624602e33db2758f7ee554"},
+    {file = "referencing-0.32.1.tar.gz", hash = "sha256:3c57da0513e9563eb7e203ebe9bb3a1b509b042016433bd1e45a2853466c3dd3"},
 ]
 
 [package.dependencies]
@@ -1160,13 +1160,13 @@ tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "robocorp-log-pytest"
-version = "0.0.1"
+version = "0.0.2"
 description = "PyTest plugin for auto-logging of pytest tests with robocorp-log."
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_log_pytest-0.0.1-py3-none-any.whl", hash = "sha256:7b3c6c33e784cd4181f8537b4332e3ce9cd7db5197e7ad1bfb679ab9e9ca6282"},
-    {file = "robocorp_log_pytest-0.0.1.tar.gz", hash = "sha256:32fcc12321cf833700bc9e18e78fa6ca2470959d57fa4c4a0beddf691b3336ec"},
+    {file = "robocorp_log_pytest-0.0.2-py3-none-any.whl", hash = "sha256:90c319266e03279db5b138b40301b2875a3855282b706ddb4b2e302002201cfb"},
+    {file = "robocorp_log_pytest-0.0.2.tar.gz", hash = "sha256:ee5a3a366f94831e51ddd41bf4ee4c48d3dd6cfb4c72f8d91044f2ba2adec88d"},
 ]
 
 [package.dependencies]
@@ -1440,13 +1440,13 @@ files = [
 
 [[package]]
 name = "types-psutil"
-version = "5.9.5.17"
+version = "5.9.5.20240106"
 description = "Typing stubs for psutil"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "types-psutil-5.9.5.17.tar.gz", hash = "sha256:f7d8769812d72a4b513d7ec9eb5580fe2f6013fc270394a603cb6534811f3e4d"},
-    {file = "types_psutil-5.9.5.17-py3-none-any.whl", hash = "sha256:2161d166256084acf629d30aaf6bda8bee726ae1fea530559650281056b491fc"},
+    {file = "types-psutil-5.9.5.20240106.tar.gz", hash = "sha256:60b233fb613b41fe859526103dbda0b4812d7a16c5f791119ec7016fbe1c8128"},
+    {file = "types_psutil-5.9.5.20240106-py3-none-any.whl", hash = "sha256:fea169a85b1bb9d9edd0b063a93ad950e37d574290b1bf11ef5e46c9c5d82326"},
 ]
 
 [[package]]
@@ -1462,13 +1462,13 @@ files = [
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20231231"
+version = "2.31.0.20240106"
 description = "Typing stubs for requests"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.31.0.20231231.tar.gz", hash = "sha256:0f8c0c9764773384122813548d9eea92a5c4e1f33ed54556b508968ec5065cee"},
-    {file = "types_requests-2.31.0.20231231-py3-none-any.whl", hash = "sha256:2e2230c7bc8dd63fa3153c1c0ae335f8a368447f0582fc332f17d54f88e69027"},
+    {file = "types-requests-2.31.0.20240106.tar.gz", hash = "sha256:0e1c731c17f33618ec58e022b614a1a2ecc25f7dc86800b36ef341380402c612"},
+    {file = "types_requests-2.31.0.20240106-py3-none-any.whl", hash = "sha256:da997b3b6a72cc08d09f4dba9802fdbabc89104b35fe24ee588e674037689354"},
 ]
 
 [package.dependencies]
@@ -1697,4 +1697,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "31f39b514e9186940365f1b29c4232e605564ab6a986d3a3e142fc2906ad0c6b"
+content-hash = "d8cbaf4391c8b86c19ed1a52bf67fffa7faae9fd7b9e20b728aafb72278cf3f9"

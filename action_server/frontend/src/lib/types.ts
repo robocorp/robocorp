@@ -17,9 +17,16 @@ export interface Action {
   output_schema: string; // The json content for the schema output
 }
 
+export enum RunStatus {
+  'NOT_RUN' = 0,
+  'RUNNING' = 1,
+  'PASSED' = 2,
+  'FAILED' = 3,
+}
+
 export interface Run {
   id: string; // primary key (uuid)
-  status: number; // 0=not run, 1=running, 2=passed, 3=failed
+  status: RunStatus; // 0=not run, 1=running, 2=passed, 3=failed
   action_id: string; // foreign key to the action
   start_time: string; // The time of the run creation.
   run_time?: number | null; // The time from the run creation to the run finish (in seconds)
@@ -29,18 +36,11 @@ export interface Run {
   numbered_id: number;
 }
 
-export interface RunTableEntry {
-  id: string; // primary key (uuid)
-  status: number; // 0=not run, 1=running, 2=passed, 3=failed
-  action_id: string; // foreign key to the action
-  action: Action | undefined;
-  start_time: string; // The time of the run creation.
-  run_time?: number | null; // The time from the run creation to the run finish (in seconds)
-  inputs: string; // The json content with the variables used as an input
-  result?: string | null; // The json content of the output that the run generated
-  error_message?: string | null; // If the status=failed, this may have an error message
-  numbered_id: number;
+export interface RunTableEntry extends Run {
+  action?: Action;
 }
+
+export type Artifact = Record<string, string>;
 
 export interface AsyncLoaded<T> {
   data?: T;
@@ -50,4 +50,21 @@ export interface AsyncLoaded<T> {
 
 export type LoadedRuns = AsyncLoaded<Run[]>;
 export type LoadedActionsPackages = AsyncLoaded<ActionPackage[]>;
-export type LoadedArtifacts = AsyncLoaded<any>;
+export type LoadedArtifacts = AsyncLoaded<Artifact>;
+
+export interface InputProperty {
+  type: InputPropertyType;
+  description: string;
+  title: string;
+}
+
+export enum InputPropertyType {
+  'STRING' = 'string',
+  'BOOLEAN' = 'boolean',
+  'NUMBER' = 'number',
+  'INTEGER' = 'integer',
+}
+
+export type ServerConfig = {
+  expose_url: string;
+};

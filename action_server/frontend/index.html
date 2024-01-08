@@ -1,47 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Robocorp Action Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none'%3E%3Cstyle%3Epath%7Bfill:%23353131%7D@media (prefers-color-scheme:dark)%7Bpath%7Bfill:%23fff%7D%7D%3C/style%3E%3Cpath fill='%23fff' d='M5.806 8.97h2.097l-1.106 3.125c-.145.397.252.61.505.285L10.672 8a.4.4 0 0 0 .097-.247.255.255 0 0 0-.263-.262H8.404l1.11-3.124c.142-.398-.252-.61-.504-.282L5.639 8.462a.4.4 0 0 0-.1.246c0 .15.11.263.267.263M13.995 13.289c2.673-2.79 2.673-7.325 0-10.115a.55.55 0 0 0-.806 0 .61.61 0 0 0 0 .84c2.228 2.325 2.228 6.104 0 8.428a.61.61 0 0 0 0 .84.55.55 0 0 0 .406.174c.148 0 .291-.06.405-.173zm-1.407-2.11a4.24 4.24 0 0 0 1.17-2.95 4.24 4.24 0 0 0-1.17-2.95.55.55 0 0 0-.806 0 .61.61 0 0 0 0 .84c.537.56.834 1.31.834 2.11 0 .798-.297 1.543-.834 2.11a.61.61 0 0 0 0 .84c.114.119.257.173.406.173.148 0 .291-.06.405-.173zm-9.776 2.11a.61.61 0 0 0 0-.84c-2.229-2.325-2.229-6.104 0-8.428a.61.61 0 0 0 0-.84.55.55 0 0 0-.806 0C-.668 5.957-.668 10.498 2 13.288a.55.55 0 0 0 .406.172c.148 0 .291-.06.406-.172m1.407-2.11a.61.61 0 0 0 0-.84c-1.114-1.163-1.114-3.052 0-4.214a.61.61 0 0 0 0-.84.55.55 0 0 0-.806 0c-1.56 1.626-1.56 4.273 0 5.9a.55.55 0 0 0 .406.173c.148 0 .291-.06.405-.173z'/%3E%3C/svg%3E"
+    />
+    <style>
+      #root {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="utf-8" />
-  <title>Robocorp Action Server</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    html,
-    body,
-    #root {
-      margin: 0;
-      padding: 0;
-      border: 0;
-
-      position: relative;
-      width: 100%;
-      height: 100%;
-      /* background: #222; -- helpful to see parent background sometimes */
-    }
-
-    #logIframe {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-    }
-
-    .runsLine {
-      justify-content: space-between;
-      display: flex;
-    }
-
-    .runsButton {
-      margin-left: auto;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="root" />
-  <script type="module" src="/src/index.tsx"></script>
-</body>
-
+  <body>
+    <div id="root" />
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
 </html>

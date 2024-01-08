@@ -5,16 +5,16 @@ export enum ModelType {
   ACTIONS = 'actions',
 }
 
-export interface CachedModel {
+export interface CachedModel<T> {
   isPending: boolean;
-  data: any[] | undefined;
+  data: T[] | undefined;
   errorMessage?: string | undefined;
 }
 
 export class ModelContainer {
-  private models: Map<ModelType, CachedModel>;
+  private models: Map<ModelType, CachedModel<unknown>>;
 
-  private callbacks: Map<ModelType, Dispatch<any>[]>;
+  private callbacks: Map<ModelType, Dispatch<unknown>[]>;
 
   constructor() {
     this.models = new Map();
@@ -37,6 +37,7 @@ export class ModelContainer {
    * @param type the model that should be listened.
    * @param callback A Dispatch<any> to be called when the model changes.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public addListener(type: ModelType, callback: Dispatch<any>): void {
     let callbackList = this.callbacks.get(type);
     if (callbackList === undefined) {
@@ -58,6 +59,7 @@ export class ModelContainer {
    * @param type the model that should no longer be listened by this Dispatch<any>
    * @param callback the previously registered callback.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public removeListener(type: ModelType, callback: Dispatch<any>): void {
     const callbackList = this.callbacks.get(type);
     if (callbackList !== undefined) {
@@ -72,18 +74,16 @@ export class ModelContainer {
    * Should be called when a new model is loaded from the backend.
    * It must be always set as a whole.
    */
-  public onModelUpdated(type: ModelType, model: CachedModel): void {
+  public onModelUpdated<T>(type: ModelType, model: CachedModel<T>): void {
     this.models.set(type, model);
 
     const callbacks = this.callbacks.get(type);
     if (callbacks !== undefined) {
-      for (const callback of callbacks) {
-        callback(model);
-      }
+      callbacks.forEach((callback) => callback(model));
     }
   }
 
-  public getCurrentModel(type: ModelType): CachedModel | undefined {
-    return this.models.get(type);
+  public getCurrentModel<T>(type: ModelType) {
+    return this.models.get(type) as CachedModel<T> | undefined;
   }
 }
