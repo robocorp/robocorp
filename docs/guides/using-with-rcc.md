@@ -14,7 +14,8 @@ tasks:
   Run Task:
     shell: python task.py
 
-condaConfigFile: conda.yaml
+environmentConfigs:
+  - conda.yaml
 artifactsDir: output
 PATH:
   - .
@@ -91,7 +92,8 @@ This command can be subsituted in the existing `robot.yaml`:
 tasks:
   Run Task:
     shell: python -m robocorp.tasks run task.py
-condaConfigFile: conda.yaml
+environmentConfigs:
+  - conda.yaml
 artifactsDir: output
 PATH:
   - .

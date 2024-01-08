@@ -43,6 +43,7 @@ export const ACTION_PACKAGE_SAMPLE_DATA: ActionPackage[] = [
 
 const run1: Run = {
   id: '1',
+  numbered_id: 1,
   status: 2,
   action_id: 'action_1',
   start_time: '2023-11-30T08:00:00Z',
@@ -54,6 +55,7 @@ const run1: Run = {
 
 const run2: Run = {
   id: '2',
+  numbered_id: 2,
   status: 3,
   action_id: 'action_2',
   start_time: '2023-11-29T15:30:00Z',
@@ -65,6 +67,7 @@ const run2: Run = {
 
 const run3: Run = {
   id: '3',
+  numbered_id: 3,
   status: 1,
   action_id: 'action_3',
   start_time: '2023-12-01T10:45:00Z',
@@ -75,8 +78,8 @@ const run3: Run = {
 };
 
 export const RUNS = [run1, run2, run3];
-for (let index = 4; index < 100; index++) {
+for (let index = 4; index < 100; index += 1) {
   const element = { ...run1 };
-  element['id'] = '' + index;
+  element.id = `${index}`;
   RUNS.push(element);
 }

@@ -17,7 +17,8 @@ tasks:
   case_big_structures:
     shell: python -m robocorp.tasks run tasks.py -t case_big_structures --console-colors=plain
 
-condaConfigFile: conda.yaml
+environmentConfigs:
+  - conda.yaml
 artifactsDir: output
 ignoreFiles:
   - .gitignore

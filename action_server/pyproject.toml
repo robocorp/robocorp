@@ -33,7 +33,7 @@ psutil = "^5"
 robocorp-devutils = { path = "../devutils/", develop = true }
 types-requests = "^2"
 types-PyYAML = "^6"
-robocorp-log-pytest = "^0.0.1"
+robocorp-log-pytest = "^0.0.2"
 types-psutil = "^5"
 
 

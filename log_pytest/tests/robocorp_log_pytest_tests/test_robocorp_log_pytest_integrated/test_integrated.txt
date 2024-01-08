@@ -217,6 +217,11 @@ Failed: assert False
 
         EE: METHOD: ERROR
     ET: FAIL
+    ST: test_fixture_fail
+        SE: METHOD: fixture
+            STB: RuntimeError: something bad in fixture
+        EE: METHOD: ERROR
+    ET: FAIL
     ST: run finished (print results)
     ET: PASS
 ER: FAIL

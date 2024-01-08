@@ -2,7 +2,9 @@ tasks:
   solve_challenge:
     shell: python -m robocorp.tasks run tasks.py -t solve_challenge
 
-condaConfigFile: conda.yaml
+environmentConfigs:
+  - conda.yaml
+
 artifactsDir: output
 ignoreFiles:
   - .gitignore
