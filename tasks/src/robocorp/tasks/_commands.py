@@ -8,7 +8,7 @@ import traceback
 from argparse import ArgumentParser, ArgumentTypeError
 from io import StringIO
 from pathlib import Path
-from typing import Any, List, Literal, Optional, Sequence, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
 from robocorp.tasks import _constants
 from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
@@ -139,6 +139,7 @@ def run(
     additional_arguments: Optional[List[str]] = None,
     preload_module: Optional[List[str]] = None,
     glob: Optional[str] = None,
+    json_input: Optional[str] = None,
 ) -> int:
     """
     Runs a task.
@@ -187,17 +188,21 @@ def run(
         preload_module: The modules which should be pre-loaded (i.e.: loaded
             after the logging is in place but before any other task is collected).
         glob: A glob to define from which module names the tasks should be loaded.
+        json_input: The path to a json file to be loaded to get the arguments.
 
     Returns:
         0 if everything went well.
         1 if there was some error running the task.
     """
+    import copy
+
     from robocorp.log import console, redirect
     from robocorp.log.pyproject_config import (
         read_pyproject_toml,
         read_robocorp_auto_log_config,
     )
 
+    from robocorp.tasks._exceptions import InvalidArgumentsError
     from robocorp.tasks._interrupts import interrupt_on_timeout
 
     from ._collect_tasks import collect_tasks
@@ -320,6 +325,36 @@ def run(
         pyproject_toml_contents,
     )
 
+    json_loaded_arguments: Optional[Dict[str, Any]] = None
+    if json_input:
+        json_path: Path = Path(json_input)
+        if not json_path.exists():
+            context.show_error(
+                f"Error: The file passed as `--json-arguments` does not exist ({json_input})"
+            )
+            sys.exit(1)
+
+        with json_path.open("rb") as stream:
+            try:
+                arguments = json.load(stream)
+            except Exception as e:
+                context.show_error(
+                    f"Error: Unable to read the contents of {json_input} as json.\nOriginal error: {e}"
+                )
+                sys.exit(1)
+            if not isinstance(arguments, dict):
+                context.show_error(
+                    f"Error: Expected the root of '{json_input}' to be a json object. Found: {type(arguments)} ({arguments})"
+                )
+                sys.exit(1)
+            for key in arguments.keys():
+                if not isinstance(key, str):
+                    context.show_error(
+                        f"Error: Expected all the keys in '{json_input}' to be strings. Found: {type(key)} ({key})"
+                    )
+                    sys.exit(1)
+            json_loaded_arguments = arguments
+
     retcode = 22  # Something went off if this was kept until the end.
     try:
         with set_config(run_config), setup_cli_auto_logging(
@@ -383,9 +418,16 @@ def run(
                         set_current_task(task)
                         before_task_run(task)
                         try:
-                            args, kwargs = _normalize_arguments(
-                                task.method, additional_arguments or []
-                            )
+                            if json_loaded_arguments is not None:
+                                args: Sequence = []
+                                kwargs = copy.deepcopy(json_loaded_arguments)
+                                _verify_signature_matches(task.method, kwargs)
+
+                            else:
+                                args, kwargs = _normalize_arguments(
+                                    task.method, additional_arguments or []
+                                )
+
                             result = task.run(*args, **kwargs)
                             task.result = result
                             task.status = Status.PASS
@@ -507,6 +549,52 @@ def check_boolean(value):
     if value.lower() not in ["true", "false", "t", "f", "yes", "no", "1", "0"]:
         raise ArgumentTypeError(f"Invalid value for boolean flag: {value}")
     return str_to_bool(value)
+
+
+def _verify_signature_matches(target_method, kwargs: Dict[str, Any]):
+    from typing import get_type_hints
+
+    from robocorp.tasks._exceptions import InvalidArgumentsError
+
+    sig = inspect.signature(target_method)
+    type_hints = get_type_hints(target_method)
+    method_name = target_method.__code__.co_name
+
+    # Add arguments to the parser based on the function signature and type hints
+    for param_name, param in sig.parameters.items():
+        param_type = type_hints.get(param_name)
+
+        if param_type is None:
+            # If not given, default to `str`.
+            param_type = str
+
+        if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+            # TODO: Support array and object.
+            raise InvalidArgumentsError(
+                f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool."
+            )
+
+        if param.default is inspect.Parameter.empty:
+            # It's required, so, let's see if it's in the kwargs.
+            if param_name not in kwargs:
+                raise InvalidArgumentsError(
+                    f"Error. The parameter `{param_name}` was not defined in the input."
+                )
+
+        passed_value = kwargs.get(param_name, inspect.Parameter.empty)
+        if passed_value is not inspect.Parameter.empty:
+            if not isinstance(passed_value, param_type):
+                raise InvalidArgumentsError(
+                    f"Error. Expected the parameter: `{param_name}` to be of type: {param_type.__name__}. Found type: {type(passed_value).__name__}."
+                )
+
+    error_message = ""
+    try:
+        sig.bind(**kwargs)
+    except Exception as e:
+        error_message = f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\nError: {e}"
+    if error_message:
+        raise InvalidArgumentsError(error_message)
 
 
 def _normalize_arguments(

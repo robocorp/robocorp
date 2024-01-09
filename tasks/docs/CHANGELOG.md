@@ -1,6 +1,10 @@
 # Changelog
 
-## 2.7.0 - 2024-01-5
+## 2.8.0 - 2024-01-09
+
+- Arguments to `@task` may be passed in a json file (with `--json-input=<path to .json file>`).
+
+## 2.7.0 - 2024-01-05
 
 - Fixed issue where imports would fail when collecting tasks because the path being used wasn't absolute. 
 - The task may now have associated information passed as `**kwargs` in the task (available in `ITask.options`).
