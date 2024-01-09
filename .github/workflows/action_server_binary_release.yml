@@ -150,16 +150,11 @@ jobs:
           security import cert.p12 -A -P $MACOS_SIGNING_CERT_PASSWORD
           security set-key-partition-list -S apple-tool:,apple: -s -k "$MACOS_SIGNING_CERT_PASSWORD" build.keychain
           ls -la build/
-          echo 'before codesign'
           codesign --verbose=4 --entitlements entitlements.mac.plist --deep --force -o runtime -s "Robocorp Technologies, Inc." --timestamp build/action-server-unsigned
-          echo 'after first'
           codesign --verify --deep --verbose=2 build/action-server-unsigned
-          echo 'after second code sign'
           codesign -v --verbose=4 --display build/action-server-unsigned
-          echo 'after codesign'
           # notarize MacOS binary (zipped because notarization does not allow executable files)
           zip action-server.zip build/action-server-unsigned
-          echo 'after zip'
           # xcrun notarytool submit --apple-id $APPLEID --team-id $APPLETEAMID --password $APPLEIDPASS action-server.zip
           unzip -o action-server.zip -d build/
           mv build/action-server-unsigned build/action-server
