@@ -160,7 +160,7 @@ jobs:
           # notarize MacOS binary (zipped because notarization does not allow executable files)
           zip action-server.zip build/action-server-unsigned
           echo 'after zip'
-          xcrun notarytool submit --apple-id $APPLEID --team-id $APPLETEAMID --password $APPLEIDPASS action-server.zip
+          # xcrun notarytool submit --apple-id $APPLEID --team-id $APPLETEAMID --password $APPLEIDPASS action-server.zip
           unzip -o action-server.zip -d build/
           mv build/action-server-unsigned build/action-server
 
