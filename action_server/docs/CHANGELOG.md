@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.9 - 2024-01-08
+
+- Fixed build issue (`rcc` should not be bundled in source release).
+
+## 0.0.8 - 2024-01-08
+
+- Properly depend on node 20.x when doing build.
+- Trying to fix build issue (`rcc` should not be bundled in source release).
+
+## 0.0.7 - 2024-01-08
+
+- Make sure that `rcc` is not bundled when doing the source dist (otherwise the linux binary could be wrongly used in mac).
+- UI revamp for the action server.
+- When an action has default values it can be properly run without passing those as arguments.
+- Updated template to start action server project.
+
+
 ## 0.0.6 - 2024-01-05
 
 - `rcc` is now bundled in the action server wheel.
