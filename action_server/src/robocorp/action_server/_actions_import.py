@@ -1,6 +1,5 @@
 import json
 import logging
-import platform
 import subprocess
 import typing
 from pathlib import Path
