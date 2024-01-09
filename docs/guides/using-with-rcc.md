@@ -1,4 +1,4 @@
-# Using robo libraries in existing projects
+# Using Robocorp libraries in existing projects
 
 It's possible to use certain features - such as logging - from the `robo` framework in existing [rcc](https://github.com/robocorp/rcc) projects. It can be done by adding a single `pip` dependency and making a few simple changes.
 
