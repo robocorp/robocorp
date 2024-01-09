@@ -7,7 +7,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/robocorp/robocorp)](https://github.com/robocorp/robocorp/issues)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## 🐍 Create, deploy and operate Python AI Actions and Automations anywhere. 🤖
+# Create, deploy and operate 🐍 Python AI Actions <br/> and 🤖 Automations anywhere.
 
 Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connects any AI Assistant platform to your data and applications.
 
@@ -17,7 +17,7 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 ---
 
-## 🏃‍♂️ Quickstart
+# 🏃‍♂️ Quickstart
 
 Install Robocorp Action Server:
 
@@ -44,36 +44,38 @@ action-server start --expose
 
 Once that’s done, you’ll have an Action Server UI locally at [http://localhost:8080](http://localhost:8080)), and a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_).
 
+Head over to [Action Server docs](./action_server/docs) for more in detail documentation.
+
 ---
 
-## What makes a Python function an ⚡️Action?
+# What makes a Python function an ⚡️Action?
 
 Three key things to know are:
 
-- [conda.yaml file](https://todo) that sets up your **Python environment and dependencies**
-- [@action decorator](https://todo) that determines the **action entry point**
-- [Type hints and docstring](https://todo) in Google-style to let AI agents know **what the Action does**.
+- [conda.yaml file](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) that sets up your **Python environment and dependencies**
+- [@action decorator](./actions/docs) that determines the **action entry point**
+- [Type hints and docstring](./actions/docs) in Google-style to let AI agents know **what the Action does**.
 
 ---
 
-### Add Action Server as a Toolkit to [🦜️🔗 Langchain](https://github.com/robocorp/langchain)
+## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)
 
-Robocorp Action Server comes with everything needed to connect it to your Langchain AI app project. The easiest way is to start with the template, provided in the Langchain project. Here’s how to do it!
+Robocorp Action Server comes with everything needed to connect it to your Langchain AI app project. The easiest way is to start with the template, provided in the Langchain project. Here’s how to do it:
 
 ```sh
-# Install Langchain cli tool if not already there
+# Install LangChain cli tool if not already there
 pip install langchain-cli
 
-# Create the template
+# Use the Action Server template
 langchain app new my-awesome-app --package action_server
 
 # Start the template locally
 langchain template serve
 ```
 
-After running the steps above, you’ll have a Playground running at http://127.0.0.1:8000/playground where you can test the Actions.
+After running the steps above, you’ll have a Playground running at http://127.0.0.1:8000/playground where you can test your Actions with an Ai agent.
 
-Want to build your own things? Adding your own Robocorp AI Actions to a Langchain project is as easy as the code below. Just remember to change the URL of the Action Server if you are not running both the Action Server and Langchain app on the same machine.
+Want to build your own thing? Adding your own Robocorp AI Actions to a Langchain project is as easy as the code below. Just remember to change the URL of the Action Server if you are not running both the Action Server and Langchain app on the same machine.
 
 ```py
 from langchain_robocorp import ActionServerToolkit
@@ -83,7 +85,7 @@ toolkit = ActionServerToolkit(url="http://localhost:8080")
 tools = toolkit.get_tools()
 ```
 
-### Connect with OpenAI GPTs Actions
+## Connect with OpenAI GPTs Actions
 
 Once you have started the Action Server with `--expose` flag, you’ll get a URL available to the public, along with the authentication token. The relevant part of the output from the terminal looks like this, of course with your own details:
 
@@ -94,7 +96,7 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 🔑 Add following header api authorization header to run actions: { "Authorization": "Bearer xxx_xxx" }
 ```
 
-Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and Add Authentication with Authentication method set to “API key” and Auth Type to “Bearer”.
+Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
 ---
 
@@ -132,7 +134,7 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 - Run Action Server locally, and expose it to public internet right from your laptop.
 - Deploy, monitor, and scale through Robocorp cloud (coming soon)
 
-## Roadmap
+### Roadmap
 
 - [x] Action Server Installer
 - [x] Expose actions to public URL
@@ -150,13 +152,13 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 - [ ] Link Action Servers to [Control Room]()
   - [ ] Scalability / load-balancing
 
-## Contributing and issues
+### Contributing and issues
 
 > ⭐️ First, please star the repo - your support is highly appreciated!
 
 TODO
 
-## Contributors
+### Contributors
 
 <!-- readme: contributors -start -->
 
