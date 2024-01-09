@@ -122,7 +122,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
 
     space_root = use_env.get("PYTHON_EXE")
     if space_root:
-        log.info(f"Python interpretor path: {space_root}")
+        log.info(f"Python interpreter path: {space_root}")
 
     action_package = ActionPackage(
         id=action_package_id,
