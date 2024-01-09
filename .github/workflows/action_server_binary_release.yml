@@ -256,7 +256,7 @@ jobs:
             aws-region: eu-west-1
       - name: Copy files to the deploy drop-box with the AWS CLI
         run: |
-            aws s3 sync s3-drop s3://action-server-build-drop-box
+            aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
   update-index:
       # Way to disable the final deploy steps
       if: ${{ false }}
