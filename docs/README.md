@@ -2,7 +2,7 @@
 
 ## Project
 
-- [Using robo libraries in existing projects](using-with-rcc.md)
+- [**Using Robocorp libraries in existing projects**](guides/using-with-rcc.md)
 
 ## Robocorp libraries
 
