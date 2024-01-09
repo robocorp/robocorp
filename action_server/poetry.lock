@@ -1102,17 +1102,17 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "robocorp-actions"
-version = "0.0.3"
+version = "0.0.4"
 description = "Robocorp Actions"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_actions-0.0.3-py3-none-any.whl", hash = "sha256:d40b2ed2319f5503685aeea783049ca131c3947fd93c3c63aa64e43ce1cada5b"},
-    {file = "robocorp_actions-0.0.3.tar.gz", hash = "sha256:06cc4f4270d8d6be53550b6f1e2a82f74784f0800a1f0d4bc7cc3485263ea40d"},
+    {file = "robocorp_actions-0.0.4-py3-none-any.whl", hash = "sha256:fc32f5e9d5fb5aae6a21751a477c90f73f3c14d80512d8d36789dcf257c0dd99"},
+    {file = "robocorp_actions-0.0.4.tar.gz", hash = "sha256:102b45d69c592631c09840cec89562b91a4248486875f22ee728a091e33068c4"},
 ]
 
 [package.dependencies]
-robocorp-tasks = ">=2.7.0,<3.0.0"
+robocorp-tasks = ">=2.8.0,<3.0.0"
 
 [[package]]
 name = "robocorp-devutils"
@@ -1175,13 +1175,13 @@ robocorp-log = ">=2.5,<3"
 
 [[package]]
 name = "robocorp-tasks"
-version = "2.7.0"
+version = "2.8.0"
 description = "The automation framework for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_tasks-2.7.0-py3-none-any.whl", hash = "sha256:79f7da4d1d29491323790cbcef8bff05fec82549938165a3f38e5c9fcf255314"},
-    {file = "robocorp_tasks-2.7.0.tar.gz", hash = "sha256:32dc830d8a587206c340ff82f49c9e25bd956302264e2049b32c26fae15f26b1"},
+    {file = "robocorp_tasks-2.8.0-py3-none-any.whl", hash = "sha256:2641fffd95dee54a265eefd6091efedad8b24db4e77eb6f79f9e3c543e4263c7"},
+    {file = "robocorp_tasks-2.8.0.tar.gz", hash = "sha256:025aefd8d475a78eb8c3f6d7439bf3239aa8085041f380ed9c0ae69d9f50a79d"},
 ]
 
 [package.dependencies]
@@ -1697,4 +1697,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d8cbaf4391c8b86c19ed1a52bf67fffa7faae9fd7b9e20b728aafb72278cf3f9"
+content-hash = "fc35e947c750ea48a1dfa5db211e75017b448564d77db52ff3ecbcb64bcdb4ef"

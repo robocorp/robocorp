@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-action-server"
-version = "0.0.9"
+version = "0.0.10"
 description = "Robocorp local task server"
 authors = ["Fabio Zadrozny <fabiofz@gmail.com>"]
 readme = "README.md"
@@ -24,7 +24,7 @@ uvicorn = "^0.23.2"
 pydantic = "^2.4.2"
 jsonschema = "^4.19.2"
 PyYAML = "^6"
-robocorp-actions = "^0.0.3"
+robocorp-actions = "^0.0.4"
 websockets = "^12.0"
 requests = "^2"
 psutil = "^5"

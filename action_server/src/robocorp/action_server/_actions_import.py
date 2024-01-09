@@ -193,10 +193,10 @@ def _add_actions_to_db(
     from robocorp.action_server._settings import get_python_exe_from_env
 
     v = _get_robocorp_actions_version(env, import_path)
-    if v < (0, 0, 2):
+    if v < (0, 0, 4):
         raise RuntimeError(
             f"Error, the `robocorp.actions` version is: {v}. "
-            "Expected it to be 0.0.2 or higher"
+            "Expected it to be 0.0.4 or higher"
         )
 
     python = get_python_exe_from_env(env)

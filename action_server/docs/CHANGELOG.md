@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.10 - 2024-01-09
+
+- Arguments are passed to the `@action` using `--json-input` command line argument (requires `robocorp-actions 0.0.4`).
+  Fixes issue where having long arguments could make the action invocation fail.
+
 ## 0.0.9 - 2024-01-08
 
 - Fixed build issue (`rcc` should not be bundled in source release).
