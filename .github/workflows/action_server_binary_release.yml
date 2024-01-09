@@ -167,7 +167,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: action-server-signed-macos
-          path: build/action-server
+          path: action_server/build/action-server
 
   sign-windows:
     needs:
