@@ -4,7 +4,7 @@
 
 - [Using robo libraries in existing projects](using-with-rcc.md)
 
-## Libraries
+## Robocorp libraries
 
 - [`robocorp.tasks`](../tasks/docs/README.md) - Create entrypoints for your automation project.
 - [`robocorp.log`](../log/docs/README.md) - Configure and control the execution log.
@@ -14,3 +14,7 @@
 - [`robocorp.browser`](../browser/docs/README.md) - Automate actions in a browser, powered by [Playwright](https://playwright.dev/).
 - [`robocorp.http`](../http/docs/README.md) - Download files easily, or make custom HTTP requests.
 - [`robocorp.excel`](../excel/docs/README.md) - Read and write Excel files.
+
+## External libraries
+
+- [**Recommended 3rd-party libraries**](3rd_party/README.md)
