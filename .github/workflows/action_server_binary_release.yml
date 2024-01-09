@@ -151,7 +151,6 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "$MACOS_SIGNING_CERT_PASSWORD" build.keychain
           ls -la build/
           codesign --verbose=4 --entitlements entitlements.mac.plist --deep --force -o runtime -s "Robocorp Technologies, Inc." --timestamp build/action-server-unsigned
-          echo 'after first'
           codesign --verify --deep --verbose=2 build/action-server-unsigned
           codesign -v --verbose=4 --display build/action-server-unsigned
           # notarize MacOS binary (zipped because notarization does not allow executable files)
