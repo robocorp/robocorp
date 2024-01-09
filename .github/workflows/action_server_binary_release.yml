@@ -55,6 +55,25 @@ jobs:
             cd build-binary
             pyoxidizer run
 
+      - name: Action Server Python Binary Signing [Windows]
+        if: matrix.os == 'windows-2019'
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.CI_GITHUB_TOKEN}}
+          VAULT_URL: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_URL}}
+          CLIENT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_ID}}
+          TENANT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_TENANT_ID}}
+          CLIENT_SECRET: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_SECRET}}
+          CERTIFICATE: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CERTIFICATE}}
+        run: |
+          dotnet tool install --global AzureSignTool --version 3.0.0
+          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build-binary\build\x86_64-pc-windows-msvc\debug\install\action-server.exe
+        shell: powershell
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-binaries
@@ -70,4 +89,199 @@ jobs:
         with:
           name: action-server-version
           path: "action_server/version.txt"
-          
+
+      - name: Copy assets [Linux]
+        if: matrix.os == 'ubuntu-20.04'
+        run: |
+            cp -R build-binary/build/x86_64-unknown-linux-gnu/debug/install/* go-wrapper/assets
+      - name: Copy assets [Mac]
+        if: matrix.os == 'macos-11'
+        run: |
+            cp -R build-binary/build/x86_64-apple-darwin/debug/install/* go-wrapper/assets
+      - name: Copy assets [Windows]
+        if: matrix.os == 'windows-2019'
+        run: |
+            xcopy /e /h /i build-binary\\build\\x86_64-pc-windows-msvc\\debug\\install go-wrapper\\assets
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: action-server-version
+          path: "action_server/go-wrapper/assets"
+      
+      - name: Build Go binary wrapper
+        run: |
+            cd go-wrapper
+            go build -o action-server-unsigned
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-action-server-unsigned
+          path: "action_server/go-wrapper/action-server-unsigned"
+
+  sign-macos:
+    needs:
+      - build
+    defaults:
+      run:
+        working-directory: ./action_server
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+            name: macOS-action-server-unsigned
+            path: action_server/build
+
+      - name: Action Server Signing [macOS]
+        env:
+          APPLEID: ${{ secrets.MACOS_APP_ID_FOR_SIGNING }}
+          APPLEIDPASS: ${{ secrets.MACOS_APP_ID_PASS_FOR_SIGNING }}
+          APPLETEAMID: ${{ secrets.MACOS_TEAM_ID_FOR_NOTARIZATION }}
+          MACOS_SIGNING_CERT: ${{ secrets.MACOS_SIGNING_CERT }}
+          MACOS_SIGNING_CERT_PASSWORD: ${{ secrets.MACOS_SIGNING_CERT_PASSWORD }}
+        run: |
+          # sign MacOS binary
+          security create-keychain -p "$MACOS_SIGNING_CERT_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$MACOS_SIGNING_CERT_PASSWORD" build.keychain
+          echo $MACOS_SIGNING_CERT | base64 --decode -o cert.p12
+          security import cert.p12 -A -P $MACOS_SIGNING_CERT_PASSWORD
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$MACOS_SIGNING_CERT_PASSWORD" build.keychain
+          ls -la build/
+          echo 'before codesign'
+          codesign --verbose=4 --entitlements entitlements.mac.plist --deep --force -o runtime -s "Robocorp Technologies, Inc." --timestamp build/action-server-unsigned
+          echo 'after first'
+          codesign --verify --deep --verbose=2 build/action-server-unsigned
+          echo 'after second code sign'
+          codesign -v --verbose=4 --display build/action-server-unsigned
+          echo 'after codesign'
+          # notarize MacOS binary (zipped because notarization does not allow executable files)
+          zip action-server.zip build/action-server-unsigned
+          echo 'after zip'
+          # xcrun notarytool submit --apple-id $APPLEID --team-id $APPLETEAMID --password $APPLEIDPASS action-server.zip
+          unzip -o action-server.zip -d build/
+          mv build/action-server-unsigned build/action-server
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: action-server-signed-macos
+          path: action_server/build/action-server
+
+  sign-windows:
+    needs:
+      - build
+    defaults:
+      run:
+        working-directory: ./action_server
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+            name: Windows-action-server-unsigned
+            path: action_server/build
+
+      - name: Action Server Signing [Windows]
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.CI_GITHUB_TOKEN}}
+          VAULT_URL: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_URL}}
+          CLIENT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_ID}}
+          TENANT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_TENANT_ID}}
+          CLIENT_SECRET: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_SECRET}}
+          CERTIFICATE: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CERTIFICATE}}
+        run: |
+          dotnet tool install --global AzureSignTool --version 3.0.0
+          mv build\action-server-unsigned build\action-server.exe
+          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build\action-server.exe
+        shell: powershell
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: action-server-signed-windows
+          path: action_server/build/action-server.exe
+
+  deploy-s3:
+    needs:
+      - sign-macos
+      - sign-windows
+    defaults:
+      run:
+        working-directory: ./action_server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+            name: action-server-signed-windows
+            path: action_server/build/windows64/
+      - uses: actions/download-artifact@v4
+        with:
+            name: action-server-signed-macos
+            path: action_server/build/macos64/
+      - uses: actions/download-artifact@v4
+        with:
+            name: Linux-action-server-unsigned
+            path: action_server/build/linux64/
+      - uses: actions/download-artifact@v4
+        with:
+            name: action-server-version
+            path: action_server/build/
+      - run: |
+          ls -l
+          pwd
+          ls -l build
+          mkdir s3-drop
+          # We need to rename the linux binary because the others are renamed during signing
+          mv build/linux64/action-server-unsigned build/linux64/action-server
+          mv build/version.txt s3-drop/
+          mv build/macos64 s3-drop/
+          mv build/linux64 s3-drop/
+          mv build/windows64 s3-drop/
+          ls -l s3-drop/
+          ver=`cat s3-drop/version.txt`
+          echo "actionServerVersion=${ver}" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v4
+        with:
+          name: action-server-artifacts-for-s3-${{ env.actionServerVersion }}
+          path: action_server/s3-drop
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CICD_DROPBOX }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CICD_DROPBOX }}
+            aws-region: eu-west-1
+      - name: Copy files to the deploy drop-box with the AWS CLI
+        run: |
+            aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
+  update-index:
+      # Way to disable the final deploy steps
+      if: ${{ false }}
+      timeout-minutes: 10
+      runs-on: ubuntu-latest
+      needs:
+          # Only update index when deploy passes
+          - deploy-s3
+      defaults:
+        run:
+          working-directory: ./action_server
+      steps:
+          - uses: actions/checkout@v4
+          - name: Generate the new index files
+            run: |
+              mkdir -p build/
+              python3 index.py
+          - name: Configure AWS credentials for index.html update
+            uses: aws-actions/configure-aws-credentials@v1-node16
+            with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
+                aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
+                aws-region: eu-west-1
+          - name: Copy files to the deploy drop-box with the AWS CLI
+            run: |
+                aws s3 cp ./build/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
+                aws s3 cp ./build/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
+
