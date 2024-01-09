@@ -3,7 +3,6 @@ import inspect
 import json
 import logging
 import os
-import sys
 import time
 import typing
 from pathlib import Path
@@ -176,16 +175,20 @@ def _run_action_in_thread(
         inputs = {}
         if args or kwargs:
             bound = signature.bind(*args, **kwargs)
-            cmdline.append("--")
 
             for k, v in bound.arguments.items():
                 inputs[k] = v
-                cmdline.append(f"--{k}")
-                cmdline.append(str(v))
 
         run_id = gen_uuid("run")
         relative_artifacts_path: str = _create_run_artifacts_dir(action, run_id)
         run: Run = _create_run(action, run_id, inputs, relative_artifacts_path)
+
+        input_json = (
+            settings.artifacts_dir
+            / relative_artifacts_path
+            / "__action_server_inputs.json"
+        )
+        cmdline.append(f"--json-input={input_json}")
 
         initial_time = time.monotonic()
         try:
@@ -221,11 +224,7 @@ import it again from the new location.
                 / "__action_server_result.json"
             )
 
-            (
-                settings.artifacts_dir
-                / relative_artifacts_path
-                / "__action_server_inputs.json"
-            ).write_text(json.dumps(inputs))
+            input_json.write_text(json.dumps(inputs))
 
             for key, value in headers.items():
                 if value:
