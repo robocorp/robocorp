@@ -1,0 +1,31 @@
+name: Action Server Update Downloads
+
+on:
+  workflow_dispatch:
+    # Enables manual triggering via GitHub Actions
+
+jobs:
+  update-index:
+      # Way to disable the final deploy steps
+      if: ${{ true }}
+      timeout-minutes: 10
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: ./action_server
+      steps:
+          - uses: actions/checkout@v4
+          - name: Generate the new index files
+            run: |
+              cd build-binary/
+              python downloads_index.py -c ../docs/CHANGELOG.md -p index.html -j index.json
+          - name: Configure AWS credentials for index.html update
+            uses: aws-actions/configure-aws-credentials@v1-node16
+            with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
+                aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
+                aws-region: eu-west-1
+          - name: Copy files to the deploy drop-box with the AWS CLI
+            run: |
+                aws s3 cp ./build-binary/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
+                aws s3 cp ./build-binary/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
