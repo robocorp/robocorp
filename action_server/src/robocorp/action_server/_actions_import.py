@@ -120,7 +120,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     if not name:
         name = import_path.name
 
-    log.info(f"Python Interpretor path: {use_env.get('RCC_HOLOTREE_SPACE_ROOT')}/bin/python")
+    log.info(f"Python Interpreter path: {use_env.get('RCC_HOLOTREE_SPACE_ROOT')}/bin/python")
 
     action_package = ActionPackage(
         id=action_package_id,
