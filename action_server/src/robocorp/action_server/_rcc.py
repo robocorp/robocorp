@@ -177,7 +177,7 @@ class Rcc(object):
         output = boutput.decode("utf-8", "replace")
 
         do_log_as_info = (
-            log_errors and logging.root.level <= logging.INFO
+            log_errors and logging.root.level < logging.INFO
         ) or logging.root.level <= logging.DEBUG
 
         if do_log_as_info:
@@ -206,7 +206,7 @@ class Rcc(object):
             mutex_name=RCC_CLOUD_ROBOT_MUTEX_NAME,
             cwd=str(conda_yaml.parent),
             timeout=timeout,  # Creating the env may be really slow!
-            show_interactive_output=True,
+            show_interactive_output=logging.root.level <= logging.DEBUG,
         )
 
         def return_failure(msg: Optional[str]) -> ActionResult[EnvInfo]:
