@@ -121,12 +121,9 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     if not name:
         name = import_path.name
 
-    space_root = use_env.get("RCC_HOLOTREE_SPACE_ROOT")
+    space_root = use_env.get("PYTHON_EXE")
     if space_root:
-        if platform.system() == "Windows":
-            log.info(f"Python interpretor path: {Path(space_root) / 'python.exe'}")
-        else:
-            log.info(f"Python interpretor path: {Path(space_root) / 'bin' / 'python'}")
+        log.info(f"Python interpretor path: {space_root}")
 
     action_package = ActionPackage(
         id=action_package_id,
