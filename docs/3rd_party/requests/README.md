@@ -4,7 +4,8 @@ The `requests` library is one of the most known and used Python libraries for HT
 
 👉 Their slogan tells it all: _**HTTP for Humans**_
 
-Whether you need to download a file, interact with an API or simply checking if a website is responding, for everything HTTP, you should just use `requests`.
+Whether you need to download a file, interact with an API or simply checking if a website is responding, for everything
+HTTP, you should just use `requests`.
 
 ## Usage
 
@@ -20,9 +21,9 @@ def download_file(url, local_filename):
     return local_filename
 ```
 
-###### Various [snippets](./snippets)
+###### Various [snippets](snippets)
 
-- [File download](./snippets/download.py)
+- [File download](snippets/download.py)
 
 ###### Examples in Robocorp Portal
 
