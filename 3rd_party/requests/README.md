@@ -1,10 +1,10 @@
-# Requests -library
+# Requests
 
-Requests -library is one of the most known and used Python libraries.
+The `requests` library is one of the most known and used Python libraries for HTTP calls.
 
 👉 Their slogan tells it all: `HTTP for Humans`
 
-Whether you need to download a file or check if a website is responding, for everything HTTP, you should just use `requests.`
+Whether you need to download a file, interact with an API or simply checking if a website is responding, for everything HTTP, you should just use `requests`.
 
 ## Usage
 
