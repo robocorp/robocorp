@@ -254,7 +254,7 @@ jobs:
             aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
   update-index:
       # Way to disable the final deploy steps
-      if: ${{ false }}
+      if: ${{ true }}
       timeout-minutes: 10
       runs-on: ubuntu-latest
       needs:
