@@ -268,8 +268,8 @@ jobs:
           - uses: actions/checkout@v4
           - name: Generate the new index files
             run: |
-              mkdir -p build/
-              python3 index.py
+              cd build-binary/
+              python downloads_index.py -c ..\docs\CHANGELOG.md -p index.html -j index.json
           - name: Configure AWS credentials for index.html update
             uses: aws-actions/configure-aws-credentials@v1-node16
             with:
@@ -278,6 +278,6 @@ jobs:
                 aws-region: eu-west-1
           - name: Copy files to the deploy drop-box with the AWS CLI
             run: |
-                aws s3 cp ./build/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
-                aws s3 cp ./build/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
+                aws s3 cp ./build-binary/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
+                aws s3 cp ./build-binary/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
 

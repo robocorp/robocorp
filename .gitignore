@@ -30,3 +30,5 @@ dist/
 # Removed old files
 /examples/
 /**/output/
+/action_server/build-binary/*.html
+/action_server/build-binary/*.json
