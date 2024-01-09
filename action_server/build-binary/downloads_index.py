@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Creates a simple static downloads HTML page and JSON file to accommodated downloading the executable from one url
-# Usage: python downloads_index.py -c docs/CHANGELOG.md -p index.html -j index.json
+# Usage: python downloads_index.py -c ../docs/CHANGELOG.md -p index.html -j index.json
 
 import argparse
 import json
