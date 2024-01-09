@@ -1,6 +1,7 @@
 from pathlib import Path
-from invoke import task
+
 from devutils.invoke_utils import build_common_tasks
+from invoke import task
 
 CURDIR = Path(__file__).absolute().parent
 
@@ -38,7 +39,7 @@ def update(ctx):
             dep_name = name[len("robocorp-") :]
             dep_pyproject = CURDIR.parent / dep_name / "pyproject.toml"
             dep_contents = tomlkit.loads(dep_pyproject.read_text())
-            dep_version = dep_contents["tool"]["poetry"]["version"]
+            dep_version = f'^{dep_contents["tool"]["poetry"]["version"]}'
             if version != dep_version:
                 print(f"Updating {name}: {version} -> {dep_version}")
                 dependencies[name] = dep_version
@@ -62,6 +63,7 @@ def update(ctx):
 def outdated(ctx):
     """Check if dependencies in metapackage are outdated"""
     import sys
+
     import tomlkit
 
     pyproject = CURDIR / "pyproject.toml"
@@ -87,6 +89,7 @@ def outdated(ctx):
 def _fetch_version(name):
     import json
     import urllib.request
+
     import semver
 
     with urllib.request.urlopen(f"https://pypi.org/pypi/{name}/json") as response:
@@ -97,12 +100,21 @@ def _fetch_version(name):
 
 
 def _bump_by_changes(version, changes):
+    if version.startswith("^"):
+        version = version[1:]
+
     import semver
 
     version = semver.Version.parse(version)
     major, minor, patch = False, False, False
 
     for before, after in changes:
+        if before.startswith("^"):
+            before = before[1:]
+
+        if after.startswith("^"):
+            after = after[1:]
+
         before = semver.Version.parse(before)
         after = semver.Version.parse(after)
 
