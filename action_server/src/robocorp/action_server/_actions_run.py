@@ -312,9 +312,13 @@ def generate_func_from_action(action: "Action"):
         desc = param_data.get("description", "")
         argument_names.append(f"args.{param_name}")
         param_type = param_data.get("type", "string")
+
         argument = f"""
     {param_name}: Annotated[{_spec_api_type_to_python_type[param_type]}, 
         Param(description={desc!r})]"""
+        if "default" in param_data:
+            default = param_data.get("default")
+            argument = f"{argument}={default!r}"
         arguments.append(argument)
 
     # Note: Headers are explicitly hidden from spec to make the OpenAPI schema compatible with OpenAI

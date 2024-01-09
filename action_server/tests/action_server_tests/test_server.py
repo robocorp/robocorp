@@ -165,9 +165,7 @@ def test_import(
 
     db_path = base_case.db_path
 
-    found = client.post_get_str(
-        "api/actions/greeter/greet/run", {"name": "Foo", "title": "Mr."}
-    )
+    found = client.post_get_str("api/actions/greeter/greet/run", {"name": "Foo"})
     assert found == '"Hello Mr. Foo."', f"{found} != '\"Hello Mr. Foo.\"'"
 
     # 500 seems appropriate here as the user task didn't complete properly.

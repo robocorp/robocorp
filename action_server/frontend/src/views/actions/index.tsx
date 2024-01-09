@@ -23,7 +23,7 @@ const ActionRow: FC<TableRowProps<Action, { packages: ActionPackage[]; runs: Run
 
   const runCount = useMemo(
     () => runs?.filter((item) => item.action_id === action.id).length || 0,
-    [action],
+    [action, runs],
   );
 
   const onClickAction = useCallback(() => {
@@ -98,7 +98,13 @@ export const ActionPackages = () => {
       <Header>
         <Header.Title title="Action Packages" />
       </Header>
-      <Table columns={columns} data={actions} row={ActionRow} rowProps={tableProps} />
+      <Table
+        columns={columns}
+        data={actions}
+        row={ActionRow}
+        rowProps={tableProps}
+        rowCount="all"
+      />
       <ActionDetails />
     </>
   );

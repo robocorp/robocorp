@@ -268,7 +268,7 @@ export const ActionRuns: FC = () => {
         values={selectedStates}
         onChange={setSelectedStates}
       />
-      <Table sort={sort} onSort={onSort} columns={columns} data={runs} row={RunRow} rowCount={10} />
+      <Table sort={sort} onSort={onSort} columns={columns} data={runs} row={RunRow} rowCount={20} />
       <ActionRunDetails />
     </ActionRunsContext.Provider>
   );

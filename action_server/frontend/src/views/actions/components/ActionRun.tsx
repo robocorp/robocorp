@@ -56,10 +56,8 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
 
   useEffect(() => {
     if (inputSchema.properties) {
-      const { required } = inputSchema;
-      const initialFormData = Object.entries(inputSchema.properties)
-        .filter(([key]) => required.includes(key))
-        .map<FormDataEntry>(([key, value]) => {
+      const initialFormData = Object.entries(inputSchema.properties).map<FormDataEntry>(
+        ([key, value]) => {
           switch (value.type) {
             case InputPropertyType.NUMBER:
               return [key, value, '0.0'];
@@ -71,7 +69,8 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
             default:
               return [key, value, ''];
           }
-        });
+        },
+      );
 
       setFormData(initialFormData);
     }
@@ -113,6 +112,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
               description={description}
               value={value}
               type="number"
+              required={isRequired}
               onChange={(e) => handleInputChange(e, index)}
             />
           );
@@ -123,6 +123,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
               label={title}
               description={description}
               checked={value === 'true'}
+              required={isRequired}
               onChange={(e) => handleInputChange(e, index)}
             />
           );
