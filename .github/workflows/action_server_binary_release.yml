@@ -55,6 +55,19 @@ jobs:
             cd build-binary
             pyoxidizer run
 
+      - name: Action Server Python Binary Signing [Windows]
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.CI_GITHUB_TOKEN}}
+          VAULT_URL: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_URL}}
+          CLIENT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_ID}}
+          TENANT_ID: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_TENANT_ID}}
+          CLIENT_SECRET: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CLIENT_SECRET}}
+          CERTIFICATE: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CERTIFICATE}}
+        run: |
+          dotnet tool install --global AzureSignTool --version 3.0.0
+          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build-binary\build\x86_64-pc-windows-msvc\debug\install\action-server.exe
+        shell: powershell
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -141,7 +154,7 @@ jobs:
           echo 'after first'
           codesign --verify --deep --verbose=2 build/action-server-unsigned
           echo 'after second code sign'
-          codesign -v --verbose=4 --display build/action-server-unsgined
+          codesign -v --verbose=4 --display build/action-server-unsigned
           echo 'after codesign'
           # notarize MacOS binary (zipped because notarization does not allow executable files)
           zip action-server.zip build/action-server-unsigned
