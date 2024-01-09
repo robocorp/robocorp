@@ -1,7 +1,4 @@
 ![Robocorp](./docs/include/robocorp-header.svg)
-
-# Robocorp
-
 <samp>[Docs](https://robocorp.com/docs) | [Blog](https://robocorp.com/blog) | [Examples](https://robocorp.com/portal) | [ReMark](https://chat.robocorp.com) | [Courses](https://robocorp.com/docs/courses) | [Slack](https://robocorp-developers.slack.com/) | [Youtube](https://www.youtube.com/@Robocorp) | [𝕏](https://twitter.com/RobocorpInc)</samp>
 
 [![PyPI - Version](https://img.shields.io/pypi/v/robocorp?label=robocorp&color=%23733CFF)](https://pypi.org/project/robocorp)
@@ -155,20 +152,9 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 
 ## Contributing and issues
 
-> [!NOTE]
-> Useful information that users should know, even when skimming content.
+> ⭐️ First, please star the repo - your support is highly appreciated!
 
-> [!TIP]
-> Helpful advice for doing things better or more easily.
-
-> [!IMPORTANT]
-> Key information users need to know to achieve their goal.
-
-> [!WARNING]
-> Urgent info that needs immediate user attention to avoid problems.
-
-> [!CAUTION]
-> Advises about risks or negative outcomes of certain actions.
+TODO
 
 ## Contributors
 
