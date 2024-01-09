@@ -268,7 +268,7 @@ jobs:
           - name: Generate the new index files
             run: |
               cd build-binary/
-              python downloads_index.py -c ..\docs\CHANGELOG.md -p index.html -j index.json
+              python downloads_index.py -c ../docs/CHANGELOG.md -p index.html -j index.json
           - name: Configure AWS credentials for index.html update
             uses: aws-actions/configure-aws-credentials@v1-node16
             with:
