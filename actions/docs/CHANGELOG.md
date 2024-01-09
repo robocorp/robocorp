@@ -1,4 +1,9 @@
 
+## 0.0.4 - 2024-01-09
+
+- Arguments to `@action` may be passed in a json file (with `--json-input=<path to .json file>`).
+- Requires `robocorp-tasks >= 2.8.0` now.
+
 ## 0.0.3 - 2024-01-05
 
 - Pass `@action(is_consequential=True)` to add `x-openai-isConsequential` option to action openapi spec (when used with the action-server).

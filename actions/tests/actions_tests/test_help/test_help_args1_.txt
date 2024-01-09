@@ -3,6 +3,7 @@ usage: robocorp.actions run [-h] [--glob GLOB] [-a ACTION_NAME] [-o OUTPUT_DIR]
                             [--max-log-file-size MAX_LOG_FILE_SIZE]
                             [--console-colors {auto,plain,ansi}]
                             [--log-output-to-stdout {no,json}]
+                            [--json-input JSON_INPUT]
                             [--preload-module PRELOAD_MODULE] [--no-status-rc]
                             [--teardown-dump-threads-timeout TEARDOWN_DUMP_THREADS_TIMEOUT]
                             [--teardown-interrupt-timeout TEARDOWN_INTERRUPT_TIMEOUT]
@@ -36,6 +37,11 @@ options:
                         Can be used so that log messages are also sent to the
                         'stdout' (if not specified the RC_LOG_OUTPUT_STDOUT is
                         also queried).
+  --json-input JSON_INPUT
+                        May be used to pass the arguments to the action by
+                        loading the arguments from a file (defined as a json
+                        object, where keys are the arguments names and the
+                        values are the values to be set to the arguments).
   --preload-module PRELOAD_MODULE
                         May be used to load a module(s) as the first step when
                         collecting actions.

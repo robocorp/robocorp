@@ -122,6 +122,11 @@ class _ArgDispatcher:
         )
 
         run_parser.add_argument(
+            "--json-input",
+            help="May be used to pass the arguments to the task by loading the arguments from a file (defined as a json object, where keys are the arguments names and the values are the values to be set to the arguments).",
+            dest="json_input",
+        )
+        run_parser.add_argument(
             "--preload-module",
             action="append",
             help="May be used to load a module(s) as the first step when collecting tasks.",

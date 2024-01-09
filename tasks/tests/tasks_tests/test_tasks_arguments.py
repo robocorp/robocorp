@@ -1,3 +1,7 @@
+import json
+from pathlib import Path
+
+
 def check(datadir, args, msg="", returncode=1):
     from devutils.fixtures import robocorp_tasks_run
 
@@ -12,6 +16,23 @@ def check(datadir, args, msg="", returncode=1):
 
     stdout = result.stdout.decode("utf-8")
     assert msg in stdout, f"{msg}\nnot in\n{stdout}"
+
+
+def test_tasks_arguments_json_input(datadir, tmpdir) -> None:
+    json_input = Path(tmpdir / "my.json")
+    json_input.write_text(json.dumps({"s": "1"}))
+
+    check(datadir, ["-t=accept_str", f"--json-input={json_input}"], returncode=0)
+
+    json_input = Path(tmpdir / "my.json")
+    json_input.write_text(json.dumps({"s": 1}))
+
+    check(
+        datadir,
+        ["-t=accept_str", f"--json-input={json_input}"],
+        "Error. Expected the parameter: `s` to be of type: str. Found type: int.",
+        returncode=1,
+    )
 
 
 def test_tasks_arguments(datadir) -> None:
