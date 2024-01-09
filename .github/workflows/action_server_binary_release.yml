@@ -56,6 +56,7 @@ jobs:
             pyoxidizer run
 
       - name: Action Server Python Binary Signing [Windows]
+        if: matrix.os == 'windows-2019'
         env:
           NODE_AUTH_TOKEN: ${{secrets.CI_GITHUB_TOKEN}}
           VAULT_URL: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_URL}}

@@ -65,7 +65,7 @@ func main() {
 	// Determine the appropriate path based on the operating system
 	switch runtime.GOOS {
 	case "windows":
-		appDataDir := os.Getenv("APPDATA")
+		appDataDir := os.Getenv("LOCALAPPDATA")
 		actionServerPath = fmt.Sprintf("%s\\robocorp\\action-server\\%s", appDataDir, version)
 		executablePath = filepath.Join(actionServerPath, "action-server.exe")
 	case "linux", "darwin":
