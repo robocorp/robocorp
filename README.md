@@ -164,8 +164,9 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 
 ## Roadmap
 
-- [x] Action Server Installer
+- [x] Action Server `brew install` for Mac users
 - [x] Expose actions to public URL
+- [x] Resume previously exposed session
 - [ ] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code)
 - [ ] MS Copilot Studio manifest file support
 - [ ] Llamaindex Tools support
