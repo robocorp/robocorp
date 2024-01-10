@@ -1,6 +1,5 @@
 import json
 import logging
-import platform
 import subprocess
 import typing
 from pathlib import Path
@@ -121,12 +120,9 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     if not name:
         name = import_path.name
 
-    space_root = use_env.get("RCC_HOLOTREE_SPACE_ROOT")
-    if space_root:
-        if platform.system() == "Windows":
-            log.info(f"Python interpretor path: {Path(space_root) / 'python.exe'}")
-        else:
-            log.info(f"Python interpretor path: {Path(space_root) / 'bin' / 'python'}")
+    python_exe = use_env.get("PYTHON_EXE")
+    if python_exe:
+        log.info(f"Python interpreter path: {python_exe}")
 
     action_package = ActionPackage(
         id=action_package_id,
