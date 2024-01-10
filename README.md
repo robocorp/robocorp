@@ -54,11 +54,38 @@ Head over to [Action Server docs](./action_server/docs) for more in detail docum
 
 # What makes a Python function an ⚡️Action?
 
-Three key things to know are:
+Two things to know are:
 
-- [conda.yaml file](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) that sets up your **Python environment and dependencies**
-- [@action decorator](./actions/docs) that determines the **action entry point**
-- [Type hints and docstring](./actions/docs) in Google-style to let AI agents know **what the Action does**.
+[conda.yaml file](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) that sets up your **Python environment and dependencies**:
+
+```yaml
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10.12
+  - pip=23.2.1
+  - robocorp-truststore=0.8.0
+  - pip:
+      - robocorp==1.3.0
+      - numpy==1.26.3
+```
+
+[@action decorator](./actions/docs) that determines the **action entry point** and [Type hints and docstring](./actions/docs) to let AI agents know **what the Action does**.
+
+```py
+@action
+def greeting(name: str) -> str:
+    """
+    Greets the user
+
+    Args:
+        name (str): The user name
+
+    Returns:
+        str: Final user greeting
+    """
+```
 
 ---
 
@@ -161,7 +188,7 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 > ⭐️ First, please star the repo - your support is highly appreciated!
 
 - 🚩 Issues – our [GitHub Issues](https://github.com/robocorp/robocorp/issues) is kept up to date with bugs, improvements, and feature requests
-- 🙋 Help - refer to the [/docs](repo documentation) and you are welcom to [join our Community Slack](https://robocorp-developers.slack.com/) if you experience any difficulty getting setup
+- 🙋 Help - you are welcome to [join our Community Slack](https://robocorp-developers.slack.com/) if you experience any difficulty getting setup
 - 🌟 Recognition – [PR's](https://github.com/robocorp/robocorp/pulls) are welcome!
 - 🔐 Security – TODO
 
