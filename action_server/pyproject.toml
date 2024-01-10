@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-action-server"
-version = "0.0.10"
+version = "0.0.11"
 description = "Robocorp local task server"
 authors = ["Fabio Zadrozny <fabiofz@gmail.com>"]
 readme = "README.md"
