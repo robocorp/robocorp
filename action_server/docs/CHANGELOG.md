@@ -2,6 +2,10 @@
 
 - Fix main README and update docs.
 
+## 0.0.11 - 2024-01-10
+
+- Fixed issue where the actions wouldn't be shown in the UI if the `@action` didn't have any required arguments.
+
 ## 0.0.10 - 2024-01-09
 
 - Arguments are passed to the `@action` using `--json-input` command line argument (requires `robocorp-actions 0.0.4`).
