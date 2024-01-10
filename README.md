@@ -169,19 +169,14 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 
 - [x] Action Server Installer
 - [x] Expose actions to public URL
-- [ ] Dev convenience
-  - [ ] Run `@actions` like `@tasks` in vscode
-  - [ ] Hot reload
-  - [ ] Secret management
-  - [ ] Shared asset storage
-  - [ ] Action update history
-  - [ ] docstring validator
-- [ ] MS Copilot Studio support
+- [ ] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code)
+- [ ] MS Copilot Studio manifest file support
+- [ ] Link and deploy Action Servers to [Control Room](https://cloud.robocorp.com/)
+- [ ] Hot reload of actions after a change
+- [ ] Docstring validator and autogeneration
 - [ ] More complex input args
 - [ ] Explicit action user approval
 - [ ] Stateful actions
-- [ ] Link Action Servers to [Control Room]()
-  - [ ] Scalability / load-balancing
 
 ## Contributing and issues
 
@@ -190,7 +185,7 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 - 🚩 Issues – our [GitHub Issues](https://github.com/robocorp/robocorp/issues) is kept up to date with bugs, improvements, and feature requests
 - 🙋 Help - you are welcome to [join our Community Slack](https://robocorp-developers.slack.com/) if you experience any difficulty getting setup
 - 🌟 Recognition – [PR's](https://github.com/robocorp/robocorp/pulls) are welcome!
-- 🔐 Security – TODO
+- 🔐 [Security](https://robocorp.com/.well-known/security.txt)
 
 ### Contributors
 
