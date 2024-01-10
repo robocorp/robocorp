@@ -2,13 +2,13 @@
 
 # module `robocorp.vault`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L0)
 
 ______________________________________________________________________
 
 ## function `get_secret`
 
-**Source:** [`__init__.py:19`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L19)
+**Source:** [`__init__.py:19`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L19)
 
 ```python
 get_secret(name: str, hide: bool = True) → SecretContainer
@@ -36,7 +36,7 @@ ______________________________________________________________________
 
 ## function `set_secret`
 
-**Source:** [`__init__.py:47`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L47)
+**Source:** [`__init__.py:47`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L47)
 
 ```python
 set_secret(secret: SecretContainer, hide: bool = True) → None
@@ -63,7 +63,7 @@ ______________________________________________________________________
 
 ## function `create_secret`
 
-**Source:** [`__init__.py:72`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/__init__.py#L72)
+**Source:** [`__init__.py:72`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L72)
 
 ```python
 create_secret(
@@ -100,7 +100,7 @@ ______________________________________________________________________
 
 ## class `SecretContainer`
 
-**Source:** [`_secrets.py:5`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L5)
+**Source:** [`_secrets.py:5`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/_secrets.py#L5)
 
 Container for a secret with name, description, and multiple key-value pairs.
 
@@ -110,7 +110,7 @@ Note that keys are always converted to str internally.
 
 ### method `__init__`
 
-**Source:** [`_secrets.py:13`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L13)
+**Source:** [`_secrets.py:13`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/_secrets.py#L13)
 
 ```python
 __init__(name: str, description: str, values: Dict[str, Any])
@@ -130,7 +130,7 @@ ______________________________________________________________________
 
 ### method `update`
 
-**Source:** [`_secrets.py:32`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_secrets.py#L32)
+**Source:** [`_secrets.py:32`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/_secrets.py#L32)
 
 ```python
 update(kvpairs) → None
@@ -140,6 +140,6 @@ ______________________________________________________________________
 
 ## exception `RobocorpVaultError`
 
-**Source:** [`_errors.py:1`](https://github.com/robocorp/robo/tree/master/vault/src/robocorp/vault/_errors.py#L1)
+**Source:** [`_errors.py:1`](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/_errors.py#L1)
 
 Raised when there's problem with reading from Robocorp Vault.

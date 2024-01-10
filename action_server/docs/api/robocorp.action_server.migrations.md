@@ -2,7 +2,7 @@
 
 # module `robocorp.action_server.migrations`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L0)
 
 The way that migrations work is the following:
 
@@ -19,7 +19,7 @@ ______________________________________________________________________
 
 ## function `migrate_db`
 
-**Source:** [`__init__.py:48`](https://github.com/robocorp/robo/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L48)
+**Source:** [`__init__.py:48`](https://github.com/robocorp/robocorp/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L48)
 
 ```python
 migrate_db(
@@ -37,7 +37,7 @@ ______________________________________________________________________
 
 ## function `db_migration_pending`
 
-**Source:** [`__init__.py:133`](https://github.com/robocorp/robo/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L133)
+**Source:** [`__init__.py:133`](https://github.com/robocorp/robocorp/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L133)
 
 ```python
 db_migration_pending(db_path: Union[Path, str]) → bool
@@ -47,7 +47,7 @@ ______________________________________________________________________
 
 ## class `Migration`
 
-**Source:** [`__init__.py:34`](https://github.com/robocorp/robo/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L34)
+**Source:** [`__init__.py:34`](https://github.com/robocorp/robocorp/tree/master/action_server/src/robocorp/action_server/migrations/__init__.py#L34)
 
 Migration(id: int, name: str)
 

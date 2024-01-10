@@ -2,7 +2,7 @@
 
 # module `robocorp.log.console`
 
-**Source:** [`console.py:0`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L0)
+**Source:** [`console.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L0)
 
 ## Variables
 
@@ -19,7 +19,7 @@ ______________________________________________________________________
 
 ## function `set_color`
 
-**Source:** [`console.py:215`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L215)
+**Source:** [`console.py:215`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L215)
 
 ```python
 set_color(foreground_color: str) → _OnExitContextManager
@@ -36,7 +36,7 @@ ______________________________________________________________________
 
 ## function `set_mode`
 
-**Source:** [`console.py:229`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/console.py#L229)
+**Source:** [`console.py:229`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L229)
 
 ```python
 set_mode(mode: str) → None

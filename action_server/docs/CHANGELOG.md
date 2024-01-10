@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix main README and update docs.
+
 ## 0.0.10 - 2024-01-09
 
 - Arguments are passed to the `@action` using `--json-input` command line argument (requires `robocorp-actions 0.0.4`).
@@ -88,4 +90,3 @@ action-server start --actions-sync=false --datadir=c:/temp/datadir
 
 - First release (pre-alpha).
 - Can import actions in the backend and run using API
-
