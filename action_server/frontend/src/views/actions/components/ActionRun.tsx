@@ -40,7 +40,7 @@ const convertType = (v: string, valueType: InputPropertyType): string | number |
 };
 
 type InputSchema = {
-  required: string[];
+  required: string[] | undefined; // May be undefined if there are no required entries.
   properties: Record<string, InputProperty>;
 };
 
@@ -98,7 +98,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     const { required } = inputSchema;
 
     return formData.map(([key, property, value], index) => {
-      const isRequired = required.includes(key);
+      const isRequired = required && required.includes(key);
       const { description } = property;
       const title = `${property.title}${isRequired ? ' *' : ''}`;
 

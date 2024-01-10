@@ -15,6 +15,8 @@ import { CachedModel, ModelContainer, ModelType } from './modelContainer';
 
 export const baseUrl = '';
 export const baseUrlWs = `ws://${window.location.host}`;
+// export const baseUrl = 'http://localhost:8090';
+// export const baseUrlWs = 'ws://localhost:8090';
 
 interface Opts {
   body?: string;

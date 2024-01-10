@@ -15,6 +15,7 @@ import { HeaderAndMenu } from '~/components/Header';
 import { Redirect, SideHeader } from '~/components';
 import { LoadedActionsPackages, LoadedRuns, ServerConfig } from '~/lib/types';
 import {
+  baseUrl,
   startTrackActions,
   startTrackRuns,
   stopTrackActions,
@@ -110,7 +111,7 @@ const Root = () => {
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const response = await fetch('/config');
+      const response = await fetch(`${baseUrl}/config`);
       const payload = await response.json();
       setServerConfig(payload);
     };
