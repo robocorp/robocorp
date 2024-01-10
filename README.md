@@ -134,7 +134,7 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 - Run Action Server locally, and expose it to public internet right from your laptop.
 - Deploy, monitor, and scale through Robocorp cloud (coming soon)
 
-### Roadmap
+## Roadmap
 
 - [x] Action Server Installer
 - [x] Expose actions to public URL
@@ -152,11 +152,14 @@ Zero code deployment - no need to learn the tricks with AWS Lambdas or similar
 - [ ] Link Action Servers to [Control Room]()
   - [ ] Scalability / load-balancing
 
-### Contributing and issues
+## Contributing and issues
 
 > ⭐️ First, please star the repo - your support is highly appreciated!
 
-TODO
+- 🚩 Issues – our [GitHub Issues](https://github.com/robocorp/robocorp/issues) is kept up to date with bugs, improvements, and feature requests
+- 🙋 Help - refer to the [/docs](repo documentation) and you are welcom to [join our Community Slack](https://robocorp-developers.slack.com/) if you experience any difficulty getting setup
+- 🌟 Recognition – [PR's](https://github.com/robocorp/robocorp/pulls) are welcome!
+- 🔐 Security – TODO
 
 ### Contributors
 
