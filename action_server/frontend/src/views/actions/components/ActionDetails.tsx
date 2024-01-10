@@ -36,8 +36,8 @@ export const ActionDetails: FC = () => {
             <Drawer.Header.Title title={action.name} />
             <Drawer.Header.Badges>
               {!action.enabled && (
-                <Tooltip text="This action is not available or has been removed">
-                  <Badge variant="info" size="small" label="Disabled" />
+                <Tooltip text="This action has been removed or renamed and is not available for running">
+                  <Badge variant="warning" size="small" label="Not available" />
                 </Tooltip>
               )}
             </Drawer.Header.Badges>
