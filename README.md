@@ -42,7 +42,7 @@ action-server new
 Navigate to the freshly created project folder and start the server:
 
 ```sh
-cd my-project
+cd my-first-action-server
 action-server start --expose
 ```
 
