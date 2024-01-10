@@ -3,6 +3,7 @@ import { Action, ActionPackage, Run } from './types';
 const action1: Action = {
   id: '1',
   action_package_id: 'calc1',
+  enabled: true,
   name: 'Action 1',
   docs: 'Documentation for Action 1',
   file: 'action_1.js',
@@ -14,6 +15,7 @@ const action1: Action = {
 const action2: Action = {
   id: '2',
   action_package_id: 'calc1',
+  enabled: true,
   name: 'Action 2',
   docs: 'Documentation for Action 2',
   file: 'action_2.js',
@@ -25,6 +27,7 @@ const action2: Action = {
 const action3: Action = {
   id: '3',
   action_package_id: 'calc1',
+  enabled: false,
   name: 'Action 3',
   docs: 'Documentation for Action 3',
   file: 'action_3.js',
