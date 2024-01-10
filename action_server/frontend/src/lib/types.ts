@@ -9,6 +9,7 @@ export interface Action {
   action_package_id: string; // foreign key to the action package
   name: string; // The action name
   docs: string; // Docs for the action
+  enabled: boolean; // Is the action available to be run
 
   // File for the action (relative to the directory in the ActionPackage).
   file: string;
