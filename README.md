@@ -12,8 +12,6 @@
 
 Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connects any AI Assistant platform to your data and applications.
 
-![The Robocorp Stack](./docs/include/robocorp-stack.webp)
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./docs/include/robocorp-flow-dark.webp">
   <img alt="Text changing depending on mode. Light: 'So light!' Dark: 'So dark!'" src="./docs/include/robocorp-flow-light.webp">
