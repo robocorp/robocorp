@@ -280,6 +280,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Wait for Downloads S3 Bucket to have the right content
+        timeout-minutes: 5
+        run: |
+          # Define variables
+          VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
+          # EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
+          EXPECTED_VERSION="0.0.10"
+
+          while true; do
+            DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
+            echo "Downloaded version: $DOWNLOADED_VERSION"
+            echo "Expected version: $EXPECTED_VERSION"
+
+            # Compare versions
+            if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
+              echo "Versions match."
+              break
+            else
+              echo "Versions do not match. Retrying in 30 seconds."
+            fi
+
+            sleep 30
+          done
       - name: Trigger Brew Deploy Workflow
         run: |
           curl -X POST \
