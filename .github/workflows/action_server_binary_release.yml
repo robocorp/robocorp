@@ -270,7 +270,7 @@ jobs:
       - sign-macos
       - deploy-s3
     
-    uses: robocorp/packaging/.github/workflows/action-server-brew.yml@master
+    uses: robocorp/packaging/.github/workflows/action-server_brew.yml@master
     with:
       version: "${{ needs.sign-macos.outputs.version }}"
 
