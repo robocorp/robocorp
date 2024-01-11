@@ -250,30 +250,41 @@ jobs:
         run: |
             aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
   update-index:
-      # Way to disable the final deploy steps
-      if: ${{ true }}
-      timeout-minutes: 10
-      runs-on: ubuntu-latest
-      needs:
-          # Only update index when deploy passes
-          - deploy-s3
-      defaults:
-        run:
-          working-directory: ./action_server
-      steps:
-          - uses: actions/checkout@v4
-          - name: Generate the new index files
-            run: |
-              cd build-binary/
-              python downloads_index.py -c ../docs/CHANGELOG.md -p index.html -j index.json
-          - name: Configure AWS credentials for index.html update
-            uses: aws-actions/configure-aws-credentials@v1-node16
-            with:
-                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
-                aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
-                aws-region: eu-west-1
-          - name: Copy files to the deploy drop-box with the AWS CLI
-            run: |
-                aws s3 cp ./build-binary/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
-                aws s3 cp ./build-binary/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
+    # Way to disable the final deploy steps
+    if: ${{ true }}
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    needs:
+        # Only update index when deploy passes
+        - deploy-s3
+    defaults:
+      run:
+        working-directory: ./action_server
+    steps:
+        - uses: actions/checkout@v4
+        - name: Generate the new index files
+          run: |
+            cd build-binary/
+            python downloads_index.py -c ../docs/CHANGELOG.md -p index.html -j index.json
+        - name: Configure AWS credentials for index.html update
+          uses: aws-actions/configure-aws-credentials@v1-node16
+          with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
+              aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
+              aws-region: eu-west-1
+        - name: Copy files to the deploy drop-box with the AWS CLI
+          run: |
+              aws s3 cp ./build-binary/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
+              aws s3 cp ./build-binary/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
+  
+  trigger-brew-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Brew Upgrade Workflow
+        run: |
+          curl -X POST \
+          -H "Authorization: token ${{ secrets.CI_GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server-brew.yml/dispatches \
+          -d '{"ref":"main","inputs":{"version":"${ver}"}}'
 
