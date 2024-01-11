@@ -1,6 +1,6 @@
 name: ⭐️ Feature Request
-description: Template for missing feature
-title: "[Feature Request]: "
+description: Submit a proposal/request for a new LangChain feature
+title: "[Feature]: "
 body:
   - type: checkboxes
     id: library

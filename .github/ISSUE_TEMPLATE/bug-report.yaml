@@ -1,13 +1,13 @@
 name: 🐛 Bug report
-description: Template for bug reports
+description: Submit a bug report to help us make Robocorp better
 title: "[Issue]: "
 body:
   - type: checkboxes
     id: library
     attributes:
-      label: Affected library
-      description: Select one or more libraries that are affected by the bug reported
-       options:
+      label: Target library
+      description: Select one or more libraries affected by the bug reported
+      options:
         - label: Action Server
           required: false
         - label: robocorp-actions
