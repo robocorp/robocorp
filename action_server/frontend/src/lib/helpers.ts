@@ -1,3 +1,5 @@
+import { Run } from './types';
+
 export function logError(err: unknown) {
   if (err instanceof Error) {
     const indent = '    ';
@@ -49,5 +51,18 @@ export const prettyPrint = (input: string) => {
     return JSON.stringify(JSON.parse(input), null, 4);
   } catch {
     return input;
+  }
+};
+
+export const stringifyResult = (result?: string | boolean | number) => {
+  switch (typeof result) {
+    case 'string':
+      return result;
+    case 'number':
+      return result.toString();
+    case 'boolean':
+      return result ? 'true' : 'false';
+    default:
+      return '';
   }
 };
