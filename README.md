@@ -12,6 +12,8 @@
 
 Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connects any AI Assistant platform to your data and applications.
 
+Robocorp Action Server makes your Python scripts compatible with ChatGPT and LangChain by automatically creating and exposing an API based on function declaration, type hints and docstrings. Just add `@action` and start!
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./docs/include/robocorp-flow-dark.webp">
   <img alt="Text changing depending on mode. Light: 'So light!' Dark: 'So dark!'" src="./docs/include/robocorp-flow-light.webp">
