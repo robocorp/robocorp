@@ -282,5 +282,5 @@ jobs:
             -H "Authorization: token ${{ secrets.GHA_TO_OTHER_REPO }}" \
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
-            -d '{"ref":"main","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
+            -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
 
