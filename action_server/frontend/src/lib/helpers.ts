@@ -1,5 +1,3 @@
-import { Run } from './types';
-
 export function logError(err: unknown) {
   if (err instanceof Error) {
     const indent = '    ';
