@@ -57,7 +57,7 @@ Head over to [Action Server docs](./action_server/docs) for more in detail docum
 1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
 
 <details>
-  <summary>Curious to more about `conda.yaml`? We've got your covered.</summary>
+  <summary>Curious to more about <code>conda.yaml</code>? We've got your covered.</summary>
 
 - Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 `conda.yaml` defines your channels (where are your dependencies coming from), the versions of e.g. python and pip your actions are built to work with, and all the packages you need as dependendencies.
 
@@ -104,16 +104,27 @@ Robocorp Action Server comes with everything needed to connect it to your Langch
 # Install LangChain cli tool if not already there
 pip install langchain-cli
 
-# Use the Action Server template
-langchain app new my-awesome-app --package action_server
-
-# Start the template locally
-langchain template serve
+# Create a new LangChain app using Action Server template
+langchain app new my-awesome-app --package robocorp-action-server
 ```
 
-After running the steps above, you’ll have a Playground available at http://127.0.0.1:8000/playground where you can test your Actions with an AI agent.
+And add the following code to the created `./my-awesome-app/app/server.py` file:
 
-Want to build your own thing? Adding your own Robocorp AI Actions to a Langchain project is as easy as the code below. Just remember to change the URL of the Action Server if you are not running both the Action Server and Langchain app on the same machine.
+```py
+from robocorp_action_server import agent_executor as action_server_chain
+
+add_routes(app, action_server_chain, path="/robocorp-action-server")
+```
+
+And inside the project directory spin up a LangServe instance directly by:
+
+```sh
+langchain serve
+```
+
+After running the steps above, you’ll have a Playground available at http://127.0.0.1:8000/robocorp-action-server/playground/ where you can test your Actions with an AI agent.
+
+**Want to build your own thing?** Adding your own Robocorp AI Actions to a Langchain project is as easy as the code below. Just remember to change the URL of the Action Server if you are not running both the Action Server and Langchain app on the same machine.
 
 ```py
 from langchain_robocorp import ActionServerToolkit
@@ -184,12 +195,8 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - 🚩 Issues – our [GitHub Issues](https://github.com/robocorp/robocorp/issues) is kept up to date with bugs, improvements, and feature requests
 - 🙋 Help - you are welcome to [join our Community Slack](https://robocorp-developers.slack.com/) if you experience any difficulty getting setup
 - 🌟 Contribution and recognition – Start [here](https://github.com/robocorp/robocorp/blob/master/CONTRIBUTING.md), [PR's](https://github.com/robocorp/robocorp/pulls) are welcome!
-- 🔐 [Security](https://robocorp.com/.well-known/security.txt)
+- 🔐 Refer to our [Security policy](https://robocorp.com/.well-known/security.txt) for details
 
 ### Contributors
 
-<!-- readme: contributors -start -->
-
 ![Contributors](https://contrib.nn.ci/api?repo=robocorp/robocorp)
-
-<!-- readme: contributors -end -->
