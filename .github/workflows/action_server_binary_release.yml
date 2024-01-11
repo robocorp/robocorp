@@ -285,8 +285,7 @@ jobs:
         run: |
           # Define variables
           VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
-          # EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
-          EXPECTED_VERSION="0.0.10"
+          EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
 
           while true; do
             DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
