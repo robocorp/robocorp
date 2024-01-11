@@ -201,7 +201,7 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 
 - 🔐 **Decouple AI and Actions that touches your data/apps** - Clarity and security with segregation of duties between your AI agent and code that touches your data and apps. Build `@action` and use from multiple AI frameworks.
 - 🏎️ **Develop Actions faster with `robocorp` automation libraries** - Robocorp libraries and the Python ecosystem lets you act on anything - from data to API to Browser to Desktops.
-- 🕵️ **Observability out of the box** - Log and trace every `@action` run automatically without a single `print` statement.
+- 🕵️ **Observability out of the box** - Log and trace every `@action` run automatically without a single `print` statement. _Pro tip: connect [LangSmith](https://www.langchain.com/langsmith) traces with Action logs!_
 - 🤯 **No-pain Python environment management** - Don't do [this](https://xkcd.com/1987/). Robocorp manages a full Python environment for your actions with ease.
 - 🚀 **Deploy with zero config and infra** - One step deployment, and you'll be connecting your `@action` to AI apps like Langchain and OpenAI GPTs in seconds.
 
@@ -226,7 +226,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [ ] Link and deploy Action Servers to [Control Room](https://cloud.robocorp.com/)
 - [ ] Hot reload of actions after a change
 - [ ] Docstring validator and autogeneration
-- [ ] More complex input args
+- [ ] More complex input args (currently action can take `str`, `bool`, `int` and `float`)
 - [ ] Explicit action user approval
 - [ ] Stateful actions
 
