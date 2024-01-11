@@ -2,7 +2,7 @@
 
 # module `robocorp.tasks.cli`
 
-**Source:** [`cli.py:0`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/cli.py#L0)
+**Source:** [`cli.py:0`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L0)
 
 Main entry point for running tasks from robocorp-tasks.
 
@@ -14,7 +14,7 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`cli.py:36`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/cli.py#L36)
+**Source:** [`cli.py:36`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L36)
 
 ```python
 main(args=None, exit: bool = True) → int

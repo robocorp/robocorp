@@ -4,9 +4,7 @@ version = "0.0.1"
 description = "Utilities for development in monorepo."
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
-	"Kerkko P. <kerkko@robocorp.com>",
-	"Ossi R. <ossi@robocorp.com>",
-	"Antero V. <antero@robocorp.com>",
+	"Cosmin P. <cosmin@robocorp.com>",
 ]
 readme = "README.md"
 packages = [{include = "devutils", from="src"}]

@@ -1,4 +1,4 @@
-It's possible to send special keys (using the [send_keys](https://github.com/robocorp/robo/blob/master/windows/docs/api/robocorp.windows.md#method-send_keys) method) 
+It's possible to send special keys (using the [send_keys](https://github.com/robocorp/robocorp/blob/master/windows/docs/api/robocorp.windows.md#method-send_keys) method) 
 by wrapping the related code below with `{}` (Example: `{Ctrl}`, `{Enter}`). 
 
 | Key code            | Key description                                                          |

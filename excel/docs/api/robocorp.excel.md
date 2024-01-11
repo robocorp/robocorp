@@ -2,13 +2,13 @@
 
 # module `robocorp.excel`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/__init__.py#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/__init__.py#L0)
 
 ______________________________________________________________________
 
 ## function `create_workbook`
 
-**Source:** [`excel.py:9`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L9)
+**Source:** [`excel.py:9`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/excel.py#L9)
 
 ```python
 create_workbook(
@@ -41,7 +41,7 @@ ______________________________________________________________________
 
 ## function `open_workbook`
 
-**Source:** [`excel.py:50`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/excel.py#L50)
+**Source:** [`excel.py:50`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/excel.py#L50)
 
 ```python
 open_workbook(
@@ -79,7 +79,7 @@ Opens the workbook in memory. The file can be in either `.xlsx` or `.xls` format
 
 ## class `Table`
 
-**Source:** [`tables.py:122`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L122)
+**Source:** [`tables.py:122`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L122)
 
 Container class for tabular data.
 
@@ -93,7 +93,7 @@ Container class for tabular data.
 
 ### method `__init__`
 
-**Source:** [`tables.py:137`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L137)
+**Source:** [`tables.py:137`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L137)
 
 
 ```python
@@ -124,7 +124,7 @@ ______________________________________________________________________
 
 ### method `append_column`
 
-**Source:** [`tables.py:702`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L702)
+**Source:** [`tables.py:702`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L702)
 
 ```python
 append_column(column=None, values=None)
@@ -134,7 +134,7 @@ ______________________________________________________________________
 
 ### method `append_row`
 
-**Source:** [`tables.py:693`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L693)
+**Source:** [`tables.py:693`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L693)
 
 ```python
 append_row(row=None)
@@ -146,7 +146,7 @@ ______________________________________________________________________
 
 ### method `append_rows`
 
-**Source:** [`tables.py:697`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L697)
+**Source:** [`tables.py:697`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L697)
 
 ```python
 append_rows(rows)
@@ -158,7 +158,7 @@ ______________________________________________________________________
 
 ### method `append_table`
 
-**Source:** [`tables.py:735`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L735)
+**Source:** [`tables.py:735`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L735)
 
 ```python
 append_table(table)
@@ -170,7 +170,7 @@ ______________________________________________________________________
 
 ### method `clear`
 
-**Source:** [`tables.py:468`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L468)
+**Source:** [`tables.py:468`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L468)
 
 ```python
 clear()
@@ -182,7 +182,7 @@ ______________________________________________________________________
 
 ### method `column_location`
 
-**Source:** [`tables.py:384`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L384)
+**Source:** [`tables.py:384`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L384)
 
 ```python
 column_location(value)
@@ -194,7 +194,7 @@ ______________________________________________________________________
 
 ### method `copy`
 
-**Source:** [`tables.py:464`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L464)
+**Source:** [`tables.py:464`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L464)
 
 ```python
 copy()
@@ -206,7 +206,7 @@ ______________________________________________________________________
 
 ### method `delete_columns`
 
-**Source:** [`tables.py:720`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L720)
+**Source:** [`tables.py:720`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L720)
 
 ```python
 delete_columns(columns)
@@ -218,7 +218,7 @@ ______________________________________________________________________
 
 ### method `delete_rows`
 
-**Source:** [`tables.py:708`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L708)
+**Source:** [`tables.py:708`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L708)
 
 ```python
 delete_rows(indexes: Union[int, str, List[Union[int, str]]])
@@ -230,7 +230,7 @@ ______________________________________________________________________
 
 ### method `filter_all`
 
-**Source:** [`tables.py:806`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L806)
+**Source:** [`tables.py:806`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L806)
 
 ```python
 filter_all(
@@ -246,7 +246,7 @@ ______________________________________________________________________
 
 ### method `filter_by_column`
 
-**Source:** [`tables.py:819`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L819)
+**Source:** [`tables.py:819`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L819)
 
 ```python
 filter_by_column(column: Union[int, str], condition: Callable[[Any], bool])
@@ -260,7 +260,7 @@ ______________________________________________________________________
 
 ### method `get`
 
-**Source:** [`tables.py:482`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L482)
+**Source:** [`tables.py:482`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L482)
 
 ```python
 get(indexes=None, columns=None, as_list=False)
@@ -284,7 +284,7 @@ ______________________________________________________________________
 
 ### method `get_cell`
 
-**Source:** [`tables.py:511`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L511)
+**Source:** [`tables.py:511`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L511)
 
 ```python
 get_cell(index, column)
@@ -296,7 +296,7 @@ ______________________________________________________________________
 
 ### method `get_column`
 
-**Source:** [`tables.py:542`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L542)
+**Source:** [`tables.py:542`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L542)
 
 ```python
 get_column(column, indexes=None, as_list=False)
@@ -314,7 +314,7 @@ ______________________________________________________________________
 
 ### method `get_row`
 
-**Source:** [`tables.py:518`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L518)
+**Source:** [`tables.py:518`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L518)
 
 ```python
 get_row(index: Union[int, str], columns=None, as_list=False)
@@ -332,7 +332,7 @@ ______________________________________________________________________
 
 ### method `get_slice`
 
-**Source:** [`tables.py:585`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L585)
+**Source:** [`tables.py:585`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L585)
 
 ```python
 get_slice(start: Optional[int, str] = None, end: Optional[int, str] = None)
@@ -344,7 +344,7 @@ ______________________________________________________________________
 
 ### method `get_table`
 
-**Source:** [`tables.py:566`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L566)
+**Source:** [`tables.py:566`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L566)
 
 ```python
 get_table(
@@ -360,7 +360,7 @@ ______________________________________________________________________
 
 ### method `group_by_column`
 
-**Source:** [`tables.py:785`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L785)
+**Source:** [`tables.py:785`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L785)
 
 ```python
 group_by_column(column)
@@ -372,7 +372,7 @@ ______________________________________________________________________
 
 ### method `head`
 
-**Source:** [`tables.py:472`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L472)
+**Source:** [`tables.py:472`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L472)
 
 ```python
 head(rows, as_list=False)
@@ -384,7 +384,7 @@ ______________________________________________________________________
 
 ### method `index_location`
 
-**Source:** [`tables.py:367`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L367)
+**Source:** [`tables.py:367`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L367)
 
 ```python
 index_location(value: Union[int, str]) → int
@@ -394,7 +394,7 @@ ______________________________________________________________________
 
 ### method `iter_dicts`
 
-**Source:** [`tables.py:840`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L840)
+**Source:** [`tables.py:840`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L840)
 
 ```python
 iter_dicts(
@@ -408,7 +408,7 @@ ______________________________________________________________________
 
 ### method `iter_lists`
 
-**Source:** [`tables.py:832`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L832)
+**Source:** [`tables.py:832`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L832)
 
 ```python
 iter_lists(with_index=True)
@@ -420,7 +420,7 @@ ______________________________________________________________________
 
 ### method `iter_tuples`
 
-**Source:** [`tables.py:848`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L848)
+**Source:** [`tables.py:848`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L848)
 
 ```python
 iter_tuples(with_index=True, name='Row')
@@ -434,7 +434,7 @@ ______________________________________________________________________
 
 ### method `set`
 
-**Source:** [`tables.py:625`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L625)
+**Source:** [`tables.py:625`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L625)
 
 ```python
 set(indexes=None, columns=None, values=None)
@@ -450,7 +450,7 @@ ______________________________________________________________________
 
 ### method `set_cell`
 
-**Source:** [`tables.py:649`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L649)
+**Source:** [`tables.py:649`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L649)
 
 ```python
 set_cell(index, column, value)
@@ -464,7 +464,7 @@ ______________________________________________________________________
 
 ### method `set_column`
 
-**Source:** [`tables.py:678`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L678)
+**Source:** [`tables.py:678`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L678)
 
 ```python
 set_column(column, values)
@@ -476,7 +476,7 @@ ______________________________________________________________________
 
 ### method `set_row`
 
-**Source:** [`tables.py:666`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L666)
+**Source:** [`tables.py:666`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L666)
 
 ```python
 set_row(index, values)
@@ -488,7 +488,7 @@ ______________________________________________________________________
 
 ### method `sort_by_column`
 
-**Source:** [`tables.py:747`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L747)
+**Source:** [`tables.py:747`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L747)
 
 ```python
 sort_by_column(columns, ascending=False)
@@ -500,7 +500,7 @@ ______________________________________________________________________
 
 ### method `tail`
 
-**Source:** [`tables.py:477`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L477)
+**Source:** [`tables.py:477`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L477)
 
 ```python
 tail(rows, as_list=False)
@@ -512,7 +512,7 @@ ______________________________________________________________________
 
 ### method `to_dict`
 
-**Source:** [`tables.py:878`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L878)
+**Source:** [`tables.py:878`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L878)
 
 ```python
 to_dict(with_index=True)
@@ -524,7 +524,7 @@ ______________________________________________________________________
 
 ### method `to_list`
 
-**Source:** [`tables.py:864`](https://github.com/robocorp/robo/tree/master/excel/src/robocorp/excel/tables.py#L864)
+**Source:** [`tables.py:864`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L864)
 
 ```python
 to_list(with_index=True)

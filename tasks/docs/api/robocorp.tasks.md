@@ -2,7 +2,7 @@
 
 # module `robocorp.tasks`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L0)
 
 Robocorp tasks helps in creating entry points for your automation project.
 
@@ -38,7 +38,7 @@ ______________________________________________________________________
 
 ## function `task`
 
-**Source:** [`__init__.py:45`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L45)
+**Source:** [`__init__.py:45`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L45)
 
 ```python
 task(*args, **kwargs)
@@ -81,7 +81,7 @@ ______________________________________________________________________
 
 ## function `setup`
 
-**Source:** [`_fixtures.py:26`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L26)
+**Source:** [`_fixtures.py:26`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L26)
 
 ```python
 setup(
@@ -144,7 +144,7 @@ ______________________________________________________________________
 
 ## function `teardown`
 
-**Source:** [`_fixtures.py:148`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L148)
+**Source:** [`_fixtures.py:148`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L148)
 
 ```python
 teardown(
@@ -189,7 +189,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`__init__.py:98`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L98)
+**Source:** [`__init__.py:98`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L98)
 
 ```python
 session_cache(func)
@@ -209,7 +209,7 @@ ______________________________________________________________________
 
 ## function `task_cache`
 
-**Source:** [`__init__.py:120`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L120)
+**Source:** [`__init__.py:120`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L120)
 
 ```python
 task_cache(func)
@@ -229,7 +229,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`__init__.py:142`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L142)
+**Source:** [`__init__.py:142`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L142)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -241,7 +241,7 @@ ______________________________________________________________________
 
 ## function `get_current_task`
 
-**Source:** [`__init__.py:155`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/__init__.py#L155)
+**Source:** [`__init__.py:155`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L155)
 
 ```python
 get_current_task() → Optional[ITask]
@@ -253,7 +253,7 @@ ______________________________________________________________________
 
 ## class `ITask`
 
-**Source:** [`_protocols.py:51`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L51)
+**Source:** [`_protocols.py:51`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L51)
 
 #### property `failed`
 
@@ -271,7 +271,7 @@ ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`_protocols.py:82`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L82)
+**Source:** [`_protocols.py:82`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L82)
 
 ```python
 run() → Any
@@ -281,7 +281,7 @@ ______________________________________________________________________
 
 ## enum `Status`
 
-**Source:** [`_protocols.py:43`](https://github.com/robocorp/robo/tree/master/tasks/src/robocorp/tasks/_protocols.py#L43)
+**Source:** [`_protocols.py:43`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L43)
 
 Task state
 

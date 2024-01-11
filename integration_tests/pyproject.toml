@@ -4,6 +4,7 @@ version = "0.0.1"
 description = "Robocorp integration tests"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
+	"Cosmin P. <cosmin@robocorp.com>",
 ]
 readme = "README.md"
 packages = [

@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix main README and update docs.
+
 ## 2.2.1 - 2023-11-02
 
 - Reverted change to issue on playwright shutdown and added option to skip

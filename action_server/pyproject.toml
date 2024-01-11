@@ -2,9 +2,11 @@
 name = "robocorp-action-server"
 version = "0.0.11"
 description = "Robocorp local task server"
-authors = ["Fabio Zadrozny <fabiofz@gmail.com>"]
+authors = [
+	"Fabio Z. <fabio@robocorp.com>",
+]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{ include = "robocorp", from = "src" }]
 include = [

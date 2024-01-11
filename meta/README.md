@@ -10,4 +10,4 @@ The following packages are currently included:
 - [robocorp-vault](https://pypi.org/project/robocorp-vault)
 - [robocorp-storage](https://pypi.org/project/robocorp-storage)
 
-For further documentation, see the [project repository](https://github.com/robocorp/robo).
+For further documentation, see the [project repository](https://github.com/robocorp/robocorp).

@@ -3,10 +3,11 @@ name = "robocorp"
 version = "1.4.0"
 description = "Robocorp core libraries for Python automation"
 authors = [
-	"Ossi Rajuvaara <ossi@robocorp.com>",
+	"Fabio Z. <fabio@robocorp.com>",
+	"Cosmin P. <cosmin@robocorp.com>",
 ]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 

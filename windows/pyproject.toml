@@ -4,9 +4,10 @@ version = "1.0.0"
 description = "Robocorp Windows Automation (API to automate Windows)"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
+	"Cosmin P. <cosmin@robocorp.com>",
 ]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{include = "robocorp/windows", from="src"}]
 

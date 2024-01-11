@@ -4,10 +4,9 @@ version = "1.0.2"
 description = "Robocorp Asset Storage library"
 authors = [
 	"Cosmin P. <cosmin@robocorp.com>",
-	"Ossi R. <ossi@robocorp.com>",
 ]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 

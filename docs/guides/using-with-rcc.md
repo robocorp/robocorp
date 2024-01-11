@@ -119,4 +119,4 @@ log_filter_rules = [
 ]
 ```
 
-To see more documentation for configuration, see the [README.md](https://github.com/robocorp/robo/blob/master/log/README.md) of the library.
+To see more documentation for configuration, see the [README.md](https://github.com/robocorp/robocorp/blob/master/log/README.md) of the library.
