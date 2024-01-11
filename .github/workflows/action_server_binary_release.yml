@@ -269,9 +269,8 @@ jobs:
       # sign-macos needs to be explicit in order to get the version, even if it's implied
       - sign-macos
       - deploy-s3
-    steps:
-      - name: Trigger Brew Upgrade Workflow
-        uses: robocorp/packaging/.github/workflows/action-server-brew.yml@main
-        with:
-          version: "${{ needs.sign-macos.outputs.version }}"
+    
+    uses: robocorp/packaging/.github/workflows/action-server-brew.yml@main
+    with:
+      version: "${{ needs.sign-macos.outputs.version }}"
 
