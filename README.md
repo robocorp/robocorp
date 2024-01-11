@@ -78,7 +78,7 @@ action-server start --expose
 👉 Using the --expose -flag, you also get a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_) and an API key. These are the details that you need to configure your AI Agent.
 
 
-Head over to [Action Server docs](./action_server/readme.md) for more.
+Head over to [Action Server docs](./action_server/README.md) for more.
 
 ---
 
@@ -106,8 +106,8 @@ Think of this as an equivalent of the requirements.txt, but much better. 👩‍
 
 👉 You will probably not want run the Actions just on your machine, so by using `conda.yaml`:
 
-- You do not need to manage Python installations on the target machines
-- You can avoid `Works on my machine`
+- You can avoid `Works on my machine` -cases
+- You do not need to manage Python installations on all the machines
 - You can control exactly which version of Python your automation will run on 
   - ..as well as the pip version to avoid dep. resolution changes
 - No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
