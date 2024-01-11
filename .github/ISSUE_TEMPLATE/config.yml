@@ -1,0 +1,12 @@
+blank_issues_enabled: true
+version: 2.1
+contact_links:
+  - name: 🤔 Idea, Question or Problem?
+    about: Ask a question or ask about a problem in GitHub Discussions.
+    url: https://github.com/robocorp/robocorp/discussions
+  - name: 💬 Slack
+    url: https://discord.gg/6adMQxSpJS
+    about: Join our Community Slack for more in-depth discussions.
+  - name: 🚨 Report a Security Vulnerability
+    about: Please refer to our security policy for more details.
+    url: https://robocorp.com/.well-known/security.txt

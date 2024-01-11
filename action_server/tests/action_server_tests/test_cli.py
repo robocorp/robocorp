@@ -24,40 +24,9 @@ def test_download_rcc(tmpdir) -> None:
 def test_new(
     tmpdir, action_server_process: ActionServerProcess, client: ActionServerClient
 ) -> None:
-    from action_server_tests.fixtures import robocorp_action_server_run
+    from robocorp.action_server._selftest import check_new_template
 
-    curdir = os.path.abspath(".")
-    try:
-        os.chdir(str(tmpdir))
-        robocorp_action_server_run(["new", "--name=my_project"], returncode=0)
-        assert os.path.exists(str(tmpdir / "my_project" / "conda.yaml"))
-
-        # Note: timeout is big because it'll use rcc to bootstrap the env here.
-        action_server_process.start(
-            db_file="server.db",
-            cwd=str(tmpdir / "my_project"),
-            actions_sync=True,
-            timeout=300,
-        )
-        action_packages = client.get_json("api/actionPackages")
-        assert len(action_packages) == 1
-        action_package = next(iter(action_packages))
-        actions = action_package["actions"]
-        action_names = tuple(action["name"] for action in actions)
-        assert "compare_time_zones" in action_names
-
-        found = client.post_get_str(
-            "/api/actions/my-project/compare-time-zones/run",
-            {
-                "user_timezone": "Europe/Helsinki",
-                "compare_to_timezones": "America/New_York, Asia/Kolkata",
-            },
-        )
-        assert "Current time in Europe/Helsinki" in found
-        assert "Current time in America/New_York" in found
-        assert "Current time in Asia/Kolkata" in found
-    finally:
-        os.chdir(curdir)
+    check_new_template(tmpdir, action_server_process, client)
 
 
 # def test_schema(str_regression, tmpdir) -> None:

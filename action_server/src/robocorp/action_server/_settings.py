@@ -2,10 +2,9 @@ import logging
 import os
 import sys
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional
-
-from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +49,11 @@ def get_default_settings_dir() -> Path:
     return path
 
 
-class Settings(BaseModel):
+@dataclass(slots=True, kw_only=True)
+class Settings:
+    artifacts_dir: Path
+    datadir: Path
+
     title: str = "Robocorp Actions Server"
 
     address: str = "localhost"
@@ -59,19 +62,19 @@ class Settings(BaseModel):
     db_file: str = "server.db"
     expose_url: str = "robocorp.link"
 
-    artifacts_dir: Path
-    datadir: Path
-
-    class Config:
-        # pylint: disable=too-few-public-methods
-        validate_assignment = True
-
     @classmethod
     def defaults(cls):
-        props = cls.model_json_schema()["properties"]
-        return {key: value.get("default") for key, value in props.items()}
+        fields = cls.__dataclass_fields__
+        ret = {}
+        SENTINEL = []
+        for name, field in fields.items():
+            v = getattr(field, "default", SENTINEL)
+            if v is not SENTINEL:
+                ret[name] = v
+        return ret
 
-    def __init__(self, args):
+    @classmethod
+    def create(cls, args) -> "Settings":
         user_specified_datadir = args.datadir
         if not user_specified_datadir:
             import hashlib
@@ -94,17 +97,19 @@ class Settings(BaseModel):
             user_expanded_datadir = Path(user_specified_datadir).expanduser()
 
         datadir = user_expanded_datadir.absolute()
-        super().__init__(datadir=datadir, artifacts_dir=datadir / "artifacts")
+
+        settings = Settings(datadir=datadir, artifacts_dir=datadir / "artifacts")
         # Optional (just in 'start' command, not in 'import')
         if hasattr(args, "address"):
-            self.address = args.address
+            settings.address = args.address
 
         if hasattr(args, "port"):
-            self.port = args.port
+            settings.port = args.port
 
         # Used in either import or start commands.
-        self.verbose = args.verbose
-        self.db_file = args.db_file
+        settings.verbose = args.verbose
+        settings.db_file = args.db_file
+        return settings
 
     def to_uvicorn(self):
         return {
@@ -121,7 +126,7 @@ _global_settings: Optional[Settings] = None
 @contextmanager
 def setup_settings(args) -> Iterator[Settings]:
     global _global_settings
-    settings = Settings(args)
+    settings = Settings.create(args)
     _global_settings = settings
     try:
         yield settings

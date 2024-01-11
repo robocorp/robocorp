@@ -1,0 +1,48 @@
+name: 🐛 Bug report
+description: Submit a bug report to help us make Robocorp better
+title: "[Issue]: "
+body:
+  - type: checkboxes
+    id: library
+    attributes:
+      label: Target library
+      description: Select one or more libraries affected by the bug reported
+      options:
+        - label: Action Server
+          required: false
+        - label: robocorp-actions
+          required: false
+        - label: robocorp-browser
+          required: false
+        - label: robocorp-tasks
+          required: false
+        - label: robocorp-vault
+          required: false
+        - label: robocorp-windows
+          required: false
+        - label: robocorp-workitems
+          required: false
+  - type: textarea
+    id: issue
+    attributes:
+      label: What happened?
+      description: >-
+        Give details on what you are doing, what you expect to happen, and what
+        is currently happening.
+      placeholder: >-
+        * I'm trying to use the `robocorp` library to do X
+        * I'expected to get Y
+        * Instead it does Z
+    validations:
+      required: true
+  - type: textarea
+    id: system
+    attributes:
+      label: System Info
+      description: Sharign your system information will help us a lot
+      placeholder: >-
+        * Library version
+        * Python version
+        * Operating System version
+    validations:
+      required: true

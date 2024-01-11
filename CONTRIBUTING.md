@@ -1,6 +1,6 @@
 # Contributing
 
-This is a contribution guide for the `robo` project and associated libraries.
+This is a contribution guide for the `robocorp` project and associated libraries.
 
 ## Library Development
 
@@ -63,7 +63,7 @@ it to PyPI.
 
 ### Metapackage
 
-In the `meta` folder is a metapackage for the core features of the `robo` framework,
+In the `meta` folder is a metapackage for the core features of the `robocorp` framework,
 i.e. logging, tasks, and Control Room libraries. It is used in templates and examples
 as an easy way to get the main features into a project.
 

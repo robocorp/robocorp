@@ -12,6 +12,8 @@
 
 Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connects any AI Assistant platform to your data and applications.
 
+Robocorp Action Server makes your Python scripts compatible with ChatGPT and LangChain by automatically creating and exposing an API based on function declaration, type hints and docstrings. Just add `@action` and start!
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./docs/include/robocorp-flow-dark.webp">
   <img alt="Text changing depending on mode. Light: 'So light!' Dark: 'So dark!'" src="./docs/include/robocorp-flow-light.webp">
@@ -25,45 +27,66 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 Install Robocorp Action Server:
 
-```sh
-# On macOS
-brew install robocorp/tools/action-server
+<details open>
+<summary><b>For macOS</b></summary>
 
-# On Linux or Windows
-pip install robocorp-action-server
+```sh
+brew update
+brew install robocorp/tools/action-server 
+```
+</details>
+
+<details>
+<summary><b>For Windows</b></summary>
+
+```sh
+# Download Robocorp Action Server
+curl -o action-server.exe https://downloads.robocorp.com/action-server/releases/latest/windows64/action-server.exe
+
+# Add to PATH or move to a folder that is in PATH
+setx PATH=%PATH%;%CD%
 ```
 
-Bootstrap a new project from a template. You’ll be prompted for a name of the project:
+</details>
 
+<details>
+<summary><b>For Linux</b></summary>
+
+```sh
+# Download Robocorp Action Server
+curl -o action-server https://downloads.robocorp.com/action-server/releases/latest/linux64/action-server
+chmod a+x action-server
+
+# Add to PATH or move to a folder that is in PATH
+sudo mv action-server /usr/local/bin/
+```
+
+</details>
+<br/>
+
+Bootstrap a new project from a template. You’ll be prompted for a name of the project:
 ```sh
 action-server new
 ```
 
 Navigate to the freshly created project folder and start the server:
-
 ```sh
-cd my-first-action-server
+cd my-project
 action-server start --expose
 ```
 
-Once that’s done, you’ll have an Action Server UI locally at [http://localhost:8080](http://localhost:8080)), and a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_).
+👉 You should now have an Action Server running locally at: http://localhost:8080, to open the web UI.
 
-Head over to [Action Server docs](./action_server/docs) for more in detail documentation.
+👉 Using the --expose -flag, you also get a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_) and an API key. These are the details that you need to configure your AI Agent.
+
+
+Head over to [Action Server docs](./action_server/README.md) for more.
 
 ---
 
 # What makes a Python function an ⚡️Action?
 
 1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
-
-<details>
-  <summary>Curious to more about <code>conda.yaml</code>? We've got your covered.</summary>
-
-- Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 `conda.yaml` defines your channels (where are your dependencies coming from), the versions of e.g. python and pip your actions are built to work with, and all the packages you need as dependendencies.
-
-- When starting an Action Server, this file is used as a "recipe" to build the entire environment, making sure everything works on any machine every time the exact same way. Neat, right? Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
-
-</details>
 
 ```yaml
 channels:
@@ -74,9 +97,30 @@ dependencies:
   - pip=23.2.1
   - robocorp-truststore=0.8.0
   - pip:
-      - robocorp==1.3.0
+      - robocorp==1.4.0
+      - robocorp-actions==0.0.4
       - numpy==1.26.3
 ```
+
+<details>
+  <summary>🙋‍♂️ "Why not just pip install...?"</summary>
+
+Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 With `conda.yaml` you are not just controlling your PyPI dependencies, you control the complete Python environment, which makes things repeatable and easy.
+
+👉 You will probably not want run the Actions just on your machine, so by using `conda.yaml`:
+
+- You can avoid `Works on my machine` -cases
+- You do not need to manage Python installations on all the machines
+- You can control exactly which version of Python your automation will run on 
+  - ..as well as the pip version to avoid dep. resolution changes
+- No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
+- Define dependencies in conda.yaml let our tooling do the heavy lifting.
+- You get all the content of [conda-forge](https://prefix.dev/channels/conda-forge) without any extra tooling
+
+> Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
+
+</details>
+<br/>
 
 2️⃣ [@action decorator](./actions/docs) that determines the **action entry point** and [Type hints and docstring](./actions/docs) to let AI agents know **what the Action does** in natural language.
 
@@ -159,7 +203,7 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 
 - 🔐 **Decouple AI and Actions that touches your data/apps** - Clarity and security with segregation of duties between your AI agent and code that touches your data and apps. Build `@action` and use from multiple AI frameworks.
 - 🏎️ **Develop Actions faster with `robocorp` automation libraries** - Robocorp libraries and the Python ecosystem lets you act on anything - from data to API to Browser to Desktops.
-- 🕵️ **Observability out of the box** - Log and trace every `@action` run automatically without a single `print` statement.
+- 🕵️ **Observability out of the box** - Log and trace every `@action` run automatically without a single `print` statement. _Pro tip: connect [LangSmith](https://www.langchain.com/langsmith) traces with Action logs!_
 - 🤯 **No-pain Python environment management** - Don't do [this](https://xkcd.com/1987/). Robocorp manages a full Python environment for your actions with ease.
 - 🚀 **Deploy with zero config and infra** - One step deployment, and you'll be connecting your `@action` to AI apps like Langchain and OpenAI GPTs in seconds.
 
@@ -184,7 +228,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [ ] Link and deploy Action Servers to [Control Room](https://cloud.robocorp.com/)
 - [ ] Hot reload of actions after a change
 - [ ] Docstring validator and autogeneration
-- [ ] More complex input args
+- [ ] More complex input args (currently action can take `str`, `bool`, `int` and `float`)
 - [ ] Explicit action user approval
 - [ ] Stateful actions
 

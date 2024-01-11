@@ -65,7 +65,9 @@ export const ActionPackages = () => {
   const { loadedActions, loadedRuns } = useActionServerContext();
 
   const actions = useMemo(() => {
-    return loadedActions.data?.flatMap((item) => item.actions) || [];
+    return (
+      loadedActions.data?.flatMap((item) => item.actions).filter((action) => action.enabled) || []
+    );
   }, [loadedActions.data]);
 
   const tableProps = useMemo(() => {

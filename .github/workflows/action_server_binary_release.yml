@@ -5,6 +5,8 @@ on:
     # Enables manual triggering via GitHub Actions
 
   push:
+    # branches:
+    #   - wip2
     tags:
       - "robocorp-action_server-*"
 
@@ -45,12 +47,14 @@ jobs:
            CI: true
            NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         
-        
       - name: Build binary
         run: |
             python -m pip install pyoxidizer
             cd build-binary
-            pyoxidizer run
+            pyoxidizer run --release
+        env:
+           RC_ACTION_SERVER_FORCE_DOWNLOAD_RCC: true
+           RC_ACTION_SERVER_DO_SELFTEST: true
 
       - name: Action Server Python Binary Signing [Windows]
         if: matrix.os == 'windows-2019'
@@ -63,7 +67,7 @@ jobs:
           CERTIFICATE: ${{secrets.WIN_SIGN_AZURE_KEY_VAULT_CERTIFICATE}}
         run: |
           dotnet tool install --global AzureSignTool --version 3.0.0
-          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build-binary\build\x86_64-pc-windows-msvc\debug\install\action-server.exe
+          azuresigntool sign --description-url "https://robocorp.com" --file-digest sha256 --azure-key-vault-url $Env:VAULT_URL --azure-key-vault-client-id $Env:CLIENT_ID --azure-key-vault-tenant-id $Env:TENANT_ID --azure-key-vault-client-secret $Env:CLIENT_SECRET --azure-key-vault-certificate $Env:CERTIFICATE --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 build-binary\build\x86_64-pc-windows-msvc\release\install\action-server.exe
         shell: powershell
 
       - name: Set up Go
@@ -90,15 +94,15 @@ jobs:
       - name: Copy assets [Linux]
         if: matrix.os == 'ubuntu-20.04'
         run: |
-            cp -R build-binary/build/x86_64-unknown-linux-gnu/debug/install/* go-wrapper/assets
+            cp -R build-binary/build/x86_64-unknown-linux-gnu/release/install/* go-wrapper/assets
       - name: Copy assets [Mac]
         if: matrix.os == 'macos-11'
         run: |
-            cp -R build-binary/build/x86_64-apple-darwin/debug/install/* go-wrapper/assets
+            cp -R build-binary/build/x86_64-apple-darwin/release/install/* go-wrapper/assets
       - name: Copy assets [Windows]
         if: matrix.os == 'windows-2019'
         run: |
-            xcopy /e /h /i build-binary\\build\\x86_64-pc-windows-msvc\\debug\\install go-wrapper\\assets
+            xcopy /e /h /i build-binary\\build\\x86_64-pc-windows-msvc\\release\\install go-wrapper\\assets
 
       - uses: actions/download-artifact@v4
         with:

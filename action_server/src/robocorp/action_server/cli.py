@@ -8,8 +8,6 @@ from typing import Optional, Union
 from robocorp.action_server._robo_utils.auth import generate_api_key
 
 from . import __version__
-from ._settings import Settings
-from ._server_expose import read_expose_session_json
 
 log = logging.getLogger(__name__)
 
@@ -78,6 +76,8 @@ def str2bool(v):
 
 
 def _create_parser():
+    from ._settings import Settings
+
     defaults = Settings.defaults()
     base_parser = argparse.ArgumentParser(
         prog="action-server",
@@ -229,6 +229,38 @@ def _create_parser():
 
 
 def main(args: Optional[list[str]] = None, *, exit=True) -> int:
+    if args is None:
+        args = sys.argv[1:]
+
+    if not args:
+        if os.environ.get(
+            "RC_ACTION_SERVER_FORCE_DOWNLOAD_RCC", ""
+        ).strip().lower() in (
+            "1",
+            "true",
+        ):
+            print(
+                "As RC_ACTION_SERVER_FORCE_DOWNLOAD_RCC is set and no arguments were "
+                "passed, rcc will be downloaded."
+            )
+
+            from robocorp.action_server._download_rcc import download_rcc
+
+            download_rcc(force=True)
+
+        if os.environ.get("RC_ACTION_SERVER_DO_SELFTEST", "").strip().lower() in (
+            "1",
+            "true",
+        ):
+            from . import _selftest
+
+            print(
+                "As RC_ACTION_SERVER_DO_SELFTEST is set and no arguments were passed, "
+                "a selftest will be run."
+            )
+
+            sys.exit(_selftest.do_selftest())
+
     retcode = _main_retcode(args, exit=exit)
     if exit:
         sys.exit(retcode)
@@ -273,7 +305,6 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     from ._rcc import initialize_rcc
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
-    from ._settings import setup_settings
 
     if args is None:
         args = sys.argv[1:]
@@ -326,6 +357,8 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     logger.setLevel(log_level)
 
     _setup_stdout_logging(log_level)
+
+    from ._settings import setup_settings
 
     with setup_settings(base_args) as settings:
         settings.datadir.mkdir(parents=True, exist_ok=True)
@@ -442,6 +475,8 @@ To migrate the database to the current version
 
                             expose_session = None
                             if base_args.expose:
+                                from ._server_expose import read_expose_session_json
+
                                 expose_session = read_expose_session_json(
                                     datadir=str(settings.datadir)
                                 )

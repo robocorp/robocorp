@@ -12,14 +12,19 @@ HTTP, you should just use `requests`.
 ```python
 import requests
 
-
-def download_file(url, local_filename):
+def download_file(url: str, filename: str) -> str:
+    """ 
+    Download a file from the given url. 
+    """
     response = requests.get(url)
-    response.raise_for_status()  # this will raise an exception if the request fails
-    with open(local_filename, 'wb') as stream:
-        stream.write(response.content)  # write the content of the response to a file
-    return local_filename
+    response.raise_for_status()
+    with open(filename, 'wb') as stream:
+        stream.write(response.content)
+    return filename
 ```
+
+> AI/LLM's are quite good with `requests`.<br/>
+👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 
