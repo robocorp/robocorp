@@ -10,7 +10,7 @@ from typing import Iterator, List, Optional
 from invoke import task
 
 ROOT = Path(__file__).parent.parent.parent
-REPOSITORY_URL = "https://github.com/robocorp/robo/tree/master/"
+REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
 
 
 class RoundtripPyProject:

@@ -2,9 +2,11 @@
 name = "robocorp-actions"
 version = "0.0.4"
 description = "Robocorp Actions"
-authors = ["Fabio Zadrozny <fabiofz@gmail.com>"]
+authors = [
+	"Fabio Z. <fabio@robocorp.com>",
+]
 readme = "README.md"
-repository = "https://github.com/robocorp/robo/"
+repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{ include = "robocorp", from = "src" }]
 

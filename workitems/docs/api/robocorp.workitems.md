@@ -2,7 +2,7 @@
 
 # module `robocorp.workitems`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L0)
 
 ## Variables
 
@@ -13,7 +13,7 @@ ______________________________________________________________________
 
 ## class `Inputs`
 
-**Source:** [`__init__.py:65`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L65)
+**Source:** [`__init__.py:65`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L65)
 
 Inputs represents the input queue of work items.
 
@@ -31,7 +31,7 @@ ______________________________________________________________________
 
 ### method `reserve`
 
-**Source:** [`__init__.py:98`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L98)
+**Source:** [`__init__.py:98`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L98)
 
 ```python
 reserve() → Input
@@ -53,7 +53,7 @@ ______________________________________________________________________
 
 ## class `Outputs`
 
-**Source:** [`__init__.py:113`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L113)
+**Source:** [`__init__.py:113`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L113)
 
 Outputs represents the output queue of work items.
 
@@ -67,7 +67,7 @@ ______________________________________________________________________
 
 ### method `create`
 
-**Source:** [`__init__.py:139`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/__init__.py#L139)
+**Source:** [`__init__.py:139`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L139)
 
 ```python
 create(
@@ -95,7 +95,7 @@ ______________________________________________________________________
 
 ## class `Input`
 
-**Source:** [`_workitem.py:207`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L207)
+**Source:** [`_workitem.py:207`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L207)
 
 Container for an input work item.
 
@@ -107,7 +107,7 @@ There can only be one input work item reserved at a time. To reserve the next it
 
 ### method `__init__`
 
-**Source:** [`_workitem.py:222`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L222)
+**Source:** [`_workitem.py:222`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L222)
 
 ```python
 __init__(adapter: BaseAdapter, item_id: str)
@@ -149,7 +149,7 @@ ______________________________________________________________________
 
 ### method `add_file`
 
-**Source:** [`_workitem.py:118`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L118)
+**Source:** [`_workitem.py:118`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L118)
 
 ```python
 add_file(path: Union[Path, str], name: Optional[str] = None) → Path
@@ -171,7 +171,7 @@ ______________________________________________________________________
 
 ### method `add_files`
 
-**Source:** [`_workitem.py:145`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145)
+**Source:** [`_workitem.py:145`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145)
 
 ```python
 add_files(pattern: str) → list[Path]
@@ -192,7 +192,7 @@ ______________________________________________________________________
 
 ### method `create_output`
 
-**Source:** [`_workitem.py:434`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L434)
+**Source:** [`_workitem.py:434`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L434)
 
 ```python
 create_output() → Output
@@ -204,7 +204,7 @@ ______________________________________________________________________
 
 ### method `done`
 
-**Source:** [`_workitem.py:442`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L442)
+**Source:** [`_workitem.py:442`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L442)
 
 ```python
 done()
@@ -216,7 +216,7 @@ ______________________________________________________________________
 
 ### method `email`
 
-**Source:** [`_workitem.py:288`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L288)
+**Source:** [`_workitem.py:288`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L288)
 
 ```python
 email(html=True, encoding='utf-8', ignore_errors=False) → Optional[Email]
@@ -241,7 +241,7 @@ ______________________________________________________________________
 
 ### method `fail`
 
-**Source:** [`_workitem.py:453`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L453)
+**Source:** [`_workitem.py:453`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L453)
 
 ```python
 fail(
@@ -263,7 +263,7 @@ ______________________________________________________________________
 
 ### method `get_file`
 
-**Source:** [`_workitem.py:366`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L366)
+**Source:** [`_workitem.py:366`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L366)
 
 ```python
 get_file(name: str, path: Optional[Path, str] = None) → Path
@@ -285,7 +285,7 @@ ______________________________________________________________________
 
 ### method `get_files`
 
-**Source:** [`_workitem.py:396`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L396)
+**Source:** [`_workitem.py:396`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L396)
 
 ```python
 get_files(pattern: str, path: Optional[Path] = None) → list[Path]
@@ -307,7 +307,7 @@ ______________________________________________________________________
 
 ### method `load`
 
-**Source:** [`_workitem.py:72`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72)
+**Source:** [`_workitem.py:72`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72)
 
 ```python
 load() → None
@@ -319,7 +319,7 @@ ______________________________________________________________________
 
 ### method `remove_file`
 
-**Source:** [`_workitem.py:167`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167)
+**Source:** [`_workitem.py:167`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167)
 
 ```python
 remove_file(name: str, missing_ok: bool = False)
@@ -338,7 +338,7 @@ ______________________________________________________________________
 
 ### method `remove_files`
 
-**Source:** [`_workitem.py:186`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L186)
+**Source:** [`_workitem.py:186`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L186)
 
 ```python
 remove_files(pattern: str) → list[str]
@@ -359,7 +359,7 @@ ______________________________________________________________________
 
 ### method `save`
 
-**Source:** [`_workitem.py:277`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L277)
+**Source:** [`_workitem.py:277`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L277)
 
 ```python
 save()
@@ -375,7 +375,7 @@ ______________________________________________________________________
 
 ## class `Output`
 
-**Source:** [`_workitem.py:511`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L511)
+**Source:** [`_workitem.py:511`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L511)
 
 Container for an output work item.
 
@@ -385,7 +385,7 @@ Note: An output item always has an input item as a parent, which is used for tra
 
 ### method `__init__`
 
-**Source:** [`_workitem.py:521`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L521)
+**Source:** [`_workitem.py:521`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L521)
 
 ```python
 __init__(adapter: BaseAdapter, parent_id: str)
@@ -415,7 +415,7 @@ ______________________________________________________________________
 
 ### method `add_file`
 
-**Source:** [`_workitem.py:118`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L118)
+**Source:** [`_workitem.py:118`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L118)
 
 ```python
 add_file(path: Union[Path, str], name: Optional[str] = None) → Path
@@ -437,7 +437,7 @@ ______________________________________________________________________
 
 ### method `add_files`
 
-**Source:** [`_workitem.py:145`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145)
+**Source:** [`_workitem.py:145`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145)
 
 ```python
 add_files(pattern: str) → list[Path]
@@ -458,7 +458,7 @@ ______________________________________________________________________
 
 ### method `load`
 
-**Source:** [`_workitem.py:72`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72)
+**Source:** [`_workitem.py:72`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L72)
 
 ```python
 load() → None
@@ -470,7 +470,7 @@ ______________________________________________________________________
 
 ### method `remove_file`
 
-**Source:** [`_workitem.py:167`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167)
+**Source:** [`_workitem.py:167`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167)
 
 ```python
 remove_file(name: str, missing_ok: bool = False)
@@ -489,7 +489,7 @@ ______________________________________________________________________
 
 ### method `remove_files`
 
-**Source:** [`_workitem.py:186`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L186)
+**Source:** [`_workitem.py:186`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L186)
 
 ```python
 remove_files(pattern: str) → list[str]
@@ -510,7 +510,7 @@ ______________________________________________________________________
 
 ### method `save`
 
-**Source:** [`_workitem.py:82`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_workitem.py#L82)
+**Source:** [`_workitem.py:82`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L82)
 
 ```python
 save()
@@ -524,7 +524,7 @@ ______________________________________________________________________
 
 ## enum `State`
 
-**Source:** [`_types.py:15`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_types.py#L15)
+**Source:** [`_types.py:15`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_types.py#L15)
 
 Work item state, after release.
 
@@ -537,7 +537,7 @@ ______________________________________________________________________
 
 ## enum `ExceptionType`
 
-**Source:** [`_types.py:22`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_types.py#L22)
+**Source:** [`_types.py:22`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_types.py#L22)
 
 Failed work item error type.
 
@@ -550,7 +550,7 @@ ______________________________________________________________________
 
 ## exception `EmptyQueue`
 
-**Source:** [`_exceptions.py:6`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L6)
+**Source:** [`_exceptions.py:6`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L6)
 
 Raised when trying to load an input item and none available.
 
@@ -558,13 +558,13 @@ ______________________________________________________________________
 
 ## exception `BusinessException`
 
-**Source:** [`_exceptions.py:22`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L22)
+**Source:** [`_exceptions.py:22`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L22)
 
 An exception that can be raised to release an input work item with a BUSINESS exception type.
 
 ### method `__init__`
 
-**Source:** [`_exceptions.py:11`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11)
+**Source:** [`_exceptions.py:11`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11)
 
 ```python
 __init__(message: Optional[str] = None, code: Optional[str] = None)
@@ -574,13 +574,13 @@ ______________________________________________________________________
 
 ## exception `ApplicationException`
 
-**Source:** [`_exceptions.py:29`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L29)
+**Source:** [`_exceptions.py:29`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L29)
 
 An exception that can be raised to release an input work item with an APPLICATION exception type.
 
 ### method `__init__`
 
-**Source:** [`_exceptions.py:11`](https://github.com/robocorp/robo/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11)
+**Source:** [`_exceptions.py:11`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_exceptions.py#L11)
 
 ```python
 __init__(message: Optional[str] = None, code: Optional[str] = None)

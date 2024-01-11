@@ -31,6 +31,7 @@ class BodyPayload(BaseModel):
 class ExposeSessionJson(BaseModel):
     expose_session: str
     url: str
+    api_key: str | None = None
 
 
 def get_expose_session_path(datadir: str) -> str:
@@ -53,12 +54,14 @@ def read_expose_session_json(datadir: str) -> None | ExposeSessionJson:
     return session_json
 
 
-def write_expose_session_json(datadir: str, expose_session: str, url: str) -> None:
+def write_expose_session_json(
+    datadir: str, expose_session_json=ExposeSessionJson
+) -> None:
     expose_session_path = get_expose_session_path(datadir)
     log.debug(f"🗂️ Writing expose_session.json path={expose_session_path}")
     with open(expose_session_path, "w") as f:
         json.dump(
-            ExposeSessionJson(expose_session=expose_session, url=url).model_dump(),
+            expose_session_json.model_dump(),
             f,
             indent=2,
         )
@@ -145,8 +148,11 @@ async def expose_server(
                             new_expose_session = get_expose_session(session_payload)
                             write_expose_session_json(
                                 datadir=datadir,
-                                expose_session=new_expose_session,
-                                url=url,
+                                expose_session_json=ExposeSessionJson(
+                                    expose_session=new_expose_session,
+                                    api_key=api_key,
+                                    url=url,
+                                ),
                             )
                             continue
                         except Exception as e:

@@ -1,3 +1,6 @@
+# Changelog
+
+- Fix main README and update docs.
 
 ## 0.0.4 - 2024-01-09
 
@@ -20,7 +23,7 @@ It's possible to define an action such as:
 from robocorp.actions import action
 
 @action
-def convert_to_int(value:str) -> int:
+def convert_to_int(value: str) -> int:
     return int(value)
 ```
 

@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix main README and update docs.
+
 ## 0.0.11 - 2024-01-10
 
 - Fixed issue where the actions wouldn't be shown in the UI if the `@action` didn't have any required arguments.
@@ -92,4 +94,3 @@ action-server start --actions-sync=false --datadir=c:/temp/datadir
 
 - First release (pre-alpha).
 - Can import actions in the backend and run using API
-

@@ -2,13 +2,13 @@
 
 # module `robocorp.log.redirect`
 
-**Source:** [`redirect.py:0`](https://github.com/robocorp/robo/tree/master/log/src/robocorp/log/redirect.py#L0)
+**Source:** [`redirect.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/redirect.py#L0)
 
 ______________________________________________________________________
 
 ## function `setup_stdout_logging`
 
-**Source:** [`setup_stdout_logging:136`](https://github.com/robocorp/robo/tree/master/log/robocorp/log/redirect/setup_stdout_logging#L136)
+**Source:** [`setup_stdout_logging:136`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/redirect/setup_stdout_logging#L136)
 
 ```python
 setup_stdout_logging(

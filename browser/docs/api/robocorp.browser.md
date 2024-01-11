@@ -2,13 +2,13 @@
 
 # module `robocorp.browser`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L0)
 
 ______________________________________________________________________
 
 ## function `configure`
 
-**Source:** [`__init__.py:18`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L18)
+**Source:** [`__init__.py:18`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L18)
 
 ```python
 configure(**kwargs) → None
@@ -45,7 +45,7 @@ ______________________________________________________________________
 
 ## function `configure_context`
 
-**Source:** [`__init__.py:87`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L87)
+**Source:** [`__init__.py:87`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L87)
 
 ```python
 configure_context(**kwargs) → None
@@ -70,7 +70,7 @@ ______________________________________________________________________
 
 ## function `page`
 
-**Source:** [`__init__.py:115`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L115)
+**Source:** [`__init__.py:115`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L115)
 
 ```python
 page() → Page
@@ -94,7 +94,7 @@ ______________________________________________________________________
 
 ## function `browser`
 
-**Source:** [`__init__.py:137`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L137)
+**Source:** [`__init__.py:137`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L137)
 
 ```python
 browser() → Browser
@@ -118,7 +118,7 @@ ______________________________________________________________________
 
 ## function `playwright`
 
-**Source:** [`__init__.py:165`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L165)
+**Source:** [`__init__.py:165`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L165)
 
 ```python
 playwright() → Playwright
@@ -139,7 +139,7 @@ ______________________________________________________________________
 
 ## function `context`
 
-**Source:** [`__init__.py:186`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L186)
+**Source:** [`__init__.py:186`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L186)
 
 ```python
 context(**kwargs) → BrowserContext
@@ -163,7 +163,7 @@ ______________________________________________________________________
 
 ## function `goto`
 
-**Source:** [`__init__.py:212`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L212)
+**Source:** [`__init__.py:212`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L212)
 
 ```python
 goto(url: str) → Page
@@ -182,7 +182,7 @@ ______________________________________________________________________
 
 ## function `screenshot`
 
-**Source:** [`__init__.py:228`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L228)
+**Source:** [`__init__.py:228`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L228)
 
 ```python
 screenshot(
@@ -208,7 +208,7 @@ ______________________________________________________________________
 
 ## function `install`
 
-**Source:** [`__init__.py:271`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/__init__.py#L271)
+**Source:** [`__init__.py:271`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L271)
 
 ```python
 install(browser_engine: BrowserEngine, force: bool = False)
@@ -226,7 +226,7 @@ ______________________________________________________________________
 
 ## enum `BrowserEngine`
 
-**Source:** [`_types.py:14`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_types.py#L14)
+**Source:** [`_types.py:14`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L14)
 
 Valid browser engines for Playwright.
 
@@ -245,7 +245,7 @@ ______________________________________________________________________
 
 ## exception `InstallError`
 
-**Source:** [`_types.py:10`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_types.py#L10)
+**Source:** [`_types.py:10`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L10)
 
 Error encountered during browser install
 
@@ -253,7 +253,7 @@ ______________________________________________________________________
 
 ## exception `BrowserNotFound`
 
-**Source:** [`_types.py:6`](https://github.com/robocorp/robo/tree/master/browser/src/robocorp/browser/_types.py#L6)
+**Source:** [`_types.py:6`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L6)
 
 No matching browser found in the environment.
 
