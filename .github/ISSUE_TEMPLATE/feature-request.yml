@@ -1,0 +1,38 @@
+name: ⭐️ Feature Request
+description: Template for missing feature
+title: "[Feature Request]: "
+body:
+  - type: checkboxes
+    id: library
+    attributes:
+      label: Target library
+      description: Select one or more libraries for the feature request
+      options:
+        - label: Action Server
+          required: false
+        - label: Actions
+          required: false
+        - label: Browser
+          required: false
+        - label: Tasks
+          required: false
+        - label: Vault
+          required: false
+        - label: Windows
+          required: false
+        - label: Workitems
+          required: false
+  - type: textarea
+    attributes:
+      label: Description
+      description: Describe the problem or the missing capability
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Describe the solution you'd like
+      description: If you have a solution in mind, please describe it.
+  - type: textarea
+    attributes:
+      label: Describe alternatives you've considered
+      description: Are you using or have you considered any alternative solutions or workarounds?

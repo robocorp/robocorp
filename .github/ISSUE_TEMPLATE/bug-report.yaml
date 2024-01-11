@@ -1,0 +1,48 @@
+name: 🐛 Bug report
+description: Template for bug reports
+title: "[Issue]: "
+body:
+  - type: checkboxes
+    id: library
+    attributes:
+      label: Affected library
+      description: Select one or more libraries that are affected by the bug reported
+      options:
+        - label: Action Server
+          required: false
+        - label: Actions
+          required: false
+        - label: Browser
+          required: false
+        - label: Tasks
+          required: false
+        - label: Vault
+          required: false
+        - label: Windows
+          required: false
+        - label: Workitems
+          required: false
+  - type: textarea
+    id: issue
+    attributes:
+      label: What happened?
+      description: >-
+        Give details on what you are doing, what you expect to happen, and what
+        is currently happening.
+      placeholder: |
+      * I'm trying to use the `robocorp` library to do X
+      * I'expected to get Y
+      * Instead it does Z
+    validations:
+      required: true
+  - type: textarea
+    id: system
+    attributes:
+      label: System Info
+      description: Please share your system info with us.
+      placeholder: |
+      * library version
+      * operating system and version
+- operating system"
+    validations:
+      required: true
