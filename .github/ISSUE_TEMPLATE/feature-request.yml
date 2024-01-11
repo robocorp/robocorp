@@ -10,17 +10,17 @@ body:
       options:
         - label: Action Server
           required: false
-        - label: Actions
+        - label: robocorp-actions
           required: false
-        - label: Browser
+        - label: robocorp-browser
           required: false
-        - label: Tasks
+        - label: robocorp-tasks
           required: false
-        - label: Vault
+        - label: robocorp-vault
           required: false
-        - label: Windows
+        - label: robocorp-windows
           required: false
-        - label: Workitems
+        - label: robocorp-workitems
           required: false
   - type: textarea
     attributes:

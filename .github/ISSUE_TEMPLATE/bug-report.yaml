@@ -7,20 +7,20 @@ body:
     attributes:
       label: Affected library
       description: Select one or more libraries that are affected by the bug reported
-      options:
+       options:
         - label: Action Server
           required: false
-        - label: Actions
+        - label: robocorp-actions
           required: false
-        - label: Browser
+        - label: robocorp-browser
           required: false
-        - label: Tasks
+        - label: robocorp-tasks
           required: false
-        - label: Vault
+        - label: robocorp-vault
           required: false
-        - label: Windows
+        - label: robocorp-windows
           required: false
-        - label: Workitems
+        - label: robocorp-workitems
           required: false
   - type: textarea
     id: issue
@@ -29,20 +29,20 @@ body:
       description: >-
         Give details on what you are doing, what you expect to happen, and what
         is currently happening.
-      placeholder: |
-      * I'm trying to use the `robocorp` library to do X
-      * I'expected to get Y
-      * Instead it does Z
+      placeholder: >-
+        * I'm trying to use the `robocorp` library to do X
+        * I'expected to get Y
+        * Instead it does Z
     validations:
       required: true
   - type: textarea
     id: system
     attributes:
       label: System Info
-      description: Please share your system info with us.
-      placeholder: |
-      * library version
-      * operating system and version
-- operating system"
+      description: Sharign your system information will help us a lot
+      placeholder: >-
+        * Library version
+        * Python version
+        * Operating System version
     validations:
       required: true
