@@ -23,32 +23,72 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 # 🏃‍♂️ Quickstart
 
-Install Robocorp Action Server:
+<details open>
+<summary><b>For macOS</b></summary>
 
 ```sh
-# On macOS
-brew install robocorp/tools/action-server
+# Install Robocorp Action Server
+brew update
+brew install robocorp/tools/action-server 
 
-# On Linux or Windows
-pip install robocorp-action-server
-```
-
-Bootstrap a new project from a template. You’ll be prompted for a name of the project:
-
-```sh
+# Bootstrap a new project from a template. 
+# You’ll be prompted for a name of the project
 action-server new
-```
 
-Navigate to the freshly created project folder and start the server:
+# Navigate to the freshly created project folder and start the server 
+cd my-project
+action-server start --expose
+```
+</details>
+<br/>
+<details>
+<summary><b>For Windows</b></summary>
 
 ```sh
-cd my-first-action-server
+# Download Robocorp Action Server
+curl -o action-server.exe https://downloads.robocorp.com/action-server/releases/latest/windows64/action-server.exe
+
+# Add to PATH or move to a folder that is in PATH
+setx PATH=%PATH%;%CD%
+
+# Bootstrap a new project from a template. 
+# You’ll be prompted for a name of the project
+action-server new
+
+# Navigate to the freshly created project folder and start the server
+cd my-project
 action-server start --expose
 ```
 
+</details>
+<br/>
+
+<details>
+<summary><b>For Linux</b></summary>
+
+```sh
+# Download Robocorp Action Server
+curl -o action-server https://downloads.robocorp.com/action-server/releases/latest/linux64/action-server
+chmod a+x action-server
+
+# Add to PATH or move to a folder that is in PATH
+sudo mv action-server /usr/local/bin/
+
+# Bootstrap a new project from a template. 
+# You’ll be prompted for a name of the project
+action-server new
+
+# Navigate to the freshly created project folder and start the server
+cd my-project
+action-server start --expose
+```
+
+</details>
+<br/>
+
 Once that’s done, you’ll have an Action Server UI locally at [http://localhost:8080](http://localhost:8080)), and a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_).
 
-Head over to [Action Server docs](./action_server/docs) for more in detail documentation.
+Head over to [Action Server docs](./action_server/readme.md) for more.
 
 ---
 
