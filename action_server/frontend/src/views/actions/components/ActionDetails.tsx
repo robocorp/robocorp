@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Drawer, Tabs } from '@robocorp/components';
+import { Badge, Drawer, Tabs, Tooltip } from '@robocorp/components';
 
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { ActionRun } from './ActionRun';
@@ -34,14 +34,23 @@ export const ActionDetails: FC = () => {
         <>
           <Drawer.Header>
             <Drawer.Header.Title title={action.name} />
+            <Drawer.Header.Badges>
+              {!action.enabled && (
+                <Tooltip text="This action has been removed or renamed and is not available for running">
+                  <Badge variant="warning" size="small" label="Not available" />
+                </Tooltip>
+              )}
+            </Drawer.Header.Badges>
           </Drawer.Header>
           <Drawer.Content>
             <Tabs>
-              <Tabs.Tab>Run</Tabs.Tab>
+              {action.enabled && <Tabs.Tab>Run</Tabs.Tab>}
               <Tabs.Tab>Documentation</Tabs.Tab>
-              <Tabs.Panel>
-                <ActionRun action={action} actionPackage={actionPackage} />
-              </Tabs.Panel>
+              {action.enabled && (
+                <Tabs.Panel>
+                  <ActionRun action={action} actionPackage={actionPackage} />
+                </Tabs.Panel>
+              )}
               <Tabs.Panel>
                 <ActionDocumentation action={action} />
               </Tabs.Panel>
