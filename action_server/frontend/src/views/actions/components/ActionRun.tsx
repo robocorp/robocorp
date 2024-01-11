@@ -4,13 +4,16 @@ import { Button, Checkbox, Form, Header, Input } from '@robocorp/components';
 import { runAction } from '~/lib/requestData';
 import { Action, ActionPackage, AsyncLoaded, InputProperty, InputPropertyType } from '~/lib/types';
 import { Code } from '~/components';
+import { stringifyResult } from '~/lib/helpers';
 
 type Props = {
   action: Action;
   actionPackage: ActionPackage;
 };
 
-const dataLoadedInitial: AsyncLoaded<unknown> = {
+type RunResult = string | number | boolean | undefined;
+
+const dataLoadedInitial: AsyncLoaded<RunResult> = {
   data: undefined,
   isPending: false,
 };
@@ -48,7 +51,7 @@ type FormDataEntry = [string, InputProperty, string];
 
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [formData, setFormData] = useState<FormDataEntry[]>([]);
-  const [result, setResult] = useState<AsyncLoaded<unknown>>(dataLoadedInitial);
+  const [result, setResult] = useState<AsyncLoaded<RunResult>>(dataLoadedInitial);
 
   const inputSchema: InputSchema = useMemo(() => {
     return JSON.parse(action.input_schema);
@@ -177,7 +180,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           <Header size="small">
             <Header.Title title="Result" />
           </Header>
-          <Code lineNumbers={false} value={result.errorMessage || (result.data as string)} />
+          <Code lineNumbers={false} value={result.errorMessage || stringifyResult(result.data)} />
         </>
       )}
     </Form>
