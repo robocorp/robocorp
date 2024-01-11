@@ -59,10 +59,10 @@ Head over to [Action Server docs](./action_server/docs) for more in detail docum
 <details>
   <summary>Curious to more about `conda.yaml`? We've got your covered.</summary>
 
-  - Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 `conda.yaml` defines your channels (where are your dependencies coming from), the versions of e.g. python and pip your actions are built to work with, and all the packages you need as dependendencies.
-  
-  - When starting an Action Server, this file is used as a "recipe" to build the entire environment, making sure everything works on any machine every time the exact same way. Neat, right? Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
-  
+- Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 `conda.yaml` defines your channels (where are your dependencies coming from), the versions of e.g. python and pip your actions are built to work with, and all the packages you need as dependendencies.
+
+- When starting an Action Server, this file is used as a "recipe" to build the entire environment, making sure everything works on any machine every time the exact same way. Neat, right? Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
+
 </details>
 
 ```yaml
@@ -147,8 +147,8 @@ Adding the Action Server hosted AI Action to your custom GPT is super simple, ba
 Robocorp stack is hands down the easiest way to give AI agents more capabilities. It’s an end-to-end stack supporting every type of connection between AI and your apps and data. You are in control where to run the code and everything is built for easiness, security, and scalability.
 
 - 🔐 **Decouple AI and Actions that touches your data/apps** - Clarity and security with segregation of duties between your AI agent and code that touches your data and apps. Build `@action` and use from multiple AI frameworks.
-- 🏎️ **Develop Actions faster with `robocorp` automation libraries** - Robocorp libraries and the Python ecosystem let's you act on anything - from data to API to Browser to Desktops.
-- 🕵️ **Observability out of the box** - Log and trace every `@action` run automatically without a single `print` statement. 
+- 🏎️ **Develop Actions faster with `robocorp` automation libraries** - Robocorp libraries and the Python ecosystem lets you act on anything - from data to API to Browser to Desktops.
+- 🕵️ **Observability out of the box** - Log and trace every `@action` run automatically without a single `print` statement.
 - 🤯 **No-pain Python environment management** - Don't do [this](https://xkcd.com/1987/). Robocorp manages a full Python environment for your actions with ease.
 - 🚀 **Deploy with zero config and infra** - One step deployment, and you'll be connecting your `@action` to AI apps like Langchain and OpenAI GPTs in seconds.
 
@@ -156,9 +156,9 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 
 Check out these example projects for inspiration.
 
-- 🤡 Get a random joke or jokes per theme. Showcases how easy it is to work with APIs. (Coming soon, credit XX for the idea)
+- 🤡 Get a random joke or jokes per theme. Showcases how easy it is to work with APIs. (Coming soon)
 - 🕸️ Open a local Playwright browser and make some Google searches. (Coming soon)
-- 🖥️ Fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time. (Coming soon)
+- 🖥️ Securely fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time. (Coming soon)
 
 Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or drop us a line at [tommi@robocorp.com](mailto:tommi@robocorp.com). We'll soon start showcasing the best of the community here!
 
