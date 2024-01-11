@@ -269,6 +269,9 @@ jobs:
       # sign-macos needs to be explicit in order to get the version, even if it's implied
       - sign-macos
       - deploy-s3
+        defaults:
+    run:
+      working-directory: .
     
     runs-on: ubuntu-latest
 
