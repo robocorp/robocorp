@@ -7,3 +7,7 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 
 - [Requests: "Requests: HTTP for Humans™"](https://github.com/robocorp/robocorp/blob/master/docs/3rd_party/requests/README.md)
 - ...
+
+
+> AI/LLM's are quite good with the most used Python libaries:<br/>
+👉 Try asking [ReMark](https://chat.robocorp.com)
