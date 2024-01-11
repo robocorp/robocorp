@@ -25,45 +25,66 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 Install Robocorp Action Server:
 
-```sh
-# On macOS
-brew install robocorp/tools/action-server
+<details open>
+<summary><b>For macOS</b></summary>
 
-# On Linux or Windows
-pip install robocorp-action-server
+```sh
+brew update
+brew install robocorp/tools/action-server 
+```
+</details>
+
+<details>
+<summary><b>For Windows</b></summary>
+
+```sh
+# Download Robocorp Action Server
+curl -o action-server.exe https://downloads.robocorp.com/action-server/releases/latest/windows64/action-server.exe
+
+# Add to PATH or move to a folder that is in PATH
+setx PATH=%PATH%;%CD%
 ```
 
-Bootstrap a new project from a template. You’ll be prompted for a name of the project:
+</details>
 
+<details>
+<summary><b>For Linux</b></summary>
+
+```sh
+# Download Robocorp Action Server
+curl -o action-server https://downloads.robocorp.com/action-server/releases/latest/linux64/action-server
+chmod a+x action-server
+
+# Add to PATH or move to a folder that is in PATH
+sudo mv action-server /usr/local/bin/
+```
+
+</details>
+<br/>
+
+Bootstrap a new project from a template. You’ll be prompted for a name of the project:
 ```sh
 action-server new
 ```
 
 Navigate to the freshly created project folder and start the server:
-
 ```sh
-cd my-first-action-server
+cd my-project
 action-server start --expose
 ```
 
-Once that’s done, you’ll have an Action Server UI locally at [http://localhost:8080](http://localhost:8080)), and a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_).
+👉 You should now have an Action Server running locally at: http://localhost:8080, to open the web UI.
 
-Head over to [Action Server docs](./action_server/docs) for more in detail documentation.
+👉 Using the --expose -flag, you also get a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_) and an API key. These are the details that you need to configure your AI Agent.
+
+
+Head over to [Action Server docs](./action_server/README.md) for more.
 
 ---
 
 # What makes a Python function an ⚡️Action?
 
 1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
-
-<details>
-  <summary>Curious to more about <code>conda.yaml</code>? We've got your covered.</summary>
-
-- Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 `conda.yaml` defines your channels (where are your dependencies coming from), the versions of e.g. python and pip your actions are built to work with, and all the packages you need as dependendencies.
-
-- When starting an Action Server, this file is used as a "recipe" to build the entire environment, making sure everything works on any machine every time the exact same way. Neat, right? Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
-
-</details>
 
 ```yaml
 channels:
@@ -77,6 +98,26 @@ dependencies:
       - robocorp==1.3.0
       - numpy==1.26.3
 ```
+
+<details>
+  <summary>🙋‍♂️ "Why not just pip install...?"</summary>
+
+Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 With `conda.yaml` you are not just controlling your PyPI dependencies, you control the complete Python environment, which makes things repeatable and easy.
+
+👉 You will probably not want run the Actions just on your machine, so by using `conda.yaml`:
+
+- You can avoid `Works on my machine` -cases
+- You do not need to manage Python installations on all the machines
+- You can control exactly which version of Python your automation will run on 
+  - ..as well as the pip version to avoid dep. resolution changes
+- No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
+- Define dependencies in conda.yaml let our tooling do the heavy lifting.
+- You get all the content of [conda-forge](https://prefix.dev/channels/conda-forge) without any extra tooling
+
+> Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
+
+</details>
+<br/>
 
 2️⃣ [@action decorator](./actions/docs) that determines the **action entry point** and [Type hints and docstring](./actions/docs) to let AI agents know **what the Action does** in natural language.
 
