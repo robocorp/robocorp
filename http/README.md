@@ -20,5 +20,5 @@ def download_file(url, local_filename):
 
 > Note: `requests` -library is already included in `robocorp` -package.
 > 
-> Check out more under our [`requests`](https://github.com/robocorp/robocorp/blob/master/docs/3rd_party/requests/README.md)
+> Check out more under our [**Requests**](https://github.com/robocorp/robocorp/blob/master/docs/3rd_party/requests/README.md)
 > 3rd-party library documentation. 
