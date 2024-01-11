@@ -127,7 +127,7 @@ def _create_parser():
             'Adds authentication. Pass it as `{"Authorization": "Bearer <API_KEY>"}` '
             "header. Pass `--api-key None` to disable authentication."
         ),
-        default=generate_api_key(),
+        default=None,
     )
     start_parser.add_argument(
         "--actions-sync",
@@ -454,9 +454,17 @@ To migrate the database to the current version
                                     else:
                                         expose_session = None
 
+                            api_key = base_args.api_key
+                            if api_key is None:
+                                # reuse the previously exposed api key
+                                if expose_session and expose_session.api_key:
+                                    api_key = expose_session.api_key
+                                else:
+                                    api_key = generate_api_key()
+
                             start_server(
                                 expose=base_args.expose,
-                                api_key=base_args.api_key,
+                                api_key=api_key,
                                 expose_session=expose_session.expose_session
                                 if expose_session
                                 else None,
