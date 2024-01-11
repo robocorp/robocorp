@@ -95,7 +95,8 @@ dependencies:
   - pip=23.2.1
   - robocorp-truststore=0.8.0
   - pip:
-      - robocorp==1.3.0
+      - robocorp==1.4.0
+      - robocorp-actions==0.0.4
       - numpy==1.26.3
 ```
 
