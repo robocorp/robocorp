@@ -88,14 +88,14 @@ def make_exe():
     # an optional fallback.
 
     # Use in-memory location for adding resources by default.
-    # policy.resources_location = "in-memory"
+    policy.resources_location = "in-memory"
 
     # Use filesystem-relative location for adding resources by default.
-    policy.resources_location = "filesystem-relative:lib"
+    # policy.resources_location = "filesystem-relative:lib"
 
     # Attempt to add resources relative to the built binary when
     # `resources_location` fails.
-    # policy.resources_location_fallback = "filesystem-relative:prefix"
+    policy.resources_location_fallback = "filesystem-relative:lib"
 
     # Clear out a fallback resource location.
     # policy.resources_location_fallback = None
@@ -252,7 +252,7 @@ def make_exe():
 
     for resource in exe.pip_install(
         [
-            "robocorp-actions>=0.0.3",
+            "robocorp-actions>=0.0.4",
             "fastapi>=0.104.1",
             "uvicorn>=0.23.2",
             "pydantic>=2.4.2",
@@ -263,21 +263,30 @@ def make_exe():
             "psutil>=5",
         ]
     ):
-        # TODO: Make everything possible in-memory
-        # (some things don't work, but we should
-        # be able to differentiate).
-        # print(resource)
-        # print(resource.name)
-        # print(type(resource))
-        # resource.add_location = "in-memory"
-        # resource.add_location = "filesystem-relative:lib"
-        resource.add_source = True
+        if resource.name in ("py.typed",) or resource.name.endswith(".pyi"):
+            continue
+
+        if "psutil.tests" in resource.name:
+            continue
+
+        if str(type(resource)) == "PythonModuleSource":
+            resource.add_location = "in-memory"
+            resource.add_source = False
+        else:
+            # print(">>", resource.name, str(type(resource)), resource)
+            resource.add_location = "filesystem-relative:lib"
+            resource.add_source = True
         exe.add_python_resource(resource)
 
     for resource in exe.read_package_root(
         path="../src",
         packages=["robocorp.action_server"],
     ):
+        if "bin/rcc" in resource.name:
+            # We'll download it after the build is done (because I couldn't
+            # find a way to make the executable bit be kept by pyoxidizer).
+            continue
+
         resource.add_location = "filesystem-relative:lib"
         resource.add_source = True
         exe.add_python_resource(resource)

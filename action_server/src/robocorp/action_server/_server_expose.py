@@ -55,7 +55,7 @@ def read_expose_session_json(datadir: str) -> None | ExposeSessionJson:
 
 
 def write_expose_session_json(
-    datadir: str, expose_session_json=ExposeSessionJson
+    datadir: str, expose_session_json: ExposeSessionJson
 ) -> None:
     expose_session_path = get_expose_session_path(datadir)
     log.debug(f"🗂️ Writing expose_session.json path={expose_session_path}")

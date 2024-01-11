@@ -88,4 +88,7 @@ def download_rcc(ctx: Context, system: Optional[str] = None) -> None:
     """
     Downloads RCC in the place where the action server expects it
     """
-    run(ctx, "python -m robocorp.action_server download-rcc")
+    env = os.environ.copy()
+    curr_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = curr_pythonpath + os.pathsep + str(CURDIR / "src")
+    run(ctx, "python -m robocorp.action_server download-rcc", env=env)
