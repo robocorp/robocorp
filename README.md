@@ -124,7 +124,7 @@ Think of this as an equivalent of the requirements.txt, but much better. 👩‍
 </details>
 <br/>
 
-2️⃣ [@action decorator](./actions/docs) that determines the **action entry point** and [Type hints and docstring](./actions/docs) to let AI agents know **what the Action does** in natural language.
+2️⃣ [@action decorator](./actions) that determines the **action entry point** and [Type hints and docstring](./actions#describe-your-action) to let AI agents know **what the Action does** in natural language.
 
 ```py
 @action
