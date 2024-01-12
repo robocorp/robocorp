@@ -127,7 +127,7 @@ async def expose_server(
                 )
 
                 async with websockets.connect(
-                    f"wss://client.{expose_url}",
+                    f"ws://{expose_url}",
                     extra_headers=headers,
                     logger=log,
                 ) as ws:
@@ -139,7 +139,8 @@ async def expose_server(
                         try:
                             session_payload = SessionPayload(**data)
 
-                            url = f"https://{session_payload.sessionId}.{expose_url}"
+                            # url = f"https://{session_payload.sessionId}.{expose_url}"
+                            url = f"http://{expose_url}?sessionId={session_payload.sessionId}"
                             log.info(f"🌍 URL: {url}")
                             if api_key is not None:
                                 log.info(
