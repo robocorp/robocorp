@@ -9,7 +9,7 @@
       "type": "python",
       "request": "launch",
       "program": "src/robocorp/action_server/__main__.py",
-      "args": ["start", "--port", "8080", "--expose"],
+      "args": ["start", "--port", "8080", "--expose", "--expose-allow-reuse"],
       "console": "integratedTerminal",
       "justMyCode": true
     }

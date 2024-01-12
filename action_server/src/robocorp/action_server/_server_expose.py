@@ -112,6 +112,16 @@ async def expose_server(
         retry_delay = 1
         retries = 0
 
+        async def send_heartbeat(ws):
+            heartbeat_interval = 2  # seconds
+            while True:
+                try:
+                    log.info("Sending heartbeat")
+                    await ws.send("ping")
+                    await asyncio.sleep(heartbeat_interval)
+                except websockets.exceptions.ConnectionClosed:
+                    break
+
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
         )
@@ -131,87 +141,103 @@ async def expose_server(
                     extra_headers=headers,
                     logger=log,
                 ) as ws:
-                    while True:
-                        message = await ws.recv()
+                    heartbeat_task = asyncio.create_task(send_heartbeat(ws))
 
-                        data = json.loads(message)
+                    try:
+                        while True:
+                            message = await ws.recv()
 
-                        try:
-                            session_payload = SessionPayload(**data)
+                            print("This is data", message)
+                            if message == "pong":
+                                print("Pong received")
+                                continue
 
-                            # url = f"https://{session_payload.sessionId}.{expose_url}"
-                            url = f"http://{expose_url}?sessionId={session_payload.sessionId}"
-                            log.info(f"🌍 URL: {url}")
-                            if api_key is not None:
-                                log.info(
-                                    f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
+                            data = json.loads(message)
+
+                            try:
+                                session_payload = SessionPayload(**data)
+
+                                # url = f"https://{session_payload.sessionId}.{expose_url}"
+                                url = f"http://{expose_url}?sessionId={session_payload.sessionId}"
+                                log.info(f"🌍 URL: {url}")
+                                if api_key is not None:
+                                    log.info(
+                                        f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
+                                    )
+                                new_expose_session = get_expose_session(session_payload)
+                                write_expose_session_json(
+                                    datadir=datadir,
+                                    expose_session_json=ExposeSessionJson(
+                                        expose_session=new_expose_session,
+                                        api_key=api_key,
+                                        url=url,
+                                    ),
                                 )
-                            new_expose_session = get_expose_session(session_payload)
-                            write_expose_session_json(
-                                datadir=datadir,
-                                expose_session_json=ExposeSessionJson(
-                                    expose_session=new_expose_session,
-                                    api_key=api_key,
-                                    url=url,
-                                ),
-                            )
-                            continue
-                        except Exception as e:
-                            if not session_payload:
-                                log.error(
-                                    "Unable to get session payload. Exposing the local server failed. Try again."
-                                )
-                                raise
-                            pass
-
-                        try:
-                            payload = BodyPayload(**data)
-                            if payload.path != "/openapi.json" and api_key is not None:
-                                if (
-                                    payload.headers.get("authorization")
-                                    != f"Bearer {api_key}"
-                                ):
+                                continue
+                            except Exception as e:
+                                if not session_payload:
                                     log.error(
-                                        "Request failed because the API key is invalid."
+                                        "Unable to get session payload. Exposing the local server failed. Try again."
                                     )
-                                    await ws.send(
-                                        json.dumps(
-                                            {
-                                                "requestId": payload.requestId,
-                                                "response": json.dumps(
-                                                    {
-                                                        "error": {
-                                                            "code": "INVALID_API_KEY",
-                                                            "message": "The API key is invalid.",
-                                                        },
-                                                    }
-                                                ),
-                                                "status": 403,
-                                            }
+                                    raise
+                                pass
+
+                            try:
+                                payload = BodyPayload(**data)
+                                if (
+                                    payload.path != "/openapi.json"
+                                    and api_key is not None
+                                ):
+                                    if (
+                                        payload.headers.get("authorization")
+                                        != f"Bearer {api_key}"
+                                    ):
+                                        log.error(
+                                            "Request failed because the API key is invalid."
                                         )
-                                    )
-                                    continue
+                                        await ws.send(
+                                            json.dumps(
+                                                {
+                                                    "requestId": payload.requestId,
+                                                    "response": json.dumps(
+                                                        {
+                                                            "error": {
+                                                                "code": "INVALID_API_KEY",
+                                                                "message": "The API key is invalid.",
+                                                            },
+                                                        }
+                                                    ),
+                                                    "status": 403,
+                                                }
+                                            )
+                                        )
+                                        continue
 
-                            base_url = f"http://{host}:{port}"
-                            response: requests.Response = forward_request(
-                                base_url=base_url, payload=payload
-                            )
-                            await ws.send(
-                                json.dumps(
-                                    {
-                                        "requestId": payload.requestId,
-                                        "response": json.dumps(
-                                            response.json(),
-                                            indent=2,
-                                        ),
-                                        "status": response.status_code,
-                                    }
+                                base_url = f"http://{host}:{port}"
+                                response: requests.Response = forward_request(
+                                    base_url=base_url, payload=payload
                                 )
-                            )
+                                await ws.send(
+                                    json.dumps(
+                                        {
+                                            "requestId": payload.requestId,
+                                            "response": json.dumps(
+                                                response.json(),
+                                                indent=2,
+                                            ),
+                                            "status": response.status_code,
+                                        }
+                                    )
+                                )
 
-                        except Exception as e:
-                            log.error("Error forwarding request", e)
-                            pass
+                            except Exception as e:
+                                log.error("Error forwarding request", e)
+                                pass
+                    finally:
+                        # Cancel the heartbeat task when the connection is closed or an error occurs
+                        heartbeat_task.cancel()
+                        await heartbeat_task
+
             except websockets.exceptions.ConnectionClosed:
                 log.info("Connection closed, attempting to reconnect...")
                 retries += 1
