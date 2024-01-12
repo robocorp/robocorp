@@ -18,32 +18,32 @@ def sum_numbers(a: float, b: float) -> float:
 
 **And your function is now an ⚡️ action!**
 
-You can now run and debug your action by Starting Action Server with `action-server start` and open the UI at http://localhost:8080.
+You can now run and debug your action by Starting Action Server with `action-server start` and accessing the UI at http://localhost:8080.
 
 > [!NOTE]
-> Action inputs and output support only `int`, `float`, `str`, and `bool` types.
+> Action inputs and outputs support only `int`, `float`, `str`, and `bool` types.
 
 ## Describe your action
 
 For an action's purpose and usage to be understood by AI models _(and humans)_ it needs to be documented correctly.
 
-To do that, use [Google Style Docstring](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings) to write a clear and concise description on what your action does and document all the action inputs and expected output:
+To do that, use [Google Style Docstring](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings) to write a clear and concise description on what your action does and document the action inputs and expected output:
 
 ```py
 @action
 def get_weather_forecast(city: str, days: int, scale: str = "celsius") -> str:
     """
-    Returns current weather conditions for a given city.
+    Returns weather conditions forecast for a given city.
 
     Args:
         city (str): Target city to get the weather conditions for
         days: How many day forecast to return
-        scale (str): Temperature scale to use, should be one of "Celsius" or "Fahrenheit"
+        scale (str): Temperature scale to use, should be one of "celsius" or "fahrenheit"
 
     Returns:
-        str: List of requested timezones, their current time and the user time difference in hours
+        str: The requested weather conditions forecast
     """
-    output: list[str] = []
+    ...
 ```
 
 > [!TIP]
@@ -62,7 +62,7 @@ def get_weather_forecast(city: str, days: int, scale: str = "celsius") -> str:
 
 ### Execution
 
-Usually an action would be run by the Action Server, but it's also possible to do that directly in command line by passing the named arguments:
+To get the full benefits of your actions, the suggested way to run them is using the Action Server. But it's also possible to do that directly in command line by passing the named arguments:
 
 ```sh
 python -m robocorp.actions -- --city=Helsinki --days=3
