@@ -122,6 +122,8 @@ jobs:
   sign-macos:
     needs:
       - build
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
     defaults:
       run:
         working-directory: ./action_server
@@ -134,6 +136,18 @@ jobs:
         with:
             name: macOS-action-server-unsigned
             path: action_server/build
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: action-server-version
+          path: "action_server"
+      
+      - name: Set Version for Brew
+        id: set_version
+        run: |
+          VERSION=$(cat version.txt)
+          echo "Version: $VERSION"
+          echo "::set-output name=version::$VERSION"
 
       - name: Action Server Signing [macOS]
         env:
@@ -253,31 +267,44 @@ jobs:
       - name: Copy files to the deploy drop-box with the AWS CLI
         run: |
             aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
-  update-index:
-      # Way to disable the final deploy steps
-      if: ${{ true }}
-      timeout-minutes: 10
-      runs-on: ubuntu-latest
-      needs:
-          # Only update index when deploy passes
-          - deploy-s3
-      defaults:
-        run:
-          working-directory: ./action_server
-      steps:
-          - uses: actions/checkout@v4
-          - name: Generate the new index files
-            run: |
-              cd build-binary/
-              python downloads_index.py -c ../docs/CHANGELOG.md -p index.html -j index.json
-          - name: Configure AWS credentials for index.html update
-            uses: aws-actions/configure-aws-credentials@v1-node16
-            with:
-                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
-                aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
-                aws-region: eu-west-1
-          - name: Copy files to the deploy drop-box with the AWS CLI
-            run: |
-                aws s3 cp ./build-binary/index.html s3://downloads.robocorp.com/action-server/releases/index.html --cache-control max-age=120 --content-type "text/html"
-                aws s3 cp ./build-binary/index.json s3://downloads.robocorp.com/action-server/releases/index.json --cache-control max-age=120 --content-type "application/json"
+  
+  trigger-brew-workflow:
+    needs:
+      # sign-macos needs to be explicit in order to get the version, even if it's implied
+      - sign-macos
+      - deploy-s3
+    defaults:
+      run:
+        working-directory: .
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for Downloads S3 Bucket to have the right content
+        timeout-minutes: 5
+        run: |
+          VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
+          EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
+
+          while true; do
+            DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
+            echo "Downloaded version: $DOWNLOADED_VERSION"
+            echo "Expected version: $EXPECTED_VERSION"
+
+            if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
+              echo "Versions match."
+              break
+            else
+              echo "Versions do not match. Retrying in 30 seconds."
+            fi
+
+            sleep 30
+          done
+      - name: Trigger Brew Deploy Workflow
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GHA_TO_OTHER_REPO }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
+            -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
 
