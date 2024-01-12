@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.4.2 - 2024-01-12 (deprecated)
+
 ## 0.4.1 - 2024-01-11
 
 - ⚠️ This library is DEPRECATED, use `requests` instead!
