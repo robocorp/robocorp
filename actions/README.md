@@ -4,7 +4,7 @@ A Python library designed to simplify the development of Python actions _(AI or 
 
 ## Getting started
 
-If you have not setup Action Server already, see the [🏃‍♂️ Quickstart](../#%EF%B8%8F-quickstart) on how to do that.
+If you have not setup Action Server already, see the [🏃‍♂️ Quickstart](https://github.com/robocorp/robocorp#quickstart) on how to do that.
 
 Decorate your Python function with the `@action` decorator:
 
