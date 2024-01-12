@@ -12,7 +12,7 @@ and decorate it with the `@action` decorator, like this:
 i.e.:
 
 
-```
+```python
 from robocorp.actions import action
 
 @action
@@ -32,7 +32,7 @@ named arguments after a `--`.
 Example:
 
 
-```python
+```sh
 python -m robocorp.actions -- --a=2 --b=3
 ```
 
