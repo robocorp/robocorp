@@ -62,7 +62,7 @@ def get_weather_forecast(city: str, days: int, scale: str = "celsius") -> str:
 
 ### Execution
 
-To get the full benefits of your actions, the suggested way to run them is using the Action Server. But it's also possible to do that directly in command line by passing the named arguments:
+To get the full benefits of your actions, the suggested way to run them is using Action Server. But it's also possible to do that directly in command line by passing the named arguments:
 
 ```sh
 python -m robocorp.actions -- --city=Helsinki --days=3
