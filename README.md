@@ -23,7 +23,7 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 ---
 
-# 🏃‍♂️ Quickstart
+<h1 id="quickstart">🏃‍♂️ Quickstart</h1>
 
 Install Robocorp Action Server:
 
@@ -32,8 +32,9 @@ Install Robocorp Action Server:
 
 ```sh
 brew update
-brew install robocorp/tools/action-server 
+brew install robocorp/tools/action-server
 ```
+
 </details>
 
 <details>
@@ -42,10 +43,8 @@ brew install robocorp/tools/action-server
 ```sh
 # Download Robocorp Action Server
 curl -o action-server.exe https://downloads.robocorp.com/action-server/releases/latest/windows64/action-server.exe
-
-# Add to PATH or move to a folder that is in PATH
-setx PATH=%PATH%;%CD%
 ```
+You can download/move the executable into a folder that is in your `PATH`, or you can [add the folder into PATH](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) so that you can call `action-server` wherever you are.
 
 </details>
 
@@ -65,11 +64,13 @@ sudo mv action-server /usr/local/bin/
 <br/>
 
 Bootstrap a new project from a template. You’ll be prompted for a name of the project:
+
 ```sh
 action-server new
 ```
 
 Navigate to the freshly created project folder and start the server:
+
 ```sh
 cd my-project
 action-server start --expose
@@ -78,7 +79,6 @@ action-server start --expose
 👉 You should now have an Action Server running locally at: http://localhost:8080, to open the web UI.
 
 👉 Using the --expose -flag, you also get a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_) and an API key. These are the details that you need to configure your AI Agent.
-
 
 Head over to [Action Server docs](./action_server/README.md) for more.
 
@@ -111,7 +111,7 @@ Think of this as an equivalent of the requirements.txt, but much better. 👩‍
 
 - You can avoid `Works on my machine` -cases
 - You do not need to manage Python installations on all the machines
-- You can control exactly which version of Python your automation will run on 
+- You can control exactly which version of Python your automation will run on
   - ..as well as the pip version to avoid dep. resolution changes
 - No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
 - Define dependencies in conda.yaml let our tooling do the heavy lifting.
@@ -122,7 +122,7 @@ Think of this as an equivalent of the requirements.txt, but much better. 👩‍
 </details>
 <br/>
 
-2️⃣ [@action decorator](./actions/docs) that determines the **action entry point** and [Type hints and docstring](./actions/docs) to let AI agents know **what the Action does** in natural language.
+2️⃣ [@action decorator](./actions) that determines the **action entry point** and [Type hints and docstring](./actions#describe-your-action) to let AI agents know **what the Action does** in natural language.
 
 ```py
 @action

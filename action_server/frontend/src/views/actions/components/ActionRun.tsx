@@ -29,10 +29,10 @@ const convertType = (v: string, valueType: InputPropertyType): string | number |
     case InputPropertyType.INTEGER:
       return parseInt(v, 10);
     case InputPropertyType.BOOLEAN:
-      if (v === 'false') {
+      if (v === 'False') {
         return false;
       }
-      if (v === 'true') {
+      if (v === 'True') {
         return true;
       }
       throw new Error(`Unable to convert: ${v} to a boolean.`);
@@ -61,11 +61,15 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     if (inputSchema.properties) {
       const initialFormData = Object.entries(inputSchema.properties).map<FormDataEntry>(
         ([key, value]) => {
+          if (value.default) {
+            return [key, value, value.default];
+          }
+
           switch (value.type) {
             case InputPropertyType.NUMBER:
               return [key, value, '0.0'];
             case InputPropertyType.BOOLEAN:
-              return [key, value, 'true'];
+              return [key, value, 'True'];
             case InputPropertyType.INTEGER:
               return [key, value, '0'];
             case InputPropertyType.STRING:
@@ -86,7 +90,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         const [, field] = output[index];
 
         if (field.type === InputPropertyType.BOOLEAN) {
-          output[index][2] = e.target.checked ? 'true' : 'false';
+          output[index][2] = e.target.checked ? 'True' : 'False';
         } else {
           output[index][2] = e.target.value;
         }
@@ -125,7 +129,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
               key={key}
               label={title}
               description={description}
-              checked={value === 'true'}
+              checked={value === 'True'}
               required={isRequired}
               onChange={(e) => handleInputChange(e, index)}
             />
