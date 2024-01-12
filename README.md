@@ -23,7 +23,7 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 ---
 
-# 🏃‍♂️ Quickstart
+<h1 id="quickstart">🏃‍♂️ Quickstart</h1>
 
 Install Robocorp Action Server:
 
@@ -32,8 +32,9 @@ Install Robocorp Action Server:
 
 ```sh
 brew update
-brew install robocorp/tools/action-server 
+brew install robocorp/tools/action-server
 ```
+
 </details>
 
 <details>
@@ -65,11 +66,13 @@ sudo mv action-server /usr/local/bin/
 <br/>
 
 Bootstrap a new project from a template. You’ll be prompted for a name of the project:
+
 ```sh
 action-server new
 ```
 
 Navigate to the freshly created project folder and start the server:
+
 ```sh
 cd my-project
 action-server start --expose
@@ -78,7 +81,6 @@ action-server start --expose
 👉 You should now have an Action Server running locally at: http://localhost:8080, to open the web UI.
 
 👉 Using the --expose -flag, you also get a public internet-facing URL (something like _twently-cuddly-dinosaurs.robocorp.link_) and an API key. These are the details that you need to configure your AI Agent.
-
 
 Head over to [Action Server docs](./action_server/README.md) for more.
 
@@ -111,7 +113,7 @@ Think of this as an equivalent of the requirements.txt, but much better. 👩‍
 
 - You can avoid `Works on my machine` -cases
 - You do not need to manage Python installations on all the machines
-- You can control exactly which version of Python your automation will run on 
+- You can control exactly which version of Python your automation will run on
   - ..as well as the pip version to avoid dep. resolution changes
 - No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
 - Define dependencies in conda.yaml let our tooling do the heavy lifting.
