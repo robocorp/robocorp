@@ -283,7 +283,6 @@ jobs:
       - name: Wait for Downloads S3 Bucket to have the right content
         timeout-minutes: 5
         run: |
-          # Define variables
           VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
           EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
 
@@ -292,7 +291,6 @@ jobs:
             echo "Downloaded version: $DOWNLOADED_VERSION"
             echo "Expected version: $EXPECTED_VERSION"
 
-            # Compare versions
             if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
               echo "Versions match."
               break
