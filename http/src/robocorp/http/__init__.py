@@ -1,11 +1,6 @@
 import warnings
 
-from robocorp.http._http import download
-
-__version__ = "0.4.1"
-__all__ = [
-    "download",
-]
+__version__ = "0.4.2"
 
 warnings.warn(
     "This library is DEPRECATED, please use `requests` instead! "
