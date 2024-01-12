@@ -57,6 +57,7 @@ export interface InputProperty {
   type: InputPropertyType;
   description: string;
   title: string;
+  default?: string;
 }
 
 export enum InputPropertyType {
