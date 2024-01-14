@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.8.1 - 2024-01-14
+
+- Fix main README and update docs.
+- Fix version retrieval during development.
+
 ## 2.8.0 - 2023-10-27
 
 - `log.html`: It's now possible to click icon to show details (so, items without a message are also clickable).
