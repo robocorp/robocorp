@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.1 - 2024-01-14
+
+- Fix main README and update docs.
+
 ## 2.8.0 - 2024-01-09
 
 - Arguments to `@task` may be passed in a json file (with `--json-input=<path to .json file>`).
