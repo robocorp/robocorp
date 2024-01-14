@@ -8,7 +8,7 @@ from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
 from ._action_options import ActionOptions
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 version_info = [int(x) for x in __version__.split(".")]
 
 
