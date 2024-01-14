@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1 - 2024-01-14
+
+- Fix main README and update docs.
+
 ## 1.0.0 - 2023-12-12
 
 - Documentation fixes regarding the `timeout` parameter.
