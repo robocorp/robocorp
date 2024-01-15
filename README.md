@@ -228,7 +228,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [ ] Link and deploy Action Servers to [Control Room](https://cloud.robocorp.com/)
 - [ ] Hot reload of actions after a change
 - [ ] Docstring validator and autogeneration
-- [ ] More complex input args (currently action can take `str`, `bool`, `int` and `float`)
+- [ ] More complex input args (currently `str`, `bool`, `int` and `float`) and return values (currently `str` and `bool`)
 - [ ] Explicit action user approval
 - [ ] Stateful actions
 
