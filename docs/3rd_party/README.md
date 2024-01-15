@@ -6,6 +6,7 @@ For some libraries, we can also provide basic helper snippets, and in case we ge
 bigger, we will consider creating fully-fledged wrapper libraries.
 
 - [Requests: "Requests: HTTP for Humans™"](https://github.com/robocorp/robocorp/blob/master/docs/3rd_party/requests/README.md)
+- [Python-dotenv](https://pypi.org/project/python-dotenv/)
 - ...
 
 

@@ -1,6 +1,6 @@
 # robocorp-action-server
 
-[Robocorp Action Server](../readme.md) is a Python framework designed to simplify the deployment
+[Robocorp Action Server](../README.md) is a Python framework designed to simplify the deployment
 of actions (AI or otherwise).
 
 An `action` in this case is defined as a Python function (which has inputs/outputs
