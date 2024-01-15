@@ -131,8 +131,8 @@ async def expose_server(
     Exposes the server to the world.
     """
 
-    pong_queue = asyncio.Queue(maxsize=1)
-    no_connection_queue = asyncio.Queue(maxsize=1)
+    pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
+    no_connection_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
 
     async def listen_for_requests() -> None:
         max_retries = 3
