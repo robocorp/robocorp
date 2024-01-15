@@ -95,6 +95,12 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
+async def send_ping(ws):
+    while True:
+        await ws.send("ping")
+        await asyncio.sleep(2)
+
+
 async def expose_server(
     port: int,
     host: str,
@@ -111,16 +117,6 @@ async def expose_server(
         max_retries = 3
         retry_delay = 1
         retries = 0
-
-        async def send_heartbeat(ws):
-            heartbeat_interval = 2  # seconds
-            while True:
-                try:
-                    log.info("Sending heartbeat")
-                    await ws.send("ping")
-                    await asyncio.sleep(heartbeat_interval)
-                except websockets.exceptions.ConnectionClosed:
-                    break
 
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
@@ -141,7 +137,7 @@ async def expose_server(
                     extra_headers=headers,
                     logger=log,
                 ) as ws:
-                    heartbeat_task = asyncio.create_task(send_heartbeat(ws))
+                    ping_task = asyncio.create_task(send_ping(ws))
 
                     try:
                         while True:
@@ -235,8 +231,8 @@ async def expose_server(
                                 pass
                     finally:
                         # Cancel the heartbeat task when the connection is closed or an error occurs
-                        heartbeat_task.cancel()
-                        await heartbeat_task
+                        ping_task.cancel()
+                        await ping_task
 
             except websockets.exceptions.ConnectionClosed:
                 log.info("Connection closed, attempting to reconnect...")
