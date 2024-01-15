@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp"
-version = "1.4.1"
+version = "1.4.2"
 description = "Robocorp core libraries for Python automation"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",

@@ -17,4 +17,4 @@ The following packages are currently included:
 | [`robocorp.storage`](./storage)     | [![robocorp-storage](https://img.shields.io/pypi/v/robocorp-storage?label=robocorp-storage)](https://pypi.org/project/robocorp-storage/)         | Store assets in Control Room and manage them during the execution.                                                                |
 
 
-For further documentation on libraries, see the [Libraries docs](../docs/README.md).
+For further documentation on libraries, see the [Libraries docs](https://github.com/robocorp/robocorp/blob/master/docs/README.md).
