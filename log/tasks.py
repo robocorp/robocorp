@@ -87,7 +87,7 @@ def get_tag():
     import subprocess
 
     # i.e.: Gets the last tagged version
-    cmd = "git describe --tags --abbrev=0 --match robocorp-log*".split()
+    cmd = "git describe --tags --abbrev=0 --match robocorp-log-[0-9]*".split()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     stdout, stderr = popen.communicate()
 

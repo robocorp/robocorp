@@ -1,6 +1,12 @@
 # Changelog
 
+## 0.0.13 - 2024-01-14
+
 - Fix main README and update docs.
+
+## 0.0.12 - 2024-01-12
+
+- Auto-trigger brew pipeline after build.
 
 ## 0.0.11 - 2024-01-10
 

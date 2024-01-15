@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.0.5 - 2024-01-14
+
 - Fix main README and update docs.
 
 ## 0.0.4 - 2024-01-09

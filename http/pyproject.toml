@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "robocorp-http"
-version = "0.4.1"
-description = "Robocorp HTTP library"
+version = "0.4.2"
+description = "Robocorp HTTP library (deprecated)"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
 	"Cosmin P. <cosmin@robocorp.com>",

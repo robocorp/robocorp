@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 1.0.3 - 2024-01-14
+
+- Fix main README and update docs.
 
 ## 1.0.2 - 2023-11-06
 

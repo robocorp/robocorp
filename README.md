@@ -140,6 +140,20 @@ def greeting(name: str) -> str:
 
 ---
 
+## Connect with OpenAI GPTs Actions
+
+Once you have started the Action Server with `--expose` flag, you’ll get a URL available to the public, along with the authentication token. The relevant part of the output from the terminal looks like this, of course with your own details:
+
+```sh
+...
+Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
+🌍 URL: https://seventy-six-helpless-dragonflies.robocorp.link
+🔑 Add following header api authorization header to run actions: { "Authorization": "Bearer xxx_xxx" }
+```
+
+Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
+
+
 ## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)
 
 Robocorp Action Server comes with everything needed to connect it to your Langchain AI app project. The easiest way is to start with the template, provided in the Langchain project. Here’s how to do it:
@@ -178,19 +192,6 @@ toolkit = ActionServerToolkit(url="http://localhost:8080")
 tools = toolkit.get_tools()
 ```
 
-## Connect with OpenAI GPTs Actions
-
-Once you have started the Action Server with `--expose` flag, you’ll get a URL available to the public, along with the authentication token. The relevant part of the output from the terminal looks like this, of course with your own details:
-
-```sh
-...
-Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
-🌍 URL: https://seventy-six-helpless-dragonflies.robocorp.link
-🔑 Add following header api authorization header to run actions: { "Authorization": "Bearer xxx_xxx" }
-```
-
-Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
-
 ---
 
 ## Why use Robocorp AI Actions
@@ -228,7 +229,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [ ] Link and deploy Action Servers to [Control Room](https://cloud.robocorp.com/)
 - [ ] Hot reload of actions after a change
 - [ ] Docstring validator and autogeneration
-- [ ] More complex input args (currently action can take `str`, `bool`, `int` and `float`)
+- [ ] More complex input args (currently `str`, `bool`, `int` and `float`) and return values (currently `str` and `bool`)
 - [ ] Explicit action user approval
 - [ ] Stateful actions
 
