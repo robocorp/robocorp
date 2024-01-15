@@ -95,29 +95,28 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-class PongTimeoutError(Exception):
-    """Custom exception for pong response timeout."""
-
-    pass
-
-
 async def handle_ping_pong(
-    ws: websockets.WebSocketClientProtocol, pong_queue: asyncio.Queue
+    ws: websockets.WebSocketClientProtocol,
+    pong_queue: asyncio.Queue,
+    no_connection_queue: asyncio.Queue,
 ):
     while True:
-        try:
-            log.debug("️➡️ outgoing ping")
-            await ws.send("ping")
+        await asyncio.sleep(2)
+        log.debug("️➡️ outgoing ping")
+        await ws.send("ping")
 
-            await asyncio.wait_for(pong_queue.get(), timeout=5)
+        try:
+            await asyncio.wait_for(pong_queue.get(), timeout=2)
             log.debug("⬅️ incoming pong")
         except asyncio.TimeoutError:
-            ws.close()
-            raise PongTimeoutError()
-        except Exception as e:
-            log.error("Error handling ping pong", e)
-            return
-        await asyncio.sleep(2)
+            log.debug("Ping-pong message timeout")
+            await ws.close()
+            await no_connection_queue.put("no_connection")
+            break
+
+
+class ExposePingTimeoutError(Exception):
+    pass
 
 
 async def expose_server(
@@ -133,36 +132,55 @@ async def expose_server(
     """
 
     pong_queue = asyncio.Queue(maxsize=1)
+    no_connection_queue = asyncio.Queue(maxsize=1)
 
     async def listen_for_requests() -> None:
         max_retries = 3
-        retry_delay = 1
+        retry_delay = 3
         retries = 0
 
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
         )
         while retries < max_retries:
-            try:
-                headers = (
-                    {
-                        "x-session-id": session_payload.sessionId,
-                        "x-session-secret": session_payload.sessionSecret,
-                    }
-                    if session_payload
-                    else {}
-                )
+            headers = (
+                {
+                    "x-session-id": session_payload.sessionId,
+                    "x-session-secret": session_payload.sessionSecret,
+                }
+                if session_payload
+                else {}
+            )
 
+            try:
                 async with websockets.connect(
                     f"wss://client.{expose_url}",
                     extra_headers=headers,
                     logger=log,
+                    close_timeout=0,
                 ) as ws:
-                    ping_task = asyncio.create_task(handle_ping_pong(ws, pong_queue))
+                    if retries > 0:
+                        log.info("Reconnected to expose tunnel server")
+                        retries = 0
+
+                    ping_task = asyncio.create_task(
+                        handle_ping_pong(ws, pong_queue, no_connection_queue)
+                    )
 
                     try:
                         while True:
-                            message = await ws.recv()
+                            done, pending = await asyncio.wait(
+                                [ws.recv(), no_connection_queue.get()],
+                                return_when=asyncio.FIRST_COMPLETED,
+                            )
+
+                            for task in done:
+                                message = task.result()
+                                if message == "no_connection":
+                                    raise ExposePingTimeoutError("No connection")
+
+                            for task in pending:
+                                task.cancel()
 
                             if message == "pong":
                                 await pong_queue.put("pong")
@@ -250,24 +268,38 @@ async def expose_server(
                             except Exception as e:
                                 log.error("Error forwarding request", e)
                                 pass
+
+                    except Exception as e:
+                        raise e
+
                     finally:
+                        ping_task.cancel()
                         try:
-                            ping_task.cancel()
                             await ping_task
                         except asyncio.CancelledError:
                             pass
 
             except (
-                websockets.exceptions.ConnectionClosed,
-                websockets.exceptions.ConnectionClosedError,
-                PongTimeoutError,
-            ):
-                log.info("Connection closed, attempting to reconnect...")
+                websockets.ConnectionClosed,
+                websockets.ConnectionClosedError,
+                ExposePingTimeoutError,
+                OSError,
+            ) as e:
                 retries += 1
+                log.info(
+                    f"Connection closed, attempting to reconnect...({retries}/{max_retries})"
+                )
+                log.debug(e)
                 await asyncio.sleep(retry_delay * retries)
+
             except Exception as e:
-                log.error(f"An error occurred: {e}")
+                log.error("Error connecting to expose tunnel server", e)
                 break
+
+        else:
+            log.error(
+                "Could not connect to expose tunnel server. Check your connectivity and try again."
+            )
 
     task = asyncio.create_task(listen_for_requests())
     await task  # Wait for listen_for_requests to complete
