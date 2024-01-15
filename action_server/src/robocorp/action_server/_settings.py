@@ -60,8 +60,8 @@ class Settings:
     port: int = 8080
     verbose: bool = False
     db_file: str = "server.db"
-    # expose_url: str = "robocorp.link"
-    expose_url: str = "localhost:8787"
+    expose_url: str = "robocorp.link"
+    # expose_url: str = "localhost:8787"
 
     @classmethod
     def defaults(cls):

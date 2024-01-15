@@ -96,9 +96,20 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
 
 
 async def send_ping(ws):
-    while True:
-        await ws.send("ping")
-        await asyncio.sleep(2)
+    try:
+        while True:
+            print("️➡️ outgoing ping")
+            await ws.send("ping")
+            await asyncio.sleep(2)
+    except websockets.exceptions.ConnectionClosed as e:
+        log.error(f"Websocket connection closed: {e}")
+        raise
+    except asyncio.CancelledError:
+        log.info("Ping task cancelled")
+        raise
+    except Exception as e:
+        log.error(f"Error in send_ping: {e}")
+        raise
 
 
 async def expose_server(
@@ -133,7 +144,7 @@ async def expose_server(
                 )
 
                 async with websockets.connect(
-                    f"ws://{expose_url}",
+                    f"wss://client.{expose_url}",
                     extra_headers=headers,
                     logger=log,
                 ) as ws:
@@ -143,9 +154,8 @@ async def expose_server(
                         while True:
                             message = await ws.recv()
 
-                            print("This is data", message)
                             if message == "pong":
-                                print("Pong received")
+                                print("⬅️ incoming pong")
                                 continue
 
                             data = json.loads(message)
@@ -153,8 +163,9 @@ async def expose_server(
                             try:
                                 session_payload = SessionPayload(**data)
 
-                                # url = f"https://{session_payload.sessionId}.{expose_url}"
-                                url = f"http://{expose_url}?sessionId={session_payload.sessionId}"
+                                url = (
+                                    f"https://{session_payload.sessionId}.{expose_url}"
+                                )
                                 log.info(f"🌍 URL: {url}")
                                 if api_key is not None:
                                     log.info(
