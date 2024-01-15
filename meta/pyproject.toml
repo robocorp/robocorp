@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp"
-version = "1.4.2"
+version = "1.4.3"
 description = "Robocorp core libraries for Python automation"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -13,7 +13,6 @@ packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-python-dotenv = "^1.0.0"
 robocorp-tasks = "^2.8.1"
 robocorp-log = "^2.8.1"
 robocorp-workitems = "^1.4.2"
