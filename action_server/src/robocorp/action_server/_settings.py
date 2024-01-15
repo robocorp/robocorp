@@ -61,7 +61,6 @@ class Settings:
     verbose: bool = False
     db_file: str = "server.db"
     expose_url: str = "robocorp.link"
-    # expose_url: str = "localhost:8787"
 
     @classmethod
     def defaults(cls):

@@ -95,21 +95,29 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
         raise NotImplementedError(f"Method {payload.method} not implemented")
 
 
-async def send_ping(ws):
-    try:
-        while True:
-            print("️➡️ outgoing ping")
+class PongTimeoutError(Exception):
+    """Custom exception for pong response timeout."""
+
+    pass
+
+
+async def handle_ping_pong(
+    ws: websockets.WebSocketClientProtocol, pong_queue: asyncio.Queue
+):
+    while True:
+        try:
+            log.debug("️➡️ outgoing ping")
             await ws.send("ping")
-            await asyncio.sleep(2)
-    except websockets.exceptions.ConnectionClosed as e:
-        log.error(f"Websocket connection closed: {e}")
-        raise
-    except asyncio.CancelledError:
-        log.info("Ping task cancelled")
-        raise
-    except Exception as e:
-        log.error(f"Error in send_ping: {e}")
-        raise
+
+            await asyncio.wait_for(pong_queue.get(), timeout=5)
+            log.debug("⬅️ incoming pong")
+        except asyncio.TimeoutError:
+            ws.close()
+            raise PongTimeoutError()
+        except Exception as e:
+            log.error("Error handling ping pong", e)
+            return
+        await asyncio.sleep(2)
 
 
 async def expose_server(
@@ -123,6 +131,8 @@ async def expose_server(
     """
     Exposes the server to the world.
     """
+
+    pong_queue = asyncio.Queue(maxsize=1)
 
     async def listen_for_requests() -> None:
         max_retries = 3
@@ -148,14 +158,14 @@ async def expose_server(
                     extra_headers=headers,
                     logger=log,
                 ) as ws:
-                    ping_task = asyncio.create_task(send_ping(ws))
+                    ping_task = asyncio.create_task(handle_ping_pong(ws, pong_queue))
 
                     try:
                         while True:
                             message = await ws.recv()
 
                             if message == "pong":
-                                print("⬅️ incoming pong")
+                                await pong_queue.put("pong")
                                 continue
 
                             data = json.loads(message)
@@ -241,14 +251,19 @@ async def expose_server(
                                 log.error("Error forwarding request", e)
                                 pass
                     finally:
-                        # Cancel the heartbeat task when the connection is closed or an error occurs
-                        ping_task.cancel()
-                        await ping_task
+                        try:
+                            ping_task.cancel()
+                            await ping_task
+                        except asyncio.CancelledError:
+                            pass
 
-            except websockets.exceptions.ConnectionClosed:
+            except (
+                websockets.exceptions.ConnectionClosed,
+                websockets.exceptions.ConnectionClosedError,
+                PongTimeoutError,
+            ):
                 log.info("Connection closed, attempting to reconnect...")
                 retries += 1
-                # sleep with exponential backoff
                 await asyncio.sleep(retry_delay * retries)
             except Exception as e:
                 log.error(f"An error occurred: {e}")
