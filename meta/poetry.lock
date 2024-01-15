@@ -558,22 +558,22 @@ testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 
 [[package]]
 name = "marshmallow"
-version = "3.20.1"
+version = "3.20.2"
 description = "A lightweight library for converting complex datatypes to and from native Python datatypes."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "marshmallow-3.20.1-py3-none-any.whl", hash = "sha256:684939db93e80ad3561392f47be0230743131560a41c5110684c16e21ade0a5c"},
-    {file = "marshmallow-3.20.1.tar.gz", hash = "sha256:5d2371bbe42000f2b3fb5eaa065224df7d8f8597bc19a1bbfa5bfe7fba8da889"},
+    {file = "marshmallow-3.20.2-py3-none-any.whl", hash = "sha256:c21d4b98fee747c130e6bc8f45c4b3199ea66bc00c12ee1f639f0aeca034d5e9"},
+    {file = "marshmallow-3.20.2.tar.gz", hash = "sha256:4c1daff273513dc5eb24b219a8035559dc573c8f322558ef85f5438ddd1236dd"},
 ]
 
 [package.dependencies]
 packaging = ">=17.0"
 
 [package.extras]
-dev = ["flake8 (==6.0.0)", "flake8-bugbear (==23.7.10)", "mypy (==1.4.1)", "pre-commit (>=2.4,<4.0)", "pytest", "pytz", "simplejson", "tox"]
-docs = ["alabaster (==0.7.13)", "autodocsumm (==0.2.11)", "sphinx (==7.0.1)", "sphinx-issues (==3.0.1)", "sphinx-version-warning (==1.1.2)"]
-lint = ["flake8 (==6.0.0)", "flake8-bugbear (==23.7.10)", "mypy (==1.4.1)", "pre-commit (>=2.4,<4.0)"]
+dev = ["pre-commit (>=2.4,<4.0)", "pytest", "pytz", "simplejson", "tox"]
+docs = ["alabaster (==0.7.15)", "autodocsumm (==0.2.12)", "sphinx (==7.2.6)", "sphinx-issues (==3.0.1)", "sphinx-version-warning (==1.1.2)"]
+lint = ["pre-commit (>=2.4,<4.0)"]
 tests = ["pytest", "pytz", "simplejson"]
 
 [[package]]
@@ -953,6 +953,20 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-dotenv"
+version = "1.0.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python-dotenv-1.0.0.tar.gz", hash = "sha256:a8df96034aae6d2d50a4ebe8216326c61c3eb64836776504fcca410e5937a3ba"},
+    {file = "python_dotenv-1.0.0-py3-none-any.whl", hash = "sha256:f5971a9226b701070a4bf2c38c89e5a3f0d64de8debda981d1db98583009122a"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -1053,13 +1067,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.8.0"
+version = "2.8.1"
 description = "Automatic trace logging for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_log-2.8.0-py3-none-any.whl", hash = "sha256:0436592f2fc32778125fe4e5ba7a94161ce4502023d645d23f09f99a130334d8"},
-    {file = "robocorp_log-2.8.0.tar.gz", hash = "sha256:0998707b4098b997bb9e5363029e62849d8b181900793db350d747d7e645f94c"},
+    {file = "robocorp_log-2.8.1-py3-none-any.whl", hash = "sha256:0c4eb6e11fe23cbd010e72258166555e55b3bd2522266c18ce20a276166ac730"},
+    {file = "robocorp_log-2.8.1.tar.gz", hash = "sha256:de611dba969d52c76340ea70a6dc055f4ca2714e09174f682f0665c273e24275"},
 ]
 
 [package.dependencies]
@@ -1068,13 +1082,13 @@ tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "robocorp-storage"
-version = "1.0.2"
+version = "1.0.3"
 description = "Robocorp Asset Storage library"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "robocorp_storage-1.0.2-py3-none-any.whl", hash = "sha256:a6a3966b854e63b1ccdf4f6e0835b9694452dc4ff9151508ea9d477aa84c3d8e"},
-    {file = "robocorp_storage-1.0.2.tar.gz", hash = "sha256:b669df33ca728dbbb00b6be562f42bbaa2aec8cbeec3a56a9a57e162d437aaed"},
+    {file = "robocorp_storage-1.0.3-py3-none-any.whl", hash = "sha256:d613db9f09cc039b78dc0ae456afcb4a5423dd3136e93c297013fb8920f96d76"},
+    {file = "robocorp_storage-1.0.3.tar.gz", hash = "sha256:b378e7fce65ed1140cc13f8253b260fde35e72a79c8c8b02f1763281a34839ef"},
 ]
 
 [package.dependencies]
@@ -1083,13 +1097,13 @@ tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
 name = "robocorp-tasks"
-version = "2.8.0"
+version = "2.8.1"
 description = "The automation framework for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_tasks-2.8.0-py3-none-any.whl", hash = "sha256:2641fffd95dee54a265eefd6091efedad8b24db4e77eb6f79f9e3c543e4263c7"},
-    {file = "robocorp_tasks-2.8.0.tar.gz", hash = "sha256:025aefd8d475a78eb8c3f6d7439bf3239aa8085041f380ed9c0ae69d9f50a79d"},
+    {file = "robocorp_tasks-2.8.1-py3-none-any.whl", hash = "sha256:1d8dffd3147f6698dc4abdefac723e12c735f6018488e754ee10a04090a9f06f"},
+    {file = "robocorp_tasks-2.8.1.tar.gz", hash = "sha256:db99e370d183b4ab7a4ecdc835e40072828dd6ea24d0df66a3ce7ea7ad9259b5"},
 ]
 
 [package.dependencies]
@@ -1099,30 +1113,30 @@ robocorp-log = ">=2.4,<3"
 
 [[package]]
 name = "robocorp-vault"
-version = "1.3.0"
+version = "1.3.2"
 description = "Robocorp Control Room Vault API integration library"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_vault-1.3.0-py3-none-any.whl", hash = "sha256:a71194fd9a1c6cf339525482ddfaa2568aaadf0b4a6e57e9e13e215124106159"},
-    {file = "robocorp_vault-1.3.0.tar.gz", hash = "sha256:837b8c6805ef54886986d59b726e7635b70cf71717335b36167735111c869153"},
+    {file = "robocorp_vault-1.3.2-py3-none-any.whl", hash = "sha256:333fff5000c0e80078617544513b6f82d4d1a062b67deb32351a9f71591547e8"},
+    {file = "robocorp_vault-1.3.2.tar.gz", hash = "sha256:b77ba9e16270d6542d5ce93b59786f17dc5c443128ed0b1828346253d707f3f7"},
 ]
 
 [package.dependencies]
-cryptography = ">=41.0.1,<42.0.0"
+cryptography = ">=41.0.6,<42.0.0"
 pyyaml = ">=6.0,<7.0"
 requests = ">=2.31,<3.0"
 tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
 name = "robocorp-workitems"
-version = "1.4.1"
+version = "1.4.2"
 description = "Robocorp Work Items library"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_workitems-1.4.1-py3-none-any.whl", hash = "sha256:131cdbfeaa5c9e259ee876dbb8125c55c38897240f1de602f057188b20c814e0"},
-    {file = "robocorp_workitems-1.4.1.tar.gz", hash = "sha256:838b427216d0d32f5442ecec34c4a6df58859b66241e8335ebef43e214501742"},
+    {file = "robocorp_workitems-1.4.2-py3-none-any.whl", hash = "sha256:19879206d1b5318ac3e462355ca3c621fcd0339f2adfe1189be56173ea8af21c"},
+    {file = "robocorp_workitems-1.4.2.tar.gz", hash = "sha256:7aa9a2dbd6a64dd18bb2cc155459bac6058bce779ada0523fdd66a1b157524e7"},
 ]
 
 [package.dependencies]
@@ -1412,4 +1426,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "198040f89bbc9f6616707f03008ecc2a363f42e0221dabe0e81f9e1162a9a241"
+content-hash = "a7bdeb8075268cc9941b67dd12ae39a312810509d3b6fcb55f3a35e96ea82088"
