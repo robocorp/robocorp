@@ -154,7 +154,7 @@ async def expose_server(
 
                             url = f"https://{session_payload.sessionId}.{expose_url}"
                             log.info(
-                                f"\n  [green][bold]🌍 Public URL:[/bold] [bright_blue]{url}[/]"
+                                f"  [green][bold]🌍 Public URL:[/bold] [bright_blue]{url}[/]"
                             )
                             if api_key is not None:
                                 log.info(

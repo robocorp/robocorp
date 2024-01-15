@@ -211,9 +211,8 @@ def start_server(
         expose_subprocess = subprocess.Popen(args)
 
     def _on_started_message(self, **kwargs):
-        bottom_padding = "" if expose else "\n"
         log.info(
-            f"\n  [bold green]⚡️ Action Server started at http://{settings.address}:{settings.port}[/]{bottom_padding}"
+            f"\n  [bold green]⚡️ Action Server started at http://{settings.address}:{settings.port}[/]\n"
         )
 
     async def _on_startup():
