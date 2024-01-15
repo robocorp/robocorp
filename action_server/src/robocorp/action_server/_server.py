@@ -210,6 +210,12 @@ def start_server(
         ]
         expose_subprocess = subprocess.Popen(args)
 
+    def _on_started_message(self, **kwargs):
+        bottom_padding = "" if expose else "\n"
+        log.info(
+            f"\n  [bold green]⚡️ Action Server started at http://{settings.address}:{settings.port}[/]{bottom_padding}"
+        )
+
     async def _on_startup():
         if expose:
             loop = asyncio.get_event_loop()
@@ -249,4 +255,6 @@ def start_server(
     kwargs = settings.to_uvicorn()
     config = uvicorn.Config(app=app, **kwargs)
     server = uvicorn.Server(config)
+    server._log_started_message = _on_started_message  # type: ignore[assignment]
+
     asyncio.run(server.serve())

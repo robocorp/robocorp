@@ -5,6 +5,9 @@ import logging
 import os
 import sys
 from typing import Optional
+from rich.logging import RichHandler
+from rich.highlighter import NullHighlighter
+
 
 import requests
 import websockets
@@ -12,7 +15,17 @@ from pydantic import BaseModel, ValidationError
 
 from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
-log = logging.getLogger(__name__)
+rich = RichHandler(
+    show_time=False,
+    show_level=False,
+    show_path=False,
+    highlighter=NullHighlighter(),
+    markup=True,
+)
+
+logging.basicConfig(level="INFO", format="%(message)s", datefmt="[%X]", handlers=[rich])
+
+log = logging.getLogger("rich")
 
 
 class SessionPayload(BaseModel):
@@ -140,10 +153,12 @@ async def expose_server(
                             session_payload = SessionPayload(**data)
 
                             url = f"https://{session_payload.sessionId}.{expose_url}"
-                            log.info(f"🌍 URL: {url}")
+                            log.info(
+                                f"\n  [green][bold]🌍 Public URL:[/bold] [bright_blue]{url}[/]"
+                            )
                             if api_key is not None:
                                 log.info(
-                                    f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
+                                    f'  [bold]🔑 API authorization key:[/] [bright_blue]{{ "Authorization": "Bearer {api_key}" }}[/]\n'  # noqa
                                 )
                             new_expose_session = get_expose_session(session_payload)
                             write_expose_session_json(
@@ -217,7 +232,7 @@ async def expose_server(
                 # sleep with exponential backoff
                 await asyncio.sleep(retry_delay * retries)
             except Exception as e:
-                log.error(f"An error occurred: {e}")
+                log.error(f"An error occurred: {repr(e)} {e}")
                 break
 
     task = asyncio.create_task(listen_for_requests())

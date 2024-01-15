@@ -43,7 +43,7 @@ def _to_response(
     path: str,
     trace=False,
 ) -> Dict[str, Any]:
-    LOGGER.error("Invalid request: %s [%s]", message, path)
+    LOGGER.error("Invalid request: %s \[%s]", message, path)
     if trace:
         LOGGER.error(traceback.format_exc())
 

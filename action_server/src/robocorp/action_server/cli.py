@@ -4,6 +4,9 @@ import os.path
 import sys
 from pathlib import Path
 from typing import Optional, Union
+from rich.logging import RichHandler
+from rich.console import Console
+from rich.highlighter import NullHighlighter
 
 from robocorp.action_server._robo_utils.auth import generate_api_key
 
@@ -268,20 +271,20 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:
 
 
 def _setup_stdout_logging(log_level):
-    from logging import StreamHandler
+    is_debug = log_level == logging.DEBUG
 
-    stream_handler = StreamHandler()
-    stream_handler.setLevel(log_level)
-    if log_level == logging.DEBUG:
-        formatter = logging.Formatter(
-            "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
-        )
-    else:
-        formatter = logging.Formatter("%(message)s", datefmt="[%X]")
+    rich_handler = RichHandler(
+        show_time=is_debug,
+        show_level=False,
+        show_path=is_debug,
+        keywords=[],
+        markup=True,
+    )
 
-    stream_handler.setFormatter(formatter)
+    rich_handler.setLevel(log_level)
     logger = logging.root
-    logger.addHandler(stream_handler)
+
+    logger.addHandler(rich_handler)
 
 
 def _setup_logging(datadir: Path, log_level):
@@ -455,7 +458,7 @@ To migrate the database to the current version
                     elif command == "start":
                         # start imports the current directory by default
                         # (unless --actions-sync=false is specified).
-                        log.info("Synchronize actions: %s", base_args.actions_sync)
+                        log.debug("Synchronize actions: %s", base_args.actions_sync)
 
                         rcc.feedack_metric("action-server.started", __version__)
 
@@ -483,8 +486,10 @@ To migrate the database to the current version
                                     datadir=str(settings.datadir)
                                 )
                                 if expose_session and not base_args.expose_allow_reuse:
-                                    confirm = input(
-                                        f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
+                                    console = Console()
+
+                                    confirm = console.input(
+                                        f"[bold]> Resume previous expose URL {expose_session.url} Y/N?[/] [dim][Y][/] "
                                     )
                                     if confirm.lower() == "y" or confirm == "":
                                         log.debug("Resuming previous expose session")

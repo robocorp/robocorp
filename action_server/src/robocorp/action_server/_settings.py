@@ -9,6 +9,43 @@ from typing import Iterator, Optional
 log = logging.getLogger(__name__)
 
 
+UVICORN_LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "access": {
+            "()": "uvicorn.logging.AccessFormatter",
+            "fmt": '%(asctime)s - "%(request_line)s" %(status_code)s',
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "use_colors": True,
+        },
+        "default": {
+            "()": "uvicorn.logging.DefaultFormatter",
+            "fmt": "%(levelprefix)s %(asctime)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "use_colors": True,
+        },
+    },
+    "handlers": {
+        "access": {
+            "class": "logging.StreamHandler",
+            "formatter": "access",
+            "stream": "ext://sys.stdout",
+        },
+        "default": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stderr",
+        },
+    },
+    "loggers": {
+        "uvicorn": {"handlers": ["default"], "level": "DEBUG", "propagate": True},
+        "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+        "uvicorn.error": {"level": "INFO", "propagate": False},
+    },
+}
+
+
 def is_frozen():
     if getattr(sys, "frozen", False):
         return True
@@ -89,7 +126,7 @@ class Settings:
             short_hash = hashlib.sha256(as_posix.encode()).hexdigest()[:8]
             datadir_name = f"{get_default_settings_dir()}/{name}_{short_hash}"
 
-            log.info(f"Using datadir (scoped to the current directory): {datadir_name}")
+            log.info(f"Using datadir: {datadir_name}")
             user_expanded_datadir = Path(datadir_name).expanduser()
 
         else:
@@ -116,7 +153,7 @@ class Settings:
             "host": self.address,
             "port": self.port,
             "reload": False,
-            "log_config": None,
+            "log_config": UVICORN_LOG_CONFIG,
         }
 
 

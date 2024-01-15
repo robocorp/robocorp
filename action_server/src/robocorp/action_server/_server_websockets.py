@@ -179,7 +179,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     # just log it and ignore.
                     log.info('Ignoring additional call to "start_listen_run_events"')
     except WebSocketDisconnect:
-        log.info("Client disconnected from websocket.")
+        log.debug("Client disconnected from websocket.")
     except Exception:
         log.exception("Unexpected exception from websocket.")
     finally:

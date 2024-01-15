@@ -43,7 +43,7 @@ def import_action_package(
     from ._models import ActionPackage
     from ._rcc import create_hash, get_rcc
 
-    log.info("Importing action package from: %s", action_package_dir)
+    log.debug("Importing action package from: %s", action_package_dir)
 
     datadir = datadir.absolute()
     import_path = Path(action_package_dir).absolute()
@@ -80,7 +80,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         if not contents.get("dependencies"):
             raise ActionPackageError(f"{conda_yaml} has no 'dependencies' specified.")
 
-        log.info(
+        log.debug(
             f"""Actions added with managed environment defined by: {conda_yaml}."""
         )
 
@@ -131,7 +131,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         conda_hash=condahash,
         env_json=json.dumps(use_env),
     )
-    log.info(f"Collecting actions for Action Package: {name}.")
+    log.debug(f"Collecting actions for Action Package: {name}.")
 
     env = build_python_launch_env(use_env)
     _add_actions_to_db(
@@ -285,7 +285,7 @@ def _add_actions_to_db(
 
         seen_action_ids = set()
         with db.transaction():
-            log.info("Updating action package: %s", action_package.name)
+            log.debug("Updating action package: %s", action_package.name)
             db.update_by_id(
                 ActionPackage,
                 existing_action_package.id,
@@ -301,7 +301,7 @@ def _add_actions_to_db(
                     # This is an existing action, we need to update it.
                     new_action_as_dict = asdict(action)
                     del new_action_as_dict["id"]
-                    log.info("Updating action: %s", action.name)
+                    log.debug("Updating action: %s", action.name)
                     db.update_by_id(Action, existing_action.id, new_action_as_dict)
                     seen_action_ids.add(existing_action.id)
                 else:

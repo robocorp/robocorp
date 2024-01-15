@@ -8,6 +8,7 @@ import typing
 from pathlib import Path
 from typing import Annotated, Any, Dict, List, Optional
 
+from fastapi import HTTPException
 from fastapi.params import Header, Param
 from pydantic import BaseModel
 
@@ -241,7 +242,7 @@ import it again from the new location.
 
                 def on_output(line):
                     stream.write(line)
-                    print("on_output:", line.strip())
+                    log.info(f"[dim bold]\[{action.name}]:[/] {line.strip()}")
 
                 with process.on_stderr.register(on_output), process.on_stdout.register(
                     on_output
@@ -276,7 +277,7 @@ import it again from the new location.
                     )
         except BaseException as e:
             _set_run_as_finished_failed(run, str(e), initial_time)
-            raise
+            raise HTTPException(status_code=500, detail=str(e))
 
 
 def _name_as_class_name(name):
