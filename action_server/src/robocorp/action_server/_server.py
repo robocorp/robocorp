@@ -163,15 +163,7 @@ def start_server(
 
     expose_subprocess = None
 
-    def expose_later(loop):
-        from robocorp.action_server._settings import is_frozen
-
-        nonlocal expose_subprocess
-
-        if not server.started:
-            loop.call_later(1 / 15.0, partial(expose_later, loop))
-            return
-
+    def _get_currrent_host():
         port = settings.port if settings.port != 0 else None
         host = settings.address
         if port is None:
@@ -182,7 +174,20 @@ def start_server(
                 raise Exception("Unable to find a port to expose")
             sockname = sockets_ipv4[0].getsockname()
             host = sockname[0]
-            port = sockname[1]
+            port = sockname[1]  
+
+        return (host, port)
+
+    def expose_later(loop):
+        from robocorp.action_server._settings import is_frozen
+
+        nonlocal expose_subprocess
+
+        if not server.started:
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
+            return
+
+        (port, host) = _get_currrent_host()
 
         parent_pid = os.getpid()
 
@@ -211,8 +216,9 @@ def start_server(
         expose_subprocess = subprocess.Popen(args)
 
     def _on_started_message(self, **kwargs):
+        (host, port) = _get_currrent_host()
         log.info(
-            f"\n  [bold green]⚡️ Action Server started at http://{settings.address}:{settings.port}[/]\n"
+            f"\n  [bold green]⚡️ Action Server started at http://{settings.address}:{port}[/]\n"
         )
 
     async def _on_startup():
