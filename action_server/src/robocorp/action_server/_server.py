@@ -174,7 +174,7 @@ def start_server(
                 raise Exception("Unable to find a port to expose")
             sockname = sockets_ipv4[0].getsockname()
             host = sockname[0]
-            port = sockname[1]  
+            port = sockname[1]
 
         return (host, port)
 
