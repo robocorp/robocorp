@@ -187,7 +187,7 @@ def start_server(
             loop.call_later(1 / 15.0, partial(expose_later, loop))
             return
 
-        (port, host) = _get_currrent_host()
+        (host, port) = _get_currrent_host()
 
         parent_pid = os.getpid()
 
