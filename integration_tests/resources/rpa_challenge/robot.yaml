@@ -17,4 +17,3 @@ PYTHONPATH:
   - ../../../log/src
   - ../../../browser/src
   - ../../../excel/src
-  - ../../../http/src
