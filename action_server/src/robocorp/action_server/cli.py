@@ -365,7 +365,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         robocorp_home = settings.datadir / ".robocorp_home"
         robocorp_home.mkdir(parents=True, exist_ok=True)
 
-        with initialize_rcc(download_rcc(force=False), robocorp_home):
+        with initialize_rcc(download_rcc(force=False), robocorp_home) as rcc:
             if command == "new":
                 from ._new_project import create_new_project
 
@@ -456,6 +456,8 @@ To migrate the database to the current version
                         # start imports the current directory by default
                         # (unless --actions-sync=false is specified).
                         log.info("Synchronize actions: %s", base_args.actions_sync)
+
+                        rcc.feedack_metric("action-server.started", __version__)
 
                         if base_args.actions_sync:
                             if not base_args.dir:

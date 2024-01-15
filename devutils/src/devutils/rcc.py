@@ -136,7 +136,9 @@ class Rcc(object):
     def __init__(self, rcc_location: str, robocorp_home: str, endpoint: str) -> None:
         self.rcc_location = rcc_location
         self.robocorp_home = robocorp_home
-        self.config_location = ""
+        self.config_location = os.environ.get(
+            "RC_ACTION_SERVER_RCC_CONFIG_LOCATION", ""
+        )
         self.endpoint = endpoint
         self._last_verified_account_info: Optional[AccountInfo] = None
 

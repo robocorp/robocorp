@@ -7,7 +7,7 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 from subprocess import CalledProcessError, TimeoutExpired
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from robocorp.action_server._protocols import ActionResult, RCCActionResult, Sentinel
 from robocorp.action_server._robo_utils.constants import NULL
@@ -42,6 +42,33 @@ class Rcc(object):
     def __init__(self, rcc_location: Path, robocorp_home: Path):
         self._rcc_location = rcc_location
         self._robocorp_home = robocorp_home
+        self.config_location = os.environ.get(
+            "RC_ACTION_SERVER_RCC_CONFIG_LOCATION", ""
+        )
+
+    def _compute_env(self):
+        env = os.environ.copy()
+        env.pop("PYTHONPATH", "")
+        env.pop("PYTHONHOME", "")
+        env.pop("VIRTUAL_ENV", "")
+        env["PYTHONIOENCODING"] = "utf-8"
+        env["PYTHONUNBUFFERED"] = "1"
+
+        env["ROBOCORP_HOME"] = str(self._robocorp_home)
+        return env
+
+    def _compute_launch_args_and_kwargs(
+        self, cwd, env, args, stderr=Sentinel.SENTINEL
+    ) -> Tuple[list, dict]:
+        from robocorp.action_server._robo_utils.process import build_subprocess_kwargs
+
+        if stderr is Sentinel.SENTINEL:
+            stderr = subprocess.PIPE
+
+        kwargs: dict = build_subprocess_kwargs(cwd, env, stderr=stderr)
+        rcc_location = str(self._rcc_location)
+        args = [rcc_location] + args + ["--controller", "ActionServer"]
+        return args, kwargs
 
     def _run_rcc(
         self,
@@ -68,27 +95,12 @@ class Rcc(object):
         """
         from subprocess import check_output, list2cmdline
 
-        from robocorp.action_server._robo_utils.process import (
-            build_subprocess_kwargs,
-            check_output_interactive,
-        )
+        from robocorp.action_server._robo_utils.process import check_output_interactive
 
-        if stderr is Sentinel.SENTINEL:
-            stderr = subprocess.PIPE
+        env = self._compute_env()
+        robocorp_home = env["ROBOCORP_HOME"]
 
-        rcc_location = str(self._rcc_location)
-
-        env = os.environ.copy()
-        env.pop("PYTHONPATH", "")
-        env.pop("PYTHONHOME", "")
-        env.pop("VIRTUAL_ENV", "")
-        env["PYTHONIOENCODING"] = "utf-8"
-        env["PYTHONUNBUFFERED"] = "1"
-
-        robocorp_home = env["ROBOCORP_HOME"] = str(self._robocorp_home)
-
-        kwargs: dict = build_subprocess_kwargs(cwd, env, stderr=stderr)
-        args = [rcc_location] + args + ["--controller", "ActionServer"]
+        args, kwargs = self._compute_launch_args_and_kwargs(cwd, env, args, stderr)
         cmdline = list2cmdline([str(x) for x in args])
 
         try:
@@ -255,6 +267,25 @@ class Rcc(object):
         if not ret.success:
             return ActionResult(False, ret.message, None)
         return ActionResult(True, None, ret.result)
+
+    def _add_config_to_args(self, args: List[str]) -> List[str]:
+        config_location = self.config_location
+        if config_location:
+            args.append("--config")
+            args.append(config_location)
+        return args
+
+    def feedack_metric(self, name, value="+1") -> None:
+        env = self._compute_env()
+
+        args = ["feedback", "metric", "-t", "action-server", "-n", name, "-v", value]
+        self._add_config_to_args(args)
+        cwd = None
+        args, kwargs = self._compute_launch_args_and_kwargs(cwd, env, args)
+        try:
+            subprocess.Popen(args, **kwargs)
+        except BaseException:
+            log.exception("Error submitting feedback.")
 
 
 _rcc: Optional["Rcc"] = None

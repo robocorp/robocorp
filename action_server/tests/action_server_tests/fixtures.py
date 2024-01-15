@@ -19,9 +19,41 @@ def action_server_datadir(tmpdir) -> Path:
     return Path(str(tmpdir)) / ".robocorp_action_server"
 
 
+@pytest.fixture(scope="session")
+def rcc_config_location(temp_directory_session) -> Path:
+    ret = Path(temp_directory_session) / ".rcc_config"
+    ret.mkdir(parents=True, exist_ok=True)
+    ret = ret / "rcc.yaml"
+    os.environ["RC_ACTION_SERVER_RCC_CONFIG_LOCATION"] = str(ret)
+    return ret
+
+
+@pytest.fixture(scope="session", autouse=True)
+def disable_feedback(temp_directory_session, rcc_config_location) -> None:
+    from robocorp.action_server._download_rcc import get_default_rcc_location
+    from robocorp.action_server._rcc import Rcc
+
+    robocorp_home = temp_directory_session / ".robocorp_home"
+    robocorp_home.mkdir(parents=True, exist_ok=True)
+
+    rcc_location = get_default_rcc_location()
+    rcc = Rcc(rcc_location, robocorp_home)
+    result = rcc._run_rcc(
+        "configure identity --do-not-track --config".split()
+        + [str(rcc_config_location)]
+    )
+
+    assert result.success
+    result_msg = result.result
+    assert result_msg
+    if "disabled" not in result_msg:
+        raise AssertionError(f"Did not expect {result_msg}")
+
+
 @pytest.fixture
 def action_server_process(action_server_datadir) -> Iterator[ActionServerProcess]:
     ret = ActionServerProcess(action_server_datadir)
+
     yield ret
     ret.stop()
 
