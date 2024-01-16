@@ -6,11 +6,6 @@ import subprocess
 import sys
 from functools import partial
 from typing import Dict, Optional
-from fastapi import Depends, Security, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-
-from ._server_expose import get_expose_session_payload, read_expose_session_json
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +25,8 @@ def start_server(
 
     import docstring_parser
     import uvicorn
+    from fastapi import Depends, HTTPException, Security
+    from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
     from fastapi.staticfiles import StaticFiles
     from starlette.requests import Request
     from starlette.responses import HTMLResponse
@@ -146,6 +143,8 @@ def start_server(
 
     @app.get("/config", include_in_schema=False)
     async def serve_config():
+        from ._server_expose import get_expose_session_payload, read_expose_session_json
+
         payload = {"expose_url": False, "auth_enabled": False}
 
         if api_key:

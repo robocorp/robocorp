@@ -5,8 +5,6 @@ import sys
 from pathlib import Path
 from typing import Optional, Union
 
-from robocorp.action_server._robo_utils.auth import get_api_key
-
 from . import __version__
 
 log = logging.getLogger(__name__)
@@ -544,6 +542,8 @@ To migrate the database to the current version
                             if base_args.api_key:
                                 api_key = base_args.api_key
                             elif base_args.expose:
+                                from ._robo_utils.auth import get_api_key
+
                                 api_key = get_api_key(settings.datadir)
 
                             start_server(

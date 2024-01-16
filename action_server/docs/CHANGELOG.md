@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.15 - 2024-01-16
+
+- The `--api-key` is now checked in any calls, not just on the connection relative to the `--expose`.
+- The Run UI now has a field to specify the `--api-key` to be used in a run.
+
 ## 0.0.14 - 2024-01-16
 
 - It's now possible to specify the server url using the `--server-url` command line parameter.

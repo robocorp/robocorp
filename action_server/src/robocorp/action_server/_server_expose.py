@@ -4,13 +4,14 @@ import json
 import logging
 import os
 import sys
+import typing
 from typing import Optional
 
 import requests
-import websockets
 from pydantic import BaseModel, ValidationError
 
-from robocorp.action_server._robo_utils.process import exit_when_pid_exists
+if typing.TYPE_CHECKING:
+    import websockets
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +96,7 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
 
 
 async def handle_ping_pong(
-    ws: websockets.WebSocketClientProtocol,
+    ws: "websockets.WebSocketClientProtocol",
     pong_queue: asyncio.Queue,
     no_connection_queue: asyncio.Queue,
 ):
@@ -126,6 +127,7 @@ async def expose_server(
     """
     Exposes the server to the world.
     """
+    import websockets
 
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
     no_connection_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
@@ -268,6 +270,8 @@ async def expose_server(
 
 
 def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session):
+    from robocorp.action_server._robo_utils.process import exit_when_pid_exists
+
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
         format="%(message)s",
