@@ -287,7 +287,7 @@ def test_server_url_flag(action_server_process: ActionServerProcess, data_regres
 def test_auth_routes(action_server_process: ActionServerProcess, data_regression):
     from action_server_tests.fixtures import get_in_resources
 
-    pack = get_in_resources("greeter")
+    pack = get_in_resources("no_conda", "greeter")
     action_server_process.start(
         cwd=pack,
         actions_sync=True,
