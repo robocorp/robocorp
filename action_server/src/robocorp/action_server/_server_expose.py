@@ -189,7 +189,6 @@ async def expose_server(
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
 
     async def listen_for_requests() -> None:
-        max_retries = 3
         retry_delay = 3
         retries = 0
 
@@ -253,7 +252,7 @@ async def expose_server(
                                 continue
             except websockets.exceptions.ConnectionClosedError:
                 retries += 1
-                log.info(f"Reconnecting to expose server ({retries}/{max_retries})")
+                log.info("Lost connection. Reconnecting to expose server...")
                 await asyncio.sleep(retry_delay * retries)
                 continue
             except socket.gaierror:
