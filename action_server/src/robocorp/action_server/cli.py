@@ -501,9 +501,9 @@ To migrate the database to the current version
 
                             api_key = None
                             if base_args.api_key:
-                                api_key = get_api_key(
-                                    settings.datadir, base_args.api_key
-                                )
+                                api_key = base_args.api_key
+                            elif base_args.expose:
+                                api_key = get_api_key(settings.datadir)
 
                             start_server(
                                 expose=base_args.expose,

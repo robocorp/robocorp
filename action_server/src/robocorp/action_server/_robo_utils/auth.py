@@ -9,11 +9,8 @@ def generate_api_key():
     return secrets.token_urlsafe(32)
 
 
-def get_api_key(datadir: Path, explicit_api_key: Optional[str]) -> str:
+def get_api_key(datadir: Path) -> str:
     api_key_path = os.path.join(datadir, ".api_key")
-
-    if explicit_api_key:
-        return explicit_api_key
 
     try:
         with open(api_key_path, "r") as file:
