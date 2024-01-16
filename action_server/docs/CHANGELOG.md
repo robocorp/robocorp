@@ -4,6 +4,7 @@
 
 - The `--api-key` is now checked in any calls, not just on the connection relative to the `--expose`.
 - The Run UI now has a field to specify the `--api-key` to be used in a run.
+- Console startup message showing url for action server UI is improved.
 
 ## 0.0.14 - 2024-01-16
 
