@@ -210,8 +210,6 @@ async def expose_server(
             f"wss://client.{expose_url}",
             extra_headers=headers,
             logger=websockets_logger,
-            ping_interval=None,
-            close_timeout=0,
         ):
             if retries > 0:
                 retries = 0
