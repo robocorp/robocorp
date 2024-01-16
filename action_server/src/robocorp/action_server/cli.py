@@ -279,7 +279,7 @@ def _setup_stdout_logging(log_level):
         show_path=is_debug,
         keywords=[],
         markup=True,
-        highlighter=NullHighlighter()
+        highlighter=NullHighlighter(),
     )
 
     rich_handler.setLevel(log_level)
