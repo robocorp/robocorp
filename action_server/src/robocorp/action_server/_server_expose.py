@@ -15,6 +15,10 @@ from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
 log = logging.getLogger(__name__)
 
+# disable websockets logger. It's too verbose
+websockets_logger = logging.getLogger("websockets")
+websockets_logger.setLevel(logging.ERROR)
+
 
 class SessionPayload(BaseModel):
     sessionId: str
@@ -205,10 +209,13 @@ async def expose_server(
         async for ws in websockets.connect(
             f"wss://client.{expose_url}",
             extra_headers=headers,
-            logger=log,
+            logger=websockets_logger,
             ping_interval=None,
             close_timeout=0,
         ):
+            if retries > 0:
+                retries = 0
+
             ping_task = asyncio.create_task(
                 handle_ping_pong(ws, pong_queue, ping_interval)
             )
