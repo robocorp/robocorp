@@ -154,7 +154,7 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
 > [!TIP]
-> Use `@action(is_consequential=True)` flag to avoid user needing to accept the action execution separately each time on your GPT.
+> Use `@action(is_consequential=False)` flag to avoid user needing to accept the action execution separately each time on your GPT.
 
 
 ## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)

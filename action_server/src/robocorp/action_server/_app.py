@@ -14,7 +14,9 @@ LOGGER = logging.getLogger(__name__)
 @cache
 def get_app():
     settings = get_settings()
-    app = FastAPI(title=settings.title)
+
+    server = {"url": settings.server_url}
+    app = FastAPI(title=settings.title, servers=[server])
 
     app.add_middleware(
         CORSMiddleware,

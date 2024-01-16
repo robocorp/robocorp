@@ -77,6 +77,7 @@ class ActionServerProcess:
         actions_sync=False,
         cwd: Optional[Path | str] = None,
         add_shutdown_api: bool = False,
+        additional_args: Optional[list[str]] = None,
     ) -> None:
         from robocorp.action_server._robo_utils.process import Process
         from robocorp.action_server._settings import is_frozen
@@ -106,12 +107,16 @@ class ActionServerProcess:
             f"--datadir={str(self._datadir)}",
             f"--db-file={db_file}",
         ]
+
+        if additional_args:
+            new_args = new_args + additional_args
+
         env = {}
         if add_shutdown_api:
             env["RC_ADD_SHUTDOWN_API"] = "1"
         process = self._process = Process(new_args, cwd=cwd, env=env)
 
-        compiled = re.compile(r"http://([\w.-]+):(\d+)")
+        compiled = re.compile(r"Uvicorn running on http://([\w.-]+):(\d+)")
         future: Future[Tuple[str, str]] = Future()
 
         def collect_port_from_stdout(line):
