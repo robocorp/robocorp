@@ -1,5 +1,3 @@
-import os
-from typing import Optional
 from pathlib import Path
 
 
@@ -10,18 +8,15 @@ def generate_api_key():
 
 
 def get_api_key(datadir: Path) -> str:
-    api_key_path = os.path.join(datadir, ".api_key")
+    api_key_path = datadir / ".api_key"
 
     try:
-        with open(api_key_path, "r") as file:
-            api_key = file.read()
+        api_key = api_key_path.read_text("utf-8")
     except Exception:
         api_key = ""
 
     if len(api_key) == 0:
         api_key = generate_api_key()
-
-        with open(api_key_path, "w") as file:
-            file.write(api_key)
+        api_key_path.write_text(api_key, "utf-8")
 
     return api_key
