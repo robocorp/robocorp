@@ -204,9 +204,6 @@ async def expose_server(
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
 
     async def listen_for_requests() -> None:
-        retry_delay = 3
-        retries = 0
-
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
         )
@@ -220,72 +217,62 @@ async def expose_server(
             else {}
         )
 
-        while True:
-            async for ws in websockets.connect(
-                f"wss://client.{expose_url}",
-                extra_headers=headers,
-                logger=websockets_logger,
-                open_timeout=2,
-                close_timeout=0,
-            ):
-                if retries > 0:
-                    retries = 0
+        async for ws in websockets.connect(
+            f"wss://client.{expose_url}",
+            extra_headers=headers,
+            logger=websockets_logger,
+            open_timeout=2,
+            close_timeout=0,
+        ):
+            ping_task = asyncio.create_task(
+                handle_ping_pong(ws, pong_queue, ping_interval)
+            )
 
-                ping_task = asyncio.create_task(
-                    handle_ping_pong(ws, pong_queue, ping_interval)
-                )
+            try:
+                while True:
+                    message = await ws.recv()
+                    if message == "pong":
+                        await pong_queue.put("pong")
+                        continue
 
-                try:
-                    while True:
-                        message = await ws.recv()
-                        if message == "pong":
-                            await pong_queue.put("pong")
-                            continue
+                    data = json.loads(message)
 
-                        data = json.loads(message)
-
-                        match data:
-                            case {"sessionId": _, "sessionSecret": _}:
-                                try:
-                                    session_payload = SessionPayload(**data)
-                                    handle_session_payload(
-                                        session_payload, api_key, expose_url, datadir
-                                    )
-                                except ValidationError as e:
-                                    if not session_payload:
-                                        log.error(
-                                            "Expose session initialization failed", e
-                                        )
-                                        continue
-                                    pass
-                            case _:
-                                try:
-                                    body_payload = BodyPayload(**data)
-                                    response = handle_body_payload(
-                                        body_payload, api_key, f"http://{host}:{port}"
-                                    )
-                                    await ws.send(response)
-                                except ValidationError as e:
-                                    log.error("Expose request validation failed", e)
+                    match data:
+                        case {"sessionId": _, "sessionSecret": _}:
+                            try:
+                                session_payload = SessionPayload(**data)
+                                handle_session_payload(
+                                    session_payload, api_key, expose_url, datadir
+                                )
+                            except ValidationError as e:
+                                if not session_payload:
+                                    log.error("Expose session initialization failed", e)
                                     continue
-                except websockets.exceptions.ConnectionClosedError:
-                    break
-                except socket.gaierror:
-                    log.info("No internet connection")
-                    break
-                finally:
-                    ping_task.cancel()
-                    try:
-                        await ping_task
-                    except asyncio.CancelledError as e:
-                        print(e)
-                        pass
-            else:
-                log.info("Expose server connection closed")
-
-            retries += 1
-            log.info("Lost connection. Reconnecting to expose server...")
-            await asyncio.sleep(retry_delay * retries)
+                                pass
+                        case _:
+                            try:
+                                body_payload = BodyPayload(**data)
+                                response = handle_body_payload(
+                                    body_payload, api_key, f"http://{host}:{port}"
+                                )
+                                await ws.send(response)
+                            except ValidationError as e:
+                                log.error("Expose request validation failed", e)
+                                continue
+            except websockets.exceptions.ConnectionClosedError:
+                log.info("Lost connection. Reconnecting to expose server...")
+            except socket.gaierror:
+                log.info("No internet connection")
+                break
+            finally:
+                ping_task.cancel()
+                try:
+                    await ping_task
+                except asyncio.CancelledError as e:
+                    print(e)
+                    pass
+        else:
+            log.info("Expose server connection closed")
 
     task = asyncio.create_task(listen_for_requests())
     await task  # Wait for listen_for_requests to complete
