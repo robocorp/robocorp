@@ -133,8 +133,8 @@ async def handle_ping_pong(
 
 
 def handle_session_payload(
-    session_payload: SessionPayload, api_key: str, expose_url: str, datadir: str
-) -> None:
+    session_payload: SessionPayload, api_key: str | None, expose_url: str, datadir: str
+):
     url = f"https://{session_payload.sessionId}.{expose_url}"
     log.info(f"🌍 URL: {url}")
     if api_key is not None:
@@ -154,9 +154,9 @@ def handle_session_payload(
 
 def handle_body_payload(
     payload: BodyPayload,
-    api_key: str,
+    api_key: str | None,
     base_url: str,
-) -> str:
+):
     if payload.path != "/openapi.json" and api_key is not None:
         if payload.headers.get("authorization") != f"Bearer {api_key}":
             log.error("Request failed because the API key is invalid.")
