@@ -15,9 +15,24 @@ from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
 log = logging.getLogger(__name__)
 
+
 # disable websockets logger. It's too verbose
+class NoExceptionFormatter(logging.Formatter):
+    def format(self, record):
+        record.exc_info = None
+        return super().format(record)
+
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+
+formatter = NoExceptionFormatter("%(message)s")
+console_handler.setFormatter(formatter)
+
+
 websockets_logger = logging.getLogger("websockets")
-websockets_logger.setLevel(logging.ERROR)
+websockets_logger.addHandler(console_handler)
+websockets_logger.propagate = False
 
 
 class SessionPayload(BaseModel):
@@ -120,7 +135,7 @@ async def handle_ping_pong(
 def handle_session_payload(
     session_payload: SessionPayload, api_key: str, expose_url: str, datadir: str
 ) -> None:
-    url = f"https://{session_payload.sessionId}.{expose_url}"
+    url = f"http://{expose_url}?sessionId={session_payload.sessionId}"
     log.info(f"🌍 URL: {url}")
     if api_key is not None:
         log.info(
@@ -205,67 +220,74 @@ async def expose_server(
             else {}
         )
 
-        async for ws in websockets.connect(
-            f"wss://client.{expose_url}",
-            extra_headers=headers,
-            logger=websockets_logger,
-        ):
-            if retries > 0:
-                retries = 0
+        while True:
+            async for ws in websockets.connect(
+                f"ws://{expose_url}",
+                extra_headers=headers,
+                logger=websockets_logger,
+                open_timeout=2,
+                close_timeout=0,
+            ):
+                if retries > 0:
+                    retries = 0
 
-            ping_task = asyncio.create_task(
-                handle_ping_pong(ws, pong_queue, ping_interval)
-            )
+                ping_task = asyncio.create_task(
+                    handle_ping_pong(ws, pong_queue, ping_interval)
+                )
 
-            try:
-                while True:
-                    message = await ws.recv()
-                    if message == "no_connection":
-                        continue
-                    elif message == "pong":
-                        await pong_queue.put("pong")
-                        continue
-
-                    data = json.loads(message)
-
-                    match data:
-                        case {"sessionId": _, "sessionSecret": _}:
-                            try:
-                                session_payload = SessionPayload(**data)
-                                handle_session_payload(
-                                    session_payload, api_key, expose_url, datadir
-                                )
-                            except ValidationError as e:
-                                if not session_payload:
-                                    log.error("Expose session initialization failed", e)
-                                    continue
-                                pass
-                        case _:
-                            try:
-                                body_payload = BodyPayload(**data)
-                                response = handle_body_payload(
-                                    body_payload, api_key, f"http://{host}:{port}"
-                                )
-                                await ws.send(response)
-                            except ValidationError as e:
-                                log.error("Expose request validation failed", e)
-                                continue
-            except websockets.exceptions.ConnectionClosedError:
-                retries += 1
-                log.info("Lost connection. Reconnecting to expose server...")
-                await asyncio.sleep(retry_delay * retries)
-                continue
-            except socket.gaierror:
-                log.info("No internet connection")
-            finally:
-                ping_task.cancel()
                 try:
-                    await ping_task
-                except asyncio.CancelledError as e:
-                    print(e)
-                    pass
-        else:
-            log.info("Expose server connection closed")
+                    while True:
+                        message = await ws.recv()
+                        if message == "no_connection":
+                            continue
+                        elif message == "pong":
+                            await pong_queue.put("pong")
+                            continue
+
+                        data = json.loads(message)
+
+                        match data:
+                            case {"sessionId": _, "sessionSecret": _}:
+                                try:
+                                    session_payload = SessionPayload(**data)
+                                    handle_session_payload(
+                                        session_payload, api_key, expose_url, datadir
+                                    )
+                                except ValidationError as e:
+                                    if not session_payload:
+                                        log.error(
+                                            "Expose session initialization failed", e
+                                        )
+                                        continue
+                                    pass
+                            case _:
+                                try:
+                                    body_payload = BodyPayload(**data)
+                                    response = handle_body_payload(
+                                        body_payload, api_key, f"http://{host}:{port}"
+                                    )
+                                    await ws.send(response)
+                                except ValidationError as e:
+                                    log.error("Expose request validation failed", e)
+                                    continue
+                except websockets.exceptions.ConnectionClosedError:
+                    break
+                except socket.gaierror:
+                    log.info("No internet connection")
+                    break
+                finally:
+                    ping_task.cancel()
+                    try:
+                        await ping_task
+                    except asyncio.CancelledError as e:
+                        print(e)
+                        pass
+            else:
+                log.info("Expose server connection closed")
+
+            retries += 1
+            log.info("Lost connection. Reconnecting to expose server...")
+            await asyncio.sleep(retry_delay * retries)
 
     task = asyncio.create_task(listen_for_requests())
     await task  # Wait for listen_for_requests to complete
