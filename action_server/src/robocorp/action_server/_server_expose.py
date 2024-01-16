@@ -16,7 +16,7 @@ from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 log = logging.getLogger(__name__)
 
 
-# disable websockets logger. It's too verbose
+# websockets logger will log the retries with the stack trace. this makes it less verbose.
 class NoExceptionFormatter(logging.Formatter):
     def format(self, record):
         record.exc_info = None
@@ -135,7 +135,7 @@ async def handle_ping_pong(
 def handle_session_payload(
     session_payload: SessionPayload, api_key: str, expose_url: str, datadir: str
 ) -> None:
-    url = f"http://{expose_url}?sessionId={session_payload.sessionId}"
+    url = f"https://{session_payload.sessionId}.{expose_url}"
     log.info(f"🌍 URL: {url}")
     if api_key is not None:
         log.info(
@@ -222,7 +222,7 @@ async def expose_server(
 
         while True:
             async for ws in websockets.connect(
-                f"ws://{expose_url}",
+                f"wss://client.{expose_url}",
                 extra_headers=headers,
                 logger=websockets_logger,
                 open_timeout=2,
@@ -238,9 +238,7 @@ async def expose_server(
                 try:
                     while True:
                         message = await ws.recv()
-                        if message == "no_connection":
-                            continue
-                        elif message == "pong":
+                        if message == "pong":
                             await pong_queue.put("pong")
                             continue
 
