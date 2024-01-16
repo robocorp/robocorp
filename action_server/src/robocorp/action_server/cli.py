@@ -115,6 +115,14 @@ def _create_parser():
         help="Expose the server to the world",
     )
     start_parser.add_argument(
+        "--server-url",
+        help=(
+            "Explicit server url to be defined in the OpenAPI spec 'servers' section."
+            "Defaults to the localhost url."
+        ),
+        default=None,
+    )
+    start_parser.add_argument(
         "--expose-allow-reuse",
         dest="expose_allow_reuse",
         action="store_true",

@@ -466,3 +466,5 @@ paths:
                 type: string
           description: Successful Response
       summary: Serve Log Html
+servers:
+- url: http://localhost:0
