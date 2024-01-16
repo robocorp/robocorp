@@ -77,7 +77,7 @@ class ActionServerProcess:
         actions_sync=False,
         cwd: Optional[Path | str] = None,
         add_shutdown_api: bool = False,
-        additional_args: Optional[list[str]] = None
+        additional_args: Optional[list[str]] = None,
     ) -> None:
         from robocorp.action_server._robo_utils.process import Process
         from robocorp.action_server._settings import is_frozen
