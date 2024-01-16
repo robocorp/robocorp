@@ -102,12 +102,10 @@ async def handle_ping_pong(
 ):
     while True:
         await asyncio.sleep(2)
-        log.debug("️➡️ outgoing ping")
         await ws.send("ping")
 
         try:
             await asyncio.wait_for(pong_queue.get(), timeout=2)
-            log.debug("⬅️ incoming pong")
         except asyncio.TimeoutError:
             log.debug("Ping-pong message timeout")
             await ws.close()
@@ -313,16 +311,19 @@ def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_s
     )
 
     exit_when_pid_exists(int(parent_pid))
-    asyncio.run(
-        expose_server(
-            port=int(port),
-            host=host,
-            expose_url=expose_url,
-            datadir=datadir,
-            api_key=api_key if api_key != "None" else None,
-            expose_session=expose_session if expose_session != "None" else None,
+    try:
+        asyncio.run(
+            expose_server(
+                port=int(port),
+                host=host,
+                expose_url=expose_url,
+                datadir=datadir,
+                api_key=api_key if api_key != "None" else None,
+                expose_session=expose_session if expose_session != "None" else None,
+            )
         )
-    )
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
