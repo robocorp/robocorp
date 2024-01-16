@@ -14,6 +14,7 @@
     `--max-processes=<n-processes>`
     `--reuse-process`
 - If the return of an `@action` does not conform to the proper return type a better error message is given.
+- Improved keepalive/reconnection on the `--expose` tunnel (ping-pong messages).
 
 ## 0.0.13 - 2024-01-14
 
