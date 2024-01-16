@@ -269,7 +269,6 @@ async def expose_server(
                 try:
                     await ping_task
                 except asyncio.CancelledError as e:
-                    print(e)
                     pass
         else:
             log.info("Expose server connection closed")
