@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- It's now possible to specify the server url using the `--server-url` command line parameter.
 - A process pool is now available in the action server. The following new arguments are available:
     `--min-processes=<n-processes>`
     `--max-processes=<n-processes>`
