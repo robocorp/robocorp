@@ -153,6 +153,9 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 
 Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
+> [!TIP]
+> Use `@action(is_consequential=True)` flag to avoid user needing to accept the action execution separately each time on your GPT.
+
 
 ## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)
 
@@ -212,11 +215,12 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 
 Check out these example projects for inspiration.
 
-- 🤡 Get a random joke or jokes per theme. Showcases how easy it is to work with APIs. (Coming soon)
-- 🕸️ Open a local Playwright browser and make some Google searches. (Coming soon)
-- 🖥️ Securely fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time. (Coming soon)
+- 🐣 [Simplest possible AI Action](https://github.com/robocorp/actions-cookbook/tree/master/greeter)
+- 🤡 [Get a random joke or jokes per theme. Showcases how easy it is to work with APIs.](https://github.com/robocorp/actions-cookbook/tree/master/api-jokes)
+- 🕸️ [Open a local Playwright browser and make some Google searches.](https://github.com/robocorp/actions-cookbook/tree/master/browser-google)
+- 🖥️ [Securely fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time.](https://github.com/robocorp/actions-cookbook/tree/master/desktop-files)
 
-Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or drop us a line at [tommi@robocorp.com](mailto:tommi@robocorp.com). We'll soon start showcasing the best of the community here!
+Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best from the community here!
 
 ## Roadmap
 
