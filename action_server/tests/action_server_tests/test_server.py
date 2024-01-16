@@ -275,6 +275,15 @@ def test_routes(action_server_process: ActionServerProcess, data_regression):
     client.get_error("/api/runs/bad-run-id", 404)
 
 
+def test_server_url_flag(action_server_process: ActionServerProcess, data_regression):
+    action_server_process.start(additional_args=["--server-url=https://foo.bar"])
+
+    client = ActionServerClient(action_server_process)
+    openapi_json = client.get_openapi_json()
+    spec = json.loads(openapi_json)
+    data_regression.check(spec)
+
+
 def test_subprocesses_killed(
     action_server_process: ActionServerProcess, client: ActionServerClient
 ):

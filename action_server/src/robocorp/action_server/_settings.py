@@ -61,6 +61,7 @@ class Settings:
     verbose: bool = False
     db_file: str = "server.db"
     expose_url: str = "robocorp.link"
+    server_url: str = "http://localhost:8080"
 
     @classmethod
     def defaults(cls):
@@ -105,6 +106,11 @@ class Settings:
 
         if hasattr(args, "port"):
             settings.port = args.port
+
+        if hasattr(args, "server_url") and args.server_url is not None:
+            settings.server_url = args.server_url
+        else:
+            settings.server_url = f"http://{settings.address}:{settings.port}"
 
         # Used in either import or start commands.
         settings.verbose = args.verbose
