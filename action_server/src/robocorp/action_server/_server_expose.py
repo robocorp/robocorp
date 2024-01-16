@@ -31,7 +31,6 @@ class BodyPayload(BaseModel):
 class ExposeSessionJson(BaseModel):
     expose_session: str
     url: str
-    api_key: str | None = None
 
 
 def get_expose_session_path(datadir: str) -> str:
@@ -122,7 +121,6 @@ async def expose_server(
     host: str,
     expose_url: str,
     datadir: str,
-    api_key: str | None = None,
     expose_session: str | None = None,
 ):
     """
@@ -192,17 +190,12 @@ async def expose_server(
                                 url = (
                                     f"https://{session_payload.sessionId}.{expose_url}"
                                 )
-                                log.info(f"🌍 URL: {url}")
-                                if api_key is not None:
-                                    log.info(
-                                        f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
-                                    )
+                                log.info(f"  🌍 Public URL: {url}\n")
                                 new_expose_session = get_expose_session(session_payload)
                                 write_expose_session_json(
                                     datadir=datadir,
                                     expose_session_json=ExposeSessionJson(
                                         expose_session=new_expose_session,
-                                        api_key=api_key,
                                         url=url,
                                     ),
                                 )
@@ -217,35 +210,6 @@ async def expose_server(
 
                             try:
                                 payload = BodyPayload(**data)
-                                if (
-                                    payload.path != "/openapi.json"
-                                    and api_key is not None
-                                ):
-                                    if (
-                                        payload.headers.get("authorization")
-                                        != f"Bearer {api_key}"
-                                    ):
-                                        log.error(
-                                            "Request failed because the API key is invalid."
-                                        )
-                                        await ws.send(
-                                            json.dumps(
-                                                {
-                                                    "requestId": payload.requestId,
-                                                    "response": json.dumps(
-                                                        {
-                                                            "error": {
-                                                                "code": "INVALID_API_KEY",
-                                                                "message": "The API key is invalid.",
-                                                            },
-                                                        }
-                                                    ),
-                                                    "status": 403,
-                                                }
-                                            )
-                                        )
-                                        continue
-
                                 base_url = f"http://{host}:{port}"
                                 response: requests.Response = forward_request(
                                     base_url=base_url, payload=payload
@@ -303,7 +267,7 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_session):
+def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session):
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
         format="%(message)s",
@@ -318,7 +282,6 @@ def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_s
                 host=host,
                 expose_url=expose_url,
                 datadir=datadir,
-                api_key=api_key if api_key != "None" else None,
                 expose_session=expose_session if expose_session != "None" else None,
             )
         )

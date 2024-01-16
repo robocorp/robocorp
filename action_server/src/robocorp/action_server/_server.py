@@ -6,6 +6,9 @@ import subprocess
 import sys
 from functools import partial
 from typing import Dict, Optional
+from fastapi import Depends, Security, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
 
 from ._server_expose import get_expose_session_payload, read_expose_session_json
 
@@ -61,6 +64,22 @@ def start_server(
         (action_package.id, action_package) for action_package in db.all(ActionPackage)
     )
 
+    def verify_api_key(
+        token: HTTPAuthorizationCredentials = Security(HTTPBearer(auto_error=True)),
+    ) -> HTTPAuthorizationCredentials:
+        if token.credentials != api_key:
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid or missing API Key",
+            )
+        else:
+            return token
+
+    endpoint_dependencies = []
+
+    if api_key:
+        endpoint_dependencies.append(Depends(verify_api_key))
+
     actions = db.all(Action)
     for action in actions:
         if not action.enabled:
@@ -94,6 +113,7 @@ def start_server(
             description=doc_desc,
             operation_id=action.name,
             methods=["POST"],
+            dependencies=endpoint_dependencies,
             openapi_extra={
                 "x-openai-isConsequential": action.is_consequential,
             }
@@ -126,7 +146,10 @@ def start_server(
 
     @app.get("/config", include_in_schema=False)
     async def serve_config():
-        payload = {"expose_url": False}
+        payload = {"expose_url": False, "auth_enabled": False}
+
+        if api_key:
+            payload["auth_enabled"] = True
 
         if expose:
             current_expose_session = read_expose_session_json(
@@ -168,15 +191,7 @@ def start_server(
 
     expose_subprocess = None
 
-    def expose_later(loop):
-        from robocorp.action_server._settings import is_frozen
-
-        nonlocal expose_subprocess
-
-        if not server.started:
-            loop.call_later(1 / 15.0, partial(expose_later, loop))
-            return
-
+    def _get_currrent_host():
         port = settings.port if settings.port != 0 else None
         host = settings.address
         if port is None:
@@ -188,6 +203,19 @@ def start_server(
             sockname = sockets_ipv4[0].getsockname()
             host = sockname[0]
             port = sockname[1]
+
+        return (host, port)
+
+    def expose_later(loop):
+        from robocorp.action_server._settings import is_frozen
+
+        nonlocal expose_subprocess
+
+        if not server.started:
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
+            return
+
+        (host, port) = _get_currrent_host()
 
         parent_pid = os.getpid()
 
@@ -210,10 +238,18 @@ def start_server(
             host,
             settings.expose_url,
             settings.datadir,
-            str(api_key),
             str(expose_session),
         ]
         expose_subprocess = subprocess.Popen(args)
+
+    def _on_started_message(self, **kwargs):
+        (host, port) = _get_currrent_host()
+        log.info(f"\n  ⚡️ Action Server started at http://{settings.address}:{port}")
+
+        if api_key:
+            log.info(
+                f'  🔑 API Authorization key: {{ "Authorization": "Bearer {api_key}"}}'
+            )
 
     async def _on_startup():
         if expose:
@@ -257,4 +293,6 @@ def start_server(
         kwargs = settings.to_uvicorn()
         config = uvicorn.Config(app=app, **kwargs)
         server = uvicorn.Server(config)
+        server._log_started_message = _on_started_message  # type: ignore[assignment]
+
         asyncio.run(server.serve())

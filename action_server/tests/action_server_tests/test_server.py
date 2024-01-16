@@ -304,6 +304,32 @@ def test_server_url_flag(action_server_process: ActionServerProcess, data_regres
     data_regression.check(spec)
 
 
+def test_auth_routes(action_server_process: ActionServerProcess, data_regression):
+    from action_server_tests.fixtures import get_in_resources
+
+    pack = get_in_resources("no_conda", "greeter")
+    action_server_process.start(
+        cwd=pack,
+        actions_sync=True,
+        db_file="server.db",
+        additional_args=["--api-key=Foo"],
+    )
+
+    client = ActionServerClient(action_server_process)
+    openapi_json = client.get_openapi_json()
+    spec = json.loads(openapi_json)
+    data_regression.check(spec)
+
+    client.post_error("api/actions/greeter/greet/run", 403)
+
+    found = client.post_get_str(
+        "api/actions/greeter/greet/run",
+        {"name": "Foo"},
+        {"Authorization": "Bearer Foo"},
+    )
+    assert found == '"Hello Mr. Foo."', f"{found} != '\"Hello Mr. Foo.\"'"
+
+
 def test_server_process_pool(
     action_server_process: ActionServerProcess, data_regression
 ):

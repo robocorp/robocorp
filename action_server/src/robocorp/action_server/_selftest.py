@@ -124,7 +124,7 @@ class ActionServerProcess:
             env["RC_ADD_SHUTDOWN_API"] = "1"
         process = self._process = Process(new_args, cwd=cwd, env=env)
 
-        compiled = re.compile(r"Uvicorn running on http://([\w.-]+):(\d+)")
+        compiled = re.compile(r"Action Server started at http://([\w.-]+):(\d+)")
         future: Future[Tuple[str, str]] = Future()
 
         def collect_port_from_stdout(line):
@@ -207,10 +207,10 @@ class ActionServerClient:
         except Exception:
             raise AssertionError(f"Unable to load: {contents!r}")
 
-    def post_get_str(self, url, data):
+    def post_get_str(self, url, data, headers: Optional[dict] | None = None):
         import requests
 
-        result = requests.post(self.build_full_url(url), json=data)
+        result = requests.post(self.build_full_url(url), headers=headers, json=data)
         assert result.status_code == 200
         return result.text
 

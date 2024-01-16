@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 from typing import Optional, Union
 
+from robocorp.action_server._robo_utils.auth import get_api_key
+
 from . import __version__
 
 log = logging.getLogger(__name__)
@@ -538,13 +540,11 @@ To migrate the database to the current version
                                     else:
                                         expose_session = None
 
-                            api_key = base_args.api_key
-                            if api_key is None:
-                                # reuse the previously exposed api key
-                                if expose_session and expose_session.api_key:
-                                    api_key = expose_session.api_key
-                                else:
-                                    api_key = generate_api_key()
+                            api_key = None
+                            if base_args.api_key:
+                                api_key = base_args.api_key
+                            elif base_args.expose:
+                                api_key = get_api_key(settings.datadir)
 
                             start_server(
                                 expose=base_args.expose,
