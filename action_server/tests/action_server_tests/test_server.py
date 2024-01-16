@@ -33,6 +33,26 @@ def test_schema_request_no_actions_registered(
     data_regression.check(json.loads(openapi_json))
 
 
+def test_bad_return_on_no_conda(
+    action_server_process: ActionServerProcess,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import get_in_resources
+
+    calculator = get_in_resources("no_conda", "calculator")
+    action_server_process.start(
+        db_file="server.db",
+        cwd=calculator,
+        actions_sync=True,
+        timeout=300,
+    )
+    found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
+    assert found.json()["message"] == (
+        "Error in action. Expected return type: string. "
+        "Found return type: <class 'NoneType'> (value: None)."
+    )
+
+
 def test_import_no_conda(
     action_server_process: ActionServerProcess,
     data_regression,
@@ -282,6 +302,24 @@ def test_server_url_flag(action_server_process: ActionServerProcess, data_regres
     openapi_json = client.get_openapi_json()
     spec = json.loads(openapi_json)
     data_regression.check(spec)
+
+
+def test_server_process_pool(
+    action_server_process: ActionServerProcess, data_regression
+):
+    from action_server_tests.fixtures import get_in_resources
+
+    no_conda_dir = get_in_resources("no_conda")
+
+    action_server_process.start(
+        cwd=no_conda_dir,
+        actions_sync=True,
+        db_file="server.db",
+        add_shutdown_api=True,
+        min_processes=1,
+        max_processes=2,
+        reuse_processes=True,
+    )
 
 
 def test_subprocesses_killed(

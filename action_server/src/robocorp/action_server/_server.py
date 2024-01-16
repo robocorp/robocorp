@@ -23,13 +23,15 @@ def _name_to_url(name):
 def start_server(
     expose: bool, api_key: str | None = None, expose_session: str | None = None
 ) -> None:
+    from dataclasses import asdict
+
     import docstring_parser
     import uvicorn
     from fastapi.staticfiles import StaticFiles
     from starlette.requests import Request
     from starlette.responses import HTMLResponse
 
-    from . import _actions_run
+    from . import _actions_process_pool, _actions_run
     from ._api_action_package import action_package_api_router
     from ._api_run import run_api_router
     from ._app import get_app
@@ -39,7 +41,9 @@ def start_server(
 
     settings = get_settings()
 
-    log.debug("Starting server (settings: %s)", settings)
+    settings_dict = asdict(settings)
+    settings_str = "\n".join(f"    {k} = {v!r}" for k, v in settings_dict.items())
+    log.debug(f"Starting server. Settings:\n{settings_str}")
 
     app = get_app()
 
@@ -57,7 +61,8 @@ def start_server(
         (action_package.id, action_package) for action_package in db.all(ActionPackage)
     )
 
-    for action in db.all(Action):
+    actions = db.all(Action)
+    for action in actions:
         if not action.enabled:
             # Disabled actions should not be registered.
             continue
@@ -246,7 +251,10 @@ def start_server(
     app.add_event_handler("startup", _on_startup)
     app.add_event_handler("shutdown", _on_shutdown)
 
-    kwargs = settings.to_uvicorn()
-    config = uvicorn.Config(app=app, **kwargs)
-    server = uvicorn.Server(config)
-    asyncio.run(server.serve())
+    with _actions_process_pool.setup_actions_process_pool(
+        settings, action_package_id_to_action_package, actions
+    ):
+        kwargs = settings.to_uvicorn()
+        config = uvicorn.Config(app=app, **kwargs)
+        server = uvicorn.Server(config)
+        asyncio.run(server.serve())

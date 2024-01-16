@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- A process pool is now available in the action server. The following new arguments are available:
+    `--min-processes=<n-processes>`
+    `--max-processes=<n-processes>`
+    `--reuse-process`
+- If the return of an `@action` does not conform to the proper return type a better error message is given.
+
 ## 0.0.13 - 2024-01-14
 
 - Fix main README and update docs.

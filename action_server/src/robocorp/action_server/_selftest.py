@@ -77,6 +77,9 @@ class ActionServerProcess:
         actions_sync=False,
         cwd: Optional[Path | str] = None,
         add_shutdown_api: bool = False,
+        min_processes: int = 0,
+        max_processes: int = 20,
+        reuse_processes: bool = False,
         additional_args: Optional[list[str]] = None,
     ) -> None:
         from robocorp.action_server._robo_utils.process import Process
@@ -108,6 +111,11 @@ class ActionServerProcess:
             f"--db-file={db_file}",
         ]
 
+        new_args.append(f"--min-processes={min_processes}")
+        new_args.append(f"--max-processes={max_processes}")
+        if reuse_processes:
+            new_args.append("--reuse-processes")
+
         if additional_args:
             new_args = new_args + additional_args
 
@@ -138,7 +146,7 @@ class ActionServerProcess:
         process.on_stderr.register(on_stderr)
         process.on_stdout.register(on_stdout)
 
-        with process.on_stdout.register(collect_port_from_stdout):
+        with process.on_stderr.register(collect_port_from_stdout):
             process.start()
             if timeout > 1:
                 initial_time = time.monotonic()
@@ -211,6 +219,7 @@ class ActionServerClient:
 
         result = requests.post(self.build_full_url(url), json=data or {})
         assert result.status_code == status_code
+        return result
 
     def get_error(self, url, status_code):
         import requests

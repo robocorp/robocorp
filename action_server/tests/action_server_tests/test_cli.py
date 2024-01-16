@@ -16,7 +16,7 @@ def test_version() -> None:
 def test_download_rcc(tmpdir) -> None:
     from action_server_tests.fixtures import robocorp_action_server_run
 
-    rcc_location = tmpdir / "rcc.exe" if sys.platform == "win32" else "rcc"
+    rcc_location = tmpdir / ("rcc.exe" if sys.platform == "win32" else "rcc")
     robocorp_action_server_run(["download-rcc", "--file", rcc_location], returncode=0)
     assert os.path.exists(rcc_location)
 

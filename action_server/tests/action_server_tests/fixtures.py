@@ -10,7 +10,6 @@ from robocorp.action_server._selftest import (
     ActionServerClient,
     ActionServerProcess,
     robocorp_action_server_run,
-    run_python_module,
 )
 
 

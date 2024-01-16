@@ -5,8 +5,6 @@ import sys
 from pathlib import Path
 from typing import Optional, Union
 
-from robocorp.action_server._robo_utils.auth import generate_api_key
-
 from . import __version__
 
 log = logging.getLogger(__name__)
@@ -156,6 +154,37 @@ def _create_parser():
         action="append",
     )
 
+    start_parser.add_argument(
+        "--min-processes",
+        type=int,
+        help=(
+            "The minimum number of action processes that should always be kept alive, "
+            "ready to process any incoming request."
+        ),
+        default=1,
+    )
+    start_parser.add_argument(
+        "--max-processes",
+        type=int,
+        help=(
+            "The maximum number of processes that may be created to handle the actions."
+        ),
+        default=20,
+    )
+    start_parser.add_argument(
+        "--reuse-processes",
+        action="store_true",
+        help=(
+            "By default actions are run once and then after the action runs the "
+            "process that ran the action exits. This can be changed by using "
+            "--reuse-processes. With this flag, after running the action instead of "
+            "exiting the process will be available to run another action in the same "
+            "process (note that in this case care must be taken so that memory leakage "
+            "does not happen in the action and that global state from one run does not "
+            "interfere with a subsequent run)."
+        ),
+    )
+
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
 
@@ -297,7 +326,9 @@ def _setup_logging(datadir: Path, log_level):
 
     log_file = str(datadir / "server_log.txt")
     log.info(f"Logs may be found at: {log_file}.")
-    rotating_handler = RotatingFileHandler(log_file, maxBytes=1_000_000, backupCount=3)
+    rotating_handler = RotatingFileHandler(
+        log_file, maxBytes=1_000_000, backupCount=3, encoding="utf-8"
+    )
     rotating_handler.setLevel(log_level)
     rotating_handler.setFormatter(
         logging.Formatter(
@@ -309,8 +340,11 @@ def _setup_logging(datadir: Path, log_level):
 
 
 def _main_retcode(args: Optional[list[str]], exit) -> int:
+    from robocorp.action_server._settings import is_frozen
+
     from ._download_rcc import download_rcc
     from ._rcc import initialize_rcc
+    from ._robo_utils.auth import generate_api_key
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
 
@@ -430,6 +464,11 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
                         return 1
                     return 0
                 else:
+                    if is_frozen():
+                        cmdline = "action-server"
+                    else:
+                        cmdline = "python -m robocorp.action_server"
+
                     if not is_new and db_migration_pending(db_path):
                         print(
                             f"""It was not possible to start the server because a 
@@ -438,7 +477,7 @@ Robocorp Action Server.
 
 Please run the command:
 
-python -m robocorp.action_server migrate
+{cmdline} migrate
 
 To migrate the database to the current version
 -- or start from scratch by erasing the file: 
