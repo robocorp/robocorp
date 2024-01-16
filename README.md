@@ -216,7 +216,7 @@ Check out these example projects for inspiration.
 - 🕸️ Open a local Playwright browser and make some Google searches. (Coming soon)
 - 🖥️ Securely fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time. (Coming soon)
 
-Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best of the community `@actions` here!
+Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best from the community here!
 
 ## Roadmap
 
