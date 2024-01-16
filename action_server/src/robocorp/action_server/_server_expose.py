@@ -121,7 +121,6 @@ async def expose_server(
     host: str,
     expose_url: str,
     datadir: str,
-
     expose_session: str | None = None,
 ):
     """

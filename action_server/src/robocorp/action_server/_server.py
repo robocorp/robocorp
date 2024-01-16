@@ -141,10 +141,7 @@ def start_server(
 
     @app.get("/config", include_in_schema=False)
     async def serve_config():
-        payload = {
-            "expose_url": False,
-            "auth_enabled": False
-        }
+        payload = {"expose_url": False, "auth_enabled": False}
 
         if api_key:
             payload["auth_enabled"] = True
