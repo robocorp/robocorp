@@ -3,6 +3,7 @@ import codecs
 import json
 import logging
 import os
+import socket
 import sys
 from typing import Optional
 
@@ -98,23 +99,74 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
 async def handle_ping_pong(
     ws: websockets.WebSocketClientProtocol,
     pong_queue: asyncio.Queue,
-    no_connection_queue: asyncio.Queue,
+    ping_interval: int,
 ):
     while True:
-        await asyncio.sleep(2)
+        await asyncio.sleep(ping_interval)
         await ws.send("ping")
 
         try:
-            await asyncio.wait_for(pong_queue.get(), timeout=2)
-        except asyncio.TimeoutError:
-            log.debug("Ping-pong message timeout")
+            await asyncio.wait_for(pong_queue.get(), timeout=ping_interval)
+        except (asyncio.TimeoutError, TimeoutError):
+            log.debug("Lost connection to expose server")
             await ws.close()
-            await no_connection_queue.put("no_connection")
             break
 
 
-class ExposePingTimeoutError(Exception):
-    pass
+def handle_session_payload(
+    session_payload: SessionPayload, api_key: str, expose_url: str, datadir: str
+) -> None:
+    url = f"https://{session_payload.sessionId}.{expose_url}"
+    log.info(f"🌍 URL: {url}")
+    if api_key is not None:
+        log.info(
+            f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
+        )
+    new_expose_session = get_expose_session(session_payload)
+    write_expose_session_json(
+        datadir=datadir,
+        expose_session_json=ExposeSessionJson(
+            expose_session=new_expose_session,
+            api_key=api_key,
+            url=url,
+        ),
+    )
+
+
+def handle_body_payload(
+    payload: BodyPayload,
+    api_key: str,
+    base_url: str,
+) -> str:
+    if payload.path != "/openapi.json" and api_key is not None:
+        if payload.headers.get("authorization") != f"Bearer {api_key}":
+            log.error("Request failed because the API key is invalid.")
+            return json.dumps(
+                {
+                    "requestId": payload.requestId,
+                    "response": json.dumps(
+                        {
+                            "error": {
+                                "code": "INVALID_API_KEY",
+                                "message": "The API key is invalid.",
+                            },
+                        }
+                    ),
+                    "status": 403,
+                }
+            )
+
+    response: requests.Response = forward_request(base_url=base_url, payload=payload)
+    return json.dumps(
+        {
+            "requestId": payload.requestId,
+            "response": json.dumps(
+                response.json(),
+                indent=2,
+            ),
+            "status": response.status_code,
+        }
+    )
 
 
 async def expose_server(
@@ -124,13 +176,13 @@ async def expose_server(
     datadir: str,
     api_key: str | None = None,
     expose_session: str | None = None,
+    ping_interval: int = 4,
 ):
     """
     Exposes the server to the world.
     """
 
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
-    no_connection_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
 
     async def listen_for_requests() -> None:
         max_retries = 3
@@ -140,164 +192,76 @@ async def expose_server(
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
         )
-        while retries < max_retries:
-            headers = (
-                {
-                    "x-session-id": session_payload.sessionId,
-                    "x-session-secret": session_payload.sessionSecret,
-                }
-                if session_payload
-                else {}
+
+        headers = (
+            {
+                "x-session-id": session_payload.sessionId,
+                "x-session-secret": session_payload.sessionSecret,
+            }
+            if session_payload
+            else {}
+        )
+
+        async for ws in websockets.connect(
+            f"wss://client.{expose_url}",
+            extra_headers=headers,
+            logger=log,
+            ping_interval=None,
+            close_timeout=0,
+        ):
+            ping_task = asyncio.create_task(
+                handle_ping_pong(ws, pong_queue, ping_interval)
             )
 
             try:
-                async with websockets.connect(
-                    f"wss://client.{expose_url}",
-                    extra_headers=headers,
-                    logger=log,
-                    close_timeout=0,
-                ) as ws:
-                    if retries > 0:
-                        log.info("Reconnected to expose tunnel server")
-                        retries = 0
+                while True:
+                    message = await ws.recv()
+                    if message == "no_connection":
+                        continue
+                    elif message == "pong":
+                        await pong_queue.put("pong")
+                        continue
 
-                    ping_task = asyncio.create_task(
-                        handle_ping_pong(ws, pong_queue, no_connection_queue)
-                    )
+                    data = json.loads(message)
 
-                    try:
-                        while True:
-                            done, pending = await asyncio.wait(
-                                [ws.recv(), no_connection_queue.get()],
-                                return_when=asyncio.FIRST_COMPLETED,
-                            )
-
-                            for task in done:
-                                message = task.result()
-                                if message == "no_connection":
-                                    raise ExposePingTimeoutError("No connection")
-
-                            for task in pending:
-                                task.cancel()
-
-                            if message == "pong":
-                                await pong_queue.put("pong")
-                                continue
-
-                            data = json.loads(message)
-
+                    match data:
+                        case {"sessionId": _, "sessionSecret": _}:
                             try:
                                 session_payload = SessionPayload(**data)
-
-                                url = (
-                                    f"https://{session_payload.sessionId}.{expose_url}"
+                                handle_session_payload(
+                                    session_payload, api_key, expose_url, datadir
                                 )
-                                log.info(f"🌍 URL: {url}")
-                                if api_key is not None:
-                                    log.info(
-                                        f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
-                                    )
-                                new_expose_session = get_expose_session(session_payload)
-                                write_expose_session_json(
-                                    datadir=datadir,
-                                    expose_session_json=ExposeSessionJson(
-                                        expose_session=new_expose_session,
-                                        api_key=api_key,
-                                        url=url,
-                                    ),
-                                )
-                                continue
-                            except Exception as e:
+                            except ValidationError as e:
                                 if not session_payload:
-                                    log.error(
-                                        "Unable to get session payload. Exposing the local server failed. Try again."
-                                    )
-                                    raise
+                                    log.error("Expose session initialization failed", e)
+                                    continue
                                 pass
-
+                        case _:
                             try:
-                                payload = BodyPayload(**data)
-                                if (
-                                    payload.path != "/openapi.json"
-                                    and api_key is not None
-                                ):
-                                    if (
-                                        payload.headers.get("authorization")
-                                        != f"Bearer {api_key}"
-                                    ):
-                                        log.error(
-                                            "Request failed because the API key is invalid."
-                                        )
-                                        await ws.send(
-                                            json.dumps(
-                                                {
-                                                    "requestId": payload.requestId,
-                                                    "response": json.dumps(
-                                                        {
-                                                            "error": {
-                                                                "code": "INVALID_API_KEY",
-                                                                "message": "The API key is invalid.",
-                                                            },
-                                                        }
-                                                    ),
-                                                    "status": 403,
-                                                }
-                                            )
-                                        )
-                                        continue
-
-                                base_url = f"http://{host}:{port}"
-                                response: requests.Response = forward_request(
-                                    base_url=base_url, payload=payload
+                                body_payload = BodyPayload(**data)
+                                response = handle_body_payload(
+                                    body_payload, api_key, f"http://{host}:{port}"
                                 )
-                                await ws.send(
-                                    json.dumps(
-                                        {
-                                            "requestId": payload.requestId,
-                                            "response": json.dumps(
-                                                response.json(),
-                                                indent=2,
-                                            ),
-                                            "status": response.status_code,
-                                        }
-                                    )
-                                )
-
-                            except Exception as e:
-                                log.error("Error forwarding request", e)
-                                pass
-
-                    except Exception as e:
-                        raise e
-
-                    finally:
-                        ping_task.cancel()
-                        try:
-                            await ping_task
-                        except asyncio.CancelledError:
-                            pass
-
-            except (
-                websockets.ConnectionClosed,
-                websockets.ConnectionClosedError,
-                ExposePingTimeoutError,
-                OSError,
-            ) as e:
+                                await ws.send(response)
+                            except ValidationError as e:
+                                log.error("Expose request validation failed", e)
+                                continue
+            except websockets.exceptions.ConnectionClosedError:
                 retries += 1
-                log.info(
-                    f"Connection closed, attempting to reconnect...({retries}/{max_retries})"
-                )
-                log.debug(e)
+                log.info(f"Reconnecting to expose server ({retries}/{max_retries})")
                 await asyncio.sleep(retry_delay * retries)
-
-            except Exception as e:
-                log.error("Error connecting to expose tunnel server", e)
-                break
-
+                continue
+            except socket.gaierror:
+                log.info("No internet connection")
+            finally:
+                ping_task.cancel()
+                try:
+                    await ping_task
+                except asyncio.CancelledError as e:
+                    print(e)
+                    pass
         else:
-            log.error(
-                "Could not connect to expose tunnel server. Check your connectivity and try again."
-            )
+            log.info("Expose server connection closed")
 
     task = asyncio.create_task(listen_for_requests())
     await task  # Wait for listen_for_requests to complete
