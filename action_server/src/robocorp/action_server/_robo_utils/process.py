@@ -114,7 +114,7 @@ class Process:
             partial(_popen_raise, self._args, **kwargs)
         )
         log.debug("Subprocess started [pid=%s,uid=%d]", proc.pid, self._uid)
-        _start_reader_threads(self._proc, self._on_stderr, self._on_stdout)
+        _start_reader_threads(self._proc, self._on_stdout, self._on_stderr)
 
     def _on_stderr(self, line):
         if len(self.on_stderr) > 0:
