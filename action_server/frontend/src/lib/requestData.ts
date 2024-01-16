@@ -27,6 +27,7 @@ const loadAsync = async <T>(
   url: string,
   method: 'POST' | 'GET',
   opts: Opts | undefined = undefined,
+  headers: HeadersInit | undefined = undefined,
 ): Promise<CachedModel<T>> => {
   try {
     const body: string | undefined = opts?.body;
@@ -42,6 +43,7 @@ const loadAsync = async <T>(
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        ...headers,
       },
     };
     if (body !== undefined) {
@@ -402,15 +404,22 @@ export const runAction = async (
   actionName: string,
   args: object,
   setLoaded: Dispatch<SetStateAction<AsyncLoaded<any>>>,
+  apiKey?: string,
 ) => {
   setLoaded({
     isPending: true,
     data: undefined,
   });
+
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+  };
+
   const data = await loadAsync(
     `${baseUrl}/api/actions/${actionPackageName}/${actionName}/run`,
     'POST',
     { body: JSON.stringify(args) },
+    headers,
   );
   setLoaded(data);
 };
