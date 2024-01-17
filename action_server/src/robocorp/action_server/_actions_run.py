@@ -2,11 +2,9 @@ import datetime
 import inspect
 import json
 import logging
-import os
 import time
 import typing
-from pathlib import Path
-from typing import Annotated, Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, Optional
 
 from fastapi.params import Header, Param
 from pydantic import BaseModel
@@ -17,11 +15,18 @@ if typing.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-_spec_api_type_to_python_type = {
+_spec_api_type_to_python_type_str = {
     "string": "str",
     "integer": "int",
     "number": "float",
     "boolean": "bool",
+}
+
+_spec_api_type_to_python_type = {
+    "string": str,
+    "integer": int,
+    "number": float,
+    "boolean": bool,
 }
 
 
@@ -140,38 +145,19 @@ def _run_action_in_thread(
     We have to take care of making a run with the proper environment,
     creating the run, collecting output info, etc.
     """
-    from robocorp.action_server._settings import get_python_exe_from_env
+    from robocorp.action_server._gen_ids import gen_uuid
+    from robocorp.action_server._settings import get_settings
 
-    from ._gen_ids import gen_uuid
-    from ._models import Run, get_action_package_from_action, get_db
-    from ._robo_utils.process import Process, build_python_launch_env
-    from ._settings import get_settings
+    from ._actions_process_pool import get_actions_process_pool
+    from ._models import Run, get_db
 
     settings = get_settings()
+    ret_type = kwargs.pop("__ret_type__", "")
+    if not ret_type:
+        ret_type = "string"
+
     db = get_db()
     with db.connect():  # Connection is per-thread, so, we need to create a new one.
-        action_package = get_action_package_from_action(action)
-        env = build_python_launch_env(json.loads(action_package.env_json))
-        directory = Path(action_package.directory)
-
-        # Make it absolute now!
-        if not directory.is_absolute():
-            directory = (settings.datadir / directory).absolute()
-
-        python = get_python_exe_from_env(env)
-        cmdline: List[str] = [
-            python,
-            "-m",
-            "robocorp.actions",
-            "run",
-            "--preload-module",
-            "preload_actions",
-            "-a",
-            action.name,
-        ]
-
-        cmdline.append(str(action.file))
-
         inputs = {}
         if args or kwargs:
             bound = signature.bind(*args, **kwargs)
@@ -179,104 +165,81 @@ def _run_action_in_thread(
             for k, v in bound.arguments.items():
                 inputs[k] = v
 
-        run_id = gen_uuid("run")
-        relative_artifacts_path: str = _create_run_artifacts_dir(action, run_id)
-        run: Run = _create_run(action, run_id, inputs, relative_artifacts_path)
-
-        input_json = (
-            settings.artifacts_dir
-            / relative_artifacts_path
-            / "__action_server_inputs.json"
-        )
-        cmdline.append(f"--json-input={input_json}")
-
-        initial_time = time.monotonic()
-        try:
-            if not directory.exists():
-                raise RuntimeError(
-                    f"""Error. Unable to run the action: {action} because its directory:
-{directory} 
-does not exist.
-This usually happens because the action was moved to a different
-location. To fix please move it back to the original location or
-import it again from the new location.
-"""
-                )
-
-            # Add the module to preload to the PYTHONPATH
-            from robocorp.action_server import _preload_actions
-
-            p = Path(_preload_actions.__file__)
-            if "__init__" in p.name:
-                p = p.parent
-            curr_pythonpath = env.get("PYTHONPATH", "")
-            if not curr_pythonpath:
-                env["PYTHONPATH"] = str(p)
-            else:
-                env["PYTHONPATH"] = f"{p}{os.pathsep}{curr_pythonpath}"
-            env["ROBOT_ARTIFACTS"] = str(
-                settings.artifacts_dir / relative_artifacts_path
+        expected_return_type = _spec_api_type_to_python_type.get(ret_type)
+        if not expected_return_type:
+            raise RuntimeError(
+                f"The return type in the spec for the action {action.name} is not valid. Found: {ret_type}."
             )
 
-            result_json = env["RC_ACTION_RESULT_LOCATION"] = str(
+        actions_process_pool = get_actions_process_pool()
+        with actions_process_pool.obtain_process_for_action(action) as process_handle:
+            run_id = gen_uuid("run")
+            relative_artifacts_path: str = _create_run_artifacts_dir(action, run_id)
+            run: Run = _create_run(action, run_id, inputs, relative_artifacts_path)
+
+            input_json = (
+                settings.artifacts_dir
+                / relative_artifacts_path
+                / "__action_server_inputs.json"
+            )
+            input_json.write_text(json.dumps(inputs))
+
+            robot_artifacts = settings.artifacts_dir / relative_artifacts_path
+
+            result_json = (
                 settings.artifacts_dir
                 / relative_artifacts_path
                 / "__action_server_result.json"
             )
-
-            input_json.write_text(json.dumps(inputs))
-
-            for key, value in headers.items():
-                if value:
-                    env[key.upper()] = value
-
-            process = Process(cmdline, cwd=directory, env=env)
 
             output_file = (
                 settings.artifacts_dir
                 / relative_artifacts_path
                 / "__action_server_output.txt"
             )
-            with output_file.open("w") as stream:
 
-                def on_output(line):
-                    stream.write(line)
-                    print("on_output:", line.strip())
+            initial_time = time.monotonic()
+            try:
+                _set_run_as_running(run, initial_time)
+                returncode = process_handle.run_action(
+                    action,
+                    input_json,
+                    robot_artifacts,
+                    output_file,
+                    result_json,
+                    headers,
+                )
 
-                with process.on_stderr.register(on_output), process.on_stdout.register(
-                    on_output
-                ):
-                    process.start()
-
-                    _set_run_as_running(run, initial_time)
-
-                    process.join()
-
-                    if process.returncode == 0:
-                        try:
-                            result: str = Path(result_json).read_text(
-                                "utf-8", "replace"
-                            )
-                        except Exception:
+                if returncode == 0:
+                    try:
+                        result: str = result_json.read_text("utf-8", "replace")
+                    except Exception:
+                        raise RuntimeError(
+                            "It was not possible to collect the contents of the "
+                            "result (json not created)."
+                        )
+                    try:
+                        _set_run_as_finished_ok(run, result, initial_time)
+                        ret = json.loads(result)
+                    except Exception:
+                        raise RuntimeError(
+                            "Error loading the contents of {result_json} as json."
+                        )
+                    else:
+                        if not isinstance(ret, expected_return_type):
                             raise RuntimeError(
-                                "It was not possible to collect the contents of the "
-                                "result (json not created)."
+                                f"Error in action. Expected return type: {ret_type}. Found return type: {type(ret)} (value: {ret})."
                             )
-                        try:
-                            _set_run_as_finished_ok(run, result, initial_time)
-                            return json.loads(result)
-                        except Exception:
-                            raise RuntimeError(
-                                "Error loading the contents of {result_json} as json."
-                            )
+                        return ret
 
-                    raise RuntimeError(
-                        f"Error: the process did not complete successfully when "
-                        f"running. returncode: {process.returncode}"
-                    )
-        except BaseException as e:
-            _set_run_as_finished_failed(run, str(e), initial_time)
-            raise
+                raise RuntimeError(
+                    f"Error: the process did not complete successfully when "
+                    f"running. returncode: {returncode}"
+                )
+
+            except BaseException as e:
+                _set_run_as_finished_failed(run, str(e), initial_time)
+                raise
 
 
 def _name_as_class_name(name):
@@ -313,7 +276,7 @@ def generate_func_from_action(action: "Action"):
         param_type = param_data.get("type", "string")
 
         argument = f"""
-    {param_name}: Annotated[{_spec_api_type_to_python_type[param_type]}, 
+    {param_name}: Annotated[{_spec_api_type_to_python_type_str[param_type]}, 
         Param(description={desc!r})]"""
         if "default" in param_data:
             default = param_data.get("default")
@@ -331,8 +294,9 @@ def generate_func_from_action(action: "Action"):
     ret = ""
     if ret_type:
         ret_desc = output_schema_dict.get("description")
-        ret = f"""-> Annotated[{_spec_api_type_to_python_type[ret_type]}, 
+        ret = f"""-> Annotated[{_spec_api_type_to_python_type_str[ret_type]}, 
         Param(description={ret_desc!r})]"""
+    argument_names.append(f"__ret_type__={ret_type!r}")
 
     code = f"""
 class {_name_as_class_name(action.name)}Input(BaseModel):

@@ -1,21 +1,16 @@
-import json
 import os
+
+# This has to be imported once and we're done.
+# Note that this module may be imported multiple times (at it's imported once
+# and then it's removed from sys.modules and then reimported in a new run)
+# as such, things that should be only done once need to be in a separate module.
+
+try:
+    import preload_actions_teardown  # type: ignore
+except ImportError:
+    from . import preload_actions_teardown
+
 from robocorp.log import html
-
-RC_ACTION_RESULT_LOCATION = os.environ.get("RC_ACTION_RESULT_LOCATION", "")
-
-if RC_ACTION_RESULT_LOCATION:
-    from pathlib import Path
-
-    from robocorp.actions import IAction, teardown
-
-    @teardown
-    def on_teardown_save_result(action: IAction):
-        result = action.result
-        p = Path(RC_ACTION_RESULT_LOCATION)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(result))
-
 
 X_ACTION_TRACE = os.environ.get("X_ACTION_TRACE", "")
 

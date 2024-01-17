@@ -1,0 +1,406 @@
+components:
+  schemas:
+    Action:
+      properties:
+        action_package_id:
+          title: Action Package Id
+          type: string
+        docs:
+          title: Docs
+          type: string
+        enabled:
+          default: true
+          title: Enabled
+          type: boolean
+        file:
+          title: File
+          type: string
+        id:
+          title: Id
+          type: string
+        input_schema:
+          title: Input Schema
+          type: string
+        is_consequential:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Consequential
+        lineno:
+          title: Lineno
+          type: integer
+        name:
+          title: Name
+          type: string
+        output_schema:
+          title: Output Schema
+          type: string
+      required:
+      - id
+      - action_package_id
+      - name
+      - docs
+      - file
+      - lineno
+      - input_schema
+      - output_schema
+      title: Action
+      type: object
+    ActionPackageApi:
+      properties:
+        actions:
+          items:
+            $ref: '#/components/schemas/Action'
+          title: Actions
+          type: array
+        id:
+          title: Id
+          type: string
+        name:
+          title: Name
+          type: string
+      required:
+      - id
+      - name
+      - actions
+      title: ActionPackageApi
+      type: object
+    ArtifactInfo:
+      properties:
+        name:
+          title: Name
+          type: string
+        size_in_bytes:
+          title: Size In Bytes
+          type: integer
+      required:
+      - name
+      - size_in_bytes
+      title: ArtifactInfo
+      type: object
+    GreetInput:
+      properties:
+        name:
+          description: The name of the person to greet.
+          title: Name
+          type: string
+        title:
+          default: Mr.
+          description: The title for the persor (Mr., Mrs., ...).
+          title: Title
+          type: string
+      required:
+      - name
+      title: GreetInput
+      type: object
+    HTTPValidationError:
+      properties:
+        errors:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Errors
+          type: array
+      title: HTTPValidationError
+      type: object
+    Run:
+      properties:
+        action_id:
+          title: Action Id
+          type: string
+        error_message:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error Message
+        id:
+          title: Id
+          type: string
+        inputs:
+          title: Inputs
+          type: string
+        numbered_id:
+          title: Numbered Id
+          type: integer
+        relative_artifacts_dir:
+          title: Relative Artifacts Dir
+          type: string
+        result:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Result
+        run_time:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Run Time
+        start_time:
+          title: Start Time
+          type: string
+        status:
+          title: Status
+          type: integer
+      required:
+      - id
+      - status
+      - action_id
+      - start_time
+      - run_time
+      - inputs
+      - result
+      - error_message
+      - relative_artifacts_dir
+      - numbered_id
+      title: Run
+      type: object
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+  securitySchemes:
+    HTTPBearer:
+      scheme: bearer
+      type: http
+info:
+  title: Robocorp Actions Server
+  version: 0.1.0
+openapi: 3.1.0
+paths:
+  /api/actionPackages:
+    get:
+      operationId: list_action_packages_api_actionPackages_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ActionPackageApi'
+                title: Response List Action Packages Api Actionpackages Get
+                type: array
+          description: Successful Response
+      summary: List Action Packages
+  /api/actions/greeter/greet/run:
+    post:
+      description: Provides a greeting for a person.
+      operationId: greet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GreetInput'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: The greeting for the person.
+                title: Response Greet
+                type: string
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      security:
+      - HTTPBearer: []
+      summary: Greet
+  /api/runs:
+    get:
+      operationId: list_runs_api_runs_get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Run'
+                title: Response List Runs Api Runs Get
+                type: array
+          description: Successful Response
+      summary: List Runs
+  /api/runs/{run_id}:
+    get:
+      operationId: show_run_api_runs__run_id__get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Run'
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Show Run
+  /api/runs/{run_id}/artifacts:
+    get:
+      operationId: get_run_artifacts_api_runs__run_id__artifacts_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: 'Provides a list with the artifacts available
+
+                  for a given run (i.e.: [{''name'': ''__action_server_output.txt'',
+                  ''size_in_bytes'': 22}])
+
+                  '
+                items:
+                  $ref: '#/components/schemas/ArtifactInfo'
+                title: Response Get Run Artifacts Api Runs  Run Id  Artifacts Get
+                type: array
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Artifacts
+  /api/runs/{run_id}/artifacts/binary-content:
+    get:
+      operationId: get_run_artifact_binary_api_runs__run_id__artifacts_binary_content_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      - in: query
+        name: artifact_name
+        required: true
+        schema:
+          title: Artifact name for which the content should be gotten.
+          type: string
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Artifact Binary
+  /api/runs/{run_id}/artifacts/text-content:
+    get:
+      operationId: get_run_artifact_text_api_runs__run_id__artifacts_text_content_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      - in: query
+        name: artifact_names
+        required: false
+        schema:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Artifact names for which the content should be gotten.
+      - in: query
+        name: artifact_name_regexp
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: A regexp to match artifact names.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                title: Response Get Run Artifact Text Api Runs  Run Id  Artifacts
+                  Text Content Get
+                type: object
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Artifact Text
+  /api/runs/{run_id}/log.html:
+    get:
+      operationId: get_run_log_html_api_runs__run_id__log_html_get
+      parameters:
+      - in: path
+        name: run_id
+        required: true
+        schema:
+          title: ID for run
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful Response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Run Log Html
+  /base_log.html:
+    get:
+      operationId: serve_log_html_base_log_html_get
+      responses:
+        '200':
+          content:
+            text/html:
+              schema:
+                type: string
+          description: Successful Response
+      summary: Serve Log Html
+servers:
+- url: http://localhost:0

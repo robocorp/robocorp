@@ -5,13 +5,14 @@ import logging
 import os
 import socket
 import sys
+import typing
 from typing import Optional
 
 import requests
-import websockets
 from pydantic import BaseModel, ValidationError
 
-from robocorp.action_server._robo_utils.process import exit_when_pid_exists
+if typing.TYPE_CHECKING:
+    import websockets
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +52,6 @@ class BodyPayload(BaseModel):
 class ExposeSessionJson(BaseModel):
     expose_session: str
     url: str
-    api_key: str | None = None
 
 
 def get_expose_session_path(datadir: str) -> str:
@@ -116,7 +116,7 @@ def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
 
 
 async def handle_ping_pong(
-    ws: websockets.WebSocketClientProtocol,
+    ws: "websockets.WebSocketClientProtocol",
     pong_queue: asyncio.Queue,
     ping_interval: int,
 ):
@@ -133,20 +133,15 @@ async def handle_ping_pong(
 
 
 def handle_session_payload(
-    session_payload: SessionPayload, api_key: str | None, expose_url: str, datadir: str
+    session_payload: SessionPayload,  expose_url: str, datadir: str
 ):
     url = f"https://{session_payload.sessionId}.{expose_url}"
-    log.info(f"🌍 URL: {url}")
-    if api_key is not None:
-        log.info(
-            f'🔑 Add following header api authorization header to run actions: {{ "Authorization": "Bearer {api_key}" }}'  # noqa
-        )
+    log.info(f"  🌍 Public URL: {url}\n")
     new_expose_session = get_expose_session(session_payload)
     write_expose_session_json(
         datadir=datadir,
         expose_session_json=ExposeSessionJson(
             expose_session=new_expose_session,
-            api_key=api_key,
             url=url,
         ),
     )
@@ -154,27 +149,8 @@ def handle_session_payload(
 
 def handle_body_payload(
     payload: BodyPayload,
-    api_key: str | None,
     base_url: str,
 ):
-    if payload.path != "/openapi.json" and api_key is not None:
-        if payload.headers.get("authorization") != f"Bearer {api_key}":
-            log.error("Request failed because the API key is invalid.")
-            return json.dumps(
-                {
-                    "requestId": payload.requestId,
-                    "response": json.dumps(
-                        {
-                            "error": {
-                                "code": "INVALID_API_KEY",
-                                "message": "The API key is invalid.",
-                            },
-                        }
-                    ),
-                    "status": 403,
-                }
-            )
-
     response: requests.Response = forward_request(base_url=base_url, payload=payload)
     return json.dumps(
         {
@@ -193,13 +169,13 @@ async def expose_server(
     host: str,
     expose_url: str,
     datadir: str,
-    api_key: str | None = None,
     expose_session: str | None = None,
     ping_interval: int = 4,
 ):
     """
     Exposes the server to the world.
     """
+    import websockets
 
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
 
@@ -242,7 +218,7 @@ async def expose_server(
                             try:
                                 session_payload = SessionPayload(**data)
                                 handle_session_payload(
-                                    session_payload, api_key, expose_url, datadir
+                                    session_payload, expose_url, datadir
                                 )
                             except ValidationError as e:
                                 if not session_payload:
@@ -253,7 +229,7 @@ async def expose_server(
                             try:
                                 body_payload = BodyPayload(**data)
                                 response = handle_body_payload(
-                                    body_payload, api_key, f"http://{host}:{port}"
+                                    body_payload, f"http://{host}:{port}"
                                 )
                                 await ws.send(response)
                             except ValidationError as e:
@@ -277,7 +253,9 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_session):
+def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session):
+    from robocorp.action_server._robo_utils.process import exit_when_pid_exists
+
     logging.basicConfig(
         level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
         format="%(message)s",
@@ -292,7 +270,6 @@ def main(parent_pid, port, verbose, host, expose_url, datadir, api_key, expose_s
                 host=host,
                 expose_url=expose_url,
                 datadir=datadir,
-                api_key=api_key if api_key != "None" else None,
                 expose_session=expose_session if expose_session != "None" else None,
             )
         )

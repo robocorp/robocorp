@@ -5,6 +5,8 @@ import { runAction } from '~/lib/requestData';
 import { Action, ActionPackage, AsyncLoaded, InputProperty, InputPropertyType } from '~/lib/types';
 import { Code } from '~/components';
 import { stringifyResult } from '~/lib/helpers';
+import { useActionServerContext } from '~/lib/actionServerContext';
+import { useLocalStorage } from '~/lib/useLocalStorage';
 
 type Props = {
   action: Action;
@@ -50,6 +52,8 @@ type InputSchema = {
 type FormDataEntry = [string, InputProperty, string];
 
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
+  const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
+  const { serverConfig } = useActionServerContext();
   const [formData, setFormData] = useState<FormDataEntry[]>([]);
   const [result, setResult] = useState<AsyncLoaded<RunResult>>(dataLoadedInitial);
 
@@ -165,14 +169,25 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           nameToUrl(action.name),
           Object.fromEntries(useData),
           setResult,
+          serverConfig?.auth_enabled ? apiKey : undefined,
         );
       }
     },
-    [formData, action, actionPackage, inputSchema, result, setResult],
+    [formData, action, actionPackage, inputSchema, result, serverConfig, apiKey, setResult],
   );
 
   return (
     <Form busy={result.isPending} onSubmit={onSubmit}>
+      {serverConfig?.auth_enabled && (
+        <Form.Fieldset>
+          <Input
+            label="API Key"
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+          />
+        </Form.Fieldset>
+      )}
       <Form.Fieldset>{fields}</Form.Fieldset>
       <Button.Group align="right">
         <Button loading={result.isPending} type="submit" variant="primary">
