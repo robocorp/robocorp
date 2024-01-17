@@ -1,4 +1,3 @@
-import re
 import logging
 from contextlib import contextmanager
 
