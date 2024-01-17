@@ -133,7 +133,7 @@ async def handle_ping_pong(
 
 
 def handle_session_payload(
-    session_payload: SessionPayload,  expose_url: str, datadir: str
+    session_payload: SessionPayload, expose_url: str, datadir: str
 ):
     url = f"https://{session_payload.sessionId}.{expose_url}"
     log.info(f"  🌍 Public URL: {url}\n")
