@@ -10,7 +10,10 @@ from typing import Dict, Iterator
 
 import pytest
 
-from robocorp.action_server._actions_process_pool import ActionsProcessPool
+from robocorp.action_server._actions_process_pool import (
+    ActionsProcessPool,
+    ProcessHandle,
+)
 from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
 
 
@@ -94,6 +97,7 @@ class _RunInfo:
     input_json: Path
     result_json: Path
     output_file: Path
+    process_handle: ProcessHandle
 
 
 @contextmanager
@@ -130,6 +134,7 @@ def _create_run(
             input_json=input_json,
             result_json=result_json,
             output_file=output_file,
+            process_handle=process_handle,
         )
 
 
@@ -145,6 +150,47 @@ def test_actions_process_pool_run(actions_process_pool: ActionsProcessPool, tmpd
             assert run_info.future.result() == 0
             assert run_info.output_file.exists()
             assert run_info.result_json.exists()
+
+
+def test_actions_process_pool_process_crash(
+    actions_process_pool: ActionsProcessPool, tmpdir
+):
+    actions = actions_process_pool.actions
+    assert len(actions) == 1
+    action = next(iter(actions))
+
+    # Creates one action at a time here as we get the result and then move
+    # on to the next.
+    with _create_run(tmpdir, actions_process_pool, action, 1) as run_info1:
+        assert actions_process_pool.get_running_processes_count() == 1
+
+        with _create_run(tmpdir, actions_process_pool, action, 2) as run_info2:
+            assert actions_process_pool.get_running_processes_count() == 2
+
+            with _create_run(tmpdir, actions_process_pool, action, 3) as run_info3:
+                assert actions_process_pool.get_running_processes_count() == 3
+
+                assert run_info1.future.result() == 0
+                assert run_info2.future.result() == 0
+                assert run_info3.future.result() == 0
+
+                # Kill while process is checked-out.
+                run_info3.process_handle.kill()
+
+            assert actions_process_pool.get_running_processes_count() == 2
+            # Usually it'd be 1 idle, but as it was killed it's not added.
+            assert actions_process_pool.get_idle_processes_count() == 0
+
+        assert actions_process_pool.get_running_processes_count() == 1
+        assert actions_process_pool.get_idle_processes_count() == 1
+
+        # Kill idle process
+        run_info2.process_handle.kill()
+        with _create_run(tmpdir, actions_process_pool, action, 4) as run_info4:
+            assert run_info2.process_handle != run_info4.process_handle
+            assert run_info4.future.result() == 0
+            assert actions_process_pool.get_running_processes_count() == 2
+            assert actions_process_pool.get_idle_processes_count() == 0
 
 
 def test_actions_process_pool_max_concurrent(

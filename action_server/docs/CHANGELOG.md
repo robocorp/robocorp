@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- If a process crashes while in the process pool idle processes it's not reused in a new run.
+
 ## 0.0.15 - 2024-01-16
 
 - The `--api-key` is now checked in any calls, not just on the connection relative to the `--expose`.

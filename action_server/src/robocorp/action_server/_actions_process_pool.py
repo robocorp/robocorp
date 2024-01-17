@@ -408,6 +408,14 @@ class ActionsProcessPool:
                     log.debug(
                         f"Process Pool: Using idle process ({process_handle.pid})."
                     )
+                    if not process_handle.is_alive():
+                        # Process died while trying to get it.
+                        log.critical(
+                            f"Process Pool: Unexpected: Idle process exited "
+                            f"({process_handle.pid})."
+                        )
+                        continue
+
                     self._add_to_running_processes(process_handle)
                 else:
                     # No compatible process: we need to create one now.
@@ -422,6 +430,13 @@ class ActionsProcessPool:
                         log.debug(
                             f"Process Pool: Created process ({process_handle.pid})."
                         )
+                        if not process_handle.is_alive():
+                            # Process died while trying to get it.
+                            log.critical(
+                                f"Process Pool: Unexpected: Idle process exited right "
+                                f"after creation ({process_handle.pid})."
+                            )
+                            continue
                         self._add_to_running_processes(process_handle)
                     else:
                         log.critical(
