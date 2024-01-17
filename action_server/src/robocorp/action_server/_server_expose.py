@@ -6,6 +6,7 @@ import os
 import sys
 import typing
 from typing import Optional
+from termcolor import colored
 
 import requests
 from pydantic import BaseModel, ValidationError
@@ -192,7 +193,11 @@ async def expose_server(
                                 url = (
                                     f"https://{session_payload.sessionId}.{expose_url}"
                                 )
-                                log.info(f"  🌍 Public URL: {url}\n")
+                                log.info(
+                                    colored("  🌍 Public URL: ", "green", attrs=["bold"])
+                                    + colored(f"{url}\n", "light_blue")
+                                )
+
                                 new_expose_session = get_expose_session(session_payload)
                                 write_expose_session_json(
                                     datadir=datadir,

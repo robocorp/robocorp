@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional
+from termcolor import colored
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +95,7 @@ class Settings:
             short_hash = hashlib.sha256(as_posix.encode()).hexdigest()[:8]
             datadir_name = f"{get_default_settings_dir()}/{name}_{short_hash}"
 
-            log.info(f"Using datadir (scoped to the current directory): {datadir_name}")
+            log.info(colored(f"Using datadir: {datadir_name}", attrs=["dark"]))
             user_expanded_datadir = Path(datadir_name).expanduser()
 
         else:
@@ -131,7 +132,7 @@ class Settings:
             "host": self.address,
             "port": self.port,
             "reload": False,
-            "log_config": None,
+            "log_config": UVICORN_LOG_CONFIG,
         }
 
 
@@ -153,3 +154,40 @@ def get_settings() -> Settings:
     if _global_settings is None:
         raise AssertionError("It seems that the settings have not been setup yet.")
     return _global_settings
+
+
+UVICORN_LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "access": {
+            "()": "uvicorn.logging.AccessFormatter",
+            "fmt": '%(asctime)s - "%(request_line)s" %(status_code)s',
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "use_colors": True,
+        },
+        "default": {
+            "()": "uvicorn.logging.DefaultFormatter",
+            "fmt": "%(levelprefix)s %(asctime)s - %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "use_colors": True,
+        },
+    },
+    "handlers": {
+        "access": {
+            "class": "logging.StreamHandler",
+            "formatter": "access",
+            "stream": "ext://sys.stdout",
+        },
+        "default": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stderr",
+        },
+    },
+    "loggers": {
+        "uvicorn": {"handlers": ["default"], "level": "DEBUG", "propagate": True},
+        "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+        "uvicorn.error": {"level": "INFO", "propagate": False},
+    },
+}

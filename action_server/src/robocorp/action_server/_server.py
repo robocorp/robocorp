@@ -6,6 +6,7 @@ import subprocess
 import sys
 from functools import partial
 from typing import Dict, Optional
+from termcolor import colored
 
 log = logging.getLogger(__name__)
 
@@ -243,11 +244,16 @@ def start_server(
 
     def _on_started_message(self, **kwargs):
         (host, port) = _get_currrent_host()
-        log.info(f"\n  ⚡️ Action Server started at http://{settings.address}:{port}")
+
+        log.info(
+            colored("\n  ⚡️ Action Server started at: ", "green", attrs=["bold"])
+            + colored(f"http://{settings.address}:{port}", "light_blue")
+        )
 
         if api_key:
             log.info(
-                f'  🔑 API Authorization key: {{ "Authorization": "Bearer {api_key}"}}'
+                colored("  🔑 API Authorization key: ", attrs=["bold"])
+                + f'{{ "Authorization": "Bearer {api_key}"}}'
             )
 
     async def _on_startup():
