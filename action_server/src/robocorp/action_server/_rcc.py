@@ -67,7 +67,7 @@ class Rcc(object):
 
         kwargs: dict = build_subprocess_kwargs(cwd, env, stderr=stderr)
         rcc_location = str(self._rcc_location)
-        args = [rcc_location] + args + ["--controller", "ActionServer"]
+        args = [rcc_location] + args + ["--controller", "action-server"]
         return args, kwargs
 
     def _run_rcc(
