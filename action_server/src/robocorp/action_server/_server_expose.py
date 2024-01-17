@@ -17,25 +17,6 @@ if typing.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-# websockets logger will log the retries with the stack trace. this makes it less verbose.
-class NoExceptionFormatter(logging.Formatter):
-    def format(self, record):
-        record.exc_info = None
-        return super().format(record)
-
-
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
-
-formatter = NoExceptionFormatter("%(message)s")
-console_handler.setFormatter(formatter)
-
-
-websockets_logger = logging.getLogger("websockets")
-websockets_logger.addHandler(console_handler)
-websockets_logger.propagate = False
-
-
 class SessionPayload(BaseModel):
     sessionId: str
     sessionSecret: str
@@ -196,7 +177,7 @@ async def expose_server(
         async for ws in websockets.connect(
             f"wss://client.{expose_url}",
             extra_headers=headers,
-            logger=websockets_logger,
+            logger=log,
             open_timeout=2,
             close_timeout=0,
         ):
