@@ -1,5 +1,5 @@
 name: ⭐️ Feature Request
-description: Submit a proposal/request for a new LangChain feature
+description: Submit a proposal/request for a new feature
 title: "[Feature]: "
 body:
   - type: checkboxes
