@@ -222,8 +222,8 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 - 🤯 **No-pain Python environment management** - Don't do [this](https://xkcd.com/1987/). Robocorp manages a full Python environment for your actions with ease.
 - 🚀 **Deploy with zero config and infra** - One step deployment, and you'll be connecting your `@action` to AI apps like Langchain and OpenAI GPTs in seconds.
 
-<div id="langchain"/>
-## Inspo
+<div id="inspiration"/>
+## Inspiration
 
 Check out these example projects for inspiration.
 
