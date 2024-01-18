@@ -28,7 +28,7 @@ class FormatterStdout(Formatter):
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             status_code = access_formatter.get_status_code(int(status_code))
             return (
-                colored(f"{timestamp} - ", attrs=["dark"])
+                colored(f"{timestamp}: ", attrs=["dark"])
                 + colored(method, attrs=["bold"])
                 + f" {full_path} {status_code}"
             )
