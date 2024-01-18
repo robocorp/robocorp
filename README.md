@@ -20,16 +20,6 @@ Robocorp Action Server makes your Python scripts compatible with ChatGPT and Lan
 </picture>
 
 
-
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=7aq6QDCaUmA">
-    <img src="https://img.youtube.com/vi/7aq6QDCaUmA/0.jpg" alt="AI Actions Example">
-  </a>
-  <br/>
-  👆 AI Actions Example video in Youtube
-</p>
-<br/>
-
 Looking for a replacement to RPA? Head over to our [Enterprise Python Automation site](https://robocorp.com/docs/quickstart-guide) for more.
 
 ---
@@ -162,9 +152,15 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 🔑 Add following header api authorization header to run actions: { "Authorization": "Bearer xxx_xxx" }
 ```
 
+<h3 id="actions-video" align="center">
+  <a href="https://www.youtube.com/watch?v=7aq6QDCaUmA">
+    👉 Example video in Youtube 👈
+  </a>
+</h3>
+
 Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
-> [!TIP]
+> **TIP:**<br/>
 > Use `@action(is_consequential=False)` flag to avoid user needing to accept the action execution separately each time on your GPT.
 
 
