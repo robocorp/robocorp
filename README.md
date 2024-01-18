@@ -19,11 +19,14 @@ Robocorp Action Server makes your Python scripts compatible with ChatGPT and Lan
   <img alt="Text changing depending on mode. Light: 'So light!' Dark: 'So dark!'" src="./docs/include/robocorp-flow-light.webp">
 </picture>
 
+
 Looking for a replacement to RPA? Head over to our [Enterprise Python Automation site](https://robocorp.com/docs/quickstart-guide) for more.
 
 ---
 
-<h1 id="quickstart">🏃‍♂️ Quickstart</h1>
+<div id="quickstart"></div>
+
+# 🏃‍♂️ Quickstart
 
 Install Robocorp Action Server:
 
@@ -84,7 +87,9 @@ Head over to [Action Server docs](./action_server/README.md) for more.
 
 ---
 
-# What makes a Python function an ⚡️Action?
+<div id="python-action"></div>
+
+# What makes a Python function an⚡️Action?
 
 1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
 
@@ -140,6 +145,8 @@ def greeting(name: str) -> str:
 
 ---
 
+<div id="connect-gpt"></div>
+
 ## Connect with OpenAI GPTs Actions
 
 Once you have started the Action Server with `--expose` flag, you’ll get a URL available to the public, along with the authentication token. The relevant part of the output from the terminal looks like this, of course with your own details:
@@ -151,11 +158,18 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 🔑 Add following header api authorization header to run actions: { "Authorization": "Bearer xxx_xxx" }
 ```
 
+<h3 id="actions-video" align="center">
+  <a href="https://www.youtube.com/watch?v=7aq6QDCaUmA">
+    👉 Example video in Youtube 👈
+  </a>
+</h3>
+
 Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
-> [!TIP]
+> **TIP:**<br/>
 > Use `@action(is_consequential=False)` flag to avoid user needing to accept the action execution separately each time on your GPT.
 
+<div id="langchain"></div>
 
 ## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)
 
@@ -197,6 +211,8 @@ tools = toolkit.get_tools()
 
 ---
 
+<div id="why-actions"></div>
+
 ## Why use Robocorp AI Actions
 
 - ❤️ “when it comes to automation, the Robocorp suite is the best one” _[/u/disturbing_nickname](https://old.reddit.com/r/rpa/comments/18qqspn/codeonly_rpa_pet_project/kez2jds/?context=3)_
@@ -211,7 +227,9 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 - 🤯 **No-pain Python environment management** - Don't do [this](https://xkcd.com/1987/). Robocorp manages a full Python environment for your actions with ease.
 - 🚀 **Deploy with zero config and infra** - One step deployment, and you'll be connecting your `@action` to AI apps like Langchain and OpenAI GPTs in seconds.
 
-## Inspo
+<div id="inspiration"></div>
+
+## Inspiration
 
 Check out these example projects for inspiration.
 
@@ -221,6 +239,8 @@ Check out these example projects for inspiration.
 - 🖥️ [Securely fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time.](https://github.com/robocorp/actions-cookbook/tree/master/desktop-files)
 
 Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best from the community here!
+
+<div id="roadmap"></div>
 
 ## Roadmap
 
@@ -236,6 +256,8 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [ ] More complex input args (currently `str`, `bool`, `int` and `float`) and return values (currently `str` and `bool`)
 - [ ] Explicit action user approval
 - [ ] Stateful actions
+
+<div id="contribute"></div>
 
 ## Contributing and issues
 
