@@ -24,7 +24,8 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 ---
 
-<h1 id="quickstart">🏃‍♂️ Quickstart</h1>
+<div id="quickstart"/>
+# 🏃‍♂️ Quickstart
 
 Install Robocorp Action Server:
 
@@ -85,7 +86,8 @@ Head over to [Action Server docs](./action_server/README.md) for more.
 
 ---
 
-# What makes a Python function an ⚡️Action?
+<div id="python-action"/>
+# What makes a Python function an⚡️Action?
 
 1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
 
@@ -141,6 +143,7 @@ def greeting(name: str) -> str:
 
 ---
 
+<div id="connect-gpt"/>
 ## Connect with OpenAI GPTs Actions
 
 Once you have started the Action Server with `--expose` flag, you’ll get a URL available to the public, along with the authentication token. The relevant part of the output from the terminal looks like this, of course with your own details:
@@ -163,7 +166,7 @@ Adding the Action Server hosted AI Action to your custom GPT is super simple, ba
 > **TIP:**<br/>
 > Use `@action(is_consequential=False)` flag to avoid user needing to accept the action execution separately each time on your GPT.
 
-
+<div id="langchain"/>
 ## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)
 
 Robocorp Action Server comes with everything needed to connect it to your Langchain AI app project. The easiest way is to start with the template, provided in the Langchain project. Here’s how to do it:
@@ -204,6 +207,7 @@ tools = toolkit.get_tools()
 
 ---
 
+<div id="why-actions"/>
 ## Why use Robocorp AI Actions
 
 - ❤️ “when it comes to automation, the Robocorp suite is the best one” _[/u/disturbing_nickname](https://old.reddit.com/r/rpa/comments/18qqspn/codeonly_rpa_pet_project/kez2jds/?context=3)_
@@ -218,6 +222,7 @@ Robocorp stack is hands down the easiest way to give AI agents more capabilities
 - 🤯 **No-pain Python environment management** - Don't do [this](https://xkcd.com/1987/). Robocorp manages a full Python environment for your actions with ease.
 - 🚀 **Deploy with zero config and infra** - One step deployment, and you'll be connecting your `@action` to AI apps like Langchain and OpenAI GPTs in seconds.
 
+<div id="langchain"/>
 ## Inspo
 
 Check out these example projects for inspiration.
@@ -229,6 +234,7 @@ Check out these example projects for inspiration.
 
 Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best from the community here!
 
+<div id="roadmap"/>
 ## Roadmap
 
 - [x] Action Server `brew install` for Mac users
@@ -244,6 +250,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [ ] Explicit action user approval
 - [ ] Stateful actions
 
+<div id="contribute"/>
 ## Contributing and issues
 
 > ⭐️ First, please star the repo - your support is highly appreciated!
