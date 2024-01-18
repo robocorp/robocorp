@@ -63,7 +63,7 @@ class Settings:
     expose_url: str = "robocorp.link"
     server_url: str = "http://localhost:8080"
 
-    min_processes: int = 0
+    min_processes: int = 2
     max_processes: int = 20
     reuse_processes: bool = False
 

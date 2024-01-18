@@ -1,6 +1,7 @@
 import json
 import logging
 import subprocess
+import sys
 import typing
 from pathlib import Path
 from typing import Optional
@@ -37,11 +38,12 @@ def import_action_package(
         environment.
     """
 
-    from robocorp.action_server._robo_utils.process import build_python_launch_env
-
+    from ._errors_action_server import ActionServerValidationError
     from ._gen_ids import gen_uuid
     from ._models import ActionPackage
     from ._rcc import create_hash, get_rcc
+    from ._robo_utils.process import build_python_launch_env
+    from ._settings import is_frozen
 
     log.info("Importing action package from: %s", action_package_dir)
 
@@ -60,7 +62,12 @@ def import_action_package(
     # Verify if it's actually a proper package (meaning that it has
     # the conda.yaml as well as actions we can run).
     conda_yaml = import_path / "conda.yaml"
-    if not conda_yaml.exists():
+    conda_yaml_exists = conda_yaml.exists()
+    if not conda_yaml_exists:
+        if is_frozen():
+            raise ActionServerValidationError(
+                f"Unable to import actions in standalone action-server because no `conda.yaml` is available at: {conda_yaml}."
+            )
         log.info(
             """Adding action without a managed environment (conda.yaml unavailable).
 Note: no virtual environment will be used for the imported actions, they'll be run in the same environment used to run the action server."""
@@ -134,6 +141,24 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     log.info(f"Collecting actions for Action Package: {name}.")
 
     env = build_python_launch_env(use_env)
+
+    v = _get_robocorp_actions_version(env, import_path)
+    if v < (0, 0, 6):
+        v_as_str = ".".join(str(x) for x in v)
+
+        if conda_yaml_exists:
+            raise ActionServerValidationError(
+                f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
+                f"Expected `robocorp-actions` version to be 0.0.6 or higher.\n"
+                f"Please update the version in: {conda_yaml}\n"
+            )
+        else:
+            raise ActionServerValidationError(
+                f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
+                f"Expected it to be 0.0.6 or higher.\n"
+                f"Please update the `robocorp-actions` version in your python environment (python: {sys.executable})\n"
+            )
+
     _add_actions_to_db(
         datadir,
         env,
@@ -152,17 +177,7 @@ def _get_robocorp_actions_version(env, cwd) -> tuple[int, ...]:
         "-c",
         "import robocorp.actions;print(robocorp.actions.__version__)",
     ]
-    output = subprocess.check_output(
-        cmdline,
-        env=env,
-        cwd=cwd,
-    )
-    str_output = output.decode("utf-8", "replace")
-    try:
-        return tuple(int(x) for x in str_output.strip().split("."))
-    except Exception:
-        raise RuntimeError(
-            f"""Unable to get robocorp.actions version.
+    msg = f"""Unable to get robocorp.actions version.
 
 This usually means that `robocorp.actions` is not installed in the python
 environment (if `conda.yaml` is present, make sure that `robocorp-actions`
@@ -172,7 +187,20 @@ is installed in the same environment being used to run the action server).
 Python executable being used:
 {python}
 """
+
+    try:
+        output = subprocess.check_output(
+            cmdline,
+            env=env,
+            cwd=cwd,
         )
+    except Exception:
+        raise RuntimeError(msg)
+    str_output = output.decode("utf-8", "replace")
+    try:
+        return tuple(int(x) for x in str_output.strip().split("."))
+    except Exception:
+        raise RuntimeError(msg)
 
 
 def _add_actions_to_db(
@@ -187,13 +215,6 @@ def _add_actions_to_db(
     from robocorp.action_server._gen_ids import gen_uuid
     from robocorp.action_server._models import Action, ActionPackage, get_db
     from robocorp.action_server._settings import get_python_exe_from_env
-
-    v = _get_robocorp_actions_version(env, import_path)
-    if v < (0, 0, 4):
-        raise RuntimeError(
-            f"Error, the `robocorp.actions` version is: {v}. "
-            "Expected it to be 0.0.4 or higher"
-        )
 
     python = get_python_exe_from_env(env)
 

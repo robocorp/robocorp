@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from . import __version__
+from ._errors_action_server import ActionServerValidationError
 
 log = logging.getLogger(__name__)
 
@@ -161,7 +162,7 @@ def _create_parser():
             "The minimum number of action processes that should always be kept alive, "
             "ready to process any incoming request."
         ),
-        default=1,
+        default=2,
     )
     start_parser.add_argument(
         "--max-processes",
@@ -493,10 +494,19 @@ To migrate the database to the current version
                         if not base_args.dir:
                             base_args.dir = ["."]
 
-                        for action_package_dir in base_args.dir:
-                            _actions_import.import_action_package(
-                                settings.datadir, os.path.abspath(action_package_dir)
+                        try:
+                            for action_package_dir in base_args.dir:
+                                _actions_import.import_action_package(
+                                    settings.datadir,
+                                    os.path.abspath(action_package_dir),
+                                )
+                        except ActionServerValidationError as e:
+                            print(
+                                "Unable to import action. Please fix the error below and retry.",
+                                file=sys.stderr,
                             )
+                            print(str(e), file=sys.stderr)
+                            return 1
                         return 0
 
                     elif command == "start":

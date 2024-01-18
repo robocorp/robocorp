@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.17 - 2024-01-19
+
+- By default the minimum number of processes is now 2.
+- Verify that the `robocorp-actions` version found is 0.0.6 or higher.
+    - Required for fixes running `@action` multiple times in the same process.
+
 ## 0.0.16 - 2024-01-18
 
 - If a process crashes while in the process pool idle processes it's not reused in a new run.
