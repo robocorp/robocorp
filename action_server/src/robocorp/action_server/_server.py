@@ -239,24 +239,30 @@ def start_server(
             settings.expose_url,
             settings.datadir,
             str(expose_session),
+            api_key,
         ]
         expose_subprocess = subprocess.Popen(args)
 
     def _on_started_message(self, **kwargs):
         (host, port) = _get_currrent_host()
 
-        padding_bottom = "" if (api_key or expose) else "\n"
         log.info(
-            colored("\n  ⚡️ Action Server started at: ", "green", attrs=["bold"])
-            + colored(f"http://{settings.address}:{port}{padding_bottom}", "light_blue")
+            colored("\n  ⚡️ Local Action Server: ", "green", attrs=["bold"])
+            + colored(f"http://{settings.address}:{port}", "light_blue")
         )
 
-        if api_key:
-            padding_bottom = "" if expose else "\n"
+        if not expose:
             log.info(
-                colored("  🔑 API Authorization key: ", attrs=["bold"])
-                + f'{{ "Authorization": "Bearer {api_key}"}}{padding_bottom}'
+                colored("     Public access: use ", attrs=["dark"])
+                + colored("--expose", attrs=["bold"])
+                + colored(" to expose\n", attrs=["dark"])
             )
+
+            if api_key:
+                log.info(
+                    colored("  🔑 API Authorization Bearer key: ", attrs=["bold"])
+                    + f"{api_key}\n"
+                )
 
     async def _on_startup():
         if expose:

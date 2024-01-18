@@ -115,13 +115,18 @@ async def handle_ping_pong(
 
 
 def handle_session_payload(
-    session_payload: SessionPayload, expose_url: str, datadir: str
+    session_payload: SessionPayload, expose_url: str, datadir: str, api_key: str | None
 ):
     url = f"https://{session_payload.sessionId}.{expose_url}"
     log.info(
         colored("  🌍 Public URL: ", "green", attrs=["bold"])
-        + colored(f"{url}\n", "light_blue")
+        + colored(f"{url}", "light_blue")
     )
+    if api_key:
+        log.info(
+            colored("  🔑 API Authorization Bearer key: ", attrs=["bold"])
+            + f"{api_key}\n"
+        )
     new_expose_session = get_expose_session(session_payload)
     write_expose_session_json(
         datadir=datadir,
@@ -156,6 +161,7 @@ async def expose_server(
     datadir: str,
     expose_session: str | None = None,
     ping_interval: int = 4,
+    api_key: str | None = None,
 ):
     """
     Exposes the server to the world.
@@ -203,7 +209,7 @@ async def expose_server(
                             try:
                                 session_payload = SessionPayload(**data)
                                 handle_session_payload(
-                                    session_payload, expose_url, datadir
+                                    session_payload, expose_url, datadir, api_key
                                 )
                             except ValidationError as e:
                                 if not session_payload:
@@ -238,7 +244,7 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session):
+def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session, api_key):
     from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
     logging.basicConfig(
@@ -256,6 +262,7 @@ def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session):
                 expose_url=expose_url,
                 datadir=datadir,
                 expose_session=expose_session if expose_session != "None" else None,
+                api_key=api_key,
             )
         )
     except KeyboardInterrupt:
