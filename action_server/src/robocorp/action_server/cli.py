@@ -371,7 +371,6 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     parser = _create_parser()
     base_args = parser.parse_args(args)
 
-
     command = base_args.command
     if not command:
         parser.print_help()
@@ -400,7 +399,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     ):
         print(f"Unexpected command: {command}.", file=sys.stderr)
         return 1
-    
+
     # Log to stdout.
     log_level = logging.DEBUG if base_args.verbose else logging.INFO
 
