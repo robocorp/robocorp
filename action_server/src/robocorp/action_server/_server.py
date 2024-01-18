@@ -245,15 +245,17 @@ def start_server(
     def _on_started_message(self, **kwargs):
         (host, port) = _get_currrent_host()
 
+        padding_bottom = "" if (api_key or expose) else "\n"
         log.info(
             colored("\n  ⚡️ Action Server started at: ", "green", attrs=["bold"])
-            + colored(f"http://{settings.address}:{port}", "light_blue")
+            + colored(f"http://{settings.address}:{port}{padding_bottom}", "light_blue")
         )
 
         if api_key:
+            padding_bottom = "" if expose else "\n"
             log.info(
                 colored("  🔑 API Authorization key: ", attrs=["bold"])
-                + f'{{ "Authorization": "Bearer {api_key}"}}'
+                + f'{{ "Authorization": "Bearer {api_key}"}}{padding_bottom}'
             )
 
     async def _on_startup():

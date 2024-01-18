@@ -7,7 +7,11 @@ from typing import Optional, Union
 from termcolor import colored
 
 from . import __version__
-from ._robo_utils.log_formatter import FormatterNoColor
+from ._robo_utils.log_formatter import (
+    FormatterNoColor,
+    FormatterStdout,
+    UvicornLogFilter,
+)
 
 log = logging.getLogger(__name__)
 
@@ -317,7 +321,8 @@ def _setup_stdout_logging(log_level):
             "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
         )
     else:
-        formatter = logging.Formatter("%(message)s", datefmt="[%X]")
+        formatter = FormatterStdout("%(message)s", datefmt="[%X]")
+        stream_handler.addFilter(UvicornLogFilter())
 
     stream_handler.setFormatter(formatter)
     logger = logging.root

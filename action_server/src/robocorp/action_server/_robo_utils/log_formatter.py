@@ -1,5 +1,8 @@
 import re
-from logging import Formatter
+from datetime import datetime
+from termcolor import colored
+from logging import Formatter, Filter
+from uvicorn.logging import AccessFormatter
 
 
 class FormatterNoColor(Formatter):
@@ -8,3 +11,32 @@ class FormatterNoColor(Formatter):
     def format(self, record):
         message = super().format(record)
         return self.strip_colors_regex.sub("", message)
+
+
+class FormatterStdout(Formatter):
+    def format(self, record):
+        if record.name.startswith("uvicorn"):
+            access_formatter = AccessFormatter()
+            (
+                client_addr,
+                method,
+                full_path,
+                http_version,
+                status_code,
+            ) = record.args
+
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            status_code = access_formatter.get_status_code(int(status_code))
+            return (
+                colored(f"{timestamp} - ", attrs=["dark"])
+                + colored(method, attrs=["bold"])
+                + f" {full_path} {status_code}"
+            )
+
+        return super().format(record)
+
+
+class UvicornLogFilter(Filter):
+    def filter(self, record):
+        # Log only Uvicorn Access messages
+        return not (record.name.startswith("uvicorn") and len(record.args) != 5)
