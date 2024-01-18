@@ -22,7 +22,7 @@ Robocorp Action Server makes your Python scripts compatible with ChatGPT and Lan
 
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=7aq6QDCaUmA" target="_blank">
+  <a href="https://www.youtube.com/watch?v=7aq6QDCaUmA">
     <img src="https://img.youtube.com/vi/7aq6QDCaUmA/0.jpg" alt="AI Actions Example">
   </a>
   <br/>
