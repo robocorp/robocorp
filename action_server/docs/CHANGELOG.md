@@ -1,8 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.0.16 - 2024-01-18
 
 - If a process crashes while in the process pool idle processes it's not reused in a new run.
+- When reusing processes, `@setup(scope="session")` is only called once and `@teardown(scope="session")` is no longer called.
+    - Requires `robocorp-actions 0.0.6`.
+    - Also fixes issue where files containing `@action` would be reimported on each new run when process is reused.
 
 ## 0.0.15 - 2024-01-16
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.9.0 - 2024-01-18
+
+- Provides support for calling `main` multiple times.
+    - Modules containing `@task` are no longer reimported anymore.
+    - Any `@task` that was already imported is still available for running in a new `main` call.
+    - `RC_TASKS_SKIP_SESSION_SETUP` env variable may be used to skip setup of new `@setup`s found.
+    - `RC_TASKS_SKIP_SESSION_TEARDOWN` env variable may be used to skip teardon of `@teardown`s found.
+
 ## 2.8.1 - 2024-01-14
 
 - Fix main README and update docs.

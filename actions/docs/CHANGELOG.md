@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.6 - 2024-01-18
+
+- Provides support for calling `main` multiple times.
+    - Modules containing `@action` are no longer reimported anymore.
+    - Any `@action` that was already imported is still available for running in a new `main` call.
+    - `RC_TASKS_SKIP_SESSION_SETUP` env variable may be used to skip setup of new `@setup`s found.
+    - `RC_TASKS_SKIP_SESSION_TEARDOWN` env variable may be used to skip teardon of `@teardown`s found.
+
 ## 0.0.5 - 2024-01-14
 
 - Fix main README and update docs.

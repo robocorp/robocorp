@@ -127,6 +127,7 @@ def _create_run(
                 output_file,
                 result_json,
                 headers,
+                actions_process_pool._reuse_processes,
             )
         )
         yield _RunInfo(

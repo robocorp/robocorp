@@ -205,6 +205,7 @@ class ProcessHandle:
         robot_artifacts: Path,
         result_json: Path,
         headers: Dict[str, str],
+        reuse_process: bool,
     ) -> int:
         msg = {
             "command": "run_action",
@@ -214,6 +215,7 @@ class ProcessHandle:
             "robot_artifacts": f"{robot_artifacts}",
             "result_json": f"{result_json}",
             "headers": headers,
+            "reuse_process": reuse_process,
         }
         self._writer.write(msg)
         queue = self._read_queue
@@ -228,6 +230,7 @@ class ProcessHandle:
         output_file: Path,
         result_json: Path,
         headers: Dict[str, str],
+        reuse_process: bool,
     ) -> int:
         """
         Runs the action and returns the returncode from running the action.
@@ -247,6 +250,7 @@ class ProcessHandle:
                     robot_artifacts,
                     result_json,
                     headers,
+                    reuse_process,
                 )
                 return returncode
 

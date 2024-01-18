@@ -172,6 +172,8 @@ def _run_action_in_thread(
             )
 
         actions_process_pool = get_actions_process_pool()
+        reuse_process = settings.reuse_processes
+
         with actions_process_pool.obtain_process_for_action(action) as process_handle:
             run_id = gen_uuid("run")
             relative_artifacts_path: str = _create_run_artifacts_dir(action, run_id)
@@ -208,6 +210,7 @@ def _run_action_in_thread(
                     output_file,
                     result_json,
                     headers,
+                    reuse_process,
                 )
 
                 if returncode == 0:

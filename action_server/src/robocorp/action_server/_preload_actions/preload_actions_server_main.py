@@ -204,9 +204,22 @@ class MessagesHandler:
                 robot_artifacts = message["robot_artifacts"]
                 result_json = message["result_json"]
                 headers = message["headers"]
+                reuse_process = message["reuse_process"]
 
                 os.environ["ROBOT_ARTIFACTS"] = robot_artifacts
                 os.environ["RC_ACTION_RESULT_LOCATION"] = result_json
+
+                if reuse_process:
+                    # Setup is skipped (for callbacks which still haven't been
+                    # executed)
+                    os.environ["RC_TASKS_SKIP_SESSION_SETUP"] = "1"
+
+                    # Teardown is skipped (for all callbacks).
+                    os.environ["RC_TASKS_SKIP_SESSION_TEARDOWN"] = "1"
+                else:
+                    os.environ.pop("RC_TASKS_SKIP_SESSION_TEARDOWN", None)
+                    os.environ.pop("RC_TASKS_SKIP_SESSION_SETUP", None)
+
                 if headers:
                     for key, value in headers.items():
                         if key and value:

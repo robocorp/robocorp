@@ -53,6 +53,32 @@ def test_bad_return_on_no_conda(
     )
 
 
+def test_global_return_reuse_process(
+    action_server_process: ActionServerProcess,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import get_in_resources
+
+    calculator = get_in_resources("no_conda", "calculator")
+    action_server_process.start(
+        db_file="server.db",
+        cwd=calculator,
+        actions_sync=True,
+        timeout=300,
+        min_processes=1,
+        max_processes=1,
+        reuse_processes=True,
+    )
+    found = client.post_get_str(
+        "api/actions/calculator/global-return-reuse-process/run", {}
+    )
+    assert found == '"1"'
+    found = client.post_get_str(
+        "api/actions/calculator/global-return-reuse-process/run", {}
+    )
+    assert found == '"2"'
+
+
 def test_import_no_conda(
     action_server_process: ActionServerProcess,
     data_regression,
