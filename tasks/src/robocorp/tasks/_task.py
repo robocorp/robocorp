@@ -46,12 +46,13 @@ def _build_properties(
 class Task:
     def __init__(
         self,
-        module: ModuleType,
+        module_name: str,
+        module_file: str,
         method: typing.Callable,
         options: Optional[Dict] = None,
     ):
-        self.module_name = module.__name__
-        self.filename = module.__file__ or "<filename unavailable>"
+        self.module_name = module_name
+        self.filename = module_file or "<filename unavailable>"
         self.method = method
         self.message = ""
         self.exc_info: Optional[OptExcInfo] = None
