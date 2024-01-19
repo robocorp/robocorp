@@ -331,7 +331,7 @@ jobs:
 
   release:
 
-    if: ${{ needs.deploy-s3.outputs.is_beta == 'true' }}
+    if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
 
     needs:
       - deploy-s3  # needed for check_beta
