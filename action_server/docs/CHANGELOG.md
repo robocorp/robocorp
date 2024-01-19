@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.18 - 2024-01-19
 
 - The response from a run now includes an `"X-Action-Server-Run-Id"` header containing the run id.
     - This makes it possible to query more information from `api/runs/{run_id}` after the run finishes.
