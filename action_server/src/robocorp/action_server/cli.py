@@ -4,14 +4,10 @@ import os.path
 import sys
 from pathlib import Path
 from typing import Optional, Union
+
 from termcolor import colored
 
 from . import __version__
-from ._robo_utils.log_formatter import (
-    FormatterNoColor,
-    FormatterStdout,
-    UvicornLogFilter,
-)
 from ._errors_action_server import ActionServerValidationError
 
 log = logging.getLogger(__name__)
@@ -322,6 +318,8 @@ def _setup_stdout_logging(log_level):
             "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
         )
     else:
+        from ._robo_utils.log_formatter import FormatterStdout, UvicornLogFilter
+
         formatter = FormatterStdout("%(message)s", datefmt="[%X]")
         stream_handler.addFilter(UvicornLogFilter())
 
@@ -332,6 +330,8 @@ def _setup_stdout_logging(log_level):
 
 def _setup_logging(datadir: Path, log_level):
     from logging.handlers import RotatingFileHandler
+
+    from ._robo_utils.log_formatter import FormatterNoColor
 
     log_file = str(datadir / "server_log.txt")
     log.info(colored(f"Logs may be found at: {log_file}.", attrs=["dark"]))
@@ -515,7 +515,7 @@ To migrate the database to the current version
                                 )
                         except ActionServerValidationError as e:
                             print(
-                                "Unable to import action. Please fix the error below and retry.",
+                                "\nUnable to import action. Please fix the error below and retry.",
                                 file=sys.stderr,
                             )
                             print(str(e), file=sys.stderr)
@@ -533,12 +533,20 @@ To migrate the database to the current version
                             if not base_args.dir:
                                 base_args.dir = ["."]
 
-                            for action_package_dir in base_args.dir:
-                                _actions_import.import_action_package(
-                                    settings.datadir,
-                                    os.path.abspath(action_package_dir),
-                                    disable_not_imported=base_args.actions_sync,
+                            try:
+                                for action_package_dir in base_args.dir:
+                                    _actions_import.import_action_package(
+                                        settings.datadir,
+                                        os.path.abspath(action_package_dir),
+                                        disable_not_imported=base_args.actions_sync,
+                                    )
+                            except ActionServerValidationError as e:
+                                print(
+                                    "\nUnable to import action. Please fix the error below and retry.",
+                                    file=sys.stderr,
                                 )
+                                print(str(e), file=sys.stderr)
+                                return 1
 
                         with use_runs_state_ctx(db):
                             from ._server import start_server
