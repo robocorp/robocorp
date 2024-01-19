@@ -335,7 +335,7 @@ jobs:
 
     needs:
       - deploy-s3  # needed for check_beta
-      - trigger-brew-workflow
+      # - trigger-brew-workflow
     
     defaults:
       run:
