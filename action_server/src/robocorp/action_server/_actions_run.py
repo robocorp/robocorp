@@ -6,7 +6,7 @@ import time
 import typing
 from typing import Annotated, Any, Dict, Optional
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 from fastapi.params import Header, Param
 from pydantic import BaseModel
 
@@ -133,6 +133,7 @@ def _set_run_as_running(run: "Run", initial_time: float):
 
 def _run_action_in_thread(
     action: "Action",
+    response: Response,
     signature: inspect.Signature,
     headers: Dict[str, str],
     *args,
@@ -177,6 +178,7 @@ def _run_action_in_thread(
 
         with actions_process_pool.obtain_process_for_action(action) as process_handle:
             run_id = gen_uuid("run")
+            response.headers["X-Action-Server-Run-Id"] = run_id
             relative_artifacts_path: str = _create_run_artifacts_dir(action, run_id)
             run: Run = _create_run(action, run_id, inputs, relative_artifacts_path)
 
@@ -254,20 +256,27 @@ def generate_func_from_action(action: "Action"):
     """
     This function generates a method from the given action.
 
-    def method(
-        name: Annotated[str, Param(description="This is the name")],
-        title: Annotated[str, Param(description="This is the title")] = None,
-    ) -> int:
-        pass
+        class CalculatorSumInput(BaseModel):
+            v1: Annotated[float, Param(description='First number.')]
+            v2: Annotated[float, Param(description='Second number.')]
 
-    class MethodInput(BaseModel):
-        name: Annotated[str, Param(description="This is the name")]
-        title: Annotated[str, Param(description="This is the title")] = None
+        def calculator_sum_as_params(
+            v1: Annotated[float, Param(description='First number.')],
+            v2: Annotated[float, Param(description='Second number.')]
+        )-> Annotated[float, Param(description='The sum of v1 + v2.')]:
 
-    def method(
-        args: MethodInput
-    ) -> int:
-        return 1
+            pass
+
+        def calculator_sum(
+            args:CalculatorSumInput,
+            response: Response,
+            x_action_trace: Optional[str] = Header(None, description='Client application run trace reference', alias='X-action-trace', include_in_schema=False)
+        ) -> Annotated[float, Param(description='The sum of v1 + v2.')]:
+
+            headers = {'x_action_trace': x_action_trace}
+            return _run_action_in_thread(action, signature, headers, args.v1, args.v2, __ret_type__='number')
+
+        signature = inspect.signature(calculator_sum_as_params)
     """
     input_schema_dict = json.loads(action.input_schema)
     output_schema_dict = json.loads(action.output_schema)
@@ -310,13 +319,13 @@ class {_name_as_class_name(action.name)}Input(BaseModel):
 def {action.name}_as_params({', '.join(arguments)}){ret}:
     pass
 
-def {action.name}(args:{_name_as_class_name(action.name)}Input, {", ".join(headers_as_params)}){ret}:
+def {action.name}(args:{_name_as_class_name(action.name)}Input, response: Response, {", ".join(headers_as_params)}){ret}:
     headers = {{{", ".join(headers_as_values)}}}
-    return _run_action_in_thread(action, signature, headers, {', '.join(argument_names)})
+    return _run_action_in_thread(action, response, signature, headers, {', '.join(argument_names)})
 
 signature = inspect.signature({action.name}_as_params)
 """
-
+    # print(f"Code:\n{code}")
     compiled = compile(code, "<string>", "exec")
     ctx: dict = {
         "Annotated": Annotated,
@@ -326,6 +335,7 @@ signature = inspect.signature({action.name}_as_params)
         "Optional": Optional,
         "action": action,
         "inspect": inspect,
+        "Response": Response,
         "_run_action_in_thread": _run_action_in_thread,
     }
     exec(compiled, ctx)

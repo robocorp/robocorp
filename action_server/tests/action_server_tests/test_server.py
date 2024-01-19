@@ -53,6 +53,39 @@ def test_bad_return_on_no_conda(
     )
 
 
+def test_run_id_in_response_header(
+    action_server_process: ActionServerProcess,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import get_in_resources
+
+    calculator = get_in_resources("no_conda", "calculator")
+    action_server_process.start(
+        db_file="server.db",
+        cwd=calculator,
+        actions_sync=True,
+        timeout=300,
+    )
+    import requests
+
+    result = requests.post(
+        client.build_full_url("api/actions/calculator/calculator-sum/run"),
+        json={"v1": 1, "v2": 2},
+    )
+    assert result.status_code == 200
+    assert json.loads(result.text) == 3
+    run_id = result.headers["X-Action-Server-Run-Id"]
+
+    result = requests.get(
+        client.build_full_url(f"api/runs/{run_id}"),
+    )
+
+    run_info = result.json()
+    assert json.loads(run_info["inputs"]) == {"v1": 1, "v2": 2}
+    assert json.loads(run_info["result"]) == 3
+    assert run_info["id"] == run_id
+
+
 def test_global_return_reuse_process(
     action_server_process: ActionServerProcess,
     client: ActionServerClient,
