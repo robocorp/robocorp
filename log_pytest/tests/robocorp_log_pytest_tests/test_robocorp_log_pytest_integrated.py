@@ -37,7 +37,7 @@ def run_pytest(
 
 
 def test_integrated(datadir, str_regression) -> None:
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    from robocorp.log._log_formatting import pretty_format_logs_from_log_html
 
     run_pytest(
         [

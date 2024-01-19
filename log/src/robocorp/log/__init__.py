@@ -763,26 +763,58 @@ def iter_decoded_log_format_from_log_html(log_html: Path) -> Iterator[dict]:
         Note: the exact format of the messages provided is not stable across
         releases.
     """
+
+    txt = log_html.read_text(encoding="utf-8")
+    return iter_decoded_log_format_from_log_html_contents(txt, log_html)
+
+
+def iter_decoded_log_format_from_log_html_contents(
+    log_html_contents: str, log_html: Optional[Path] = None
+) -> Iterator[dict]:
+    """
+    Reads the data saved in the log html and provides decoded messages (dicts).
+
+    Returns:
+        An iterator which will decode the messages and provides a dictionary for
+        each message found.
+
+        Example of messages provided:
+
+        ```python
+        {'message_type': 'V', 'version': '1'}
+        {'message_type': 'T', 'time': '2022-10-31T07:45:57.116'}
+        {'message_type': 'ID', 'part': 1, 'id': 'gen-from-output-xml'}
+        {'message_type': 'SR', 'name': 'Robot Check', 'time_delta_in_seconds': 0.3}
+        ...
+        ```
+
+        Note: the exact format of the messages provided is not stable across
+        releases.
+    """
     import base64
     import zlib
     from ast import literal_eval
 
-    txt = log_html.read_text(encoding="utf-8")
-    i = txt.find("let chunks = [")
-    j = txt.find("];", i)
+    i = log_html_contents.find("let chunks = [")
+    j = log_html_contents.find("];", i)
 
     if i < 0 or j < 0:
         # It may be that we're in dev mode and the target should be the bundle.js
+        if log_html is None:
+            raise AssertionError("Unable to find chunks in log html contents.")
+
         bundle_js = log_html.parent / "bundle.js"
         if bundle_js.exists():
-            txt = bundle_js.read_text(encoding="utf-8")
-            i = txt.find("let chunks = [")
-            j = txt.find("];", i)
+            log_html_contents = bundle_js.read_text(encoding="utf-8")
+            i = log_html_contents.find("let chunks = [")
+            j = log_html_contents.find("];", i)
 
-    assert i > 0, f"Could not find the chunks in the file ({log_html})."
+    assert (
+        i > 0
+    ), f"Could not find the chunks in the file ({log_html or '<log_html_not_provided>'})."
     assert j > 0, "Could not find the end of the chunks in the file."
 
-    sub = txt[i + len("let chunks = ") : j + 1]
+    sub = log_html_contents[i + len("let chunks = ") : j + 1]
     # We have something as:
     # ['base64strZippedStr', 'base64strZippedStr']
     # so, at this point decode it and unzip it

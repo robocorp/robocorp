@@ -58,6 +58,7 @@ def test_run_id_in_response_header(
     client: ActionServerClient,
 ) -> None:
     from action_server_tests.fixtures import get_in_resources
+    from robocorp.log._log_formatting import pretty_format_logs_from_log_html_contents
 
     calculator = get_in_resources("no_conda", "calculator")
     action_server_process.start(
@@ -84,6 +85,39 @@ def test_run_id_in_response_header(
     assert json.loads(run_info["inputs"]) == {"v1": 1, "v2": 2}
     assert json.loads(run_info["result"]) == 3
     assert run_info["id"] == run_id
+
+    artifacts_response = client.get_json(
+        f"api/runs/{run_id}/artifacts/text-content",
+        params={
+            "artifact_names": [
+                "log.html",
+            ]
+        },
+    )
+    log_html_contents = artifacts_response["log.html"]
+    log_pretty_printed = pretty_format_logs_from_log_html_contents(log_html_contents)
+
+    # Note: there are more contents, but the ones below are the ones we cane about
+    expected = """
+SR: calculator_tasks.py - calculator_sum
+    ST: Collect tasks
+    ET: PASS
+    ST: calculator_sum
+        SE: METHOD: calculator_sum
+            EA: float: v1: 1.0
+            EA: float: v2: 2.0
+            R: float: 3.0
+        EE: METHOD: PASS
+        SE: METHOD: on_teardown_save_result
+        EE: METHOD: PASS
+    ET: PASS
+    ST: Teardown tasks
+    ET: PASS
+ER: PASS
+"""
+
+    for line in expected:
+        assert line in log_pretty_printed, f"'{line}' not in:\n{log_pretty_printed}"
 
 
 def test_global_return_reuse_process(

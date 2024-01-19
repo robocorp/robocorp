@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added auxiliary function `iter_decoded_log_format_from_log_html_contents` to `robocorp.log` to public API.
+
 ## 2.8.1 - 2024-01-14
 
 - Fix main README and update docs.

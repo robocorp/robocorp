@@ -4,6 +4,7 @@
 
 - The response from a run now includes an `"X-Action-Server-Run-Id"` header containing the run id.
     - This makes it possible to query more information from `api/runs/{run_id}` after the run finishes.
+- Fixed issue where `@action` code would not have logging in place.
 
 ## 0.0.17 - 2024-01-19
 

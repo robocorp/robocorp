@@ -19,7 +19,7 @@ class _DummyStdin(object):
     def __init__(self, original_stdin=sys.stdin, *args, **kwargs):
         try:
             self.encoding = sys.stdin.encoding
-        except:
+        except Exception:
             # Not sure if it's available in all Python versions...
             pass
         self.original_stdin = original_stdin
@@ -28,7 +28,7 @@ class _DummyStdin(object):
             self.errors = (
                 sys.stdin.errors
             )  # Who knew? sys streams have an errors attribute!
-        except:
+        except Exception:
             # Not sure if it's available in all Python versions...
             pass
 
@@ -107,7 +107,7 @@ def socket_connect(host, port):
         s.settimeout(DEFAULT_TIMEOUT if USE_TIMEOUTS else NO_TIMEOUT)
         s.connect((host, port))
         s.settimeout(None)  # no timeout after connected
-    except:
+    except Exception:
         raise RuntimeError("Could not connect to %s: %s", host, port)
 
     rfile = s.makefile("rb")
@@ -147,21 +147,24 @@ class MessagesHandler:
         self._jsonrpc_stream_writer = JsonRpcStreamWriter(write_stream)
 
     def start(self):
-        import io
-        from contextlib import redirect_stderr, redirect_stdout
-
         self._jsonrpc_stream_reader.start()
 
+        # Removed for now: this messes up the logging because
+        # by the time the imports are done it's important that the
+        # needed scaffolding to collect the log contents is in place.
+        #
+        # import io
+        # from contextlib import redirect_stderr, redirect_stdout
         # Collect actions so that it's ready to go when requested.
-        s = io.StringIO()
-        try:
-            from robocorp.actions import cli
-
-            with redirect_stdout(s), redirect_stderr(s):
-                cli.main(["list"], exit=False)
-        except BaseException:
-            print(s.getvalue())
-            traceback.print_exc()
+        # s = io.StringIO()
+        # try:
+        #     from robocorp.actions import cli
+        #
+        #     with redirect_stdout(s), redirect_stderr(s):
+        #         cli.main(["list"], exit=False)
+        # except BaseException:
+        #     print(s.getvalue())
+        #     traceback.print_exc()
 
         while True:
             msg = self._readqueue.get()
