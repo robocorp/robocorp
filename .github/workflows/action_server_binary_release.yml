@@ -368,7 +368,7 @@ jobs:
             name: Linux-action-server-unsigned
             path: linux64/
       - name: Rename Linux binary
-        run: ls -al linux64/
+        run: mv linux64/action-server-unisigned linux64/action-server && ls -al linux64
 
       # Upload binaries to release
 
@@ -376,21 +376,21 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: linux64/action-server
+          file: ./linux64/action-server
           asset_name: action-server-$tag-ubuntu64
           tag: ${{ github.ref }}
       - name: Upload MacOS binary
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: macos64/action-server
+          file: ./macos64/action-server
           asset_name: action-server-$tag-ubuntu64
           tag: ${{ github.ref }}
       - name: Upload Windows binary
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: windows64/action-server.exe
+          file: ./windows64/action-server.exe
           asset_name: action-server-$tag-ubuntu64
           tag: ${{ github.ref }}
 
