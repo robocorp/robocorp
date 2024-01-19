@@ -379,6 +379,7 @@ jobs:
           file: ./linux64/action-server
           asset_name: action-server-$tag-ubuntu64
           tag: ${{ github.ref }}
+          overwrite: true
       - name: Upload MacOS binary
         uses: svenstaro/upload-release-action@v2
         with:
@@ -386,6 +387,7 @@ jobs:
           file: ./macos64/action-server
           asset_name: action-server-$tag-ubuntu64
           tag: ${{ github.ref }}
+          overwrite: true
       - name: Upload Windows binary
         uses: svenstaro/upload-release-action@v2
         with:
@@ -393,4 +395,5 @@ jobs:
           file: ./windows64/action-server.exe
           asset_name: action-server-$tag-ubuntu64
           tag: ${{ github.ref }}
+          overwrite: true
 
