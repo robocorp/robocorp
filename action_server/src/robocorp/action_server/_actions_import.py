@@ -5,6 +5,7 @@ import sys
 import typing
 from pathlib import Path
 from typing import Optional
+from termcolor import colored
 
 if typing.TYPE_CHECKING:
     from robocorp.action_server._models import ActionPackage
@@ -45,7 +46,7 @@ def import_action_package(
     from ._robo_utils.process import build_python_launch_env
     from ._settings import is_frozen
 
-    log.info("Importing action package from: %s", action_package_dir)
+    log.debug("Importing action package from: %s", action_package_dir)
 
     datadir = datadir.absolute()
     import_path = Path(action_package_dir).absolute()
@@ -87,7 +88,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         if not contents.get("dependencies"):
             raise ActionPackageError(f"{conda_yaml} has no 'dependencies' specified.")
 
-        log.info(
+        log.debug(
             f"""Actions added with managed environment defined by: {conda_yaml}."""
         )
 
@@ -129,7 +130,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
 
     python_exe = use_env.get("PYTHON_EXE")
     if python_exe:
-        log.info(f"Python interpreter path: {python_exe}")
+        log.info(colored(f"Python interpreter path: {python_exe}", attrs=["dark"]))
 
     action_package = ActionPackage(
         id=action_package_id,
@@ -138,7 +139,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         conda_hash=condahash,
         env_json=json.dumps(use_env),
     )
-    log.info(f"Collecting actions for Action Package: {name}.")
+    log.debug(f"Collecting actions for Action Package: {name}.")
 
     env = build_python_launch_env(use_env)
 
@@ -306,7 +307,7 @@ def _add_actions_to_db(
 
         seen_action_ids = set()
         with db.transaction():
-            log.info("Updating action package: %s", action_package.name)
+            log.debug("Updating action package: %s", action_package.name)
             db.update_by_id(
                 ActionPackage,
                 existing_action_package.id,
@@ -322,7 +323,7 @@ def _add_actions_to_db(
                     # This is an existing action, we need to update it.
                     new_action_as_dict = asdict(action)
                     del new_action_as_dict["id"]
-                    log.info("Updating action: %s", action.name)
+                    log.debug("Updating action: %s", action.name)
                     db.update_by_id(Action, existing_action.id, new_action_as_dict)
                     seen_action_ids.add(existing_action.id)
                 else:

@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional
+from termcolor import colored
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +95,7 @@ class Settings:
             short_hash = hashlib.sha256(as_posix.encode()).hexdigest()[:8]
             datadir_name = f"{get_default_settings_dir()}/{name}_{short_hash}"
 
-            log.info(f"Using datadir (scoped to the current directory): {datadir_name}")
+            log.info(colored(f"Using datadir: {datadir_name}", attrs=["dark"]))
             user_expanded_datadir = Path(datadir_name).expanduser()
 
         else:

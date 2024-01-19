@@ -6,6 +6,7 @@ import subprocess
 import sys
 from functools import partial
 from typing import Dict, Optional
+from termcolor import colored
 
 log = logging.getLogger(__name__)
 
@@ -238,17 +239,30 @@ def start_server(
             settings.expose_url,
             settings.datadir,
             str(expose_session),
+            api_key,
         ]
         expose_subprocess = subprocess.Popen(args)
 
     def _on_started_message(self, **kwargs):
         (host, port) = _get_currrent_host()
-        log.info(f"\n  ⚡️ Action Server started at http://{settings.address}:{port}")
 
-        if api_key:
+        log.info(
+            colored("\n  ⚡️ Local Action Server: ", "green", attrs=["bold"])
+            + colored(f"http://{settings.address}:{port}", "light_blue")
+        )
+
+        if not expose:
             log.info(
-                f'  🔑 API Authorization key: {{ "Authorization": "Bearer {api_key}"}}'
+                colored("     Public access: use ", attrs=["dark"])
+                + colored("--expose", attrs=["bold"])
+                + colored(" to expose\n", attrs=["dark"])
             )
+
+            if api_key:
+                log.info(
+                    colored("  🔑 API Authorization Bearer key: ", attrs=["bold"])
+                    + f"{api_key}\n"
+                )
 
     async def _on_startup():
         if expose:

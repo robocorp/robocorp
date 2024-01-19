@@ -30,6 +30,7 @@ robocorp-actions = "^0.0.6"
 websockets = "^12.0"
 requests = "^2"
 psutil = "^5"
+termcolor = "^2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = { path = "../devutils/", develop = true }

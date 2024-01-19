@@ -124,7 +124,7 @@ class ActionServerProcess:
             env["RC_ADD_SHUTDOWN_API"] = "1"
         process = self._process = Process(new_args, cwd=cwd, env=env)
 
-        compiled = re.compile(r"Action Server started at http://([\w.-]+):(\d+)")
+        compiled = re.compile(r"Local Action Server: http://([\w.-]+):(\d+)")
         future: Future[Tuple[str, str]] = Future()
 
         def collect_port_from_stdout(line):

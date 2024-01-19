@@ -6,6 +6,7 @@ import time
 import typing
 from typing import Annotated, Any, Dict, Optional
 
+from fastapi import HTTPException
 from fastapi.params import Header, Param
 from pydantic import BaseModel
 
@@ -242,7 +243,7 @@ def _run_action_in_thread(
 
             except BaseException as e:
                 _set_run_as_finished_failed(run, str(e), initial_time)
-                raise
+                raise HTTPException(status_code=500, detail=str(e))
 
 
 def _name_as_class_name(name):

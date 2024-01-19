@@ -4,8 +4,14 @@ import os.path
 import sys
 from pathlib import Path
 from typing import Optional, Union
+from termcolor import colored
 
 from . import __version__
+from ._robo_utils.log_formatter import (
+    FormatterNoColor,
+    FormatterStdout,
+    UvicornLogFilter,
+)
 from ._errors_action_server import ActionServerValidationError
 
 log = logging.getLogger(__name__)
@@ -311,11 +317,13 @@ def _setup_stdout_logging(log_level):
     stream_handler = StreamHandler()
     stream_handler.setLevel(log_level)
     if log_level == logging.DEBUG:
+        os.environ["NO_COLOR"] = "true"
         formatter = logging.Formatter(
             "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
         )
     else:
-        formatter = logging.Formatter("%(message)s", datefmt="[%X]")
+        formatter = FormatterStdout("%(message)s", datefmt="[%X]")
+        stream_handler.addFilter(UvicornLogFilter())
 
     stream_handler.setFormatter(formatter)
     logger = logging.root
@@ -326,13 +334,13 @@ def _setup_logging(datadir: Path, log_level):
     from logging.handlers import RotatingFileHandler
 
     log_file = str(datadir / "server_log.txt")
-    log.info(f"Logs may be found at: {log_file}.")
+    log.info(colored(f"Logs may be found at: {log_file}.", attrs=["dark"]))
     rotating_handler = RotatingFileHandler(
         log_file, maxBytes=1_000_000, backupCount=3, encoding="utf-8"
     )
     rotating_handler.setLevel(log_level)
     rotating_handler.setFormatter(
-        logging.Formatter(
+        FormatterNoColor(
             "%(asctime)s [%(levelname)s] %(message)s", datefmt="[%Y-%m-%d %H:%M:%S]"
         )
     )
@@ -400,6 +408,11 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     logger.setLevel(log_level)
 
     _setup_stdout_logging(log_level)
+
+    log.info(
+        colored("\n  ⚡️ Starting Action Server ", attrs=["bold"])
+        + colored(f"v{__version__}\n", attrs=["dark"])
+    )
 
     from ._settings import setup_settings
 
@@ -512,7 +525,7 @@ To migrate the database to the current version
                     elif command == "start":
                         # start imports the current directory by default
                         # (unless --actions-sync=false is specified).
-                        log.info("Synchronize actions: %s", base_args.actions_sync)
+                        log.debug("Synchronize actions: %s", base_args.actions_sync)
 
                         rcc.feedack_metric("action-server.started", __version__)
 
@@ -541,7 +554,13 @@ To migrate the database to the current version
                                 )
                                 if expose_session and not base_args.expose_allow_reuse:
                                     confirm = input(
-                                        f"Resume previous expose URL {expose_session.url} Y/N? [Y] "
+                                        colored(
+                                            "> Resume previous expose URL ",
+                                            attrs=["bold"],
+                                        )
+                                        + colored(expose_session.url, "light_blue")
+                                        + colored(" Y/N?", attrs=["bold"])
+                                        + colored(" [Y]", attrs=["dark"])
                                     )
                                     if confirm.lower() == "y" or confirm == "":
                                         log.debug("Resuming previous expose session")

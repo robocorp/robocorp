@@ -8,6 +8,7 @@ import threading
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Set
+from termcolor import colored
 
 from robocorp.action_server._models import Action, ActionPackage
 
@@ -160,7 +161,11 @@ class ProcessHandle:
                 if not line:
                     break
                 line = line.decode("utf-8", "replace")
-                print(f"output (pid: {pid}): {line.strip()}\n", end="")
+                print(
+                    colored(f"output (pid: {pid}): ", attrs=["dark"])
+                    + f"{line.strip()}\n",
+                    end="",
+                )
                 self._on_stderr(line)
 
         stderr = self._process.stderr
