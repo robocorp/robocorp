@@ -347,7 +347,7 @@ jobs:
         uses: Roang-zero1/github-create-release-action@v3
         with:
           release_title: ${{ github.ref_name }}
-          # TODO: once we have a changelog, add the URL
+          changelog_file: actions_server/docs/CHANGELOG.md
           release_text: Binaries available as assets. Run `<executable_name> help` for usage instructions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
