@@ -1083,13 +1083,13 @@ tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
 name = "robocorp-tasks"
-version = "2.8.1"
+version = "2.9.0"
 description = "The automation framework for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_tasks-2.8.1-py3-none-any.whl", hash = "sha256:1d8dffd3147f6698dc4abdefac723e12c735f6018488e754ee10a04090a9f06f"},
-    {file = "robocorp_tasks-2.8.1.tar.gz", hash = "sha256:db99e370d183b4ab7a4ecdc835e40072828dd6ea24d0df66a3ce7ea7ad9259b5"},
+    {file = "robocorp_tasks-2.9.0-py3-none-any.whl", hash = "sha256:24887d9fdba7a0b1f78fc7a4f2676c9fe0706680b648ec45c97b4d42048b3823"},
+    {file = "robocorp_tasks-2.9.0.tar.gz", hash = "sha256:93a1851a49884fede05b0dd3dd817b918def65210a232e0adf35e2651d49b1d5"},
 ]
 
 [package.dependencies]
@@ -1412,4 +1412,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "fa4f3d0279bb2035331090d9bbfd6a91e650c4d9da7f130383d9a6d9a386c474"
+content-hash = "42abd69b661df2aa3639b8ef8ef988fc09a139ffbcb0a923f4ab5ac8b2a50335"
