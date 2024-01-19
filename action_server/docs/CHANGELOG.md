@@ -3,6 +3,8 @@
 ## 0.0.17 - 2024-01-19
 
 - By default the minimum number of processes is now 2.
+- Console/log output improved.
+- Full traceback no longer shown if `robocorp-actions` version does not match the one expected.
 - Verify that the `robocorp-actions` version found is 0.0.6 or higher.
     - Required for fixes running `@action` multiple times in the same process.
 
