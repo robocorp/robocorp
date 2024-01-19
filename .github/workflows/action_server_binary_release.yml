@@ -226,12 +226,12 @@ jobs:
       is_beta: ${{ steps.check_beta.outputs.is_beta }}
 
     steps:
+      - uses: actions/checkout@v4
 
       - name: Check if this is a beta release
         id: check_beta
         run: echo "is_beta=${{ endsWith(github.ref_name, '-beta') }}" >> $GITHUB_ENV
 
-      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
             name: action-server-signed-windows
