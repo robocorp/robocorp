@@ -33,6 +33,52 @@ def test_schema_request_no_actions_registered(
     data_regression.check(json.loads(openapi_json))
 
 
+def test_bad_return_on_no_conda(
+    action_server_process: ActionServerProcess,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import get_in_resources
+
+    calculator = get_in_resources("no_conda", "calculator")
+    action_server_process.start(
+        db_file="server.db",
+        cwd=calculator,
+        actions_sync=True,
+        timeout=300,
+    )
+    found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
+    assert found.json()["message"] == (
+        "Error in action. Expected return type: string. "
+        "Found return type: <class 'NoneType'> (value: None)."
+    )
+
+
+def test_global_return_reuse_process(
+    action_server_process: ActionServerProcess,
+    client: ActionServerClient,
+) -> None:
+    from action_server_tests.fixtures import get_in_resources
+
+    calculator = get_in_resources("no_conda", "calculator")
+    action_server_process.start(
+        db_file="server.db",
+        cwd=calculator,
+        actions_sync=True,
+        timeout=300,
+        min_processes=1,
+        max_processes=1,
+        reuse_processes=True,
+    )
+    found = client.post_get_str(
+        "api/actions/calculator/global-return-reuse-process/run", {}
+    )
+    assert found == '"1"'
+    found = client.post_get_str(
+        "api/actions/calculator/global-return-reuse-process/run", {}
+    )
+    assert found == '"2"'
+
+
 def test_import_no_conda(
     action_server_process: ActionServerProcess,
     data_regression,
@@ -273,6 +319,59 @@ def test_routes(action_server_process: ActionServerProcess, data_regression):
     assert run0["id"] == runs[0]["id"]
 
     client.get_error("/api/runs/bad-run-id", 404)
+
+
+def test_server_url_flag(action_server_process: ActionServerProcess, data_regression):
+    action_server_process.start(additional_args=["--server-url=https://foo.bar"])
+
+    client = ActionServerClient(action_server_process)
+    openapi_json = client.get_openapi_json()
+    spec = json.loads(openapi_json)
+    data_regression.check(spec)
+
+
+def test_auth_routes(action_server_process: ActionServerProcess, data_regression):
+    from action_server_tests.fixtures import get_in_resources
+
+    pack = get_in_resources("no_conda", "greeter")
+    action_server_process.start(
+        cwd=pack,
+        actions_sync=True,
+        db_file="server.db",
+        additional_args=["--api-key=Foo"],
+    )
+
+    client = ActionServerClient(action_server_process)
+    openapi_json = client.get_openapi_json()
+    spec = json.loads(openapi_json)
+    data_regression.check(spec)
+
+    client.post_error("api/actions/greeter/greet/run", 403)
+
+    found = client.post_get_str(
+        "api/actions/greeter/greet/run",
+        {"name": "Foo"},
+        {"Authorization": "Bearer Foo"},
+    )
+    assert found == '"Hello Mr. Foo."', f"{found} != '\"Hello Mr. Foo.\"'"
+
+
+def test_server_process_pool(
+    action_server_process: ActionServerProcess, data_regression
+):
+    from action_server_tests.fixtures import get_in_resources
+
+    no_conda_dir = get_in_resources("no_conda")
+
+    action_server_process.start(
+        cwd=no_conda_dir,
+        actions_sync=True,
+        db_file="server.db",
+        add_shutdown_api=True,
+        min_processes=1,
+        max_processes=2,
+        reuse_processes=True,
+    )
 
 
 def test_subprocesses_killed(

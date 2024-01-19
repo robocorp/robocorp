@@ -78,40 +78,6 @@ components:
       - size_in_bytes
       title: ArtifactInfo
       type: object
-    BrokenActionInput:
-      properties: {}
-      title: BrokenActionInput
-      type: object
-    CalculatorSumInput:
-      properties:
-        v1:
-          description: First number.
-          title: V1
-          type: number
-        v2:
-          description: Second number.
-          title: V2
-          type: number
-      required:
-      - v1
-      - v2
-      title: CalculatorSumInput
-      type: object
-    GreetInput:
-      properties:
-        name:
-          description: The name of the person to greet.
-          title: Name
-          type: string
-        title:
-          default: Mr.
-          description: The title for the persor (Mr., Mrs., ...).
-          title: Title
-          type: string
-      required:
-      - name
-      title: GreetInput
-      type: object
     HTTPValidationError:
       properties:
         errors:
@@ -212,83 +178,6 @@ paths:
                 type: array
           description: Successful Response
       summary: List Action Packages
-  /api/actions/calculator/broken-action/run:
-    post:
-      description: This always raises an error.
-      operationId: broken_action
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BrokenActionInput'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                title: Response Broken Action
-                type: integer
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      summary: Broken Action
-  /api/actions/calculator/calculator-sum/run:
-    post:
-      description: Sums 2 numbers and returns them.
-      operationId: calculator_sum
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CalculatorSumInput'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                description: The sum of v1 + v2.
-                title: Response Calculator Sum
-                type: number
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      summary: Calculator Sum
-  /api/actions/greeter/greet/run:
-    post:
-      description: Provides a greeting for a person.
-      operationId: greet
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GreetInput'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                description: The greeting for the person.
-                title: Response Greet
-                type: string
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      summary: Greet
   /api/runs:
     get:
       operationId: list_runs_api_runs_get
@@ -467,4 +356,4 @@ paths:
           description: Successful Response
       summary: Serve Log Html
 servers:
-- url: http://localhost:0
+- url: https://foo.bar

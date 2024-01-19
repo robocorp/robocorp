@@ -30,3 +30,20 @@ def neverending_action() -> str:
 
     time.sleep(500)
     raise RuntimeError("Should never get here...")
+
+
+@action
+def bad_return_none():
+    """
+    Return None when string is expected
+    """
+
+
+global_value = 0
+
+
+@action
+def global_return_reuse_process():
+    global global_value
+    global_value += 1
+    return str(global_value)

@@ -60,13 +60,15 @@ action-server start --expose
 
 ## What do you need in your Action Package
 
-An `Action Package` is currently defined as a local folder that contains at least one Python file containing an action entry point (a Python function marked with `@action` -decorator from `robocorp.actions`).
+An `Action Package` is currently defined as a local folder that contains at least one Python file containing an action entry point 
+(a Python function marked with `@action` -decorator from `robocorp.actions`).
 
-Optionally, you can have a `conda.yaml` for specifying the
-Python environment and dependencies for your Action (if a `conda.yaml` is
-present, then [RCC](https://github.com/robocorp/rcc/) will be used to 
-automatically bootstrap it and keep it updated given the `conda.yaml` contents.
+The `conda.yaml` file is required for specifying the Python environment and dependencies for 
+your Action ([RCC](https://github.com/robocorp/rcc/) will be used to 
+automatically bootstrap it and keep it updated given the `conda.yaml` contents).
 
+Note: the `conda.yaml` is optional if the action server is not being used as a standalone
+(i.e.: if it was pip-installed it can use the same python environment where it's installed).
 
 *See*: [More information on `conda.yaml`](https://robocorp.com/docs/setup/installing-python-package-dependencies). 
 

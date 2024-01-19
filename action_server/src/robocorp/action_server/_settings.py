@@ -61,6 +61,11 @@ class Settings:
     verbose: bool = False
     db_file: str = "server.db"
     expose_url: str = "robocorp.link"
+    server_url: str = "http://localhost:8080"
+
+    min_processes: int = 0
+    max_processes: int = 20
+    reuse_processes: bool = False
 
     @classmethod
     def defaults(cls):
@@ -100,11 +105,21 @@ class Settings:
 
         settings = Settings(datadir=datadir, artifacts_dir=datadir / "artifacts")
         # Optional (just in 'start' command, not in 'import')
-        if hasattr(args, "address"):
-            settings.address = args.address
+        for attr in (
+            "address",
+            "port",
+            "min_processes",
+            "max_processes",
+            "reuse_processes",
+        ):
+            assert hasattr(settings, attr)
+            if hasattr(args, attr):
+                setattr(settings, attr, getattr(args, attr))
 
-        if hasattr(args, "port"):
-            settings.port = args.port
+        if hasattr(args, "server_url") and args.server_url is not None:
+            settings.server_url = args.server_url
+        else:
+            settings.server_url = f"http://{settings.address}:{settings.port}"
 
         # Used in either import or start commands.
         settings.verbose = args.verbose

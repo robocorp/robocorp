@@ -14,6 +14,10 @@ def _fix_pythonpath():
         # remove it.
         del sys.modules["tasks"]
 
+    from robocorp.tasks._collect_tasks import clear_previously_collected_tasks
+
+    clear_previously_collected_tasks()
+
     yield
 
     if "tasks" in sys.modules:

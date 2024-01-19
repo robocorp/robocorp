@@ -47,18 +47,25 @@ def _stream_reader(stream, on_output):
 
 
 def _start_reader_threads(process, on_stdout, on_stderr):
-    threads = [
-        threading.Thread(
-            target=_stream_reader,
-            args=(process.stdout, on_stdout),
-            name="stream_reader_stdout",
-        ),
-        threading.Thread(
-            target=_stream_reader,
-            args=(process.stderr, on_stderr),
-            name="stream_reader_stderr",
-        ),
-    ]
+    threads = []
+    if on_stdout is not None:
+        threads.append(
+            threading.Thread(
+                target=_stream_reader,
+                args=(process.stdout, on_stdout),
+                name="stream_reader_stdout",
+            )
+        )
+
+    if on_stderr is not None:
+        threads.append(
+            threading.Thread(
+                target=_stream_reader,
+                args=(process.stderr, on_stderr),
+                name="stream_reader_stderr",
+            )
+        )
+
     for t in threads:
         t.start()
 
@@ -103,7 +110,7 @@ class Process:
             )
         self._proc.wait()
 
-    def start(self) -> None:
+    def start(self, read_stderr: bool = True, read_stdout: bool = True) -> None:
         kwargs = build_subprocess_kwargs(
             self._cwd, self._env, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
@@ -114,7 +121,14 @@ class Process:
             partial(_popen_raise, self._args, **kwargs)
         )
         log.debug("Subprocess started [pid=%s,uid=%d]", proc.pid, self._uid)
-        _start_reader_threads(self._proc, self._on_stderr, self._on_stdout)
+        on_stdout = None
+        if read_stdout:
+            on_stdout = self._on_stdout
+
+        on_stderr = None
+        if read_stderr:
+            on_stderr = self._on_stderr
+        _start_reader_threads(self._proc, on_stdout, on_stderr)
 
     def _on_stderr(self, line):
         if len(self.on_stderr) > 0:

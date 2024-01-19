@@ -27,7 +27,7 @@ def methodb(a: str = "a") -> int:
 def test_task_schema():
     from robocorp.tasks._task import Task
 
-    task = Task(sys.modules[__name__], methoda)
+    task = Task(__name__, __file__, methoda)
     input_schema = task.input_schema
     assert input_schema == {
         "additionalProperties": False,
@@ -38,7 +38,7 @@ def test_task_schema():
         "type": "object",
     }
 
-    task = Task(sys.modules[__name__], methodb)
+    task = Task(__name__, __file__, methodb)
     input_schema = task.input_schema
     assert input_schema == {
         "additionalProperties": False,
@@ -53,10 +53,10 @@ def test_task_schema():
         "type": "object",
     }
 
-    task = Task(sys.modules[__name__], methodb)
+    task = Task(__name__, __file__, methodb)
     output_schema = task.output_schema
     assert output_schema == {"type": "integer", "description": "The number 1."}
 
-    task = Task(sys.modules[__name__], methoda, options=dict(is_consequential=True))
+    task = Task(__name__, __file__, methoda, options=dict(is_consequential=True))
     options = task.options
     assert options["is_consequential"] is True

@@ -202,7 +202,6 @@ def run(
         read_robocorp_auto_log_config,
     )
 
-    from robocorp.tasks._exceptions import InvalidArgumentsError
     from robocorp.tasks._interrupts import interrupt_on_timeout
 
     from ._collect_tasks import collect_tasks

@@ -78,25 +78,6 @@ components:
       - size_in_bytes
       title: ArtifactInfo
       type: object
-    BrokenActionInput:
-      properties: {}
-      title: BrokenActionInput
-      type: object
-    CalculatorSumInput:
-      properties:
-        v1:
-          description: First number.
-          title: V1
-          type: number
-        v2:
-          description: Second number.
-          title: V2
-          type: number
-      required:
-      - v1
-      - v2
-      title: CalculatorSumInput
-      type: object
     GreetInput:
       properties:
         name:
@@ -193,6 +174,10 @@ components:
       - type
       title: ValidationError
       type: object
+  securitySchemes:
+    HTTPBearer:
+      scheme: bearer
+      type: http
 info:
   title: Robocorp Actions Server
   version: 0.1.0
@@ -212,57 +197,6 @@ paths:
                 type: array
           description: Successful Response
       summary: List Action Packages
-  /api/actions/calculator/broken-action/run:
-    post:
-      description: This always raises an error.
-      operationId: broken_action
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BrokenActionInput'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                title: Response Broken Action
-                type: integer
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      summary: Broken Action
-  /api/actions/calculator/calculator-sum/run:
-    post:
-      description: Sums 2 numbers and returns them.
-      operationId: calculator_sum
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CalculatorSumInput'
-        required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                description: The sum of v1 + v2.
-                title: Response Calculator Sum
-                type: number
-          description: Successful Response
-        '422':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-          description: Validation Error
-      summary: Calculator Sum
   /api/actions/greeter/greet/run:
     post:
       description: Provides a greeting for a person.
@@ -288,6 +222,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
+      security:
+      - HTTPBearer: []
       summary: Greet
   /api/runs:
     get:

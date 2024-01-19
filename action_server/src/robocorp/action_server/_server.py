@@ -7,8 +7,6 @@ import sys
 from functools import partial
 from typing import Dict, Optional
 
-from ._server_expose import get_expose_session_payload, read_expose_session_json
-
 log = logging.getLogger(__name__)
 
 
@@ -23,13 +21,17 @@ def _name_to_url(name):
 def start_server(
     expose: bool, api_key: str | None = None, expose_session: str | None = None
 ) -> None:
+    from dataclasses import asdict
+
     import docstring_parser
     import uvicorn
+    from fastapi import Depends, HTTPException, Security
+    from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
     from fastapi.staticfiles import StaticFiles
     from starlette.requests import Request
     from starlette.responses import HTMLResponse
 
-    from . import _actions_run
+    from . import _actions_process_pool, _actions_run
     from ._api_action_package import action_package_api_router
     from ._api_run import run_api_router
     from ._app import get_app
@@ -39,7 +41,9 @@ def start_server(
 
     settings = get_settings()
 
-    log.debug("Starting server (settings: %s)", settings)
+    settings_dict = asdict(settings)
+    settings_str = "\n".join(f"    {k} = {v!r}" for k, v in settings_dict.items())
+    log.debug(f"Starting server. Settings:\n{settings_str}")
 
     app = get_app()
 
@@ -57,7 +61,24 @@ def start_server(
         (action_package.id, action_package) for action_package in db.all(ActionPackage)
     )
 
-    for action in db.all(Action):
+    def verify_api_key(
+        token: HTTPAuthorizationCredentials = Security(HTTPBearer(auto_error=True)),
+    ) -> HTTPAuthorizationCredentials:
+        if token.credentials != api_key:
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid or missing API Key",
+            )
+        else:
+            return token
+
+    endpoint_dependencies = []
+
+    if api_key:
+        endpoint_dependencies.append(Depends(verify_api_key))
+
+    actions = db.all(Action)
+    for action in actions:
         if not action.enabled:
             # Disabled actions should not be registered.
             continue
@@ -89,6 +110,7 @@ def start_server(
             description=doc_desc,
             operation_id=action.name,
             methods=["POST"],
+            dependencies=endpoint_dependencies,
             openapi_extra={
                 "x-openai-isConsequential": action.is_consequential,
             }
@@ -121,7 +143,12 @@ def start_server(
 
     @app.get("/config", include_in_schema=False)
     async def serve_config():
-        payload = {"expose_url": False}
+        from ._server_expose import get_expose_session_payload, read_expose_session_json
+
+        payload = {"expose_url": False, "auth_enabled": False}
+
+        if api_key:
+            payload["auth_enabled"] = True
 
         if expose:
             current_expose_session = read_expose_session_json(
@@ -163,15 +190,7 @@ def start_server(
 
     expose_subprocess = None
 
-    def expose_later(loop):
-        from robocorp.action_server._settings import is_frozen
-
-        nonlocal expose_subprocess
-
-        if not server.started:
-            loop.call_later(1 / 15.0, partial(expose_later, loop))
-            return
-
+    def _get_currrent_host():
         port = settings.port if settings.port != 0 else None
         host = settings.address
         if port is None:
@@ -183,6 +202,19 @@ def start_server(
             sockname = sockets_ipv4[0].getsockname()
             host = sockname[0]
             port = sockname[1]
+
+        return (host, port)
+
+    def expose_later(loop):
+        from robocorp.action_server._settings import is_frozen
+
+        nonlocal expose_subprocess
+
+        if not server.started:
+            loop.call_later(1 / 15.0, partial(expose_later, loop))
+            return
+
+        (host, port) = _get_currrent_host()
 
         parent_pid = os.getpid()
 
@@ -205,10 +237,18 @@ def start_server(
             host,
             settings.expose_url,
             settings.datadir,
-            str(api_key),
             str(expose_session),
         ]
         expose_subprocess = subprocess.Popen(args)
+
+    def _on_started_message(self, **kwargs):
+        (host, port) = _get_currrent_host()
+        log.info(f"\n  ⚡️ Action Server started at http://{settings.address}:{port}")
+
+        if api_key:
+            log.info(
+                f'  🔑 API Authorization key: {{ "Authorization": "Bearer {api_key}"}}'
+            )
 
     async def _on_startup():
         if expose:
@@ -246,7 +286,12 @@ def start_server(
     app.add_event_handler("startup", _on_startup)
     app.add_event_handler("shutdown", _on_shutdown)
 
-    kwargs = settings.to_uvicorn()
-    config = uvicorn.Config(app=app, **kwargs)
-    server = uvicorn.Server(config)
-    asyncio.run(server.serve())
+    with _actions_process_pool.setup_actions_process_pool(
+        settings, action_package_id_to_action_package, actions
+    ):
+        kwargs = settings.to_uvicorn()
+        config = uvicorn.Config(app=app, **kwargs)
+        server = uvicorn.Server(config)
+        server._log_started_message = _on_started_message  # type: ignore[assignment]
+
+        asyncio.run(server.serve())

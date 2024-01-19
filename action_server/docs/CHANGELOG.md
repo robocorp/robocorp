@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.0.16 - 2024-01-18
+
+- If a process crashes while in the process pool idle processes it's not reused in a new run.
+- When reusing processes, `@setup(scope="session")` is only called once and `@teardown(scope="session")` is no longer called.
+    - Requires `robocorp-actions 0.0.6`.
+    - Also fixes issue where files containing `@action` would be reimported on each new run when process is reused.
+
+## 0.0.15 - 2024-01-16
+
+- The `--api-key` is now checked in any calls, not just on the connection relative to the `--expose`.
+- The Run UI now has a field to specify the `--api-key` to be used in a run.
+- Console startup message showing url for action server UI is improved.
+
+## 0.0.14 - 2024-01-16
+
+- It's now possible to specify the server url using the `--server-url` command line parameter.
+- A process pool is now available in the action server. The following new arguments are available:
+    `--min-processes=<n-processes>`
+    `--max-processes=<n-processes>`
+    `--reuse-process`
+- If the return of an `@action` does not conform to the proper return type a better error message is given.
+- Improved keepalive/reconnection on the `--expose` tunnel (ping-pong messages).
+
 ## 0.0.13 - 2024-01-14
 
 - Fix main README and update docs.

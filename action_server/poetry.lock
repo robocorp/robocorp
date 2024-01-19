@@ -384,13 +384,13 @@ colors = ["colorama (>=0.4.6)"]
 
 [[package]]
 name = "jsonschema"
-version = "4.20.0"
+version = "4.21.0"
 description = "An implementation of JSON Schema validation for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jsonschema-4.20.0-py3-none-any.whl", hash = "sha256:ed6231f0429ecf966f5bc8dfef245998220549cbbcf140f913b7464c52c3b6b3"},
-    {file = "jsonschema-4.20.0.tar.gz", hash = "sha256:4f614fd46d8d61258610998997743ec5492a648b33cf478c1ddc23ed4598a5fa"},
+    {file = "jsonschema-4.21.0-py3-none-any.whl", hash = "sha256:70a09719d375c0a2874571b363c8a24be7df8071b80c9aa76bc4551e7297c63c"},
+    {file = "jsonschema-4.21.0.tar.gz", hash = "sha256:3ba18e27f7491ea4a1b22edce00fb820eec968d397feb3f9cb61d5894bb38167"},
 ]
 
 [package.dependencies]
@@ -1102,17 +1102,17 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "robocorp-actions"
-version = "0.0.4"
+version = "0.0.6"
 description = "Robocorp Actions"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_actions-0.0.4-py3-none-any.whl", hash = "sha256:fc32f5e9d5fb5aae6a21751a477c90f73f3c14d80512d8d36789dcf257c0dd99"},
-    {file = "robocorp_actions-0.0.4.tar.gz", hash = "sha256:102b45d69c592631c09840cec89562b91a4248486875f22ee728a091e33068c4"},
+    {file = "robocorp_actions-0.0.6-py3-none-any.whl", hash = "sha256:84c547b13bd6d9a4e969a05e83c1da0aabef6717236215368348250717ba1758"},
+    {file = "robocorp_actions-0.0.6.tar.gz", hash = "sha256:153be4de45ae702040f86db4acdc968bfb98c08ab32db066eb793f8568918e0b"},
 ]
 
 [package.dependencies]
-robocorp-tasks = ">=2.8.0,<3.0.0"
+robocorp-tasks = ">=2.9.0,<3.0.0"
 
 [[package]]
 name = "robocorp-devutils"
@@ -1145,13 +1145,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.8.0"
+version = "2.8.1"
 description = "Automatic trace logging for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_log-2.8.0-py3-none-any.whl", hash = "sha256:0436592f2fc32778125fe4e5ba7a94161ce4502023d645d23f09f99a130334d8"},
-    {file = "robocorp_log-2.8.0.tar.gz", hash = "sha256:0998707b4098b997bb9e5363029e62849d8b181900793db350d747d7e645f94c"},
+    {file = "robocorp_log-2.8.1-py3-none-any.whl", hash = "sha256:0c4eb6e11fe23cbd010e72258166555e55b3bd2522266c18ce20a276166ac730"},
+    {file = "robocorp_log-2.8.1.tar.gz", hash = "sha256:de611dba969d52c76340ea70a6dc055f4ca2714e09174f682f0665c273e24275"},
 ]
 
 [package.dependencies]
@@ -1175,13 +1175,13 @@ robocorp-log = ">=2.5,<3"
 
 [[package]]
 name = "robocorp-tasks"
-version = "2.8.0"
+version = "2.9.0"
 description = "The automation framework for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_tasks-2.8.0-py3-none-any.whl", hash = "sha256:2641fffd95dee54a265eefd6091efedad8b24db4e77eb6f79f9e3c543e4263c7"},
-    {file = "robocorp_tasks-2.8.0.tar.gz", hash = "sha256:025aefd8d475a78eb8c3f6d7439bf3239aa8085041f380ed9c0ae69d9f50a79d"},
+    {file = "robocorp_tasks-2.9.0-py3-none-any.whl", hash = "sha256:24887d9fdba7a0b1f78fc7a4f2676c9fe0706680b648ec45c97b4d42048b3823"},
+    {file = "robocorp_tasks-2.9.0.tar.gz", hash = "sha256:93a1851a49884fede05b0dd3dd817b918def65210a232e0adf35e2651d49b1d5"},
 ]
 
 [package.dependencies]
@@ -1697,4 +1697,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "fc35e947c750ea48a1dfa5db211e75017b448564d77db52ff3ecbcb64bcdb4ef"
+content-hash = "19776def4acdc6a30014a383b49c7512e29227d15df3bc6dbab4094d6347ca5f"

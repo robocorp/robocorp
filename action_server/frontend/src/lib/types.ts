@@ -69,4 +69,5 @@ export enum InputPropertyType {
 
 export type ServerConfig = {
   expose_url: string;
+  auth_enabled: boolean;
 };
