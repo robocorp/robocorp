@@ -377,7 +377,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./linux64/action-server
-          asset_name: action-server-$tag-ubuntu64
+          asset_name: $tag-linux64
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload MacOS binary
@@ -385,7 +385,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./macos64/action-server
-          asset_name: action-server-$tag-ubuntu64
+          asset_name: $tag-macos64
           tag: ${{ github.ref }}
           overwrite: true
       - name: Upload Windows binary
@@ -393,7 +393,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./windows64/action-server.exe
-          asset_name: action-server-$tag-ubuntu64
+          asset_name: $tag-windows64
           tag: ${{ github.ref }}
           overwrite: true
 
