@@ -252,7 +252,7 @@ def make_exe():
 
     for resource in exe.pip_install(
         [
-            "robocorp-actions>=0.0.4",
+            "robocorp-actions>=0.0.6",
             "fastapi>=0.104.1",
             "uvicorn>=0.23.2",
             "pydantic>=2.4.2",
@@ -261,6 +261,7 @@ def make_exe():
             "websockets>=12.0",
             "requests>=2",
             "psutil>=5",
+            "termcolor>=2.4",
         ]
     ):
         if resource.name in ("py.typed",) or resource.name.endswith(".pyi"):
