@@ -229,7 +229,7 @@ jobs:
 
       - name: Check if this is a beta release
         id: check_beta
-        run: echo "is_beta=${{ endsWith(github.event_name, '-beta') }}" >> $GITHUB_ENV
+        run: echo "is_beta=${{ endsWith(github.ref_name, '-beta') }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -273,7 +273,6 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CICD_DROPBOX }}
             aws-region: eu-west-1
       - name: AWS S3 copies
-        if: ${{ !steps.check_beta.outputs.is_beta }}
         run: |
           if [ "${{ !steps.check_beta.outputs.is_beta }}" = "true" ]; then
             echo "Normal release, aws sync to drop-box, full pipeline"
@@ -329,4 +328,63 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
             -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
+
+  release:
+
+    if: ${{ !steps.check_beta.outputs.is_beta }}
+
+    needs:
+      - trigger-brew-workflow
+    
+    defaults:
+      run:
+        working-directory: .
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create GitHub release
+        uses: Roang-zero1/github-create-release-action@v3
+        with:
+          release_title: ${{ github.ref_name }}
+          # TODO: once we have a changelog, add the URL
+          release_text: Binaries available as assets. Run `<executable_name> help` for usage instructions.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+            name: action-server-signed-windows
+            path: windows64/
+      - uses: actions/download-artifact@v4
+        with:
+            name: action-server-signed-macos
+            path: macos64/
+      - uses: actions/download-artifact@v4
+        with:
+            name: Linux-action-server-unsigned
+            path: linux64/
+
+      # Upload binaries to release
+
+      - name: Upload Linux binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: linux64/action-server
+          asset_name: action-server-$tag-ubuntu64
+          tag: ${{ github.ref }}
+      - name: Upload MacOS binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: macos64/action-server
+          asset_name: action-server-$tag-ubuntu64
+          tag: ${{ github.ref }}
+      - name: Upload Windows binary
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: windows64/action-server.exe
+          asset_name: action-server-$tag-ubuntu64
+          tag: ${{ github.ref }}
 
