@@ -230,7 +230,10 @@ jobs:
 
       - name: Check if this is a beta release
         id: check_beta
-        run: echo "is_beta=${{ endsWith(github.ref_name, '-beta') }}" >> $GITHUB_ENV
+        run: |
+          is_beta=${{ endsWith(github.ref_name, '-beta') }}
+          echo "is_beta: $is_beta"
+          echo "::set-output name=is_beta::$is_beta"
 
       # - uses: actions/download-artifact@v4
       #   with:
