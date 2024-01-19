@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.9.0 - 2024-01-19
 
 - Added auxiliary function `iter_decoded_log_format_from_log_html_contents` to `robocorp.log` to public API.
 
