@@ -331,9 +331,10 @@ jobs:
 
   release:
 
-    if: ${{ !steps.check_beta.outputs.is_beta }}
+    if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
 
     needs:
+      - deploy-s3  # needed for check_beta
       - trigger-brew-workflow
     
     defaults:
