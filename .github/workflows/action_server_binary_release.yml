@@ -368,7 +368,7 @@ jobs:
             name: Linux-action-server-unsigned
             path: linux64/
       - name: Rename Linux binary
-        run: mv linux64/action-server-unisigned linux64/action-server
+        run: ls -al linux64/
 
       # Upload binaries to release
 
