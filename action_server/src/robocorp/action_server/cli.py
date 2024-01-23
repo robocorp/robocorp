@@ -188,6 +188,14 @@ def _create_parser():
         ),
     )
 
+    start_parser.add_argument(
+        "--full-openapi-spec",
+        action="store_true",
+        help="By default, the public OpenAPI specification will include only endpoints to run "
+        "individual actions and omit all other endpoints. With this flag, all endpoints "
+        "available will be defined in the public OpenAPI specification.",
+    )
+
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
 

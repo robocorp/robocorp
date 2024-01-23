@@ -68,6 +68,8 @@ class Settings:
     max_processes: int = 20
     reuse_processes: bool = False
 
+    full_openapi_spec: bool = False
+
     @classmethod
     def defaults(cls):
         fields = cls.__dataclass_fields__
@@ -112,6 +114,7 @@ class Settings:
             "min_processes",
             "max_processes",
             "reuse_processes",
+            "full_openapi_spec",
         ):
             assert hasattr(settings, attr)
             if hasattr(args, attr):

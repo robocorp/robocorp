@@ -397,6 +397,17 @@ def test_server_url_flag(action_server_process: ActionServerProcess, data_regres
     data_regression.check(spec)
 
 
+def test_server_full_openapi_flag(
+    action_server_process: ActionServerProcess, data_regression
+):
+    action_server_process.start(additional_args=["--full-openapi-spec"])
+
+    client = ActionServerClient(action_server_process)
+    openapi_json = client.get_openapi_json()
+    spec = json.loads(openapi_json)
+    data_regression.check(spec)
+
+
 def test_auth_routes(action_server_process: ActionServerProcess, data_regression):
     from action_server_tests.fixtures import get_in_resources
 

@@ -138,11 +138,13 @@ def start_server(
 
         app.add_api_route("/api/shutdown/", shutdown, methods=["POST"])
 
-    app.include_router(run_api_router)
-    app.include_router(action_package_api_router)
+    app.include_router(run_api_router, include_in_schema=settings.full_openapi_spec)
+    app.include_router(
+        action_package_api_router, include_in_schema=settings.full_openapi_spec
+    )
     app.include_router(websocket_api_router)
 
-    @app.get("/config", include_in_schema=False)
+    @app.get("/config", include_in_schema=settings.full_openapi_spec)
     async def serve_config():
         from ._server_expose import get_expose_session_payload, read_expose_session_json
 
@@ -169,7 +171,6 @@ def start_server(
 
         return payload
 
-    @app.get("/base_log.html", response_class=HTMLResponse)
     async def serve_log_html(request: Request):
         from robocorp.log import _index_v3 as index
 
@@ -186,7 +187,7 @@ def start_server(
             index_route,
             serve_index,
             response_class=HTMLResponse,
-            include_in_schema=False,
+            include_in_schema=settings.full_openapi_spec,
         )
 
     expose_subprocess = None
