@@ -27,7 +27,7 @@ class ActionPackage:  # Table name: action_package
     # When relative starts with `./`, otherwise it's absolute.
     directory: str
 
-    # The sha256 hash of the conda.yaml (based only on the actual content
+    # The sha256 hash of the action-server.yaml (based only on the actual content
     # not considering spaces and comments).
     conda_hash: str
 

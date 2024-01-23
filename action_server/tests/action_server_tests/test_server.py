@@ -1,4 +1,5 @@
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -144,6 +145,75 @@ def test_global_return_reuse_process(
         "api/actions/calculator/global-return-reuse-process/run", {}
     )
     assert found == '"2"'
+
+
+@pytest.mark.parametrize("strategy", ["action-server.yaml", "conda.yaml", "no-conda"])
+def test_import_action_server_strategies(
+    action_server_datadir: Path,
+    strategy: str,
+) -> None:
+    from action_server_tests.fixtures import (
+        get_in_resources,
+        robocorp_action_server_run,
+    )
+
+    from robocorp.action_server._models import Action, ActionPackage, load_db
+
+    if strategy == "conda.yaml":
+        root_dir = get_in_resources("calculator")
+    elif strategy == "action-server.yaml":
+        root_dir = get_in_resources("greeter")
+    else:
+        assert strategy == "no-conda"
+        root_dir = get_in_resources("no_conda", "greeter")
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={root_dir}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    db_path = action_server_datadir / "server.db"
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            action_packages = db.all(ActionPackage)
+
+            assert len(action_packages) == 1
+            action_package = next(iter(action_packages))
+            env = json.loads(action_package.env_json)
+
+            if strategy == "conda.yaml":
+                # calculator
+                assert env.get("PYTHON_EXE") not in (
+                    None,
+                    "",
+                    sys.executable,
+                ), "Expected custom env"
+                assert len(actions) == 2
+            elif strategy == "action-server.yaml":
+                # greeter
+                assert len(actions) == 1
+                assert env.get("PYTHON_EXE") not in (
+                    None,
+                    "",
+                    sys.executable,
+                ), "Expected custom env"
+            else:
+                # no_conda/greeter
+                assert env.get("PYTHON_EXE") in (
+                    None,
+                    "",
+                    sys.executable,
+                ), "Expected current env"
+                assert strategy == "no-conda"
+                assert len(actions) == 1
 
 
 def test_import_no_conda(

@@ -5,6 +5,7 @@ import sys
 import typing
 from pathlib import Path
 from typing import Optional
+
 from termcolor import colored
 
 if typing.TYPE_CHECKING:
@@ -61,35 +62,49 @@ def import_action_package(
     import yaml
 
     # Verify if it's actually a proper package (meaning that it has
-    # the conda.yaml as well as actions we can run).
-    conda_yaml = import_path / "conda.yaml"
-    conda_yaml_exists = conda_yaml.exists()
-    if not conda_yaml_exists:
+    # the action-server.yaml as well as actions we can run).
+    action_server_yaml = import_path / "action-server.yaml"
+    action_server_yaml_exists = action_server_yaml.exists()
+    if not action_server_yaml_exists:
+        # Backward-compatibility
+        action_server_yaml = import_path / "conda.yaml"
+        action_server_yaml_exists = action_server_yaml.exists()
+        if action_server_yaml_exists:
+            log.critical(
+                "Deprecation message: The file for defining the environment is now `action-server.yaml`.\n"
+                f"Please rename `conda.yaml` to `action-server.yaml` at {action_server_yaml}"
+            )
+
+    if not action_server_yaml_exists:
         if is_frozen():
             raise ActionServerValidationError(
-                f"Unable to import actions in standalone action-server because no `conda.yaml` is available at: {conda_yaml}."
+                f"Unable to import actions in standalone action-server because no `action-server.yaml` is available at: {action_server_yaml}."
             )
         log.info(
-            """Adding action without a managed environment (conda.yaml unavailable).
+            """Adding action without a managed environment (action-server.yaml unavailable).
 Note: no virtual environment will be used for the imported actions, they'll be run in the same environment used to run the action server."""
         )
         condahash = "<unmanaged>"
         use_env = {}
     else:
         try:
-            with open(conda_yaml, "r", encoding="utf-8") as stream:
+            with open(action_server_yaml, "r", encoding="utf-8") as stream:
                 contents = yaml.safe_load(stream)
         except Exception:
-            raise ActionPackageError(f"{conda_yaml} does not seem a valid yaml.")
+            raise ActionPackageError(
+                f"{action_server_yaml} does not seem a valid yaml."
+            )
 
         if not isinstance(contents, dict):
-            raise ActionPackageError(f"{conda_yaml} has no dict as top-level.")
+            raise ActionPackageError(f"{action_server_yaml} has no dict as top-level.")
 
         if not contents.get("dependencies"):
-            raise ActionPackageError(f"{conda_yaml} has no 'dependencies' specified.")
+            raise ActionPackageError(
+                f"{action_server_yaml} has no 'dependencies' specified."
+            )
 
         log.debug(
-            f"""Actions added with managed environment defined by: {conda_yaml}."""
+            f"""Actions added with managed environment defined by: {action_server_yaml}."""
         )
 
         # The hash is based only on the parsed contents, not on the file
@@ -101,7 +116,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
             "Bootstrapping RCC environment (please wait, this can take a long time)."
         )
         rcc = get_rcc()
-        env_info = rcc.create_env_and_get_vars(conda_yaml, condahash)
+        env_info = rcc.create_env_and_get_vars(action_server_yaml, condahash)
         if not env_info.success:
             raise ActionPackageError(
                 f"It was not possible to bootstrap the RCC environment. "
@@ -147,11 +162,11 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     if v < (0, 0, 6):
         v_as_str = ".".join(str(x) for x in v)
 
-        if conda_yaml_exists:
+        if action_server_yaml_exists:
             raise ActionServerValidationError(
                 f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
                 f"Expected `robocorp-actions` version to be 0.0.6 or higher.\n"
-                f"Please update the version in: {conda_yaml}\n"
+                f"Please update the version in: {action_server_yaml}\n"
             )
         else:
             raise ActionServerValidationError(
@@ -181,7 +196,7 @@ def _get_robocorp_actions_version(env, cwd) -> tuple[int, ...]:
     msg = f"""Unable to get robocorp.actions version.
 
 This usually means that `robocorp.actions` is not installed in the python
-environment (if `conda.yaml` is present, make sure that `robocorp-actions`
+environment (if `action-server.yaml` is present, make sure that `robocorp-actions`
 is defined in the environment, otherwise make sure that `robocorp-actions`
 is installed in the same environment being used to run the action server).
 

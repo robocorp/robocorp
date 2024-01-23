@@ -274,10 +274,17 @@ def run_command_line(
 ) -> CompletedProcess:
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
+    cp["PYTHONIOENCODING"] = "utf-8"
     if additional_env:
         cp.update(additional_env)
     result = subprocess.run(
-        cmdline, capture_output=True, text=True, env=cp, cwd=cwd, timeout=timeout
+        cmdline,
+        capture_output=True,
+        text=True,
+        env=cp,
+        cwd=cwd,
+        timeout=timeout,
+        encoding="utf-8",
     )
 
     if returncode == "error" and result.returncode:
@@ -286,8 +293,8 @@ def run_command_line(
     if result.returncode == returncode:
         return result
 
-    env_str = "\n".join(str(x) for x in sorted(cp.items()))
-
+    # Not really that helpful in general and very verbose...
+    # env_str = "\n".join(str(x) for x in sorted(cp.items()))
     raise AssertionError(
         f"""Expected returncode: {returncode}. Found: {result.returncode}.
 === stdout:
@@ -295,9 +302,6 @@ def run_command_line(
 
 === stderr:
 {result.stderr}
-
-=== Env:
-{env_str}
 
 === Args:
 {cmdline}
@@ -330,6 +334,8 @@ def check_new_template(
 
         my_project_dir = tmpdir / "my_project"
         my_project_dir_conda = my_project_dir / "conda.yaml"
+        if not my_project_dir.exists():
+            my_project_dir_conda = my_project_dir / "action-server.yaml"
 
         if verbose:
             print(my_project_dir, "exists", my_project_dir.exists())

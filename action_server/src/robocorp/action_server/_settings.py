@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Optional
+
 from termcolor import colored
 
 log = logging.getLogger(__name__)
@@ -26,8 +27,8 @@ def get_python_exe_from_env(env):
     if not python:
         if is_frozen():
             raise RuntimeError(
-                "Unable to run because no 'conda.yaml' was present to bootstrap the environment\n"
-                "(note: when the action server is distributed without sources, a 'conda.yaml' for "
+                "Unable to run because no 'action-server.yaml' was present to bootstrap the environment\n"
+                "(note: when the action server is distributed without sources, an 'action-server.yaml' for "
                 "the target environment is always required)."
             )
         else:
