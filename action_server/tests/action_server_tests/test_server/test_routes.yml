@@ -385,16 +385,5 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
           description: Validation Error
       summary: Get Run Log Html
-  /base_log.html:
-    get:
-      operationId: serve_log_html_base_log_html_get
-      responses:
-        '200':
-          content:
-            text/html:
-              schema:
-                type: string
-          description: Successful Response
-      summary: Serve Log Html
 servers:
 - url: http://localhost:0

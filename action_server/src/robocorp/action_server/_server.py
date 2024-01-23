@@ -169,7 +169,6 @@ def start_server(
 
         return payload
 
-    @app.get("/base_log.html", response_class=HTMLResponse)
     async def serve_log_html(request: Request):
         from robocorp.log import _index_v3 as index
 
@@ -180,14 +179,14 @@ def start_server(
 
         return HTMLResponse(FILE_CONTENTS["index.html"])
 
-    index_routes = ["/", "/runs/{full_path:path}", "/actions/{full_path:path}"]
-    for index_route in index_routes:
-        app.add_api_route(
-            index_route,
-            serve_index,
-            response_class=HTMLResponse,
-            include_in_schema=False,
-        )
+    #index_routes = ["/", "/runs/{full_path:path}", "/actions/{full_path:path}"]
+    #for index_route in index_routes:
+    #    app.add_api_route(
+    #        index_route,
+    #        serve_index,
+    #        response_class=HTMLResponse,
+    #        include_in_schema=False,
+    #    )
 
     expose_subprocess = None
 

@@ -331,24 +331,6 @@
                     }
                 }
             }
-        },
-        "/base_log.html": {
-            "get": {
-                "summary": "Serve Log Html",
-                "operationId": "serve_log_html_base_log_html_get",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "text/html": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
     "components": {
