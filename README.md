@@ -1,6 +1,6 @@
 ![Robocorp](./docs/include/robocorp-header.svg)
 
-<samp>[Docs](https://robocorp.com/docs) | [Blog](https://robocorp.com/blog) | [Examples](https://robocorp.com/portal) | [ReMark](https://chat.robocorp.com) | [Courses](https://robocorp.com/docs/courses) | [Slack](https://robocorp-developers.slack.com/) | [Youtube](https://www.youtube.com/@Robocorp) | [𝕏](https://twitter.com/RobocorpInc)</samp>
+<samp>[Docs](https://robocorp.com/docs) | [Blog](https://robocorp.com/blog) | [Examples](https://github.com/robocorp/actions-cookbook) | [ReMark](https://chat.robocorp.com) | [Courses](https://robocorp.com/docs/courses) | [Slack](https://robocorp-developers.slack.com/) | [Youtube](https://www.youtube.com/@Robocorp) | [𝕏](https://twitter.com/RobocorpInc)</samp>
 
 [![PyPI - Version](https://img.shields.io/pypi/v/robocorp?label=robocorp&color=%23733CFF)](https://pypi.org/project/robocorp)
 [![PyPI - Version](https://img.shields.io/pypi/v/robocorp-action-server?label=action-server&color=%23733CFF)](https://pypi.org/project/robocorp-action-server)
@@ -10,7 +10,7 @@
 
 # Create, deploy and operate 🐍 Python Automations <br/> and AI Actions anywhere.
 
-Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connects any AI Assistant platform to your data and applications.
+Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connect any AI Assistant platform to your data and applications.
 
 Robocorp Action Server makes your Python scripts compatible with ChatGPT and LangChain by automatically creating and exposing an API based on function declaration, type hints and docstrings. Just add `@action` and start!
 
@@ -66,7 +66,7 @@ sudo mv action-server /usr/local/bin/
 </details>
 <br/>
 
-Bootstrap a new project from a template. You’ll be prompted for a name of the project:
+Bootstrap a new project from a template. You’ll be prompted for the name of the project:
 
 ```sh
 action-server new
@@ -164,16 +164,16 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
   </a>
 </h3>
 
-Adding the Action Server hosted AI Action to your custom GPT is super simple, basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
+Adding the Action Server-hosted AI Action to your custom GPT is super simple: basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
 > **TIP:**<br/>
-> Use `@action(is_consequential=False)` flag to avoid user needing to accept the action execution separately each time on your GPT.
+> Use the `@action(is_consequential=False)` flag to avoid the user needing to accept the action execution separately each time on your GPT.
 
 <div id="langchain"></div>
 
 ## Add Action Server as a Toolkit to [🦜️🔗 LangChain](https://github.com/robocorp/langchain)
 
-Robocorp Action Server comes with everything needed to connect it to your Langchain AI app project. The easiest way is to start with the template, provided in the Langchain project. Here’s how to do it:
+Robocorp Action Server has everything needed to connect it to your Langchain AI app project. The easiest way is to start with the template provided in the Langchain project. Here’s how to do it:
 
 ```sh
 # Install LangChain cli tool if not already there
@@ -199,7 +199,7 @@ langchain serve
 
 After running the steps above, you’ll have a Playground available at http://127.0.0.1:8000/robocorp-action-server/playground/ where you can test your Actions with an AI agent.
 
-**Want to build your own thing?** Adding your own Robocorp AI Actions to a Langchain project is as easy as the code below. Just remember to change the URL of the Action Server if you are not running both the Action Server and Langchain app on the same machine.
+**Want to build your own thing?** Adding your Robocorp AI Actions to a Langchain project is as easy as the code below. Just remember to change the URL of the Action Server if you are not running both the Action Server and Langchain app on the same machine.
 
 ```py
 from langchain_robocorp import ActionServerToolkit
