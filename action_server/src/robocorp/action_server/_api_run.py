@@ -12,7 +12,7 @@ from starlette.responses import FileResponse
 from robocorp.action_server._models import Run
 
 log = logging.getLogger(__name__)
-run_api_router = APIRouter(prefix="/api/runs", include_in_schema=False)
+run_api_router = APIRouter(prefix="/api/runs")
 
 
 @run_api_router.get("", response_model=list[Run])
