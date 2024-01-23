@@ -5,7 +5,9 @@ from fastapi.routing import APIRouter
 
 from robocorp.action_server._models import Action, ActionPackage
 
-action_package_api_router = APIRouter(prefix="/api/actionPackages", include_in_schema=False)
+action_package_api_router = APIRouter(
+    prefix="/api/actionPackages", include_in_schema=False
+)
 
 
 @dataclass
