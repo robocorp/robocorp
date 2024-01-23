@@ -114,7 +114,7 @@ class Settings:
             "min_processes",
             "max_processes",
             "reuse_processes",
-            "full_openapi_spec"
+            "full_openapi_spec",
         ):
             assert hasattr(settings, attr)
             if hasattr(args, attr):

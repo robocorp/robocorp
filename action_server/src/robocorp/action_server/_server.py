@@ -139,7 +139,9 @@ def start_server(
         app.add_api_route("/api/shutdown/", shutdown, methods=["POST"])
 
     app.include_router(run_api_router, include_in_schema=settings.full_openapi_spec)
-    app.include_router(action_package_api_router, include_in_schema=settings.full_openapi_spec)
+    app.include_router(
+        action_package_api_router, include_in_schema=settings.full_openapi_spec
+    )
     app.include_router(websocket_api_router)
 
     @app.get("/config", include_in_schema=settings.full_openapi_spec)
