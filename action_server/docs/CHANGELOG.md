@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.19 - 2024-01-24
+
+- Instead of defining a `conda.yaml` it's expected that an `action-server.yaml` is defined
+  (at this point it's expected that it has the same contents as the `conda.yaml`).
+
 ## 0.0.18 - 2024-01-19
 
 - The response from a run now includes an `"X-Action-Server-Run-Id"` header containing the run id.
