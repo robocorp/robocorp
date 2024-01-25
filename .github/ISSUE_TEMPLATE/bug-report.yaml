@@ -1,27 +1,6 @@
 name: 🐛 Bug report
 description: Submit a bug report to help us make Robocorp better
-title: "[Issue]: "
 body:
-  - type: checkboxes
-    id: library
-    attributes:
-      label: Target library
-      description: Select one or more libraries affected by the bug reported
-      options:
-        - label: Action Server
-          required: false
-        - label: robocorp-actions
-          required: false
-        - label: robocorp-browser
-          required: false
-        - label: robocorp-tasks
-          required: false
-        - label: robocorp-vault
-          required: false
-        - label: robocorp-windows
-          required: false
-        - label: robocorp-workitems
-          required: false
   - type: textarea
     id: issue
     attributes:
@@ -39,7 +18,7 @@ body:
     id: system
     attributes:
       label: System Info
-      description: Sharign your system information will help us a lot
+      description: Sharing your system information will help us a lot
       placeholder: >-
         * Library version
         * Python version
