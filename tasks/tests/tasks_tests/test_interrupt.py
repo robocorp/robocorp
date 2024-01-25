@@ -27,11 +27,12 @@ def test_interrupt_main_thread():
         # If this fails it means that although we interrupted Python actually
         # waited for the next instruction to send the event and didn't really
         # interrupt the thread.
-        assert (
-            actual_timeout < timeout
-        ), "Expected the actual timeout (%s) to be < than the timeout (%s)" % (
-            actual_timeout,
-            timeout,
+        assert actual_timeout < timeout, (
+            "Expected the actual timeout (%s) to be < than the timeout (%s)"
+            % (
+                actual_timeout,
+                timeout,
+            )
         )
     else:
         raise AssertionError("KeyboardInterrupt not generated in main thread.")

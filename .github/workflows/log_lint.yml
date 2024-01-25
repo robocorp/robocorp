@@ -28,8 +28,10 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Install poetry/invoke
+        run: |
+            pipx install poetry
+            pipx install invoke
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
@@ -62,12 +64,10 @@ jobs:
           CI: true
           NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
-      - name: Black check
+      - name: "`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`"
+        if: always()
         run: |
-          poetry run black --check src tests --exclude="_index\.py|_index_v2\.py"
-
-      - name: mypy robocorp-log
-        run: |
-          poetry run mypy --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases src tests
-
+          inv lint
+          inv typecheck
+  
 

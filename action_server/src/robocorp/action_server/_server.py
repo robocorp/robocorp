@@ -6,6 +6,7 @@ import subprocess
 import sys
 from functools import partial
 from typing import Dict, Optional
+
 from termcolor import colored
 
 log = logging.getLogger(__name__)

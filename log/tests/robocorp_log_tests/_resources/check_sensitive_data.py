@@ -63,7 +63,7 @@ def run():
 
 
 def another_func_with_exc():
-    password = "my_pass"
+    password = "my_pass"  # noqa
     raise RuntimeError("some exc in another_func_with_exc.")
 
 

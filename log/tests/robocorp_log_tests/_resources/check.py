@@ -35,12 +35,12 @@ def another(var):
 def check_if():
     a = 10
     if a < 10:
-        y = 9
+        y = 9  # noqa
     else:
-        y = 20
+        y = 20  # noqa
 
     if a == 10:
-        y = 30
+        y = 30  # noqa
 
 
 def check_if_exception():
@@ -103,8 +103,8 @@ def check_message_really_big():
 
 def call_recursive_function():
     # Let some big contents in the frame...
-    v1 = "abcd1234_" * 10000
-    v2 = "abcde12345_" * 10000
+    v1 = "abcd1234_" * 10000  # noqa
+    v2 = "abcde12345_" * 10000  # noqa
     call_recursive_function()
 
 
@@ -137,7 +137,7 @@ def check_big_for_in_for():
 
         matrix.append(row)
 
-    final_matrix = matrix
+    final_matrix = matrix  # noqa
 
 
 def check_for_with_continue_break():
@@ -160,7 +160,7 @@ def check_for_with_continue_break_2():
 
 
 def some_call_with_exc():
-    v = 10
+    v = 10  # noqa
     raise RuntimeError("some_exc")
 
 

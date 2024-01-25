@@ -9,7 +9,7 @@ from devutils.fixtures import robocorp_tasks_run
 def test_core_log_integration_error_in_import(datadir, str_regression):
     import re
 
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    from robocorp.log._log_formatting import pretty_format_logs_from_log_html
 
     result = robocorp_tasks_run(
         ["run", "main_with_error_in_import.py"], returncode=1, cwd=str(datadir)
@@ -41,17 +41,8 @@ def test_core_log_integration_error_in_import(datadir, str_regression):
 
 
 def test_core_log_integration_config_log(datadir, str_regression):
-    import os
-
-    matrix_name = os.environ.get("GITHUB_ACTIONS_MATRIX_NAME")
-    if matrix_name:
-        if "devmode" not in matrix_name:
-            # i.e.: When testing with log in release mode we can't use
-            # the hack to import the tests.
-            pytest.skip(f"Disabled for matrix name: {matrix_name}")
-
     from robocorp.log import verify_log_messages_from_log_html
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    from robocorp.log._log_formatting import pretty_format_logs_from_log_html
 
     result = robocorp_tasks_run(["run", "simple.py"], returncode=0, cwd=str(datadir))
 
@@ -107,13 +98,12 @@ default_library_filter_kind = "exclude"
 
 
 def test_core_log_integration_lines(datadir, str_regression) -> None:
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    from robocorp.log._log_formatting import pretty_format_logs_from_log_html
 
     result = robocorp_tasks_run(
         ["run", "main_check_lines.py"], returncode=0, cwd=str(datadir)
     )
 
-    decoded = result.stderr.decode("utf-8", "replace")
     decoded = result.stdout.decode("utf-8", "replace")
     assert "Robocorp Log (html)" in decoded
 
@@ -151,7 +141,7 @@ def test_core_log_integration_console_messages(datadir, str_regression, mode) ->
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()
 
-    msgs = verify_log_messages_from_log_html(
+    verify_log_messages_from_log_html(
         log_target,
         [
             {
@@ -248,7 +238,7 @@ def test_receive_at_socket(datadir, server_socket) -> None:
     port = server_socket.port
 
     additional_env: Dict[str, str] = {"ROBOCORP_TASKS_LOG_LISTENER_PORT": str(port)}
-    result = robocorp_tasks_run(
+    robocorp_tasks_run(
         ["run", "--console-color=plain", "simple.py"],
         returncode=0,
         cwd=str(datadir),
@@ -258,7 +248,7 @@ def test_receive_at_socket(datadir, server_socket) -> None:
     data = "".join(server_socket.received_data)
 
     s = io.StringIO(data)
-    msgs = verify_log_messages_from_stream(
+    verify_log_messages_from_stream(
         s,
         [
             {

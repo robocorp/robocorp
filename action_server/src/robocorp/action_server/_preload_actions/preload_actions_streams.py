@@ -100,7 +100,7 @@ class JsonRpcStreamReaderThread(threading.Thread):
 
                 try:
                     msg = json.loads(data)
-                except:
+                except Exception:
                     log.exception("Failed to parse JSON message %s", data)
                     continue
 
@@ -111,7 +111,7 @@ class JsonRpcStreamReaderThread(threading.Thread):
                     if msg.get("method") == "cancelProgress":
                         try:
                             self._message_consumer(msg)
-                        except:
+                        except BaseException:
                             log.exception("Error processing JSON message %s", msg)
                         continue
 
@@ -179,7 +179,7 @@ class JsonRpcStreamReader(object):
                         msg()
                     else:
                         message_consumer(msg)
-                except:
+                except Exception:
                     log.exception("Error processing JSON message %s", msg)
                     continue
 

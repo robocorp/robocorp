@@ -1,6 +1,4 @@
 import os
-import platform
-import shutil
 import sys
 from contextlib import contextmanager
 from pathlib import Path
@@ -24,7 +22,11 @@ if devutils_found:
     from devutils.invoke_utils import build_common_tasks
 
     globals().update(
-        build_common_tasks(Path(__file__).absolute().parent, "robocorp.action_server")
+        build_common_tasks(
+            Path(__file__).absolute().parent,
+            "robocorp.action_server",
+            ruff_format_arguments=r"--exclude=_static_contents.py",
+        )
     )
 
 from invoke import Context, task

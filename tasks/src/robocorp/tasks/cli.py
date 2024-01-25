@@ -29,7 +29,7 @@ if sys.platform == "win32":
     sys.coinit_flags = _COINIT_MULTITHREADED  # type:ignore
 
 # Just importing is enough to register the commands
-from . import _commands  # @UnusedImport
+from . import _commands  # noqa
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
 

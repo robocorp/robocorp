@@ -1,4 +1,3 @@
-import ast as ast_module
 from io import StringIO
 from pathlib import Path
 

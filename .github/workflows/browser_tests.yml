@@ -65,10 +65,11 @@ jobs:
     - name: Install dependencies (in dev mode)
       run: python -m invoke devinstall
 
-    - name: Run Lint
-      run: invoke lint
-    - name: Run Typecheck
-      run: invoke typecheck
+    - name: "`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`"
+      if: always()
+      run: |
+        inv lint
+        inv typecheck
 
     # Because we've installed the logging in dev mode we need to build the view too
     - name: npm ci

@@ -8,7 +8,7 @@ import os
 try:
     import preload_actions_teardown  # type: ignore
 except ImportError:
-    from . import preload_actions_teardown
+    from . import preload_actions_teardown  # noqa
 
 from robocorp.log import html
 

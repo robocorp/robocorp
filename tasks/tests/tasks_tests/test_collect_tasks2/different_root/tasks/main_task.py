@@ -1,6 +1,6 @@
 from robocorp.tasks import task
 
-from . import module
+from . import module  # noqa
 
 
 @task

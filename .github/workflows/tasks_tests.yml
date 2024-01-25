@@ -97,20 +97,17 @@ jobs:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 
-    - name: Black check
+    - name: "`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`"
+      if: always()
       run: |
-        poetry run black --check src tests
-    
-    - name: mypy robocorp-tasks
-      run: |
-        poetry run mypy --follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases src tests
-        
+        inv lint
+        inv typecheck
+
     # Note: the env for dev mode or not is already setup at this point.
     - name: Test
+      if: always()
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
-        # We need to access robocorp_log_tests.fixtures in tasks tests.
-        PYTHONPATH: '../log/tests'
       run: |
         poetry run pytest -rfE -vv tests/tasks_tests
         
