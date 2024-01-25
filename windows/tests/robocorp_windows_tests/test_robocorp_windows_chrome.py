@@ -1,4 +1,16 @@
 def test_multiple_interactions():
+    try:
+        _check_multiple_interactions()
+    except BaseException:
+        # We're not using robocorp.tasks to run, so, we don't have
+        # screenshots automatically.
+        from robocorp.windows import desktop
+
+        desktop().log_screenshot()
+        raise
+
+
+def _check_multiple_interactions():
     import os
     from pathlib import Path
 
@@ -8,6 +20,7 @@ def test_multiple_interactions():
     desktop.windows_run("chrome.exe")
     w = desktop.wait_for_active_window("executable:chrome.exe", timeout=20)
 
+    raise RuntimeError()
     sample_html = os.path.join(os.path.dirname(__file__), "sample.html")
     assert os.path.exists(sample_html)
     url = Path(sample_html).as_uri()
