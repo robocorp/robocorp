@@ -1,16 +1,4 @@
 - docs: ''
-  file: my_task.py
-  input_schema:
-    additionalProperties: false
-    properties: {}
-    type: object
-  line: 4
-  name: task_on_my_task
-  options: null
-  output_schema:
-    description: ''
-    type: string
-- docs: ''
   file: another_module.py
   input_schema:
     additionalProperties: false
@@ -18,6 +6,18 @@
     type: object
   line: 4
   name: task_on_another_module
+  options: null
+  output_schema:
+    description: ''
+    type: string
+- docs: ''
+  file: my_task.py
+  input_schema:
+    additionalProperties: false
+    properties: {}
+    type: object
+  line: 4
+  name: task_on_my_task
   options: null
   output_schema:
     description: ''
