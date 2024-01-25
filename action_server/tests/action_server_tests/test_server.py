@@ -216,6 +216,62 @@ def test_import_action_server_strategies(
                 assert len(actions) == 1
 
 
+def test_import_default_value(
+    tmpdir,
+    action_server_datadir: Path,
+) -> None:
+    from action_server_tests.fixtures import robocorp_action_server_run
+
+    from robocorp.action_server._database import Database
+    from robocorp.action_server._models import Action, load_db
+
+    action_server_datadir.mkdir(parents=True, exist_ok=True)
+    db_path = action_server_datadir / "server.db"
+    assert not db_path.exists()
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action
+def calculator_sum(v1: int = 5) -> float:
+    return v1 + v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    db: Database
+    with load_db(db_path) as db:
+        with db.connect():
+            actions = db.all(Action)
+            assert len(actions) == 1
+            assert json.loads(actions[0].input_schema) == {
+                "additionalProperties": False,
+                "properties": {
+                    "v1": {
+                        "type": "integer",
+                        "description": "",
+                        "title": "V1",
+                        "default": 5,
+                    }
+                },
+                "type": "object",
+            }
+
+
 def test_import_no_conda(
     action_server_process: ActionServerProcess,
     data_regression,

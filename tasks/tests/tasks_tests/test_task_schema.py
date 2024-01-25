@@ -24,6 +24,19 @@ def methodb(a: str = "a") -> int:
     return 1
 
 
+def methodc(a: int = 1) -> int:
+    """
+    This is methodc.
+
+    Args:
+        a: This is argument a.
+
+    Returns:
+        The number 1.
+    """
+    return 1
+
+
 def test_task_schema():
     from robocorp.tasks._task import Task
 
@@ -60,3 +73,22 @@ def test_task_schema():
     task = Task(__name__, __file__, methoda, options=dict(is_consequential=True))
     options = task.options
     assert options["is_consequential"] is True
+
+
+def test_task_schema_default_value_type():
+    from robocorp.tasks._task import Task
+
+    task = Task(__name__, __file__, methodc)
+    input_schema = task.input_schema
+    assert input_schema == {
+        "additionalProperties": False,
+        "properties": {
+            "a": {
+                "default": 1,
+                "title": "A",
+                "type": "integer",
+                "description": "This is argument a.",
+            }
+        },
+        "type": "object",
+    }
