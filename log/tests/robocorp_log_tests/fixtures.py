@@ -13,20 +13,14 @@ from robocorp.log.protocols import LogHTMLStyle
 
 if True:
     # Aliases to imports moved to project
-    from robocorp.log._constants import UNSCOPED_ELEMENTS  # @UnusedImport
-    from robocorp.log._log_formatting import (
-        pretty_format_logs_from_iter,  # @UnusedImport
+    from robocorp.log._constants import UNSCOPED_ELEMENTS  # noqa
+    from robocorp.log._log_formatting import pretty_format_logs_from_iter  # noqa
+    from robocorp.log._log_formatting import pretty_format_logs_from_log_html  # noqa
+    from robocorp.log._log_formatting import pretty_format_logs_from_stream  # noqa
+    from robocorp.log._log_formatting import (  # noqa
+        pretty_format_logs_from_log_html_contents,
     )
-    from robocorp.log._log_formatting import (
-        pretty_format_logs_from_log_html,  # @UnusedImport
-    )
-    from robocorp.log._log_formatting import (
-        pretty_format_logs_from_log_html_contents,  # @UnusedImport
-    )
-    from robocorp.log._log_formatting import (
-        pretty_format_logs_from_stream,  # @UnusedImport
-    )
-    from robocorp.log.protocols import IReadLines  # @UnusedImport
+    from robocorp.log.protocols import IReadLines  # noqa
 
 
 class _SetupInfo:

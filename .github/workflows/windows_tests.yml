@@ -44,19 +44,26 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
     - name: Install poetry
-      run: pipx install poetry
+      run: |
+        pipx install poetry
+        pipx install invoke
 
     - name: Install dependencies
       run: poetry install
-    - name: Run Typecheck
-      run: poetry run python -m invoke typecheck
+
     - name: Run Unittests
+      if: always()
       run: poetry run python -m invoke test
       env:
         CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
         CI_ENDPOINT: ${{ secrets.CI_ENDPOINT }}
-    - name: Run Lint
-      run: poetry run python -m invoke lint
+        
+    - name: "`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`"
+      if: always()
+      run: |
+        inv lint
+        inv typecheck
+        
     - uses: actions/upload-artifact@v1
       if: always()
       with:

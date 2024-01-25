@@ -34,7 +34,7 @@ import traceback
 import weakref
 from typing import ContextManager
 
-from .constants import NULL
+from ._null_in_tests import NULL
 
 log = logging.getLogger(__name__)
 
@@ -199,8 +199,6 @@ else:  # Linux
                 Should only be False if this mutex is expected to be released in
                 a different thread.
             """
-            from .process import is_process_alive
-
             if base_dir is None:
                 base_dir = tempfile.gettempdir()
             os.makedirs(base_dir, exist_ok=True)
@@ -243,10 +241,7 @@ else:  # Linux
                             log.exception("Unable to get locking pid.")
                             curr_pid = "<unable to get locking pid>"
 
-                        try:
-                            is_alive = is_process_alive(int(curr_pid))
-                        except BaseException:
-                            is_alive = "<unknown>"
+                        is_alive = "<unknown>"
                         log.info(
                             "Current pid holding lock: %s. Alive: %s. This pid: %s Filename: %s",
                             curr_pid,

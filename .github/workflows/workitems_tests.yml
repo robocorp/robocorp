@@ -48,13 +48,18 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
     - name: Install poetry
-      run: pipx install poetry
+      run: |
+        pipx install poetry
+        pipx install invoke
 
     - name: Install dependencies
       run: poetry install
-    - name: Run Lint
-      run: poetry run invoke lint
-    - name: Run Typecheck
-      run: poetry run invoke typecheck
+
     - name: Run Unittests
       run: poetry run invoke test
+
+    - name: "`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`"
+      if: always()
+      run: |
+        inv lint
+        inv typecheck

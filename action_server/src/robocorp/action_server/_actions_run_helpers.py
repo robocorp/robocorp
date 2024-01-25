@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict
 
 if typing.TYPE_CHECKING:
-    from robocorp.action_server._models import Action, ActionPackage
+    from robocorp.action_server._models import ActionPackage
     from robocorp.action_server._settings import Settings
 
 

@@ -65,9 +65,7 @@ def _setup_test_callbacks():
         setup_callback.after_method
     ), _lifecycle_hooks.method_return.register(
         setup_callback.method_return
-    ), _lifecycle_hooks.method_except.register(
-        setup_callback.method_except
-    ):
+    ), _lifecycle_hooks.method_except.register(setup_callback.method_except):
         yield setup_callback
 
 

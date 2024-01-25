@@ -16,7 +16,13 @@ except ImportError:
 
 from devutils.invoke_utils import build_common_tasks
 
-globals().update(build_common_tasks(Path(__file__).absolute().parent, "robocorp.log"))
+globals().update(
+    build_common_tasks(
+        Path(__file__).absolute().parent,
+        "robocorp.log",
+        ruff_format_arguments=r"--exclude=_index.py --exclude=_index_v2.py",
+    )
+)
 
 try:
     from robocorp import log

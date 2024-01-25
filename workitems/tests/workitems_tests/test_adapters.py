@@ -195,9 +195,7 @@ class TestRobocorpAdapter:
             "robocorp.workitems._requests.requests.put"
         ) as mock_put, mock.patch(
             "robocorp.workitems._requests.requests.delete"
-        ) as mock_delete, mock.patch(
-            "time.sleep", return_value=None
-        ) as mock_sleep:
+        ) as mock_delete, mock.patch("time.sleep", return_value=None) as mock_sleep:
             self.mock_get = mock_get
             self.mock_post = mock_post
             self.mock_put = mock_put

@@ -85,7 +85,7 @@ def test_log_with_yield_from_iterator(tmpdir, ui_regenerate):
 
     log_target = setup_info.log_target
     assert log_target.exists()
-    msgs = verify_log_messages_from_log_html(
+    verify_log_messages_from_log_html(
         log_target,
         [
             {
@@ -112,7 +112,7 @@ def test_log_with_for_loop(tmpdir, ui_regenerate):
 
     log_target = setup_info.log_target
     assert log_target.exists()
-    msgs = verify_log_messages_from_log_html(
+    verify_log_messages_from_log_html(
         log_target,
         [
             {"message_type": "SE", "name": "for i in range(5)", "type": "FOR"},

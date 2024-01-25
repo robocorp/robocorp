@@ -1,4 +1,16 @@
 def test_multiple_interactions():
+    try:
+        _check_multiple_interactions()
+    except BaseException:
+        # We're not using robocorp.tasks to run, so, we don't have
+        # screenshots automatically.
+        from robocorp.windows import desktop
+
+        desktop().log_screenshot()
+        raise
+
+
+def _check_multiple_interactions():
     import os
     from pathlib import Path
 

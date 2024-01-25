@@ -7,10 +7,10 @@ import socket
 import sys
 import typing
 from typing import Optional
-from termcolor import colored
 
 import requests
 from pydantic import BaseModel, ValidationError
+from termcolor import colored
 
 if typing.TYPE_CHECKING:
     import websockets
@@ -235,7 +235,7 @@ async def expose_server(
                 ping_task.cancel()
                 try:
                     await ping_task
-                except asyncio.CancelledError as e:
+                except asyncio.CancelledError:
                     pass
         else:
             log.info("Expose server connection closed")

@@ -5,7 +5,7 @@ import textwrap
 from contextlib import contextmanager
 from itertools import chain
 from pathlib import Path
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Tuple
 
 from invoke import task
 
@@ -87,7 +87,14 @@ def to_identifier(value: str) -> str:
     return value
 
 
-def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] = None):
+def build_common_tasks(
+    root: Path,
+    package_name: str,
+    tag_prefix: Optional[str] = None,
+    ruff_format_arguments: str = "",
+    parallel_tests: bool = True,
+    source_directories: Tuple[str, ...] = ("src", "tests"),
+):
     """
     Args:
         root: The path to the package root (i.e.: /tasks in the repo)
@@ -156,9 +163,10 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     @task
     def lint(ctx, strict: bool = False):
         """Run static analysis and formatting checks"""
-        poetry(ctx, f"run ruff src tests")
-        poetry(ctx, f"run black --check src tests")
-        poetry(ctx, f"run isort --check src tests")
+        targets = " ".join(source_directories)
+        poetry(ctx, f"run ruff {targets}")
+        poetry(ctx, f"run ruff format --check {targets} {ruff_format_arguments}")
+        poetry(ctx, f"run isort --check {targets}")
         if strict:
             poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
 
@@ -172,8 +180,8 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
             "--show-column-numbers",
             "--namespace-packages",
             "--explicit-package-bases",
-            f"-p {package_name}",
         ]
+        cmd.extend(source_directories)
         if strict:
             cmd.append("--strict")
         poetry(*cmd)
@@ -181,13 +189,18 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     @task
     def pretty(ctx):
         """Auto-format code and sort imports"""
-        poetry(ctx, f"run black src tests")
-        poetry(ctx, f"run isort src tests")
+        targets = " ".join(source_directories)
+        poetry(ctx, f"run ruff --fix {targets}")
+        poetry(ctx, f"run ruff format {targets} {ruff_format_arguments}")
+        poetry(ctx, f"run isort {targets}")
 
     @task
     def test(ctx):
         """Run unittests"""
-        poetry(ctx, f"run pytest -rfE -vv")
+        cmd = "run pytest -rfE -vv"
+        if parallel_tests:
+            cmd += " -n auto"
+        poetry(ctx, cmd)
 
     @task
     def doctest(ctx):

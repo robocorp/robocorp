@@ -27,19 +27,23 @@ def ci_credentials() -> str:
 
 @pytest.fixture(scope="session")
 def rcc_loc(tmpdir_factory):
-    tests_rcc_dir = os.path.expanduser("~/.robocorp_tests_rcc")
-    os.makedirs(tests_rcc_dir, exist_ok=True)
+    from devutils._system_mutex_in_tests import timed_acquire_mutex
 
-    # tests_rcc_dir = tmpdir_factory.mktemp("rcc_dir")
+    with timed_acquire_mutex("download_rcc_in_tests"):
+        tests_rcc_dir = os.path.expanduser("~/.robocorp_tests_rcc")
+        os.makedirs(tests_rcc_dir, exist_ok=True)
 
-    location = os.path.join(str(tests_rcc_dir), f"rcc_{RCC_VERSION}")
-    if sys.platform == "win32":
-        location += ".exe"
-    _download_rcc(location, force=False)
-    assert os.path.exists(location)
+        # tests_rcc_dir = tmpdir_factory.mktemp("rcc_dir")
 
-    # Disable tracking for tests
-    subprocess.check_call([location] + "configure identity --do-not-track".split())
+        location = os.path.join(str(tests_rcc_dir), f"rcc_{RCC_VERSION}")
+        if sys.platform == "win32":
+            location += ".exe"
+        _download_rcc(location, force=False)
+        assert os.path.exists(location)
+
+        # Disable tracking for tests
+        subprocess.check_call([location] + "configure identity --do-not-track".split())
+
     return Path(location)
 
 
@@ -84,7 +88,7 @@ def robocorp_home(tmpdir_factory) -> str:
     return str(dirname)
 
 
-RCC_VERSION = "v14.6.0"
+RCC_VERSION = "v17.13.0"
 
 
 def _download_rcc(location: str, force: bool = False) -> None:

@@ -1,6 +1,3 @@
-import sys
-
-
 def methoda(a: str) -> int:
     """
     This is methoda.

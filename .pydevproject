@@ -29,6 +29,8 @@
         <path>/${PROJECT_DIR_NAME}/windows/tests</path>
         <path>/${PROJECT_DIR_NAME}/actions/src</path>
         <path>/${PROJECT_DIR_NAME}/actions/tests</path>
+        <path>/${PROJECT_DIR_NAME}/workitems/src</path>
+        <path>/${PROJECT_DIR_NAME}/workitems/tests</path>
         <path>/${PROJECT_DIR_NAME}/action_server/src</path>
         <path>/${PROJECT_DIR_NAME}/action_server/tests</path>
     </pydev_pathproperty>

@@ -170,7 +170,6 @@ def setup_stdout_logging(
             mode = "json"
 
     original_stdout = sys.stdout
-    original_stderr = sys.stderr
 
     try:
         if mode == "json":

@@ -541,13 +541,15 @@ class _RoboOutputImpl:
 
         def __call__(self, robot_impl, msg_type):
             oid = robot_impl._obtain_id
-            robot_impl._write_with_separator(
-                f"{msg_type} ",
-                [
-                    oid(self.name),
-                    robot_impl._number(self.time_delta),
-                ],
-            ),
+            (
+                robot_impl._write_with_separator(
+                    f"{msg_type} ",
+                    [
+                        oid(self.name),
+                        robot_impl._number(self.time_delta),
+                    ],
+                ),
+            )
 
     def start_run(self, name: str, time_delta: float) -> None:
         self._stack_handler.push_record(
@@ -577,13 +579,17 @@ class _RoboOutputImpl:
         def __call__(self, robot_impl, msg_type):
             loc_id = robot_impl._obtain_loc_id
 
-            robot_impl._write_with_separator(
-                f"{msg_type} ",
-                [
-                    loc_id(self.name, self.libname, self.source, self.line, self.doc),
-                    robot_impl._number(self.time_delta),
-                ],
-            ),
+            (
+                robot_impl._write_with_separator(
+                    f"{msg_type} ",
+                    [
+                        loc_id(
+                            self.name, self.libname, self.source, self.line, self.doc
+                        ),
+                        robot_impl._number(self.time_delta),
+                    ],
+                ),
+            )
 
     def start_task(
         self,
@@ -633,13 +639,15 @@ class _RoboOutputImpl:
 
         def __call__(self, robot_impl, msg_type):
             oid = robot_impl._obtain_id
-            robot_impl._write_with_separator(
-                f"{msg_type} ",
-                [
-                    oid("Process snapshot"),
-                    robot_impl._number(self.time_delta),
-                ],
-            ),
+            (
+                robot_impl._write_with_separator(
+                    f"{msg_type} ",
+                    [
+                        oid("Process snapshot"),
+                        robot_impl._number(self.time_delta),
+                    ],
+                ),
+            )
 
     def process_snapshot(self, hide_vars: bool) -> None:
         from robocorp import log
@@ -883,10 +891,12 @@ Virtual Memory Size: {vms}"""
 
         def __call__(self, robot_impl, msg_type):
             oid = robot_impl._obtain_id
-            robot_impl._write_with_separator(
-                f"{msg_type} ",
-                [oid(self.title), robot_impl._number(self.time_delta)],
-            ),
+            (
+                robot_impl._write_with_separator(
+                    f"{msg_type} ",
+                    [oid(self.title), robot_impl._number(self.time_delta)],
+                ),
+            )
 
     def _write_stack(
         self,

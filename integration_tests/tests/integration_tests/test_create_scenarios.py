@@ -12,7 +12,7 @@ def case_task_and_element(rcc_loc, resources_dir: Path) -> str:
 
     from robocorp import log
     from robocorp.log import setup_auto_logging
-    from tasks_tests.resources import check
+    from tasks_tests.resources import check  # type: ignore
 
     s = StringIO()
 
