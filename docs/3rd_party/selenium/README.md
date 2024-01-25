@@ -1,7 +1,7 @@
 # Selenium
 
 Selenium is a browser automation tool with a long history being a well tested and go to solution.
-It can be used to automate also legacy browser such as Internet Explorer.
+It can also be used to automate legacy browsers such as Internet Explorer.
 
 ## Usage
 
