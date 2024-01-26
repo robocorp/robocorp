@@ -6,15 +6,28 @@ This is a contribution guide for the `robocorp` project and associated libraries
 
 ### Prerequisites
 
-The tool used for Python dependency management is `poetry`. Both Python (>=3.9) and
-Poetry should be available in either the global environment or in an activated
-Conda environment.
+The tool used for Python dependency management is `poetry` and the commands
+to manage the project are run with `invoke`.
 
-It can be installed via pip:
+They can be installed via pip:
 
 ```
 pip install poetry
+pip install invoke
 ```
+
+Note that `invoke` will automatically call the commands using `poetry run`, so,
+in general it's not needed to activate the environment manually.
+
+### Conda
+
+While `conda` is not always required (if not found a `.venv` will be created
+by `poetry` based on the global python found), when it's found, running 
+commands from `invoke` will prefix such commands with 
+`conda run -n <project-name>` and `inv install` will create
+the related environment automatically. 
+
+When using conda, `poetry` and `invoke` should've been installed in the base environment.
 
 ### Development
 
@@ -22,34 +35,48 @@ To start working on a library, you need to install the project's development-tim
 dependencies. This can be done by navigating to the library's folder and running:
 
 ```
-poetry install
+inv install
 ```
 
-After installation, the environment will have `invoke`, which is used for running
-different project management tasks defined in `tasks.py` (and `devutils`).
+This will create an environment for that project (either in `.venv` or with
+conda with an env based on the project name).
+
+If other dependent libraries also need to be changed (for instance, when
+running on `robocorp-tasks` but also needing to change something in `robocorp-log`),
+it's possible to use:
+
+```
+inv devinstall
+```
+
+This will install all the robocorp libraries in development mode in the python env.
+
+### Calling invoke tasks
 
 To see all available tasks, run `invoke --list` or `inv -l` for short:
 
 ```
-poetry run invoke --list
+invoke --list
 ```
 
-For instance, static analysis can be run with:
+For instance, linting can be run with:
 
 ```
-poetry run inv lint
+inv lint
 ```
 
 If linting fails, syntax issues are usually be fixed by: 
 
 ```
-poetry run inv pretty
+inv pretty
 ```
 
-**Note:** If you're using a virtual environment already, `invoke` and all other dependencies
-should be installed in it directly, and it is not necessary to prefix everything with
-`poetry run`. Another option is to use `poetry shell` to get a subshell with the
-project's environment.
+Typechecking can be checked with:
+
+```
+inv typecheck
+```
+
 
 ### Testing
 
@@ -57,7 +84,7 @@ Testing is done with `pytest` for python libraries. For javascript `jest` is
 usually used.
 
 To run all tests for a given project, go to the project folder in the monorepo
-and then run `poetry run inv test`.
+and then run `inv test`.
 (to run single tests, it's recommended that you configure your favorite editor/IDE
 to use the test framework inside your IDE).
 
@@ -90,13 +117,13 @@ should be updated with the correct dependencies. To see if the current configura
 matches what is availale in PyPI, run the following:
 
 ```
-invoke outdated
+inv outdated
 ```
 
 If it warns about outdated packages, they can be updated with:
 
 ```
-invoke update
+inv update
 ```
 
 The update task also automatically bumps the version of the metapackage based
