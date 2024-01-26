@@ -19,7 +19,7 @@ print(df.to_string())
 ###### Various [snippets](snippets)
 
 - [Create CSV from a dictionary](snippets/export_to_csv.py)
-- [Query CSV data](snippets/query_csv.py)
+- [Query CSV data](snippets/query_csv_data.py)
 
 ## Links and references
 
