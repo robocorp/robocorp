@@ -40,10 +40,26 @@ For instance, static analysis can be run with:
 poetry run inv lint
 ```
 
+If linting fails, syntax issues are usually be fixed by: 
+
+```
+poetry run inv pretty
+```
+
 **Note:** If you're using a virtual environment already, `invoke` and all other dependencies
 should be installed in it directly, and it is not necessary to prefix everything with
 `poetry run`. Another option is to use `poetry shell` to get a subshell with the
 project's environment.
+
+### Testing
+
+Testing is done with `pytest` for python libraries. For javascript `jest` is
+usually used.
+
+To run all tests for a given project, go to the project folder in the monorepo
+and then run `poetry run inv test`.
+(to run single tests, it's recommended that you configure your favorite editor/IDE
+to use the test framework inside your IDE).
 
 ### Releasing
 
