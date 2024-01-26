@@ -20,7 +20,7 @@ globals().update(
     build_common_tasks(
         Path(__file__).absolute().parent,
         "robocorp.log",
-        ruff_format_arguments=r"--exclude=_index.py --exclude=_index_v2.py",
+        ruff_format_arguments=r"--exclude=_index.py --exclude=_index_v2.py --exclude=_index_v3.py",
     )
 )
 

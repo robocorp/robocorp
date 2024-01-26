@@ -120,9 +120,11 @@ def test_browser_type_launch_args(clear_session_caches, monkeypatch):
     from robocorp import browser
     from robocorp.browser._context import browser_type_launch_args
 
-    default_headless = not os.environ.get(
-        "GITHUB_ACTIONS_MATRIX_NAME"
-    ) and sys.platform.startswith("linux")
+    default_headless = False
+    if sys.platform.startswith("linux"):
+        default_headless = not (
+            os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
+        )
 
     assert browser_type_launch_args()["headless"] is default_headless
 

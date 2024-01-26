@@ -5,6 +5,7 @@ import sys
 import tempfile
 import textwrap
 from contextlib import contextmanager
+from functools import lru_cache
 from itertools import chain
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Tuple
@@ -85,6 +86,7 @@ def to_identifier(value: str) -> str:
     return value
 
 
+@lru_cache
 def _use_conda() -> bool:
     """
     Determines whether conda should be used for the env.
@@ -98,7 +100,12 @@ def _use_conda() -> bool:
         raise RuntimeError(
             f'Unrecognized value for "RC_USE_CONDA" env var: {use_conda_flag!r}.'
         )
-    return "CONDA_EXE" in os.environ
+    conda_exe = os.environ.get("CONDA_EXE")
+    if not conda_exe:
+        return False
+    if Path(conda_exe).exists():
+        return True
+    return False
 
 
 def _conda_env_name_to_conda_prefix() -> Dict[str, str]:
@@ -173,20 +180,21 @@ def build_common_tasks(
         return run(ctx, *prefix, *cmd)
 
     def _make_conda_env_if_needed():
-        if not _env_in_conda(CONDA_ENV_NAME):
-            print(f"Conda env: {CONDA_ENV_NAME} not found. Creating now.")
-            subprocess.check_call(
-                [
-                    "conda",
-                    "create",
-                    "-c",
-                    "conda-forge",
-                    "-n",
-                    CONDA_ENV_NAME,
-                    "python=3.10",
-                    "-y",
-                ]
-            )
+        if _use_conda():
+            if not _env_in_conda(CONDA_ENV_NAME):
+                print(f"Conda env: {CONDA_ENV_NAME} not found. Creating now.")
+                subprocess.check_call(
+                    [
+                        "conda",
+                        "create",
+                        "-c",
+                        "conda-forge",
+                        "-n",
+                        CONDA_ENV_NAME,
+                        "python=3.10",
+                        "-y",
+                    ]
+                )
 
     @task
     def install(ctx):

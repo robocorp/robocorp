@@ -15,7 +15,7 @@ import sys
 # Use certificates from native storage (if `truststore` installed)
 if sys.version_info >= (3, 10):
     try:
-        import truststore
+        import truststore  # type: ignore
 
         truststore.inject_into_ssl()
     except ModuleNotFoundError:

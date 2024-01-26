@@ -24,6 +24,13 @@ def _check_multiple_interactions():
     assert os.path.exists(sample_html)
     url = Path(sample_html).as_uri()
 
+    # In GitHub Actions on a fresh install Chrome asks to sign in.
+    # We have to decline
+    try:
+        w.find("id:declineSignInButton").click()
+    except windows.ElementNotFound:
+        pass  # Ignore if not there.
+
     address_bar = w.find('control:EditControl name:"Address and search bar"')
 
     address_bar.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
