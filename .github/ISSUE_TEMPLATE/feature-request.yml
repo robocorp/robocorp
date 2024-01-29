@@ -38,8 +38,9 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Feature/enhancement description
-      description: Describe the problem you try to solve or the missing capability.
+      label: Feature or enhancement
+      description: >-
+        Describe the problem you're trying to solve or the missing capability.
     validations:
       required: true
   - type: textarea

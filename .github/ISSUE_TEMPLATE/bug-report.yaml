@@ -45,7 +45,7 @@ body:
   - type: textarea
     attributes:
       label: System info
-      description: Sharing your system information will help us with debugging
+      description: Sharing your system information will help us with debugging.
       placeholder: >-
         * Library version
         * Python version
