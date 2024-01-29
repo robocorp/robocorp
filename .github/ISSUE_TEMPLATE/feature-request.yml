@@ -1,27 +1,35 @@
 name: ⭐️ Feature Request
 description: Submit a proposal/request for a new feature
-title: "[Feature]: "
+labels: [ feature ]
 body:
-  - type: checkboxes
-    id: library
+  - type: dropdown
+    id: components
     attributes:
-      label: Target library
-      description: Select one or more libraries for the feature request
+      label: Target components
+      description: Select the affected packages in the reported feature
+      multiple: true
       options:
-        - label: Action Server
-          required: false
-        - label: robocorp-actions
-          required: false
-        - label: robocorp-browser
-          required: false
-        - label: robocorp-tasks
-          required: false
-        - label: robocorp-vault
-          required: false
-        - label: robocorp-windows
-          required: false
-        - label: robocorp-workitems
-          required: false
+        - Other
+        - action_server
+        - actions
+        - browser
+        - desktop
+        - devutils
+        - docs
+        - excel
+        - integration_tests
+        - log
+        - log_pytest
+        - meta
+        - storage
+        - tasks
+        - templates
+        - vault
+        - windows
+        - workitems
+      default: 0
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Description
@@ -30,8 +38,8 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Describe the solution you'd like
-      description: If you have a solution in mind, please describe it.
+      label: Describe the solution you'd like to see
+      description: If you have a solution in mind, please detail it.
   - type: textarea
     attributes:
       label: Describe alternatives you've considered

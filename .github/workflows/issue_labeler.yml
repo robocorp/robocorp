@@ -1,0 +1,49 @@
+name: Issue labeler
+
+on:
+  issues:
+    types: [ opened ]
+
+permissions:
+  contents: read
+
+jobs:
+  label-component:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # required for all workflows
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Parse bug issue form
+        uses: stefanbuck/github-issue-parser@v3
+        id: bug-issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/bug-report.yml
+
+      - name: Set bug labels based on the component field
+        uses: redhat-plumbers-in-action/advanced-issue-labeler@v3.0.0
+        with:
+          issue-form: ${{ steps.bug-issue-parser.outputs.jsonString }}
+          section: components
+          block-list: |
+            Other
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
+
+      - name: Parse feature issue form
+        uses: stefanbuck/github-issue-parser@v3
+        id: feature-issue-parser
+        with:
+          template-path: .github/ISSUE_TEMPLATE/feature-request.yml
+
+      - name: Set feature labels based on the component field
+        uses: redhat-plumbers-in-action/advanced-issue-labeler@v3.0.0
+        with:
+          issue-form: ${{ steps.feature-issue-parser.outputs.jsonString }}
+          section: components
+          block-list: |
+            Other
+          token: ${{ secrets.CI_GITHUB_TOKEN }}

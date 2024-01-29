@@ -1,27 +1,35 @@
 name: 🐛 Bug report
 description: Submit a bug report to help us make Robocorp better
-title: "[Issue]: "
+labels: [ bug ]
 body:
-  - type: checkboxes
-    id: library
+  - type: dropdown
+    id: components
     attributes:
-      label: Target library
-      description: Select one or more libraries affected by the bug reported
+      label: Target components
+      description: Select the affected packages in the reported bug
+      multiple: true
       options:
-        - label: Action Server
-          required: false
-        - label: robocorp-actions
-          required: false
-        - label: robocorp-browser
-          required: false
-        - label: robocorp-tasks
-          required: false
-        - label: robocorp-vault
-          required: false
-        - label: robocorp-windows
-          required: false
-        - label: robocorp-workitems
-          required: false
+        - Other
+        - action_server
+        - actions
+        - browser
+        - desktop
+        - devutils
+        - docs
+        - excel
+        - integration_tests
+        - log
+        - log_pytest
+        - meta
+        - storage
+        - tasks
+        - templates
+        - vault
+        - windows
+        - workitems
+      default: 0
+    validations:
+      required: true
   - type: textarea
     id: issue
     attributes:
@@ -39,7 +47,7 @@ body:
     id: system
     attributes:
       label: System Info
-      description: Sharign your system information will help us a lot
+      description: Sharing your system information will help us a lot
       placeholder: >-
         * Library version
         * Python version
