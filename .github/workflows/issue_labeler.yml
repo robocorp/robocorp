@@ -31,7 +31,7 @@ jobs:
           section: components
           block-list: |
             Other
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
 
       - name: Parse feature issue form
         uses: stefanbuck/github-issue-parser@v3
@@ -46,4 +46,4 @@ jobs:
           section: components
           block-list: |
             Other
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
