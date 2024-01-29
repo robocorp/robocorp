@@ -4,9 +4,9 @@ policy:
       block-list: [ 'Other' ]
       label:
         - name: 'Action Server'
-          keys: [ 'action_server' ]
+          keys: [ 'action_server', 'actions' ]
         - name: 'Library'
-          keys: [ 'actions', 'browser', 'desktop', 'excel', 'log', 'log_pytest', 'meta', 'storage', 'tasks', 'vault', 'windows', 'workitems' ]
+          keys: [ 'browser', 'desktop', 'excel', 'log', 'log_pytest', 'meta', 'storage', 'tasks', 'vault', 'windows', 'workitems' ]
         - name: 'robocorp'
           keys: [ 'meta' ]
         - name: 'robocorp-actions'

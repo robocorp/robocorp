@@ -32,15 +32,19 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Description
-      description: Describe the problem or the missing capability
+      label: Why & who
+      description: Let us know why this is important and to whom is addressed.
     validations:
       required: true
   - type: textarea
     attributes:
-      label: Describe the solution you'd like to see
-      description: If you have a solution in mind, please detail it.
+      label: Feature/enhancement description
+      description: Describe the problem you try to solve or the missing capability.
+    validations:
+      required: true
   - type: textarea
     attributes:
-      label: Describe alternatives you've considered
-      description: Are you using or have you considered any alternative solutions or workarounds?
+      label: Solution & alternative
+      description: >-
+        If you have a solution in mind, please detail it. Are you using or have you
+        considered any alternative one or workaround?

@@ -31,26 +31,35 @@ body:
     validations:
       required: true
   - type: textarea
-    id: issue
     attributes:
-      label: What happened?
+      label: What is wrong
       description: >-
         Give details on what you are doing, what you expect to happen, and what
         is currently happening.
       placeholder: >-
         * I'm trying to use the `robocorp` library to do X
-        * I'expected to get Y
+        * I expected to get Y
         * Instead it does Z
     validations:
       required: true
   - type: textarea
-    id: system
     attributes:
-      label: System Info
-      description: Sharing your system information will help us a lot
+      label: System info
+      description: Sharing your system information will help us with debugging
       placeholder: >-
         * Library version
         * Python version
         * Operating System version
     validations:
       required: true
+  - type: textarea
+    attributes:
+      label: Example script
+      description: >-
+        If possible, please provide an automation example which replicates the problem.
+        Including any input/output data sample to test the example with.
+        (⚠️do not share sensitive information as this is a public source)
+      placeholder: >-
+        * Here's the isolated script block which highlights the bug
+        * Which is operating on this file
+        * And produces this behaviour/output instead of the expected one
