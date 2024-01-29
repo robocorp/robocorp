@@ -1,6 +1,35 @@
 name: ⭐️ Feature Request
 description: Submit a proposal/request for a new feature
+labels: [ feature ]
 body:
+  - type: dropdown
+    id: components
+    attributes:
+      label: Target components
+      description: Select the affected packages in the reported feature
+      multiple: true
+      options:
+        - Other
+        - action_server
+        - actions
+        - browser
+        - desktop
+        - devutils
+        - docs
+        - excel
+        - integration_tests
+        - log
+        - log_pytest
+        - meta
+        - storage
+        - tasks
+        - templates
+        - vault
+        - windows
+        - workitems
+      default: 0
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Description

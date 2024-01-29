@@ -1,6 +1,35 @@
 name: 🐛 Bug report
 description: Submit a bug report to help us make Robocorp better
+labels: [ bug ]
 body:
+  - type: dropdown
+    id: components
+    attributes:
+      label: Target components
+      description: Select the affected packages in the reported bug
+      multiple: true
+      options:
+        - Other
+        - action_server
+        - actions
+        - browser
+        - desktop
+        - devutils
+        - docs
+        - excel
+        - integration_tests
+        - log
+        - log_pytest
+        - meta
+        - storage
+        - tasks
+        - templates
+        - vault
+        - windows
+        - workitems
+      default: 0
+    validations:
+      required: true
   - type: textarea
     id: issue
     attributes:
