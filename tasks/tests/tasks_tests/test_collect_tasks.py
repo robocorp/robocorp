@@ -71,9 +71,7 @@ def test_collect_tasks_integrated(datadir):
         ["run", str(datadir), "-t", "main"], returncode=0, cwd=datadir
     )
 
-    assert (
-        not result.stderr
-    ), f"Error with command line: {result.args}: {result.stderr.decode('utf-8', 'replace')}"
+    assert not result.stderr, f"Error with command line: {result.args}: {result.stderr.decode('utf-8', 'replace')}"
     assert "In some method" in result.stdout.decode("utf-8")
 
     # That's the default.

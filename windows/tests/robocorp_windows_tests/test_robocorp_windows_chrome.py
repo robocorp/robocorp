@@ -1,4 +1,16 @@
 def test_multiple_interactions():
+    try:
+        _check_multiple_interactions()
+    except BaseException:
+        # We're not using robocorp.tasks to run, so, we don't have
+        # screenshots automatically.
+        from robocorp.windows import desktop
+
+        desktop().log_screenshot()
+        raise
+
+
+def _check_multiple_interactions():
     import os
     from pathlib import Path
 
@@ -11,6 +23,13 @@ def test_multiple_interactions():
     sample_html = os.path.join(os.path.dirname(__file__), "sample.html")
     assert os.path.exists(sample_html)
     url = Path(sample_html).as_uri()
+
+    # In GitHub Actions on a fresh install Chrome asks to sign in.
+    # We have to decline
+    try:
+        w.find("id:declineSignInButton").click()
+    except windows.ElementNotFound:
+        pass  # Ignore if not there.
 
     address_bar = w.find('control:EditControl name:"Address and search bar"')
 

@@ -30,6 +30,7 @@ def test_collect_tasks_glob(datadir, data_regression, glob_pattern):
     found = json.loads(result.stdout)
     for entry in found:
         _fix_file(entry)
+    found = sorted(found, key=lambda obj: obj["name"])
     data_regression.check(found)
 
 

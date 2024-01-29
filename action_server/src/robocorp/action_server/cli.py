@@ -361,7 +361,6 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
 
     from ._download_rcc import download_rcc
     from ._rcc import initialize_rcc
-    from ._robo_utils.auth import generate_api_key
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
 

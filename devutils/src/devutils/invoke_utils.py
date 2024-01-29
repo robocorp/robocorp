@@ -1,11 +1,14 @@
+import os
 import re
+import subprocess
 import sys
 import tempfile
 import textwrap
 from contextlib import contextmanager
+from functools import lru_cache
 from itertools import chain
 from pathlib import Path
-from typing import Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from invoke import task
 
@@ -59,8 +62,6 @@ def get_tag(tag_prefix: str) -> str:
     Args:
         tag_prefix: The tag prefix to match (i.e.: "robocorp-tasks")
     """
-    import subprocess
-
     # i.e.: Gets the last tagged version
     cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}-[0-9]*".split()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
@@ -71,8 +72,6 @@ def get_tag(tag_prefix: str) -> str:
 
 
 def get_all_tags(tag_prefix: str) -> List[str]:
-    import subprocess
-
     cmd = "git tag".split()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     stdout, stderr = popen.communicate()
@@ -87,7 +86,68 @@ def to_identifier(value: str) -> str:
     return value
 
 
-def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] = None):
+@lru_cache
+def _use_conda() -> bool:
+    """
+    Determines whether conda should be used for the env.
+    """
+    use_conda_flag = os.environ.get("RC_USE_CONDA", "")
+    if use_conda_flag:
+        if use_conda_flag.lower() in ("1", "true"):
+            return True
+        if use_conda_flag.lower() in ("0", "false"):
+            return False
+        raise RuntimeError(
+            f'Unrecognized value for "RC_USE_CONDA" env var: {use_conda_flag!r}.'
+        )
+    conda_exe = os.environ.get("CONDA_EXE")
+    if not conda_exe:
+        return False
+    if Path(conda_exe).exists():
+        return True
+    return False
+
+
+def _conda_env_name_to_conda_prefix() -> Dict[str, str]:
+    ret = {}
+    output = subprocess.check_output(["conda", "env", "list"], encoding="utf-8")
+    for line in output.splitlines():
+        line = line.strip()
+        if line.startswith("#") or not line:
+            continue
+        try:
+            name, prefix = line.split()
+        except Exception:
+            continue  # Not all lines have the name and prefix
+        name = name.strip()
+        ret[name] = prefix
+    return ret
+
+
+def _activated_conda_env() -> Optional[str]:
+    if os.environ.get("CONDA_PREFIX"):
+        return os.environ.get("CONDA_DEFAULT_ENV", "").strip()
+    return None
+
+
+def _env_in_conda(env_name) -> bool:
+    """
+    If the given environment name exists in conda, return True, otherwise False.
+
+    :param env_name:
+        The name of the env to check (example: 'robocorp-tasks').
+    """
+    return env_name in _conda_env_name_to_conda_prefix()
+
+
+def build_common_tasks(
+    root: Path,
+    package_name: str,
+    tag_prefix: Optional[str] = None,
+    ruff_format_arguments: str = "",
+    parallel_tests: bool = True,
+    source_directories: Tuple[str, ...] = ("src", "tests"),
+):
     """
     Args:
         root: The path to the package root (i.e.: /tasks in the repo)
@@ -101,10 +161,9 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
         tag_prefix = package_name.replace(".", "-")
 
     DIST = root / "dist"
+    CONDA_ENV_NAME = package_name.replace(".", "-").replace("_", "-")
 
     def run(ctx, *cmd, **options):
-        import os
-
         options.setdefault("pty", sys.platform != "win32")
         options.setdefault("echo", True)
 
@@ -113,16 +172,40 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
         return ctx.run(args, **options)
 
     def poetry(ctx, *cmd):
-        return run(ctx, "poetry", *cmd)
+        prefix = []
+        if _use_conda():
+            prefix.extend(["conda", "run", "--no-capture-output", "-n", CONDA_ENV_NAME])
+        prefix.append("poetry")
+
+        return run(ctx, *prefix, *cmd)
+
+    def _make_conda_env_if_needed():
+        if _use_conda():
+            if not _env_in_conda(CONDA_ENV_NAME):
+                print(f"Conda env: {CONDA_ENV_NAME} not found. Creating now.")
+                subprocess.check_call(
+                    [
+                        "conda",
+                        "create",
+                        "-c",
+                        "conda-forge",
+                        "-n",
+                        CONDA_ENV_NAME,
+                        "python=3.10",
+                        "-y",
+                    ]
+                )
 
     @task
     def install(ctx):
         """Install dependencies"""
+        _make_conda_env_if_needed()
         poetry(ctx, "install")
 
     @task
     def devinstall(ctx):
         """Install dependencies with deps in dev mode"""
+        _make_conda_env_if_needed()
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
 
@@ -156,9 +239,10 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     @task
     def lint(ctx, strict: bool = False):
         """Run static analysis and formatting checks"""
-        poetry(ctx, f"run ruff src tests")
-        poetry(ctx, f"run black --check src tests")
-        poetry(ctx, f"run isort --check src tests")
+        targets = " ".join(source_directories)
+        poetry(ctx, f"run ruff {targets}")
+        poetry(ctx, f"run ruff format --check {targets} {ruff_format_arguments}")
+        poetry(ctx, f"run isort --check {targets}")
         if strict:
             poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
 
@@ -172,8 +256,8 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
             "--show-column-numbers",
             "--namespace-packages",
             "--explicit-package-bases",
-            f"-p {package_name}",
         ]
+        cmd.extend(source_directories)
         if strict:
             cmd.append("--strict")
         poetry(*cmd)
@@ -181,13 +265,18 @@ def build_common_tasks(root: Path, package_name: str, tag_prefix: Optional[str] 
     @task
     def pretty(ctx):
         """Auto-format code and sort imports"""
-        poetry(ctx, f"run black src tests")
-        poetry(ctx, f"run isort src tests")
+        targets = " ".join(source_directories)
+        poetry(ctx, f"run ruff --fix {targets}")
+        poetry(ctx, f"run ruff format {targets} {ruff_format_arguments}")
+        poetry(ctx, f"run isort {targets}")
 
     @task
     def test(ctx):
         """Run unittests"""
-        poetry(ctx, f"run pytest -rfE -vv")
+        cmd = "run pytest -rfE -vv"
+        if parallel_tests:
+            cmd += " -n auto"
+        poetry(ctx, cmd)
 
     @task
     def doctest(ctx):

@@ -1,5 +1,5 @@
 def call_in_iterator(value):
-    x = value
+    x = value  # noqa
 
 
 def iterate_entries_in_project(steps: int):
@@ -14,13 +14,13 @@ def iterate_entries_in_project(steps: int):
 
 def for_iter():
     for i in range(5):
-        a = i
+        a = i  # noqa
 
 
 def for_iter_multiple_targets():
     for i, j in enumerate(range(2)):
-        a = i
-        b = j
+        a = i  # noqa
+        b = j  # noqa
 
 
 def while_loop_multiple_targets():
@@ -29,26 +29,26 @@ def while_loop_multiple_targets():
     while i < 10 and j < 10:
         i += 1
         j += 1
-        a = i
-        b = j
+        a = i  # noqa
+        b = j  # noqa
 
 
 def for_iter_exc():
     for i in range(5):
-        a = i
+        a = i  # noqa
         if i == 2:
             raise RuntimeError("some error")
 
 
 def for_early_return():
     for i in range(5):
-        a = i
+        a = i  # noqa
         if i == 2:
             return
 
 
 def call_in_main(value):
-    y = value
+    y = value  # noqa
 
 
 def main():
@@ -65,7 +65,7 @@ def yield_from():
 
 def main_yield_from():
     for v in yield_from():
-        val = v
+        val = v  # noqa
 
 
 def yield_augassign():

@@ -27,6 +27,9 @@ xlutils = "^2.0.0"
 openpyxl = "^3.0.9"
 typing-extensions = "^4.5.0"
 
+[tool.mypy]
+mypy_path = "src:tests"
+
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
 

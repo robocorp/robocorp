@@ -1,6 +1,6 @@
 from robocorp.actions import action
 
-from .runner import ReplRunner
+from .runner import ReplRunner  # noqa
 
 
 @action

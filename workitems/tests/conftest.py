@@ -1,8 +1,4 @@
-from .fixtures import adapter, context, inputs, outputs
-
-__all__ = [
-    "inputs",
-    "outputs",
-    "context",
-    "adapter",
+pytest_plugins = [
+    "devutils.fixtures",
+    "workitems_tests.fixtures",
 ]

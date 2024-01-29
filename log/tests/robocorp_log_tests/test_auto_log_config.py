@@ -19,7 +19,7 @@ def test_auto_log_config() -> None:
     )
 
     assert config.get_filter_kind_by_module_name("myRPA.bar") == FilterKind.exclude
-    assert config.get_filter_kind_by_module_name("anothermodule") == None
+    assert config.get_filter_kind_by_module_name("anothermodule") is None
     assert (
         config.get_filter_kind_by_module_name("another.module")
         == FilterKind.log_on_project_call

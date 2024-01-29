@@ -1,14 +1,20 @@
 import inspect
 import typing
 from contextlib import contextmanager
-from types import ModuleType
 from typing import Any, Dict, List, Literal, Optional, Tuple, get_type_hints
 
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
 
-from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
-from robocorp.tasks._protocols import IContext, ITask, Status
+from ._constants import SUPPORTED_TYPES_IN_SCHEMA
+from ._protocols import IContext, ITask, Status
+
+_map_python_type_to_user_type = {
+    str: "string",
+    int: "integer",
+    float: "number",
+    bool: "boolean",
+}
 
 
 def _build_properties(
@@ -24,14 +30,7 @@ def _build_properties(
         if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
             param_type_clsname = f"Error. The {kind} type '{param_type.__name__}' in '{method_name}' is not supported. Supported {kind} types: str, int, float, bool."
         else:
-            if param_type == str:
-                param_type_clsname = "string"
-            elif param_type == int:
-                param_type_clsname = "integer"
-            elif param_type == float:
-                param_type_clsname = "number"
-            elif param_type == bool:
-                param_type_clsname = "boolean"
+            param_type_clsname = _map_python_type_to_user_type[param_type]
 
     properties = {
         "type": param_type_clsname,
@@ -115,7 +114,7 @@ class Task:
             if param.default is inspect.Parameter.empty:
                 required.append(param.name)
             else:
-                param_properties["default"] = str(param.default)
+                param_properties["default"] = param.default
 
         if required:
             schema["required"] = required

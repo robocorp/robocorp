@@ -15,7 +15,7 @@ import sys
 # Use certificates from native storage (if `truststore` installed)
 if sys.version_info >= (3, 10):
     try:
-        import truststore
+        import truststore  # type: ignore
 
         truststore.inject_into_ssl()
     except ModuleNotFoundError:
@@ -29,7 +29,7 @@ if sys.platform == "win32":
     sys.coinit_flags = _COINIT_MULTITHREADED  # type:ignore
 
 # Just importing is enough to register the commands
-from . import _commands  # @UnusedImport
+from . import _commands  # noqa
 from ._argdispatch import arg_dispatch as _arg_dispatch
 
 

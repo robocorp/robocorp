@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install poetry
-      run: pipx install poetry
+      run: python -m pip install poetry invoke tomlkit
 
     - name: Setup node
       uses: actions/setup-node@v3
@@ -37,7 +37,7 @@ jobs:
         cache: 'poetry'
 
     - name: Install project
-      run: poetry install
+      run: inv install
       env:
         ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
 
@@ -46,7 +46,7 @@ jobs:
 
     - name: Build with poetry
       run: |
-        poetry run inv build-frontend
+        inv build-frontend
         # Make sure that we have no binaries present when doing the build.
         rm src/robocorp/bin/rcc src/robocorp/bin/rcc.exe -f
         # Just sdist here, wheels are built in the manylinux job.

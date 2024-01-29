@@ -24,7 +24,7 @@ def test_errors(log_setup, tmpdir):
         raise AssertionError("Expected error and it was not raised.")
 
     stream.seek(0)
-    msgs = verify_log_messages_from_stream(
+    verify_log_messages_from_stream(
         stream,
         [
             dict(message_type="EE", status=Status.ERROR),

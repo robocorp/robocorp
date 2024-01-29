@@ -9,7 +9,7 @@ authors = [
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp", from="src"}]
+packages = [{include = "robocorp/workitems", from="src"}]
 
 [tool.black]
 skip-string-normalization = false
@@ -17,6 +17,9 @@ skip-magic-trailing-comma = false
 
 [tool.isort]
 profile = "black"
+
+[tool.mypy]
+mypy_path = "src:tests"
 
 [tool.poetry.dependencies]
 python = "^3.9"

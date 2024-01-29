@@ -95,7 +95,7 @@ def _collect_mutex_allocation_msg(mutex_name):
         write_contents.append("\n--- Stack ---\n")
         write_contents.append(s.getvalue())
         return "\n".join(write_contents)
-    except:
+    except BaseException:
         try:
             return str(os.getpid())
         except Exception:
@@ -143,7 +143,7 @@ if sys.platform == "win32":
                 try:
                     with open(filename) as stream:
                         self.mutex_creation_info = stream.read()
-                except:
+                except BaseException:
                     self.mutex_creation_info = "<unable to read>"
             else:
 
@@ -230,7 +230,7 @@ else:  # Linux
                 try:
                     with open(filename) as stream:
                         self.mutex_creation_info = stream.read()
-                except:
+                except BaseException:
                     self.mutex_creation_info = "<unable to read>"
 
                 # It was unable to get the lock
@@ -239,13 +239,13 @@ else:  # Linux
                         try:
                             with open(filename, "r") as stream:
                                 curr_pid = stream.readline().strip()[-1]
-                        except:
+                        except BaseException:
                             log.exception("Unable to get locking pid.")
                             curr_pid = "<unable to get locking pid>"
 
                         try:
                             is_alive = is_process_alive(int(curr_pid))
-                        except:
+                        except BaseException:
                             is_alive = "<unknown>"
                         log.info(
                             "Current pid holding lock: %s. Alive: %s. This pid: %s Filename: %s",
@@ -254,7 +254,7 @@ else:  # Linux
                             os.getpid(),
                             filename,
                         )
-                    except:
+                    except BaseException:
                         if logging.root.level <= logging.DEBUG:
                             log.exception("Error getting lock info on failure.")
             else:

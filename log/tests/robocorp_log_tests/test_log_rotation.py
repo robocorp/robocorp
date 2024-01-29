@@ -3,7 +3,7 @@ def test_rotate_logs(tmpdir, str_regression) -> None:
     from pathlib import Path
 
     from robocorp_log_tests._resources import check
-    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html
+    from robocorp_log_tests.fixtures import pretty_format_logs_from_log_html  # noqa
 
     from robocorp import log as robolog
     from robocorp.log import iter_decoded_log_format_from_stream
