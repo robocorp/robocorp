@@ -269,11 +269,19 @@ jobs:
         with:
           name: action-server-artifacts-for-s3-${{ env.actionServerVersion }}
           path: action_server/s3-drop
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials Dropbox bucket [Non-Beta]
+        if: ${{ steps.check_beta.outputs.is_beta == 'false' }}
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CICD_DROPBOX }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CICD_DROPBOX }}
+            aws-region: eu-west-1
+      - name: Configure AWS credentials Downloads bucket [Beta]
+        if: ${{ steps.check_beta.outputs.is_beta == 'true' }}
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
+            aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
             aws-region: eu-west-1
       - name: AWS S3 copies
         run: |
@@ -289,56 +297,56 @@ jobs:
             aws s3 cp s3-drop/linux64/action-server $S3_BASE_URL/linux64/action-server --cache-control max-age=120 --content-type "application/octet-stream"
           fi
           
-  # trigger-brew-workflow:
-  #   needs:
-  #     # sign-macos needs to be explicit in order to get the version, even if it's implied
-  #     - sign-macos
-  #     - deploy-s3
-  #   defaults:
-  #     run:
-  #       working-directory: .
+  trigger-brew-workflow:
+    needs:
+      # sign-macos needs to be explicit in order to get the version, even if it's implied
+      - sign-macos
+      - deploy-s3
+    defaults:
+      run:
+        working-directory: .
     
-  #   # No Brew run for beta -releases
-  #   if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
+    # No Brew run for beta -releases
+    if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
 
-  #   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Wait for Downloads S3 Bucket to have the right content
-  #       timeout-minutes: 5
-  #       run: |
-  #         VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
-  #         EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
+    steps:
+      - name: Wait for Downloads S3 Bucket to have the right content
+        timeout-minutes: 5
+        run: |
+          VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
+          EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
 
-  #         while true; do
-  #           DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
-  #           echo "Downloaded version: $DOWNLOADED_VERSION"
-  #           echo "Expected version: $EXPECTED_VERSION"
+          while true; do
+            DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
+            echo "Downloaded version: $DOWNLOADED_VERSION"
+            echo "Expected version: $EXPECTED_VERSION"
 
-  #           if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
-  #             echo "Versions match."
-  #             break
-  #           else
-  #             echo "Versions do not match. Retrying in 30 seconds."
-  #           fi
+            if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
+              echo "Versions match."
+              break
+            else
+              echo "Versions do not match. Retrying in 30 seconds."
+            fi
 
-  #           sleep 30
-  #         done
-  #     - name: Trigger Brew Deploy Workflow
-  #       run: |
-  #         curl -X POST \
-  #           -H "Authorization: token ${{ secrets.GHA_TO_OTHER_REPO }}" \
-  #           -H "Accept: application/vnd.github.v3+json" \
-  #           https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
-  #           -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
+            sleep 30
+          done
+      - name: Trigger Brew Deploy Workflow
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GHA_TO_OTHER_REPO }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
+            -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
 
   release:
 
     if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
 
     needs:
-      - deploy-s3  # needed for check_beta
-      # - trigger-brew-workflow
+      - deploy-s3  # needed for is_beta
+      - trigger-brew-workflow
     
     defaults:
       run:
