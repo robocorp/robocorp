@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def restrict_to_window_locators(
-    or_search_params: Tuple[OrSearchParams, ...]
+    or_search_params: Tuple[OrSearchParams, ...],
 ) -> Tuple[OrSearchParams, ...]:
     last_part: OrSearchParams = or_search_params[-1]
     also_add_as_pane = []
