@@ -29,3 +29,7 @@ policy:
           keys: [ 'windows' ]
         - name: 'robocorp-workitems'
           keys: [ 'workitems' ]
+        - name: 'chore'
+          keys: [ 'devutils', 'integration_tests' ]
+        - name: 'documentation'
+          keys: [ 'docs' ]

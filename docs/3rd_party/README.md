@@ -9,6 +9,9 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [Selenium: "[..] automates browsers. That's it!"](./selenium/README.md)
 - [Pandas: "Used for working with data sets"](./pandas/README.md)
 - [Psutil: "Utilitary for system monitoring and management"](./psutil/README.md)
+- [BeautifulSoup: "Scrape web pages with ease"](./beautifulsoup4/README.md)
+- [Boto3: "Interact with AWS services programatically"](./boto3/README.md)
+- [Numpy: "Collection of mathematical functions to operate on arrays and matrices"](./numpy/README.md)
 - ...
 
 
