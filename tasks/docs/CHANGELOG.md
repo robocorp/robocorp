@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.1 - 2024-01-31
+
+- Internal changes related to handling arguments.
+
 ## 2.9.0 - 2024-01-18
 
 - Provides support for calling `main` multiple times.

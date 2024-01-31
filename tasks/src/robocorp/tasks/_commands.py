@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import traceback
+import typing
 from argparse import ArgumentParser, ArgumentTypeError
 from io import StringIO
 from pathlib import Path
@@ -18,7 +19,9 @@ from ._argdispatch import arg_dispatch as _arg_dispatch
 
 # Note: the args must match the 'dest' on the configured argparser.
 @_arg_dispatch.register(name="list")
-def list_tasks(path: str, glob: Optional[str] = None) -> int:
+def list_tasks(
+    path: str, glob: Optional[str] = None, __stream__: Optional[typing.IO] = None
+) -> int:
     """
     Prints the tasks available at a given path to the stdout in json format.
 
@@ -48,6 +51,11 @@ def list_tasks(path: str, glob: Optional[str] = None) -> int:
         return 1
 
     original_stdout = sys.stdout
+    if __stream__ is not None:
+        write_to = __stream__
+    else:
+        write_to = original_stdout
+
     with redirect_stdout(sys.stderr):
         task: ITask
         tasks_found = []
@@ -64,8 +72,8 @@ def list_tasks(path: str, glob: Optional[str] = None) -> int:
                 }
             )
 
-        original_stdout.write(json.dumps(tasks_found))
-        original_stdout.flush()
+        write_to.write(json.dumps(tasks_found))
+        write_to.flush()
     return 0
 
 

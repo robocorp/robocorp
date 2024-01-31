@@ -34,6 +34,16 @@ log = logging.getLogger(__name__)
 #             json.dump(schema, file, indent=4)
 
 
+def _add_skip_lint(parser, defaults):
+    parser.add_argument(
+        "--skip-lint",
+        default=False,
+        help="Skip `@action` linting when an action is found (by default any "
+        "`@action` is linted for errors when found).",
+        action="store_true",
+    )
+
+
 def _add_data_args(parser, defaults):
     parser.add_argument(
         "-d",
@@ -156,7 +166,7 @@ def _create_parser():
         "from a different directory",
         action="append",
     )
-
+    _add_skip_lint(start_parser, defaults)
     start_parser.add_argument(
         "--min-processes",
         type=int,
@@ -211,7 +221,7 @@ def _create_parser():
         help="Can be used to import an action package from the local filesystem",
         action="append",
     )
-
+    _add_skip_lint(import_parser, defaults)
     _add_data_args(import_parser, defaults)
     _add_verbose_args(import_parser, defaults)
 
@@ -517,15 +527,22 @@ To migrate the database to the current version
                         try:
                             for action_package_dir in base_args.dir:
                                 _actions_import.import_action_package(
-                                    settings.datadir,
-                                    os.path.abspath(action_package_dir),
+                                    datadir=settings.datadir,
+                                    action_package_dir=os.path.abspath(
+                                        action_package_dir
+                                    ),
+                                    skip_lint=base_args.skip_lint,
+                                    disable_not_imported=False,
+                                    name=None,
                                 )
                         except ActionServerValidationError as e:
-                            print(
-                                "\nUnable to import action. Please fix the error below and retry.",
-                                file=sys.stderr,
+                            log.critical(
+                                colored(
+                                    f"\nUnable to import action. Please fix the error below and retry.\n{e}",
+                                    color="red",
+                                    attrs=["bold"],
+                                )
                             )
-                            print(str(e), file=sys.stderr)
                             return 1
                         return 0
 
@@ -543,16 +560,22 @@ To migrate the database to the current version
                             try:
                                 for action_package_dir in base_args.dir:
                                     _actions_import.import_action_package(
-                                        settings.datadir,
-                                        os.path.abspath(action_package_dir),
+                                        datadir=settings.datadir,
+                                        action_package_dir=os.path.abspath(
+                                            action_package_dir
+                                        ),
                                         disable_not_imported=base_args.actions_sync,
+                                        skip_lint=base_args.skip_lint,
+                                        name=None,
                                     )
                             except ActionServerValidationError as e:
-                                print(
-                                    "\nUnable to import action. Please fix the error below and retry.",
-                                    file=sys.stderr,
+                                log.critical(
+                                    colored(
+                                        f"\nUnable to import action. Please fix the error below and retry.\n{e}",
+                                        color="red",
+                                        attrs=["bold"],
+                                    )
                                 )
-                                print(str(e), file=sys.stderr)
                                 return 1
 
                         with use_runs_state_ctx(db):

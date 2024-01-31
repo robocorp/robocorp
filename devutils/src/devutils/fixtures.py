@@ -309,7 +309,8 @@ def python_run(
     if result.returncode == returncode:
         return result
 
-    env_str = "\n".join(str(x) for x in sorted(cp.items()))
+    # This is a bit too verbose, so, commented out for now.
+    # env_str = "\n".join(str(x) for x in sorted(cp.items()))
 
     raise AssertionError(
         f"""Expected returncode: {returncode}. Found: {result.returncode}.
@@ -318,9 +319,6 @@ def python_run(
 
 === stderr:
 {result.stderr.decode('utf-8')}
-
-=== Env:
-{env_str}
 
 === Args:
 {args}

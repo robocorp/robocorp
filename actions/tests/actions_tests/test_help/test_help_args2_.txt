@@ -1,4 +1,4 @@
-usage: robocorp.actions list [-h] [--glob GLOB] [path]
+usage: robocorp.actions list [-h] [--glob GLOB] [--skip-lint] [path]
 
 positional arguments:
   path         The directory or file from where the actions should be listed
@@ -7,4 +7,6 @@ positional arguments:
 options:
   -h, --help   show this help message and exit
   --glob GLOB  May be used to specify a glob to select from which files actions
-               should be searched (default '*action*.py')
+               should be searched (default '*action*.py|*action*.py')
+  --skip-lint  Skip `@action` linting when an action is found (by default any
+               `@action` is linted for errors when found).

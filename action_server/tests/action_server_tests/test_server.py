@@ -46,6 +46,7 @@ def test_bad_return_on_no_conda(
         cwd=calculator,
         actions_sync=True,
         timeout=300,
+        lint=False,
     )
     found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
     assert found.json()["message"] == (
@@ -247,6 +248,7 @@ def calculator_sum(v1: int = 5) -> float:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -307,6 +309,7 @@ def calculator_sum(v1: float, v2: float) -> float:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -339,6 +342,7 @@ def another_action(a1: str, a2: str) -> str:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -677,6 +681,7 @@ def calculator_sum(v1: float, v2: float) -> float:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -706,6 +711,7 @@ def calculator_sum(v1: str, v2: str) -> str:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
