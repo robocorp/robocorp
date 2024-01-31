@@ -8,7 +8,7 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [Requests: "Requests: HTTP for Humans™"](./requests/README.md)
 - [Selenium: "[..] automates browsers. That's it!"](./selenium/README.md)
 - [Pandas: "Used for working with data sets"](./pandas/README.md)
-- [BeautifulSoup: "Scape web pages with ease"](./beautifulsoup4/README.md)
+- [BeautifulSoup: "Scrape web pages with ease"](./beautifulsoup4/README.md)
 - ...
 
 
