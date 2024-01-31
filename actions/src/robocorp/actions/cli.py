@@ -18,7 +18,7 @@ def main(args=None, exit: bool = True) -> int:
     from robocorp.tasks import _constants
     from robocorp.tasks.cli import main
 
-    _constants.DEFAULT_TASK_SEARCH_GLOB = "*action*.py|*task*.py"
+    _constants.DEFAULT_TASK_SEARCH_GLOB = "*action*.py"
     _constants.MODULE_ENTRY_POINT = "robocorp.actions"
 
     return main(args, exit, argument_dispatcher=_ActionsArgDispatcher())

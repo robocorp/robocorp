@@ -30,8 +30,8 @@ MYPY_ARGS: --follow-imports=silent --show-column-numbers --namespace-packages --
 MYPY_FILE_LOCATION: ''
 MYPY_USE_CONSOLE: true
 PYDEV_TEST_RUNNER: '2'
-PYDEV_TEST_RUNNER_DEFAULT_PARAMETERS: --capture=no -W ignore::DeprecationWarning -n 0 --tb=native -vv --force-regen --assert=plain
-# PYDEV_TEST_RUNNER_DEFAULT_PARAMETERS: --capture=no -W ignore::DeprecationWarning -n auto --tb=native -vv --force-regen --assert=plain
+# PYDEV_TEST_RUNNER_DEFAULT_PARAMETERS: --capture=no -W ignore::DeprecationWarning -n 0 --tb=native -vv --force-regen --assert=plain
+PYDEV_TEST_RUNNER_DEFAULT_PARAMETERS: --capture=no -W ignore::DeprecationWarning -n auto --tb=native -vv --force-regen --assert=plain
 PYDEV_USE_PYUNIT_VIEW: true
 RUFF_ARGS: ''
 RUFF_FILE_LOCATION: ''

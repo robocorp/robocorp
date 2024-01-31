@@ -101,7 +101,7 @@ def test_run_id_in_response_header(
 
     # Note: there are more contents, but the ones below are the ones we cane about
     expected = """
-SR: calculator_tasks.py - calculator_sum
+SR: calculator_actions.py - calculator_sum
     ST: Collect tasks
     ET: PASS
     ST: calculator_sum
@@ -462,7 +462,7 @@ def test_import(
             )
             assert len(found) == 2
             assert (
-                "Collecting task greet from: greeter_task.py"
+                "Collecting task greet from: greeter_action.py"
                 in found["__action_server_output.txt"]
             )
             assert '"PASS"' in found["output.robolog"]
@@ -484,7 +484,7 @@ def test_import(
                 },
             )
 
-            assert "Collecting task greet from: greeter_task.py" in found
+            assert "Collecting task greet from: greeter_action.py" in found
 
 
 def test_routes(action_server_process: ActionServerProcess, data_regression):

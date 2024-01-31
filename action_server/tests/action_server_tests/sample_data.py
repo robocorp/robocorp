@@ -18,7 +18,7 @@ ACTION = Action(
     action_package_id=ACTION_PACKAGE.id,
     name="greet",
     docs="Provides a greeting for a person.",
-    file="greeter_task.py",
+    file="greeter_action.py",
     lineno=4,
     input_schema=(
         '{"additionalProperties": false, '

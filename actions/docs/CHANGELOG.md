@@ -9,6 +9,7 @@
     - Each argument has a description in the docstring (error).
     - Arguments are properly typed (warning).
     - Return is properly typed (warning).
+- Files named `*task*.py` are no longer loaded by default in actions.
 
 ## 0.0.6 - 2024-01-18
 
