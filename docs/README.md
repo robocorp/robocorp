@@ -36,6 +36,13 @@ It's possible to install individual components of the project as separate depend
 | [`robocorp.windows`](../windows)     | [![robocorp-windows](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)](https://pypi.org/project/robocorp-windows/)         | Automate Windows desktop applications, powered by [uiautomation](https://github.com/yinkaisheng/Python-UIAutomation-for-Windows). | - |
 | [`robocorp.excel`](../excel)         | [![robocorp-excel](https://img.shields.io/pypi/v/robocorp-excel?label=robocorp-excel)](https://pypi.org/project/robocorp-excel/)                 | Read and write Excel files directly, with support for both .xlsx and .xls.                                                        | - |
 
+> ⚠️ Any library that isn't included by default in `robocorp` (not having the
+> "Metapackage" mark) should be added as a dependency if you wish to make it available
+> in your Python environment. Do this by listing any of the above as a requirement in
+> your dependencies configuration file:
+> - _conda.yaml_ for an automation Task Package
+> - _action-package.yaml_ for an automation Action Package
+> - _requirements.txt_, _pyproject.toml_ etc. for the rest
 
 > **On versions:** <br/>
 We follow [semver](https://semver.org) to the best of our ability in library versioning.<br/>
