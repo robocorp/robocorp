@@ -48,18 +48,9 @@ class _ArgDispatcher:
 
         return argparse.ArgumentParser
 
-    def _create_argparser(self):
-        cls = self._get_argument_parser_class()
-        parser = cls(
-            prog=_constants.MODULE_ENTRY_POINT,
-            description=self._get_description(),
-            epilog="View https://github.com/robocorp/robo for more information",
-        )
-
-        subparsers = parser.add_subparsers(dest="command")
-
+    def _create_run_parser(self, main_parser):
         # Run
-        run_parser = subparsers.add_parser(
+        run_parser = main_parser.add_parser(
             "run",
             help="Collects tasks with the @task decorator and all tasks that matches based on the task name filter.",
         )
@@ -71,7 +62,7 @@ class _ArgDispatcher:
         )
         run_parser.add_argument(
             "--glob",
-            help="May be used to specify a glob to select from which files tasks should be searched (default '*task*.py')",
+            help=f"May be used to specify a glob to select from which files tasks should be searched (default '{_constants.DEFAULT_TASK_SEARCH_GLOB}')",
         )
         self._add_task_argument(run_parser)
         run_parser.add_argument(
@@ -162,8 +153,11 @@ class _ArgDispatcher:
             help="Can be used to do an early os._exit to avoid the tasks session teardown or the interpreter teardown. Not recommended in general.",
         )
 
+        return run_parser
+
+    def _create_list_tasks_parser(self, main_parser):
         # List tasks
-        list_parser = subparsers.add_parser(
+        list_parser = main_parser.add_parser(
             "list",
             help="Provides output to stdout with json contents of the tasks available.",
         )
@@ -176,10 +170,23 @@ class _ArgDispatcher:
         list_parser.add_argument(
             "--glob",
             help=(
-                "May be used to specify a glob to select from which files tasks should be searched (default '*task*.py')"
+                f"May be used to specify a glob to select from which files tasks should be searched (default '{_constants.DEFAULT_TASK_SEARCH_GLOB}')"
             ),
         )
 
+        return list_parser
+
+    def _create_argparser(self):
+        cls = self._get_argument_parser_class()
+        parser = cls(
+            prog=_constants.MODULE_ENTRY_POINT,
+            description=self._get_description(),
+            epilog="View https://github.com/robocorp/robo for more information",
+        )
+
+        subparsers = parser.add_subparsers(dest="command")
+        self._create_run_parser(subparsers)
+        self._create_list_tasks_parser(subparsers)
         return parser
 
     def parse_args(self, args: List[str]):

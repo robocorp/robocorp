@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-actions"
-version = "0.0.6"
+version = "0.0.7"
 description = "Robocorp Actions"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
