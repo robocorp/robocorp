@@ -235,110 +235,110 @@ jobs:
           echo "is_beta: $is_beta"
           echo "::set-output name=is_beta::$is_beta"
 
-      - uses: actions/download-artifact@v4
-        with:
-            name: action-server-signed-windows
-            path: action_server/build/windows64/
-      - uses: actions/download-artifact@v4
-        with:
-            name: action-server-signed-macos
-            path: action_server/build/macos64/
-      - uses: actions/download-artifact@v4
-        with:
-            name: Linux-action-server-unsigned
-            path: action_server/build/linux64/
-      - uses: actions/download-artifact@v4
-        with:
-            name: action-server-version
-            path: action_server/build/
-      - run: |
-          ls -l
-          pwd
-          ls -l build
-          mkdir s3-drop
-          # We need to rename the linux binary because the others are renamed during signing
-          mv build/linux64/action-server-unsigned build/linux64/action-server
-          mv build/version.txt s3-drop/
-          mv build/macos64 s3-drop/
-          mv build/linux64 s3-drop/
-          mv build/windows64 s3-drop/
-          ls -l s3-drop/
-          ver=`cat s3-drop/version.txt`
-          echo "actionServerVersion=${ver}" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v4
-        with:
-          name: action-server-artifacts-for-s3-${{ env.actionServerVersion }}
-          path: action_server/s3-drop
-      - name: Configure AWS credentials Dropbox bucket [Non-Beta]
-        if: ${{ steps.check_beta.outputs.is_beta == 'false' }}
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CICD_DROPBOX }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CICD_DROPBOX }}
-            aws-region: eu-west-1
-      - name: Configure AWS credentials Downloads bucket [Beta]
-        if: ${{ steps.check_beta.outputs.is_beta == 'true' }}
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
-            aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
-            aws-region: eu-west-1
-      - name: AWS S3 copies
-        run: |
-          if [ "${{ !steps.check_beta.outputs.is_beta }}" = "true" ]; then
-            echo "Normal release, aws sync to drop-box, full pipeline"
-            aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
-          else
-            echo "BETA RELEASE, only copy the executable for testing"
-            S3_BASE_URL="s3://downloads.robocorp.com/action-server/beta"
-            aws s3 cp s3-drop/version.txt $S3_BASE_URL/version.txt --cache-control max-age=120 --content-type "text/plain"
-            aws s3 cp s3-drop/windows64/action-server.exe $S3_BASE_URL/windows64/action-server.exe --cache-control max-age=120 --content-type "application/octet-stream"
-            aws s3 cp s3-drop/macos64/action-server $S3_BASE_URL/macos64/action-server --cache-control max-age=120 --content-type "application/octet-stream"
-            aws s3 cp s3-drop/linux64/action-server $S3_BASE_URL/linux64/action-server --cache-control max-age=120 --content-type "application/octet-stream"
-          fi
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #       name: action-server-signed-windows
+      #       path: action_server/build/windows64/
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #       name: action-server-signed-macos
+      #       path: action_server/build/macos64/
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #       name: Linux-action-server-unsigned
+      #       path: action_server/build/linux64/
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #       name: action-server-version
+      #       path: action_server/build/
+      # - run: |
+      #     ls -l
+      #     pwd
+      #     ls -l build
+      #     mkdir s3-drop
+      #     # We need to rename the linux binary because the others are renamed during signing
+      #     mv build/linux64/action-server-unsigned build/linux64/action-server
+      #     mv build/version.txt s3-drop/
+      #     mv build/macos64 s3-drop/
+      #     mv build/linux64 s3-drop/
+      #     mv build/windows64 s3-drop/
+      #     ls -l s3-drop/
+      #     ver=`cat s3-drop/version.txt`
+      #     echo "actionServerVersion=${ver}" >> $GITHUB_ENV
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: action-server-artifacts-for-s3-${{ env.actionServerVersion }}
+      #     path: action_server/s3-drop
+      # - name: Configure AWS credentials Dropbox bucket [Non-Beta]
+      #   if: ${{ steps.check_beta.outputs.is_beta == 'false' }}
+      #   uses: aws-actions/configure-aws-credentials@v1-node16
+      #   with:
+      #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CICD_DROPBOX }}
+      #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CICD_DROPBOX }}
+      #       aws-region: eu-west-1
+      # - name: Configure AWS credentials Downloads bucket [Beta]
+      #   if: ${{ steps.check_beta.outputs.is_beta == 'true' }}
+      #   uses: aws-actions/configure-aws-credentials@v1-node16
+      #   with:
+      #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DOWNLOADS_INDEX_UPDATER }}
+      #       aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_DOWNLOADS_INDEX_UPDATER }}
+      #       aws-region: eu-west-1
+      # - name: AWS S3 copies
+      #   run: |
+      #     if [ "${{ !steps.check_beta.outputs.is_beta }}" = "true" ]; then
+      #       echo "Normal release, aws sync to drop-box, full pipeline"
+      #       aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
+      #     else
+      #       echo "BETA RELEASE, only copy the executable for testing"
+      #       S3_BASE_URL="s3://downloads.robocorp.com/action-server/beta"
+      #       aws s3 cp s3-drop/version.txt $S3_BASE_URL/version.txt --cache-control max-age=120 --content-type "text/plain"
+      #       aws s3 cp s3-drop/windows64/action-server.exe $S3_BASE_URL/windows64/action-server.exe --cache-control max-age=120 --content-type "application/octet-stream"
+      #       aws s3 cp s3-drop/macos64/action-server $S3_BASE_URL/macos64/action-server --cache-control max-age=120 --content-type "application/octet-stream"
+      #       aws s3 cp s3-drop/linux64/action-server $S3_BASE_URL/linux64/action-server --cache-control max-age=120 --content-type "application/octet-stream"
+      #     fi
           
-  trigger-brew-workflow:
-    needs:
-      # sign-macos needs to be explicit in order to get the version, even if it's implied
-      - sign-macos
-      - deploy-s3
-    defaults:
-      run:
-        working-directory: .
+  # trigger-brew-workflow:
+  #   needs:
+  #     # sign-macos needs to be explicit in order to get the version, even if it's implied
+  #     - sign-macos
+  #     - deploy-s3
+  #   defaults:
+  #     run:
+  #       working-directory: .
     
-    # No Brew run for beta -releases
-    if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
+  #   # No Brew run for beta -releases
+  #   if: ${{ needs.deploy-s3.outputs.is_beta == 'false' }}
 
-    runs-on: ubuntu-latest
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Wait for Downloads S3 Bucket to have the right content
-        timeout-minutes: 5
-        run: |
-          VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
-          EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
+  #   steps:
+  #     - name: Wait for Downloads S3 Bucket to have the right content
+  #       timeout-minutes: 5
+  #       run: |
+  #         VERSION_URL="https://downloads.robocorp.com/action-server/releases/latest/version.txt"
+  #         EXPECTED_VERSION=${{ needs.sign-macos.outputs.version }}
 
-          while true; do
-            DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
-            echo "Downloaded version: $DOWNLOADED_VERSION"
-            echo "Expected version: $EXPECTED_VERSION"
+  #         while true; do
+  #           DOWNLOADED_VERSION=$(curl -sS $VERSION_URL)
+  #           echo "Downloaded version: $DOWNLOADED_VERSION"
+  #           echo "Expected version: $EXPECTED_VERSION"
 
-            if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
-              echo "Versions match."
-              break
-            else
-              echo "Versions do not match. Retrying in 30 seconds."
-            fi
+  #           if [ "$DOWNLOADED_VERSION" = "$EXPECTED_VERSION" ]; then
+  #             echo "Versions match."
+  #             break
+  #           else
+  #             echo "Versions do not match. Retrying in 30 seconds."
+  #           fi
 
-            sleep 30
-          done
-      - name: Trigger Brew Deploy Workflow
-        run: |
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GHA_TO_OTHER_REPO }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
-            -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
+  #           sleep 30
+  #         done
+  #     - name: Trigger Brew Deploy Workflow
+  #       run: |
+  #         curl -X POST \
+  #           -H "Authorization: token ${{ secrets.GHA_TO_OTHER_REPO }}" \
+  #           -H "Accept: application/vnd.github.v3+json" \
+  #           https://api.github.com/repos/robocorp/packaging/actions/workflows/action-server_brew.yml/dispatches \
+  #           -d '{"ref":"master","inputs":{"version":"${{ needs.sign-macos.outputs.version }}"}}'
 
   release:
 
@@ -346,7 +346,7 @@ jobs:
 
     needs:
       - deploy-s3  # needed for is_beta
-      - trigger-brew-workflow
+      # - trigger-brew-workflow
     
     defaults:
       run:
@@ -355,12 +355,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Create GitHub release
         uses: Roang-zero1/github-create-release-action@v3
         with:
           release_title: ${{ github.ref_name }}
           changelog_file: actions_server/docs/CHANGELOG.md
-          release_text: Binaries available as assets. Run `<executable_name> help` for usage instructions.
+          release_text: Binaries available as assets. Run `action-server help` for usage instructions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v4
