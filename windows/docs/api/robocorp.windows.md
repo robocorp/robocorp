@@ -4,13 +4,15 @@
 
 **Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L0)
 
-The `robocorp-windows` library is a library to be used to interact with native widgets on the Windows OS.
+Module used to interact with native widgets on the Windows OS through UI Automation.
+
+This library can be made available by pinning ![](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows) in your dependencies' configuration.
 
 ______________________________________________________________________
 
 ## function `get_icon_from_file`
 
-**Source:** [`__init__.py:32`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L32)
+**Source:** [`__init__.py:36`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L36)
 
 ```python
 get_icon_from_file(path: str) → Optional[ForwardRef('Image')]
@@ -49,7 +51,7 @@ ______________________________________________________________________
 
 ## function `desktop`
 
-**Source:** [`__init__.py:80`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L80)
+**Source:** [`__init__.py:84`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L84)
 
 ```python
 desktop() → Desktop
@@ -66,7 +68,7 @@ ______________________________________________________________________
 
 ## function `config`
 
-**Source:** [`__init__.py:96`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L96)
+**Source:** [`__init__.py:100`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L100)
 
 ```python
 config() → Config
@@ -89,7 +91,7 @@ ______________________________________________________________________
 
 ## function `find_window`
 
-**Source:** [`__init__.py:153`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L153)
+**Source:** [`__init__.py:157`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L157)
 
 ```python
 find_window(
@@ -135,7 +137,7 @@ ______________________________________________________________________
 
 ## function `find_windows`
 
-**Source:** [`__init__.py:202`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L202)
+**Source:** [`__init__.py:206`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L206)
 
 ```python
 find_windows(
@@ -175,7 +177,7 @@ ______________________________________________________________________
 
 ## function `wait_for_condition`
 
-**Source:** [`__init__.py:246`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L246)
+**Source:** [`__init__.py:250`](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L250)
 
 ```python
 wait_for_condition(
@@ -2101,7 +2103,7 @@ set_value(
     enter: bool = False,
     newline: bool = False,
     send_keys_fallback: bool = True,
-    validator: Optional[Callable] = <function set_value_validator at 0x000001AF6046DC60>,
+    validator: Optional[Callable] = <function set_value_validator at 0x000001E88F1D9FC0>,
     locator: Optional[str] = None,
     search_depth: int = 8,
     timeout: Optional[float] = None

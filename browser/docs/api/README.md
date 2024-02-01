@@ -4,14 +4,14 @@
 
 ## Modules
 
-- [`robocorp.browser`](./robocorp.browser.md#module-robocorpbrowser)
+- [`robocorp.browser`](./robocorp.browser.md#module-robocorpbrowser): Main module for doing browser automation with Playwright.
 - [`robocorp.browser.cli`](./robocorp.browser.cli.md#module-robocorpbrowsercli)
 
 ## Classes
 
 - [`_types.BrowserEngine`](./robocorp.browser._types.md#class-browserengine): Valid browser engines for Playwright.
 - [`_types.BrowserNotFound`](./robocorp.browser._types.md#class-browsernotfound): No matching browser found in the environment.
-- [`_types.InstallError`](./robocorp.browser._types.md#class-installerror): Error encountered during browser install
+- [`_types.InstallError`](./robocorp.browser._types.md#class-installerror): Error encountered during browser install.
 
 ## Functions
 
