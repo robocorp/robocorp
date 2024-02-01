@@ -1,8 +1,12 @@
 # ruff: noqa: F401
 """
-The `robocorp-windows` library is a library to be used to interact
-with native widgets on the Windows OS.
+Module used to interact with native widgets on the Windows OS through UI Automation.
+
+This library can be made available by pinning
+![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)
+in your dependencies' configuration.
 """
+
 import time
 import typing
 from functools import lru_cache

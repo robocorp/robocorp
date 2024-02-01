@@ -53,3 +53,8 @@ ignore_missing_imports = true
 log_filter_rules = [
     {name = "wincon", kind = "exclude"},
 ]
+
+[tool.ruff]
+exclude = [
+    "_vendored",
+]
