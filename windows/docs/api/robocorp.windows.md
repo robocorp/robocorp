@@ -2103,7 +2103,7 @@ set_value(
     enter: bool = False,
     newline: bool = False,
     send_keys_fallback: bool = True,
-    validator: Optional[Callable] = <function set_value_validator at 0x000001E88F1D9FC0>,
+    validator: Optional[Callable] = <function set_value_validator at 0x000001E906FC9AB0>,
     locator: Optional[str] = None,
     search_depth: int = 8,
     timeout: Optional[float] = None

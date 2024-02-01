@@ -23,9 +23,9 @@ The property names available for matching are:
 
 - `subname` identifies a target window/control by its `name` matching using the `in` operator. Example: `subname:cal"`.
 
-- `class`: identifies a target window/control by its `class`. Example: `control:Button`, `control:TextBlock`.
+- `class`: identifies a target window/control by its `class`. Example: `class:Button`, `class:TextBlock`.
 
-- `control` (may also be used as `class`): identifies a target window/control by its `type`. Example: `control:ButtonControl`, `control:ButtonControl`.
+- `control` (may also be used as `type`): identifies a target window/control by its `type`. Example: `control:ButtonControl`, `type:ButtonControl`.
 
 - `id` (may also be used as `automationid`): identifies a target window/control by its `automation id`. Example: `id:"open button"`.
 
@@ -65,4 +65,3 @@ may be found. It's not recommended to have a big depth value as bigger depths
 mean that more items have to be traversed to find an element which can make 
 such searches slower (so, more queries with a shalower depth is recommended 
 over less queries with a bigger depth).
-
