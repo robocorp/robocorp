@@ -1,3 +1,11 @@
+"""
+Main module for doing Excel automation.
+
+This library can be made available by pinning
+![`robocorp-excel`](https://img.shields.io/pypi/v/robocorp-excel?label=robocorp-excel)
+in your dependencies' configuration.
+"""
+
 from robocorp.excel.excel import create_workbook, open_workbook
 from robocorp.excel.tables import Table
 

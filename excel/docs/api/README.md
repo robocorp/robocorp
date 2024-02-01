@@ -4,7 +4,7 @@
 
 ## Modules
 
-- [`robocorp.excel`](./robocorp.excel.md#module-robocorpexcel)
+- [`robocorp.excel`](./robocorp.excel.md#module-robocorpexcel): Main module for doing Excel automation.
 - [`robocorp.excel.excel`](./robocorp.excel.excel.md#module-robocorpexcelexcel)
 - [`robocorp.excel.tables`](./robocorp.excel.tables.md#module-robocorpexceltables)
 - [`robocorp.excel.workbook`](./robocorp.excel.workbook.md#module-robocorpexcelworkbook)
