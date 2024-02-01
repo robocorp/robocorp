@@ -8,6 +8,7 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [Requests: "Requests: HTTP for Humans™"](./requests/README.md)
 - [Selenium: "[..] automates browsers. That's it!"](./selenium/README.md)
 - [Pandas: "Used for working with data sets"](./pandas/README.md)
+- [Cryptography: "Secure your application"](./cryptography/README.md)
 - [Psutil: "Utilitary for system monitoring and management"](./psutil/README.md)
 - [BeautifulSoup: "Scrape web pages with ease"](./beautifulsoup4/README.md)
 - [Boto3: "Interact with AWS services programatically"](./boto3/README.md)
