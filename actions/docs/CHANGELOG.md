@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.7 - 2024-01-31
+
+- When actions are imported they're also automatically linted for the following errors:
+    - Mising docstrings (error)
+    - Mising docstrings docstring (error)
+    - Return statement is found (error).
+    - Each argument has a description in the docstring (error).
+    - Arguments are properly typed (warning).
+    - Return is properly typed (warning).
+- Files named `*task*.py` are no longer loaded by default in actions.
+
 ## 0.0.6 - 2024-01-18
 
 - Provides support for calling `main` multiple times.

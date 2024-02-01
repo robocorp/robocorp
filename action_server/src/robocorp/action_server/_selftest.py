@@ -80,6 +80,7 @@ class ActionServerProcess:
         min_processes: int = 0,
         max_processes: int = 20,
         reuse_processes: bool = False,
+        lint: bool = False,
         additional_args: Optional[list[str]] = None,
     ) -> None:
         from robocorp.action_server._robo_utils.process import Process
@@ -110,6 +111,9 @@ class ActionServerProcess:
             f"--datadir={str(self._datadir)}",
             f"--db-file={db_file}",
         ]
+
+        if not lint:
+            new_args.append("--skip-lint")
 
         new_args.append(f"--min-processes={min_processes}")
         new_args.append(f"--max-processes={max_processes}")
@@ -218,7 +222,14 @@ class ActionServerClient:
         import requests
 
         result = requests.post(self.build_full_url(url), json=data or {})
-        assert result.status_code == status_code
+        if result.status_code != status_code:
+            raise AssertionError(
+                (
+                    f"Expected: {result.status_code}.\n"
+                    f"Found: {status_code}\n"
+                    f"Text: {result.text}\n"
+                )
+            )
         return result
 
     def get_error(self, url, status_code):

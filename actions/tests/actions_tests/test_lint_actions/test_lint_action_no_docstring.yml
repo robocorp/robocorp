@@ -1,0 +1,32 @@
+- message: '@action docstring not found. Please define it as this is what an LLM would
+    use to decide whether to call this action.'
+  range:
+    end:
+      character: 13
+      line: 3
+    start:
+      character: 4
+      line: 3
+  severity: 1
+  source: robocorp.actions
+- message: '@action without return annotation defined (`str` considered as the return
+    type).'
+  range:
+    end:
+      character: 13
+      line: 3
+    start:
+      character: 4
+      line: 3
+  severity: 2
+  source: robocorp.actions
+- message: '@action without a `return` (an `@action` must have a return value).'
+  range:
+    end:
+      character: 13
+      line: 3
+    start:
+      character: 4
+      line: 3
+  severity: 1
+  source: robocorp.actions

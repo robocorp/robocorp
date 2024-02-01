@@ -19,10 +19,12 @@ class ActionPackageError(Exception):
 
 
 def import_action_package(
+    *,
     datadir: Path,
     action_package_dir: str,
-    name: Optional[str] = None,
-    disable_not_imported: bool = False,
+    name: Optional[str],
+    disable_not_imported: bool,
+    skip_lint: bool,
 ):
     """
     Imports action packages based on directories given in the filesystem.
@@ -159,19 +161,21 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     env = build_python_launch_env(use_env)
 
     v = _get_robocorp_actions_version(env, import_path)
-    if v < (0, 0, 6):
+    expected_version = (0, 0, 7)
+    expected_version_str = ".".join(str(x) for x in expected_version)
+    if v < expected_version:
         v_as_str = ".".join(str(x) for x in v)
 
         if action_server_yaml_exists:
             raise ActionServerValidationError(
                 f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
-                f"Expected `robocorp-actions` version to be 0.0.6 or higher.\n"
+                f"Expected `robocorp-actions` version to be {expected_version_str} or higher.\n"
                 f"Please update the version in: {action_server_yaml}\n"
             )
         else:
             raise ActionServerValidationError(
                 f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
-                f"Expected it to be 0.0.6 or higher.\n"
+                f"Expected it to be {expected_version_str} or higher.\n"
                 f"Please update the `robocorp-actions` version in your python environment (python: {sys.executable})\n"
             )
 
@@ -181,6 +185,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         import_path,
         action_package,
         disable_not_imported=disable_not_imported,
+        skip_lint=skip_lint,
     )
 
 
@@ -225,9 +230,13 @@ def _add_actions_to_db(
     import_path: Path,
     action_package: "ActionPackage",
     disable_not_imported: bool,
+    skip_lint: bool,
 ):
     from dataclasses import asdict
 
+    from robocorp.actions._lint_action import format_lint_results
+
+    from robocorp.action_server._errors_action_server import ActionServerValidationError
     from robocorp.action_server._gen_ids import gen_uuid
     from robocorp.action_server._models import Action, ActionPackage, get_db
     from robocorp.action_server._settings import get_python_exe_from_env
@@ -235,6 +244,9 @@ def _add_actions_to_db(
     python = get_python_exe_from_env(env)
 
     cmdline = [python, "-m", "robocorp.actions", "list"]
+
+    if skip_lint:
+        cmdline.append("--skip-lint")
 
     popen = subprocess.Popen(
         cmdline,
@@ -246,6 +258,24 @@ def _add_actions_to_db(
     )
     stdout, stderr = popen.communicate()
     if popen.poll() != 0:
+        if popen.poll() == 1:
+            # Let's see if we have linting issues.
+            try:
+                loaded_from_stdout = json.loads(stdout)
+            except Exception:
+                pass  # Ok, just go with the "regular" error.
+            else:
+                # We loaded some json from the stdout. Check if there
+                # were linting errors.
+                if isinstance(loaded_from_stdout, dict):
+                    lint_result = loaded_from_stdout.get("lint_result")
+                    if isinstance(lint_result, dict):
+                        formatted_lint_result = format_lint_results(lint_result)
+                        if formatted_lint_result is not None:
+                            raise ActionServerValidationError(
+                                formatted_lint_result.message
+                            )
+
         raise RuntimeError(
             f"It was not possible to list the actions.\n"
             f"cmdline: {subprocess.list2cmdline(cmdline)}\n"
@@ -253,6 +283,12 @@ def _add_actions_to_db(
             f"stdout:{stdout.decode('utf-8', 'replace')}\n"
             f"stderr:{stderr.decode('utf-8', 'replace')}"
         )
+
+    # If it didn't fail the import, consider as warning (and thus print in yellow).
+    decoded_stderr = stderr.decode("utf-8", "replace").strip()
+    if decoded_stderr:
+        log.critical(colored(f"{decoded_stderr}\n", color="yellow", attrs=["bold"]))
+
     try:
         loaded = json.loads(stdout)
     except json.JSONDecodeError:
