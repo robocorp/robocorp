@@ -22,3 +22,4 @@ def broken_action() -> int:
     This always raises an error.
     """
     raise RuntimeError("This is broken")
+    return 1

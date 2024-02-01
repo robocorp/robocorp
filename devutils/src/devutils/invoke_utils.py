@@ -329,6 +329,11 @@ def build_common_tasks(
         poetry(ctx, "build")
 
     @task
+    def lock(ctx):
+        """Run poetry lock"""
+        poetry(ctx, "lock")
+
+    @task
     def docs(ctx):
         """Build API documentation"""
         output_path = root / "docs" / "api"

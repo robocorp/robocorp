@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.20 - 2024-01-31
+
+- When importing actions, lint them by default (`--skip-lint` may be used
+  to disable linting).
+  - `robocorp-actions 0.0.7` is now required.
+
 ## 0.0.19 - 2024-01-24
 
 - Instead of defining a `conda.yaml` it's expected that an `action-server.yaml` is defined
