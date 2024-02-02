@@ -5,7 +5,7 @@ from typing import Any
 from ._errors import RobocorpVaultError
 from ._secrets import SecretContainer
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 version_info = [int(x) for x in __version__.split(".")]
 
 
