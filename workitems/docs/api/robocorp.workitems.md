@@ -113,6 +113,10 @@ There can only be one input work item reserved at a time. To reserve the next it
 __init__(adapter: BaseAdapter, item_id: str)
 ```
 
+#### property `exception`
+
+Current work item exception if any.
+
 #### property `files`
 
 Names of attached files.
@@ -192,7 +196,7 @@ ______________________________________________________________________
 
 ### method `create_output`
 
-**Source:** [`_workitem.py:434`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L434)
+**Source:** [`_workitem.py:440`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L440)
 
 ```python
 create_output() → Output
@@ -204,7 +208,7 @@ ______________________________________________________________________
 
 ### method `done`
 
-**Source:** [`_workitem.py:442`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L442)
+**Source:** [`_workitem.py:448`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L448)
 
 ```python
 done()
@@ -216,7 +220,7 @@ ______________________________________________________________________
 
 ### method `email`
 
-**Source:** [`_workitem.py:288`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L288)
+**Source:** [`_workitem.py:294`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L294)
 
 ```python
 email(html=True, encoding='utf-8', ignore_errors=False) → Optional[Email]
@@ -241,7 +245,7 @@ ______________________________________________________________________
 
 ### method `fail`
 
-**Source:** [`_workitem.py:453`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L453)
+**Source:** [`_workitem.py:459`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L459)
 
 ```python
 fail(
@@ -263,7 +267,7 @@ ______________________________________________________________________
 
 ### method `get_file`
 
-**Source:** [`_workitem.py:366`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L366)
+**Source:** [`_workitem.py:372`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L372)
 
 ```python
 get_file(name: str, path: Optional[Path, str] = None) → Path
@@ -285,7 +289,7 @@ ______________________________________________________________________
 
 ### method `get_files`
 
-**Source:** [`_workitem.py:396`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L396)
+**Source:** [`_workitem.py:402`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L402)
 
 ```python
 get_files(pattern: str, path: Optional[Path] = None) → list[Path]
@@ -359,7 +363,7 @@ ______________________________________________________________________
 
 ### method `save`
 
-**Source:** [`_workitem.py:277`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L277)
+**Source:** [`_workitem.py:283`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L283)
 
 ```python
 save()
@@ -375,7 +379,7 @@ ______________________________________________________________________
 
 ## class `Output`
 
-**Source:** [`_workitem.py:511`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L511)
+**Source:** [`_workitem.py:518`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L518)
 
 Container for an output work item.
 
@@ -385,7 +389,7 @@ Note: An output item always has an input item as a parent, which is used for tra
 
 ### method `__init__`
 
-**Source:** [`_workitem.py:521`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L521)
+**Source:** [`_workitem.py:528`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L528)
 
 ```python
 __init__(adapter: BaseAdapter, parent_id: str)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.3 - 2024-02-06
+
+- Add exception property to workitems
+
 ## 1.4.2 - 2024-01-14
 
 - Fix main README and update docs.
