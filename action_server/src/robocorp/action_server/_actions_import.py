@@ -65,7 +65,9 @@ def import_action_package(
 
     # Verify if it's actually a proper package (meaning that it has
     # the action-server.yaml as well as actions we can run).
-    action_server_yaml = import_path / "action-server.yaml"
+    original_action_server_yaml = action_server_yaml = (
+        import_path / "action-server.yaml"
+    )
     action_server_yaml_exists = action_server_yaml.exists()
     if not action_server_yaml_exists:
         # Backward-compatibility
@@ -80,7 +82,7 @@ def import_action_package(
     if not action_server_yaml_exists:
         if is_frozen():
             raise ActionServerValidationError(
-                f"Unable to import actions in standalone action-server because no `action-server.yaml` is available at: {action_server_yaml}."
+                f"Unable to import actions in standalone action-server because no `action-server.yaml` is available at: {original_action_server_yaml}."
             )
         log.info(
             """Adding action without a managed environment (action-server.yaml unavailable).
