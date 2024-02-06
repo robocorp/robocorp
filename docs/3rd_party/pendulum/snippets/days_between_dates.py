@@ -1,16 +1,16 @@
 import pendulum
 
 
-def days_between_dates(date1, date2) -> int:
+def days_between_dates(date1: str, date2: str) -> int:
     """
     Calculates the difference in days between two dates.
 
     Args:
-        date1 (str): first date in YYYY-MM-DD format
-        date2 (str): second date in YYYY-MM-DD format
+        date1: first date in YYYY-MM-DD format
+        date2: second date in YYYY-MM-DD format
 
     Returns:
-        int: difference in days between the two dates
+        The difference in days between the two dates.
     """
 
     dt1 = pendulum.parse(date1)

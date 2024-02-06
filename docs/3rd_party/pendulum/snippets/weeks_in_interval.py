@@ -6,11 +6,11 @@ def weeks_in_interval(start_date: str, end_date: str) -> list[pendulum.DateTime]
     Generate a list of weeks within the interval between start_date and end_date
 
     Args:
-        start_date (str): The start date of the interval.
-        end_date (str): The end date of the interval.
+        start_date: The start date of the interval.
+        end_date: The end date of the interval.
 
     Returns:
-        list[pendulum.DateTime]: A list of weeks within the interval.
+        A list of weeks within the interval.
     """
 
     start_date = pendulum.parse(start_date)
