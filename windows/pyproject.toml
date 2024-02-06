@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-windows"
-version = "1.0.1"
+version = "1.0.2"
 description = "Robocorp Windows Automation (API to automate Windows)"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -52,4 +52,9 @@ ignore_missing_imports = true
 
 log_filter_rules = [
     {name = "wincon", kind = "exclude"},
+]
+
+[tool.ruff]
+exclude = [
+    "_vendored",
 ]

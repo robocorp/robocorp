@@ -1,3 +1,11 @@
+"""
+Main module for doing browser automation with Playwright.
+
+This library can be made available by pinning
+![`robocorp-browser`](https://img.shields.io/pypi/v/robocorp-browser?label=robocorp-browser)
+in your dependencies' configuration.
+"""
+
 from typing import Literal, Optional, Union
 
 from playwright.sync_api import (
@@ -11,7 +19,7 @@ from playwright.sync_api import (
 
 from ._types import BrowserEngine, BrowserNotFound, InstallError
 
-__version__ = "2.2.2"
+__version__ = "2.2.3"
 version_info = [int(x) for x in __version__.split(".")]
 
 

@@ -360,8 +360,8 @@ jobs:
         uses: Roang-zero1/github-create-release-action@v3
         with:
           release_title: ${{ github.ref_name }}
-          changelog_file: actions_server/docs/CHANGELOG.md
-          release_text: Binaries available as assets. Run `action-server help` for usage instructions.
+          changelog_file: action_server/docs/CHANGELOG.md
+          release_text: Binaries available as assets. Run `action-server -h` for usage instructions.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/download-artifact@v4

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.3 - 2024-02-01
+
+- Leave the range more flexible for cryptography so that users can use a newer
+  version (`">=41.0.6,<44"`)
+
 ## 1.3.2 - 2024-01-14
 
 - Security update: use at least `cryptography` **41.0.6**.

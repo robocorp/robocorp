@@ -1,5 +1,13 @@
 `robocorp-windows` is a library which can be used for Windows desktop automation.
 
+> ⚠️ This library isn't included by default in `robocorp`. In order to use this, you
+> have to make it available in your Python environment by listing
+> ![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)
+> as a requirement in your dependencies configuration file:
+> - _conda.yaml_ for an automation Task Package
+> - _action-package.yaml_ for an automation Action Package
+> - _requirements.txt_, _pyproject.toml_ etc. for the rest
+
 The basic idea of the library is enabling windows and controls to be found
 by leveraging `locators` (i.e.: strings which identify how to reach some
 window or control) and then interacting with such elements.
