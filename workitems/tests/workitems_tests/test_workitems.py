@@ -1,5 +1,6 @@
 import os
 import tempfile
+from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -133,11 +134,9 @@ def test_input_fail(inputs, adapter):
     assert item.exception is None
     assert len(adapter.releases) == 0
 
-    exception = {
-        "type": ExceptionType.BUSINESS,
-        "code": "MY_ERR_CODE",
-        "message": "Something went oopsy",
-    }
+    exception = OrderedDict(
+        type=ExceptionType.BUSINESS, code="MY_ERR_CODE", message="Something went oopsy"
+    )
 
     item.fail(*exception.values())
     assert item.state is State.FAILED
