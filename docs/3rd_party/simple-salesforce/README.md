@@ -10,7 +10,7 @@ from simple_salesforce import Salesforce
 sf = Salesforce(username='myemail@example.com', password='password', security_token='token')
 
 # Create a contact
-sf.Contact.create({'FirstName': 'John', 'LastName':'Smith','Email':'example@example.com'})
+sf.Contact.create({'FirstName': 'John', 'LastName': 'Smith','Email': 'example@example.com'})
 ```
 
 > AI/LLM's are quite good with `simple-salesforce`.<br/>

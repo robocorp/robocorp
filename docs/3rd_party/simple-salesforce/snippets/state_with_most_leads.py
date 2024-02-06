@@ -3,32 +3,32 @@ from typing import Optional
 from simple_salesforce import Salesforce
 
 
-def connect_to_salesforce(username, password, security_token) -> Salesforce:
+def connect_to_salesforce(username: str, password: str, security_token: str) -> Salesforce:
     """
     Connects to Salesforce using provided credentials.
 
     Args:
-        username (str): Salesforce username.
-        password (str): Salesforce password.
-        security_token (str): Salesforce security token.
+        username: Salesforce username.
+        password: Salesforce password.
+        security_token: Salesforce security token.
 
     Returns:
-        Salesforce: Salesforce connection object.
+        Salesforce connection object.
     """
     return Salesforce(
         username=username, password=password, security_token=security_token
     )
 
 
-def get_state_with_most_leads(sf) -> Optional[str]:
+def get_state_with_most_leads(sf: Salesforce) -> Optional[str]:
     """
     Retrieves the state with the most leads from Salesforce.
 
     Args:
-        sf (Salesforce): Salesforce connection object.
+        sf: Salesforce connection object.
 
     Returns:
-        str: State with the most leads.
+        State with the most leads.
     """
     result = sf.query(
         "SELECT State, COUNT(Id) FROM Lead GROUP BY State ORDER BY COUNT(Id) DESC LIMIT 1"
