@@ -14,15 +14,18 @@ __pycache__/
 .idea/
 
 # Eclipse / PyDev
-# Please keep these as they contain instructions for Eclipse/PyDev to 
+# Please keep these as they contain instructions for Eclipse/PyDev to
 # automatically recognize the project structure as well as settings for
-# code-formatting, mypy, test running, etc. 
+# code-formatting, mypy, test running, etc.
 # .project
 # .pydevproject
 # .settings
 #
 # This one can be ignored.
 .settings/org.eclipse.core.resources.prefs
+
+# Virtual envs
+.venv
 
 # Project generated files
 dist/
