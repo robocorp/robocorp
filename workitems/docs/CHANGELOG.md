@@ -2,7 +2,8 @@
 
 ## 1.4.3 - 2024-02-07
 
-- Add exception property to workitems
+- Support for retrieving the error through the `exception` property of a failed input
+  work item.
 
 ## 1.4.2 - 2024-01-14
 
