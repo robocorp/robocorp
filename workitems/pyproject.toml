@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-workitems"
-version = "1.4.2"
+version = "1.4.3"
 description = "Robocorp Work Items library"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",

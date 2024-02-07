@@ -222,6 +222,7 @@ class Input(WorkItem):
     def __init__(self, adapter: BaseAdapter, item_id: str):
         super().__init__(adapter, item_id=item_id)
         self._state: Optional[State] = None
+        self._exception: Optional[dict] = None
         self._outputs: list[Output] = []
         self._saved = True
 
@@ -263,6 +264,11 @@ class Input(WorkItem):
     def state(self) -> Optional[State]:
         """Current release state."""
         return self._state
+
+    @property
+    def exception(self) -> Optional[dict]:
+        """Current work item exception if any."""
+        return self._exception
 
     @property
     def released(self) -> bool:
@@ -483,6 +489,7 @@ class Input(WorkItem):
         state = State.FAILED
         self._adapter.release_input(self.id, state, exception=exception)
         self._state = state
+        self._exception = exception
 
     # Backwards compatibility
     def download_file(self, name: str, path: Optional[PathType] = None) -> Path:

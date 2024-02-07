@@ -1,5 +1,6 @@
 import os
 import tempfile
+from collections import OrderedDict
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -115,10 +116,12 @@ def test_outputs_magic_methods(outputs):
 def test_input_pass(inputs, adapter):
     item = inputs.current
     assert item.state is None
+    assert item.exception is None
     assert len(adapter.releases) == 0
 
     item.done()
     assert item.state is State.DONE
+    assert item.exception is None
 
     _, state, exc = adapter.releases[-1]
     assert state is State.DONE
@@ -128,16 +131,20 @@ def test_input_pass(inputs, adapter):
 def test_input_fail(inputs, adapter):
     item = inputs.current
     assert item.state is None
+    assert item.exception is None
     assert len(adapter.releases) == 0
 
-    item.fail(ExceptionType.BUSINESS, "MY_ERR_CODE", "Something went oopsy")
+    exception = OrderedDict(
+        type=ExceptionType.BUSINESS, code="MY_ERR_CODE", message="Something went oopsy"
+    )
+
+    item.fail(*exception.values())
     assert item.state is State.FAILED
+    assert item.exception == exception
 
     _, state, exc = adapter.releases[-1]
     assert state is State.FAILED
-    assert exc["type"] == "BUSINESS"
-    assert exc["code"] == "MY_ERR_CODE"
-    assert exc["message"] == "Something went oopsy"
+    assert exc == exception
 
 
 def test_input_create_output(inputs):
@@ -319,6 +326,7 @@ def test_release_work_item_failed(inputs, adapter, fail_kwargs):
     }
 
     assert item.state == State.FAILED
+    assert item.exception == exception
     assert adapter.releases == [("workitem-id-first", State.FAILED, exception)]
 
 
