@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.3 - 2024-02-06
+## 1.4.3 - 2024-02-07
 
 - Add exception property to workitems
 
