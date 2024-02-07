@@ -1,15 +1,22 @@
 from fpdf import FPDF
 
+CENTER = "C"
 
-def create_custom_invoice(title, subtitle, items, filename="invoice.pdf"):
+
+def create_custom_invoice(
+    title: str,
+    subtitle: str,
+    items: list[tuple[str, int, int]],
+    filename: str = "invoice.pdf",
+):
     """
     Creates a custom invoice PDF document using fpdf2.
 
     Args:
-    - title: Title of the invoice.
-    - subtitle: Subtitle of the invoice.
-    - items: List of tuples containing item details (name, quantity, price).
-    - filename: Name of the output PDF file.
+        title: Title of the invoice.
+        subtitle: Subtitle of the invoice.
+        items: List of tuples containing item details (name, quantity, price).
+        filename: Name of the output PDF file.
 
     Example:
     >>> create_custom_invoice(
@@ -27,8 +34,8 @@ def create_custom_invoice(title, subtitle, items, filename="invoice.pdf"):
     pdf.add_page()
     pdf.set_font("Arial", size=12)
 
-    pdf.cell(200, 10, txt=title, ln=True, align="C")
-    pdf.cell(200, 10, txt=subtitle, ln=True, align="C")
+    pdf.cell(200, 10, txt=title, ln=True, align=CENTER)
+    pdf.cell(200, 10, txt=subtitle, ln=True, align=CENTER)
     pdf.ln(10)
 
     col_width = 60

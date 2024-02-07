@@ -7,10 +7,10 @@ def extract_pdf_metadata(pdf_file):
     Extracts metadata from a PDF file using PDFMiner.six.
 
     Args:
-    - pdf_file (str): Path to the PDF file.
+        pdf_file: Path to the PDF file.
 
     Returns:
-    - metadata (dict): Dictionary containing PDF metadata.
+        A dictionary containing PDF metadata.
     """
     metadata = {}
     with open(pdf_file, "rb") as f:
