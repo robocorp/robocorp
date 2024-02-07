@@ -31,7 +31,7 @@ jobs:
           section: components
           block-list: |
             Other
-          config-path: .github/workflows/advanced-issue-labeler.yml
+          config-path: .github/advanced-issue-labeler.yml
           token: ${{ secrets.CI_GITHUB_TOKEN }}
 
       - name: Parse feature issue form
@@ -47,5 +47,5 @@ jobs:
           section: components
           block-list: |
             Other
-          config-path: .github/workflows/advanced-issue-labeler.yml
+          config-path: .github/advanced-issue-labeler.yml
           token: ${{ secrets.CI_GITHUB_TOKEN }}
