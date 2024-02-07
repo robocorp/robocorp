@@ -11,6 +11,7 @@ call.
 """
 
 import sys
+from typing import List, Optional, Protocol
 
 # Use certificates from native storage (if `truststore` installed)
 if sys.version_info >= (3, 10):
@@ -30,15 +31,34 @@ if sys.platform == "win32":
 
 # Just importing is enough to register the commands
 from . import _commands  # noqa
-from ._argdispatch import arg_dispatch as _arg_dispatch
 
 
-def main(args=None, exit: bool = True) -> int:
+class IArgumentsHandler(Protocol):
+    def process_args(self, args: List[str]) -> int:
+        """
+        Args:
+            args: The arguments to process.
+
+        Returns: the exitcode.
+        """
+
+
+def main(
+    args=None,
+    exit: bool = True,
+    argument_dispatcher: Optional[IArgumentsHandler] = None,
+) -> int:
     """Entry point for running tasks from robocorp-tasks."""
     if args is None:
         args = sys.argv[1:]
 
-    returncode = _arg_dispatch.process_args(args)
+    dispatcher: IArgumentsHandler
+    if argument_dispatcher is None:
+        from ._argdispatch import arg_dispatch as dispatcher
+    else:
+        dispatcher = argument_dispatcher
+
+    returncode = dispatcher.process_args(args)
     if exit:
         sys.exit(returncode)
     return returncode

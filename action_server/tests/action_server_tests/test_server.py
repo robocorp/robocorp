@@ -46,6 +46,7 @@ def test_bad_return_on_no_conda(
         cwd=calculator,
         actions_sync=True,
         timeout=300,
+        lint=False,
     )
     found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
     assert found.json()["message"] == (
@@ -100,7 +101,7 @@ def test_run_id_in_response_header(
 
     # Note: there are more contents, but the ones below are the ones we cane about
     expected = """
-SR: calculator_tasks.py - calculator_sum
+SR: calculator_actions.py - calculator_sum
     ST: Collect tasks
     ET: PASS
     ST: calculator_sum
@@ -247,6 +248,7 @@ def calculator_sum(v1: int = 5) -> float:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -307,6 +309,7 @@ def calculator_sum(v1: float, v2: float) -> float:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -339,6 +342,7 @@ def another_action(a1: str, a2: str) -> str:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -458,7 +462,7 @@ def test_import(
             )
             assert len(found) == 2
             assert (
-                "Collecting task greet from: greeter_task.py"
+                "Collecting task greet from: greeter_action.py"
                 in found["__action_server_output.txt"]
             )
             assert '"PASS"' in found["output.robolog"]
@@ -480,7 +484,7 @@ def test_import(
                 },
             )
 
-            assert "Collecting task greet from: greeter_task.py" in found
+            assert "Collecting task greet from: greeter_action.py" in found
 
 
 def test_routes(action_server_process: ActionServerProcess, data_regression):
@@ -677,6 +681,7 @@ def calculator_sum(v1: float, v2: float) -> float:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],
@@ -706,6 +711,7 @@ def calculator_sum(v1: str, v2: str) -> str:
             f"--dir={calculator.parent}",
             "--db-file=server.db",
             "-v",
+            "--skip-lint",
             "--datadir",
             action_server_datadir,
         ],

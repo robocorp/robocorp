@@ -723,7 +723,7 @@ class ControlElement:
             for child in iter_in:
                 print(child, file=stream)
 
-                space = " " * ((child.depth * 4 + 2))
+                space = " " * (child.depth * 4 + 2)
                 control = child.control
                 print(f"{space}Properties:", file=stream)
                 try:

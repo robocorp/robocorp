@@ -4,7 +4,7 @@
 
 ## Modules
 
-- [`robocorp.windows`](./robocorp.windows.md#module-robocorpwindows): The `robocorp-windows` library is a library to be used to interact
+- [`robocorp.windows`](./robocorp.windows.md#module-robocorpwindows): Module used to interact with native widgets on the Windows OS through UI Automation.
 - [`robocorp.windows.protocols`](./robocorp.windows.protocols.md#module-robocorpwindowsprotocols)
 
 ## Classes

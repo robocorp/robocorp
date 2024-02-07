@@ -8,7 +8,7 @@ class BrowserNotFound(Error):
 
 
 class InstallError(RuntimeError):
-    """Error encountered during browser install"""
+    """Error encountered during browser install."""
 
 
 class BrowserEngine(str, Enum):

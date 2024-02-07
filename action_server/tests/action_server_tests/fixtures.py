@@ -245,7 +245,7 @@ CREATE UNIQUE INDEX counter_id_index ON counter(id);
                     "ap-001-e8efd343-ccd5-470c-84bf-a32b9752e324",
                     "greet",
                     "Provides a greeting for a person.",
-                    "greeter_task.py",
+                    "greeter_action.py",
                     4,
                     '{"additionalProperties": false, "properties": {"name": {"type": "string", "description": "The name of the person to greet.", "title": "Name"},"title": {"type": "string", "description": "The title for the persor (Mr., Mrs., ...).", "title": "Title", "default": "Mr."}}, "type": "object", "required": ["name"]}',
                     '{"type": "string", "description": "The greeting for the person."}',

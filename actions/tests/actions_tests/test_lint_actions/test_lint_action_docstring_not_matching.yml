@@ -1,0 +1,12 @@
+- message: 'Parameter: `param1` documentation not found in docstring. Please update
+    docstring to add it as an LLM needs this info to understand what needs to be passed
+    to call this action.'
+  range:
+    end:
+      character: 25
+      line: 3
+    start:
+      character: 14
+      line: 3
+  severity: 1
+  source: robocorp.actions

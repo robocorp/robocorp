@@ -1,0 +1,11 @@
+- message: 'Parameter: `param1` without annotation (considering `str` as the expected
+    type).'
+  range:
+    end:
+      character: 20
+      line: 3
+    start:
+      character: 14
+      line: 3
+  severity: 2
+  source: robocorp.actions
