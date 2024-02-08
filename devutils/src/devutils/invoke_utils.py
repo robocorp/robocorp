@@ -13,7 +13,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 from invoke import task
 
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
 
 

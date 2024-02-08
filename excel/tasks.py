@@ -1,26 +1,19 @@
-from importlib.machinery import SourceFileLoader
+import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent
 
-TASKS_PATH = Path(__file__).resolve()
-
-
-# Since the `robocorp-devutils` dependency is available in the local Poetry isolated
-#  environment only, we won't have it available with Invoke commands running outside
-#  such environment.
-def load_devutils():
-    devutils_path = (
-        TASKS_PATH.parent.parent /
-        "devutils" / "src" / "devutils" / "__init__.py"
-    )
-    assert devutils_path.is_file(), f"{devutils_path} does not exist"
-    return SourceFileLoader("devutils", str(devutils_path)).load_module()
-
-# But we still need to import the package in order to expose the common Invoke tasks.
+# To run Invoke commands outside the Poetry env (like `inv install`), you'd need to
+#  manually fiddle with Python's import path so the module we're interested into gets
+#  available for import.
 try:
     import devutils
 except ImportError:
-    devutils = load_devutils()
+    devutils_src = ROOT.parent / "devutils" / "src"
+    assert devutils_src.exists(), f"{devutils_src} does not exist!"
+    sys.path.append(str(devutils_src))
 
-common_tasks = devutils.build_common_tasks(TASKS_PATH.parent, "robocorp.excel")
+from devutils.invoke_utils import build_common_tasks
+
+common_tasks = build_common_tasks(ROOT, "robocorp.excel")
 globals().update(common_tasks)
