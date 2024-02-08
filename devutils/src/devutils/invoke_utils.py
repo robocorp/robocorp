@@ -404,19 +404,20 @@ def build_common_tasks(
         Checks if the current tag matches the latest version (exits with 1 if it
         does not match and with 0 if it does match).
         """
-        import importlib
-
-        mod = importlib.import_module(package_name)
+        module_version = poetry(
+            ctx,
+            f"run python -c 'import {package_name}; print({package_name}.__version__)'",
+        ).stdout.strip()
 
         tag = get_tag(tag_prefix)
         version = tag[tag.rfind("-") + 1 :]
 
-        if mod.__version__ == version:
+        if module_version == version:
             sys.stderr.write(f"Version matches ({version}) (exit(0))\n")
             sys.exit(0)
         else:
             sys.stderr.write(
-                f"Version does not match ({tag_prefix}: {mod.__version__} != repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
+                f"Version does not match ({tag_prefix}: {module_version} != repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
             )
             sys.exit(1)
 
