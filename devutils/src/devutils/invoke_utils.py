@@ -13,13 +13,8 @@ from typing import Dict, Iterator, List, Optional, Tuple
 from invoke import task
 
 
-SRC = Path(__file__).resolve().parent.parent
-ROOT = SRC.parent
+ROOT = Path(__file__).resolve().parent.parent
 REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
-
-sys.path.append(str(SRC))
-# Do any `devutils` imports below, e.g.:
-# from devutils.rcc import build_subprocess_kwargs
 
 
 class RoundtripPyProject:
