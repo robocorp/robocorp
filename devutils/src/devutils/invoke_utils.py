@@ -8,10 +8,9 @@ from contextlib import contextmanager
 from functools import lru_cache
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Dict, Generator, Iterator, List, Optional, Tuple
 
 from invoke import task
-
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
@@ -172,11 +171,14 @@ def build_common_tasks(
         args = " ".join(str(c) for c in cmd)
         return ctx.run(args, **options)
 
-    def poetry(ctx, *cmd):
+    def poetry(ctx, *cmd, verbose: bool = False):
         prefix = []
         if _use_conda():
             prefix.extend(["conda", "run", "--no-capture-output", "-n", CONDA_ENV_NAME])
         prefix.append("poetry")
+
+        if verbose:
+            prefix.append("--verbose")
 
         return run(ctx, *prefix, *cmd)
 
@@ -198,15 +200,31 @@ def build_common_tasks(
                 )
 
     @task
-    def install(ctx):
-        """Install dependencies"""
-        _make_conda_env_if_needed()
-        poetry(ctx, "install")
+    def install(ctx, local: str = None, update: bool = False, verbose: bool = False):
+        """
+        Installs or updates dependencies.
 
-    @task
-    def devinstall(ctx):
-        """Install dependencies with deps in dev mode"""
+        Args:
+            local: A comma-separated list of local projects to install in develop mode.
+            update: Whether to update the dependencies.
+            verbose: Whether to run in verbose mode.
+        """
         _make_conda_env_if_needed()
+
+        if update:
+            poetry(ctx, "update", verbose=verbose)
+            return
+
+        projects = local.split(",") if local else None
+        if projects:
+            with mark_as_develop_mode(projects):
+                poetry(ctx, "lock --no-update")
+                poetry(ctx, "install", verbose=verbose)
+        else:
+            poetry(ctx, "install", verbose=verbose)
+
+    @contextmanager
+    def mark_as_develop_mode(projects: list[str]):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
 
@@ -218,21 +236,22 @@ def build_common_tasks(
             for pyproject in all_pyprojects:
                 roundtrip_py_project = RoundtripPyProject(pyproject)
                 roundtrips.append(roundtrip_py_project)
+
                 with roundtrip_py_project.update() as contents:
                     dependencies = contents["tool"]["poetry"]["dependencies"]
 
                     for key, value in tuple(dependencies.items()):
+                        if not key.startswith("robocorp-"):
+                            continue
+
                         # Changes something as:
                         # robocorp-log = "0.1.0"
                         # to:
-                        # robocorp-log = {path = "../log/", develop = true}
-                        if key.startswith("robocorp-"):
-                            name = key[len("robocorp-") :]
-                            value = dict(path=f"../{name}/", develop=True)
-                            dependencies[key] = value
-
-            poetry(ctx, "lock --no-update")
-            poetry(ctx, "install")
+                        # robocorp-log = {path = "../log/", develop = true
+                        name = key[len("robocorp-") :]
+                        if name in projects:
+                            dependencies[key] = dict(path=f"../{name}/", develop=True)
+            yield
         finally:
             for roundtrip in roundtrips:
                 roundtrip.restore()
