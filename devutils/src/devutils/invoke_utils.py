@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from functools import lru_cache
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Generator, Iterator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple
 
 from invoke import task
 
