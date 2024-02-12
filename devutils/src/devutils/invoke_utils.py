@@ -431,7 +431,7 @@ def build_common_tasks(
         )
 
         print(f"Pushing tag: {current_tag}")
-        ctx.run(f"git push origin {current_tag}")
+        run(ctx, f"git push origin {current_tag}")
 
     @task
     def check_tag_version(ctx):
