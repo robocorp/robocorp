@@ -435,7 +435,8 @@ def build_common_tasks(
             echo=True,
         )
 
-        print(f"Trigger the release with: git push origin {current_tag}")
+        print(f"Pushing tag: {current_tag}")
+        ctx.run(f"git push origin {current_tag}")
 
     @task
     def check_tag_version(ctx):
