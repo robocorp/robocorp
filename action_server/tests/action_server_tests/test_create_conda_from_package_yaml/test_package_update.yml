@@ -1,0 +1,17 @@
+dependencies:
+  conda-forge:
+  - python=3.10.12
+  - pip=23.2.1
+  - robocorp-truststore=0.8.0
+  - foo=3
+  - bar=3
+  pip:
+  - robocorp=1.4.0
+  - robocorp-actions=0.0.7
+  - playwright=1.1
+  - pytz=2023.3
+description: Action package description
+documentation: https://github.com/...
+post-install:
+- python -m foobar
+version: 0.0.1

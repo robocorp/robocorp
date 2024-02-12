@@ -1,0 +1,33 @@
+Generating package.yaml from conda.yaml
+Found constraint: '>' for playwright. It'll be converted to '='
+Found constraint: '>' for foo. It'll be converted to '='
+Found constraint: '>=' for bar. It'll be converted to '='
+Creating package.yaml
+Contents:
+----------------
+
+# Required: A description of what's in the action package.
+description: Action package description
+
+# Required: The current version of this action package.
+version: 0.0.1
+
+# Required: A link to where the documentation on the package lives.
+documentation: https://github.com/...
+
+dependencies:
+  conda-forge:
+  - python=3.10.12
+  - pip=23.2.1
+  - robocorp-truststore=0.8.0
+  - foo=3
+  - bar=3
+  pip:
+  - robocorp=1.4.0
+  - robocorp-actions=0.0.7
+  - playwright=1.1
+  - pytz=2023.3
+
+----------------
+
+Renaming conda.yaml to conda.yaml.bak
