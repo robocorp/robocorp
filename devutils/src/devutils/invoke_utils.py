@@ -377,11 +377,6 @@ def build_common_tasks(
         Returns:
             True if there are new changes, False otherwise.
         """
-        # cmd = "git diff --name-only".split()
-
-        # popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-        # stdout, _ = popen.communicate()
-
         changed_files = (
             run(ctx, "git --no-pager diff --name-only", hide=True)
             .stdout.strip()
