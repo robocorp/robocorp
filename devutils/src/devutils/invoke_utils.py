@@ -389,7 +389,7 @@ def build_common_tasks(
 
         return False
 
-    @task(lint, docs)
+    @task(lint, typecheck, test, docs)
     def check_all(ctx):
         """Run all checks"""
         assert not check_document_changes(), "There are uncommitted docs changes"
