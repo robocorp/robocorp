@@ -291,11 +291,16 @@ def build_common_tasks(
         poetry(ctx, f"run isort {targets}")
 
     @task
-    def test(ctx):
+    def test(ctx, test=None):
         """Run unittests"""
         cmd = "run pytest -rfE -vv"
+
+        if test:
+            cmd += f" {test}"
+
         if parallel_tests:
             cmd += " -n auto"
+
         poetry(ctx, cmd)
 
     @task
