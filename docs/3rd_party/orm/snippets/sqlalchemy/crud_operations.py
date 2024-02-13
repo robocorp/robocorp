@@ -1,11 +1,11 @@
+from typing import Optional
+
 from sqlalchemy import Column, Integer, Sequence, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Define the database engine and create a session
-engine = create_engine(
-    "sqlite:///:memory:", echo=True
-)  # Use an in-memory SQLite database for this example
+engine = create_engine("sqlite:///:memory:", echo=True)
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -23,7 +23,7 @@ class User(Base):
 Base.metadata.create_all(engine)
 
 
-def add_user(name, age):
+def add_user(name: str, age: int):
     new_user = User(name=name, age=age)
     session.add(new_user)
     session.commit()
@@ -31,18 +31,18 @@ def add_user(name, age):
     return new_user
 
 
-def update_user(user_id, new_name, new_age):
+def update_user(user_id: int, new_name: str, new_age: int):
     user = session.query(User).filter_by(id=user_id).first()
     user.name = new_name
     user.age = new_age
     session.commit()
 
 
-def delete_user(user_id):
+def delete_user(user_id: int):
     user = session.query(User).filter_by(id=user_id).first()
     session.delete(user)
     session.commit()
 
 
-def get_user(user_id) -> User:
+def get_user(user_id: int) -> Optional[User]:
     return session.query(User).filter_by(id=user_id).first()
