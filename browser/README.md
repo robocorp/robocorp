@@ -4,13 +4,14 @@ The `robocorp-browser` is a wrapper for the [Playwright](https://playwright.dev/
 project, with quality-of-life improvements such as automatic lifecycle management
 for Playwright objects (meant to be used with `robocorp-tasks`).
 
-> ⚠️ This library isn't included by default in `robocorp`. In order to use this, you
-> have to make it available in your Python environment by listing
-> ![`robocorp-browser`](https://img.shields.io/pypi/v/robocorp-browser?label=robocorp-browser)
-> as a requirement in your dependencies configuration file:
-> - _conda.yaml_ for an automation Task Package
-> - _action-package.yaml_ for an automation Action Package
+Latest version in PyPI:<br/><img src="https://img.shields.io/pypi/v/robocorp?label=robocorp-browser" alt="robocorp-browser" />
+
+> ⚠️ This library isn't included in `robocorp` -package. <br/>
+> Add the dependency in your configuration file:
+> - _conda.yaml_ for an automation Task Packages
+> - _action-package.yaml_ for an automation Action Packages
 > - _requirements.txt_, _pyproject.toml_ etc. for the rest
+
 
 ## Getting started
 
