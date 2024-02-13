@@ -223,8 +223,22 @@ def build_common_tasks(
         else:
             poetry(ctx, "install", verbose=verbose)
 
+    @task
+    def devinstall(ctx, verbose: bool = False):
+        """
+        Install the package in develop mode and its dependencies.
+
+        Args:
+            verbose: Whether to run in verbose mode.
+        """
+        _make_conda_env_if_needed()
+
+        with mark_as_develop_mode(all=True):
+            poetry(ctx, "lock --no-update")
+            poetry(ctx, "install", verbose=verbose)
+
     @contextmanager
-    def mark_as_develop_mode(projects: list[str]):
+    def mark_as_develop_mode(projects: Optional[list[str]] = None, all=False):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
 
@@ -249,7 +263,7 @@ def build_common_tasks(
                         # to:
                         # robocorp-log = {path = "../log/", develop = true
                         name = key[len("robocorp-") :]
-                        if name in projects:
+                        if all or name in projects:
                             dependencies[key] = dict(path=f"../{name}/", develop=True)
             yield
         finally:
