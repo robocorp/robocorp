@@ -148,7 +148,9 @@ def test_global_return_reuse_process(
     assert found == '"2"'
 
 
-@pytest.mark.parametrize("strategy", ["action-server.yaml", "conda.yaml", "no-conda"])
+@pytest.mark.parametrize(
+    "strategy", ["action-server.yaml", "conda.yaml", "no-conda", "package.yaml"]
+)
 def test_import_action_server_strategies(
     action_server_datadir: Path,
     strategy: str,
@@ -164,6 +166,8 @@ def test_import_action_server_strategies(
         root_dir = get_in_resources("calculator")
     elif strategy == "action-server.yaml":
         root_dir = get_in_resources("greeter")
+    elif strategy == "package.yaml":
+        root_dir = get_in_resources("hello")
     else:
         assert strategy == "no-conda"
         root_dir = get_in_resources("no_conda", "greeter")
@@ -200,6 +204,14 @@ def test_import_action_server_strategies(
                 assert len(actions) == 2
             elif strategy == "action-server.yaml":
                 # greeter
+                assert len(actions) == 1
+                assert env.get("PYTHON_EXE") not in (
+                    None,
+                    "",
+                    sys.executable,
+                ), "Expected custom env"
+            elif strategy == "package.yaml":
+                # hello
                 assert len(actions) == 1
                 assert env.get("PYTHON_EXE") not in (
                     None,

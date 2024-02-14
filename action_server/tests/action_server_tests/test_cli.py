@@ -1,6 +1,7 @@
 import os
 import sys
 
+import pytest
 from action_server_tests.fixtures import ActionServerClient, ActionServerProcess
 
 
@@ -104,3 +105,64 @@ def test_datadir_user_specified(tmpdir):
 
     with setup_settings(base_args) as settings:
         assert Path(settings.datadir) == use_dir
+
+
+@pytest.mark.parametrize(
+    "op", ["dry_run.backup", "dry_run.no_backup", "update.backup", "update.no_backup"]
+)
+def test_package_update(tmpdir, str_regression, op):
+    from pathlib import Path
+
+    from action_server_tests.fixtures import robocorp_action_server_run
+
+    tmp = Path(tmpdir)
+    conda_yaml = tmp / "conda.yaml"
+    conda_yaml.write_text(
+        """
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.10.12
+  - pip=23.2.1
+  - robocorp-truststore=0.8.0
+  - foo>3
+  - bar>=3
+  - pip:
+      - robocorp==1.4.0
+      - robocorp-actions==0.0.7
+      - playwright>1.1
+      - pytz==2023.3
+"""
+    )
+
+    assert (
+        "Flag for package operation not specified."
+        in robocorp_action_server_run(["package"], returncode=1).stderr
+    )
+
+    if op == "dry_run.no_backup":
+        result = robocorp_action_server_run(
+            ["package", "--update", "--dry-run", "--no-backup"], returncode=0, cwd=tmp
+        )
+
+    elif op == "dry_run.backup":
+        result = robocorp_action_server_run(
+            ["package", "--update", "--dry-run"], returncode=0, cwd=tmp
+        )
+
+    elif op == "update.backup":
+        result = robocorp_action_server_run(
+            ["package", "--update"], returncode=0, cwd=tmp
+        )
+        assert (tmp / "conda.yaml.bak").exists()
+        assert (tmp / "package.yaml").exists()
+
+    elif op == "update.no_backup":
+        result = robocorp_action_server_run(
+            ["package", "--update", "--no-backup"], returncode=0, cwd=tmp
+        )
+        assert not (tmp / "conda.yaml.bak").exists()
+        assert (tmp / "package.yaml").exists()
+
+    str_regression.check(result.stdout)

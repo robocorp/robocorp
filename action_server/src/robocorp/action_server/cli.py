@@ -283,6 +283,30 @@ def _create_parser():
     _add_data_args(migration_parser, defaults)
     _add_verbose_args(migration_parser, defaults)
 
+    # Package handling
+    package_parser = subparsers.add_parser(
+        "package",
+        help="Utilities to manage the action package",
+    )
+    package_parser.add_argument(
+        "--update",
+        action="store_true",
+        help="Updates the structure of a previous version of an action package to the latest version supported by the action server",
+    )
+    package_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="If passed, changes aren't actually done, they'll just be printed",
+        default=False,
+    )
+    package_parser.add_argument(
+        "--no-backup",
+        action="store_true",
+        help="If passed, file may be directly removed or overwritten, otherwise, a '.bak' file will be created prior to the operation",
+        default=False,
+    )
+    _add_verbose_args(package_parser, defaults)
+
     return base_parser
 
 
@@ -408,6 +432,19 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     if command == "download-rcc":
         download_rcc(target=base_args.file, force=True)
         return 0
+
+    if command == "package":
+        if base_args.update:
+            from ._package_handling import update_package
+
+            update_package(
+                Path(".").absolute(),
+                dry_run=base_args.dry_run,
+                backup=not base_args.no_backup,
+            )
+            return 0
+        print("Flag for package operation not specified.", file=sys.stderr)
+        return 1
 
     if command not in (
         "migrate",
