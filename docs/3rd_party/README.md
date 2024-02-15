@@ -16,6 +16,7 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [PDF: "Extract or modify information from PDFs"](./pdf/README.md)
 - [Pendulum: "Simplifying Python datetime and timezone handling"](./pendulum/README.md)
 - [Simple-Salesforce: "Automate Salesforce programatically"](./simple-salesforce/README.md)
+- [OAuthLib: "Library that aids in the implementation of OAuth"](./oauthlib/README.md)
 - ...
 
 
