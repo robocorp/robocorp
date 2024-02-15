@@ -239,6 +239,7 @@ def update_package(
             conda_yaml, dry_run=dry_run, backup=backup, stream=stream
         )
 
+
 def create_hash(contents: str) -> str:
     import hashlib
 
