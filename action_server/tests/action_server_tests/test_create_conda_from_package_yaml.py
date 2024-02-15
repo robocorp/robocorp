@@ -39,7 +39,6 @@ def test_create_conda_from_package_yaml(
         create_conda_from_package_yaml,
     )
 
-
     wheel_name = wheel_path.name
 
     tmppath = Path(tmpdir) / "check"
@@ -142,7 +141,6 @@ def test_package_update(tmpdir, data_regression):
     from robocorp.action_server.vendored_deps.action_package_handling import (
         update_package,
     )
-
 
     tmp = Path(tmpdir)
     conda_yaml = tmp / "conda.yaml"
