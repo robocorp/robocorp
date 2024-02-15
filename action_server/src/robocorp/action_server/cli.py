@@ -397,6 +397,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     from ._rcc import initialize_rcc
     from ._robo_utils.system_mutex import SystemMutex
     from ._runs_state_cache import use_runs_state_ctx
+    
 
     if args is None:
         args = sys.argv[1:]
@@ -435,8 +436,9 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
 
     if command == "package":
         if base_args.update:
-            from ._package_handling import update_package
-
+            from robocorp.action_server.vendored_deps.action_package_handling import (
+                update_package,
+            )
             update_package(
                 Path(".").absolute(),
                 dry_run=base_args.dry_run,
