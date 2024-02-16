@@ -4,7 +4,8 @@ import typing
 import weakref
 from typing import Dict, Iterator, List, Optional, Sequence, Union
 
-from ._deps_protocols import PyPiInfoTypedDict, ReleaseData, Versions, VersionStr
+from ._deps_protocols import (PyPiInfoTypedDict, ReleaseData, Versions,
+                              VersionStr)
 
 log = logging.getLogger(__name__)
 
@@ -120,15 +121,20 @@ class PyPiCloud:
         except KeyError:
             pass
 
-        import requests
+        import json
+        import urllib.request
 
         try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                self._cached_cloud[url] = response.json()
+            request = urllib.request.urlopen(
+                urllib.request.Request(url, headers={"User-Agent": "Mozilla"})
+            )
+            if request.status == 200:
+                with request:
+                    data = request.read().decode("utf-8", "replace")
+                self._cached_cloud[url] = json.loads(data)
             else:
                 log.info(
-                    f"Unable to get url (as json): {url}. Status code: {response.status_code}"
+                    f"Unable to get url (as json): {url}. Status code: {request.status}"
                 )
                 return None
         except Exception as e:
