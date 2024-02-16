@@ -31,3 +31,4 @@ dependencies:
 ----------------
 
 Renaming conda.yaml to conda.yaml.bak
+Renaming robot.yaml to robot.yaml.bak

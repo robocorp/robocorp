@@ -31,3 +31,4 @@ dependencies:
 ----------------
 
 Removing conda.yaml
+Removing robot.yaml
