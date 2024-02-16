@@ -3,7 +3,7 @@ from pathlib import Path
 
 from invoke import task
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).absolute().parent
 
 # To run Invoke commands outside the Poetry env (like `inv install`), you'd need to
 #  manually fiddle with Python's import path so the module we're interested into gets
@@ -17,9 +17,7 @@ except ImportError:
 
 from devutils.invoke_utils import build_common_tasks
 
-common_tasks = build_common_tasks(
-    ROOT, "robocorp._meta", tag_prefix="robocorp"
-)
+common_tasks = build_common_tasks(ROOT, "robocorp._meta", tag_prefix="robocorp")
 globals().update(common_tasks)
 
 

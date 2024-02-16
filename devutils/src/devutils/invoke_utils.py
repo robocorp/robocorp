@@ -5,6 +5,7 @@ import sys
 import tempfile
 import textwrap
 from contextlib import contextmanager
+from datetime import datetime
 from functools import lru_cache
 from itertools import chain
 from pathlib import Path
@@ -12,7 +13,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 from invoke import task
 
-ROOT = Path(__file__).resolve().parent.parent.parent
+ROOT = Path(__file__).absolute().parent.parent.parent
 REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
 
 
@@ -470,6 +471,37 @@ def build_common_tasks(
             )
             sys.exit(1)
 
+    def update_changelog_file(file: Path, version: str):
+        """Update the changelog file with the new version and changes"""
+
+        with open(file, "r+") as stream:
+            content = stream.read()
+
+            # Prepend a new section with the new version and changes
+            new_version_section = (
+                f"## {version} - {datetime.today().strftime('%Y-%m-%d')}\n\n"
+            )
+
+            changelog_start = re.search(r"# Changelog", content).end()
+            last_version_pos = re.search(r"## (\d+\.\d+\.\d+)", content).start()
+
+            double_newline = "\n\n"
+            unreleased_changes = content[changelog_start:last_version_pos].strip()
+
+            if unreleased_changes:
+                new_version_section += unreleased_changes + double_newline
+
+            new_content = (
+                content[:changelog_start]
+                + double_newline
+                + new_version_section
+                + content[last_version_pos:]
+            )
+
+            stream.seek(0)
+            stream.write(new_content)
+            print(print("Changed: ", file))
+
     @task
     def set_version(ctx, version):
         """Sets a new version for the project in all the needed files"""
@@ -501,6 +533,8 @@ def build_common_tasks(
         # Update version in current project __init__.py
         package_path = package_name.split(".")
         init_file = Path(root, "src", *package_path, "__init__.py")
+
         update_version(version, init_file)
+        update_changelog_file(Path(root, "docs", "CHANGELOG.md"), version)
 
     return locals()
