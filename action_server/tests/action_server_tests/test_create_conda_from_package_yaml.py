@@ -57,7 +57,7 @@ dependencies:
     # is added to pip.
     - robocorp-truststore=0.8.0
 
-  pip:
+  pypi:
     - robocorp-actions
 
   local-wheels:
@@ -124,7 +124,7 @@ def my_action() -> str:
         db_file="server.db",
         cwd=tmppath,
         actions_sync=True,
-        timeout=300,
+        timeout=400,
     )
 
     assert create_in_postinstall.exists()

@@ -4,8 +4,7 @@ import typing
 import weakref
 from typing import Dict, Iterator, List, Optional, Sequence, Union
 
-from ._deps_protocols import (PyPiInfoTypedDict, ReleaseData, Versions,
-                              VersionStr)
+from ._deps_protocols import PyPiInfoTypedDict, ReleaseData, Versions, VersionStr
 
 log = logging.getLogger(__name__)
 

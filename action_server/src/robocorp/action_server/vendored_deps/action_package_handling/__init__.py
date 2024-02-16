@@ -110,9 +110,11 @@ def _create_package_from_conda_yaml(
             conda_deps.append(dep)
 
     # Ok, at this point we should have the deps. Let's put them in the new format.
-    new_pip_deps = []
+    new_pypi_deps = []
     for dep in pip_deps:
         try:
+            if dep.startswith("--"):
+                continue
             parsed = parse_requirement(dep)
             if parsed is None:
                 continue
@@ -125,7 +127,7 @@ def _create_package_from_conda_yaml(
                         ),
                         file=stream,
                     )
-                new_pip_deps.append(f"{parsed.name}={version}")
+                new_pypi_deps.append(f"{parsed.name}={version}")
                 break
 
             for op, version in parsed.constraints[1:]:
@@ -173,7 +175,7 @@ def _create_package_from_conda_yaml(
             log.exception(f"Error collecting version info from: {dep}")
 
     new_dependencies = {
-        "dependencies": {"conda-forge": new_conda_deps, "pip": new_pip_deps}
+        "dependencies": {"conda-forge": new_conda_deps, "pypi": new_pypi_deps}
     }
 
     post_install = contents.get("rccPostInstall")
@@ -267,6 +269,8 @@ def create_hash(contents: str) -> str:
 def create_conda_contents_from_package_yaml_contents(
     package_yaml: Path, package_yaml_contents: dict
 ) -> dict:
+    from robocorp.action_server.vendored_deps.termcolors import bold_yellow
+
     def _get_in_dict(
         dct: dict,
         entry: str,
@@ -308,7 +312,16 @@ def create_conda_contents_from_package_yaml_contents(
     post_install = _get_in_dict(
         package_yaml_contents, "post-install", list, required=False
     )
-    pip = _get_in_dict(python_deps, "pip", list)
+
+    # This is an error
+    pip = _get_in_dict(python_deps, "pip", list, required=False)
+    if pip:
+        raise ActionPackageError(
+            f"'pip' entry not found in 'dependencies.pip' should be renamed to 'pypi' (in {package_yaml})."
+        )
+
+    # The user could get everything from 'conda'
+    pypi = _get_in_dict(python_deps, "pypi", list, required=False) or []
 
     converted_conda_entries: list = []
     found_truststore = False
@@ -319,22 +332,32 @@ def create_conda_contents_from_package_yaml_contents(
             found_truststore = True
         converted_conda_entries.append(entry)
 
-    if "pip" not in found_names:
-        raise ActionPackageError(
-            f"'pip' entry not found in 'environment.conda-forge' (in {package_yaml})."
-        )
-
     if "python" not in found_names:
         raise ActionPackageError(
-            f"'python' entry not found in 'environment.conda-forge' (in {package_yaml})."
+            f"'python' entry not found in 'dependencies.conda-forge' (in {package_yaml})."
         )
 
     converted_pip_entries: list = []
-    for entry in pip:
+    for entry in pypi:
+        if entry.replace(" ", "") == "--use-feature=truststore":
+            log.info(
+                bold_yellow(
+                    "--use-feature=truststore flag does not need to "
+                    "be specified (it is automatically used when a "
+                    '"robocorp-trustore" or "trustore" dependency is added).'
+                )
+            )
+            found_truststore = True
+            continue
+
+        if entry.startswith("--"):
+            raise ActionPackageError(f"Unexpected entry in pypi: {entry}")
+
         name, entry = convert_pip_entry(package_yaml, entry)
         _validate_name(name)
         if name in ("truststore", "robocorp-truststore"):
             found_truststore = True
+
         converted_pip_entries.append(entry)
 
     if found_truststore:

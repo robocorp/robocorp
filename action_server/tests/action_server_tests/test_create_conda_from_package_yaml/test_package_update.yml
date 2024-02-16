@@ -5,7 +5,7 @@ dependencies:
   - robocorp-truststore=0.8.0
   - foo=3
   - bar=3
-  pip:
+  pypi:
   - robocorp=1.4.0
   - robocorp-actions=0.0.7
   - playwright=1.1
