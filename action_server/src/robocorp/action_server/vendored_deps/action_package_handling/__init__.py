@@ -269,7 +269,7 @@ def create_hash(contents: str) -> str:
 def create_conda_contents_from_package_yaml_contents(
     package_yaml: Path, package_yaml_contents: dict
 ) -> dict:
-    from robocorp.action_server.vendored_deps.termcolors import bold_yellow
+    from ..termcolors import bold_yellow
 
     def _get_in_dict(
         dct: dict,
