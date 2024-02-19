@@ -115,7 +115,7 @@ class WorkItem:
         self._files_to_remove = set()
         self._saved = True
 
-    def add_file(self, path: Union[Path, str], name: Optional[str] = None) -> Path:
+    def add_file(self, path: PathType, name: Optional[str] = None) -> Path:
         """Attach a file from the local machine to the work item.
 
         Note: Files are not uploaded until the item is saved.
@@ -399,7 +399,7 @@ class Input(WorkItem):
 
         return path.absolute()
 
-    def get_files(self, pattern: str, path: Optional[Path] = None) -> list[Path]:
+    def get_files(self, pattern: str, path: Optional[PathType] = None) -> list[Path]:
         """Download all files attached to this work item that match
         the given pattern.
 

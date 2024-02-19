@@ -11,7 +11,7 @@ from ._exceptions import (
     EmptyQueue,
     to_exception_type,
 )
-from ._types import ExceptionType, JSONType, State
+from ._types import ExceptionType, JSONType, PathType, State
 from ._workitem import Input, Output
 
 __version__ = "1.4.3"
@@ -139,7 +139,7 @@ class Outputs:
     def create(
         self,
         payload: Optional[JSONType] = None,
-        files: Optional[Union[str, list[str]]] = None,
+        files: Optional[Union[PathType, list[PathType]]] = None,
         save: bool = True,
     ) -> Output:
         """Create a new output work item, which can have both a JSON
