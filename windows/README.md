@@ -17,7 +17,7 @@ to be subclassed or instanced directly.
 
 > 👉 Check that you have added the dependency in your configuration; this library is not a part of the `robocop` -package.
 > - _conda.yaml_ for automation [Task Packages](https://robocorp.com/docs/robot-structure)
-> - _action-package.yaml_ for an automation Action Packages
+> - _action-package.yaml_ for automation Action Packages
 > - _requirements.txt_, _pyproject.toml_ etc. for the rest
 
 
