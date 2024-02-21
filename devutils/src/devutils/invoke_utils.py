@@ -179,7 +179,7 @@ def build_common_tasks(
         prefix.append("poetry")
 
         if verbose:
-            prefix.append("--verbose")
+            prefix.append("-vv")
 
         return run(ctx, *prefix, *cmd)
 
@@ -201,7 +201,9 @@ def build_common_tasks(
                 )
 
     @task
-    def install(ctx, local: str = None, update: bool = False, verbose: bool = False):
+    def install(
+        ctx, local: Optional[str] = None, update: bool = False, verbose: bool = False
+    ):
         """
         Installs or updates dependencies.
 
@@ -216,7 +218,11 @@ def build_common_tasks(
             poetry(ctx, "update", verbose=verbose)
             return
 
-        projects = local.split(",") if local else None
+        projects = (
+            [package.replace("robocorp-", "") for package in local.split(",")]
+            if local
+            else None
+        )
         if projects:
             with mark_as_develop_mode(projects):
                 poetry(ctx, "lock --no-update")
@@ -234,12 +240,14 @@ def build_common_tasks(
         """
         _make_conda_env_if_needed()
 
-        with mark_as_develop_mode(all=True):
+        with mark_as_develop_mode(all_packages=True):
             poetry(ctx, "lock --no-update")
             poetry(ctx, "install", verbose=verbose)
 
     @contextmanager
-    def mark_as_develop_mode(projects: Optional[list[str]] = None, all=False):
+    def mark_as_develop_mode(
+        projects: Optional[list[str]] = None, all_packages: bool = False
+    ):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
 
@@ -264,7 +272,7 @@ def build_common_tasks(
                         # to:
                         # robocorp-log = {path = "../log/", develop = true
                         name = key[len("robocorp-") :]
-                        if all or name in projects:
+                        if all_packages or (projects and name in projects):
                             dependencies[key] = dict(path=f"../{name}/", develop=True)
             yield
         finally:
@@ -306,7 +314,7 @@ def build_common_tasks(
         poetry(ctx, f"run isort {targets}")
 
     @task
-    def test(ctx, test=None):
+    def test(ctx, test: Optional[str] = None):
         """Run unittests"""
         cmd = "run pytest -rfE -vv"
 
@@ -477,36 +485,34 @@ def build_common_tasks(
         with open(file, "r+") as stream:
             content = stream.read()
 
-            # Prepend a new section with the new version and changes
-            new_version_section = (
-                f"## {version} - {datetime.today().strftime('%Y-%m-%d')}\n\n"
-            )
-
+            new_version = f"## {version} - {datetime.today().strftime('%Y-%m-%d')}"
             changelog_start = re.search(r"# Changelog", content).end()
-            last_version_pos = re.search(r"## (\d+\.\d+\.\d+)", content).start()
-
+            unreleased_match = re.search(r"## Unreleased", content, flags=re.IGNORECASE)
             double_newline = "\n\n"
-            unreleased_changes = content[changelog_start:last_version_pos].strip()
 
-            if unreleased_changes:
-                new_version_section += unreleased_changes + double_newline
-
-            new_content = (
-                content[:changelog_start]
-                + double_newline
-                + new_version_section
-                + content[last_version_pos:]
-            )
+            if unreleased_match:
+                new_content = content.replace(unreleased_match.group(), new_version)
+            else:
+                new_content = (
+                    content[:changelog_start]
+                    + double_newline
+                    + new_version
+                    + content[changelog_start:]
+                )
 
             stream.seek(0)
             stream.write(new_content)
-            print(print("Changed: ", file))
+            print("Changed: ", file)
 
     @task
     def set_version(ctx, version):
         """Sets a new version for the project in all the needed files"""
-        import re
-        from pathlib import Path
+        valid_version_pattern = re.compile(r"^\d+\.\d+\.\d+$")
+        if not valid_version_pattern.match(version):
+            print(
+                f"Invalid version: {version}. Must be in the format major.minor.hotfix"
+            )
+            return
 
         version_patterns = (
             re.compile(r"(version\s*=\s*)\"\d+\.\d+\.\d+"),
