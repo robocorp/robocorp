@@ -372,10 +372,18 @@ def build_common_tasks(
         poetry(ctx, "build")
 
     @task
+    def publish(ctx, token: str):
+        """Publish to PyPI"""
+        poetry(ctx, f"config pypi-token.pypi {token}")
+        poetry(ctx, "publish")
+
+    @task
     def docs(ctx):
         """Build API documentation"""
         output_path = root / "docs" / "api"
-        output_path.mkdir(exist_ok=True)
+        if not output_path.exists():
+            print("Docs output path does not exist. Skipping...")
+            return
 
         for path in output_path.iterdir():
             path.unlink()

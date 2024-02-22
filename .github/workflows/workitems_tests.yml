@@ -49,15 +49,15 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
         cache: poetry
-    - name: Install invoke/tomlkit
-      run: pip install invoke tomlkit
+    - name: Install devutils requirements
+      run: python -m pip install -r ../devutils/requirements.txt
     - name: Install project (not dev)
       if: contains(matrix.name, '-devmode') == false
       run: inv install
     - name: Install project (dev)
       if: contains(matrix.name, '-devmode')
       run: inv devinstall
-    - name: Lint and test
+    - name: Test, lint and docs
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
         CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}

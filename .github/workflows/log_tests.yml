@@ -51,8 +51,8 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
         cache: poetry
-    - name: Install invoke/tomlkit
-      run: pip install invoke tomlkit
+    - name: Install devutils requirements
+      run: python -m pip install -r ../devutils/requirements.txt
     - name: Setup node
       uses: actions/setup-node@v3
       with:
@@ -104,7 +104,7 @@ jobs:
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-    - name: Lint and test
+    - name: Test, lint and docs
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
         CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
