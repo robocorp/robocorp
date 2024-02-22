@@ -2,7 +2,7 @@
 
 # module `robocorp.log.redirect`
 
-**Source:** [`redirect.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/redirect.py#L0)
+**Source:** [`redirect:0`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/redirect#L0)
 
 ______________________________________________________________________
 

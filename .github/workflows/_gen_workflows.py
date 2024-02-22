@@ -52,7 +52,6 @@ class BaseTests:
         assert project_dir.exists(), f"{project_dir} does not exist"
 
         self.target_file = CURDIR / f"{self.target}"
-        self.devutils_requirements = CURDIR / "devutils" / "requirements.txt"
         self.name_part = {"name": self.name}
         paths = [
             f"{self.project_name}/**",
