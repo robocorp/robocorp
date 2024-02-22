@@ -335,7 +335,10 @@ def build_common_tasks(
 
     @task
     def docs(ctx):
-        """Build API documentation"""
+        """
+            Build API documentation (inv docs)
+            Uses Lazy docs fork at: https://github.com/robocorp/lazydocs
+        """
         output_path = root / "docs" / "api"
         output_path.mkdir(exist_ok=True)
         for path in output_path.iterdir():

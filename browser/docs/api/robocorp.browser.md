@@ -27,17 +27,17 @@ browser_engine: Browser engine which should be used default="chromium" choices=\
 
 install: Install browser or not. If not defined, download is only attempted if the browser fails to launch.
 
-- <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True the browser UI will be kept hidden. If unset or set to None it'll show the browser UI only if a debugger is detected.
+headless:  If set to False the browser UI will be shown. If set to True the browser UI will be kept hidden. If unset or set to None it'll show the browser UI only if a debugger is detected.
 
 slowmo: Run interactions in slow motion (number in millis).
 
-- <b>`screenshot`</b>:  Whether to automatically capture a screenshot after each task. Options are `on`, `off`, and `only-on-failure` (default).
+screenshot:  Whether to automatically capture a screenshot after each task. Options are `on`, `off`, and `only-on-failure` (default).
 
 isolated: Used to define where the browser should be downloaded. If `True`, it'll be installed inside the isolated environment. If `False` (default) it'll be installed in a global cache folder.
 
 persistent_context_directory: If a persistent context should be used, this should be the directory in which the persistent context should be stored/loaded (it can be used to store the state of the automation to allow for sessions and cookies to be reused in a new automation).
 
-- <b>`viewport_size`</b>:  Size to be set for the viewport. Specified as tuple(width, height).
+viewport_size:  Size to be set for the viewport. Specified as tuple(width, height).
 
 skip_playwright_stop: Can be used to skip the playwright stop. Not recommended in general, only meant to be used to diagnose and workaround specific issues on the playwright stop coupled with an early os.\_exit shutdown in `robocorp-tasks`. Can cause a process leak and even a shutdown deadlock if used alone.
 
@@ -49,7 +49,7 @@ ______________________________________________________________________
 
 ## function `configure_context`
 
-**Source:** [`__init__.py:95`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L95)
+**Source:** [`__init__.py:98`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L98)
 
 ```python
 configure_context(**kwargs) → None
@@ -74,7 +74,7 @@ ______________________________________________________________________
 
 ## function `page`
 
-**Source:** [`__init__.py:123`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L123)
+**Source:** [`__init__.py:126`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L126)
 
 ```python
 page() → Page
@@ -98,7 +98,7 @@ ______________________________________________________________________
 
 ## function `browser`
 
-**Source:** [`__init__.py:145`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L145)
+**Source:** [`__init__.py:148`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L148)
 
 ```python
 browser() → Browser
@@ -122,7 +122,7 @@ ______________________________________________________________________
 
 ## function `playwright`
 
-**Source:** [`__init__.py:173`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L173)
+**Source:** [`__init__.py:176`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L176)
 
 ```python
 playwright() → Playwright
@@ -143,7 +143,7 @@ ______________________________________________________________________
 
 ## function `context`
 
-**Source:** [`__init__.py:194`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L194)
+**Source:** [`__init__.py:197`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L197)
 
 ```python
 context(**kwargs) → BrowserContext
@@ -167,7 +167,7 @@ ______________________________________________________________________
 
 ## function `goto`
 
-**Source:** [`__init__.py:220`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L220)
+**Source:** [`__init__.py:223`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L223)
 
 ```python
 goto(url: str) → Page
@@ -186,7 +186,7 @@ ______________________________________________________________________
 
 ## function `screenshot`
 
-**Source:** [`__init__.py:236`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L236)
+**Source:** [`__init__.py:239`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L239)
 
 ```python
 screenshot(
@@ -212,7 +212,7 @@ ______________________________________________________________________
 
 ## function `install`
 
-**Source:** [`__init__.py:279`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L279)
+**Source:** [`__init__.py:282`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L282)
 
 ```python
 install(browser_engine: BrowserEngine, force: bool = False)

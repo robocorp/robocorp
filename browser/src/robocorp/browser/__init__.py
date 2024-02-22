@@ -42,14 +42,16 @@ def configure(**kwargs) -> None:
             Install browser or not. If not defined, download is only
             attempted if the browser fails to launch.
 
-        headless: If set to False the browser UI will be shown. If set to True
+        headless: 
+            If set to False the browser UI will be shown. If set to True
             the browser UI will be kept hidden. If unset or set to None it'll
             show the browser UI only if a debugger is detected.
 
         slowmo:
             Run interactions in slow motion (number in millis).
 
-        screenshot: Whether to automatically capture a screenshot after each task.
+        screenshot: 
+            Whether to automatically capture a screenshot after each task.
             Options are `on`, `off`, and `only-on-failure` (default).
 
         isolated:
@@ -64,7 +66,8 @@ def configure(**kwargs) -> None:
             automation to allow for sessions and cookies to be reused in a
             new automation).
 
-        viewport_size: Size to be set for the viewport. Specified as tuple(width, height).
+        viewport_size: 
+            Size to be set for the viewport. Specified as tuple(width, height).
 
         skip_playwright_stop:
             Can be used to skip the playwright stop. Not recommended in general,
