@@ -13,6 +13,7 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [BeautifulSoup: "Scrape web pages with ease"](./beautifulsoup4/README.md)
 - [Boto3: "Interact with AWS services programatically"](./boto3/README.md)
 - [Numpy: "Collection of mathematical functions to operate on arrays and matrices"](./numpy/README.md)
+- [PDF: "Extract or modify information from PDFs"](./pdf/README.md)
 - [Pendulum: "Simplifying Python datetime and timezone handling"](./pendulum/README.md)
 - [Simple-Salesforce: "Automate Salesforce programatically"](./simple-salesforce/README.md)
 - ...

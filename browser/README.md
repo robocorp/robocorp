@@ -4,21 +4,20 @@ The `robocorp-browser` is a wrapper for the [Playwright](https://playwright.dev/
 project, with quality-of-life improvements such as automatic lifecycle management
 for Playwright objects (meant to be used with `robocorp-tasks`).
 
-> ⚠️ This library isn't included by default in `robocorp`. In order to use this, you
-> have to make it available in your Python environment by listing
-> ![`robocorp-browser`](https://img.shields.io/pypi/v/robocorp-browser?label=robocorp-browser)
-> as a requirement in your dependencies configuration file:
-> - _conda.yaml_ for an automation Task Package
-> - _action-package.yaml_ for an automation Action Package
+## Usage
+
+![`robocorp-browser`](https://img.shields.io/pypi/v/robocorp-browser?label=robocorp-browser)
+
+> 👉 Check that you have added the dependency in your configuration, this library is not apart of the `robocorp` -package.
+> - _conda.yaml_ for an automation [Task Packages](https://robocorp.com/docs/robot-structure)
+> - _action-package.yaml_ for an automation Action Packages
 > - _requirements.txt_, _pyproject.toml_ etc. for the rest
 
-## Getting started
 
 ```python
 from robocorp.tasks import task
 from robocorp import browser
 from robocorp import vault
-
 
 @task
 def browser_automate():
@@ -58,6 +57,9 @@ def login():
     page.fill('//input[@ng-reflect-name="password"]', account["password"])
     page.click("input:text('Submit')")
 ```
+
+🚀 You can also [get started with our template](https://robocorp.com/portal/robot/robocorp/template-python-browser)
+
 
 ## Guides
 

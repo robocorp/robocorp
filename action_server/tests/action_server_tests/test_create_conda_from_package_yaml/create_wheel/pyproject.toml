@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my_wheel"
+version = "1.0"
+description = "Package to test action server."
+
+[tool.distutils.bdist_wheel]
+universal = true
