@@ -523,6 +523,7 @@ class Output(WorkItem):
 
     Note: An output item always has an input item as a parent,
     which is used for traceability in a work item's history.
+    Test string.
     """
 
     def __init__(self, adapter: BaseAdapter, parent_id: str):
