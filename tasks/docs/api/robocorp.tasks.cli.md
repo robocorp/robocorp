@@ -2,7 +2,7 @@
 
 # module `robocorp.tasks.cli`
 
-**Source:** [`cli:0`](https://github.com/robocorp/robocorp/tree/master/tasks/robocorp/tasks/cli#L0)
+**Source:** [`cli.py:0`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L0)
 
 Main entry point for running tasks from robocorp-tasks.
 
@@ -14,7 +14,7 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`main:46`](https://github.com/robocorp/robocorp/tree/master/tasks/robocorp/tasks/cli/main#L46)
+**Source:** [`cli.py:46`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L46)
 
 ```python
 main(
@@ -30,13 +30,13 @@ ______________________________________________________________________
 
 ## class `IArgumentsHandler`
 
-**Source:** [`IArgumentsHandler:36`](https://github.com/robocorp/robocorp/tree/master/tasks/robocorp/tasks/cli/IArgumentsHandler#L36)
+**Source:** [`cli.py:36`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L36)
 
 ______________________________________________________________________
 
 ### method `process_args`
 
-**Source:** [`process_args:37`](https://github.com/robocorp/robocorp/tree/master/tasks/robocorp/tasks/cli/process_args#L37)
+**Source:** [`cli.py:37`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L37)
 
 ```python
 process_args(args: List[str]) → int

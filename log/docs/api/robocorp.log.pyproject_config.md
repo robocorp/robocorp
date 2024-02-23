@@ -2,7 +2,7 @@
 
 # module `robocorp.log.pyproject_config`
 
-**Source:** [`pyproject_config:0`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/pyproject_config#L0)
+**Source:** [`pyproject_config.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L0)
 
 This module contains functions to read a pyproject.toml file and  read the related tool.robocorp.log section.
 
@@ -10,7 +10,7 @@ ______________________________________________________________________
 
 ## function `read_pyproject_toml`
 
-**Source:** [`read_pyproject_toml:19`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/pyproject_config/read_pyproject_toml#L19)
+**Source:** [`pyproject_config.py:19`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L19)
 
 ```python
 read_pyproject_toml(path: Path) → Optional[PyProjectInfo]
@@ -26,7 +26,7 @@ ______________________________________________________________________
 
 ## function `read_section_from_toml`
 
-**Source:** [`read_section_from_toml:63`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/pyproject_config/read_section_from_toml#L63)
+**Source:** [`pyproject_config.py:63`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L63)
 
 ```python
 read_section_from_toml(
@@ -50,7 +50,7 @@ ______________________________________________________________________
 
 ## function `read_robocorp_auto_log_config`
 
-**Source:** [`read_robocorp_auto_log_config:110`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/pyproject_config/read_robocorp_auto_log_config#L110)
+**Source:** [`pyproject_config.py:110`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L110)
 
 ```python
 read_robocorp_auto_log_config(
@@ -71,7 +71,7 @@ ______________________________________________________________________
 
 ## class `PyProjectInfo`
 
-**Source:** [`PyProjectInfo:13`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/pyproject_config/PyProjectInfo#L13)
+**Source:** [`pyproject_config.py:13`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L13)
 
 PyProjectInfo(pyproject: pathlib.Path, toml_contents: dict)
 

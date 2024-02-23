@@ -2,19 +2,19 @@
 
 # module `robocorp.log.protocols`
 
-**Source:** [`protocols:0`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/protocols#L0)
+**Source:** [`protocols.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/protocols.py#L0)
 
 ______________________________________________________________________
 
 ## class `IReadLines`
 
-**Source:** [`IReadLines:10`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/protocols/IReadLines#L10)
+**Source:** [`protocols.py:10`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/protocols.py#L10)
 
 ______________________________________________________________________
 
 ### method `readlines`
 
-**Source:** [`readlines:11`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/protocols/readlines#L11)
+**Source:** [`protocols.py:11`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/protocols.py#L11)
 
 ```python
 readlines() → Sequence[str]
@@ -24,13 +24,13 @@ ______________________________________________________________________
 
 ## class `IContextErrorReport`
 
-**Source:** [`IContextErrorReport:15`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/protocols/IContextErrorReport#L15)
+**Source:** [`protocols.py:15`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/protocols.py#L15)
 
 ______________________________________________________________________
 
 ### method `show_error`
 
-**Source:** [`show_error:16`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/protocols/show_error#L16)
+**Source:** [`protocols.py:16`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/protocols.py#L16)
 
 ```python
 show_error(message: str)
@@ -40,4 +40,4 @@ ______________________________________________________________________
 
 ## class `Status`
 
-**Source:** [`Status:22`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/protocols/Status#L22)
+**Source:** [`protocols.py:22`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/protocols.py#L22)

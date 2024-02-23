@@ -163,7 +163,7 @@ inv build-output-view-react
 
         install_devutils = {
             "name": "Install devutils requirements",
-            "run": f"python -m pip install -r ../devutils/requirements.txt",
+            "run": "python -m pip install -r ../devutils/requirements.txt",
         }
 
         checkout_repo = {

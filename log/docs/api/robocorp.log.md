@@ -2,7 +2,7 @@
 
 # module `robocorp.log`
 
-**Source:** [`log:0`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L0)
 
 ## Variables
 
@@ -13,7 +13,7 @@ ______________________________________________________________________
 
 ## function `critical`
 
-**Source:** [`critical:107`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/critical#L107)
+**Source:** [`__init__.py:107`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L107)
 
 ```python
 critical(*message: Any) → None
@@ -47,7 +47,7 @@ ______________________________________________________________________
 
 ## function `warn`
 
-**Source:** [`warn:134`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/warn#L134)
+**Source:** [`__init__.py:134`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L134)
 
 ```python
 warn(*message: Any) → None
@@ -81,7 +81,7 @@ ______________________________________________________________________
 
 ## function `info`
 
-**Source:** [`info:161`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/info#L161)
+**Source:** [`__init__.py:161`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L161)
 
 ```python
 info(*message: Any) → None
@@ -115,7 +115,7 @@ ______________________________________________________________________
 
 ## function `debug`
 
-**Source:** [`debug:189`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/debug#L189)
+**Source:** [`__init__.py:189`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L189)
 
 ```python
 debug(*message: Any) → None
@@ -149,7 +149,7 @@ ______________________________________________________________________
 
 ## function `exception`
 
-**Source:** [`exception:217`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/exception#L217)
+**Source:** [`__init__.py:217`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L217)
 
 ```python
 exception(*message: Any)
@@ -173,7 +173,7 @@ ______________________________________________________________________
 
 ## function `html`
 
-**Source:** [`html:241`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/html#L241)
+**Source:** [`__init__.py:241`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L241)
 
 ```python
 html(html: str, level: str = 'INFO')
@@ -199,7 +199,7 @@ ______________________________________________________________________
 
 ## function `process_snapshot`
 
-**Source:** [`process_snapshot:261`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/process_snapshot#L261)
+**Source:** [`__init__.py:261`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L261)
 
 ```python
 process_snapshot() → None
@@ -213,13 +213,13 @@ ______________________________________________________________________
 
 ## function `console_message`
 
-**Source:** [`console_message:304`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/console_message#L304)
+**Source:** [`__init__.py:304`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L304)
 
 ```python
 console_message(
     message: str,
     kind: str,
-    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x101278a60>,
+    stream: Union[IO, NoneType, _SentinelUseStdout] = <robocorp.log._SentinelUseStdout object at 0x104fab5e0>,
     flush: Optional[bool] = None
 ) → None
 ```
@@ -250,7 +250,7 @@ ______________________________________________________________________
 
 ## function `suppress_methods`
 
-**Source:** [`suppress_methods:411`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/suppress_methods#L411)
+**Source:** [`__init__.py:411`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L411)
 
 ```python
 suppress_methods()
@@ -277,7 +277,7 @@ ______________________________________________________________________
 
 ## function `suppress_variables`
 
-**Source:** [`suppress_variables:432`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/suppress_variables#L432)
+**Source:** [`__init__.py:432`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L432)
 
 ```python
 suppress_variables()
@@ -304,7 +304,7 @@ ______________________________________________________________________
 
 ## function `suppress`
 
-**Source:** [`suppress:481`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/suppress#L481)
+**Source:** [`__init__.py:481`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L481)
 
 ```python
 suppress(*args, **kwargs)
@@ -355,7 +355,7 @@ ______________________________________________________________________
 
 ## function `is_sensitive_variable_name`
 
-**Source:** [`is_sensitive_variable_name:527`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/is_sensitive_variable_name#L527)
+**Source:** [`__init__.py:527`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L527)
 
 ```python
 is_sensitive_variable_name(variable_name: str) → bool
@@ -374,7 +374,7 @@ ______________________________________________________________________
 
 ## function `add_sensitive_variable_name`
 
-**Source:** [`add_sensitive_variable_name:541`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/add_sensitive_variable_name#L541)
+**Source:** [`__init__.py:541`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L541)
 
 ```python
 add_sensitive_variable_name(variable_name: str) → None
@@ -394,7 +394,7 @@ ______________________________________________________________________
 
 ## function `add_sensitive_variable_name_pattern`
 
-**Source:** [`add_sensitive_variable_name_pattern:557`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/add_sensitive_variable_name_pattern#L557)
+**Source:** [`__init__.py:557`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L557)
 
 ```python
 add_sensitive_variable_name_pattern(variable_name_pattern: str) → None
@@ -412,7 +412,7 @@ ______________________________________________________________________
 
 ## function `hide_from_output`
 
-**Source:** [`hide_from_output:570`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/hide_from_output#L570)
+**Source:** [`__init__.py:570`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L570)
 
 ```python
 hide_from_output(string_to_hide: str) → None
@@ -434,7 +434,7 @@ ______________________________________________________________________
 
 ## function `hide_strings_config`
 
-**Source:** [`hide_strings_config:613`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/hide_strings_config#L613)
+**Source:** [`__init__.py:613`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L613)
 
 ```python
 hide_strings_config() → IRedactConfiguration
@@ -468,7 +468,7 @@ ______________________________________________________________________
 
 ## function `start_run`
 
-**Source:** [`start_run:645`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/start_run#L645)
+**Source:** [`__init__.py:645`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L645)
 
 ```python
 start_run(name: str) → None
@@ -486,7 +486,7 @@ ______________________________________________________________________
 
 ## function `end_run`
 
-**Source:** [`end_run:659`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/end_run#L659)
+**Source:** [`__init__.py:659`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L659)
 
 ```python
 end_run(name: str, status: str) → None
@@ -505,7 +505,7 @@ ______________________________________________________________________
 
 ## function `start_task`
 
-**Source:** [`start_task:674`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/start_task#L674)
+**Source:** [`__init__.py:674`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L674)
 
 ```python
 start_task(
@@ -533,7 +533,7 @@ ______________________________________________________________________
 
 ## function `end_task`
 
-**Source:** [`end_task:694`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/end_task#L694)
+**Source:** [`__init__.py:694`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L694)
 
 ```python
 end_task(name: str, libname: str, status: str, message: str) → None
@@ -554,7 +554,7 @@ ______________________________________________________________________
 
 ## function `iter_decoded_log_format_from_stream`
 
-**Source:** [`iter_decoded_log_format_from_stream:714`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/iter_decoded_log_format_from_stream#L714)
+**Source:** [`__init__.py:714`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L714)
 
 ```python
 iter_decoded_log_format_from_stream(stream: IReadLines) → Iterator[dict]
@@ -589,7 +589,7 @@ ______________________________________________________________________
 
 ## function `iter_decoded_log_format_from_log_html`
 
-**Source:** [`iter_decoded_log_format_from_log_html:745`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/iter_decoded_log_format_from_log_html#L745)
+**Source:** [`__init__.py:745`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L745)
 
 ```python
 iter_decoded_log_format_from_log_html(log_html: Path) → Iterator[dict]
@@ -620,7 +620,7 @@ ______________________________________________________________________
 
 ## function `iter_decoded_log_format_from_log_html_contents`
 
-**Source:** [`iter_decoded_log_format_from_log_html_contents:771`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/iter_decoded_log_format_from_log_html_contents#L771)
+**Source:** [`__init__.py:771`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L771)
 
 ```python
 iter_decoded_log_format_from_log_html_contents(
@@ -654,7 +654,7 @@ ______________________________________________________________________
 
 ## function `verify_log_messages_from_messages_iterator`
 
-**Source:** [`verify_log_messages_from_messages_iterator:837`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/verify_log_messages_from_messages_iterator#L837)
+**Source:** [`__init__.py:837`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L837)
 
 ```python
 verify_log_messages_from_messages_iterator(
@@ -705,7 +705,7 @@ ______________________________________________________________________
 
 ## function `verify_log_messages_from_decoded_str`
 
-**Source:** [`verify_log_messages_from_decoded_str:918`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/verify_log_messages_from_decoded_str#L918)
+**Source:** [`__init__.py:918`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L918)
 
 ```python
 verify_log_messages_from_decoded_str(
@@ -729,7 +729,7 @@ ______________________________________________________________________
 
 ## function `verify_log_messages_from_log_html`
 
-**Source:** [`verify_log_messages_from_log_html:976`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/verify_log_messages_from_log_html#L976)
+**Source:** [`__init__.py:976`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L976)
 
 ```python
 verify_log_messages_from_log_html(
@@ -753,7 +753,7 @@ ______________________________________________________________________
 
 ## function `verify_log_messages_from_stream`
 
-**Source:** [`verify_log_messages_from_stream:996`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/verify_log_messages_from_stream#L996)
+**Source:** [`__init__.py:996`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L996)
 
 ```python
 verify_log_messages_from_stream(
@@ -777,7 +777,7 @@ ______________________________________________________________________
 
 ## function `setup_log`
 
-**Source:** [`setup_log:1052`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/setup_log#L1052)
+**Source:** [`__init__.py:1052`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1052)
 
 ```python
 setup_log(
@@ -848,7 +848,7 @@ ______________________________________________________________________
 
 ## function `setup_auto_logging`
 
-**Source:** [`setup_auto_logging:1186`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/setup_auto_logging#L1186)
+**Source:** [`__init__.py:1186`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1186)
 
 ```python
 setup_auto_logging(
@@ -873,7 +873,7 @@ ______________________________________________________________________
 
 ## function `add_log_output`
 
-**Source:** [`add_log_output:1219`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/add_log_output#L1219)
+**Source:** [`__init__.py:1219`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1219)
 
 ```python
 add_log_output(
@@ -908,7 +908,7 @@ ______________________________________________________________________
 
 ## function `close_log_outputs`
 
-**Source:** [`close_log_outputs:1283`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/close_log_outputs#L1283)
+**Source:** [`__init__.py:1283`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1283)
 
 ```python
 close_log_outputs()
@@ -922,7 +922,7 @@ ______________________________________________________________________
 
 ## function `add_in_memory_log_output`
 
-**Source:** [`add_in_memory_log_output:1300`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/add_in_memory_log_output#L1300)
+**Source:** [`__init__.py:1300`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1300)
 
 ```python
 add_in_memory_log_output(write: Callable[[str], Any])
@@ -941,13 +941,13 @@ ______________________________________________________________________
 
 ## class `ConsoleMessageKind`
 
-**Source:** [`ConsoleMessageKind:273`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/ConsoleMessageKind#L273)
+**Source:** [`__init__.py:273`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L273)
 
 ______________________________________________________________________
 
 ## class `IRedactConfiguration`
 
-**Source:** [`IRedactConfiguration:590`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/IRedactConfiguration#L590)
+**Source:** [`__init__.py:590`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L590)
 
 #### property `dont_hide_strings`
 
@@ -963,7 +963,7 @@ ______________________________________________________________________
 
 ## enum `FilterLogLevel`
 
-**Source:** [`FilterLogLevel:1021`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/FilterLogLevel#L1021)
+**Source:** [`__init__.py:1021`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1021)
 
 An enumeration.
 
@@ -979,6 +979,6 @@ ______________________________________________________________________
 
 ## class `IContextManager`
 
-**Source:** [`IContextManager:1032`](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/IContextManager#L1032)
+**Source:** [`__init__.py:1032`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1032)
 
 Typing for a "generic" context manager.

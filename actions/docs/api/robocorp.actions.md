@@ -2,13 +2,13 @@
 
 # module `robocorp.actions`
 
-**Source:** [`actions:0`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions#L0)
+**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L0)
 
 ______________________________________________________________________
 
 ## function `action`
 
-**Source:** [`action:23`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/action#L23)
+**Source:** [`__init__.py:23`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L23)
 
 ```python
 action(*args, **kwargs)
@@ -41,7 +41,7 @@ ______________________________________________________________________
 
 ## function `setup`
 
-**Source:** [`setup:24`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/_fixtures/setup#L24)
+**Source:** [`_fixtures.py:24`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_fixtures.py#L24)
 
 ```python
 setup(
@@ -104,7 +104,7 @@ ______________________________________________________________________
 
 ## function `teardown`
 
-**Source:** [`teardown:114`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/_fixtures/teardown#L114)
+**Source:** [`_fixtures.py:114`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_fixtures.py#L114)
 
 ```python
 teardown(
@@ -149,7 +149,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`session_cache:63`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/session_cache#L63)
+**Source:** [`__init__.py:63`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L63)
 
 ```python
 session_cache(func)
@@ -169,7 +169,7 @@ ______________________________________________________________________
 
 ## function `action_cache`
 
-**Source:** [`action_cache:84`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/action_cache#L84)
+**Source:** [`__init__.py:84`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L84)
 
 ```python
 action_cache(func)
@@ -189,7 +189,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`get_output_dir:105`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/get_output_dir#L105)
+**Source:** [`__init__.py:105`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L105)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -201,7 +201,7 @@ ______________________________________________________________________
 
 ## function `get_current_action`
 
-**Source:** [`get_current_action:115`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/actions/get_current_action#L115)
+**Source:** [`__init__.py:115`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L115)
 
 ```python
 get_current_action() → Optional[ITask]
