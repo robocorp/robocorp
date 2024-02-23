@@ -20,12 +20,27 @@ def _name_to_url(name):
     return name.replace("_", "-")
 
 
+def get_action_description_from_docs(docs: str) -> str:
+    import docstring_parser
+
+    doc_desc: str
+    try:
+        parsed = docstring_parser.parse(docs)
+        if parsed.short_description and parsed.long_description:
+            doc_desc = f"{parsed.short_description}\n{parsed.long_description}"
+        else:
+            doc_desc = parsed.long_description or parsed.short_description or ""
+    except Exception:
+        log.exception("Error parsing docstring: %s", docs)
+        doc_desc = str(docs or "")
+    return doc_desc
+
+
 def start_server(
     expose: bool, api_key: str | None = None, expose_session: str | None = None
 ) -> None:
     from dataclasses import asdict
 
-    import docstring_parser
     import uvicorn
     from fastapi import Depends, HTTPException, Security
     from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -87,12 +102,7 @@ def start_server(
 
         doc_desc: Optional[str] = ""
         if action.docs:
-            try:
-                parsed = docstring_parser.parse(action.docs)
-                doc_desc = parsed.long_description or parsed.short_description
-            except Exception:
-                log.exception("Error parsing docstring: %s", action.docs)
-                doc_desc = str(action.docs or "")
+            doc_desc = get_action_description_from_docs(action.docs)
 
         if not doc_desc:
             doc_desc = ""

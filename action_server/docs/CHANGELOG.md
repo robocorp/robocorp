@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Properly use all lines from docstring description to feed to the `openapi.json`.
+
 ## 0.0.23 - 2024-02-23
 
 - Support for Action Packages with `package.yaml`.
