@@ -344,16 +344,14 @@ def check_new_template(
             print("Template creation stderr: ", output.stderr)
 
         my_project_dir = tmpdir / "my_project"
-        my_project_dir_conda = my_project_dir / "conda.yaml"
-        if not my_project_dir.exists():
-            my_project_dir_conda = my_project_dir / "action-server.yaml"
+        my_project_package_yaml = my_project_dir / "package.yaml"
 
         if verbose:
             print(my_project_dir, "exists", my_project_dir.exists())
-            print(my_project_dir_conda, "exists", my_project_dir_conda.exists())
+            print(my_project_package_yaml, "exists", my_project_package_yaml.exists())
 
-        if not my_project_dir_conda.exists():
-            raise RuntimeError(f"Expected {my_project_dir_conda} to exist.")
+        if not my_project_package_yaml.exists():
+            raise RuntimeError(f"Expected {my_project_package_yaml} to exist.")
 
         # Note: timeout is big because it'll use rcc to bootstrap the env here.
         if verbose:
