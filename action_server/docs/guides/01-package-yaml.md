@@ -1,3 +1,7 @@
+# package.yaml
+
+### Note: introduced in the Action Server version: 0.0.21
+
 The `package.yaml` file is the base file which defines everything related to the
 actions available in the action package.
 

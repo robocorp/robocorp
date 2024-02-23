@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.21 - 2024-02-23
+
+- Support for Action Packages with `package.yaml`.
+    - `conda.yaml` or `action-server.yaml` support is deprecated (but still supported).
+    - `action-server package --update` may be used to migrate an existing package.
+- When starting up, if a running server is detected the newly spawned server will wait a bit
+  for the old one to exit before finishing with an error.
+
 ## 0.0.20 - 2024-01-31
 
 - When importing actions, lint them by default (`--skip-lint` may be used
