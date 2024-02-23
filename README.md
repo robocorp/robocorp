@@ -255,13 +255,15 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [x] Action Server `brew install` for Mac users
 - [x] Expose actions to public URL
 - [x] Resume previously exposed session
-- [ ] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code)
+- [ ] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code) [#230](https://github.com/robocorp/robocorp/issues/230)
+- [ ] Docstring to OpenAPI specs improvements [#236](https://github.com/robocorp/robocorp/issues/236), [#250](https://github.com/robocorp/robocorp/issues/250)
+- [ ] Support JSON/Dicts for inputs and outputs [#266](https://github.com/robocorp/robocorp/issues/266)
+- [ ] Action can access request headers [#167](https://github.com/robocorp/robocorp/issues/167)
 - [ ] MS Copilot Studio manifest file support
+- [ ] Action Gallery for prebuilt actions
 - [ ] Llamaindex Tools support
 - [ ] Link and deploy Action Servers to [Control Room](https://cloud.robocorp.com/)
 - [ ] Hot reload of actions after a change
-- [ ] Docstring validator and autogeneration
-- [ ] More complex input args (currently `str`, `bool`, `int` and `float`) and return values (currently `str` and `bool`)
 - [ ] Explicit action user approval
 - [ ] Stateful actions
 
