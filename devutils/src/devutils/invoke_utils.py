@@ -413,6 +413,7 @@ def build_common_tasks(
             .stdout.strip()
             .splitlines()
         )
+        print(run(ctx, "git --no-pager diff -- docs/api"))
 
         return bool(changed_files)
 
