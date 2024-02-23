@@ -16,6 +16,14 @@ def create_new_project(directory: str = "."):
     try:
         if not directory:
             directory = input("Name of the project: ")
+            if not directory:
+                raise RuntimeError("The name of the project was not given.")
+
+        if directory != ".":
+            if os.path.exists(directory) and os.listdir(directory):
+                raise RuntimeError(
+                    f"The folder: {directory} already exists and is not empty."
+                )
 
         download_and_unzip(TEMPLATE_URL, directory)
 
@@ -23,7 +31,7 @@ def create_new_project(directory: str = "."):
     except KeyboardInterrupt:
         log.debug("Operation cancelled")
     except Exception as e:
-        log.critical(f"It was not possible to create the project. Error: {e}")
+        log.critical(f"Error creating the project: {e}")
 
 
 def download_and_unzip(url: str, directory: str = "."):
