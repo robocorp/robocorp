@@ -3,7 +3,7 @@
 ## 0.0.24 - 2024-02-23
 
 - Properly use all lines from docstring description to feed to the `openapi.json`.
-- When creating project from template, don't create a root directory.
+- When creating project from template, skip the root directory in the .zip.
 
 ## 0.0.23 - 2024-02-23
 
