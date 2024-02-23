@@ -9,7 +9,7 @@ actions available in the action package.
 which are not directly compatible to `package.yaml` (so, they can't be just renamed
 directly and some changes are expected in how to define the environment).
 
-> Running: `action-server package --upgrade` can be used to automatically
+> Running: `action-server package --update` can be used to automatically
 upgrade a package in an older version to the new expected format.
 
 An example `package.yaml` would be something as:
