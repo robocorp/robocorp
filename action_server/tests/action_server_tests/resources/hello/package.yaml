@@ -2,5 +2,5 @@ dependencies:
   conda-forge: 
     - python=3.10.12
     - pip=24
-  pip:
+  pypi:
     - robocorp-actions

@@ -116,6 +116,18 @@ def test_package_update(tmpdir, str_regression, op):
     from action_server_tests.fixtures import robocorp_action_server_run
 
     tmp = Path(tmpdir)
+
+    robot_yaml = tmp / "robot.yaml"
+    robot_yaml.write_text(
+        """
+environmentConfigs:
+  - environment_windows_amd64_freeze.yaml
+  - environment_linux_amd64_freeze.yaml
+  - environment_darwin_amd64_freeze.yaml
+  - conda.yaml
+"""
+    )
+
     conda_yaml = tmp / "conda.yaml"
     conda_yaml.write_text(
         """
@@ -145,16 +157,23 @@ dependencies:
         result = robocorp_action_server_run(
             ["package", "--update", "--dry-run", "--no-backup"], returncode=0, cwd=tmp
         )
+        assert (tmp / "robot.yaml").exists()
+        assert (tmp / "conda.yaml").exists()
+        assert not (tmp / "package.yaml").exists()
 
     elif op == "dry_run.backup":
         result = robocorp_action_server_run(
             ["package", "--update", "--dry-run"], returncode=0, cwd=tmp
         )
+        assert (tmp / "robot.yaml").exists()
+        assert (tmp / "conda.yaml").exists()
+        assert not (tmp / "package.yaml").exists()
 
     elif op == "update.backup":
         result = robocorp_action_server_run(
             ["package", "--update"], returncode=0, cwd=tmp
         )
+        assert (tmp / "robot.yaml.bak").exists()
         assert (tmp / "conda.yaml.bak").exists()
         assert (tmp / "package.yaml").exists()
 
@@ -162,7 +181,10 @@ dependencies:
         result = robocorp_action_server_run(
             ["package", "--update", "--no-backup"], returncode=0, cwd=tmp
         )
+        assert not (tmp / "robot.yaml.bak").exists()
         assert not (tmp / "conda.yaml.bak").exists()
+        assert not (tmp / "robot.yaml").exists()
+        assert not (tmp / "conda.yaml").exists()
         assert (tmp / "package.yaml").exists()
 
     str_regression.check(result.stdout)

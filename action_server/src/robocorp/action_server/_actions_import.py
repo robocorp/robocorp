@@ -8,8 +8,10 @@ from typing import Optional
 
 from termcolor import colored
 
-from robocorp.action_server._cli_errors import ActionPackageError
-from robocorp.action_server._coloring import bold_red, bold_yellow
+from robocorp.action_server.vendored_deps.action_package_handling.cli_errors import (
+    ActionPackageError,
+)
+from robocorp.action_server.vendored_deps.termcolors import bold_red, bold_yellow
 
 if typing.TYPE_CHECKING:
     from robocorp.action_server._models import ActionPackage
@@ -58,10 +60,13 @@ def import_action_package(
         environment.
     """
 
+    from robocorp.action_server.vendored_deps.action_package_handling import (
+        create_conda_from_package_yaml,
+    )
+
     from ._errors_action_server import ActionServerValidationError
     from ._gen_ids import gen_uuid
     from ._models import ActionPackage
-    from ._package_handling import create_conda_from_package_yaml
     from ._rcc import create_hash, get_rcc
     from ._robo_utils.process import build_python_launch_env
     from ._settings import is_frozen

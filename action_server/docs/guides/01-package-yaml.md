@@ -1,3 +1,7 @@
+# package.yaml
+
+### Note: introduced in the Action Server version: 0.0.21
+
 The `package.yaml` file is the base file which defines everything related to the
 actions available in the action package.
 
@@ -36,7 +40,7 @@ An example `package.yaml` would be something as:
         - pip=23.2.1
         - robocorp-truststore=0.8.0
 
-      pip:
+      pypi:
         # This section is required: at least `robocorp-actions` must
         # be specified.
         # Note: robocorp-actions is special case because the action server

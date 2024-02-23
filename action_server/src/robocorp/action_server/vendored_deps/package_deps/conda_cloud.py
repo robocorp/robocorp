@@ -499,14 +499,22 @@ class CondaCloud:
                 self._state = State.done
 
     def _download(self, url: str, target_json: Path, arch: str) -> Tuple[Path, Arch]:
-        import requests
+        import urllib.request
 
         CHUNK_SIZE = 32768
 
         with target_json.open("wb") as stream:
-            with requests.get(url, stream=True) as response:
-                response.raise_for_status()
-                for chunk in response.iter_content(CHUNK_SIZE):
+            request = urllib.request.urlopen(
+                urllib.request.Request(url, headers={"User-Agent": "Mozilla"})
+            )
+
+            if request.status != 200:
+                raise RuntimeError(
+                    f"HTTP error (unable to open: {url}): {request.status}"
+                )
+
+            with request:
+                for chunk in iter(lambda: request.read(CHUNK_SIZE), b""):
                     if chunk:  # Filter out keep-alive new chunks
                         stream.write(chunk)
         return target_json, arch
