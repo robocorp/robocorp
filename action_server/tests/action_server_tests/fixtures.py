@@ -60,7 +60,7 @@ def action_server_process(action_server_datadir) -> Iterator[ActionServerProcess
 CURDIR = Path(__file__).parent.absolute()
 
 
-def get_in_resources(*parts):
+def get_in_resources(*parts) -> Path:
     curr = CURDIR / "resources"
     for part in parts:
         curr = curr / part

@@ -1,0 +1,12 @@
+channels:
+- conda-forge
+dependencies:
+- python=3.10.12
+- pip=24.0
+- robocorp-truststore=0.8.0
+- pip:
+  - --use-feature=truststore
+  - robocorp-actions
+  - '...<path>.../wheels/my_wheel-1.0-py2.py3-none-any.whl'
+rccPostInstall:
+- python ...<path>.../run_post_install.py

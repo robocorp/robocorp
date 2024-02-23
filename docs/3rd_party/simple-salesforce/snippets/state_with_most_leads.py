@@ -3,7 +3,9 @@ from typing import Optional
 from simple_salesforce import Salesforce
 
 
-def connect_to_salesforce(username: str, password: str, security_token: str) -> Salesforce:
+def connect_to_salesforce(
+    username: str, password: str, security_token: str
+) -> Salesforce:
     """
     Connects to Salesforce using provided credentials.
 

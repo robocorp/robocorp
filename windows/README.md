@@ -1,13 +1,5 @@
 `robocorp-windows` is a library which can be used for Windows desktop automation.
 
-> ⚠️ This library isn't included by default in `robocorp`. In order to use this, you
-> have to make it available in your Python environment by listing
-> ![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)
-> as a requirement in your dependencies configuration file:
-> - _conda.yaml_ for an automation Task Package
-> - _action-package.yaml_ for an automation Action Package
-> - _requirements.txt_, _pyproject.toml_ etc. for the rest
-
 The basic idea of the library is enabling windows and controls to be found
 by leveraging `locators` (i.e.: strings which identify how to reach some
 window or control) and then interacting with such elements.
@@ -25,12 +17,19 @@ to be subclassed or instanced directly.
 
 ## Usage
 
+![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)
+
+> 👉 Check that you have added the dependency in your configuration, this library is not apart of the `robocorp` -package.
+> - _conda.yaml_ for an automation [Task Packages](https://robocorp.com/docs/robot-structure)
+> - _action-package.yaml_ for an automation Action Packages
+> - _requirements.txt_, _pyproject.toml_ etc. for the rest
+
+
 The library concepts revolve around the idea that the window of interest will be 
 initially found using `find_window` and then, with that window reference, other
 controls can be queried and interacted with (for clicking, entering text, etc).
 
 Below is an example using the windows calculator:
-
 
 ```python
 from robocorp import windows
@@ -48,7 +47,6 @@ calc.click("id:clearButton or name:Clear")
 # Send the keys directly to the calculator
 calc.send_keys(keys="96+4=")
 ```
-
 
 ## Guides
 
