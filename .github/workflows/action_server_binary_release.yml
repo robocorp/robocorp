@@ -285,7 +285,7 @@ jobs:
             aws-region: eu-west-1
       - name: AWS S3 copies
         run: |
-          if [ "${{ steps.check_beta.outputs.is_beta }}" = "true" ]; then
+          if [ "${{ steps.check_beta.outputs.is_beta }}" = "false" ]; then
             echo "Normal release, aws sync to drop-box, full pipeline"
             aws s3 sync s3-drop s3://robocorp-action-server-build-drop-box
           else
