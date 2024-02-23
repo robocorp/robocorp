@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
+
 def login_and_take_screenshot():
     with webdriver.Chrome() as driver:
         driver.implicitly_wait(10)
