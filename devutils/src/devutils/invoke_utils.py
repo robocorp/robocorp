@@ -409,15 +409,12 @@ def build_common_tasks(
             True if there are new changes, False otherwise.
         """
         changed_files = (
-            run(ctx, "git --no-pager diff --name-only", hide=True)
+            run(ctx, "git --no-pager diff --name-only -- docs/api", hide=True)
             .stdout.strip()
             .splitlines()
         )
-        for file in changed_files:
-            if "docs/api" in file:
-                return True
 
-        return False
+        return bool(changed_files)
 
     @task(lint, typecheck, test, docs)
     def check_all(ctx):
