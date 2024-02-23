@@ -4,3 +4,4 @@ Found constraint: '>' for foo. It'll be converted to '='
 Found constraint: '>=' for bar. It'll be converted to '='
 Creating package.yaml
 Renaming conda.yaml to conda.yaml.bak
+Renaming robot.yaml to robot.yaml.bak

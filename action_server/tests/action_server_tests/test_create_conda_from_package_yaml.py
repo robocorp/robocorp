@@ -35,7 +35,9 @@ def test_create_conda_from_package_yaml(
     """
     import yaml
 
-    from robocorp.action_server._package_handling import create_conda_from_package_yaml
+    from robocorp.action_server.vendored_deps.action_package_handling import (
+        create_conda_from_package_yaml,
+    )
 
     wheel_name = wheel_path.name
 
@@ -55,7 +57,7 @@ dependencies:
     # is added to pip.
     - robocorp-truststore=0.8.0
 
-  pip:
+  pypi:
     - robocorp-actions
 
   local-wheels:
@@ -122,7 +124,7 @@ def my_action() -> str:
         db_file="server.db",
         cwd=tmppath,
         actions_sync=True,
-        timeout=300,
+        timeout=400,
     )
 
     assert create_in_postinstall.exists()
@@ -136,7 +138,9 @@ def test_package_update(tmpdir, data_regression):
 
     import yaml
 
-    from robocorp.action_server._package_handling import update_package
+    from robocorp.action_server.vendored_deps.action_package_handling import (
+        update_package,
+    )
 
     tmp = Path(tmpdir)
     conda_yaml = tmp / "conda.yaml"

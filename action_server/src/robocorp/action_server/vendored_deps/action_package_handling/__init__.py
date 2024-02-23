@@ -5,7 +5,7 @@ import typing
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from robocorp.action_server._cli_errors import ActionPackageError
+from .cli_errors import ActionPackageError
 
 log = logging.getLogger(__name__)
 
@@ -75,9 +75,9 @@ def _create_package_from_conda_yaml(
 ):
     import yaml
 
-    from robocorp.action_server._actions_import import bold_yellow
-    from robocorp.action_server._deps.conda_impl import conda_match_spec
-    from robocorp.action_server._deps.pip_impl.pip_distlib_util import parse_requirement
+    from ..package_deps.conda_impl import conda_match_spec
+    from ..package_deps.pip_impl.pip_distlib_util import parse_requirement
+    from ..termcolors import bold_yellow
 
     with conda_yaml.open("r", encoding="utf-8") as s:
         contents = yaml.safe_load(s)
@@ -110,9 +110,11 @@ def _create_package_from_conda_yaml(
             conda_deps.append(dep)
 
     # Ok, at this point we should have the deps. Let's put them in the new format.
-    new_pip_deps = []
+    new_pypi_deps = []
     for dep in pip_deps:
         try:
+            if dep.startswith("--"):
+                continue
             parsed = parse_requirement(dep)
             if parsed is None:
                 continue
@@ -125,7 +127,7 @@ def _create_package_from_conda_yaml(
                         ),
                         file=stream,
                     )
-                new_pip_deps.append(f"{parsed.name}={version}")
+                new_pypi_deps.append(f"{parsed.name}={version}")
                 break
 
             for op, version in parsed.constraints[1:]:
@@ -173,7 +175,7 @@ def _create_package_from_conda_yaml(
             log.exception(f"Error collecting version info from: {dep}")
 
     new_dependencies = {
-        "dependencies": {"conda-forge": new_conda_deps, "pip": new_pip_deps}
+        "dependencies": {"conda-forge": new_conda_deps, "pypi": new_pypi_deps}
     }
 
     post_install = contents.get("rccPostInstall")
@@ -202,15 +204,31 @@ documentation: https://github.com/...
     else:
         target.write_text(output, encoding="utf-8")
 
+    # Remove conda.yaml
     if backup:
-        new_path = conda_yaml.parent / (conda_yaml.name + ".bak")
-        print(f"Renaming {conda_yaml.name} to {new_path.name}", file=stream)
+        new_conda_yaml_path = conda_yaml.parent / (conda_yaml.name + ".bak")
+        print(f"Renaming {conda_yaml.name} to {new_conda_yaml_path.name}", file=stream)
         if not dry_run:
-            conda_yaml.rename(new_path)
+            conda_yaml.rename(new_conda_yaml_path)
     else:
         print(f"Removing {conda_yaml.name}", file=stream)
         if not dry_run:
             os.remove(conda_yaml)
+
+    # Remove robot.yaml
+    robot_yaml = conda_yaml.parent / "robot.yaml"
+    if robot_yaml.exists():
+        if backup:
+            new_robot_yaml_path = robot_yaml.parent / (robot_yaml.name + ".bak")
+            print(
+                f"Renaming {robot_yaml.name} to {new_robot_yaml_path.name}", file=stream
+            )
+            if not dry_run:
+                robot_yaml.rename(new_robot_yaml_path)
+        else:
+            print(f"Removing {robot_yaml.name}", file=stream)
+            if not dry_run:
+                os.remove(robot_yaml)
 
 
 def update_package(
@@ -240,26 +258,18 @@ def update_package(
         )
 
 
-def create_conda_from_package_yaml(datadir: Path, package_yaml: Path) -> Path:
-    """
-    Args:
-        package_yaml: This is the package.yaml from which the conda.yaml
-            (to be supplied to rcc to create the env) should be created.
+def create_hash(contents: str) -> str:
+    import hashlib
 
-    Returns: The path to the generated conda.yaml.
-    """
-    import yaml
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(contents.encode("utf-8"))
+    return sha256_hash.hexdigest()
 
-    from robocorp.action_server._rcc import create_hash
 
-    if not package_yaml.exists():
-        raise ActionPackageError(f"File does not exist ({package_yaml}).")
-
-    try:
-        with open(package_yaml, "r", encoding="utf-8") as stream:
-            contents = yaml.safe_load(stream)
-    except Exception:
-        raise ActionPackageError(f"Error loading file as yaml ({package_yaml}).")
+def create_conda_contents_from_package_yaml_contents(
+    package_yaml: Path, package_yaml_contents: dict
+) -> dict:
+    from ..termcolors import bold_yellow
 
     def _get_in_dict(
         dct: dict,
@@ -291,16 +301,27 @@ def create_conda_from_package_yaml(datadir: Path, package_yaml: Path) -> Path:
             )
         found_names.add(name)
 
-    if not isinstance(contents, dict):
+    if not isinstance(package_yaml_contents, dict):
         raise ActionPackageError(
             f"Dict not found as top-level element (in {package_yaml})."
         )
 
-    python_deps = _get_in_dict(contents, "dependencies", dict)
+    python_deps = _get_in_dict(package_yaml_contents, "dependencies", dict)
     conda_forge = _get_in_dict(python_deps, "conda-forge", list)
     local_wheels = _get_in_dict(python_deps, "local-wheels", list, required=False)
-    post_install = _get_in_dict(contents, "post-install", list, required=False)
-    pip = _get_in_dict(python_deps, "pip", list)
+    post_install = _get_in_dict(
+        package_yaml_contents, "post-install", list, required=False
+    )
+
+    # This is an error
+    pip = _get_in_dict(python_deps, "pip", list, required=False)
+    if pip:
+        raise ActionPackageError(
+            f"'pip' entry not found in 'dependencies.pip' should be renamed to 'pypi' (in {package_yaml})."
+        )
+
+    # The user could get everything from 'conda'
+    pypi = _get_in_dict(python_deps, "pypi", list, required=False) or []
 
     converted_conda_entries: list = []
     found_truststore = False
@@ -311,22 +332,32 @@ def create_conda_from_package_yaml(datadir: Path, package_yaml: Path) -> Path:
             found_truststore = True
         converted_conda_entries.append(entry)
 
-    if "pip" not in found_names:
-        raise ActionPackageError(
-            f"'pip' entry not found in 'environment.conda-forge' (in {package_yaml})."
-        )
-
     if "python" not in found_names:
         raise ActionPackageError(
-            f"'python' entry not found in 'environment.conda-forge' (in {package_yaml})."
+            f"'python' entry not found in 'dependencies.conda-forge' (in {package_yaml})."
         )
 
     converted_pip_entries: list = []
-    for entry in pip:
+    for entry in pypi:
+        if entry.replace(" ", "") == "--use-feature=truststore":
+            log.info(
+                bold_yellow(
+                    "--use-feature=truststore flag does not need to "
+                    "be specified (it is automatically used when a "
+                    '"robocorp-trustore" or "trustore" dependency is added).'
+                )
+            )
+            found_truststore = True
+            continue
+
+        if entry.startswith("--"):
+            raise ActionPackageError(f"Unexpected entry in pypi: {entry}")
+
         name, entry = convert_pip_entry(package_yaml, entry)
         _validate_name(name)
         if name in ("truststore", "robocorp-truststore"):
             found_truststore = True
+
         converted_pip_entries.append(entry)
 
     if found_truststore:
@@ -352,13 +383,42 @@ def create_conda_from_package_yaml(datadir: Path, package_yaml: Path) -> Path:
     if post_install:
         data["rccPostInstall"] = post_install
 
+    return data
+
+
+def create_conda_from_package_yaml(datadir: Path, package_yaml: Path) -> Path:
+    """
+    Args:
+        package_yaml: This is the package.yaml from which the conda.yaml
+            (to be supplied to rcc to create the env) should be created.
+
+        package_yaml_contents: If specified this are the yaml-loaded contents
+            of the package yaml.
+
+    Returns: The path to the generated conda.yaml.
+    """
+    import yaml
+
+    if not package_yaml.exists():
+        raise ActionPackageError(f"File does not exist ({package_yaml}).")
+
+    try:
+        with open(package_yaml, "r", encoding="utf-8") as stream:
+            package_yaml_contents = yaml.safe_load(stream)
+    except Exception:
+        raise ActionPackageError(f"Error loading file as yaml ({package_yaml}).")
+
+    data = create_conda_contents_from_package_yaml_contents(
+        package_yaml, package_yaml_contents
+    )
+
     tmpdir = datadir / "tmpdir"
     if not tmpdir.exists():
         tmpdir.mkdir(exist_ok=True)
 
-    contents = yaml.dump(data)
+    new_package_yaml_contents = yaml.dump(data)
 
-    conda_path = tmpdir / f"conda_{create_hash(contents)[:12]}.yaml"
-    conda_path.write_text(contents)
+    conda_path = tmpdir / f"conda_{create_hash(new_package_yaml_contents)[:12]}.yaml"
+    conda_path.write_text(new_package_yaml_contents)
 
     return conda_path

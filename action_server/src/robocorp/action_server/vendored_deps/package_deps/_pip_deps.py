@@ -33,7 +33,8 @@ class PipDeps:
             req = parse_requirement(value)
         except Exception as e:
             remaining = value.strip()
-            if not remaining or remaining.startswith("#"):
+            # -- ignored because it's used for pip flags (i.e.: --use-feature=trustore).
+            if not remaining or remaining.startswith("#") or remaining.startswith("--"):
                 return
 
             if value.startswith(("git+http", "http")) or value.endswith(

@@ -17,6 +17,10 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [Pendulum: "Simplifying Python datetime and timezone handling"](./pendulum/README.md)
 - [Simple-Salesforce: "Automate Salesforce programatically"](./simple-salesforce/README.md)
 - [OAuthLib: "Library that aids in the implementation of OAuth"](./oauthlib/README.md)
+- [Notifiers: "Send notifications through various channels"](./notifiers/README.md)
+- [PyOTP: "Tool for secure one-time passwords"](./pyotp/README.md)
+- [Gspread: "Python interface for Google Sheets"](./gspread/README.md)
+- [ORMs: "Talk with the databases"](./orm/README.md)
 - ...
 
 
