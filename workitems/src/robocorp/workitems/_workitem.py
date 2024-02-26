@@ -142,7 +142,7 @@ class WorkItem:
 
         return path
 
-    def add_files(self, pattern: str) -> list[Path]:
+    def add_files(self, pattern: PathType) -> list[Path]:
         """Attach files from the local machine to the work item that
         match the given pattern.
 
@@ -154,7 +154,7 @@ class WorkItem:
         Returns:
             List of added paths
         """
-        matches = glob(pattern, recursive=False)
+        matches = glob(str(pattern), recursive=False)
 
         paths = []
         for match in matches:

@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Callable, Optional, Union, cast
 
 from robocorp.tasks import get_current_task, task_cache
@@ -161,7 +162,7 @@ class Outputs:
             item.payload = payload
 
         if files is not None:
-            if isinstance(files, str):
+            if isinstance(files, (Path, str)):
                 item.add_files(pattern=files)
             else:
                 for path in files:
