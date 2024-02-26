@@ -10,7 +10,7 @@ from .cli_errors import ActionPackageError
 log = logging.getLogger(__name__)
 
 
-def _verify_name(package_yaml: Path, name: str) -> None:
+def _verify_name(package_yaml: Optional[Path], name: str) -> None:
     # Could be used to verify that something is not declared (no-op for now).
     pass
 
@@ -18,14 +18,19 @@ def _verify_name(package_yaml: Path, name: str) -> None:
 _version_chars_without_eq = (">", "<", "^", "~", "!", ",", ";")
 
 
-def _interpret_entry(package_yaml: Path, entry: str) -> Tuple[str, str, str]:
+def _interpret_entry(package_yaml: Optional[Path], entry: str) -> Tuple[str, str, str]:
     # https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers
     # https://packaging.python.org/en/latest/specifications/version-specifiers/#compatible-release
     for c in _version_chars_without_eq:
         if c in entry:
-            raise ActionPackageError(
-                f"Error in entry: {entry}. Using: {c!r} is not currently supported (in {package_yaml})."
-            )
+            if package_yaml is None:
+                raise ActionPackageError(
+                    f"Error in entry: {entry}. Char: {c!r} not valid, currently only '=' is a valid operator."
+                )
+            else:
+                raise ActionPackageError(
+                    f"Error in entry: {entry}. Char: {c!r} not valid, currently only '=' is a valid operator. (in {package_yaml})."
+                )
 
     i = entry.find("=")
     if i == -1:
@@ -43,31 +48,41 @@ def _interpret_entry(package_yaml: Path, entry: str) -> Tuple[str, str, str]:
     return name, "=", version
 
 
-def convert_conda_entry(package_yaml: Path, entry: str) -> Tuple[str, str]:
+def convert_conda_entry(
+    package_yaml: Optional[Path], entry: str
+) -> Tuple[str, str, str, str]:
     name, op, version = _interpret_entry(package_yaml, entry)
 
     if op:
         if op == "=":
-            return name, f"{name}={version}"
-        raise ActionPackageError(
-            f"Error in entry: {entry}. {op!r} not supported (in {package_yaml})."
-        )
+            return name, f"{name}={version}", "=", version
+        if package_yaml is None:
+            raise ActionPackageError(f"Error in entry: {entry}. {op!r} not supported.")
+        else:
+            raise ActionPackageError(
+                f"Error in entry: {entry}. {op!r} not supported (in {package_yaml})."
+            )
 
     assert not version
-    return name, name
+    return name, name, "", ""
 
 
-def convert_pip_entry(package_yaml: Path, entry: str) -> Tuple[str, str]:
+def convert_pip_entry(
+    package_yaml: Optional[Path], entry: str
+) -> Tuple[str, str, str, str]:
     name, op, version = _interpret_entry(package_yaml, entry)
     if op:
         if op == "=":
-            return name, f"{name}=={version}"
-        raise ActionPackageError(
-            f"Error in entry: {entry}. {op!r} not supported (in {package_yaml})."
-        )
+            return name, f"{name}=={version}", "==", version
+        if package_yaml is None:
+            raise ActionPackageError(f"Error in entry: {entry}. {op!r} not supported.")
+        else:
+            raise ActionPackageError(
+                f"Error in entry: {entry}. {op!r} not supported (in {package_yaml})."
+            )
 
     assert not version
-    return name, name
+    return name, name, "", ""
 
 
 def _create_package_from_conda_yaml(
@@ -326,7 +341,7 @@ def create_conda_contents_from_package_yaml_contents(
     converted_conda_entries: list = []
     found_truststore = False
     for entry in conda_forge:
-        name, entry = convert_conda_entry(package_yaml, entry)
+        name, entry, op, version = convert_conda_entry(package_yaml, entry)
         _validate_name(name)
         if name in ("truststore", "robocorp-truststore"):
             found_truststore = True
@@ -353,7 +368,7 @@ def create_conda_contents_from_package_yaml_contents(
         if entry.startswith("--"):
             raise ActionPackageError(f"Unexpected entry in pypi: {entry}")
 
-        name, entry = convert_pip_entry(package_yaml, entry)
+        name, entry, op, version = convert_pip_entry(package_yaml, entry)
         _validate_name(name)
         if name in ("truststore", "robocorp-truststore"):
             found_truststore = True

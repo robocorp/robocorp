@@ -4,11 +4,11 @@ it a standalone package in the future (maybe with a command line UI).
 """
 
 import pathlib
-from typing import Any, Iterator, List, Optional, Tuple
+import typing
+from typing import Any, Iterator, List, Optional, Tuple, Union
 
 import yaml
 
-from ._conda_deps import CondaDepInfo
 from ._deps_protocols import (
     ICondaCloud,
     IPyPiCloud,
@@ -16,9 +16,11 @@ from ._deps_protocols import (
     _DiagnosticsTypedDict,
     _RangeTypedDict,
 )
-from ._pip_deps import PipDepInfo
-from .conda_impl.conda_version import VersionSpec
-from .pypi_cloud import PyPiCloud
+
+if typing.TYPE_CHECKING:
+    from ._conda_deps import CondaDepInfo, CondaDeps
+    from ._package_deps import PackageDepsConda, PackageDepsPip
+    from ._pip_deps import PipDepInfo, PipDeps
 
 
 class ScalarInfo:
@@ -97,9 +99,12 @@ class LoaderWithLines(yaml.SafeLoader):
         )
 
 
-class Analyzer:
+class BaseAnalyzer:
     _pypi_cloud: IPyPiCloud
     _conda_cloud: ICondaCloud
+
+    _pip_deps: "Union[PipDeps, PackageDepsPip]"
+    _conda_deps: "Union[CondaDeps, PackageDepsConda]"
 
     def __init__(
         self,
@@ -113,18 +118,15 @@ class Analyzer:
             contents: The contents of the conda.yaml/action-server.yaml.
             path: The path for the conda yaml.
         """
-        from ._conda_deps import CondaDeps
-        from ._pip_deps import PipDeps
+        from .pypi_cloud import PyPiCloud
 
         self.contents = contents
         self.path = path
 
-        self._loaded_conda_yaml = False
+        self._loaded_yaml = False
         self._load_errors: List[_DiagnosticsTypedDict] = []
-        self._conda_data: Optional[dict] = None
+        self._yaml_data: Optional[dict] = None
 
-        self._pip_deps = PipDeps()
-        self._conda_deps = CondaDeps()
         if pypi_cloud is None:
             self._pypi_cloud = PyPiCloud()
         else:
@@ -132,10 +134,14 @@ class Analyzer:
 
         self._conda_cloud = conda_cloud
 
-    def load_conda_yaml(self) -> None:
-        if self._loaded_conda_yaml:
+    def _load_yaml_info(self) -> None:
+        """
+        Loads the base information and creates errors for syntax errors
+        loading the yaml.
+        """
+        if self._loaded_yaml:
             return
-        self._loaded_conda_yaml = True
+        self._loaded_yaml = True
 
         from yaml.parser import ParserError
 
@@ -147,7 +153,17 @@ class Analyzer:
 
             loader.name = f".../{path.parent.name}/{path.name}"
             data = loader.get_single_data()
-            self._conda_data = data
+            if isinstance(data, dict):
+                self._yaml_data = data
+            else:
+                diagnostic = {
+                    "range": create_range_from_location(0, 0),
+                    "severity": _DiagnosticSeverity.Error,
+                    "source": "robocorp-code",
+                    "message": "Error: expected dict to be root of yaml",
+                }
+                self._load_errors.append(diagnostic)
+
         except ParserError as e:
             if e.problem_mark:
                 diagnostic = {
@@ -159,52 +175,11 @@ class Analyzer:
                     "message": f"Syntax error: {e}",
                 }
                 self._load_errors.append(diagnostic)
-            return
-
-        dependencies = data.get(
-            ScalarInfo(
-                "dependencies",
-                None,
-            ),
-        )
-
-        conda_versions = self._conda_deps
-        pip_versions = self._pip_deps
-        if dependencies:
-            for dep in dependencies:
-                # At this level we're seeing conda versions. The spec is:
-                # https://docs.conda.io/projects/conda-build/en/latest/resources/package-spec.html#package-match-specifications
-                # A bunch of code from conda was copied to handle that so that we
-                # can just `conda_match_spec.parse_spec_str` to identify the version
-                # we're dealing with.
-                if isinstance(dep, ScalarInfo) and isinstance(dep.scalar, str):
-                    conda_versions.add_dep(dep.scalar, dep.as_range())
-                elif isinstance(dep, dict):
-                    pip_deps = dep.get(ScalarInfo("pip", None))
-                    if pip_deps:
-                        for dep in pip_deps:
-                            if isinstance(dep, ScalarInfo) and isinstance(
-                                dep.scalar, str
-                            ):
-                                pip_versions.add_dep(dep.scalar, dep.as_range())
-
-    def iter_issues(self) -> Iterator[_DiagnosticsTypedDict]:
-        self.load_conda_yaml()
-        if self._load_errors:
-            yield from iter(self._load_errors)
-            return
-
-        data = self._conda_data
-        if not data:
-            return
-
-        yield from self.iter_conda_issues()
-        yield from self.iter_pip_issues()
 
     def iter_pip_issues(self):
         from .pip_impl import pip_packaging_version
 
-        for dep_info in self._pip_deps.iter_pip_dep_infos():
+        for dep_info in self._pip_deps.iter_deps_infos():
             if dep_info.error_msg:
                 diagnostic = {
                     "range": dep_info.dep_range,
@@ -239,6 +214,7 @@ class Analyzer:
 
     def iter_conda_issues(self) -> Iterator[_DiagnosticsTypedDict]:
         from .conda_cloud import sort_conda_versions
+        from .conda_impl.conda_version import VersionSpec
 
         diagnostic: _DiagnosticsTypedDict
         dep_vspec = self._conda_deps.get_dep_vspec("python")
@@ -288,8 +264,20 @@ class Analyzer:
         sqlite_queries = self._conda_cloud.sqlite_queries()
         if sqlite_queries:
             with sqlite_queries.db_cursors() as db_cursors:
-                for conda_dep in self._conda_deps.iter_conda_dep_infos():
+                for conda_dep in self._conda_deps.iter_deps_infos():
                     if conda_dep.name in ("python", "pip"):
+                        continue
+
+                    if conda_dep.error_msg:
+                        diagnostic = {
+                            "range": conda_dep.dep_range,
+                            "severity": _DiagnosticSeverity.Error,
+                            "source": "robocorp-code",
+                            "message": conda_dep.error_msg,
+                        }
+
+                        yield diagnostic
+
                         continue
 
                     version_spec = conda_dep.get_dep_vspec()
@@ -321,19 +309,246 @@ class Analyzer:
 
                         yield diagnostic
 
-    def find_pip_dep_at(self, line, col) -> Optional[PipDepInfo]:
-        self.load_conda_yaml()
-        for dep_info in self._pip_deps.iter_pip_dep_infos():
+    def find_pip_dep_at(self, line, col) -> "Optional[PipDepInfo]":
+        self._load_yaml_info()
+        for dep_info in self._pip_deps.iter_deps_infos():
             if is_inside(dep_info.dep_range, line, col):
                 return dep_info
         return None
 
-    def find_conda_dep_at(self, line, col) -> Optional[CondaDepInfo]:
-        self.load_conda_yaml()
-        for dep_info in self._conda_deps.iter_conda_dep_infos():
+    def find_conda_dep_at(self, line, col) -> "Optional[CondaDepInfo]":
+        self._load_yaml_info()
+        for dep_info in self._conda_deps.iter_deps_infos():
             if is_inside(dep_info.dep_range, line, col):
                 return dep_info
         return None
+
+
+class PackageYamlAnalyzer(BaseAnalyzer):
+    def __init__(
+        self,
+        contents: str,
+        path: str,
+        conda_cloud: ICondaCloud,
+        pypi_cloud: Optional[IPyPiCloud] = None,
+    ):
+        from ._package_deps import PackageDepsConda, PackageDepsPip
+
+        self._pip_deps = PackageDepsPip()
+        self._conda_deps = PackageDepsConda()
+        self._additional_load_errors: List[_DiagnosticsTypedDict] = []
+
+        BaseAnalyzer.__init__(self, contents, path, conda_cloud, pypi_cloud=pypi_cloud)
+
+    def iter_package_yaml_issues(self) -> Iterator[_DiagnosticsTypedDict]:
+        self._load_yaml_info()
+        if self._load_errors:
+            yield from iter(self._load_errors)
+            return
+
+        data = self._yaml_data
+        if not data:
+            return
+
+        yield from iter(self._additional_load_errors)
+        yield from self.iter_conda_issues()
+        yield from self.iter_pip_issues()
+
+    def _load_yaml_info(self) -> None:
+        if self._loaded_yaml:
+            return
+        BaseAnalyzer._load_yaml_info(self)
+        data = self._yaml_data
+        if not data:
+            return
+
+        diagnostic: _DiagnosticsTypedDict
+        dependencies_key_entry: ScalarInfo
+        for key, v in data.items():
+            if isinstance(key, ScalarInfo) and isinstance(key.scalar, str):
+                if key.scalar == "dependencies":
+                    dependencies = v
+                    dependencies_key_entry = key
+                    break
+        else:
+            diagnostic = {
+                "range": create_range_from_location(0, 0),
+                "severity": _DiagnosticSeverity.Error,
+                "source": "robocorp-code",
+                "message": "Error: 'dependencies' entry not found",
+            }
+            self._additional_load_errors.append(diagnostic)
+            return
+
+        if not dependencies:
+            diagnostic = {
+                "range": create_range_from_location(0, 0),
+                "severity": _DiagnosticSeverity.Error,
+                "source": "robocorp-code",
+                "message": "Error: 'dependencies' entry must not be empty",
+            }
+            self._additional_load_errors.append(diagnostic)
+
+        elif not isinstance(dependencies, dict):
+            diagnostic = {
+                "range": create_range_from_location(0, 0),
+                "severity": _DiagnosticSeverity.Error,
+                "source": "robocorp-code",
+                "message": f"Error: expected 'dependencies' entry to be a dict (with 'conda-forge' and 'pypi' entries). Found: '{type(dependencies)}'",
+            }
+            self._additional_load_errors.append(diagnostic)
+        else:
+            for dep_name, dep in dependencies.items():
+                if isinstance(dep_name, ScalarInfo):
+                    if dep_name.scalar == "pypi":
+                        if not isinstance(dep, list):
+                            diagnostic = {
+                                "range": dep_name.as_range(),
+                                "severity": _DiagnosticSeverity.Error,
+                                "source": "robocorp-code",
+                                "message": f"Error: expected the entries of pypi to be a list. Found: {type(dep)}",
+                            }
+                            self._additional_load_errors.append(diagnostic)
+                            continue
+
+                        for entry in dep:
+                            if not isinstance(entry, ScalarInfo):
+                                diagnostic = {
+                                    "range": dep_name.as_range(),
+                                    "severity": _DiagnosticSeverity.Error,
+                                    "source": "robocorp-code",
+                                    "message": f"Error: expected the entries of pypi to be strings. Found: {type(entry)}: {entry}",
+                                }
+                                self._additional_load_errors.append(diagnostic)
+                                continue
+
+                            if (
+                                entry.scalar.replace(" ", "")
+                                == "--use-feature=truststore"
+                            ):
+                                diagnostic = {
+                                    "range": entry.as_range(),
+                                    "severity": _DiagnosticSeverity.Warning,
+                                    "source": "robocorp-code",
+                                    "message": (
+                                        "--use-feature=truststore flag does not need to "
+                                        "be specified (it is automatically used when a "
+                                        '"robocorp-trustore" or "trustore" dependency is added).'
+                                    ),
+                                }
+                                self._additional_load_errors.append(diagnostic)
+                                continue
+
+                            if entry.scalar.startswith("--"):
+                                diagnostic = {
+                                    "range": entry.as_range(),
+                                    "severity": _DiagnosticSeverity.Error,
+                                    "source": "robocorp-code",
+                                    "message": f"Invalid entry in pypi: {entry.scalar}",
+                                }
+                                self._additional_load_errors.append(diagnostic)
+                                continue
+
+                            self._pip_deps.add_dep(entry.scalar, entry.as_range())
+
+                    elif dep_name.scalar == "conda-forge":
+                        for entry in dep:
+                            if not isinstance(entry, ScalarInfo):
+                                diagnostic = {
+                                    "range": dep_name.as_range(),
+                                    "severity": _DiagnosticSeverity.Error,
+                                    "source": "robocorp-code",
+                                    "message": f"Error: expected the entries of conda-forge to be strings. Found: {type(entry)}: {entry}",
+                                }
+                                self._additional_load_errors.append(diagnostic)
+                                continue
+
+                            self._conda_deps.add_dep(entry.scalar, entry.as_range())
+
+                    else:
+                        diagnostic = {
+                            "range": dep_name.as_range(),
+                            "severity": _DiagnosticSeverity.Error,
+                            "source": "robocorp-code",
+                            "message": (
+                                "Error: only expected children are pypi and conda (dict entries). "
+                                f"Found: {dep_name.scalar}"
+                            ),
+                        }
+                        self._additional_load_errors.append(diagnostic)
+                else:
+                    diagnostic = {
+                        "range": dependencies_key_entry.as_range(),
+                        "severity": _DiagnosticSeverity.Error,
+                        "source": "robocorp-code",
+                        "message": "Error: found unexpected entry in dependencies.",
+                    }
+                    self._additional_load_errors.append(diagnostic)
+
+
+class CondaYamlAnalyzer(BaseAnalyzer):
+    def __init__(
+        self,
+        contents: str,
+        path: str,
+        conda_cloud: ICondaCloud,
+        pypi_cloud: Optional[IPyPiCloud] = None,
+    ):
+        from ._conda_deps import CondaDeps
+        from ._pip_deps import PipDeps
+
+        self._pip_deps = PipDeps()
+        self._conda_deps = CondaDeps()
+
+        BaseAnalyzer.__init__(self, contents, path, conda_cloud, pypi_cloud=pypi_cloud)
+
+    def _load_yaml_info(self) -> None:
+        if self._loaded_yaml:
+            return
+        BaseAnalyzer._load_yaml_info(self)
+        data = self._yaml_data
+        if not data:
+            return
+
+        dependencies = data.get(
+            ScalarInfo(
+                "dependencies",
+                None,
+            ),
+        )
+
+        conda_versions = self._conda_deps
+        pip_versions = self._pip_deps
+        if dependencies:
+            for dep in dependencies:
+                # At this level we're seeing conda versions. The spec is:
+                # https://docs.conda.io/projects/conda-build/en/latest/resources/package-spec.html#package-match-specifications
+                # A bunch of code from conda was copied to handle that so that we
+                # can just `conda_match_spec.parse_spec_str` to identify the version
+                # we're dealing with.
+                if isinstance(dep, ScalarInfo) and isinstance(dep.scalar, str):
+                    conda_versions.add_dep(dep.scalar, dep.as_range())
+                elif isinstance(dep, dict):
+                    pip_deps = dep.get(ScalarInfo("pip", None))
+                    if pip_deps:
+                        for dep in pip_deps:
+                            if isinstance(dep, ScalarInfo) and isinstance(
+                                dep.scalar, str
+                            ):
+                                pip_versions.add_dep(dep.scalar, dep.as_range())
+
+    def iter_conda_yaml_issues(self) -> Iterator[_DiagnosticsTypedDict]:
+        self._load_yaml_info()
+        if self._load_errors:
+            yield from iter(self._load_errors)
+            return
+
+        data = self._yaml_data
+        if not data:
+            return
+
+        yield from self.iter_conda_issues()
+        yield from self.iter_pip_issues()
 
 
 class _Position:
