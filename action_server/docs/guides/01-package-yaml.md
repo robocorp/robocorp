@@ -54,12 +54,6 @@ An example `package.yaml` would be something as:
         - robocorp=1.4.3
         - pytz=2023.3
 
-      local-wheels:
-        # This section is optional.
-        # It's possible to add references to a wheel/.zip relative
-        # to the folder containing this package.yaml.
-        - ./wheels/my-wheel.whl
-
     post-install:
         # This can be used to run custom commands which will still affect the 
         # environment after it is created (the changes to the environment will
