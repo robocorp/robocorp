@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `action-server package --update` properly adds the 'name' to the package.yaml
+
 ## 0.0.24 - 2024-02-23
 
 - Properly use all lines from docstring description to feed to the `openapi.json`.

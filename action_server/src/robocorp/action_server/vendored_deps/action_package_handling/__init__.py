@@ -199,6 +199,9 @@ def _create_package_from_conda_yaml(
         post_install_str = yaml.dump({"post-install": post_install})
 
     output = f"""
+# Required: A short name for the action package
+name: Action package name
+    
 # Required: A description of what's in the action package.
 description: Action package description
 

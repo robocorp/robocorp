@@ -6,6 +6,9 @@ Creating package.yaml
 Contents:
 ----------------
 
+# Required: A short name for the action package
+name: Action package name
+    
 # Required: A description of what's in the action package.
 description: Action package description
 
