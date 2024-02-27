@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Outputs creation supports Path-like objects for files param
+
 ## 1.4.3 - 2024-02-07
 
 - Support for retrieving the error through the `exception` property of a failed input
