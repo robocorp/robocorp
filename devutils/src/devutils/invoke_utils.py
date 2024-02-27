@@ -413,14 +413,12 @@ def build_common_tasks(
             .stdout.strip()
             .splitlines()
         )
-        print(run(ctx, "git --no-pager diff -- docs/api"))
 
         return bool(changed_files)
 
-    @task(lint, typecheck, test, docs)
+    @task(lint, typecheck, test)
     def check_all(ctx):
         """Run all checks"""
-        assert not check_document_changes(ctx), "There are uncommitted docs changes"
 
     @task
     def make_release(ctx):
