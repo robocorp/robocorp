@@ -494,15 +494,14 @@ def build_common_tasks(
             unreleased_match = re.search(r"## Unreleased", content, flags=re.IGNORECASE)
             double_newline = "\n\n"
 
+            new_content = content[:changelog_start] + double_newline + "## Unreleased"
             if unreleased_match:
-                new_content = content.replace(unreleased_match.group(), new_version)
-            else:
-                new_content = (
-                    content[:changelog_start]
-                    + double_newline
-                    + new_version
-                    + content[changelog_start:]
+                released_content = content.replace(
+                    unreleased_match.group(), new_version
                 )
+                new_content += released_content[changelog_start:]
+            else:
+                new_content += double_newline + new_version + content[changelog_start:]
 
             stream.seek(0)
             stream.write(new_content)
