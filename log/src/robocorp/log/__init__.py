@@ -296,6 +296,12 @@ class ConsoleMessageKind:
 class _SentinelUseStdout:
     pass
 
+    def __repr__(self):
+        return "_SentinelUseStdout"
+
+    def __str__(self):
+        return "_SentinelUseStdout"
+
 
 class _ConsoleMessagesLock:
     tlocal = threading.local()
