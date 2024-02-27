@@ -310,6 +310,10 @@ class BaseAnalyzer:
                         yield diagnostic
 
     def find_pip_dep_at(self, line, col) -> "Optional[PipDepInfo]":
+        """
+        Args:
+            line: 0-based line
+        """
         self._load_yaml_info()
         for dep_info in self._pip_deps.iter_deps_infos():
             if is_inside(dep_info.dep_range, line, col):
@@ -555,6 +559,9 @@ class _Position:
     def __init__(self, line: int = 0, character: int = 0):
         self.line: int = line
         self.character: int = character
+
+    def to_dict(self):
+        return {"line": self.line, "character": self.character}
 
     def __repr__(self):
         import json
