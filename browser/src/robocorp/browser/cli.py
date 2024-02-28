@@ -1,7 +1,7 @@
 # ruff: noqa: E501
 import argparse
-import sys
 import logging
+import sys
 
 from ._engines import install_browser
 from ._types import BrowserEngine, InstallError
@@ -18,7 +18,7 @@ if sys.version_info >= (3, 10):
             "Truststore injection done, using system certificate store to validate HTTPS."
         )
     except ModuleNotFoundError:
-        log.debug("Dependency `truststore` is not installed!")
+        log.warning("Dependency `truststore` is not installed!")
 
 
 def main():
