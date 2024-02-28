@@ -93,9 +93,30 @@ jobs:
       env:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
-    - name: Test, lint and docs
+    - name: Test
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
         CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
         CI_ENDPOINT: ${{ secrets.CI_ENDPOINT }}
-      run: inv check-all
+      run: inv test
+    - name: '`inv lint`, potentially fixed with `inv pretty`'
+      if: always()
+      run: '
+
+        inv lint
+
+        '
+    - name: '`inv typecheck`'
+      if: always()
+      run: '
+
+        inv typecheck
+
+        '
+    - name: '`inv docs` with checking on files changed'
+      if: always()
+      run: '
+
+        inv docs --check
+
+        '
