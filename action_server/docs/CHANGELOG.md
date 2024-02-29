@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.0.25 - 2024-02-29
 
 - `action-server package --update` properly adds the 'name' to the package.yaml
 
