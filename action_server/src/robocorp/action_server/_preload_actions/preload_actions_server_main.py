@@ -49,25 +49,7 @@ class _DummyStdin(object):
 
 
 def binary_stdio():
-    """Construct binary stdio streams (not text mode).
-
-    This seems to be different for Window/Unix Python2/3, so going by:
-        https://stackoverflow.com/questions/2850893/reading-binary-data-from-stdin
-    """
-    PY3K = sys.version_info >= (3, 0)
-
-    if PY3K:
-        stdin, stdout = sys.stdin.buffer, sys.stdout.buffer
-    else:
-        # Python 2 on Windows opens sys.stdin in text mode, and
-        # binary data that read from it becomes corrupted on \r\n
-        if sys.platform == "win32":
-            # set sys.stdin to binary mode
-            import msvcrt
-
-            msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
-            msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
-        stdin, stdout = sys.stdin, sys.stdout
+    stdin, stdout = sys.stdin.buffer, sys.stdout.buffer
 
     # The original stdin cannot be used and anything written to stdout will
     # be put in the stderr.
