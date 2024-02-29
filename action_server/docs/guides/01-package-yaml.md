@@ -1,3 +1,7 @@
+# package.yaml
+
+### Note: introduced in the Action Server version: 0.0.21
+
 The `package.yaml` file is the base file which defines everything related to the
 actions available in the action package.
 
@@ -5,7 +9,7 @@ actions available in the action package.
 which are not directly compatible to `package.yaml` (so, they can't be just renamed
 directly and some changes are expected in how to define the environment).
 
-> Running: `action-server package --upgrade` can be used to automatically
+> Running: `action-server package --update` can be used to automatically
 upgrade a package in an older version to the new expected format.
 
 An example `package.yaml` would be something as:
@@ -49,12 +53,6 @@ An example `package.yaml` would be something as:
         - robocorp-actions
         - robocorp=1.4.3
         - pytz=2023.3
-
-      local-wheels:
-        # This section is optional.
-        # It's possible to add references to a wheel/.zip relative
-        # to the folder containing this package.yaml.
-        - ./wheels/my-wheel.whl
 
     post-install:
         # This can be used to run custom commands which will still affect the 

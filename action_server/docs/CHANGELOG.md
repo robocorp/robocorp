@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.0.25 - 2024-02-29
+
+- `action-server package --update` properly adds the 'name' to the package.yaml
+
+## 0.0.24 - 2024-02-23
+
+- Properly use all lines from docstring description to feed to the `openapi.json`.
+- When creating project from template, skip the root directory in the .zip.
+
+## 0.0.23 - 2024-02-23
+
+- Support for Action Packages with `package.yaml`.
+    - `conda.yaml` or `action-server.yaml` support is deprecated (but still supported).
+    - `action-server package --update` may be used to migrate an existing package.
+- When starting up, if a running server is detected the newly spawned server will wait a bit
+  for the old one to exit before finishing with an error.
+  
+# 0.0.22 - 2024-02-23
+
+- Same as 0.0.23, but had issues publishing the actual binary.
+
+# 0.0.21 - 2024-02-23
+
+- Same as 0.0.23, but had issues publishing the actual binary.
+
 ## 0.0.20 - 2024-01-31
 
 - When importing actions, lint them by default (`--skip-lint` may be used

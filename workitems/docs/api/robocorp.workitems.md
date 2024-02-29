@@ -13,7 +13,7 @@ ______________________________________________________________________
 
 ## class `Inputs`
 
-**Source:** [`__init__.py:65`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L65)
+**Source:** [`__init__.py:66`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L66)
 
 Inputs represents the input queue of work items.
 
@@ -31,7 +31,7 @@ ______________________________________________________________________
 
 ### method `reserve`
 
-**Source:** [`__init__.py:98`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L98)
+**Source:** [`__init__.py:99`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L99)
 
 ```python
 reserve() → Input
@@ -53,7 +53,7 @@ ______________________________________________________________________
 
 ## class `Outputs`
 
-**Source:** [`__init__.py:113`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L113)
+**Source:** [`__init__.py:114`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L114)
 
 Outputs represents the output queue of work items.
 
@@ -67,12 +67,12 @@ ______________________________________________________________________
 
 ### method `create`
 
-**Source:** [`__init__.py:139`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L139)
+**Source:** [`__init__.py:140`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L140)
 
 ```python
 create(
     payload: Optional[dict[str, Any], list[Any], str, int, float, bool] = None,
-    files: Optional[str, list[str]] = None,
+    files: Optional[Path, str, list[Union[Path, str]]] = None,
     save: bool = True
 ) → Output
 ```
@@ -178,7 +178,7 @@ ______________________________________________________________________
 **Source:** [`_workitem.py:145`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145)
 
 ```python
-add_files(pattern: str) → list[Path]
+add_files(pattern: Union[Path, str]) → list[Path]
 ```
 
 Attach files from the local machine to the work item that match the given pattern.
@@ -292,7 +292,7 @@ ______________________________________________________________________
 **Source:** [`_workitem.py:402`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L402)
 
 ```python
-get_files(pattern: str, path: Optional[Path] = None) → list[Path]
+get_files(pattern: str, path: Optional[Path, str] = None) → list[Path]
 ```
 
 Download all files attached to this work item that match the given pattern.
@@ -444,7 +444,7 @@ ______________________________________________________________________
 **Source:** [`_workitem.py:145`](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L145)
 
 ```python
-add_files(pattern: str) → list[Path]
+add_files(pattern: Union[Path, str]) → list[Path]
 ```
 
 Attach files from the local machine to the work item that match the given pattern.

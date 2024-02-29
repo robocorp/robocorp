@@ -89,3 +89,26 @@ def test_task_schema_default_value_type():
         },
         "type": "object",
     }
+
+
+def methodd(a: int = 1) -> int:
+    """
+    This is a method. In this method
+    the description spans multiple lines
+    and this must be properly supported
+    in the spec.
+
+    Args:
+        a: This is argument a.
+
+    Returns:
+        The number 1.
+    """
+    return 1
+
+
+def test_task_schema_multiple_lines_in_description():
+    from robocorp.tasks._task import Task
+
+    task = Task(__name__, __file__, methodd)
+    print(task.__doc__)

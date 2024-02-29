@@ -12,6 +12,7 @@ dependencies:
   - pytz=2023.3
 description: Action package description
 documentation: https://github.com/...
+name: Action package name
 post-install:
 - python -m foobar
 version: 0.0.1

@@ -2,6 +2,7 @@ import argparse
 import logging
 import os.path
 import sys
+import time
 from pathlib import Path
 from typing import Optional, Union
 
@@ -484,16 +485,44 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
                 create_new_project(directory=base_args.name)
                 return 0
 
-            mutex = SystemMutex("action_server.lock", base_dir=str(settings.datadir))
-            if not mutex.get_mutex_aquired():
-                print(
-                    f"An action server is already started in this datadir ({settings.datadir})."
-                    f"\nPlease exit it before starting a new one."
-                    f"\nInformation on mutex holder:\n"
-                    f"{mutex.mutex_creation_info}",
-                    file=sys.stderr,
+            timeout = 3
+            timeout_at = time.time() + timeout
+
+            shown_first_message = False
+            while True:
+                mutex = SystemMutex(
+                    "action_server.lock", base_dir=str(settings.datadir)
                 )
-                return 1
+                acquired = mutex.get_mutex_aquired()
+                if acquired:
+                    if shown_first_message:
+                        print("Exited. Proceeding with action server startup.")
+                    break
+
+                msg = mutex.mutex_creation_info or ""
+                i = msg.find("--- Stack ---")
+                if i > 0:
+                    msg = msg[:i]
+                msg = msg.strip()
+
+                if not shown_first_message:
+                    shown_first_message = True
+                    print(
+                        f"An action server is already started in this datadir ({settings.datadir}).\n"
+                        f"\nInformation on mutex holder:\n"
+                        f"{msg}",
+                    )
+
+                print("Waiting for it to exit...")
+                time.sleep(0.3)
+
+                timed_out = time.time() > timeout_at
+                if timed_out:
+                    print(
+                        "\nAction server not started (timed out waiting for mutex to be released).",
+                        file=sys.stderr,
+                    )
+                    return 1
 
             # Log to file in datadir, always in debug mode
             # (only after lock is in place as multiple loggers to the same
