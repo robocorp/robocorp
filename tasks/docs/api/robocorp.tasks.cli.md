@@ -14,10 +14,36 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`cli.py:36`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L36)
+**Source:** [`cli.py:46`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L46)
 
 ```python
-main(args=None, exit: bool = True) → int
+main(
+    args=None,
+    exit: bool = True,
+    argument_dispatcher: Optional[IArgumentsHandler] = None
+) → int
 ```
 
 Entry point for running tasks from robocorp-tasks.
+
+______________________________________________________________________
+
+## class `IArgumentsHandler`
+
+**Source:** [`cli.py:36`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L36)
+
+______________________________________________________________________
+
+### method `process_args`
+
+**Source:** [`cli.py:37`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L37)
+
+```python
+process_args(args: List[str]) → int
+```
+
+**Args:**
+
+- <b>`args`</b>:  The arguments to process.
+
+Returns: the exitcode.

@@ -8,7 +8,7 @@ ______________________________________________________________________
 
 ## function `action`
 
-**Source:** [`__init__.py:25`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L25)
+**Source:** [`__init__.py:23`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L23)
 
 ```python
 action(*args, **kwargs)
@@ -149,7 +149,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`__init__.py:65`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L65)
+**Source:** [`__init__.py:63`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L63)
 
 ```python
 session_cache(func)
@@ -169,7 +169,7 @@ ______________________________________________________________________
 
 ## function `action_cache`
 
-**Source:** [`__init__.py:86`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L86)
+**Source:** [`__init__.py:84`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L84)
 
 ```python
 action_cache(func)
@@ -189,7 +189,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`__init__.py:107`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L107)
+**Source:** [`__init__.py:105`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L105)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -201,7 +201,7 @@ ______________________________________________________________________
 
 ## function `get_current_action`
 
-**Source:** [`__init__.py:117`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L117)
+**Source:** [`__init__.py:115`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L115)
 
 ```python
 get_current_action() → Optional[ITask]
@@ -213,7 +213,7 @@ ______________________________________________________________________
 
 ## class `ITask`
 
-**Source:** [`_protocols.py:51`](https://github.com/robocorp/robocorp/tree/master/actions/.venv/lib/python3.10/site-packages/robocorp/tasks/_protocols.py#L51)
+**Source:** [`ITask:51`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/tasks/_protocols/ITask#L51)
 
 #### property `failed`
 
@@ -231,7 +231,7 @@ ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`_protocols.py:82`](https://github.com/robocorp/robocorp/tree/master/actions/.venv/lib/python3.10/site-packages/robocorp/tasks/_protocols.py#L82)
+**Source:** [`run:82`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/tasks/_protocols/run#L82)
 
 ```python
 run() → Any
@@ -241,7 +241,7 @@ ______________________________________________________________________
 
 ## enum `Status`
 
-**Source:** [`_protocols.py:43`](https://github.com/robocorp/robocorp/tree/master/actions/.venv/lib/python3.10/site-packages/robocorp/tasks/_protocols.py#L43)
+**Source:** [`Status:43`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/tasks/_protocols/Status#L43)
 
 Task state
 

@@ -1,18 +1,25 @@
+import sys
 from pathlib import Path
 
-from devutils.invoke_utils import build_common_tasks
 from invoke import task
 
-CURDIR = Path(__file__).absolute().parent
+ROOT = Path(__file__).absolute().parent
 
+# To run Invoke commands outside the Poetry env (like `inv install`), you'd need to
+#  manually fiddle with Python's import path so the module we're interested into gets
+#  available for import.
+try:
+    import devutils
+except ImportError:
+    devutils_src = ROOT.parent / "devutils" / "src"
+    assert devutils_src.exists(), f"{devutils_src} does not exist!"
+    sys.path.append(str(devutils_src))
 
-globals().update(
-    build_common_tasks(
-        root=CURDIR,
-        package_name="robocorp._meta",
-        tag_prefix="robocorp",
-    )
-)
+from devutils.invoke_utils import build_common_tasks
+
+common_tasks = build_common_tasks(ROOT, "robocorp._meta", tag_prefix="robocorp")
+globals().update(common_tasks)
+
 
 if False:
     # Forward declarations from invoke_utils so that static
@@ -29,7 +36,7 @@ def update(ctx):
     """Update all dependencies to match current versions"""
     import tomlkit
 
-    pyproject = CURDIR / "pyproject.toml"
+    pyproject = ROOT / "pyproject.toml"
     contents = tomlkit.loads(pyproject.read_text())
     dependencies = contents["tool"]["poetry"]["dependencies"]
 
@@ -37,7 +44,7 @@ def update(ctx):
     for name, version in list(dependencies.items()):
         if name.startswith("robocorp-"):
             dep_name = name[len("robocorp-") :]
-            dep_pyproject = CURDIR.parent / dep_name / "pyproject.toml"
+            dep_pyproject = ROOT.parent / dep_name / "pyproject.toml"
             dep_contents = tomlkit.loads(dep_pyproject.read_text())
             dep_version = f'^{dep_contents["tool"]["poetry"]["version"]}'
             if version != dep_version:
@@ -66,7 +73,7 @@ def outdated(ctx):
 
     import tomlkit
 
-    pyproject = CURDIR / "pyproject.toml"
+    pyproject = ROOT / "pyproject.toml"
     contents = tomlkit.loads(pyproject.read_text())
     dependencies = contents["tool"]["poetry"]["dependencies"]
 

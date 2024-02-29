@@ -42,7 +42,7 @@ jobs:
         ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
 
     - name: Check tag version
-      run: poetry run invoke check-tag-version
+      run: inv check-tag-version
 
     - name: Build with poetry
       run: |
@@ -55,7 +55,7 @@ jobs:
         CI: true
         NODE_AUTH_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
         ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
-        
+
     - uses: actions/upload-artifact@v4
       with:
         name: action-server-dist

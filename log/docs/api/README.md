@@ -40,6 +40,7 @@
 - [`log.info`](./robocorp.log.md#function-info): Adds a new logging message with an info level.
 - [`log.is_sensitive_variable_name`](./robocorp.log.md#function-is_sensitive_variable_name): Returns true if the given variable name should be considered sensitive.
 - [`log.iter_decoded_log_format_from_log_html`](./robocorp.log.md#function-iter_decoded_log_format_from_log_html): Reads the data saved in the log html and provides decoded messages (dicts).
+- [`log.iter_decoded_log_format_from_log_html_contents`](./robocorp.log.md#function-iter_decoded_log_format_from_log_html_contents): Reads the data saved in the log html and provides decoded messages (dicts).
 - [`log.iter_decoded_log_format_from_stream`](./robocorp.log.md#function-iter_decoded_log_format_from_stream): Iterates stream contents and decodes those as dicts.
 - [`log.process_snapshot`](./robocorp.log.md#function-process_snapshot): Makes a process snapshot and adds it to the logs.
 - [`log.setup_auto_logging`](./robocorp.log.md#function-setup_auto_logging): Sets up automatic logging.

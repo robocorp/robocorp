@@ -49,26 +49,38 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
         cache: poetry
-    - name: Install invoke/tomlkit
-      run: pip install invoke tomlkit
+    - name: Install devutils requirements
+      run: python -m pip install -r ../devutils/requirements.txt
     - name: Install project (not dev)
       if: contains(matrix.name, '-devmode') == false
-      run: python -m invoke install
+      run: inv install
     - name: Install project (dev)
       if: contains(matrix.name, '-devmode')
-      run: python -m invoke devinstall
+      run: inv devinstall
     - name: Test
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
         CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
         CI_ENDPOINT: ${{ secrets.CI_ENDPOINT }}
-      run: python -m invoke test
-    - name: '`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`'
+      run: inv test
+    - name: '`inv lint`, potentially fixed with `inv pretty`'
       if: always()
       run: '
 
-        python -m invoke lint
+        inv lint
 
-        python -m invoke typecheck
+        '
+    - name: '`inv typecheck`'
+      if: always()
+      run: '
+
+        inv typecheck
+
+        '
+    - name: '`inv docs` with checking on files changed'
+      if: always()
+      run: '
+
+        inv docs --check
 
         '
