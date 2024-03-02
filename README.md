@@ -91,38 +91,41 @@ Head over to [Action Server docs](./action_server/README.md) for more.
 
 # What makes a Python function an⚡️Action?
 
-1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
+1️⃣ `package.yaml` file that describes the set of Actions your are working on, and defines up your **Python environment and dependencies**:
 
 ```yaml
-channels:
-  - conda-forge
+name: Package name
+description: Action package description
+version: 0.0.1
+documentation: https://github.com/...
 
 dependencies:
+  conda-forge:
   - python=3.10.12
   - pip=23.2.1
   - robocorp-truststore=0.8.0
-  - pip:
-      - robocorp==1.4.0
-      - robocorp-actions==0.0.4
-      - numpy==1.26.3
+  pypi:
+  - robocorp=1.6.1
+  - robocorp-actions=0.0.7
+  - pytz=2023.3
 ```
 
 <details>
   <summary>🙋‍♂️ "Why not just pip install...?"</summary>
 
-Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 With `conda.yaml` you are not just controlling your PyPI dependencies, you control the complete Python environment, which makes things repeatable and easy.
+Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 With `package.yaml` you are not just controlling your PyPI dependencies, you control the complete Python environment, which makes things repeatable and easy.
 
-👉 You will probably not want run the Actions just on your machine, so by using `conda.yaml`:
+👉 You will probably not want run the Actions just on your machine, so by using `package.yaml`:
 
 - You can avoid `Works on my machine` -cases
 - You do not need to manage Python installations on all the machines
 - You can control exactly which version of Python your automation will run on
-  - ..as well as the pip version to avoid dep. resolution changes
+  - ..as well as the pip version to avoid dependency resolution changes
 - No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
-- Define dependencies in conda.yaml let our tooling do the heavy lifting.
+- Define dependencies in package.yaml let our tooling do the heavy lifting.
 - You get all the content of [conda-forge](https://prefix.dev/channels/conda-forge) without any extra tooling
 
-> Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
+> This is courtesy of another open-source project of ours, [RCC](https://github.com/robocorp/rcc).
 
 </details>
 <br/>
