@@ -27,10 +27,19 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 # 🏃‍♂️ Quickstart
 
-Install Robocorp Action Server:
+There are two main ways using the Action Server: use with our Robocorp Code extension for VS Code, or DIY from the command line. This section gets you going!
 
 <details open>
-<summary><b>For macOS</b></summary>
+<summary><b>Robocorp Code extension for VS Code</b></summary>
+
+After installing [Robocorp Code extension from the VS Code Markeplace](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code), open the Command Palette (`Command-Shift-P` or `Ctrl-Shift-P`) and select `Robocorp: Create Action Package`. This will bootstrap a new project. You can then run/debug indvidual Actions from the Extension's sidebar, or start the Action Server.
+
+![github-extension](https://github.com/robocorp/robocorp/assets/40179958/d53000bf-558e-48a7-bb30-4610b9bf24c5)
+
+</details>
+
+<details open>
+<summary><b>CLI For macOS</b></summary>
 
 ```sh
 brew update
@@ -40,7 +49,7 @@ brew install robocorp/tools/action-server
 </details>
 
 <details>
-<summary><b>For Windows</b></summary>
+<summary><b>CLI For Windows</b></summary>
 
 ```sh
 # Download Robocorp Action Server
@@ -52,7 +61,7 @@ You can download/move the executable into a folder that is in your `PATH`, or yo
 </details>
 
 <details>
-<summary><b>For Linux</b></summary>
+<summary><b>CLI For Linux</b></summary>
 
 ```sh
 # Download Robocorp Action Server
@@ -258,7 +267,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [x] ~~Action Server `brew install` for Mac users~~
 - [x] ~~Expose actions to public URL~~
 - [x] ~~Resume previously exposed session~~
-- [ ] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code) [#230](https://github.com/robocorp/robocorp/issues/230)
+- [x] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code) [#230](https://github.com/robocorp/robocorp/issues/230)
 - [ ] Docstring to OpenAPI specs improvements [#236](https://github.com/robocorp/robocorp/issues/236), [#250](https://github.com/robocorp/robocorp/issues/250)
 - [ ] Support JSON/Dicts for inputs and outputs [#266](https://github.com/robocorp/robocorp/issues/266)
 - [ ] Action can access request headers [#167](https://github.com/robocorp/robocorp/issues/167)
