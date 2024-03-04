@@ -38,7 +38,7 @@ ______________________________________________________________________
 
 ## function `task`
 
-**Source:** [`__init__.py:45`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L45)
+**Source:** [`__init__.py:47`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L47)
 
 ```python
 task(*args, **kwargs)
@@ -189,7 +189,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`__init__.py:98`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L98)
+**Source:** [`__init__.py:100`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L100)
 
 ```python
 session_cache(func)
@@ -209,7 +209,7 @@ ______________________________________________________________________
 
 ## function `task_cache`
 
-**Source:** [`__init__.py:120`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L120)
+**Source:** [`__init__.py:122`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L122)
 
 ```python
 task_cache(func)
@@ -229,7 +229,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`__init__.py:142`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L142)
+**Source:** [`__init__.py:144`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L144)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -241,13 +241,23 @@ ______________________________________________________________________
 
 ## function `get_current_task`
 
-**Source:** [`__init__.py:155`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L155)
+**Source:** [`__init__.py:157`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L157)
 
 ```python
 get_current_task() → Optional[ITask]
 ```
 
 Provides the task which is being currently run or None if not currently running a task.
+
+______________________________________________________________________
+
+## function `inject_truststore`
+
+**Source:** [`__init__.py:167`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L167)
+
+```python
+inject_truststore()
+```
 
 ______________________________________________________________________
 

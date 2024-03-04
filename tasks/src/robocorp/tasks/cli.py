@@ -9,18 +9,12 @@ Note: when running tasks, clients using this approach MUST make sure that any
 code which must be automatically logged is not imported prior the the `cli.main`
 call.
 """
-
 import sys
 from typing import List, Optional, Protocol
 
-# Use certificates from native storage (if `truststore` installed)
-if sys.version_info >= (3, 10):
-    try:
-        import truststore  # type: ignore
+from . import inject_truststore
 
-        truststore.inject_into_ssl()
-    except ModuleNotFoundError:
-        pass
+inject_truststore()
 
 if sys.platform == "win32":
     # Apply workaround where `asyncio` would halt forever when windows UIAutomation.dll
@@ -30,7 +24,7 @@ if sys.platform == "win32":
     sys.coinit_flags = _COINIT_MULTITHREADED  # type:ignore
 
 # Just importing is enough to register the commands
-from . import _commands  # noqa
+from . import _commands, inject_truststore  # noqa
 
 
 class IArgumentsHandler(Protocol):

@@ -17,6 +17,7 @@
 
 - [`tasks.get_current_task`](./robocorp.tasks.md#function-get_current_task): Provides the task which is being currently run or None if not currently
 - [`tasks.get_output_dir`](./robocorp.tasks.md#function-get_output_dir): Provide the output directory being used for the run or None if there's no
+- [`tasks.inject_truststore`](./robocorp.tasks.md#function-inject_truststore)
 - [`tasks.session_cache`](./robocorp.tasks.md#function-session_cache): Provides decorator which caches return and clears automatically when all
 - [`_fixtures.setup`](./robocorp.tasks._fixtures.md#function-setup): Run code before any tasks start, or before each separate task.
 - [`tasks.task`](./robocorp.tasks.md#function-task): Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
