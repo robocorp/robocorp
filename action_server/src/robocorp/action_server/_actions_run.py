@@ -6,7 +6,7 @@ import time
 import typing
 from typing import Annotated, Any, Dict, Optional
 
-from fastapi import HTTPException, Response
+from fastapi import HTTPException, Request, Response
 from fastapi.params import Header, Param
 from pydantic import BaseModel
 
@@ -135,7 +135,7 @@ def _run_action_in_thread(
     action: "Action",
     response: Response,
     signature: inspect.Signature,
-    headers: Dict[str, str],
+    request: Request,
     *args,
     **kwargs,
 ):
@@ -212,7 +212,7 @@ def _run_action_in_thread(
                     robot_artifacts,
                     output_file,
                     result_json,
-                    headers,
+                    request,
                     reuse_process,
                 )
 
@@ -270,10 +270,10 @@ def generate_func_from_action(action: "Action"):
         def calculator_sum(
             args:CalculatorSumInput,
             response: Response,
-            x_action_trace: Optional[str] = Header(None, description='Client application run trace reference', alias='X-action-trace', include_in_schema=False)
+            request: Request,
         ) -> Annotated[float, Param(description='The sum of v1 + v2.')]:
 
-            headers = {'x_action_trace': x_action_trace}
+            headers = request.headers
             return _run_action_in_thread(action, signature, headers, args.v1, args.v2, __ret_type__='number')
 
         signature = inspect.signature(calculator_sum_as_params)
@@ -296,13 +296,6 @@ def generate_func_from_action(action: "Action"):
             argument = f"{argument}={default!r}"
         arguments.append(argument)
 
-    # Note: Headers are explicitly hidden from spec to make the OpenAPI schema compatible with OpenAI
-    headers = {
-        "x_action_trace": "Optional[str] = Header(None, description='Client application run trace reference', alias='X-action-trace', include_in_schema=False)"
-    }
-    headers_as_params = [f"{key}: {value}" for key, value in headers.items()]
-    headers_as_values = [f"'{key}': {key}" for key, _ in headers.items()]
-
     ret_type = output_schema_dict.get("type", "")
     ret = ""
     if ret_type:
@@ -319,9 +312,8 @@ class {_name_as_class_name(action.name)}Input(BaseModel):
 def {action.name}_as_params({', '.join(arguments)}){ret}:
     pass
 
-def {action.name}(args:{_name_as_class_name(action.name)}Input, response: Response, {", ".join(headers_as_params)}){ret}:
-    headers = {{{", ".join(headers_as_values)}}}
-    return _run_action_in_thread(action, response, signature, headers, {', '.join(argument_names)})
+def {action.name}(args:{_name_as_class_name(action.name)}Input, response: Response, request: Request){ret}:
+    return _run_action_in_thread(action, response, signature, request, {', '.join(argument_names)})
 
 signature = inspect.signature({action.name}_as_params)
 """
@@ -336,6 +328,7 @@ signature = inspect.signature({action.name}_as_params)
         "action": action,
         "inspect": inspect,
         "Response": Response,
+        "Request": Request,
         "_run_action_in_thread": _run_action_in_thread,
     }
     exec(compiled, ctx)

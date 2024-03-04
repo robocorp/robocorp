@@ -173,10 +173,6 @@ class MessagesHandler:
         #
         # env["ROBOT_ARTIFACTS"] = robot_artifacts
         # env["RC_ACTION_RESULT_LOCATION"] = result_json
-        #
-        # for key, value in headers.items():
-        #     if value:
-        #         env[key.upper()] = value
         command = message.get("command")
         if command == "run_action":
             from robocorp.actions import cli
@@ -207,7 +203,7 @@ class MessagesHandler:
 
                 if headers:
                     for key, value in headers.items():
-                        if key and value:
+                        if key and value and key.upper() == "X_ACTION_TRACE":
                             os.environ[key.upper()] = value
 
                 # The preloaded actions must be always in place.

@@ -213,7 +213,7 @@ ______________________________________________________________________
 
 ## class `ITask`
 
-**Source:** [`ITask:51`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/tasks/_protocols/ITask#L51)
+**Source:** [`_protocols.py:51`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L51)
 
 #### property `failed`
 
@@ -231,7 +231,7 @@ ______________________________________________________________________
 
 ### method `run`
 
-**Source:** [`run:82`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/tasks/_protocols/run#L82)
+**Source:** [`_protocols.py:82`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L82)
 
 ```python
 run() → Any
@@ -241,7 +241,7 @@ ______________________________________________________________________
 
 ## enum `Status`
 
-**Source:** [`Status:43`](https://github.com/robocorp/robocorp/tree/master/actions/robocorp/tasks/_protocols/Status#L43)
+**Source:** [`_protocols.py:43`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L43)
 
 Task state
 

@@ -1,7 +1,7 @@
 import os
 
 # This has to be imported once and we're done.
-# Note that this module may be imported multiple times (at it's imported once
+# Note that this module may be imported multiple times (it's imported once
 # and then it's removed from sys.modules and then reimported in a new run)
 # as such, things that should be only done once need to be in a separate module.
 

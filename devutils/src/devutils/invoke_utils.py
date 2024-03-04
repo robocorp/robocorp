@@ -401,7 +401,11 @@ def build_common_tasks(
         )
 
         if check:
-            assert not check_document_changes(ctx), "There are uncommitted docs changes"
+            if check_document_changes(ctx):
+                output = run(ctx, "git --no-pager diff -- docs/api")
+                raise RuntimeError(
+                    f"There are uncommitted docs changes. Changes: {output.stdout}"
+                )
 
     def check_document_changes(ctx):
         """
@@ -501,9 +505,7 @@ def build_common_tasks(
                 )
                 sys.exit(1)
 
-            unreleased_match = re.search(
-                r"## Unreleased", content, flags=re.IGNORECASE
-            )
+            unreleased_match = re.search(r"## Unreleased", content, flags=re.IGNORECASE)
             double_newline = "\n\n"
 
             new_content = content[:changelog_start] + double_newline + "## Unreleased"

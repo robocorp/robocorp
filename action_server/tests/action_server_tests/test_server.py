@@ -763,3 +763,24 @@ def calculator_sum(v1: str, v2: str) -> str:
             actions = db.all(Action)
             assert len(actions) == 1
             assert actions[0].is_consequential is False
+
+
+def todo_issue_167_access_headers(action_server_process: ActionServerProcess):
+    from action_server_tests.fixtures import get_in_resources
+
+    pack = get_in_resources("no_conda", "check_headers")
+    action_server_process.start(
+        cwd=pack,
+        actions_sync=True,
+        db_file="server.db",
+    )
+
+    client = ActionServerClient(action_server_process)
+
+    found = client.post_get_str(
+        "api/actions/check-headers/check-headers/run",
+        {"name": "Foo"},
+        headers={"header1": "value-header1"},
+        cookies=dict(cookie1="foo", cookie2="bar"),
+    )
+    print(found)
