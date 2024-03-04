@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.0.27 - 2024-03-04
+
+- Same as 0.0.26, but had issues publishing the actual binary.
+
 ## 0.0.26 - 2024-03-01
 
 - Worked around bug in which `import numpy` halts if `sys.stdin` is being read when it's imported.
