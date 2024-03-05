@@ -495,7 +495,15 @@ def build_common_tasks(
 
             new_version = f"## {version} - {datetime.today().strftime('%Y-%m-%d')}"
             changelog_start = re.search(r"# Changelog", content).end()
-            unreleased_match = re.search(r"## Unreleased", content, flags=re.IGNORECASE)
+            if not changelog_start:
+                print(
+                    f"Did not find # Changelog in the changelog:\n{file}\nPlease update Changelog before proceeding."
+                )
+                sys.exit(1)
+
+            unreleased_match = re.search(
+                r"## Unreleased", content, flags=re.IGNORECASE
+            )
             double_newline = "\n\n"
 
             new_content = content[:changelog_start] + double_newline + "## Unreleased"
@@ -510,6 +518,12 @@ def build_common_tasks(
             stream.seek(0)
             stream.write(new_content)
             print("Changed: ", file)
+
+            if not unreleased_match:
+                print(
+                    f"\nDid not find ## Unreleased in the changelog:\n{file}\nPlease update Changelog before proceeding.\nIt was updated to have the proper sessions already..."
+                )
+            sys.exit(1)
 
     @task
     def set_version(ctx, version):
