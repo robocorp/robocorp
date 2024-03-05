@@ -12,10 +12,6 @@ call.
 import sys
 from typing import List, Optional, Protocol
 
-from . import inject_truststore
-
-inject_truststore()
-
 if sys.platform == "win32":
     # Apply workaround where `asyncio` would halt forever when windows UIAutomation.dll
     # is used with comtypes.
@@ -25,6 +21,8 @@ if sys.platform == "win32":
 
 # Just importing is enough to register the commands
 from . import _commands, inject_truststore  # noqa
+
+inject_truststore()
 
 
 class IArgumentsHandler(Protocol):
