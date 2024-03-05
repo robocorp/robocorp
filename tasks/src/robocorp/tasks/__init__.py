@@ -25,8 +25,8 @@ Run all the tasks in files named *task*.py:
 Run only tasks with a given name:
 
   `python -m robocorp.tasks run <directory or file> -t <task_name>`
-  
-  
+
+
 Note: Using the `cli.main(args)` is possible to run tasks programmatically, but
 clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
@@ -172,7 +172,11 @@ def inject_truststore():
 
             truststore.inject_into_ssl()
         except ModuleNotFoundError:
-            warnings.warn(f"{__name__} - Dependency `truststore` is not installed!", Warning, stacklevel=2)
+            warnings.warn(
+                "Usage of the local truststore certificates can’t be enabled, ensure you have the truststore dependency in place.",
+                Warning,
+                stacklevel=2,
+            )
             pass
 
 
