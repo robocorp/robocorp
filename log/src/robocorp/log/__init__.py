@@ -339,6 +339,8 @@ def console_message(
         flush: Whether we should flush after sending the message (if None
                it's flushed if the end char ends with '\n').
     """
+    from ._safe_write_to_stream import safe_write_to_stream
+
     try:
         writing = _ConsoleMessagesLock.tlocal._writing
     except Exception:
@@ -377,7 +379,7 @@ def console_message(
                 ctx = nullcontext()
 
             with ctx:
-                stream.write(message)
+                safe_write_to_stream(stream, message)
 
             if flush is None:
                 flush = message.endswith("\n")

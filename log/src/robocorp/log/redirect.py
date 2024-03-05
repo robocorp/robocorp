@@ -191,6 +191,8 @@ def setup_stdout_logging(
                 EXIT = object()
 
                 def in_thread():
+                    from robocorp.log._safe_write_to_stream import safe_write_to_stream
+
                     while True:
                         msg = q.get(block=True)
                         if msg is EXIT:
@@ -212,11 +214,15 @@ def setup_stdout_logging(
                                             if not buf:
                                                 break
                                             i += 1024
-                                            original_stdout.write(f"{buf}")
+                                            safe_write_to_stream(
+                                                original_stdout, f"{buf}"
+                                            )
                                             original_stdout.flush()
                                         original_stdout.write("\n")
                                     else:
-                                        original_stdout.write(f"{decoded}\n")
+                                        safe_write_to_stream(
+                                            original_stdout, f"{decoded}\n"
+                                        )
                                     # Flush (so, clients don't need to execute as unbuffered).
                                     original_stdout.flush()
                         except Exception:
