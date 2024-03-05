@@ -373,7 +373,9 @@ class _RoboOutputImpl:
         self._next_int: "partial[int]" = partial(next, itertools.count(0))
 
     def show_error_message(self, msg):
-        sys.stderr.write(msg)
+        from robocorp.log._safe_write_to_stream import safe_write_to_stream
+
+        safe_write_to_stream(sys.stderr, msg)
         if self.on_show_error_message:
             self.on_show_error_message(msg)
 

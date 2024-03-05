@@ -3,6 +3,7 @@ This module contains utilities for testing and to do a 'selftest' of the
 executable even in release mode.
 """
 
+import json
 import os
 import re
 import subprocess
@@ -203,8 +204,6 @@ class ActionServerClient:
         return self.get_str("openapi.json")
 
     def get_json(self, url, params: Optional[dict] = None):
-        import json
-
         contents = self.get_str(url, params=params)
         try:
             return json.loads(contents)
@@ -384,8 +383,12 @@ def check_new_template(
         if verbose:
             print("Using post to call action.")
 
+        # open_api = client.get_openapi_json()
+        # decoded = json.loads(open_api)
+        # print(json.dumps(decoded, indent=4))
+
         found = client.post_get_str(
-            "/api/actions/my-project/compare-time-zones/run",
+            "/api/actions/package-name/compare-time-zones/run",
             {
                 "user_timezone": "Europe/Helsinki",
                 "compare_to_timezones": "America/New_York, Asia/Kolkata",
