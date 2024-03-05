@@ -38,7 +38,7 @@ ______________________________________________________________________
 
 ## function `task`
 
-**Source:** [`__init__.py:47`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L47)
+**Source:** [`__init__.py:48`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L48)
 
 ```python
 task(*args, **kwargs)
@@ -189,7 +189,7 @@ ______________________________________________________________________
 
 ## function `session_cache`
 
-**Source:** [`__init__.py:100`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L100)
+**Source:** [`__init__.py:101`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L101)
 
 ```python
 session_cache(func)
@@ -209,7 +209,7 @@ ______________________________________________________________________
 
 ## function `task_cache`
 
-**Source:** [`__init__.py:122`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L122)
+**Source:** [`__init__.py:123`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L123)
 
 ```python
 task_cache(func)
@@ -229,7 +229,7 @@ ______________________________________________________________________
 
 ## function `get_output_dir`
 
-**Source:** [`__init__.py:144`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L144)
+**Source:** [`__init__.py:145`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L145)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -241,7 +241,7 @@ ______________________________________________________________________
 
 ## function `get_current_task`
 
-**Source:** [`__init__.py:157`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L157)
+**Source:** [`__init__.py:158`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L158)
 
 ```python
 get_current_task() → Optional[ITask]
@@ -253,7 +253,7 @@ ______________________________________________________________________
 
 ## function `inject_truststore`
 
-**Source:** [`__init__.py:167`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L167)
+**Source:** [`__init__.py:168`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L168)
 
 ```python
 inject_truststore()

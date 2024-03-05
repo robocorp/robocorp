@@ -14,7 +14,7 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`cli.py:40`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L40)
+**Source:** [`cli.py:38`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L38)
 
 ```python
 main(
@@ -30,13 +30,13 @@ ______________________________________________________________________
 
 ## class `IArgumentsHandler`
 
-**Source:** [`cli.py:30`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L30)
+**Source:** [`cli.py:28`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L28)
 
 ______________________________________________________________________
 
 ### method `process_args`
 
-**Source:** [`cli.py:31`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L31)
+**Source:** [`cli.py:29`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L29)
 
 ```python
 process_args(args: List[str]) → int
