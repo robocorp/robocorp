@@ -4,7 +4,6 @@ import subprocess
 import sys
 import typing
 from pathlib import Path
-from typing import Optional
 
 from termcolor import colored
 
@@ -40,9 +39,9 @@ def import_action_package(
     *,
     datadir: Path,
     action_package_dir: str,
-    name: Optional[str],
     disable_not_imported: bool,
     skip_lint: bool,
+    whitelist: str,
 ):
     """
     Imports action packages based on directories given in the filesystem.
@@ -60,6 +59,7 @@ def import_action_package(
         environment.
     """
 
+    from robocorp.action_server._whitelist import accept_action_package
     from robocorp.action_server.vendored_deps.action_package_handling import (
         create_conda_from_package_yaml,
     )
@@ -91,11 +91,35 @@ def import_action_package(
         import_path / "package.yaml"
     )
 
+    action_package_name = ""
     package_yaml_exists = conda_yaml.exists()
     if package_yaml_exists:
         # Ok, new version: we create a conda.yaml automatically from
         # the environment information.
+        if not action_package_name:
+            try:
+                with open(original_package_yaml, "r", encoding="utf-8") as stream:
+                    package_yaml_contents = yaml.safe_load(stream)
+            except Exception:
+                raise ActionPackageError(
+                    f"Error loading file as yaml ({original_package_yaml})."
+                )
+            if isinstance(package_yaml_contents, dict):
+                n = package_yaml_contents.get("name")
+                if n:
+                    action_package_name = n
+
         conda_yaml = create_conda_from_package_yaml(datadir, conda_yaml)
+
+    if not action_package_name:
+        action_package_name = import_path.name
+
+    if whitelist:
+        if not accept_action_package(whitelist, action_package_name):
+            log.info(
+                f"Action package: {action_package_name} not imported because it has no match in the whitelist: {whitelist!r}"
+            )
+            return
 
     if not package_yaml_exists:
         # Backward-compatibility
@@ -172,8 +196,6 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         directory_path = import_path
 
     action_package_id = gen_uuid("action_package")
-    if not name:
-        name = import_path.name
 
     python_exe = use_env.get("PYTHON_EXE")
     if python_exe:
@@ -181,12 +203,12 @@ Note: no virtual environment will be used for the imported actions, they'll be r
 
     action_package = ActionPackage(
         id=action_package_id,
-        name=name,
+        name=action_package_name,
         directory=directory_path.as_posix(),
         conda_hash=condahash,
         env_json=json.dumps(use_env),
     )
-    log.debug(f"Collecting actions for Action Package: {name}.")
+    log.debug(f"Collecting actions for Action Package: {action_package_name}.")
 
     env = build_python_launch_env(use_env)
 
@@ -216,6 +238,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
         action_package,
         disable_not_imported=disable_not_imported,
         skip_lint=skip_lint,
+        whitelist=whitelist,
     )
 
 
@@ -261,6 +284,7 @@ def _add_actions_to_db(
     action_package: "ActionPackage",
     disable_not_imported: bool,
     skip_lint: bool,
+    whitelist: str,
 ):
     from dataclasses import asdict
 
@@ -270,6 +294,7 @@ def _add_actions_to_db(
     from robocorp.action_server._gen_ids import gen_uuid
     from robocorp.action_server._models import Action, ActionPackage, get_db
     from robocorp.action_server._settings import get_python_exe_from_env
+    from robocorp.action_server._whitelist import accept_action
 
     python = get_python_exe_from_env(env)
 
@@ -328,6 +353,14 @@ def _add_actions_to_db(
     else:
         actions = []
         for action_fields in loaded:
+            action_name = action_fields["name"]
+            if whitelist:
+                if not accept_action(whitelist, action_package.name, action_name):
+                    log.info(
+                        f"Action: {action_package.name}/{action_name} not imported because it has no match in the whitelist: {whitelist!r}"
+                    )
+                    continue
+
             filepath = Path(action_fields["file"]).absolute()
             try:
                 filepath = filepath.relative_to(import_path)
@@ -338,7 +371,7 @@ def _add_actions_to_db(
                 Action(
                     id=gen_uuid("action"),
                     action_package_id=action_package.id,
-                    name=action_fields["name"],
+                    name=action_name,
                     docs=action_fields["docs"],
                     file=filepath.as_posix(),
                     lineno=action_fields["line"],

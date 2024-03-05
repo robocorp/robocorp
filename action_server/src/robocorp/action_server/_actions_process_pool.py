@@ -138,18 +138,18 @@ class ProcessHandle:
             env=env,
         )
 
-        def _stderr_reader(stderr):
+        def _process_stream_reader(stderr_or_stdout):
             while True:
-                line = stderr.readline()
-                if not line:
+                line_bytes = stderr_or_stdout.readline()
+                if not line_bytes:
                     break
-                line = line.decode("utf-8", "replace")
+                line_as_str = line_bytes.decode("utf-8", "replace")
                 print(
                     colored(f"output (pid: {pid}): ", attrs=["dark"])
-                    + f"{line.strip()}\n",
+                    + f"{line_as_str.strip()}\n",
                     end="",
                 )
-                self._on_stderr(line)
+                self._on_output(line_bytes)
 
         self._read_queue: "Queue[dict]" = Queue()
 
@@ -173,18 +173,22 @@ class ProcessHandle:
             connection_future = run_in_thread(accept_connection)
 
             self._process = subprocess.Popen(cmdline, **subprocess_kwargs)
-            self._on_stderr = Callback()
+            self._on_output = Callback()
 
             pid = self._process.pid
 
             stderr = self._process.stderr
             stdout = self._process.stdout
 
-            t = threading.Thread(target=_stderr_reader, args=(stderr,), daemon=True)
+            t = threading.Thread(
+                target=_process_stream_reader, args=(stderr,), daemon=True
+            )
             t.name = f"Stderr reader (pid: {pid})"
             t.start()
 
-            t = threading.Thread(target=_stderr_reader, args=(stdout,), daemon=True)
+            t = threading.Thread(
+                target=_process_stream_reader, args=(stdout,), daemon=True
+            )
             t.name = f"Stdout reader (pid: {pid})"
             t.start()
 
@@ -212,12 +216,12 @@ class ProcessHandle:
             subprocess_kwargs["stdin"] = subprocess.PIPE
 
             self._process = subprocess.Popen(cmdline, **subprocess_kwargs)
-            self._on_stderr = Callback()
+            self._on_output = Callback()
 
             pid = self._process.pid
 
             stderr = self._process.stderr
-            t = threading.Thread(target=_stderr_reader, args=(stderr,))
+            t = threading.Thread(target=_process_stream_reader, args=(stderr,))
             t.name = f"Stderr reader (pid: {pid})"
             t.start()
 
@@ -294,12 +298,12 @@ class ProcessHandle:
 
         (returncode=0 means everything is Ok).
         """
-        with output_file.open("w") as stream:
+        with output_file.open("wb") as stream:
 
-            def on_output(line):
-                stream.write(line)
+            def on_output(line_bytes: bytes):
+                stream.write(line_bytes)
 
-            with self._on_stderr.register(on_output):
+            with self._on_output.register(on_output):
                 # stdout is now used for communicating, so, don't hear on it.
                 returncode = self._do_run_action(
                     action,

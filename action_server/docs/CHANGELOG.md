@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- The action package name is now gotten from the `package.yaml` and not from the directory name
+  (it's still gotten from the directory name when `conda.yaml` is used for backward compatibility).
+  
+- The action package name and action name are slugified to be ascii only and replace
+  unwanted chars for `-` in the urls.
+  
+- A `--whitelist` argument is accepted in the command line for `start` and `import` and
+  it allows whitelisting action package names as well as action names. 
+
 ## 0.0.27 - 2024-03-04
 
 - Same as 0.0.26, but had issues publishing the actual binary.

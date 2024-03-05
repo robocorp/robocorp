@@ -1,0 +1,117 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Robocorp Actions Server",
+        "version": "0.1.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:0"
+        }
+    ],
+    "paths": {
+        "/api/actions/acao-pkg/unicode-acao/run": {
+            "post": {
+                "summary": "Unicode A\u00e7\u00e3o \u03a3",
+                "operationId": "unicode_a\u00e7\u00e3o_\u03a3",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UnicodeA__o_Input"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string",
+                                    "title": "Response Unicode A\u00e7\u00e3o \u03a3"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HTTPValidationError": {
+                "properties": {
+                    "errors": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Errors"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "UnicodeA__o_Input": {
+                "properties": {
+                    "a\u00e7\u00e3o": {
+                        "type": "string",
+                        "title": "A\u00e7\u00e3o",
+                        "description": ""
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "a\u00e7\u00e3o"
+                ],
+                "title": "UnicodeA\u00e7\u00e3o\u03a3Input"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}

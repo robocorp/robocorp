@@ -31,3 +31,8 @@ def bool_false(b: bool) -> None:
 @task
 def accept_str(s) -> None:
     assert isinstance(s, str)
+
+
+@task
+def unicode_ação_Σ(ação: str) -> None:
+    assert isinstance(ação, str)
