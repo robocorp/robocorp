@@ -76,6 +76,14 @@ def _add_verbose_args(parser, defaults):
     )
 
 
+def _add_whitelist_args(parser, defaults):
+    parser.add_argument(
+        "--whitelist",
+        default="",
+        help="Allows whitelisting the actions/packages to be used",
+    )
+
+
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -209,6 +217,7 @@ def _create_parser():
 
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
+    _add_whitelist_args(start_parser, defaults)
 
     # Import
     import_parser = subparsers.add_parser(
@@ -225,6 +234,7 @@ def _create_parser():
     _add_skip_lint(import_parser, defaults)
     _add_data_args(import_parser, defaults)
     _add_verbose_args(import_parser, defaults)
+    _add_whitelist_args(import_parser, defaults)
 
     # Download RCC
     rcc_parser = subparsers.add_parser(
@@ -389,6 +399,33 @@ def _setup_logging(datadir: Path, log_level):
     )
     logger = logging.root
     logger.addHandler(rotating_handler)
+
+
+def _import_actions(base_args, settings, disable_not_imported):
+    from . import _actions_import
+
+    if not base_args.dir:
+        base_args.dir = ["."]
+
+    try:
+        for action_package_dir in base_args.dir:
+            _actions_import.import_action_package(
+                datadir=settings.datadir,
+                action_package_dir=os.path.abspath(action_package_dir),
+                skip_lint=base_args.skip_lint,
+                disable_not_imported=disable_not_imported,
+                whitelist=base_args.whitelist,
+            )
+    except ActionServerValidationError as e:
+        log.critical(
+            colored(
+                f"\nUnable to import action. Please fix the error below and retry.\n{e}",
+                color="red",
+                attrs=["bold"],
+            )
+        )
+        return 1
+    return 0
 
 
 def _main_retcode(args: Optional[list[str]], exit) -> int:
@@ -586,33 +623,10 @@ To migrate the database to the current version
                         return 1
 
                 with use_db_ctx(db_path) as db:
-                    from . import _actions_import
-
                     if command == "import":
-                        if not base_args.dir:
-                            base_args.dir = ["."]
-
-                        try:
-                            for action_package_dir in base_args.dir:
-                                _actions_import.import_action_package(
-                                    datadir=settings.datadir,
-                                    action_package_dir=os.path.abspath(
-                                        action_package_dir
-                                    ),
-                                    skip_lint=base_args.skip_lint,
-                                    disable_not_imported=False,
-                                    name=None,
-                                )
-                        except ActionServerValidationError as e:
-                            log.critical(
-                                colored(
-                                    f"\nUnable to import action. Please fix the error below and retry.\n{e}",
-                                    color="red",
-                                    attrs=["bold"],
-                                )
-                            )
-                            return 1
-                        return 0
+                        return _import_actions(
+                            base_args, settings, disable_not_imported=False
+                        )
 
                     elif command == "start":
                         # start imports the current directory by default
@@ -622,29 +636,13 @@ To migrate the database to the current version
                         rcc.feedack_metric("action-server.started", __version__)
 
                         if base_args.actions_sync:
-                            if not base_args.dir:
-                                base_args.dir = ["."]
-
-                            try:
-                                for action_package_dir in base_args.dir:
-                                    _actions_import.import_action_package(
-                                        datadir=settings.datadir,
-                                        action_package_dir=os.path.abspath(
-                                            action_package_dir
-                                        ),
-                                        disable_not_imported=base_args.actions_sync,
-                                        skip_lint=base_args.skip_lint,
-                                        name=None,
-                                    )
-                            except ActionServerValidationError as e:
-                                log.critical(
-                                    colored(
-                                        f"\nUnable to import action. Please fix the error below and retry.\n{e}",
-                                        color="red",
-                                        attrs=["bold"],
-                                    )
-                                )
-                                return 1
+                            code = _import_actions(
+                                base_args,
+                                settings,
+                                disable_not_imported=base_args.actions_sync,
+                            )
+                            if code != 0:
+                                return code
 
                         with use_runs_state_ctx(db):
                             from ._server import start_server

@@ -35,6 +35,10 @@ def test_tasks_arguments_json_input(datadir, tmpdir) -> None:
     )
 
 
+def test_tasks_unicode(datadir) -> None:
+    check(datadir, ["-t=unicode_ação_Σ", "--", "--ação=1"], returncode=0)
+
+
 def test_tasks_arguments(datadir) -> None:
     check(datadir, ["-t=accept_str", "--", "--s=1"], returncode=0)
 

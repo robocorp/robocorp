@@ -17,7 +17,9 @@ def _name_as_summary(name):
 
 
 def _name_to_url(name):
-    return name.replace("_", "-")
+    from robocorp.action_server._slugify import slugify
+
+    return slugify(name.replace("_", "-"))
 
 
 def get_action_description_from_docs(docs: str) -> str:

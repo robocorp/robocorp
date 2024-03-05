@@ -91,7 +91,7 @@ def test_task_schema_default_value_type():
     }
 
 
-def methodd(a: int = 1) -> int:
+def unicode_ação_Σ(ação: int = 1) -> int:
     """
     This is a method. In this method
     the description spans multiple lines
@@ -99,7 +99,7 @@ def methodd(a: int = 1) -> int:
     in the spec.
 
     Args:
-        a: This is argument a.
+        ação: This is an argument
 
     Returns:
         The number 1.
@@ -107,8 +107,20 @@ def methodd(a: int = 1) -> int:
     return 1
 
 
-def test_task_schema_multiple_lines_in_description():
+def test_task_unicode():
     from robocorp.tasks._task import Task
 
-    task = Task(__name__, __file__, methodd)
-    print(task.__doc__)
+    task = Task(__name__, __file__, unicode_ação_Σ)
+    input_schema = task.input_schema
+    assert input_schema == {
+        "additionalProperties": False,
+        "properties": {
+            "ação": {
+                "type": "integer",
+                "description": "This is an argument",
+                "title": "Ação",
+                "default": 1,
+            }
+        },
+        "type": "object",
+    }
