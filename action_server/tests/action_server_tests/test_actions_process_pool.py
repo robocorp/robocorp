@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path
-from typing import Dict, Iterator
+from typing import Iterator
 
 import pytest
 
@@ -100,6 +100,11 @@ class _RunInfo:
     process_handle: ProcessHandle
 
 
+class _DummyRequest:
+    def __init__(self, headers=None):
+        self.headers = headers or {}
+
+
 @contextmanager
 def _create_run(
     tmpdir, actions_process_pool: ActionsProcessPool, action, i
@@ -114,7 +119,7 @@ def _create_run(
     input_json = robot_artifacts / "input.json"
     output_file = robot_artifacts / "output.txt"
     result_json = robot_artifacts / "result.json"
-    headers: Dict[str, str] = {}
+    request = _DummyRequest()
     input_json.write_text(json.dumps({"name": "John"}))
 
     with actions_process_pool.obtain_process_for_action(action) as process_handle:
@@ -126,7 +131,7 @@ def _create_run(
                 robot_artifacts,
                 output_file,
                 result_json,
-                headers,
+                request,
                 actions_process_pool._reuse_processes,
             )
         )

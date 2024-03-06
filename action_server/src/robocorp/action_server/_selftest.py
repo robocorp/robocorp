@@ -185,7 +185,7 @@ class ActionServerClient:
     def __init__(self, action_server_process: ActionServerProcess):
         self.action_server_process = action_server_process
 
-    def build_full_url(self, url):
+    def build_full_url(self, url: str) -> str:
         host = self.action_server_process.host
         port = self.action_server_process.port
         if url.startswith("/"):
@@ -211,10 +211,18 @@ class ActionServerClient:
         except Exception:
             raise AssertionError(f"Unable to load: {contents!r}")
 
-    def post_get_str(self, url, data, headers: Optional[dict] | None = None):
+    def post_get_str(
+        self,
+        url,
+        data,
+        headers: Optional[dict] | None = None,
+        cookies: Optional[dict] | None = None,
+    ):
         import requests
 
-        result = requests.post(self.build_full_url(url), headers=headers, json=data)
+        result = requests.post(
+            self.build_full_url(url), headers=headers, json=data, cookies=cookies
+        )
         assert result.status_code == 200
         return result.text
 

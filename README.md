@@ -27,10 +27,19 @@ Looking for a replacement to RPA? Head over to our [Enterprise Python Automation
 
 # 🏃‍♂️ Quickstart
 
-Install Robocorp Action Server:
+There are two main ways using the Action Server: use with our Robocorp Code extension for VS Code, or DIY from the command line. This section gets you going!
 
 <details open>
-<summary><b>For macOS</b></summary>
+<summary><b>Robocorp Code extension for VS Code</b></summary>
+
+After installing [Robocorp Code extension from the VS Code Markeplace](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code), open the Command Palette (`Command-Shift-P` or `Ctrl-Shift-P`) and select `Robocorp: Create Action Package`. This will bootstrap a new project. You can then run/debug indvidual Actions from the Extension's sidebar, or start the Action Server.
+
+![github-extension](https://github.com/robocorp/robocorp/assets/40179958/d53000bf-558e-48a7-bb30-4610b9bf24c5)
+
+</details>
+
+<details open>
+<summary><b>CLI For macOS</b></summary>
 
 ```sh
 brew update
@@ -40,7 +49,7 @@ brew install robocorp/tools/action-server
 </details>
 
 <details>
-<summary><b>For Windows</b></summary>
+<summary><b>CLI For Windows</b></summary>
 
 ```sh
 # Download Robocorp Action Server
@@ -52,7 +61,7 @@ You can download/move the executable into a folder that is in your `PATH`, or yo
 </details>
 
 <details>
-<summary><b>For Linux</b></summary>
+<summary><b>CLI For Linux</b></summary>
 
 ```sh
 # Download Robocorp Action Server
@@ -91,38 +100,41 @@ Head over to [Action Server docs](./action_server/README.md) for more.
 
 # What makes a Python function an⚡️Action?
 
-1️⃣ `conda.yaml` file that sets up your **Python environment and dependencies**:
+1️⃣ `package.yaml` file that describes the set of Actions your are working on, and defines up your **Python environment and dependencies**:
 
 ```yaml
-channels:
-  - conda-forge
+name: Package name
+description: Action package description
+version: 0.0.1
+documentation: https://github.com/...
 
 dependencies:
+  conda-forge:
   - python=3.10.12
   - pip=23.2.1
   - robocorp-truststore=0.8.0
-  - pip:
-      - robocorp==1.4.0
-      - robocorp-actions==0.0.4
-      - numpy==1.26.3
+  pypi:
+  - robocorp=1.6.1
+  - robocorp-actions=0.0.7
+  - pytz=2023.3
 ```
 
 <details>
   <summary>🙋‍♂️ "Why not just pip install...?"</summary>
 
-Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 With `conda.yaml` you are not just controlling your PyPI dependencies, you control the complete Python environment, which makes things repeatable and easy.
+Think of this as an equivalent of the requirements.txt, but much better. 👩‍💻 With `package.yaml` you are not just controlling your PyPI dependencies, you control the complete Python environment, which makes things repeatable and easy.
 
-👉 You will probably not want run the Actions just on your machine, so by using `conda.yaml`:
+👉 You will probably not want run the Actions just on your machine, so by using `package.yaml`:
 
 - You can avoid `Works on my machine` -cases
 - You do not need to manage Python installations on all the machines
 - You can control exactly which version of Python your automation will run on
-  - ..as well as the pip version to avoid dep. resolution changes
+  - ..as well as the pip version to avoid dependency resolution changes
 - No need for venv, pyenv, ... tooling and knowledge sharing inside your team.
-- Define dependencies in conda.yaml let our tooling do the heavy lifting.
+- Define dependencies in package.yaml let our tooling do the heavy lifting.
 - You get all the content of [conda-forge](https://prefix.dev/channels/conda-forge) without any extra tooling
 
-> Dive deeper with [these](https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-condayaml) resources.
+> This is courtesy of another open-source project of ours, [RCC](https://github.com/robocorp/rcc).
 
 </details>
 <br/>
@@ -255,7 +267,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 - [x] ~~Action Server `brew install` for Mac users~~
 - [x] ~~Expose actions to public URL~~
 - [x] ~~Resume previously exposed session~~
-- [ ] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code) [#230](https://github.com/robocorp/robocorp/issues/230)
+- [x] Run and debug `@actions` like `@tasks` with [Robocorp VS Code Extension](https://marketplace.visualstudio.com/items?itemName=robocorp.robocorp-code) [#230](https://github.com/robocorp/robocorp/issues/230)
 - [ ] Docstring to OpenAPI specs improvements [#236](https://github.com/robocorp/robocorp/issues/236), [#250](https://github.com/robocorp/robocorp/issues/250)
 - [ ] Support JSON/Dicts for inputs and outputs [#266](https://github.com/robocorp/robocorp/issues/266)
 - [ ] Action can access request headers [#167](https://github.com/robocorp/robocorp/issues/167)

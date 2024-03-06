@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.0.27 - 2024-03-04
+
+- Same as 0.0.26, but had issues publishing the actual binary.
+
+## 0.0.26 - 2024-03-01
+
+- Worked around bug in which `import numpy` halts if `sys.stdin` is being read when it's imported.
+
+## 0.0.25 - 2024-02-29
+
 - `action-server package --update` properly adds the 'name' to the package.yaml
 
 ## 0.0.24 - 2024-02-23

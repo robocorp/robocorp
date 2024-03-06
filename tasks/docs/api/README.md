@@ -11,6 +11,7 @@
 
 - [`_protocols.ITask`](./robocorp.tasks._protocols.md#class-itask)
 - [`_protocols.Status`](./robocorp.tasks._protocols.md#class-status): Task state
+- [`cli.IArgumentsHandler`](./robocorp.tasks.cli.md#class-iargumentshandler)
 
 ## Functions
 
@@ -21,4 +22,5 @@
 - [`tasks.task`](./robocorp.tasks.md#function-task): Decorator for tasks (entry points) which can be executed by `robocorp.tasks`.
 - [`tasks.task_cache`](./robocorp.tasks.md#function-task_cache): Provides decorator which caches return and clears it automatically when the
 - [`_fixtures.teardown`](./robocorp.tasks._fixtures.md#function-teardown): Run code after tasks have been run, or after each separate task.
+- [`cli.inject_truststore`](./robocorp.tasks.cli.md#function-inject_truststore)
 - [`cli.main`](./robocorp.tasks.cli.md#function-main): Entry point for running tasks from robocorp-tasks.
