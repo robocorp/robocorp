@@ -11,5 +11,8 @@ def resources_dir():
 
 
 @pytest.fixture(autouse=True)
-def set_check_truststore_false(monkeypatch):
-    monkeypatch.setenv("RC_USE_TRUSTSTORE", "False")
+def disable_truststore_injection(monkeypatch):
+    """Disables truststore SSL injection during testing, so we'd avoid
+    unnecessary warnings given the missing dependency."""
+
+    monkeypatch.setenv("_RC_TEST_USE_TRUSTSTORE", "False")

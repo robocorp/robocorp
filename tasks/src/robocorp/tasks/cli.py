@@ -18,9 +18,9 @@ from typing import List, Optional, Protocol
 def inject_truststore():
     # Use certificates from native storage (if `truststore` installed)
 
-    # RC_USE_TRUSTSTORE env var is only used to avoid unwanted warnings in tests
+    # _RC_TEST_USE_TRUSTSTORE env var is only used to avoid unwanted warnings in tests
     # and should not be used for other purposes
-    if os.getenv("RC_USE_TRUSTSTORE", "True").lower() in ["false", "0"]:
+    if os.getenv("_RC_TEST_USE_TRUSTSTORE", "True").lower() in ["false", "0"]:
         return
 
     if sys.version_info >= (3, 10):
@@ -35,7 +35,6 @@ def inject_truststore():
                 Warning,
                 stacklevel=2,
             )
-            pass
 
 
 inject_truststore()
