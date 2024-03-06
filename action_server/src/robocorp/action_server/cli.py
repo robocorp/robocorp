@@ -3,6 +3,7 @@ import logging
 import os.path
 import sys
 import time
+import typing
 from pathlib import Path
 from typing import Optional, Union
 
@@ -10,6 +11,17 @@ from termcolor import colored
 
 from . import __version__
 from ._errors_action_server import ActionServerValidationError
+from ._protocols import (
+    ArgumentsNamespace,
+    ArgumentsNamespaceBaseImportOrStart,
+    ArgumentsNamespaceDownloadRcc,
+    ArgumentsNamespaceImport,
+    ArgumentsNamespacePackage,
+    ArgumentsNamespaceStart,
+)
+
+if typing.TYPE_CHECKING:
+    from ._settings import Settings
 
 log = logging.getLogger(__name__)
 
@@ -401,7 +413,20 @@ def _setup_logging(datadir: Path, log_level):
     logger.addHandler(rotating_handler)
 
 
-def _import_actions(base_args, settings, disable_not_imported):
+def _import_actions(
+    base_args: Union[ArgumentsNamespaceBaseImportOrStart],
+    settings: "Settings",
+    disable_not_imported: bool,
+) -> int:
+    """
+    Args:
+        base_args: The base arguments collected from the cli input.
+        settings: The settings for the action server.
+        disable_not_imported: Whether actions which were not imported should be disabled.
+
+    Returns: 0 if everything is correct and some other number if some error happened
+        while importing the actions.
+    """
     from . import _actions_import
 
     if not base_args.dir:
@@ -449,7 +474,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         return 0
 
     parser = _create_parser()
-    base_args = parser.parse_args(args)
+    base_args: ArgumentsNamespace = parser.parse_args(args)
 
     command = base_args.command
     if not command:
@@ -468,19 +493,25 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     #     return
 
     if command == "download-rcc":
-        download_rcc(target=base_args.file, force=True)
+        download_args: ArgumentsNamespaceDownloadRcc = typing.cast(
+            ArgumentsNamespaceDownloadRcc, base_args
+        )
+        download_rcc(target=download_args.file, force=True)
         return 0
 
     if command == "package":
-        if base_args.update:
+        package_args: ArgumentsNamespacePackage = typing.cast(
+            ArgumentsNamespacePackage, base_args
+        )
+        if package_args.update:
             from robocorp.action_server.vendored_deps.action_package_handling import (
                 update_package,
             )
 
             update_package(
                 Path(".").absolute(),
-                dry_run=base_args.dry_run,
-                backup=not base_args.no_backup,
+                dry_run=package_args.dry_run,
+                backup=not package_args.no_backup,
             )
             return 0
         print("Flag for package operation not specified.", file=sys.stderr)
@@ -625,21 +656,26 @@ To migrate the database to the current version
                 with use_db_ctx(db_path) as db:
                     if command == "import":
                         return _import_actions(
-                            base_args, settings, disable_not_imported=False
+                            typing.cast(ArgumentsNamespaceImport, base_args),
+                            settings,
+                            disable_not_imported=False,
                         )
 
                     elif command == "start":
+                        start_args: ArgumentsNamespaceStart = typing.cast(
+                            ArgumentsNamespaceStart, base_args
+                        )
                         # start imports the current directory by default
                         # (unless --actions-sync=false is specified).
-                        log.debug("Synchronize actions: %s", base_args.actions_sync)
+                        log.debug("Synchronize actions: %s", start_args.actions_sync)
 
                         rcc.feedack_metric("action-server.started", __version__)
 
-                        if base_args.actions_sync:
+                        if start_args.actions_sync:
                             code = _import_actions(
-                                base_args,
+                                start_args,
                                 settings,
-                                disable_not_imported=base_args.actions_sync,
+                                disable_not_imported=start_args.actions_sync,
                             )
                             if code != 0:
                                 return code
@@ -650,13 +686,13 @@ To migrate the database to the current version
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
                             expose_session = None
-                            if base_args.expose:
+                            if start_args.expose:
                                 from ._server_expose import read_expose_session_json
 
                                 expose_session = read_expose_session_json(
                                     datadir=str(settings.datadir)
                                 )
-                                if expose_session and not base_args.expose_allow_reuse:
+                                if expose_session and not start_args.expose_allow_reuse:
                                     confirm = input(
                                         colored(
                                             "> Resume previous expose URL ",
@@ -672,15 +708,15 @@ To migrate the database to the current version
                                         expose_session = None
 
                             api_key = None
-                            if base_args.api_key:
-                                api_key = base_args.api_key
-                            elif base_args.expose:
+                            if start_args.api_key:
+                                api_key = start_args.api_key
+                            elif start_args.expose:
                                 from ._robo_utils.auth import get_api_key
 
                                 api_key = get_api_key(settings.datadir)
 
                             start_server(
-                                expose=base_args.expose,
+                                expose=start_args.expose,
                                 api_key=api_key,
                                 expose_session=expose_session.expose_session
                                 if expose_session
