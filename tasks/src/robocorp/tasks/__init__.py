@@ -25,8 +25,8 @@ Run all the tasks in files named *task*.py:
 Run only tasks with a given name:
 
   `python -m robocorp.tasks run <directory or file> -t <task_name>`
-  
-  
+
+
 Note: Using the `cli.main(args)` is possible to run tasks programmatically, but
 clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
@@ -38,7 +38,7 @@ from typing import Dict, Optional
 from ._fixtures import setup, teardown
 from ._protocols import ITask, Status
 
-__version__ = "2.9.1"
+__version__ = "2.9.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 

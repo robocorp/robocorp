@@ -12,9 +12,19 @@ Note: when running tasks, clients using this approach MUST make sure that any co
 
 ______________________________________________________________________
 
+## function `inject_truststore`
+
+**Source:** [`cli.py:18`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L18)
+
+```python
+inject_truststore()
+```
+
+______________________________________________________________________
+
 ## function `main`
 
-**Source:** [`cli.py:46`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L46)
+**Source:** [`cli.py:63`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L63)
 
 ```python
 main(
@@ -30,13 +40,13 @@ ______________________________________________________________________
 
 ## class `IArgumentsHandler`
 
-**Source:** [`cli.py:36`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L36)
+**Source:** [`cli.py:53`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L53)
 
 ______________________________________________________________________
 
 ### method `process_args`
 
-**Source:** [`cli.py:37`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L37)
+**Source:** [`cli.py:54`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/cli.py#L54)
 
 ```python
 process_args(args: List[str]) → int
