@@ -1,24 +1,11 @@
 # ruff: noqa: E501
 import argparse
-import logging
 import sys
+
+from robocorp.tasks import cli  # noqa: F401
 
 from ._engines import install_browser
 from ._types import BrowserEngine, InstallError
-
-log = logging.getLogger(__name__)
-
-# Use certificates from native storage (if `truststore` installed)
-if sys.version_info >= (3, 10):
-    try:
-        import truststore  # type: ignore
-
-        truststore.inject_into_ssl()
-        log.info(
-            "Truststore injection done, using system certificate store to validate HTTPS."
-        )
-    except ModuleNotFoundError:
-        log.warning("Dependency `truststore` is not installed!")
 
 
 def main():
