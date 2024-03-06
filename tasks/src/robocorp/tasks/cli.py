@@ -20,7 +20,7 @@ def inject_truststore():
 
     # RC_USE_TRUSTSTORE env var is only used to avoid unwanted warnings in tests
     # and should not be used for other purposes
-    if os.getenv("RC_USE_TRUSTSTORE").lower() in ["false", "0"]:
+    if os.getenv("RC_USE_TRUSTSTORE", "True").lower() in ["false", "0"]:
         return
 
     if sys.version_info >= (3, 10):
