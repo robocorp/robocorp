@@ -31,9 +31,6 @@ Note: Using the `cli.main(args)` is possible to run tasks programmatically, but
 clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
 """
-import os
-import sys
-import warnings
 from functools import wraps
 from pathlib import Path
 from typing import Dict, Optional
@@ -165,25 +162,6 @@ def get_current_task() -> Optional[ITask]:
     return _task.get_current_task()
 
 
-def inject_truststore():
-    # Use certificates from native storage (if `truststore` installed)
-    if os.environ.get("RC_CHECK_TRUSTSTORE_DEP", "True") in ["false", "False", 0]:
-        return
-
-    if sys.version_info >= (3, 10):
-        try:
-            import truststore  # type: ignore
-
-            truststore.inject_into_ssl()
-        except ModuleNotFoundError:
-            warnings.warn(
-                "Usage of the local truststore certificates can’t be enabled, ensure you have the truststore dependency in place.",
-                Warning,
-                stacklevel=2,
-            )
-            pass
-
-
 __all__ = [
     "task",
     "setup",
@@ -194,5 +172,4 @@ __all__ = [
     "get_current_task",
     "ITask",
     "Status",
-    "inject_truststore",
 ]

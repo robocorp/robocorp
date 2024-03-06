@@ -12,4 +12,4 @@ def resources_dir():
 
 @pytest.fixture(autouse=True)
 def set_check_truststore_false(monkeypatch):
-    monkeypatch.setenv("RC_CHECK_TRUSTSTORE_DEP", "False")
+    monkeypatch.setenv("RC_USE_TRUSTSTORE", "False")
