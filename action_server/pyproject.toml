@@ -21,7 +21,7 @@ action-server = "robocorp.action_server.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-fastapi = "^0.104.1"
+fastapi = "^0.110.0"
 uvicorn = "^0.23.2"
 pydantic = "^2.4.2"
 jsonschema = "^4.19.2"
