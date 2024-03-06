@@ -8,6 +8,8 @@ from typing import Iterator, Optional
 
 from termcolor import colored
 
+from ._protocols import ArgumentsNamespace
+
 log = logging.getLogger(__name__)
 
 
@@ -83,7 +85,7 @@ class Settings:
         return ret
 
     @classmethod
-    def create(cls, args) -> "Settings":
+    def create(cls, args: ArgumentsNamespace) -> "Settings":
         user_specified_datadir = args.datadir
         if not user_specified_datadir:
             import hashlib
@@ -144,7 +146,7 @@ _global_settings: Optional[Settings] = None
 
 
 @contextmanager
-def setup_settings(args) -> Iterator[Settings]:
+def setup_settings(args: ArgumentsNamespace) -> Iterator[Settings]:
     global _global_settings
     settings = Settings.create(args)
     _global_settings = settings

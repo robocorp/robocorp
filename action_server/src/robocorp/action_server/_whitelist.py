@@ -1,7 +1,7 @@
 import fnmatch
 
 
-def normalize_name(name):
+def _normalize_name(name):
     """
     Normalizes action names to handle hyphens and underscores interchangeably.
     """
@@ -20,9 +20,9 @@ def accept_action(pattern: str, package_name: str, action_name: str) -> bool:
     Returns:
       True if the action matches the whitelist pattern, False otherwise.
     """
-    package_name = normalize_name(package_name)
-    action_name = normalize_name(action_name)
-    pattern = normalize_name(pattern)
+    package_name = _normalize_name(package_name)
+    action_name = _normalize_name(action_name)
+    pattern = _normalize_name(pattern)
 
     for single_pattern in pattern.split(","):
         # Check if the pattern includes a package name separated by '/'
@@ -53,8 +53,8 @@ def accept_action_package(pattern: str, package_name: str) -> bool:
     Returns:
       True if the action matches the whitelist pattern, False otherwise.
     """
-    package_name = normalize_name(package_name)
-    pattern = normalize_name(pattern)
+    package_name = _normalize_name(package_name)
+    pattern = _normalize_name(pattern)
 
     for single_pattern in pattern.split(","):
         # Check if the pattern includes a package name separated by '/'
