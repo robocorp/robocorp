@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+## 2.9.2 - 2024-03-06
+
+- Add `inject_truststore` util in `tasks.cli` for reuse in other libraries, then log a warning in case 
+the injection could not happen due to the missing `robocorp-truststore` dependency. 
+
 ## 2.9.1 - 2024-01-31
 
 - Internal changes related to handling arguments.
