@@ -2,6 +2,9 @@
 import argparse
 import sys
 
+# Importing to trigger truststore injection
+from robocorp.tasks import cli  # noqa: F401
+
 from ._engines import install_browser
 from ._types import BrowserEngine, InstallError
 

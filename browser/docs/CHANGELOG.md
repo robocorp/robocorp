@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+## 2.3.0 - 2024-03-07
+
+- Improved browser CLI installations by enhancing SSL with truststore injection.
+
 ## 2.2.3 - 2024-02-01
 
 - Notice in the docs about the need to include `robocorp-browser` dependency in order
@@ -12,7 +18,7 @@
 ## 2.2.1 - 2023-11-02
 
 - Reverted change to issue on playwright shutdown and added option to skip
-  the playwright stop and do an early os._exit on `robocorp-tasks` as 
+  the playwright stop and do an early os._exit on `robocorp-tasks` as
   the previous fix didn't address the issue as expected.
 
 ## 2.2.0 - 2023-10-27
@@ -21,9 +27,9 @@
 - Fixed issue where shutting down playwright could lead to a halting condition inside of `asyncio`.
 - It's now possible to configure the browser to launch with a persistent context
   directory (i.e.: `launch_persistent_context`) by specifying a `persistent_context_directory`
-  in the configuration.  
+  in the configuration.
 
-    ```python 
+    ```python
     from robocorp import browser
     browser.configure(
         persistent_context_directory="<path to directory>"
@@ -34,10 +40,10 @@
 ## 2.1.0 - 2023-08-04
 
 - It's now possible to configure the keyword arguments used to create the playwright browser context with:
-    `robocorp.browser.configure_context(**kwargs)` 
+    `robocorp.browser.configure_context(**kwargs)`
     or when creating the context with:
     `robocorp.browser.context(**kwargs)`
-  
+
 ## 2.0.1 - 2023-07-14
 
 - Fixes in the README with comments on the new `headless` behavior.
