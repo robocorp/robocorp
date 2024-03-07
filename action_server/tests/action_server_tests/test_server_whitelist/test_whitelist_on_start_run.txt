@@ -1,0 +1,123 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Robocorp Actions Server",
+        "version": "0.1.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:0"
+        }
+    ],
+    "paths": {
+        "/api/actions/calculator/calculator-sum/run": {
+            "post": {
+                "summary": "Calculator Sum",
+                "operationId": "calculator_sum",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CalculatorSumInput"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "number",
+                                    "title": "Response Calculator Sum"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CalculatorSumInput": {
+                "properties": {
+                    "v1": {
+                        "type": "number",
+                        "title": "V1",
+                        "description": ""
+                    },
+                    "v2": {
+                        "type": "number",
+                        "title": "V2",
+                        "description": ""
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "v1",
+                    "v2"
+                ],
+                "title": "CalculatorSumInput"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "errors": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Errors"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}

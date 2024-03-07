@@ -721,6 +721,7 @@ To migrate the database to the current version
                                 expose_session=expose_session.expose_session
                                 if expose_session
                                 else None,
+                                whitelist=start_args.whitelist,
                             )
                             return 0
 
