@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 2.2.4 - 2024-03-07
+## 2.3.0 - 2024-03-07
 
 - Improved browser CLI installations by enhancing SSL with truststore injection.
 
