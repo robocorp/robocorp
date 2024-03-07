@@ -4,7 +4,7 @@
 
 ## 1.3.4 - 2024-03-07
 
-- Security update fixed by cryptography `42.0.4` version
+- Security update fixed by cryptography `42.0.4` version.
 
 ## 1.3.3 - 2024-02-01
 
