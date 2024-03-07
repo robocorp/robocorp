@@ -120,4 +120,57 @@ def calculator_subtract(v1: float, v2: float) -> float:
         additional_args=["--whitelist", "calculator_sum"],
     )
 
-    str_regression.check(json.dumps(json.loads(client.get_openapi_json()), indent=4))
+    spec = json.dumps(json.loads(client.get_openapi_json()), indent=4)
+    assert "calculator_subtract" not in spec
+    str_regression.check(spec)
+
+
+def test_whitelist_on_start_run(
+    action_server_process: ActionServerProcess,
+    str_regression,
+    tmpdir,
+    client: ActionServerClient,
+    action_server_datadir: Path,
+) -> None:
+    from robocorp.action_server._selftest import robocorp_action_server_run
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+    
+@action
+def calculator_subtract(v1: float, v2: float) -> float:
+    return v1 - v2
+"""
+    )
+
+    robocorp_action_server_run(
+        [
+            "import",
+            f"--dir={calculator.parent}",
+            "--db-file=server.db",
+            "-v",
+            "--skip-lint",
+            "--datadir",
+            action_server_datadir,
+        ],
+        returncode=0,
+    )
+
+    action_server_process.start(
+        db_file="server.db",
+        cwd=calculator.parent,
+        timeout=50,
+        actions_sync=False,
+        additional_args=["--whitelist", "calculator_sum"],
+    )
+
+    spec = json.dumps(json.loads(client.get_openapi_json()), indent=4)
+    assert "calculator_subtract" not in spec
+    str_regression.check(spec)

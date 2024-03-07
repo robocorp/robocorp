@@ -39,7 +39,7 @@ def get_action_description_from_docs(docs: str) -> str:
 
 
 def start_server(
-    expose: bool, api_key: str | None = None, expose_session: str | None = None
+    expose: bool, api_key: str | None, expose_session: str | None, whitelist: str | None
 ) -> None:
     from dataclasses import asdict
 
@@ -116,6 +116,16 @@ def start_server(
             log.critical("Unable to find action package: %s", action.action_package_id)
             continue
 
+        if whitelist:
+            from ._whitelist import accept_action
+
+            if not accept_action(whitelist, action_package.name, action.name):
+                log.info(
+                    "Skipping action %s / %s (not in whitelist)",
+                    action_package.name,
+                    action.name,
+                )
+                continue
         app.add_api_route(
             f"/api/actions/{_name_to_url(action_package.name)}/{_name_to_url(action.name)}/run",
             _actions_run.generate_func_from_action(action),
