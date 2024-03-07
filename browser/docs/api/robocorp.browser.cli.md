@@ -8,7 +8,7 @@ ______________________________________________________________________
 
 ## function `main`
 
-**Source:** [`cli.py:11`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/cli.py#L11)
+**Source:** [`cli.py:12`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/cli.py#L12)
 
 ```python
 main()
