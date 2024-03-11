@@ -17,6 +17,12 @@ if typing.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
+# Note: for pydantic models, the following APIs are used:
+# cls.model_validate(dict)
+# cls.model_json_schema()
+# obj.model_dump_json()
+#
+# Besides pydantic, the following basic types are accepted:
 _spec_api_type_to_python_type = {
     "string": str,
     "integer": int,

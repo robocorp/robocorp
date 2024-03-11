@@ -34,14 +34,5 @@ def accept_data(data: InputData) -> OutputData:
 
 ## Note
 
-Note: `pydantic` is not really a hard dependency of `robocorp-actions` and must
-be included as a custom dependency in projects that require custom data models
-as `robocorp-actions` just uses duck-typing to check for the APIs below: 
-
-- `cls.model_validate(dict)` 
-- `cls.model_json_schema()`
-- `obj.model_dump_json()`
-
- -- in theory it'd be even possible to define a custom model that doesn't 
- really depend on pydantic, although the replacement would need to follow the 
- same semantics for those methods.
+Note: `pydantic` is not a hard dependency of `robocorp-actions` and must
+be included as a custom dependency in projects that require custom data models.
