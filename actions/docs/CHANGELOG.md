@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.0.8 - 2024-03-11
+
 - `pydantic` models are accepted as the input and output of `@action`s. 
 
 ## 0.0.7 - 2024-01-31
