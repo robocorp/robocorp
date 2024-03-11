@@ -1,3 +1,8 @@
+from typing import Union
+
+from pydantic import BaseModel
+
+
 def methoda(a: str) -> int:
     """
     This is methoda.
@@ -40,7 +45,6 @@ def test_task_schema():
     task = Task(__name__, __file__, methoda)
     input_schema = task.input_schema
     assert input_schema == {
-        "additionalProperties": False,
         "properties": {
             "a": {"title": "A", "type": "string", "description": "This is argument a."}
         },
@@ -51,7 +55,6 @@ def test_task_schema():
     task = Task(__name__, __file__, methodb)
     input_schema = task.input_schema
     assert input_schema == {
-        "additionalProperties": False,
         "properties": {
             "a": {
                 "default": "a",
@@ -78,7 +81,6 @@ def test_task_schema_default_value_type():
     task = Task(__name__, __file__, methodc)
     input_schema = task.input_schema
     assert input_schema == {
-        "additionalProperties": False,
         "properties": {
             "a": {
                 "default": 1,
@@ -113,7 +115,6 @@ def test_task_unicode():
     task = Task(__name__, __file__, unicode_ação_Σ)
     input_schema = task.input_schema
     assert input_schema == {
-        "additionalProperties": False,
         "properties": {
             "ação": {
                 "type": "integer",
@@ -122,5 +123,58 @@ def test_task_unicode():
                 "default": 1,
             }
         },
+        "type": "object",
+    }
+
+
+class MyCustomData(BaseModel):
+    name: str
+    price: float
+    is_offer: Union[bool, None] = None
+
+
+def method_custom_type(a: MyCustomData) -> MyCustomData:
+    return a
+
+
+def test_task_schema_custom_type():
+    from robocorp.tasks._task import Task
+
+    task = Task(__name__, __file__, method_custom_type)
+    input_schema = task.input_schema
+    assert input_schema == {
+        "properties": {
+            "a": {
+                "properties": {
+                    "name": {"title": "Name", "type": "string"},
+                    "price": {"title": "Price", "type": "number"},
+                    "is_offer": {
+                        "anyOf": [{"type": "boolean"}, {"type": "null"}],
+                        "default": None,
+                        "title": "Is Offer",
+                    },
+                },
+                "required": ["name", "price"],
+                "title": "MyCustomData",
+                "type": "object",
+            }
+        },
+        "type": "object",
+        "required": ["a"],
+    }
+
+    output_schema = task.output_schema
+    assert output_schema == {
+        "properties": {
+            "name": {"title": "Name", "type": "string"},
+            "price": {"title": "Price", "type": "number"},
+            "is_offer": {
+                "anyOf": [{"type": "boolean"}, {"type": "null"}],
+                "default": None,
+                "title": "Is Offer",
+            },
+        },
+        "required": ["name", "price"],
+        "title": "MyCustomData",
         "type": "object",
     }

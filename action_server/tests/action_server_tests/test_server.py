@@ -50,8 +50,8 @@ def test_bad_return_on_no_conda(
     )
     found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
     assert found.json()["message"] == (
-        "Error in action. Expected return type: string. "
-        "Found return type: <class 'NoneType'> (value: None)."
+        "Inconsistent value returned from action: data must be string -- i.e.: the returned "
+        "value (None) does not match the expected output schema ({'type': 'string', 'description': ''})."
     )
 
 
@@ -273,7 +273,6 @@ def calculator_sum(v1: int = 5) -> float:
             actions = db.all(Action)
             assert len(actions) == 1
             assert json.loads(actions[0].input_schema) == {
-                "additionalProperties": False,
                 "properties": {
                     "v1": {
                         "type": "integer",

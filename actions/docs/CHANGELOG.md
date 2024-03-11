@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `pydantic` models are accepted as the input and output of `@action`s. 
+
 ## 0.0.7 - 2024-01-31
 
 - When actions are imported they're also automatically linted for the following errors:

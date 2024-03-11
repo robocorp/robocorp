@@ -1,7 +1,6 @@
 - docs: ''
   file: actions.py
   input_schema:
-    additionalProperties: false
     properties: {}
     type: object
   line: 6

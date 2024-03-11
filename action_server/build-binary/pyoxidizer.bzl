@@ -250,18 +250,23 @@ def make_exe():
     # to our binary.
     # exe.add_python_resources(exe.pip_install(["-r", "requirements.txt"]))
 
+    # Important: when these versions change, pyproject.toml needs
+    # to be updated too for.
+    # This should be updated. See: https://github.com/robocorp/robocorp/issues/173
     for resource in exe.pip_install(
         [
-            "robocorp-actions>=0.0.7",
-            "fastapi>=0.104.1",
-            "uvicorn>=0.23.2",
-            "pydantic>=2.4.2",
+            "fastapi>=0.110.0",
+            "fastjsonschema>=2.19.1",
             "jsonschema>=4.19.2",
-            "PyYAML>=6",
-            "websockets>=12.0",
-            "requests>=2",
+            "msgspec>=0.18",
             "psutil>=5",
+            "pydantic>=2.4.2",
+            "pyyaml>=6",
+            "requests>=2",
+            "robocorp-actions>=0.0.7",
             "termcolor>=2.4",
+            "uvicorn>=0.23.2",
+            "websockets>=12.0",
         ]
     ):
         if resource.name in ("py.typed",) or resource.name.endswith(".pyi"):

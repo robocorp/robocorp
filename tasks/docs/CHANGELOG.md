@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `pydantic` models are accepted as the input and output of `@task`s. 
+
 ## 2.9.2 - 2024-03-06
 
 - Add `inject_truststore` util in `tasks.cli` for reuse in other libraries, then log a warning in case 

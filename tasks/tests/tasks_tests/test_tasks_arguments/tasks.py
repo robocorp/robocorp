@@ -1,4 +1,6 @@
-from typing import Tuple
+from typing import Annotated, Tuple, Union
+
+from pydantic import BaseModel, Field
 
 from robocorp.tasks import task
 
@@ -36,3 +38,14 @@ def accept_str(s) -> None:
 @task
 def unicode_ação_Σ(ação: str) -> None:
     assert isinstance(ação, str)
+
+
+class MyCustomData(BaseModel):
+    name: str
+    price: Annotated[float, Field(description="This is the price.")]
+    is_offer: Union[bool, None] = None
+
+
+@task
+def custom_data(data: MyCustomData) -> None:
+    assert isinstance(data, MyCustomData)

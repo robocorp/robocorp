@@ -428,7 +428,9 @@ def run(
                             if json_loaded_arguments is not None:
                                 args: Sequence = []
                                 kwargs = copy.deepcopy(json_loaded_arguments)
-                                _verify_signature_matches(task.method, kwargs)
+                                kwargs = _validate_and_convert_kwargs(
+                                    task.method, kwargs
+                                )
 
                             else:
                                 args, kwargs = _normalize_arguments(
@@ -558,7 +560,9 @@ def check_boolean(value):
     return str_to_bool(value)
 
 
-def _verify_signature_matches(target_method, kwargs: Dict[str, Any]):
+def _validate_and_convert_kwargs(
+    target_method, kwargs: Dict[str, Any]
+) -> Dict[str, Any]:
     from typing import get_type_hints
 
     from robocorp.tasks._exceptions import InvalidArgumentsError
@@ -566,6 +570,7 @@ def _verify_signature_matches(target_method, kwargs: Dict[str, Any]):
     sig = inspect.signature(target_method)
     type_hints = get_type_hints(target_method)
     method_name = target_method.__code__.co_name
+    new_kwargs: Dict[str, Any] = {}
 
     # Add arguments to the parser based on the function signature and type hints
     for param_name, param in sig.parameters.items():
@@ -575,12 +580,6 @@ def _verify_signature_matches(target_method, kwargs: Dict[str, Any]):
             # If not given, default to `str`.
             param_type = str
 
-        if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
-            # TODO: Support array and object.
-            raise InvalidArgumentsError(
-                f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool."
-            )
-
         if param.default is inspect.Parameter.empty:
             # It's required, so, let's see if it's in the kwargs.
             if param_name not in kwargs:
@@ -589,19 +588,45 @@ def _verify_signature_matches(target_method, kwargs: Dict[str, Any]):
                 )
 
         passed_value = kwargs.get(param_name, inspect.Parameter.empty)
+
         if passed_value is not inspect.Parameter.empty:
-            if not isinstance(passed_value, param_type):
+            if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+                model_validate = getattr(param_type, "model_validate", None)
+                if model_validate is not None:
+                    # Support for pydantic models.
+                    try:
+                        created = model_validate(passed_value)
+                    except Exception as e:
+                        msg = f"(error converting received json contents to pydantic model: {e}."
+                        raise InvalidArgumentsError(
+                            f"It's not possible to call: '{method_name}' because the passed arguments don't match the expected signature.\n{msg}"
+                        )
+                    new_kwargs[param_name] = created
+                    continue
+                else:
+                    raise InvalidArgumentsError(
+                        f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool and pydantic.Model."
+                    )
+
+            check_type = param_type
+            if param_type == float:
+                check_type = (float, int)
+            if not isinstance(passed_value, check_type):
                 raise InvalidArgumentsError(
                     f"Error. Expected the parameter: `{param_name}` to be of type: {param_type.__name__}. Found type: {type(passed_value).__name__}."
                 )
 
+            new_kwargs[param_name] = passed_value
+
     error_message = ""
     try:
-        sig.bind(**kwargs)
+        sig.bind(**new_kwargs)
     except Exception as e:
-        error_message = f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\nError: {e}"
+        error_message = f"It's not possible to call: '{method_name}' because the passed arguments don't match the expected signature.\nError: {e}"
     if error_message:
         raise InvalidArgumentsError(error_message)
+
+    return new_kwargs
 
 
 def _normalize_arguments(
@@ -628,9 +653,13 @@ def _normalize_arguments(
 
         if param_type:
             if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
-                # TODO: Support array and object.
+                if hasattr(param_type, "model_validate"):
+                    # Support for pydantic models.
+                    parser.add_argument(f"--{param_name}", required=True)
+                    continue
+
                 raise InvalidArgumentsError(
-                    f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool."
+                    f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool and pydantic.Model."
                 )
 
             if param_type == bool:
@@ -648,7 +677,7 @@ def _normalize_arguments(
     try:
         parsed_args, argv = parser.parse_known_args(args)
     except (Exception, SystemExit) as e:
-        error_message = f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\n{_get_usage(parser)}.\nError: {str(e)}."
+        error_message = f"It's not possible to call: '{method_name}' because the passed arguments don't match the expected signature.\n{_get_usage(parser)}.\nError: {str(e)}."
 
     if error_message:
         raise InvalidArgumentsError(error_message)
@@ -656,22 +685,28 @@ def _normalize_arguments(
     if argv:
         msg = "Unrecognized arguments: %s" % " ".join(argv)
         raise InvalidArgumentsError(
-            f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\n{_get_usage(parser)}.\n{msg}"
+            f"It's not possible to call: '{method_name}' because the passed arguments don't match the expected signature.\n{_get_usage(parser)}.\n{msg}"
         )
 
     # Call the user function with the parsed arguments.
-    kwargs = {
-        param_name: getattr(parsed_args, param_name) for param_name in sig.parameters
-    }
+    kwargs = {}
+    for param_name in sig.parameters:
+        param_value = getattr(parsed_args, param_name)
 
-    try:
-        sig.bind(**kwargs)
-    except Exception as e:
-        error_message = f"It's not possible to call the task: '{method_name}' because the passed arguments don't match the task signature.\n{_get_usage(parser)}.\nError: {e}"
+        if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+            model_validate = getattr(param_type, "model_validate", None)
+            if model_validate is not None:
+                try:
+                    param_value = json.loads(param_value)
+                except Exception:
+                    msg = f"(error interpreting contents for {param_name} as a json)."
+                    raise InvalidArgumentsError(
+                        f"It's not possible to call: '{method_name}' because the passed arguments don't match the expected signature.\n{msg}"
+                    )
 
-    if error_message:
-        raise InvalidArgumentsError(error_message)
+        kwargs[param_name] = param_value
 
+    kwargs = _validate_and_convert_kwargs(target_method, kwargs)
     return ([], kwargs)
 
 

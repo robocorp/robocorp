@@ -1,7 +1,6 @@
 - docs: "\n    main method docstring\n    "
   file: tasks.py
   input_schema:
-    additionalProperties: false
     properties: {}
     type: object
   line: 10
@@ -13,7 +12,6 @@
 - docs: ''
   file: tasks.py
   input_schema:
-    additionalProperties: false
     properties: {}
     type: object
   line: 22
@@ -25,7 +23,6 @@
 - docs: ''
   file: tasks.py
   input_schema:
-    additionalProperties: false
     properties:
       multiplier:
         description: ''
@@ -48,7 +45,6 @@
 - docs: ''
   file: sub_task.py
   input_schema:
-    additionalProperties: false
     properties: {}
     type: object
   line: 8
