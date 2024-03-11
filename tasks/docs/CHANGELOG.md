@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.3 - 2024-03-11
+
 - `pydantic` models are accepted as the input and output of `@task`s. 
 
 ## 2.9.2 - 2024-03-06

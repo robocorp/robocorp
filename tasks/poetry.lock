@@ -806,13 +806,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.9.0"
+version = "2.9.1"
 description = "Automatic trace logging for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_log-2.9.0-py3-none-any.whl", hash = "sha256:90e5ece35c9bd7942a284dc022d9c0e6c33f95a082be7fc0988cf56906c47f11"},
-    {file = "robocorp_log-2.9.0.tar.gz", hash = "sha256:2ef17963ab752114bf8b2c1aa4549ef4b8d798fde648749be3da1e9e172db24c"},
+    {file = "robocorp_log-2.9.1-py3-none-any.whl", hash = "sha256:62a9a5946cac126116fbddd8d77da0c951c9098eaf42f3f85fd0057193db923f"},
+    {file = "robocorp_log-2.9.1.tar.gz", hash = "sha256:b01e4832f9a8f0afb592ba6cd85ee6e83af02224e8a33827389ab0143d8a1ff5"},
 ]
 
 [package.dependencies]
