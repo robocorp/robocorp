@@ -5,9 +5,6 @@ from pathlib import Path
 def check(datadir, args, msg="", returncode=1):
     from devutils.fixtures import robocorp_tasks_run
 
-    if returncode:
-        assert msg, 'When an error is expected, the "msg" must be given.'
-
     result = robocorp_tasks_run(
         ["run", "--console-colors=plain"] + args,
         returncode=returncode,
@@ -15,6 +12,11 @@ def check(datadir, args, msg="", returncode=1):
     )
 
     stdout = result.stdout.decode("utf-8")
+    if returncode:
+        assert (
+            msg
+        ), f'When an error is expected, the "msg" must be given. Found stdout: {stdout}'
+
     assert msg in stdout, f"{msg}\nnot in\n{stdout}"
 
 
@@ -39,19 +41,39 @@ def test_tasks_unicode(datadir) -> None:
     check(datadir, ["-t=unicode_ação_Σ", "--", "--ação=1"], returncode=0)
 
 
+def test_tasks_custom_data(datadir) -> None:
+    custom = json.dumps(
+        {
+            "name": "foo",
+            "price": 22,
+            "is_offer": None,
+        }
+    )
+    check(datadir, ["-t=custom_data", "--", f"--data={custom}"], returncode=0)
+
+
+def test_tasks_custom_bad_data(datadir) -> None:
+    check(
+        datadir,
+        ["-t=custom_data", "--", "--data={error}"],
+        returncode=1,
+        msg="(error interpreting contents for data as a json)",
+    )
+
+
 def test_tasks_arguments(datadir) -> None:
     check(datadir, ["-t=accept_str", "--", "--s=1"], returncode=0)
 
     check(
         datadir,
         ["-t=return_tuple"],
-        "It's not possible to call the task: 'return_tuple' because the passed arguments don't match the task signature.",
+        "It's not possible to call: 'return_tuple' because the passed arguments don't match the expected signature.",
     )
 
     check(
         datadir,
         ["-t=return_tuple", "--", "a=2"],
-        "It's not possible to call the task: 'return_tuple' because the passed arguments don't match the task signature.",
+        "It's not possible to call: 'return_tuple' because the passed arguments don't match the expected signature.",
     )
     check(
         datadir,

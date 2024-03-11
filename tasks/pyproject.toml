@@ -28,6 +28,10 @@ docstring_parser_fork = "^0.0.5"
 robocorp-devutils = {path = "../devutils/", develop = true}
 types-psutil = "^5.9"
 
+# We just need it for tests. In runtime duck-typing is used to
+# check for `cls.parse_obj(dict)` and `cls.model_json_schema()`
+pydantic = "^2.6"
+
 [tool.isort]
 profile = "black"
 

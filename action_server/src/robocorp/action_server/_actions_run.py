@@ -1,27 +1,21 @@
 import datetime
-import inspect
 import json
 import logging
 import time
 import typing
-from typing import Annotated, Any, Dict, Optional
+from functools import partial
+from typing import Any, Callable, Dict, Tuple
 
+import fastjsonschema  # type: ignore
 from fastapi import HTTPException, Request, Response
-from fastapi.params import Header, Param
-from pydantic import BaseModel
+from fastapi.exceptions import RequestValidationError
+from starlette.concurrency import run_in_threadpool
 
 if typing.TYPE_CHECKING:
     from ._models import Action, Run
 
 log = logging.getLogger(__name__)
 
-
-_spec_api_type_to_python_type_str = {
-    "string": "str",
-    "integer": "int",
-    "number": "float",
-    "boolean": "bool",
-}
 
 _spec_api_type_to_python_type = {
     "string": str,
@@ -133,11 +127,13 @@ def _set_run_as_running(run: "Run", initial_time: float):
 
 def _run_action_in_thread(
     action: "Action",
+    input_schema_dict: dict,
+    output_schema_dict: dict,
+    input_validator: Callable[[dict], None],
+    output_validator: Callable[[dict], None],
+    body: bytes,
     response: Response,
-    signature: inspect.Signature,
     request: Request,
-    *args,
-    **kwargs,
 ):
     """
     This is where the user actually runs something.
@@ -154,25 +150,27 @@ def _run_action_in_thread(
     from ._models import Run, get_db
 
     settings = get_settings()
-    ret_type = kwargs.pop("__ret_type__", "")
-    if not ret_type:
-        ret_type = "string"
+
+    try:
+        inputs = json.loads(body)
+    except Exception as e:
+        raise RequestValidationError(
+            [
+                f"The received input arguments (sent in the body) cannot be interpreted as json. Details: {e}"
+            ]
+        )
+
+    try:
+        input_validator(inputs)
+    except Exception as e:
+        raise RequestValidationError(
+            [
+                f"The received input arguments (sent in the body) do not conform to the expected API. Details: {e}"
+            ]
+        )
 
     db = get_db()
     with db.connect():  # Connection is per-thread, so, we need to create a new one.
-        inputs = {}
-        if args or kwargs:
-            bound = signature.bind(*args, **kwargs)
-
-            for k, v in bound.arguments.items():
-                inputs[k] = v
-
-        expected_return_type = _spec_api_type_to_python_type.get(ret_type)
-        if not expected_return_type:
-            raise RuntimeError(
-                f"The return type in the spec for the action {action.name} is not valid. Found: {ret_type}."
-            )
-
         actions_process_pool = get_actions_process_pool()
         reuse_process = settings.reuse_processes
 
@@ -187,7 +185,7 @@ def _run_action_in_thread(
                 / relative_artifacts_path
                 / "__action_server_inputs.json"
             )
-            input_json.write_text(json.dumps(inputs))
+            input_json.write_bytes(body)
 
             robot_artifacts = settings.artifacts_dir / relative_artifacts_path
 
@@ -232,9 +230,11 @@ def _run_action_in_thread(
                             "Error loading the contents of {result_json} as json."
                         )
                     else:
-                        if not isinstance(ret, expected_return_type):
+                        try:
+                            output_validator(ret)
+                        except Exception as e:
                             raise RuntimeError(
-                                f"Error in action. Expected return type: {ret_type}. Found return type: {type(ret)} (value: {ret})."
+                                f"Inconsistent value returned from action: {e} -- i.e.: the returned value ({ret!r}) does not match the expected output schema ({output_schema_dict})."
                             )
                         return ret
 
@@ -252,85 +252,79 @@ def _name_as_class_name(name):
     return name.replace("_", " ").title().replace(" ", "")
 
 
-def generate_func_from_action(action: "Action"):
+def generate_func_from_action(
+    action: "Action",
+) -> Tuple[Callable[[Response, Request], Any], dict[str, object]]:
     """
-    This function generates a method from the given action.
+    This method generates the function which should be called from FastAPI.
 
-        class CalculatorSumInput(BaseModel):
-            v1: Annotated[float, Param(description='First number.')]
-            v2: Annotated[float, Param(description='Second number.')]
+    Initially it generated the function with the parameters required to build
+    the openapi.json spec properly, but it was changed to deal with the body
+    directly and provide the openapi.json bits needed as it's easier and more
+    straightforward to deal with the json directly and validate it than to
+    create an in-memory python method with the proper signature so that FastAPI
+    will do the validation.
 
-        def calculator_sum_as_params(
-            v1: Annotated[float, Param(description='First number.')],
-            v2: Annotated[float, Param(description='Second number.')]
-        )-> Annotated[float, Param(description='The sum of v1 + v2.')]:
-
-            pass
-
-        def calculator_sum(
-            args:CalculatorSumInput,
-            response: Response,
-            request: Request,
-        ) -> Annotated[float, Param(description='The sum of v1 + v2.')]:
-
-            headers = request.headers
-            return _run_action_in_thread(action, signature, headers, args.v1, args.v2, __ret_type__='number')
-
-        signature = inspect.signature(calculator_sum_as_params)
+    Returns:
+        Function/Open API spec for the function
     """
     input_schema_dict = json.loads(action.input_schema)
     output_schema_dict = json.loads(action.output_schema)
-    properties = input_schema_dict.get("properties", {})
-    arguments = []
-    argument_names = []
-    for param_name, param_data in properties.items():
-        desc = param_data.get("description", "")
-        argument_names.append(f"args.{param_name}")
-        param_type = param_data.get("type", "string")
 
-        argument = f"""
-    {param_name}: Annotated[{_spec_api_type_to_python_type_str[param_type]}, 
-        Param(description={desc!r})]"""
-        if "default" in param_data:
-            default = param_data.get("default")
-            argument = f"{argument}={default!r}"
-        arguments.append(argument)
-
-    ret_type = output_schema_dict.get("type", "")
-    ret = ""
-    if ret_type:
-        ret_desc = output_schema_dict.get("description")
-        ret = f"""-> Annotated[{_spec_api_type_to_python_type_str[ret_type]}, 
-        Param(description={ret_desc!r})]"""
-    argument_names.append(f"__ret_type__={ret_type!r}")
-
-    code = f"""
-class {_name_as_class_name(action.name)}Input(BaseModel):
-    pass
-{''.join(arguments)}
-    
-def {action.name}_as_params({', '.join(arguments)}){ret}:
-    pass
-
-def {action.name}(args:{_name_as_class_name(action.name)}Input, response: Response, request: Request){ret}:
-    return _run_action_in_thread(action, response, signature, request, {', '.join(argument_names)})
-
-signature = inspect.signature({action.name}_as_params)
-"""
-    # print(f"Code:\n{code}")
-    compiled = compile(code, "<string>", "exec")
-    ctx: dict = {
-        "Annotated": Annotated,
-        "Param": Param,
-        "Header": Header,
-        "BaseModel": BaseModel,
-        "Optional": Optional,
-        "action": action,
-        "inspect": inspect,
-        "Response": Response,
-        "Request": Request,
-        "_run_action_in_thread": _run_action_in_thread,
+    openapi_extra = {
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "schema": input_schema_dict,
+                }
+            },
+            "required": True,
+        },
+        "responses": {
+            "200": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            **output_schema_dict,
+                            **{
+                                "title": f"Response {action.name.title().replace('_', ' ').replace('-', ' ')}"
+                            },
+                        }
+                    }
+                },
+                "description": "Successful Response",
+            },
+            "422": {
+                "content": {
+                    "application/json": {
+                        "schema": {"$ref": "#/components/schemas/HTTPValidationError"}
+                    }
+                },
+                "description": "Validation Error",
+            },
+        },
     }
-    exec(compiled, ctx)
-    method = ctx[action.name]
-    return method
+
+    input_validator = fastjsonschema.compile(input_schema_dict)
+    output_validator = fastjsonschema.compile(output_schema_dict)
+
+    # The returned function must be async because we have to request the `body`
+
+    async def func(response: Response, request: Request):
+        body = await request.body()
+
+        return await run_in_threadpool(
+            partial(
+                _run_action_in_thread,
+                action,
+                input_schema_dict,
+                output_schema_dict,
+                input_validator,
+                output_validator,
+                body,
+                response,
+                request,
+            )
+        )
+
+    return func, openapi_extra

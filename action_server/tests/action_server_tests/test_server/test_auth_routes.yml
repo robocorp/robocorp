@@ -1,20 +1,5 @@
 components:
   schemas:
-    GreetInput:
-      properties:
-        name:
-          description: The name of the person to greet.
-          title: Name
-          type: string
-        title:
-          default: Mr.
-          description: The title for the persor (Mr., Mrs., ...).
-          title: Title
-          type: string
-      required:
-      - name
-      title: GreetInput
-      type: object
     HTTPValidationError:
       properties:
         errors:
@@ -50,7 +35,7 @@ components:
       scheme: bearer
       type: http
 info:
-  title: Robocorp Actions Server
+  title: Robocorp Action Server
   version: 0.1.0
 openapi: 3.1.0
 paths:
@@ -62,7 +47,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GreetInput'
+              properties:
+                name:
+                  description: The name of the person to greet.
+                  title: Name
+                  type: string
+                title:
+                  default: Mr.
+                  description: The title for the persor (Mr., Mrs., ...).
+                  title: Title
+                  type: string
+              required:
+              - name
+              type: object
         required: true
       responses:
         '200':

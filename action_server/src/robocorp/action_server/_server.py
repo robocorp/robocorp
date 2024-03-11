@@ -126,20 +126,21 @@ def start_server(
                     action.name,
                 )
                 continue
+
+        func, openapi_extra = _actions_run.generate_func_from_action(action)
+        if action.is_consequential:
+            openapi_extra["x-openai-isConsequential"] = action.is_consequential
+
         app.add_api_route(
             f"/api/actions/{_name_to_url(action_package.name)}/{_name_to_url(action.name)}/run",
-            _actions_run.generate_func_from_action(action),
+            func,
             name=action.name,
             summary=_name_as_summary(action.name),
             description=doc_desc,
             operation_id=action.name,
             methods=["POST"],
             dependencies=endpoint_dependencies,
-            openapi_extra={
-                "x-openai-isConsequential": action.is_consequential,
-            }
-            if action.is_consequential is not None
-            else None,
+            openapi_extra=openapi_extra,
         )
 
     if os.getenv("RC_ADD_SHUTDOWN_API", "").lower() in ("1", "true"):

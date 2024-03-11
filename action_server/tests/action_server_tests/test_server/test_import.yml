@@ -1,39 +1,5 @@
 components:
   schemas:
-    BrokenActionInput:
-      properties: {}
-      title: BrokenActionInput
-      type: object
-    CalculatorSumInput:
-      properties:
-        v1:
-          description: First number.
-          title: V1
-          type: number
-        v2:
-          description: Second number.
-          title: V2
-          type: number
-      required:
-      - v1
-      - v2
-      title: CalculatorSumInput
-      type: object
-    GreetInput:
-      properties:
-        name:
-          description: The name of the person to greet.
-          title: Name
-          type: string
-        title:
-          default: Mr.
-          description: The title for the persor (Mr., Mrs., ...).
-          title: Title
-          type: string
-      required:
-      - name
-      title: GreetInput
-      type: object
     HTTPValidationError:
       properties:
         errors:
@@ -65,7 +31,7 @@ components:
       title: ValidationError
       type: object
 info:
-  title: Robocorp Actions Server
+  title: Robocorp Action Server
   version: 0.1.0
 openapi: 3.1.0
 paths:
@@ -77,13 +43,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BrokenActionInput'
+              additionalProperties: false
+              properties: {}
+              type: object
         required: true
       responses:
         '200':
           content:
             application/json:
               schema:
+                description: ''
                 title: Response Broken Action
                 type: integer
           description: Successful Response
@@ -102,7 +71,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CalculatorSumInput'
+              additionalProperties: false
+              properties:
+                v1:
+                  description: First number.
+                  title: V1
+                  type: number
+                v2:
+                  description: Second number.
+                  title: V2
+                  type: number
+              required:
+              - v1
+              - v2
+              type: object
         required: true
       responses:
         '200':
@@ -128,7 +110,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GreetInput'
+              additionalProperties: false
+              properties:
+                name:
+                  description: The name of the person to greet.
+                  title: Name
+                  type: string
+                title:
+                  default: Mr.
+                  description: The title for the persor (Mr., Mrs., ...).
+                  title: Title
+                  type: string
+              required:
+              - name
+              type: object
         required: true
       responses:
         '200':

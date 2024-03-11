@@ -28,6 +28,9 @@ def _build_properties(
         param_type_clsname = "string"
     else:
         if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+            if hasattr(param_type, "model_json_schema"):
+                # Support for pydantic
+                return param_type.model_json_schema()
             param_type_clsname = f"Error. The {kind} type '{param_type.__name__}' in '{method_name}' is not supported. Supported {kind} types: str, int, float, bool."
         else:
             param_type_clsname = _map_python_type_to_user_type[param_type]
@@ -98,7 +101,6 @@ class Task:
         required: List[str] = []
 
         schema = {
-            "additionalProperties": False,
             "properties": properties,
             "type": "object",
         }
@@ -140,15 +142,6 @@ class Task:
             method_name, "", type_hints.get("return"), description, "return"
         )
         return schema
-
-        # We could use pydantic, but then adding the info from
-        # the docstring is harder...
-        # from pydantic.json_schema import GenerateJsonSchema
-        # from pydantic.validate_call import validate_call
-        #
-        # m = validate_call(validate_return=True)(self.method)
-        # schema = m.__return_pydantic_core_schema__
-        # return GenerateJsonSchema().generate(schema) or {}
 
     @property
     def status(self) -> Status:
