@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.0.28 - 2024-03-11
+
 - The action package name is now gotten from the `package.yaml` and not from the directory name
   (it's still gotten from the directory name when `conda.yaml` is used for backward compatibility).
   
