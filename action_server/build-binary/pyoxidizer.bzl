@@ -263,7 +263,7 @@ def make_exe():
             "pydantic>=2.4.2",
             "pyyaml>=6",
             "requests>=2",
-            "robocorp-actions>=0.0.7",
+            "robocorp-actions>=0.0.8",
             "termcolor>=2.4",
             "uvicorn>=0.23.2",
             "websockets>=12.0",
