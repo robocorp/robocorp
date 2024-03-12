@@ -5,6 +5,8 @@
 - Support parsing Custom Types in Action Server UI action run view
 - Add Console output to Action Server UI action run view
 - Add Public URL link to Action Server UI if Action Server is started with `--expose`
+- When used with `robocorp-actions 0.1.0`, the `headers` can now be gotten in the `request`.
+- Action server's public URL no longer changes on reconnection (with `--expose`).
 
 ## 0.0.28 - 2024-03-11
 
