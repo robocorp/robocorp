@@ -64,7 +64,16 @@ export enum InputPropertyType {
   'STRING' = 'string',
   'BOOLEAN' = 'boolean',
   'NUMBER' = 'number',
+  'FLOAT' = 'float',
   'INTEGER' = 'integer',
+  'OBJECT' = 'object',
+}
+
+export interface InputSchema {
+  type: InputPropertyType;
+  required?: string[];
+  title?: string;
+  properties: Record<string, InputProperty | InputSchema>;
 }
 
 export type ServerConfig = {

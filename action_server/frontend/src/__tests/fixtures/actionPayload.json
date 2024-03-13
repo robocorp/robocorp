@@ -1,0 +1,9 @@
+{
+  "data": {
+    "name": "John",
+    "age": 21,
+    "agreed_to_terms": false,
+    "birth_date": "",
+    "profile_url": ""
+  }
+}

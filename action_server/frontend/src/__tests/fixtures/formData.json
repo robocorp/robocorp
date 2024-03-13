@@ -1,0 +1,53 @@
+[
+  {
+    "name": "data.name",
+    "property": {
+      "description": "User's name",
+      "title": "Name",
+      "type": "string"
+    },
+    "required": true,
+    "value": "John",
+    "title": "User"
+  },
+  {
+    "name": "data.age",
+    "property": {
+      "description": "User's age",
+      "title": "Age",
+      "type": "integer"
+    },
+    "required": true,
+    "value": "21"
+  },
+  {
+    "name": "data.agreed_to_terms",
+    "property": {
+      "description": "Indicates whether the user has agreed to the terms of service",
+      "title": "Agreed To Terms",
+      "type": "boolean"
+    },
+    "required": true,
+    "value": "False"
+  },
+  {
+    "name": "data.birth_date",
+    "property": {
+      "description": "The user's birth date, optional",
+      "title": "Birth Date",
+      "type": "string"
+    },
+    "required": true,
+    "value": ""
+  },
+  {
+    "name": "data.profile_url",
+    "property": {
+      "type": "string",
+      "description": "The URL to the user's profile picture, optional",
+      "title": "Profile Url"
+    },
+    "required": true,
+    "value": ""
+  }
+]

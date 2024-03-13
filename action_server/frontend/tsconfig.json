@@ -12,6 +12,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
     "paths": {
       "~/*": ["*"]
