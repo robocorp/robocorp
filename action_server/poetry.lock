@@ -770,13 +770,13 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "pydantic"
-version = "2.6.3"
+version = "2.6.4"
 description = "Data validation using Python type hints"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pydantic-2.6.3-py3-none-any.whl", hash = "sha256:72c6034df47f46ccdf81869fddb81aade68056003900a8724a4f160700016a2a"},
-    {file = "pydantic-2.6.3.tar.gz", hash = "sha256:e07805c4c7f5c6826e33a1d4c9d47950d7eaf34868e2690f8594d2e30241f11f"},
+    {file = "pydantic-2.6.4-py3-none-any.whl", hash = "sha256:cc46fce86607580867bdc3361ad462bab9c222ef042d3da86f2fb333e1d916c5"},
+    {file = "pydantic-2.6.4.tar.gz", hash = "sha256:b1704e0847db01817624a6b86766967f552dd9dbf3afba4004409f908dcc84e6"},
 ]
 
 [package.dependencies]
@@ -1086,17 +1086,17 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "robocorp-actions"
-version = "0.0.8"
+version = "0.0.9"
 description = "Robocorp Actions"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_actions-0.0.8-py3-none-any.whl", hash = "sha256:b555580404ef7274424d5f03161e33e2275717eea9f79cb576bd2741eaa96b51"},
-    {file = "robocorp_actions-0.0.8.tar.gz", hash = "sha256:b4ff9544bf32e618c2e56dce55b2668d46f945a1c19c87e35e25c0e3d6ea6717"},
+    {file = "robocorp_actions-0.0.9-py3-none-any.whl", hash = "sha256:1a40ed205e0bf83b8cbb098c29291786a2dea66fadcc88a8f40284d55b20c483"},
+    {file = "robocorp_actions-0.0.9.tar.gz", hash = "sha256:05b36cab12de85dad18915bfe5dc51240dbe426e50ed77cfc2d91b42806b7932"},
 ]
 
 [package.dependencies]
-robocorp-tasks = ">=2.9.3,<3.0.0"
+robocorp-tasks = ">=2.10.0,<3.0.0"
 
 [[package]]
 name = "robocorp-devutils"
@@ -1158,13 +1158,13 @@ robocorp-log = ">=2.5,<3"
 
 [[package]]
 name = "robocorp-tasks"
-version = "2.9.3"
+version = "2.10.0"
 description = "The automation framework for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_tasks-2.9.3-py3-none-any.whl", hash = "sha256:12030bb6d855d1552ba102ce9bc1977fe74c0715df8dcd1cf1b5b4f88b77d382"},
-    {file = "robocorp_tasks-2.9.3.tar.gz", hash = "sha256:2f40b29c6dad6ff784eca883d9729aeb13f11c1d48368358b7fc5a9387d96722"},
+    {file = "robocorp_tasks-2.10.0-py3-none-any.whl", hash = "sha256:bb756e386b955acd53310021d3dca3b9b68fb8db4fa987e2dc774667a36bf645"},
+    {file = "robocorp_tasks-2.10.0.tar.gz", hash = "sha256:a6fc3d9802e2e04620715422df3a98469078562bcd51c86be99ad2ce2add6572"},
 ]
 
 [package.dependencies]
@@ -1695,4 +1695,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "b35347ba796531135442773e1c3a7016a7b076be92e93168a114556b774c0733"
+content-hash = "10cba2a21f2a4df6ff1227cf40a930065fa5ed5a3fc63fdc02ccc282d47300b8"
