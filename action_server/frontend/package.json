@@ -21,7 +21,7 @@
     "test:prettier": "prettier --check ./src/**/*.{ts,tsx}",
     "prettier": "prettier --write ./src/**/*.{ts,tsx}",
     "fixlint": "eslint --fix --ext .tsx,.ts .",
-    "test": "vitest"
+    "test": "vitest --run"
   },
   "dependencies": {
     "@codemirror/lang-json": "^6.0.1",

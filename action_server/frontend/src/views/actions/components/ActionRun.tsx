@@ -31,8 +31,6 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
   }, [action, actionPackage]);
 
-  console.log(JSON.parse(action.input_schema));
-
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>, index: number) => {
       setFormData((curr) => {
