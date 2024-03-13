@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- References in the schema are resolved (so, the schema for a field is valid when embedded inside a larger schema).
+
 ## 0.0.8 - 2024-03-11
 
 - `pydantic` models are accepted as the input and output of `@action`s. 

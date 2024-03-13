@@ -311,8 +311,18 @@ def generate_func_from_action(
         },
     }
 
-    input_validator = fastjsonschema.compile(input_schema_dict)
-    output_validator = fastjsonschema.compile(output_schema_dict)
+    try:
+        input_validator = fastjsonschema.compile(input_schema_dict)
+    except Exception:
+        raise RuntimeError(
+            f"Error making validator for input schema: {input_schema_dict}"
+        )
+    try:
+        output_validator = fastjsonschema.compile(output_schema_dict)
+    except Exception:
+        raise RuntimeError(
+            f"Errormaking validator for output schema: {output_schema_dict}"
+        )
 
     # The returned function must be async because we have to request the `body`
 
