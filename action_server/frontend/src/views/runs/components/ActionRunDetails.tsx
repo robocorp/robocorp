@@ -1,9 +1,15 @@
 import { Drawer, Header } from '@robocorp/components';
 import { FC, useCallback, useMemo } from 'react';
 import { logError } from '~/lib/helpers';
-import { DefinitionList, Duration, StatusBadge, Timestamp, Code } from '~/components';
+import {
+  ActionRunConsole,
+  DefinitionList,
+  Duration,
+  StatusBadge,
+  Timestamp,
+  Code,
+} from '~/components';
 import { useActionRunsContext } from './context';
-import { ActionRunConsole } from './Console';
 
 export const ActionRunDetails: FC = () => {
   const { showRun: run, setShowRun } = useActionRunsContext();

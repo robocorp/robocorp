@@ -1,27 +1,16 @@
 import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Checkbox, Form, Header, Input } from '@robocorp/components';
+import { Button, Checkbox, Form, Input } from '@robocorp/components';
 
-import { runAction } from '~/lib/requestData';
-import { Action, ActionPackage, AsyncLoaded, InputProperty, InputPropertyType } from '~/lib/types';
-import { Code } from '~/components';
-import { stringifyResult } from '~/lib/helpers';
+import { Action, ActionPackage, InputProperty, InputPropertyType } from '~/lib/types';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
+import { useActionRunMutation } from '~/queries/actions';
+import { toKebabCase } from '~/lib/helpers';
+import { ActionRunResult } from './ActionRunResult';
 
 type Props = {
   action: Action;
   actionPackage: ActionPackage;
-};
-
-type RunResult = string | number | boolean | undefined;
-
-const dataLoadedInitial: AsyncLoaded<RunResult> = {
-  data: undefined,
-  isPending: false,
-};
-
-const nameToUrl = (name: string): string => {
-  return name.replaceAll('_', '-');
 };
 
 const convertType = (v: string, valueType: InputPropertyType): string | number | boolean => {
@@ -55,7 +44,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
   const [formData, setFormData] = useState<FormDataEntry[]>([]);
-  const [result, setResult] = useState<AsyncLoaded<RunResult>>(dataLoadedInitial);
+  const { mutate: runAction, isPending, isSuccess, data, reset } = useActionRunMutation();
 
   const inputSchema: InputSchema = useMemo(() => {
     return JSON.parse(action.input_schema);
@@ -100,9 +89,9 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         }
         return output;
       });
-      setResult(dataLoadedInitial);
+      reset();
     },
-    [action, actionPackage, dataLoadedInitial, formData],
+    [action, actionPackage, formData],
   );
 
   const fields = useMemo(() => {
@@ -163,21 +152,18 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         return [key, convertType(value, field.type)];
       });
 
-      if (action?.name && actionPackage?.name) {
-        runAction(
-          nameToUrl(actionPackage.name),
-          nameToUrl(action.name),
-          Object.fromEntries(useData),
-          setResult,
-          serverConfig?.auth_enabled ? apiKey : undefined,
-        );
-      }
+      runAction({
+        actionPackageName: toKebabCase(actionPackage.name),
+        actionName: toKebabCase(action.name),
+        args: Object.fromEntries(useData),
+        apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
+      });
     },
-    [formData, action, actionPackage, inputSchema, result, serverConfig, apiKey, setResult],
+    [formData, action, actionPackage, serverConfig, apiKey],
   );
 
   return (
-    <Form busy={result.isPending} onSubmit={onSubmit}>
+    <Form busy={isPending} onSubmit={onSubmit}>
       {serverConfig?.auth_enabled && (
         <Form.Fieldset>
           <Input
@@ -190,18 +176,11 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       )}
       <Form.Fieldset>{fields}</Form.Fieldset>
       <Button.Group align="right">
-        <Button loading={result.isPending} type="submit" variant="primary">
+        <Button loading={isPending} type="submit" variant="primary">
           Run
         </Button>
       </Button.Group>
-      {!result.isPending && (result.data !== undefined || result.errorMessage) && (
-        <>
-          <Header size="small">
-            <Header.Title title="Result" />
-          </Header>
-          <Code lineNumbers={false} value={result.errorMessage || stringifyResult(result.data)} />
-        </>
-      )}
+      {isSuccess && <ActionRunResult result={data.response} runId={data.runId} />}
     </Form>
   );
 };

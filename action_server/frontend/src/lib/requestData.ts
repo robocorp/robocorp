@@ -394,32 +394,3 @@ export const collectRunArtifacts = async (
   });
   setLoaded(data);
 };
-
-/**
- * Runs the backend action and calls the `setLoaded` depending on the current state.
- * No caching for this API.
- */
-export const runAction = async (
-  actionPackageName: string,
-  actionName: string,
-  args: object,
-  setLoaded: Dispatch<SetStateAction<AsyncLoaded<any>>>,
-  apiKey?: string,
-) => {
-  setLoaded({
-    isPending: true,
-    data: undefined,
-  });
-
-  const headers = {
-    Authorization: `Bearer ${apiKey}`,
-  };
-
-  const data = await loadAsync(
-    `${baseUrl}/api/actions/${actionPackageName}/${actionName}/run`,
-    'POST',
-    { body: JSON.stringify(args) },
-    headers,
-  );
-  setLoaded(data);
-};
