@@ -185,7 +185,11 @@ const Root = () => {
               >
                 Runs
               </SideNavigation.Link>
-              <SideNavigation.Link href="/openapi.json" target="_blank" icon={<IconShare />}>
+              <SideNavigation.Link
+                href={serverConfig?.expose_url || '/openapi.json'}
+                target="_blank"
+                icon={<IconShare />}
+              >
                 OpenAPI spec
               </SideNavigation.Link>
             </ContentScroll>
