@@ -1,15 +1,7 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.browser.cli`
-
-**Source:** [`cli.py:0`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/cli.py#L0)
+# module `robocorp.browser.cli` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/cli.py#L0"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ______________________________________________________________________
 
-## function `main`
-
-**Source:** [`cli.py:12`](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/cli.py#L12)
-
-```python
-main()
-```
+## function `main` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/cli.py#L12"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
