@@ -1,0 +1,63 @@
+{
+  "properties": {
+    "data": {
+      "properties": {
+        "name": {
+          "default": "John",
+          "description": "User's name",
+          "title": "Name",
+          "type": "string"
+        },
+        "age": {
+          "default": 21,
+          "description": "User's age",
+          "title": "Age",
+          "type": "integer"
+        },
+        "address": {
+          "allOf": [
+            {
+              "properties": {
+                "city": {
+                  "description": "The city of the address",
+                  "title": "City",
+                  "type": "string"
+                },
+                "street": {
+                  "description": "The street name of the address",
+                  "title": "Street",
+                  "type": "string"
+                }
+              },
+              "required": ["city", "street"],
+              "title": "Address",
+              "type": "object"
+            }
+          ],
+          "description": "The user's address, optional"
+        },
+        "agreed_to_terms": {
+          "description": "Indicates whether the user has agreed to the terms of service",
+          "title": "Agreed To Terms",
+          "type": "boolean"
+        },
+        "gender": {
+          "allOf": [
+            {
+              "enum": ["male", "female", "not_specified"],
+              "title": "Gender",
+              "type": "string"
+            }
+          ],
+          "description": "The user's gender, optional",
+          "default": "female"
+        }
+      },
+      "required": ["name", "age", "address", "agreed_to_terms", "gender"],
+      "title": "Prospect",
+      "type": "object"
+    }
+  },
+  "type": "object",
+  "required": ["data"]
+}

@@ -178,3 +178,59 @@ def test_task_schema_custom_type():
         "title": "MyCustomData",
         "type": "object",
     }
+
+
+class Dependent(BaseModel):
+    city: str
+
+
+class MyDataWithDependent(BaseModel):
+    name: str
+    dependent: Dependent
+
+
+def method_custom_dependent_type(a: MyDataWithDependent) -> MyDataWithDependent:
+    return a
+
+
+def test_task_schema_dependent_type():
+    from robocorp.tasks._task import Task
+
+    task = Task(__name__, __file__, method_custom_dependent_type)
+    input_schema = task.input_schema
+    assert input_schema == {
+        "properties": {
+            "a": {
+                "properties": {
+                    "name": {"title": "Name", "type": "string"},
+                    "dependent": {
+                        "properties": {"city": {"title": "City", "type": "string"}},
+                        "required": ["city"],
+                        "title": "Dependent",
+                        "type": "object",
+                    },
+                },
+                "required": ["name", "dependent"],
+                "title": "MyDataWithDependent",
+                "type": "object",
+            }
+        },
+        "type": "object",
+        "required": ["a"],
+    }
+
+    output_schema = task.output_schema
+    assert output_schema == {
+        "properties": {
+            "name": {"title": "Name", "type": "string"},
+            "dependent": {
+                "properties": {"city": {"title": "City", "type": "string"}},
+                "required": ["city"],
+                "title": "Dependent",
+                "type": "object",
+            },
+        },
+        "required": ["name", "dependent"],
+        "title": "MyDataWithDependent",
+        "type": "object",
+    }
