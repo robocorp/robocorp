@@ -120,7 +120,7 @@ def _start_dummy_server(
                 raise RuntimeError("Unable to find ipv4 socket")
 
             await stop
-            await server.close()
+            server.close()
 
     asyncio.run(start())
 

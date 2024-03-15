@@ -2,6 +2,8 @@ import ast as ast_module
 from dataclasses import dataclass
 from typing import Any, Iterator, List, Optional, Tuple, TypedDict, Union, overload
 
+from robocorp.tasks._customization._plugin_manager import PluginManager
+
 
 def _iter_nodes(
     node, internal_stack: Optional[List[Any]] = None, recursive=True
@@ -217,7 +219,11 @@ def _check_return_statement(node: ast_module.FunctionDef) -> Iterator[Error]:
         )
 
 
-def _check_arguments(node: ast_module.FunctionDef, docstring: str) -> Iterator[Error]:
+def _check_arguments(
+    pm: Optional[PluginManager], node: ast_module.FunctionDef, docstring: str
+) -> Iterator[Error]:
+    from robocorp.tasks._commands import _is_managed_param
+
     arguments = node.args
     if arguments.args:
         param_name_to_description = {}
@@ -244,6 +250,9 @@ def _check_arguments(node: ast_module.FunctionDef, docstring: str) -> Iterator[E
 
         for arg in arguments.args:
             desc = param_name_to_description.pop(arg.arg, None)
+            if pm is not None and _is_managed_param(pm, arg.arg):
+                continue
+
             if not desc:
                 yield _make_error(
                     arg,
@@ -261,7 +270,9 @@ def _check_arguments(node: ast_module.FunctionDef, docstring: str) -> Iterator[E
                 )
 
 
-def iter_lint_errors(action_contents_file: str | bytes) -> Iterator[Error]:
+def iter_lint_errors(
+    action_contents_file: str | bytes, pm: Optional[PluginManager] = None
+) -> Iterator[Error]:
     ast = ast_module.parse(action_contents_file, "<string>")
     for _stack, node in _iter_nodes(ast, recursive=False):
         if isinstance(node, ast_module.FunctionDef):
@@ -284,7 +295,7 @@ def iter_lint_errors(action_contents_file: str | bytes) -> Iterator[Error]:
 
                     yield from _check_return_type(node)
                     yield from _check_return_statement(node)
-                    yield from _check_arguments(node, docstring)
+                    yield from _check_arguments(pm, node, docstring)
 
 
 _severity_id_to_severity = {

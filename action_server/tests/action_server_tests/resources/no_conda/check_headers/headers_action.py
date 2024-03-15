@@ -4,7 +4,7 @@ from robocorp.actions import Request, action
 
 
 @action
-def check_headers(request: Request, name: str, title="Mr.") -> str:
+def check_headers(request: Request, name: str, title: str = "Mr.") -> str:
     """
     Gets something from the headers.
 

@@ -14,6 +14,7 @@ def test_issue_167_access_headers(
         cwd=pack,
         actions_sync=True,
         db_file="server.db",
+        lint=True,
     )
 
     found = client.post_get_str(

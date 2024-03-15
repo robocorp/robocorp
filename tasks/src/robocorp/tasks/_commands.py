@@ -588,11 +588,11 @@ def _validate_and_convert_kwargs(
     for param_name, param in sig.parameters.items():
         param_type = type_hints.get(param_name)
 
-        is_managed_param = _is_managed_param(pm, param)
+        is_managed_param = _is_managed_param(pm, param.name)
         if param_type is None:
             # If not given, default to `str`.
             if is_managed_param:
-                param_type = _get_managed_param_type(pm, param)
+                param_type = _get_managed_param_type(pm, param.name)
             else:
                 param_type = str
 
@@ -656,17 +656,17 @@ def _inject_managed_params(
     return kwargs
 
 
-def _is_managed_param(pm: PluginManager, param: inspect.Parameter) -> bool:
+def _is_managed_param(pm: PluginManager, param_name: str) -> bool:
     if pm.has_instance(EPManagedParameters):
         ep_managed_parameters = pm.get_instance(EPManagedParameters)
-        return ep_managed_parameters.is_managed_param(param)
+        return ep_managed_parameters.is_managed_param(param_name)
     return False
 
 
-def _get_managed_param_type(pm: PluginManager, param: inspect.Parameter) -> type:
+def _get_managed_param_type(pm: PluginManager, param_name: str) -> type:
     if pm.has_instance(EPManagedParameters):
         ep_managed_parameters = pm.get_instance(EPManagedParameters)
-        managed_param_type = ep_managed_parameters.get_managed_param_type(param)
+        managed_param_type = ep_managed_parameters.get_managed_param_type(param_name)
         assert managed_param_type is not None
         return managed_param_type
     raise RuntimeError(
@@ -695,7 +695,7 @@ def _normalize_arguments(
 
     # Add arguments to the parser based on the function signature and type hints
     for param_name, param in sig.parameters.items():
-        if _is_managed_param(pm, param):
+        if _is_managed_param(pm, param.name):
             continue
 
         param_type = type_hints.get(param_name)

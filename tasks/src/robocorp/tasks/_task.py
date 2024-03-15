@@ -135,7 +135,7 @@ class Task:
         }
 
         for param in sig.parameters.values():
-            if _is_managed_param(self._pm, param):
+            if _is_managed_param(self._pm, param.name):
                 continue
             param_type = type_hints.get(param.name)
             description = param_name_to_description.get(param.name, "")

@@ -16,10 +16,11 @@ def _translate(msg):
 
 
 class _ActionsArgDispatcher(_ArgDispatcher):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.register("list")(self._list)
         self.register("run")(self._run)
+        self._pm: Optional[PluginManager] = None
 
     @contextmanager
     def _register_lint(self, stream: typing.IO):
@@ -47,7 +48,9 @@ class _ActionsArgDispatcher(_ArgDispatcher):
                 files_found.add(filename)
                 errors = list(
                     x.to_lsp_diagnostic()
-                    for x in _lint_action.iter_lint_errors(filename.read_bytes())
+                    for x in _lint_action.iter_lint_errors(
+                        filename.read_bytes(), self._pm
+                    )
                 )
                 if errors:
                     found_critical = False
@@ -152,5 +155,6 @@ class _ActionsArgDispatcher(_ArgDispatcher):
         dct = parsed.__dict__.copy()
         dct.pop("command")
         dct["pm"] = pm
+        self._pm = pm
 
         return method(**dct)

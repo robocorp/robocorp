@@ -470,7 +470,30 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         # for it.
         from . import _server_expose
 
-        _server_expose.main(*args[1:])
+        try:
+            (
+                expose_server_parent_pid,
+                expose_server_port,
+                expose_server_verbose,
+                expose_server_host,
+                expose_server_expose_url,
+                expose_server_datadir,
+                expose_server_expose_session,
+                expose_server_api_key,
+            ) = sys.argv[1:]
+        except Exception:
+            raise RuntimeError(f"Unable to initialize server with sys.argv: {sys.argv}")
+
+        _server_expose.main(
+            expose_server_parent_pid,
+            expose_server_port,
+            expose_server_verbose,
+            expose_server_host,
+            expose_server_expose_url,
+            expose_server_datadir,
+            expose_server_expose_session,
+            expose_server_api_key,
+        )
         return 0
 
     parser = _create_parser()
