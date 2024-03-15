@@ -1,6 +1,6 @@
 ## Getting request data (such as headers) in Actions
 
-Starting with `robocorp-actions 0.0.10`, it's possible to collect data from the
+Starting with `robocorp-actions 0.1.0`, it's possible to collect data from the
 received request by creating a `request: Request` argument.
 
 The data currently available in the request is:
