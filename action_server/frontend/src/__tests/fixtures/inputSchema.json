@@ -14,35 +14,47 @@
           "title": "Age",
           "type": "integer"
         },
+        "address": {
+          "allOf": [
+            {
+              "properties": {
+                "city": {
+                  "description": "The city of the address",
+                  "title": "City",
+                  "type": "string"
+                },
+                "street": {
+                  "description": "The street name of the address",
+                  "title": "Street",
+                  "type": "string"
+                }
+              },
+              "required": ["city", "street"],
+              "title": "Address",
+              "type": "object"
+            }
+          ],
+          "description": "The user's address, optional"
+        },
         "agreed_to_terms": {
           "description": "Indicates whether the user has agreed to the terms of service",
           "title": "Agreed To Terms",
           "type": "boolean"
         },
-        "birth_date": {
-          "description": "The user's birth date, optional",
-          "format": "date",
-          "title": "Birth Date",
-          "type": "string"
-        },
-        "profile_url": {
-          "anyOf": [
+        "gender": {
+          "allOf": [
             {
-              "format": "uri",
-              "maxLength": 2083,
-              "minLength": 1,
+              "enum": ["male", "female", "not_specified"],
+              "title": "Gender",
               "type": "string"
-            },
-            {
-              "type": "null"
             }
           ],
-          "description": "The URL to the user's profile picture, optional",
-          "title": "Profile Url"
+          "description": "The user's gender, optional",
+          "default": "female"
         }
       },
-      "required": ["name", "age", "agreed_to_terms", "birth_date", "profile_url"],
-      "title": "User",
+      "required": ["name", "age", "address", "agreed_to_terms", "gender"],
+      "title": "Prospect",
       "type": "object"
     }
   },

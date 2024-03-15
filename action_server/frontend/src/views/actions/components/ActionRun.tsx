@@ -1,8 +1,17 @@
-import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useState } from 'react';
-import { Button, Checkbox, Form, Header, Input, Typography } from '@robocorp/components';
+import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Form,
+  Header,
+  Input,
+  Select,
+  Typography,
+} from '@robocorp/components';
 
 import { runAction } from '~/lib/requestData';
-import { Action, ActionPackage, AsyncLoaded, InputPropertyType } from '~/lib/types';
+import { Action, ActionPackage, AsyncLoaded } from '~/lib/types';
 import { Code } from '~/components';
 import { toKebabCase, stringifyResult } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
@@ -21,6 +30,24 @@ const dataLoadedInitial: AsyncLoaded<RunResult> = {
   isPending: false,
 };
 
+const Item: FC<{ children?: ReactNode; title?: string; name: string }> = ({
+  children,
+  title,
+  name,
+}) => {
+  const indent = name.split('.').length - 1;
+  return (
+    <Box pl={indent * 16}>
+      {title && (
+        <Typography mb="$8" variant="display.small">
+          {title}
+        </Typography>
+      )}
+      {children}
+    </Box>
+  );
+};
+
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
@@ -32,25 +59,8 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   }, [action, actionPackage]);
 
   const handleInputChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>, index: number) => {
-      setFormData((curr) => {
-        return curr.map((item, idx) => {
-          if (idx !== index) {
-            return item;
-          }
-
-          const updatedItem = { ...item };
-
-          if (item.property.type === InputPropertyType.BOOLEAN) {
-            updatedItem.value = e.target.checked ? 'True' : 'False';
-          } else {
-            updatedItem.value = e.target.value;
-          }
-
-          return updatedItem;
-        });
-      });
-
+    (value: string, index: number) => {
+      setFormData((curr) => curr.map((item, idx) => (idx === index ? { ...item, value } : item)));
       setResult(dataLoadedInitial);
     },
     [action, actionPackage, dataLoadedInitial, formData],
@@ -89,26 +99,23 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           const title = `${item.property.title}${item.required ? ' *' : ''}`;
 
           switch (item.property.type) {
-            case InputPropertyType.BOOLEAN:
+            case 'boolean':
               return (
-                <>
-                  {item.title && <Typography variant="display.small">{item.title}</Typography>}
+                <Item title={item.title} name={item.name} key={item.name}>
                   <Checkbox
                     key={item.name}
                     label={title}
                     description={item.property.description}
                     checked={item.value === 'True'}
                     required={item.required}
-                    onChange={(e) => handleInputChange(e, index)}
+                    onChange={(e) => handleInputChange(e.target.checked ? 'True' : 'False', index)}
                   />
-                </>
+                </Item>
               );
-            case InputPropertyType.FLOAT:
-            case InputPropertyType.NUMBER:
-            case InputPropertyType.INTEGER:
+            case 'number':
+            case 'integer':
               return (
-                <>
-                  {item.title && <Typography variant="display.small">{item.title}</Typography>}
+                <Item title={item.title} name={item.name} key={item.name}>
                   <Input
                     key={item.name}
                     label={title}
@@ -116,14 +123,13 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                     required={item.required}
                     value={item.value}
                     type="number"
-                    onChange={(e) => handleInputChange(e, index)}
+                    onChange={(e) => handleInputChange(e.target.value, index)}
                   />
-                </>
+                </Item>
               );
-            case InputPropertyType.OBJECT:
+            case 'object':
               return (
-                <>
-                  {item.title && <Typography variant="display.small">{item.title}</Typography>}
+                <Item title={item.title} name={item.name} key={item.name}>
                   <Input
                     key={item.name}
                     label={title}
@@ -131,15 +137,28 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                     required={item.required}
                     value={item.value}
                     rows={4}
+                    onChange={(e) => handleInputChange(e.target.value, index)}
+                  />
+                </Item>
+              );
+            case 'enum':
+              return (
+                <Item title={item.title} name={item.name} key={item.name}>
+                  <Select
+                    key={item.name}
+                    label={title}
+                    description={item.property.description}
+                    required={item.required}
+                    value={item.value}
+                    items={item.options?.map((value) => ({ label: value, value })) || []}
                     onChange={(e) => handleInputChange(e, index)}
                   />
-                </>
+                </Item>
               );
-            case InputPropertyType.STRING:
+            case 'string':
             default:
               return (
-                <>
-                  {item.title && <Typography variant="display.small">{item.title}</Typography>}
+                <Item title={item.title} name={item.name} key={item.name}>
                   <Input
                     key={item.name}
                     label={title}
@@ -147,9 +166,9 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                     rows={1}
                     required={item.required}
                     value={item.value}
-                    onChange={(e) => handleInputChange(e, index)}
+                    onChange={(e) => handleInputChange(e.target.value, index)}
                   />
-                </>
+                </Item>
               );
           }
         })}

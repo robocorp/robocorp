@@ -2,52 +2,64 @@
   {
     "name": "data.name",
     "property": {
-      "description": "User's name",
       "title": "Name",
+      "description": "User's name",
       "type": "string"
     },
     "required": true,
     "value": "John",
-    "title": "User"
+    "title": "Prospect"
   },
   {
     "name": "data.age",
     "property": {
-      "description": "User's age",
       "title": "Age",
+      "description": "User's age",
       "type": "integer"
     },
     "required": true,
     "value": "21"
   },
   {
-    "name": "data.agreed_to_terms",
+    "name": "data.address.city",
     "property": {
-      "description": "Indicates whether the user has agreed to the terms of service",
-      "title": "Agreed To Terms",
-      "type": "boolean"
+      "title": "City",
+      "description": "The city of the address",
+      "type": "string"
     },
     "required": true,
-    "value": "False"
+    "value": "",
+    "title": "Address"
   },
   {
-    "name": "data.birth_date",
+    "name": "data.address.street",
     "property": {
-      "description": "The user's birth date, optional",
-      "title": "Birth Date",
+      "title": "Street",
+      "description": "The street name of the address",
       "type": "string"
     },
     "required": true,
     "value": ""
   },
   {
-    "name": "data.profile_url",
+    "name": "data.agreed_to_terms",
     "property": {
-      "type": "string",
-      "description": "The URL to the user's profile picture, optional",
-      "title": "Profile Url"
+      "title": "Agreed To Terms",
+      "description": "Indicates whether the user has agreed to the terms of service",
+      "type": "boolean"
     },
     "required": true,
-    "value": ""
+    "value": "False"
+  },
+  {
+    "name": "data.gender",
+    "property": {
+      "title": "gender",
+      "description": "The user's gender, optional",
+      "type": "enum"
+    },
+    "required": true,
+    "value": "female",
+    "options": ["male", "female", "not_specified"]
   }
 ]
