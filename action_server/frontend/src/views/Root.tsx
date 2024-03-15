@@ -1,7 +1,7 @@
 import { SideNavigation, Box, Link, Scroll, useSystemTheme } from '@robocorp/components';
 import { MouseEvent, StrictMode, useCallback, useEffect, useMemo, useState } from 'react';
 import { ThemeOverrides, ThemeProvider, styled } from '@robocorp/theme';
-import { IconBolt, IconShare, IconUnorderedList } from '@robocorp/icons/iconic';
+import { IconBolt, IconGlobe, IconShare, IconUnorderedList } from '@robocorp/icons/iconic';
 import { IconLogoRobocorp } from '@robocorp/icons/logos';
 import {
   Outlet,
@@ -185,6 +185,15 @@ const Root = () => {
               >
                 Runs
               </SideNavigation.Link>
+              {serverConfig?.expose_url && (
+                <SideNavigation.Link
+                  href={serverConfig?.expose_url}
+                  target="_blank"
+                  icon={<IconGlobe />}
+                >
+                  Public URL
+                </SideNavigation.Link>
+              )}
               <SideNavigation.Link href="/openapi.json" target="_blank" icon={<IconShare />}>
                 OpenAPI spec
               </SideNavigation.Link>
