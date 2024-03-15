@@ -821,13 +821,13 @@ tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "robocorp-tasks"
-version = "2.10.0"
+version = "3.0.0"
 description = "The automation framework for Python"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "robocorp_tasks-2.10.0-py3-none-any.whl", hash = "sha256:bb756e386b955acd53310021d3dca3b9b68fb8db4fa987e2dc774667a36bf645"},
-    {file = "robocorp_tasks-2.10.0.tar.gz", hash = "sha256:a6fc3d9802e2e04620715422df3a98469078562bcd51c86be99ad2ce2add6572"},
+    {file = "robocorp_tasks-3.0.0-py3-none-any.whl", hash = "sha256:327fd7fe03e9430e1fb8dd31221355061142310bc1289934112abcd6ccda4cee"},
+    {file = "robocorp_tasks-3.0.0.tar.gz", hash = "sha256:f203703ef6148dc56f1a122358a625d2e4e33217403a2dbd633dcd814f44453d"},
 ]
 
 [package.dependencies]
@@ -1054,13 +1054,13 @@ files = [
 
 [[package]]
 name = "zipp"
-version = "3.18.0"
+version = "3.18.1"
 description = "Backport of pathlib-compatible object wrapper for zip files"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "zipp-3.18.0-py3-none-any.whl", hash = "sha256:c1bb803ed69d2cce2373152797064f7e79bc43f0a3748eb494096a867e0ebf79"},
-    {file = "zipp-3.18.0.tar.gz", hash = "sha256:df8d042b02765029a09b157efd8e820451045890acc30f8e37dd2f94a060221f"},
+    {file = "zipp-3.18.1-py3-none-any.whl", hash = "sha256:206f5a15f2af3dbaee80769fb7dc6f249695e940acca08dfb2a4769fe61e538b"},
+    {file = "zipp-3.18.1.tar.gz", hash = "sha256:2884ed22e7d8961de1c9a05142eb69a247f120291bc0206a00a7642f09b5b715"},
 ]
 
 [package.extras]
@@ -1070,4 +1070,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "afaf6adcc1674a391d3d9b3643dc158bfaf376d9740369a9581e81cf72868393"
+content-hash = "41268e5cd7e4a5b365d63551b136e5e0b5d38614e818153104daaa67e00848e8"
