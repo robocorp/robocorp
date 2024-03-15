@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Literal, Optional, Tuple, get_type_hints
 from robocorp.log import ConsoleMessageKind, console_message
 from robocorp.log.protocols import OptExcInfo
 
+from robocorp.tasks._customization._plugin_manager import PluginManager
+
 from ._constants import SUPPORTED_TYPES_IN_SCHEMA
 from ._protocols import IContext, ITask, Status
 
@@ -17,50 +19,16 @@ _map_python_type_to_user_type = {
 }
 
 
-def _build_properties(
-    method_name: str,
-    name_for_title: str,
-    param_type: Any,
-    description: str,
-    kind: Literal["parameter", "return"],
-) -> Dict[str, Any]:
-    if not param_type:
-        param_type_clsname = "string"
-    else:
-        if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
-            if hasattr(param_type, "model_json_schema"):
-                # Support for pydantic
-                from robocorp.tasks._remove_refs import replace_refs
-
-                # Note: we inline the references and remove the definitions
-                # because this schema can be added as a part of a larger schema
-                # and in doing so the position of the references will reference
-                # an invalid path.
-                ret = replace_refs(param_type.model_json_schema())
-                ret.pop("$defs", None)
-                return ret
-            param_type_clsname = f"Error. The {kind} type '{param_type.__name__}' in '{method_name}' is not supported. Supported {kind} types: str, int, float, bool."
-        else:
-            param_type_clsname = _map_python_type_to_user_type[param_type]
-
-    properties = {
-        "type": param_type_clsname,
-        "description": description,
-    }
-
-    if name_for_title:
-        properties["title"] = name_for_title.replace("_", " ").title()
-    return properties
-
-
 class Task:
     def __init__(
         self,
+        pm: PluginManager,
         module_name: str,
         module_file: str,
         method: typing.Callable,
         options: Optional[Dict] = None,
     ):
+        self._pm = pm
         self.module_name = module_name
         self.filename = module_file or "<filename unavailable>"
         self.method = method
@@ -78,19 +46,72 @@ class Task:
     def lineno(self):
         return self.method.__code__.co_firstlineno
 
-    def run(self, *args, **kwargs):
+    def run(self, **kwargs):
         sig = inspect.signature(self.method)
         try:
-            sig.bind(*args, **kwargs)
+            sig.bind(**kwargs)
         except Exception as e:
             raise RuntimeError(
                 f"It's not possible to call the task: '{self.name}' because the passed arguments don't match the task signature.\nError: {e}"
             )
-        return self.method(*args, **kwargs)
+        return self.method(**kwargs)
+
+    def _build_properties(
+        self,
+        method_name: str,
+        param_name: Optional[str],
+        param_type: Any,
+        description: str,
+        kind: Literal["parameter", "return"],
+    ) -> Dict[str, Any]:
+        """
+        Args:
+            method_name: The name of the method for which properties are being built.
+            param_name: The parameter name (may be None if it's a return)
+            param_type: The type of the property (gotten by introspection).
+            description: The description for the property.
+            kind: Whether this is a parameter or a return.
+        """
+        if not param_type:
+            param_type_clsname = "string"
+        else:
+            if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
+                if hasattr(param_type, "model_json_schema"):
+                    # Support for pydantic
+                    from robocorp.tasks._remove_refs import replace_refs
+
+                    # Note: we inline the references and remove the definitions
+                    # because this schema can be added as a part of a larger schema
+                    # and in doing so the position of the references will reference
+                    # an invalid path.
+                    ret = replace_refs(param_type.model_json_schema())
+                    ret.pop("$defs", None)
+                    if description:
+                        ret["description"] = description
+                    if param_name:
+                        ret["title"] = param_name.replace("_", " ").title()
+                    return ret
+                param_type_clsname = (
+                    f"Error. The {kind} type '{param_type.__name__}' in '{method_name}' is not supported. "
+                    f"Supported {kind} types: str, int, float, bool or pydantic.BaseModel."
+                )
+            else:
+                param_type_clsname = _map_python_type_to_user_type[param_type]
+
+        properties = {
+            "type": param_type_clsname,
+            "description": description,
+        }
+
+        if param_name:
+            properties["title"] = param_name.replace("_", " ").title()
+        return properties
 
     @property
     def input_schema(self) -> dict[str, Any]:
         import docstring_parser
+
+        from robocorp.tasks._commands import _is_managed_param
 
         sig = inspect.signature(self.method)
         method_name = self.method.__code__.co_name
@@ -114,9 +135,11 @@ class Task:
         }
 
         for param in sig.parameters.values():
+            if _is_managed_param(self._pm, param):
+                continue
             param_type = type_hints.get(param.name)
             description = param_name_to_description.get(param.name, "")
-            param_properties = _build_properties(
+            param_properties = self._build_properties(
                 method_name, param.name, param_type, description, "parameter"
             )
             properties[param.name] = param_properties
@@ -146,8 +169,8 @@ class Task:
             if returns and returns.description:
                 description = returns.description
 
-        schema = _build_properties(
-            method_name, "", type_hints.get("return"), description, "return"
+        schema = self._build_properties(
+            method_name, None, type_hints.get("return"), description, "return"
         )
         return schema
 

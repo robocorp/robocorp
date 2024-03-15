@@ -8,7 +8,7 @@ ______________________________________________________________________
 
 ## function `action`
 
-**Source:** [`__init__.py:23`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L23)
+**Source:** [`__init__.py:24`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L24)
 
 ```python
 action(*args, **kwargs)
@@ -39,6 +39,70 @@ python -m robocorp.actions run actions.py -a enter_user
 
 ______________________________________________________________________
 
+## function `action_cache`
+
+**Source:** [`__init__.py:85`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L85)
+
+```python
+action_cache(func)
+```
+
+Provides decorator which caches return and clears it automatically when the current action has been run.
+
+A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-actions finishes running the current action.
+
+The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value.
+
+**Args:**
+
+- <b>`func`</b>:  wrapped function.
+
+______________________________________________________________________
+
+## function `get_current_action`
+
+**Source:** [`__init__.py:116`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L116)
+
+```python
+get_current_action() → Optional[IAction]
+```
+
+Provides the action which is being currently run or None if not currently running an action.
+
+______________________________________________________________________
+
+## function `get_output_dir`
+
+**Source:** [`__init__.py:106`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L106)
+
+```python
+get_output_dir() → Optional[Path]
+```
+
+Provide the output directory being used for the run or None if there's no output dir configured.
+
+______________________________________________________________________
+
+## function `session_cache`
+
+**Source:** [`__init__.py:64`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L64)
+
+```python
+session_cache(func)
+```
+
+Provides decorator which caches return and clears automatically when all actions have been run.
+
+A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-actions finishes running all actions.
+
+The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value.
+
+**Args:**
+
+- <b>`func`</b>:  wrapped function.
+
+______________________________________________________________________
+
 ## function `setup`
 
 **Source:** [`_fixtures.py:24`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_fixtures.py#L24)
@@ -47,7 +111,7 @@ ______________________________________________________________________
 setup(
     *args,
     **kwargs
-) → Union[Callable[[ITask], Any], Callable[[Callable[[ITask], Any]], Callable[[ITask], Any]], Callable[[Callable[[Sequence[ITask]], Any]], Callable[[Sequence[ITask]], Any]]]
+) → Union[Callable[[IAction], Any], Callable[[Callable[[IAction], Any]], Callable[[IAction], Any]], Callable[[Callable[[Sequence[IAction]], Any]], Callable[[Sequence[IAction]], Any]]]
 ```
 
 Run code before any actions start, or before each separate action.
@@ -110,7 +174,7 @@ ______________________________________________________________________
 teardown(
     *args,
     **kwargs
-) → Union[Callable[[ITask], Any], Callable[[Callable[[ITask], Any]], Callable[[ITask], Any]], Callable[[Callable[[Sequence[ITask]], Any]], Callable[[Sequence[ITask]], Any]]]
+) → Union[Callable[[IAction], Any], Callable[[Callable[[IAction], Any]], Callable[[IAction], Any]], Callable[[Callable[[Sequence[IAction]], Any]], Callable[[Sequence[IAction]], Any]]]
 ```
 
 Run code after actions have been run, or after each separate action.
@@ -147,73 +211,9 @@ By default, runs teardowns in `action` scope.
 
 ______________________________________________________________________
 
-## function `session_cache`
+## class `IAction`
 
-**Source:** [`__init__.py:63`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L63)
-
-```python
-session_cache(func)
-```
-
-Provides decorator which caches return and clears automatically when all actions have been run.
-
-A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-actions finishes running all actions.
-
-The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value.
-
-**Args:**
-
-- <b>`func`</b>:  wrapped function.
-
-______________________________________________________________________
-
-## function `action_cache`
-
-**Source:** [`__init__.py:84`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L84)
-
-```python
-action_cache(func)
-```
-
-Provides decorator which caches return and clears it automatically when the current action has been run.
-
-A decorator which automatically cache the result of the given function and will return it on any new invocation until robocorp-actions finishes running the current action.
-
-The function may be either a generator with a single yield (so, the first yielded value will be returned and when the cache is released the generator will be resumed) or a function returning some value.
-
-**Args:**
-
-- <b>`func`</b>:  wrapped function.
-
-______________________________________________________________________
-
-## function `get_output_dir`
-
-**Source:** [`__init__.py:105`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L105)
-
-```python
-get_output_dir() → Optional[Path]
-```
-
-Provide the output directory being used for the run or None if there's no output dir configured.
-
-______________________________________________________________________
-
-## function `get_current_action`
-
-**Source:** [`__init__.py:115`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L115)
-
-```python
-get_current_action() → Optional[ITask]
-```
-
-Provides the action which is being currently run or None if not currently running an action.
-
-______________________________________________________________________
-
-## class `ITask`
-
-**Source:** [`_protocols.py:51`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L51)
+**Source:** [`_protocols.py:8`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_protocols.py#L8)
 
 #### property `failed`
 
@@ -229,12 +229,30 @@ Returns true if the task failed. (in which case usually exc_info is not None).
 
 ______________________________________________________________________
 
-### method `run`
+## class `Request`
 
-**Source:** [`_protocols.py:82`](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L82)
+**Source:** [`_request.py:74`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_request.py#L74)
+
+Contains the information exposed in a request (such as headers and cookies).
+
+May be extended in the future to provide more information.
+
+#### property `cookies`
+
+Provides the cookies received in the request.
+
+#### property `headers`
+
+Provides the headers received in the request (excluding `cookies` which are available in `cookies`).
+
+______________________________________________________________________
+
+### classmethod `model_validate`
+
+**Source:** [`_request.py:100`](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_request.py#L100)
 
 ```python
-run() → Any
+model_validate(dct: dict) → Request
 ```
 
 ______________________________________________________________________

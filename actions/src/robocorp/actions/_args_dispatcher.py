@@ -1,8 +1,10 @@
 import sys
 import typing
 from contextlib import contextmanager
+from typing import Optional
 
 from robocorp.tasks._argdispatch import _ArgDispatcher
+from robocorp.tasks._customization._plugin_manager import PluginManager
 
 
 def _translate(msg):
@@ -140,7 +142,7 @@ class _ActionsArgDispatcher(_ArgDispatcher):
 
         return ArgumentParserTranslated
 
-    def _dispatch(self, parsed) -> int:
+    def _dispatch(self, parsed, pm: Optional[PluginManager] = None) -> int:
         # Custom dispatch as we need to account for custom flags.
         if not parsed.command:
             self._create_argparser().print_help()
@@ -149,5 +151,6 @@ class _ActionsArgDispatcher(_ArgDispatcher):
         method = self._name_to_func[parsed.command]
         dct = parsed.__dict__.copy()
         dct.pop("command")
+        dct["pm"] = pm
 
         return method(**dct)

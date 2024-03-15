@@ -5,6 +5,7 @@ from typing import Callable, Optional, overload
 from ._action_options import ActionOptions
 from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
+from ._request import Request
 
 __version__ = "0.0.9"
 version_info = [int(x) for x in __version__.split(".")]
@@ -123,13 +124,14 @@ def get_current_action() -> Optional[IAction]:
 
 
 __all__ = [
+    "IAction",
+    "Request",
+    "Status",
     "action",
+    "action_cache",
+    "get_current_action",
+    "get_output_dir",
+    "session_cache",
     "setup",
     "teardown",
-    "session_cache",
-    "action_cache",
-    "get_output_dir",
-    "get_current_action",
-    "IAction",
-    "Status",
 ]

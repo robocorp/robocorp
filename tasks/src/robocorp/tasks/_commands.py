@@ -11,16 +11,23 @@ from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
-from robocorp.tasks import _constants
-from robocorp.tasks._constants import SUPPORTED_TYPES_IN_SCHEMA
+from robocorp.tasks._customization._extension_points import EPManagedParameters
+from robocorp.tasks._protocols import ITask
 
+from . import _constants
 from ._argdispatch import arg_dispatch as _arg_dispatch
+from ._constants import SUPPORTED_TYPES_IN_SCHEMA
+from ._customization._plugin_manager import PluginManager
 
 
 # Note: the args must match the 'dest' on the configured argparser.
 @_arg_dispatch.register(name="list")
 def list_tasks(
-    path: str, glob: Optional[str] = None, __stream__: Optional[typing.IO] = None
+    *,
+    path: str,
+    glob: Optional[str] = None,
+    __stream__: Optional[typing.IO] = None,
+    pm: Optional[PluginManager] = None,
 ) -> int:
     """
     Prints the tasks available at a given path to the stdout in json format.
@@ -41,7 +48,6 @@ def list_tasks(
     from contextlib import redirect_stdout
 
     from robocorp.tasks._collect_tasks import collect_tasks
-    from robocorp.tasks._protocols import ITask
     from robocorp.tasks._task import Context
 
     p = Path(path)
@@ -49,6 +55,9 @@ def list_tasks(
     if not p.exists():
         context.show_error(f"Path: {path} does not exist")
         return 1
+
+    if pm is None:
+        pm = PluginManager()
 
     original_stdout = sys.stdout
     if __stream__ is not None:
@@ -59,7 +68,7 @@ def list_tasks(
     with redirect_stdout(sys.stderr):
         task: ITask
         tasks_found = []
-        for task in collect_tasks(p, glob=glob):
+        for task in collect_tasks(pm, p, glob=glob):
             tasks_found.append(
                 {
                     "name": task.name,
@@ -133,6 +142,7 @@ class _OsExit(enum.Enum):
 # Note: the args must match the 'dest' on the configured argparser.
 @_arg_dispatch.register()
 def run(
+    *,
     output_dir: str,
     path: str,
     task_name: Union[Sequence[str], str, None],
@@ -148,6 +158,7 @@ def run(
     preload_module: Optional[List[str]] = None,
     glob: Optional[str] = None,
     json_input: Optional[str] = None,
+    pm: Optional[PluginManager] = None,
 ) -> int:
     """
     Runs a task.
@@ -223,7 +234,7 @@ def run(
     )
     from ._log_auto_setup import setup_cli_auto_logging
     from ._log_output_setup import setup_log_output, setup_log_output_to_port
-    from ._protocols import ITask, Status
+    from ._protocols import Status
     from ._task import Context, set_current_task
 
     if not output_dir:
@@ -231,6 +242,9 @@ def run(
 
     if not output_dir:
         output_dir = "./output"
+
+    if pm is None:
+        pm = PluginManager()
 
     console.set_mode(console_colors)
 
@@ -397,7 +411,7 @@ def run(
                             f"\nCollecting {task_or_tasks} {task_name} from: {path}"
                         )
 
-                    tasks: List[ITask] = list(collect_tasks(p, task_names, glob))
+                    tasks: List[ITask] = list(collect_tasks(pm, p, task_names, glob))
 
                     if not tasks:
                         raise RobocorpTasksCollectError(
@@ -426,23 +440,21 @@ def run(
                         before_task_run(task)
                         try:
                             if json_loaded_arguments is not None:
-                                args: Sequence = []
                                 kwargs = copy.deepcopy(json_loaded_arguments)
-                                kwargs = _validate_and_convert_kwargs(
-                                    task.method, kwargs
-                                )
+                                kwargs = _validate_and_convert_kwargs(pm, task, kwargs)
 
                             else:
-                                args, kwargs = _normalize_arguments(
-                                    task.method, additional_arguments or []
+                                kwargs = _normalize_arguments(
+                                    pm, task, additional_arguments or []
                                 )
 
-                            result = task.run(*args, **kwargs)
+                            result = task.run(**kwargs)
                             task.result = result
                             task.status = Status.PASS
                         except Exception as e:
                             task.status = Status.FAIL
-                            task.message = str(e)
+                            # Make sure we put some message even if str(e) is empty.
+                            task.message = str(e) or f"{e.__class__}"
                             task.exc_info = sys.exc_info()
                         finally:
                             with interrupt_on_timeout(
@@ -561,31 +573,36 @@ def check_boolean(value):
 
 
 def _validate_and_convert_kwargs(
-    target_method, kwargs: Dict[str, Any]
+    pm: PluginManager, task: ITask, kwargs: Dict[str, Any]
 ) -> Dict[str, Any]:
     from typing import get_type_hints
 
     from robocorp.tasks._exceptions import InvalidArgumentsError
 
+    target_method = task.method
     sig = inspect.signature(target_method)
     type_hints = get_type_hints(target_method)
     method_name = target_method.__code__.co_name
     new_kwargs: Dict[str, Any] = {}
 
-    # Add arguments to the parser based on the function signature and type hints
     for param_name, param in sig.parameters.items():
         param_type = type_hints.get(param_name)
 
+        is_managed_param = _is_managed_param(pm, param)
         if param_type is None:
             # If not given, default to `str`.
-            param_type = str
+            if is_managed_param:
+                param_type = _get_managed_param_type(pm, param)
+            else:
+                param_type = str
 
         if param.default is inspect.Parameter.empty:
             # It's required, so, let's see if it's in the kwargs.
-            if param_name not in kwargs:
-                raise InvalidArgumentsError(
-                    f"Error. The parameter `{param_name}` was not defined in the input."
-                )
+            if not is_managed_param:
+                if param_name not in kwargs:
+                    raise InvalidArgumentsError(
+                        f"Error. The parameter `{param_name}` was not defined in the input."
+                    )
 
         passed_value = kwargs.get(param_name, inspect.Parameter.empty)
 
@@ -618,6 +635,7 @@ def _validate_and_convert_kwargs(
 
             new_kwargs[param_name] = passed_value
 
+    new_kwargs = _inject_managed_params(pm, sig, new_kwargs)
     error_message = ""
     try:
         sig.bind(**new_kwargs)
@@ -629,13 +647,41 @@ def _validate_and_convert_kwargs(
     return new_kwargs
 
 
+def _inject_managed_params(
+    pm: PluginManager, sig: inspect.Signature, kwargs: Dict[str, Any]
+) -> Dict[str, Any]:
+    if pm.has_instance(EPManagedParameters):
+        ep_managed_parameters = pm.get_instance(EPManagedParameters)
+        return ep_managed_parameters.inject_managed_params(sig, kwargs)
+    return kwargs
+
+
+def _is_managed_param(pm: PluginManager, param: inspect.Parameter) -> bool:
+    if pm.has_instance(EPManagedParameters):
+        ep_managed_parameters = pm.get_instance(EPManagedParameters)
+        return ep_managed_parameters.is_managed_param(param)
+    return False
+
+
+def _get_managed_param_type(pm: PluginManager, param: inspect.Parameter) -> type:
+    if pm.has_instance(EPManagedParameters):
+        ep_managed_parameters = pm.get_instance(EPManagedParameters)
+        managed_param_type = ep_managed_parameters.get_managed_param_type(param)
+        assert managed_param_type is not None
+        return managed_param_type
+    raise RuntimeError(
+        "Error: Asked managed param type for a param which is not managed."
+    )
+
+
 def _normalize_arguments(
-    target_method, args: list[str]
-) -> tuple[list[Any], dict[str, Any]]:
+    pm: PluginManager, task: ITask, args: list[str]
+) -> dict[str, Any]:
     from typing import get_type_hints
 
     from robocorp.tasks._exceptions import InvalidArgumentsError
 
+    target_method = task.method
     sig = inspect.signature(target_method)
     type_hints = get_type_hints(target_method)
     method_name = target_method.__code__.co_name
@@ -649,6 +695,9 @@ def _normalize_arguments(
 
     # Add arguments to the parser based on the function signature and type hints
     for param_name, param in sig.parameters.items():
+        if _is_managed_param(pm, param):
+            continue
+
         param_type = type_hints.get(param_name)
 
         if param_type:
@@ -706,8 +755,8 @@ def _normalize_arguments(
 
         kwargs[param_name] = param_value
 
-    kwargs = _validate_and_convert_kwargs(target_method, kwargs)
-    return ([], kwargs)
+    kwargs = _validate_and_convert_kwargs(pm, task, kwargs)
+    return kwargs
 
 
 def _get_usage(parser) -> str:

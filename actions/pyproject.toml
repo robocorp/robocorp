@@ -12,10 +12,18 @@ packages = [{ include = "robocorp", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-robocorp-tasks = "^2.10.0"
+
+# robocorp-actions is tighly coupled with robocorp-tasks, so,
+# the version must be an exact match up to the minor version.
+robocorp-tasks = "2.10.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = { path = "../devutils/", develop = true }
+
+# We just need it for tests. In runtime duck-typing is used to
+# check for `cls.parse_obj(dict)` and `cls.model_json_schema()`
+pydantic = "^2.6"
+
 
 [tool.mypy]
 mypy_path = "src:tests"

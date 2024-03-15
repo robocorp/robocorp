@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Backward incompatible release: The `robocorp.tasks.cli.IArgumentsHandler` interface
+  was changed (most clients should not have any issues as it should be rare that
+  clients need to provide a custom argument handler).
+- On custom models, the description and title is now properly set based on the docstring and parameter name.
+
 ## 2.10.0 - 2024-03-13
 
 - References in the schema are resolved (so, the schema for a field is valid when embedded inside a larger schema).
