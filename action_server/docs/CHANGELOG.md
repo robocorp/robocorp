@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.1.1 - 2024-03-15
+
+- Fixed issue running `action-server start --expose`.
+
 ## 0.1.0 - 2024-03-15
 
 - Support parsing Custom Types in Action Server UI action run view
