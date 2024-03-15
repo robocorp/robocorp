@@ -30,6 +30,7 @@
     "@robocorp/components": "1.3.3",
     "@robocorp/icons": "^2.1.2",
     "@robocorp/theme": "^1.0.1",
+    "@tanstack/react-query": "^5.28.0",
     "date-fns": "^2.30.0",
     "openapi-types": "^12.1.3",
     "react": "^18.2.0",

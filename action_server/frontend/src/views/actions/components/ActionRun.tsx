@@ -1,33 +1,17 @@
 import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Checkbox,
-  Form,
-  Header,
-  Input,
-  Select,
-  Typography,
-} from '@robocorp/components';
+import { Box, Button, Checkbox, Form, Input, Select, Typography } from '@robocorp/components';
 
-import { runAction } from '~/lib/requestData';
-import { Action, ActionPackage, AsyncLoaded } from '~/lib/types';
-import { Code } from '~/components';
-import { toKebabCase, stringifyResult } from '~/lib/helpers';
+import { Action, ActionPackage } from '~/lib/types';
+import { toKebabCase } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import { formDatatoPayload, propertiesToFormData, PropertyFormData } from '~/lib/formData';
+import { useActionRunMutation } from '~/queries/actions';
+import { ActionRunResult } from './ActionRunResult';
 
 type Props = {
   action: Action;
   actionPackage: ActionPackage;
-};
-
-type RunResult = string | number | boolean | undefined;
-
-const dataLoadedInitial: AsyncLoaded<RunResult> = {
-  data: undefined,
-  isPending: false,
 };
 
 const Item: FC<{ children?: ReactNode; title?: string; name: string }> = ({
@@ -52,7 +36,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
   const [formData, setFormData] = useState<PropertyFormData[]>([]);
-  const [result, setResult] = useState<AsyncLoaded<RunResult>>(dataLoadedInitial);
+  const { mutate: runAction, isPending, isSuccess, data, reset } = useActionRunMutation();
 
   useEffect(() => {
     setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
@@ -61,29 +45,27 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const handleInputChange = useCallback(
     (value: string, index: number) => {
       setFormData((curr) => curr.map((item, idx) => (idx === index ? { ...item, value } : item)));
-      setResult(dataLoadedInitial);
+      reset();
     },
-    [action, actionPackage, dataLoadedInitial, formData],
+    [action, actionPackage, formData],
   );
 
   const onSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-      if (action?.name && actionPackage?.name) {
-        runAction(
-          toKebabCase(actionPackage.name),
-          toKebabCase(action.name),
-          formDatatoPayload(formData),
-          setResult,
-          serverConfig?.auth_enabled ? apiKey : undefined,
-        );
-      }
+
+      runAction({
+        actionPackageName: toKebabCase(actionPackage.name),
+        actionName: toKebabCase(action.name),
+        args: formDatatoPayload(formData),
+        apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
+      });
     },
     [action, actionPackage, formData],
   );
 
   return (
-    <Form busy={result.isPending} onSubmit={onSubmit}>
+    <Form busy={isPending} onSubmit={onSubmit}>
       {serverConfig?.auth_enabled && (
         <Form.Fieldset>
           <Input
@@ -174,18 +156,11 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         })}
       </Form.Fieldset>
       <Button.Group align="right">
-        <Button loading={result.isPending} type="submit" variant="primary">
+        <Button loading={isPending} type="submit" variant="primary">
           Run
         </Button>
       </Button.Group>
-      {!result.isPending && (result.data !== undefined || result.errorMessage) && (
-        <>
-          <Header size="small">
-            <Header.Title title="Result" />
-          </Header>
-          <Code lineNumbers={false} value={result.errorMessage || stringifyResult(result.data)} />
-        </>
-      )}
+      {isSuccess && <ActionRunResult result={data.response} runId={data.runId} />}
     </Form>
   );
 };

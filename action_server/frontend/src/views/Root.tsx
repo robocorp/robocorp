@@ -10,6 +10,7 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { HeaderAndMenu } from '~/components/Header';
 import { Redirect, SideHeader } from '~/components';
@@ -109,6 +110,8 @@ const Root = () => {
   );
   const [serverConfig, setServerConfig] = useState<ServerConfig | undefined>(undefined);
 
+  const queryClient = new QueryClient();
+
   useEffect(() => {
     const fetchConfig = async () => {
       const response = await fetch(`${baseUrl}/config`);
@@ -162,56 +165,58 @@ const Root = () => {
   }, []);
 
   return (
-    <ThemeProvider name={viewSettings.theme} overrides={overrides}>
-      <ActionServerContext.Provider value={actionServerContextValue}>
-        <Main isCollapsed={false}>
-          <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
-          <SideNavigation aria-label="Navigation" open={showNavInSmallMode} onClose={onClose}>
-            <SideHeader />
-            <ContentScroll>
-              <SideNavigation.Link
-                aria-current={location.pathname.startsWith('/actions')}
-                href="/actions"
-                onClick={onNavigate('/actions')}
-                icon={<IconBolt />}
-              >
-                Actions
-              </SideNavigation.Link>
-              <SideNavigation.Link
-                aria-current={location.pathname.startsWith('/runs')}
-                href="/runs"
-                onClick={onNavigate('/runs')}
-                icon={<IconUnorderedList />}
-              >
-                Runs
-              </SideNavigation.Link>
-              {serverConfig?.expose_url && (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider name={viewSettings.theme} overrides={overrides}>
+        <ActionServerContext.Provider value={actionServerContextValue}>
+          <Main isCollapsed={false}>
+            <HeaderAndMenu onClickMenuButton={onClickMenuButton} />
+            <SideNavigation aria-label="Navigation" open={showNavInSmallMode} onClose={onClose}>
+              <SideHeader />
+              <ContentScroll>
                 <SideNavigation.Link
-                  href={serverConfig?.expose_url}
-                  target="_blank"
-                  icon={<IconGlobe />}
+                  aria-current={location.pathname.startsWith('/actions')}
+                  href="/actions"
+                  onClick={onNavigate('/actions')}
+                  icon={<IconBolt />}
                 >
-                  Public URL
+                  Actions
                 </SideNavigation.Link>
-              )}
-              <SideNavigation.Link href="/openapi.json" target="_blank" icon={<IconShare />}>
-                OpenAPI spec
-              </SideNavigation.Link>
-            </ContentScroll>
+                <SideNavigation.Link
+                  aria-current={location.pathname.startsWith('/runs')}
+                  href="/runs"
+                  onClick={onNavigate('/runs')}
+                  icon={<IconUnorderedList />}
+                >
+                  Runs
+                </SideNavigation.Link>
+                {serverConfig?.expose_url && (
+                  <SideNavigation.Link
+                    href={serverConfig?.expose_url}
+                    target="_blank"
+                    icon={<IconGlobe />}
+                  >
+                    Public URL
+                  </SideNavigation.Link>
+                )}
+                <SideNavigation.Link href="/openapi.json" target="_blank" icon={<IconShare />}>
+                  OpenAPI spec
+                </SideNavigation.Link>
+              </ContentScroll>
 
-            <Box display="flex" alignItems="center" ml={24} mt={8} color="content.subtle.light">
-              <IconLogoRobocorp size={24} />
-              <Box ml={8} fontSize={12}>
-                Powered by Robocorp
+              <Box display="flex" alignItems="center" ml={24} mt={8} color="content.subtle.light">
+                <IconLogoRobocorp size={24} />
+                <Box ml={8} fontSize={12}>
+                  Powered by Robocorp
+                </Box>
               </Box>
-            </Box>
-          </SideNavigation>
-          <section>
-            <Outlet />
-          </section>
-        </Main>
-      </ActionServerContext.Provider>
-    </ThemeProvider>
+            </SideNavigation>
+            <section>
+              <Outlet />
+            </section>
+          </Main>
+        </ActionServerContext.Provider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

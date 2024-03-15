@@ -52,19 +52,6 @@ export const prettyPrint = (input: string) => {
   }
 };
 
-export const stringifyResult = (result?: string | boolean | number) => {
-  switch (typeof result) {
-    case 'string':
-      return result;
-    case 'number':
-      return result.toString();
-    case 'boolean':
-      return result ? 'true' : 'false';
-    default:
-      return '';
-  }
-};
-
 export const toKebabCase = (str: string): string => {
   return str.replace(/[\s_]+/g, '-').toLowerCase();
 };
