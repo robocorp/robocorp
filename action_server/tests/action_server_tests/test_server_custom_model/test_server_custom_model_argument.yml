@@ -45,6 +45,18 @@ paths:
               properties:
                 data:
                   properties:
+                    depends_on:
+                      anyOf:
+                      - properties:
+                          city:
+                            description: The city.
+                            title: City
+                            type: string
+                        required:
+                        - city
+                        title: Dependent
+                        type: object
+                      - type: 'null'
                     is_offer:
                       anyOf:
                       - type: boolean
@@ -81,8 +93,19 @@ paths:
                     description: Was it accepted?.
                     title: Accepted
                     type: boolean
+                  depends_on:
+                    properties:
+                      city:
+                        description: The city.
+                        title: City
+                        type: string
+                    required:
+                    - city
+                    title: Dependent
+                    type: object
                 required:
                 - accepted
+                - depends_on
                 title: Response My Action
                 type: object
           description: Successful Response

@@ -30,7 +30,15 @@ def _build_properties(
         if param_type not in SUPPORTED_TYPES_IN_SCHEMA:
             if hasattr(param_type, "model_json_schema"):
                 # Support for pydantic
-                return param_type.model_json_schema()
+                from robocorp.tasks._remove_refs import replace_refs
+
+                # Note: we inline the references and remove the definitions
+                # because this schema can be added as a part of a larger schema
+                # and in doing so the position of the references will reference
+                # an invalid path.
+                ret = replace_refs(param_type.model_json_schema())
+                ret.pop("$defs", None)
+                return ret
             param_type_clsname = f"Error. The {kind} type '{param_type.__name__}' in '{method_name}' is not supported. Supported {kind} types: str, int, float, bool."
         else:
             param_type_clsname = _map_python_type_to_user_type[param_type]

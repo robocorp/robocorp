@@ -25,9 +25,17 @@ def test_server_custom_model_argument(
 
     found = client.post_get_str(
         "api/actions/custom-model/my-action/run",
-        {"x": "Foo", "data": {"name": "data-name", "price": 22, "is-offer": None}},
+        {
+            "x": "Foo",
+            "data": {
+                "name": "data-name",
+                "price": 22,
+                "is-offer": None,
+                "depends_on": {"city": "Foo"},
+            },
+        },
     )
-    assert json.loads(found) == {"accepted": True}
+    assert json.loads(found) == {"accepted": True, "depends_on": {"city": "Foo"}}
 
     # Bad arguments
     client.post_error(
