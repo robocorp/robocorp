@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 - 2024-03-15
+
 - Backward incompatible release: The `robocorp.tasks.cli.IArgumentsHandler` interface
   was changed (most clients should not have any issues as it should be rare that
   clients need to provide a custom argument handler).
