@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 - 2024-03-15
+
 - Support parsing Custom Types in Action Server UI action run view
 - Add Console output to Action Server UI action run view
 - Add Public URL link to Action Server UI if Action Server is started with `--expose`
