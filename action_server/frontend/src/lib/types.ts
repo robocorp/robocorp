@@ -1,3 +1,6 @@
+/* eslint-disable camelcase */
+import type { OpenAPIV3_1 } from 'openapi-types';
+
 export interface ActionPackage {
   id: string;
   name: string;
@@ -54,17 +57,10 @@ export type LoadedActionsPackages = AsyncLoaded<ActionPackage[]>;
 export type LoadedArtifacts = AsyncLoaded<Artifact>;
 
 export interface InputProperty {
-  type: InputPropertyType;
+  type: OpenAPIV3_1.NonArraySchemaObjectType | 'enum';
   description: string;
   title: string;
   default?: string;
-}
-
-export enum InputPropertyType {
-  'STRING' = 'string',
-  'BOOLEAN' = 'boolean',
-  'NUMBER' = 'number',
-  'INTEGER' = 'integer',
 }
 
 export type ServerConfig = {

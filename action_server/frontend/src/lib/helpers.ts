@@ -64,3 +64,7 @@ export const stringifyResult = (result?: string | boolean | number) => {
       return '';
   }
 };
+
+export const toKebabCase = (str: string): string => {
+  return str.replace(/[\s_]+/g, '-').toLowerCase();
+};
