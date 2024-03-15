@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Support parsing Custom Types in Action Server UI action run view
+
 ## 0.0.28 - 2024-03-11
 
 - `pydantic` models are accepted as the input and output of `@action`s.
