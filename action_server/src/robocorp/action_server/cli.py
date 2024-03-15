@@ -480,7 +480,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
                 expose_server_datadir,
                 expose_server_expose_session,
                 expose_server_api_key,
-            ) = sys.argv[1:]
+            ) = args[1:]
         except Exception:
             raise RuntimeError(f"Unable to initialize server with sys.argv: {sys.argv}")
 
