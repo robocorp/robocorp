@@ -21,12 +21,12 @@ IF EXIST ".\venv" (
     IF ERRORLEVEL 2 GOTO USE_EXISTING
 )
 
-rcc venv dev-env-libraries.yaml -s dev-library-env --force
+rcc venv devutils\dev-env-libraries.yaml -s dev-library-env --force
 
 ::INSTALL_DEPENDENCIES
 call .\venv\Scripts\activate.bat
 
-pip install poetry==1.7 invoke==2.2
+pip install -Ur devutils/requirements.txt
 
 :: Start VS Code 
 code .
