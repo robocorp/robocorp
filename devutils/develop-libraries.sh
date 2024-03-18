@@ -22,7 +22,7 @@ if [ -f "./venv" ]; then
         echo "Creating a clean environment..."
         ./devutils/rcc venv devutils/dev-env-libraries.yaml -s dev-library-env --force
         ./venv/bin/activate
-        pip install poetry==1.7 invoke==2.2
+        pip install -Ur devutils/requirements.txt
     else
         echo "Using existing development environment."
         ./venv/bin/activate
