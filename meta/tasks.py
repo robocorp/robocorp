@@ -60,7 +60,7 @@ def update(ctx):
 
     meta_version = contents["tool"]["poetry"]["version"]
     meta_version = _bump_by_changes(meta_version, changes)
-    print(f"New metapackage version: {meta_version}")
+    print(f"New meta-package version: {meta_version}")
     set_version(ctx, meta_version)
 
     poetry(ctx, "lock")
@@ -68,7 +68,7 @@ def update(ctx):
 
 @task
 def outdated(ctx):
-    """Check if dependencies in metapackage are outdated"""
+    """Check if dependencies in meta-package are outdated"""
     import sys
 
     import tomlkit
@@ -84,8 +84,9 @@ def outdated(ctx):
 
         print(f"Checking package: {name}")
         dep_version = _fetch_version(name)
+        version = version.lstrip("^")
         if version != dep_version:
-            errors.append(f"Outdated version for '{name}': {version} != {dep_version}")
+            errors.append(f"Outdated version for {name!r}: {version} != {dep_version}")
 
     if errors:
         for err in errors:

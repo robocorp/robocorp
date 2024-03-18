@@ -450,7 +450,8 @@ def build_common_tasks(
             print(f"No previous release for {package_name}")
         elif semver.compare(current_version, previous_version) <= 0:
             sys.stderr.write(
-                f"Current version older/same than previous: {current_version} <= {previous_version}\n"
+                f"Current version older/same than previous:"
+                f" {current_version} <= {previous_version}\n"
             )
             sys.exit(1)
 
@@ -487,12 +488,17 @@ def build_common_tasks(
             sys.exit(0)
         else:
             sys.stderr.write(
-                f"Version does not match ({tag_prefix}: {module_version} != repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
+                f"Version does not match ({tag_prefix}: {module_version} !="
+                f" repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
             )
             sys.exit(1)
 
     def update_changelog_file(file: Path, version: str):
         """Update the changelog file with the new version and changes"""
+
+        if not file.exists():  # usually happening with the meta one
+            print("No CHANGELOG file found, skipping update.")
+            return
 
         with open(file, "r+") as stream:
             content = stream.read()
@@ -501,7 +507,8 @@ def build_common_tasks(
             changelog_start = re.search(r"# Changelog", content).end()
             if not changelog_start:
                 print(
-                    f"Did not find # Changelog in the changelog:\n{file}\nPlease update Changelog before proceeding."
+                    f"Did not find # Changelog in the changelog:\n{file}\n"
+                    f"Please update Changelog before proceeding."
                 )
                 sys.exit(1)
 
@@ -523,7 +530,9 @@ def build_common_tasks(
 
             if not unreleased_match:
                 print(
-                    f"\nDid not find ## Unreleased in the changelog:\n{file}\nPlease update Changelog before proceeding.\nIt was updated to have the proper sessions already..."
+                    f"\nDid not find ## Unreleased in the changelog:\n{file}\n"
+                    f"Please update Changelog before proceeding.\n"
+                    f"It was updated to have the proper sessions already..."
                 )
             sys.exit(1)
 
