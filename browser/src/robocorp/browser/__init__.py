@@ -35,33 +35,47 @@ def configure(**kwargs) -> None:
         browser.configure(browser_engine="firefox", slowmo=100)
         ```
     
-    Args:
-        browser_engine: Browser engine which should be used
+   Args:
+        browser_engine:
+            Browser engine which should be used
             default="chromium"
             choices=["chromium", "chrome", "chrome-beta", "msedge",
                      "msedge-beta", "msedge-dev", "firefox", "webkit"]
+                     
         install: Install browser or not. If not defined, download is only
             attempted if the browser fails to launch.
-        headless: If set to False the browser UI will be shown. If set to True
+            
+        headless:
+            If set to False the browser UI will be shown. If set to True
             the browser UI will be kept hidden. If unset or set to None it'll
             show the browser UI only if a debugger is detected.
-        slowmo: Run interactions in slow motion (number in millis).
-        screenshot: Whether to automatically capture a screenshot after each task.
-            Options are `on`, `off`, and `only-on-failure` (default).
-        isolated: Used to define where the browser should be downloaded. If `True`,
-            it'll be installed inside the isolated environment. If `False`
-            (default) it'll be installed in a global cache folder.
-        persistent_context_directory: If a persistent context should be used, this should be the
+            
+        slowmo:
+            Run interactions in slow motion (number in millis).
+        
+        screenshot:
+            Whether to automatically capture a screenshot after each task.
+            default="only-on-failure"
+            choices=["on", "off", "only-on-failure"]
+            
+        isolated:
+            Used to define where the browser should be downloaded. If
+            `True`, it'll be installed inside the isolated environment. If
+            `False` (default) it'll be installed in a global cache folder.
+            
+        persistent_context_directory:
+            If a persistent context should be used, this should be the
             directory in which the persistent context should be
-            stored/loaded (it can be used to store the state of the
+            stored/loaded from (it can be used to store the state of the
             automation to allow for sessions and cookies to be reused in a
             new automation).
-        viewport_size: Size to be set for the viewport. Specified as tuple(width, height).
-        skip_playwright_stop: Can be used to skip the playwright stop. Not recommended in general,
-            only meant to be used to diagnose and workaround specific issues on
-            the playwright stop coupled with an early os._exit shutdown in
-            `robocorp-tasks`. Can cause a process leak and even a shutdown
-            deadlock if used alone.
+            
+        skip_playwright_stop:
+            Can be used to skip the playwright stop. Not recommended in
+            general, only meant to be used to diagnose and workaround
+            specific issues on the playwright stop coupled with an early
+            os._exit shutdown in `robocorp-tasks`. Can cause a process leak
+            and even a shutdown deadlock if used alone.
 
     Note:
         See also: `robocorp.browser.configure_context` to change other
@@ -95,7 +109,8 @@ def configure_context(**kwargs) -> None:
         ```
 
     Args:
-        **kwargs: Keyword arguments supported by `playwright.Browser.new_context` method
+        **kwargs:
+            Keyword arguments supported by `playwright.Browser.new_context` method
 
     Note:
         The changes done persist through the full session, so, new tasks which
@@ -157,7 +172,8 @@ def browser() -> Browser:
         to calling this method).
 
     Raises:
-        RuntimeError: If `persistent_context_directory` is specified in the configuration
+        RuntimeError:
+            If `persistent_context_directory` is specified in the configuration
             and this method is called a RuntimeError is raised (as in this case
             this API is not applicable as the browser and the context must be
             created at once and the browser can't be reused for the session).
@@ -266,11 +282,18 @@ def screenshot(
         ```
 
     Args:
-        element: The page/element/locator which should have its screenshot taken. If not
+        element:
+            The page/element/locator which should have its screenshot taken. If not
             given the managed page instance will be used.
-        timeout: Maximum time in milliseconds. Defaults to `5000` (5 seconds). Pass `0` to disable timeout.
-        image_type: Specify screenshot type, defaults to `png`.
-        log_level: The level of the message ("INFO", "WARN" or "ERROR")
+
+        timeout:
+            Maximum time in milliseconds. Defaults to `5000` (5 seconds). Pass `0` to disable timeout.
+
+        image_type:
+            Specify screenshot type, defaults to `png`.
+
+        log_level:
+            The level of the message ("INFO", "WARN" or "ERROR")
 
     Returns:
         The bytes from the screenshot.
@@ -307,8 +330,11 @@ def install(browser_engine: BrowserEngine, force: bool = False):
     Downloads and installs the given browser engine.
 
     Args:
-        browser_engine: Browser engine which should be installed.
-        force: Force reinstall of stable browser channels.
+        browser_engine:
+            Browser engine which should be installed.
+
+        force:
+            Force reinstall of stable browser channels.
 
     Note:
         Google Chrome or Microsoft Edge installations will be installed
@@ -318,6 +344,152 @@ def install(browser_engine: BrowserEngine, force: bool = False):
     from . import _engines
 
     _engines.install_browser(browser_engine, force=force)
+
+
+class BrowserConfig:
+    """
+        Browser config description here.
+
+        Put what you want in it. Testing.
+    """
+    def __init__(
+        self,
+        browser_engine: BrowserEngine = BrowserEngine.CHROMIUM,
+        install: Optional[bool] = None,
+        headless: Optional[bool] = None,
+        slowmo: int = 0,
+        screenshot: str = "only-on-failure",
+        isolated: bool = False,
+        skip_playwright_stop: bool = False,
+    ):
+        """
+        Configure browser engire class.
+        
+        Args:
+            browser_engine:
+                Browser engine which should be used
+                default="chromium"
+                choices=["chromium", "chrome", "chrome-beta", "msedge",
+                         "msedge-beta", "msedge-dev", "firefox", "webkit"]
+                         
+            install:
+                Install browser or not. If not defined, download is only
+                attempted if the browser fails to launch.
+                
+            headless:
+                If set to False the browser UI will be shown. If set to True
+                the browser UI will be kept hidden. If unset or set to None it'll
+                show the browser UI only if a debugger is detected.
+                
+            slowmo:
+                Run interactions in slow motion (number in millis).
+            
+            screenshot:
+                Whether to automatically capture a screenshot after each task.
+                default="only-on-failure"
+                choices=["on", "off", "only-on-failure"]
+                
+            isolated:
+                Used to define where the browser should be downloaded. If
+                `True`, it'll be installed inside the isolated environment. If
+                `False` (default) it'll be installed in a global cache folder.
+                
+            skip_playwright_stop:
+                Can be used to skip the playwright stop. Not recommended in
+                general, only meant to be used to diagnose and workaround
+                specific issues on the playwright stop coupled with an early
+                os._exit shutdown in `robocorp-tasks`. Can cause a process leak
+                and even a shutdown deadlock if used alone.
+        """  # noqa
+        self.browser_engine = browser_engine
+        self.install = install
+        self.headless = headless
+        self.slowmo = slowmo
+        self.screenshot = screenshot
+        self.isolated = isolated
+        self.skip_playwright_stop = skip_playwright_stop
+
+    @property
+    def browser_engine(self) -> BrowserEngine:
+        return self._browser_engine
+
+    @browser_engine.setter
+    def browser_engine(self, value: Union[BrowserEngine, str]):
+        self._browser_engine = BrowserEngine(value)
+
+    @property
+    def install(self) -> Optional[bool]:
+        return self._install
+
+    @install.setter
+    def install(self, value: Optional[bool]):
+        assert value is None or isinstance(value, bool)
+        self._install = value
+
+    @property
+    def headless(self) -> Optional[bool]:
+        return self._headless
+
+    @headless.setter
+    def headless(self, value: Optional[bool]):
+        assert value is None or isinstance(value, bool)
+        self._headless = value
+
+    @property
+    def slowmo(self) -> int:
+        return self._slowmo
+
+    @slowmo.setter
+    def slowmo(self, value: int):
+        assert isinstance(value, int)
+        assert value >= 0
+        self._slowmo = value
+
+    def first_method(self, name: str, level: int):
+        """
+        First method of this class description, yes yes.
+
+        Example:
+            ```python
+            browser.first_method(name="yes", level=1)
+            ```
+
+        Args:
+            name:
+                First argument, name of of
+
+            level:
+                Don't have any idea what to put here
+
+        Note:
+            The changes done persist through the full session, so, new tasks which
+            directly.
+        """
+
+    @classmethod
+    def second_method(cls, other: str, level: int):
+        """
+        Second test method of this class description.
+
+        Example:
+            ```python
+            browser.first_method(name="yes", level=1)
+            ```
+
+        Args:
+            other:
+                First argument, other, other
+
+            level:
+                Don't have any idea what to put here
+
+        Note:
+            The changes done persist through the full session, so, new tasks which
+            directly.
+        """
+
+    def __str__(self):
+        return "ceva"
 
 
 __all__ = [
@@ -333,4 +505,5 @@ __all__ = [
     "BrowserEngine",
     "InstallError",
     "BrowserNotFound",
+    "BrowserConfig",
 ]
