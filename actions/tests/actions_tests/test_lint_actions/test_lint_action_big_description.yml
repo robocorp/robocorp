@@ -1,0 +1,11 @@
+- message: 'Description has 384 chars. OpenAI just supports 300 chars in the description
+    (note: this may not be a problem in other integrations).'
+  range:
+    end:
+      character: 13
+      line: 3
+    start:
+      character: 4
+      line: 3
+  severity: 2
+  source: robocorp.actions

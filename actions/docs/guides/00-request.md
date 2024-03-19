@@ -5,8 +5,8 @@ received request by creating a `request: Request` argument.
 
 The data currently available in the request is:
 
-- `headers`: contains all the headers received except cookies.
-- `cookies`: contains all the cookies received.
+- `headers`: contains all the headers received.
+- `cookies`: contains all the cookies received in headers in a dict-like API.
 
 Note that the access to headers and cookies is case-insensitive.
 
