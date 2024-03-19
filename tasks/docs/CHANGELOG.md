@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.0.1 - 2024-03-19
+
+- The truststore SSL patching warning is issued now even when the minimum Python and/or pip versions aren't met.
+- Remove `inject_truststore` from the public API as it was never meant to be imported and used since it is executed
+  automatically already at module import time.
+
 ## 3.0.0 - 2024-03-15
 
 - Backward incompatible release: The `robocorp.tasks.cli.IArgumentsHandler` interface
@@ -20,7 +26,7 @@
 ## 2.9.2 - 2024-03-06
 
 - Add `inject_truststore` util in `tasks.cli` for reuse in other libraries, then log a warning in case 
-the injection could not happen due to the missing `robocorp-truststore` dependency. 
+  the injection could not happen due to the missing `robocorp-truststore` dependency.
 
 ## 2.9.1 - 2024-01-31
 

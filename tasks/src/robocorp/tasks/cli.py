@@ -9,40 +9,60 @@ Note: when running tasks, clients using this approach MUST make sure that any
 code which must be automatically logged is not imported prior the the `cli.main`
 call.
 """
+
 import os
 import sys
 import typing
 import warnings
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as get_version
 from typing import List, Optional, Protocol
+
+from packaging import version as version_parser
 
 if typing.TYPE_CHECKING:
     # i.e.: Don't add to public API.
     from ._customization._plugin_manager import PluginManager as _PluginManager
 
 
-def inject_truststore():
-    # Use certificates from native storage (if `truststore` installed)
+def _inject_truststore():
+    # Use certificates from the native storage. (if `truststore` installed and minimum
+    #  interpreter/pip versions are met)
 
-    # _RC_TEST_USE_TRUSTSTORE env var is only used to avoid unwanted warnings in tests
-    # and should not be used for other purposes
+    # NOTE(OvidiuCode): `_RC_TEST_USE_TRUSTSTORE` env var is only used to avoid
+    #  unwanted warnings under tests, and should not be used for other purposes.
     if os.getenv("_RC_TEST_USE_TRUSTSTORE", "True").lower() in ["false", "0"]:
         return
 
-    if sys.version_info >= (3, 10):
+    try:
+        pip_version = get_version("pip")
+    except PackageNotFoundError:
+        pip_ver_ok = False
+    else:
+        pip_ver_ok = version_parser.parse(pip_version) >= version_parser.parse("23.2.1")
+
+    truststore_ssl_on = False
+    if sys.version_info >= (3, 10, 12) and pip_ver_ok:
         try:
             import truststore  # type: ignore
-
-            truststore.inject_into_ssl()
         except ModuleNotFoundError:
-            warnings.warn(
-                "Usage of the native system certificate stores can’t be enabled, ensure you have the"
-                " `robocorp-truststore` dependency installed in the environment.",
-                Warning,
-                stacklevel=2,
-            )
+            pass
+        else:
+            truststore.inject_into_ssl()
+            truststore_ssl_on = True
+
+    if not truststore_ssl_on:
+        warnings.warn(
+            "Usage of the native system certificate stores can’t be enabled,"
+            " ensure you have the `robocorp-truststore` dependency installed in the"
+            " environment and that you're using Python 3.10.12 and pip 23.2.1 at"
+            " minimum.",
+            Warning,
+            stacklevel=2,
+        )
 
 
-inject_truststore()
+_inject_truststore()
 
 if sys.platform == "win32":
     # Apply workaround where `asyncio` would halt forever when windows UIAutomation.dll
