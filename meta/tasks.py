@@ -31,6 +31,10 @@ if False:
         raise RuntimeError("Defined in invoke_utils.")
 
 
+def _clean_prefix(version: str) -> str:
+    return version.lstrip("^")
+
+
 @task
 def update(ctx):
     """Update all dependencies to match current versions"""
@@ -84,7 +88,7 @@ def outdated(ctx):
 
         print(f"Checking package: {name}")
         dep_version = _fetch_version(name)
-        version = version.lstrip("^")
+        version = _clean_prefix(version)
         if version != dep_version:
             errors.append(f"Outdated version for {name!r}: {version} != {dep_version}")
 
@@ -108,23 +112,17 @@ def _fetch_version(name):
 
 
 def _bump_by_changes(version, changes):
-    if version.startswith("^"):
-        version = version[1:]
-
     import semver
 
+    version = _clean_prefix(version)
     version = semver.Version.parse(version)
     major, minor, patch = False, False, False
 
     for before, after in changes:
-        if before.startswith("^"):
-            before = before[1:]
-
-        if after.startswith("^"):
-            after = after[1:]
-
-        before = semver.Version.parse(before)
-        after = semver.Version.parse(after)
+        before, after = map(
+            lambda ver: semver.Version.parse(_clean_prefix(ver)),
+            (before, after)
+        )
 
         if after.major > before.major:
             major = True
@@ -140,4 +138,4 @@ def _bump_by_changes(version, changes):
     elif patch:
         return str(version.bump_patch())
 
-    raise RuntimeError("No version changes found")
+    raise RuntimeError("No version changes found!")
