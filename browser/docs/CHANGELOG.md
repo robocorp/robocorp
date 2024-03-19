@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.3.1 - 2024-03-19
+
+- Enables compatibility with Action Server `0.1.0` by accepting **robocorp-tasks**
+  `3.x.x`.
+
 ## 2.3.0 - 2024-03-07
 
 - Improved browser CLI installations by enhancing SSL with truststore injection.
@@ -77,7 +82,7 @@
 
 ## 0.4.1 - 2023-05-19
 
-- Added more information in thrown errors
+- Added more information in thrown errors.
 
 ## 0.4.0 - 2023-05-10
 
