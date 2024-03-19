@@ -19,14 +19,13 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 robocorp-log = ">=2.4,<3"
 psutil = "^5.0"
 docstring_parser_fork = "^0.0.5"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
-robocorp-truststore = "^0.8.0"
 types-psutil = "^5.9"
 
 # We just need it for tests. In runtime duck-typing is used to
