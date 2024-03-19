@@ -12,11 +12,16 @@ call.
 
 import os
 import sys
+import typing
 import warnings
 from importlib.metadata import PackageNotFoundError, version as get_version
 from typing import List, Optional, Protocol
 
 from packaging import version as version_parser
+
+if typing.TYPE_CHECKING:
+    # i.e.: Don't add to public API.
+    from ._customization._plugin_manager import PluginManager as _PluginManager
 
 
 def _inject_truststore():
@@ -70,10 +75,13 @@ from . import _commands  # noqa
 
 
 class IArgumentsHandler(Protocol):
-    def process_args(self, args: List[str]) -> int:
+    def process_args(
+        self, args: List[str], pm: Optional["_PluginManager"] = None
+    ) -> int:
         """
         Args:
             args: The arguments to process.
+            pm: The plugin manager used to customize internal functionality.
 
         Returns: the exitcode.
         """
@@ -83,8 +91,23 @@ def main(
     args=None,
     exit: bool = True,
     argument_dispatcher: Optional[IArgumentsHandler] = None,
+    plugin_manager: Optional["_PluginManager"] = None,
 ) -> int:
-    """Entry point for running tasks from robocorp-tasks."""
+    """
+    Entry point for running tasks from robocorp-tasks.
+
+    Args:
+        args: The command line arguments.
+
+        exit: Determines if the process should exit right after executing the command.
+
+        plugin_manager:
+            Provides a way to customize internal functionality (should not
+            be used by external clients in general).
+
+    Returns:
+        The exit code for the process.
+    """
     if args is None:
         args = sys.argv[1:]
 
@@ -94,7 +117,7 @@ def main(
     else:
         dispatcher = argument_dispatcher
 
-    returncode = dispatcher.process_args(args)
+    returncode = dispatcher.process_args(args, pm=plugin_manager)
     if exit:
         sys.exit(returncode)
     return returncode

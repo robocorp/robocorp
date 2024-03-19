@@ -15,7 +15,7 @@ from ._exceptions import (
 from ._types import ExceptionType, JSONType, PathType, State
 from ._workitem import Input, Output
 
-__version__ = "1.4.3"
+__version__ = "1.4.4"
 version_info = [int(x) for x in __version__.split(".")]
 
 LOGGER = logging.getLogger(__name__)

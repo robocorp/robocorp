@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.9.1 - 2024-03-11
 
 - Fixed issue writing unicode to the output when the contents cannot be encoded with the stdout/stderr encoding.
 

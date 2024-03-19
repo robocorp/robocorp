@@ -1,7 +1,6 @@
 - docs: ''
   file: my_module.py
   input_schema:
-    additionalProperties: false
     properties: {}
     type: object
   line: 4

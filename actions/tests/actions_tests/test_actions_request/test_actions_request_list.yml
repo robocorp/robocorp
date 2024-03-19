@@ -1,0 +1,20 @@
+properties:
+  custom_cls:
+    description: This is the input data.
+    properties:
+      filename:
+        description: This is the filename to save the value.
+        title: Filename
+        type: string
+      price:
+        description: This is the price.
+        title: Price
+        type: number
+    required:
+    - filename
+    - price
+    title: Custom Cls
+    type: object
+required:
+- custom_cls
+type: object

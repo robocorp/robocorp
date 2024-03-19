@@ -263,11 +263,6 @@ class ProcessHandle:
         request: Request,
         reuse_process: bool,
     ) -> int:
-        # Currently only the X_ACTION_TRACE is passed as a header.
-        use_headers = {}
-        for key, value in request.headers.items():
-            if key.upper() == "X_ACTION_TRACE":
-                use_headers[key] = value
         msg = {
             "command": "run_action",
             "action_name": action.name,
@@ -275,7 +270,8 @@ class ProcessHandle:
             "input_json": f"{input_json}",
             "robot_artifacts": f"{robot_artifacts}",
             "result_json": f"{result_json}",
-            "headers": use_headers,
+            "headers": dict(request.headers),
+            "cookies": dict(request.cookies),
             "reuse_process": reuse_process,
         }
         self._writer.write(msg)

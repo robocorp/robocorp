@@ -18,7 +18,17 @@ class _CaseInsensitiveReadOnlyDict(typing.Mapping[str, str]):
         if not headers:
             headers = {}
 
-        use_dict = dict((key.upper(), val) for (key, val) in headers.items())
+        use_dict = {}
+        for key, value in headers.items():
+            if not isinstance(key, str):
+                raise ValueError(
+                    f"Expected key to be a string. Found: {key} ({type(key)})"
+                )
+            if not isinstance(value, str):
+                raise ValueError(
+                    f"Expected value to be a string. Found: {value} ({type(value)})"
+                )
+            use_dict[key.upper()] = value
 
         self._headers: Dict[str, str] = use_dict
 
@@ -63,12 +73,32 @@ class Cookies(_CaseInsensitiveReadOnlyDict):
 
 class Request:
     """
-    Requests contains the information exposed in a request.
+    Contains the information exposed in a request (such as headers and cookies).
 
-    If clients require more information, this class can be extended as
-    needed.
+    May be extended in the future to provide more information.
     """
 
-    def __init__(self, headers: Headers, cookies: Cookies):
-        self.headers: Headers = headers
-        self.cookies: Cookies = cookies
+    @property
+    def headers(self) -> Headers:
+        """
+        Provides the headers received in the request (excluding `cookies` which
+        are available in `cookies`).
+        """
+        raise NotImplementedError(
+            "This is an abstract class. Subclasses are expected to reimplement this method."
+        )
+
+    @property
+    def cookies(self) -> Cookies:
+        """
+        Provides the cookies received in the request.
+        """
+        raise NotImplementedError(
+            "This is an abstract class. Subclasses are expected to reimplement this method."
+        )
+
+    @classmethod
+    def model_validate(cls, dct: dict) -> "Request":
+        from robocorp.actions._request_impl import _RequestImpl
+
+        return _RequestImpl.model_validate(dct)

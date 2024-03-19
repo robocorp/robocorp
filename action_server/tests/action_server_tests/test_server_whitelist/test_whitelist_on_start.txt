@@ -1,7 +1,7 @@
 {
     "openapi": "3.1.0",
     "info": {
-        "title": "Robocorp Actions Server",
+        "title": "Robocorp Action Server",
         "version": "0.1.0"
     },
     "servers": [
@@ -18,7 +18,23 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/CalculatorSumInput"
+                                "properties": {
+                                    "v1": {
+                                        "type": "number",
+                                        "title": "V1",
+                                        "description": ""
+                                    },
+                                    "v2": {
+                                        "type": "number",
+                                        "title": "V2",
+                                        "description": ""
+                                    }
+                                },
+                                "type": "object",
+                                "required": [
+                                    "v1",
+                                    "v2"
+                                ]
                             }
                         }
                     },
@@ -31,7 +47,8 @@
                             "application/json": {
                                 "schema": {
                                     "type": "number",
-                                    "title": "Response Calculator Sum"
+                                    "title": "Response Calculator Sum",
+                                    "description": ""
                                 }
                             }
                         }
@@ -52,26 +69,6 @@
     },
     "components": {
         "schemas": {
-            "CalculatorSumInput": {
-                "properties": {
-                    "v1": {
-                        "type": "number",
-                        "title": "V1",
-                        "description": ""
-                    },
-                    "v2": {
-                        "type": "number",
-                        "title": "V2",
-                        "description": ""
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "v1",
-                    "v2"
-                ],
-                "title": "CalculatorSumInput"
-            },
             "HTTPValidationError": {
                 "properties": {
                     "errors": {

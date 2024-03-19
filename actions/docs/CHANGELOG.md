@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+## 0.1.0 - 2024-03-15
+
+- `request: Request` is now a managed parameter when using `robocorp-actions`. Note
+  that by default it'll be empty, but when called from the `Action Server`, it'll
+  have `headers` and `cookies` available.
+
+## 0.0.9 - 2024-03-13
+
+- References in the schema are resolved (so, the schema for a field is valid when embedded inside a larger schema).
+
+## 0.0.8 - 2024-03-11
+
+- `pydantic` models are accepted as the input and output of `@action`s. 
+
 ## 0.0.7 - 2024-01-31
 
 - When actions are imported they're also automatically linted for the following errors:

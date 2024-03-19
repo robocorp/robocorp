@@ -62,6 +62,25 @@ def my_action(param1) -> str:
     data_regression.check([x.to_lsp_diagnostic() for x in iter_lint_errors(contents)])
 
 
+def test_lint_action_big_description(data_regression):
+    from robocorp.actions._lint_action import iter_lint_errors
+
+    contents = """
+@action
+def my_action() -> str:
+    '''
+    This description is too big. OpenAI just supports 300 hundred chars in desc.
+    This description is too big. OpenAI just supports 300 hundred chars in desc.
+    This description is too big. OpenAI just supports 300 hundred chars in desc.
+    This description is too big. OpenAI just supports 300 hundred chars in desc.
+    This description is too big. OpenAI just supports 300 hundred chars in desc.
+    '''
+    return ''
+"""
+
+    data_regression.check([x.to_lsp_diagnostic() for x in iter_lint_errors(contents)])
+
+
 def test_lint_action_integrated(datadir, data_regression):
     import json
 

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.1.1 - 2024-03-15
+
+- Fixed issue running `action-server start --expose`.
+
+## 0.1.0 - 2024-03-15
+
+- Support parsing Custom Types in Action Server UI action run view
+- Add Console output to Action Server UI action run view
+- Add Public URL link to Action Server UI if Action Server is started with `--expose`
+- When used with `robocorp-actions 0.1.0`, the `headers` can now be gotten in the `request`.
+- Action server's public URL no longer changes on reconnection (with `--expose`).
+
+## 0.0.28 - 2024-03-11
+
+- `pydantic` models are accepted as the input and output of `@action`s.
+
 - The action package name is now gotten from the `package.yaml` and not from the directory name
   (it's still gotten from the directory name when `conda.yaml` is used for backward compatibility).
   

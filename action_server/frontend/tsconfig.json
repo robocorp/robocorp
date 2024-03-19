@@ -12,10 +12,11 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
     "paths": {
       "~/*": ["*"]
     },
-    "types": ["vite/client", "jest", "node"]
+    "types": ["vite/client", "node"]
   }
 }

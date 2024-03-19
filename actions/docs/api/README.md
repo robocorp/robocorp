@@ -9,7 +9,8 @@
 
 ## Classes
 
-- [`_protocols.ITask`](./robocorp.tasks._protocols.md#class-itask)
+- [`_protocols.IAction`](./robocorp.actions._protocols.md#class-iaction)
+- [`_request.Request`](./robocorp.actions._request.md#class-request): Contains the information exposed in a request (such as headers and cookies).
 - [`_protocols.Status`](./robocorp.tasks._protocols.md#class-status): Task state
 
 ## Functions

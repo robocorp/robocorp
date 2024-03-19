@@ -9,6 +9,7 @@ import argparse
 import os
 import sys
 import traceback
+from typing import Any, Dict
 
 DEFAULT_TIMEOUT = 10
 NO_TIMEOUT = None
@@ -185,6 +186,7 @@ class MessagesHandler:
                 robot_artifacts = message["robot_artifacts"]
                 result_json = message["result_json"]
                 headers = message["headers"]
+                cookies = message["cookies"]
                 reuse_process = message["reuse_process"]
 
                 os.environ["ROBOT_ARTIFACTS"] = robot_artifacts
@@ -217,12 +219,48 @@ class MessagesHandler:
                     action_file,
                     f"--json-input={input_json}",
                 ]
-                returncode = cli.main(args, exit=False)
+
+                returncode = cli.main(
+                    args,
+                    exit=False,
+                    **self._plugin_manager_kwargs(
+                        {"request": {"headers": headers, "cookies": cookies}}
+                    ),
+                )
             except BaseException:
                 traceback.print_exc()
 
             finally:
                 self._jsonrpc_stream_writer.write({"returncode": returncode})
+
+    def _plugin_manager_kwargs(self, managed_parameters) -> Dict[str, Any]:
+        try:
+            from robocorp.actions._managed_parameters import ManagedParameters
+            from robocorp.actions._request import Request
+            from robocorp.tasks._customization._extension_points import (
+                EPManagedParameters,
+            )
+            from robocorp.tasks._customization._plugin_manager import PluginManager
+
+        except ImportError:
+            return {}
+
+        # Ok, we're dealing with a newer version of robocorp.actions and
+        # robocorp.tasks, so add the customization of parameters to
+        # add the 'request' parameter.
+
+        try:
+            pm = getattr(self, "_pm")
+        except AttributeError:
+            pm = self._pm = PluginManager()
+        pm.set_instance(
+            EPManagedParameters,
+            ManagedParameters(
+                {"request": Request.model_validate(managed_parameters["request"])}
+            ),
+        )
+
+        return {"plugin_manager": pm}
 
 
 def main(args=None):

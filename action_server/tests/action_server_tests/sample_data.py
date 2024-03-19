@@ -21,7 +21,7 @@ ACTION = Action(
     file="greeter_action.py",
     lineno=4,
     input_schema=(
-        '{"additionalProperties": false, '
+        "{"
         '"properties": {"name": '
         '{"type": "string", '
         '"description": "The name of the person to greet.", '

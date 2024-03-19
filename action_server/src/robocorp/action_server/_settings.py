@@ -58,7 +58,7 @@ class Settings:
     artifacts_dir: Path
     datadir: Path
 
-    title: str = "Robocorp Actions Server"
+    title: str = "Robocorp Action Server"
 
     address: str = "localhost"
     port: int = 8080

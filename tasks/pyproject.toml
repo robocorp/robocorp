@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-tasks"
-version = "2.9.2"
+version = "3.0.0"
 description = "The automation framework for Python"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -28,6 +28,10 @@ docstring_parser_fork = "^0.0.5"
 robocorp-devutils = {path = "../devutils/", develop = true}
 robocorp-truststore = "^0.8.0"
 types-psutil = "^5.9"
+
+# We just need it for tests. In runtime duck-typing is used to
+# check for `cls.parse_obj(dict)` and `cls.model_json_schema()`
+pydantic = "^2.6"
 
 [tool.isort]
 profile = "black"

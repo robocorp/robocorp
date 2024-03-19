@@ -50,8 +50,8 @@ def test_bad_return_on_no_conda(
     )
     found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
     assert found.json()["message"] == (
-        "Error in action. Expected return type: string. "
-        "Found return type: <class 'NoneType'> (value: None)."
+        "Inconsistent value returned from action: data must be string -- i.e.: the returned "
+        "value (None) does not match the expected output schema ({'type': 'string', 'description': ''})."
     )
 
 
@@ -273,7 +273,6 @@ def calculator_sum(v1: int = 5) -> float:
             actions = db.all(Action)
             assert len(actions) == 1
             assert json.loads(actions[0].input_schema) == {
-                "additionalProperties": False,
                 "properties": {
                     "v1": {
                         "type": "integer",
@@ -763,24 +762,3 @@ def calculator_sum(v1: str, v2: str) -> str:
             actions = db.all(Action)
             assert len(actions) == 1
             assert actions[0].is_consequential is False
-
-
-def todo_issue_167_access_headers(action_server_process: ActionServerProcess):
-    from action_server_tests.fixtures import get_in_resources
-
-    pack = get_in_resources("no_conda", "check_headers")
-    action_server_process.start(
-        cwd=pack,
-        actions_sync=True,
-        db_file="server.db",
-    )
-
-    client = ActionServerClient(action_server_process)
-
-    found = client.post_get_str(
-        "api/actions/check-headers/check-headers/run",
-        {"name": "Foo"},
-        headers={"header1": "value-header1"},
-        cookies=dict(cookie1="foo", cookie2="bar"),
-    )
-    print(found)

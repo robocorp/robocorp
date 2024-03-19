@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 3.0.0 - 2024-03-15
+
+- Backward incompatible release: The `robocorp.tasks.cli.IArgumentsHandler` interface
+  was changed (most clients should not have any issues as it should be rare that
+  clients need to provide a custom argument handler).
+- On custom models, the description and title is now properly set based on the docstring and parameter name.
+
+## 2.10.0 - 2024-03-13
+
+- References in the schema are resolved (so, the schema for a field is valid when embedded inside a larger schema).
+
+## 2.9.3 - 2024-03-11
+
+- `pydantic` models are accepted as the input and output of `@task`s. 
+
 ## 2.9.2 - 2024-03-06
 
 - Add `inject_truststore` util in `tasks.cli` for reuse in other libraries, then log a warning in case 

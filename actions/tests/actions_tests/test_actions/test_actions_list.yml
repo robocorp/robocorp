@@ -1,7 +1,6 @@
 - docs: "\n    This always raises an error.\n    "
   file: calculator_actions.py
   input_schema:
-    additionalProperties: false
     properties: {}
     type: object
   line: 19
@@ -15,7 +14,6 @@
     \        v2: Second number.\n\n    Returns:\n        The sum of v1 + v2.\n    "
   file: calculator_actions.py
   input_schema:
-    additionalProperties: false
     properties:
       v1:
         description: First number.
@@ -41,7 +39,6 @@
     \ ...).\n\n    Returns:\n        The greeting for the person.\n    "
   file: greeter_actions.py
   input_schema:
-    additionalProperties: false
     properties:
       name:
         description: The name of the person to greet.
