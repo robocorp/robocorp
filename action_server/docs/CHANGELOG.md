@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `action-server start --expose` now accepts concurrent requests.
+
 ## 0.1.1 - 2024-03-15
 
 - Fixed issue running `action-server start --expose`.

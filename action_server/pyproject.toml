@@ -23,6 +23,7 @@ action-server = "robocorp.action_server.cli:main"
 # Important: when these versions change, pyoxidizer.bzl needs
 # to be updated too for the binary build.
 # This should be updated. See: https://github.com/robocorp/robocorp/issues/173
+aiohttp = "^3.9.3"
 fastapi = "^0.110.0"
 fastjsonschema = "^2.19.1"
 jsonschema = "^4.19.2"

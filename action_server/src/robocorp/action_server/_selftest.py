@@ -183,25 +183,44 @@ class ActionServerProcess:
 
 
 class ActionServerClient:
-    def __init__(self, action_server_process: ActionServerProcess):
-        self.action_server_process = action_server_process
+    _base_url: Optional[str]
+    action_server_process: Optional[ActionServerProcess]
 
-    def build_full_url(self, url: str) -> str:
+    def __init__(self, action_server_process_or_base_url: ActionServerProcess | str):
+        if isinstance(action_server_process_or_base_url, str):
+            self._base_url = action_server_process_or_base_url
+            assert not self._base_url.endswith("/")
+            self.action_server_process = None
+        else:
+            self.action_server_process = action_server_process_or_base_url
+            self._base_url = None
+
+    @property
+    def base_url(self):
+        if self._base_url:
+            assert not self.action_server_process
+            return self._base_url
+
         host = self.action_server_process.host
         port = self.action_server_process.port
+        return f"http://{host}:{port}"
+
+    def build_full_url(self, url: str) -> str:
         if url.startswith("/"):
             url = url[1:]
-        return f"http://{host}:{port}/{url}"
+        return f"{self.base_url}/{url}"
 
     def get_str(self, url, params: Optional[dict] = None) -> str:
         import requests
 
-        result = requests.get(self.build_full_url(url), params=(params or {}))
-        assert result.status_code == 200
+        result = requests.get(
+            self.build_full_url(url), params=(params or {}), timeout=5
+        )
+        result.raise_for_status()
         return result.text
 
-    def get_openapi_json(self):
-        return self.get_str("openapi.json")
+    def get_openapi_json(self, params: Optional[dict] = None):
+        return self.get_str("openapi.json", params=params)
 
     def get_json(self, url, params: Optional[dict] = None):
         contents = self.get_str(url, params=params)
@@ -214,21 +233,27 @@ class ActionServerClient:
         self,
         url,
         data,
-        headers: Optional[dict] | None = None,
-        cookies: Optional[dict] | None = None,
+        headers: Optional[dict] = None,
+        cookies: Optional[dict] = None,
+        params: Optional[dict] = None,
     ):
         import requests
 
         result = requests.post(
-            self.build_full_url(url), headers=headers, json=data, cookies=cookies
+            self.build_full_url(url),
+            headers=headers,
+            json=data,
+            cookies=cookies,
+            params=params,
+            timeout=5,
         )
-        assert result.status_code == 200
+        result.raise_for_status()
         return result.text
 
     def post_error(self, url, status_code, data=None):
         import requests
 
-        result = requests.post(self.build_full_url(url), json=data or {})
+        result = requests.post(self.build_full_url(url), json=data or {}, timeout=5)
         if result.status_code != status_code:
             raise AssertionError(
                 (
@@ -242,7 +267,7 @@ class ActionServerClient:
     def get_error(self, url, status_code):
         import requests
 
-        result = requests.get(self.build_full_url(url))
+        result = requests.get(self.build_full_url(url), timeout=5)
         assert result.status_code == status_code
 
 
