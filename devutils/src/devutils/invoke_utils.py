@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -63,22 +64,19 @@ def get_tag(tag_prefix: str) -> str:
     Args:
         tag_prefix: The tag prefix to match (i.e.: "robocorp-tasks")
     """
-    # i.e.: Gets the last tagged version
-    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}-[0-9]*".split()
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    stdout, stderr = popen.communicate()
-
-    # Something as: b'robocorp-tasks-0.0.1'
-    return stdout.decode("utf-8").strip()
+    # Get the last tagged version.
+    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}-[0-9]*"
+    proc = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
+    # Something like 'robocorp-tasks-0.0.1'
+    return proc.stdout.strip()
 
 
 def get_all_tags(tag_prefix: str) -> List[str]:
-    cmd = "git tag".split()
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    stdout, stderr = popen.communicate()
-
-    found = stdout.decode("utf-8").strip()
-    return [x for x in found.splitlines() if x.startswith(tag_prefix)]
+    cmd = "git tag"
+    proc = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
+    tags = proc.stdout.strip().splitlines()
+    regex = re.compile(rf"{tag_prefix}-[\d.]+$")
+    return [tag for tag in tags if regex.match(tag)]
 
 
 def to_identifier(value: str) -> str:
@@ -111,7 +109,8 @@ def _use_conda() -> bool:
 
 def _conda_env_name_to_conda_prefix() -> Dict[str, str]:
     ret = {}
-    output = subprocess.check_output(["conda", "env", "list"], encoding="utf-8")
+    cmd = "conda env list"
+    output = subprocess.check_output(shlex.split(cmd), encoding="utf-8")
     for line in output.splitlines():
         line = line.strip()
         if line.startswith("#") or not line:
@@ -187,18 +186,8 @@ def build_common_tasks(
         if _use_conda():
             if not _env_in_conda(CONDA_ENV_NAME):
                 print(f"Conda env: {CONDA_ENV_NAME} not found. Creating now.")
-                subprocess.check_call(
-                    [
-                        "conda",
-                        "create",
-                        "-c",
-                        "conda-forge",
-                        "-n",
-                        CONDA_ENV_NAME,
-                        "python=3.10",
-                        "-y",
-                    ]
-                )
+                cmd = f"conda create -c conda-forge -n {CONDA_ENV_NAME} python=3.10 -y"
+                subprocess.check_call(shlex.split(cmd))
 
     @task
     def install(
@@ -428,11 +417,13 @@ def build_common_tasks(
         """Run all checks"""
         ctx.run("inv docs --check")
 
+    def _get_module_version(ctx) -> str:
+        command = f"import {package_name}; print({package_name}.__version__)"
+        return poetry(ctx, f"run python -c {command!r}").stdout.strip()
+
     @task
     def make_release(ctx):
         """Create a release tag"""
-        import importlib
-
         import semver
 
         result = run(ctx, "git rev-parse --abbrev-ref HEAD", hide=True)
@@ -441,8 +432,7 @@ def build_common_tasks(
             sys.stderr.write(f"Not on master branch: {branch}\n")
             sys.exit(1)
 
-        current_version = importlib.import_module(package_name).__version__
-
+        current_version = _get_module_version(ctx)
         previous_tag = get_tag(tag_prefix)
         previous_version = previous_tag.split("-")[-1]
 
@@ -475,11 +465,7 @@ def build_common_tasks(
         Checks if the current tag matches the latest version (exits with 1 if it
         does not match and with 0 if it does match).
         """
-        module_version = poetry(
-            ctx,
-            f"run python -c 'import {package_name}; print({package_name}.__version__)'",
-        ).stdout.strip()
-
+        module_version = _get_module_version(ctx)
         tag = get_tag(tag_prefix)
         version = tag[tag.rfind("-") + 1 :]
 
