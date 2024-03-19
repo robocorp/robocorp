@@ -14,7 +14,8 @@ import os
 import sys
 import typing
 import warnings
-from importlib.metadata import PackageNotFoundError, version as get_version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as get_version
 from typing import List, Optional, Protocol
 
 from packaging import version as version_parser
@@ -55,7 +56,7 @@ def _inject_truststore():
             "Usage of the native system certificate stores can’t be enabled,"
             " ensure you have the `robocorp-truststore` dependency installed in the"
             " environment and that you're using Python 3.10.12 and pip 23.2.1 at"
-            " minimum",
+            " minimum.",
             Warning,
             stacklevel=2,
         )
