@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.1.4 - 2024-03-20
+
+- Fixed issue in action-server binary build. 
+
 ## 0.1.3 - 2024-03-20
 
 - Fixed issue in action-server binary build. 
