@@ -6,14 +6,15 @@ import os
 import socket
 import sys
 import typing
-from typing import Optional
+from dataclasses import dataclass
+from typing import Callable, Optional, Tuple
 
-import requests
 from pydantic import BaseModel, ValidationError
 from termcolor import colored
 
 if typing.TYPE_CHECKING:
     import websockets
+    from aiohttp import ClientSession
 
 log = logging.getLogger(__name__)
 
@@ -82,19 +83,15 @@ def get_expose_session_payload(expose_session: str) -> SessionPayload:
     )
 
 
-def forward_request(base_url: str, payload: BodyPayload) -> requests.Response:
+async def forward_request_async(
+    session: "ClientSession", base_url: str, payload: BodyPayload
+) -> Tuple[int, dict]:
     url = base_url.rstrip("/") + "/" + payload.path.lstrip("/")
 
-    if payload.method == "GET":
-        return requests.get(url, headers=payload.headers)
-    elif payload.method == "POST":
-        return requests.post(url, json=payload.body, headers=payload.headers)
-    elif payload.method == "PUT":
-        return requests.put(url, json=payload.body, headers=payload.headers)
-    elif payload.method == "DELETE":
-        return requests.delete(url, headers=payload.headers)
-    else:
-        raise NotImplementedError(f"Method {payload.method} not implemented")
+    async with session.request(
+        payload.method, url, json=payload.body, headers=payload.headers
+    ) as response:
+        return response.status, await response.json()
 
 
 async def handle_ping_pong(
@@ -137,21 +134,30 @@ def handle_session_payload(
     )
 
 
-def handle_body_payload(
+async def handle_body_payload(
+    session: "ClientSession",
+    ws: "websockets.WebSocketClientProtocol",
     payload: BodyPayload,
     base_url: str,
 ):
-    response: requests.Response = forward_request(base_url=base_url, payload=payload)
-    return json.dumps(
-        {
-            "requestId": payload.requestId,
-            "response": json.dumps(
-                response.json(),
-                indent=2,
-            ),
-            "status": response.status_code,
-        }
-    )
+    try:
+        status, json_dict = await forward_request_async(
+            session=session, base_url=base_url, payload=payload
+        )
+        response_converted = json.dumps(
+            {
+                "requestId": payload.requestId,
+                "response": json.dumps(
+                    json_dict,
+                    indent=2,
+                ),
+                "status": status,
+            }
+        )
+
+        await ws.send(response_converted)
+    except Exception:
+        log.exception("Error handling body payload")
 
 
 def _headers_from_session_payload(session_payload: SessionPayload):
@@ -162,6 +168,39 @@ def _headers_from_session_payload(session_payload: SessionPayload):
     return headers
 
 
+class ServerEvent:
+    pass
+
+
+@dataclass
+class EventConnected(ServerEvent):
+    ws: "websockets.WebSocketClientProtocol"
+
+
+@dataclass
+class EventMessage(ServerEvent):
+    message: str | bytes
+
+
+@dataclass
+class EventSessionPayload(ServerEvent):
+    session_payload: SessionPayload
+
+
+@dataclass
+class EventAsyncIOLoop(ServerEvent):
+    loop: asyncio.AbstractEventLoop
+
+
+@dataclass
+class EventTaskListenForRequests(ServerEvent):
+    task: asyncio.Task
+
+
+class EventTaskListenForRequestsFinished(ServerEvent):
+    pass
+
+
 async def expose_server(
     port: int,
     host: str,
@@ -170,6 +209,7 @@ async def expose_server(
     expose_session: str | None = None,
     ping_interval: int = 4,
     api_key: str | None = None,
+    on_event: Callable[[ServerEvent], None] | None = None,
 ):
     """
     Exposes the server to the world.
@@ -177,8 +217,13 @@ async def expose_server(
     import websockets
 
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
+    if on_event is not None:
+        loop = asyncio.get_running_loop()
+        on_event(EventAsyncIOLoop(loop))
 
     async def listen_for_requests() -> None:
+        from aiohttp import ClientSession
+
         session_payload: Optional[SessionPayload] = (
             get_expose_session_payload(expose_session) if expose_session else None
         )
@@ -190,80 +235,122 @@ async def expose_server(
         # In testing wss:// is added (in production it's just robocorp.link and
         # we connect to wss://client.robocorp.link and when we receive the session
         # id/secret we print it as: https://{session_payload.sessionId}.{expose_url}).
-        if not expose_url.startswith("wss://"):
+        if not expose_url.startswith("wss://") and not expose_url.startswith("ws://"):
             use_url = f"wss://client.{expose_url}"
         else:
             use_url = expose_url
 
-        async for ws in websockets.connect(
-            use_url,
-            extra_headers=headers,
-            logger=log,
-            open_timeout=2,
-            close_timeout=0,
-        ):
-            ping_task = asyncio.create_task(
-                handle_ping_pong(ws, pong_queue, ping_interval)
-            )
+        ws: websockets.WebSocketClientProtocol
+        async with ClientSession() as session:
+            async for ws in websockets.connect(
+                use_url,
+                extra_headers=headers,
+                logger=log,
+                open_timeout=2,
+                close_timeout=0,
+            ):
+                if on_event is not None:
+                    on_event(EventConnected(ws))
+                ping_task = asyncio.create_task(
+                    handle_ping_pong(ws, pong_queue, ping_interval)
+                )
 
-            try:
-                while True:
-                    message = await ws.recv()
-                    if message == "pong":
-                        await pong_queue.put("pong")
-                        continue
-
-                    data = json.loads(message)
-
-                    match data:
-                        case {"sessionId": _, "sessionSecret": _}:
-                            try:
-                                session_payload = SessionPayload(**data)
-                                # Make sure that after we connect the session is
-                                # always the same for reconnects.
-                                # Note: tricky detail: because we're reconnecting
-                                # in the above `for` which already has the `extra_headers`
-                                # bound, we just update the headers in-place...
-                                # this could fail in the future is websockets.connect
-                                # for some reason does a copy of the extra headers,
-                                # so, we have to be careful (probably not the best
-                                # approach, but working for a fast fix).
-                                headers.update(
-                                    _headers_from_session_payload(session_payload)
-                                )
-                                handle_session_payload(
-                                    session_payload, expose_url, datadir, api_key
-                                )
-                            except ValidationError as e:
-                                if not session_payload:
-                                    log.error("Expose session initialization failed", e)
-                                    continue
-                        case _:
-                            try:
-                                body_payload = BodyPayload(**data)
-                                response = handle_body_payload(
-                                    body_payload, f"http://{host}:{port}"
-                                )
-                                await ws.send(response)
-                            except ValidationError as e:
-                                log.error("Expose request validation failed", e)
-                                continue
-            except websockets.exceptions.ConnectionClosedError:
-                log.info("Lost connection. Reconnecting to expose server...")
-            except socket.gaierror:
-                log.info("No internet connection")
-                break
-            finally:
-                ping_task.cancel()
                 try:
-                    await ping_task
-                except asyncio.CancelledError:
-                    pass
-        else:
-            log.info("Expose server connection closed")
+                    while True:
+                        message = await ws.recv()
+                        if on_event is not None:
+                            on_event(EventMessage(message))
+
+                        if message == "pong":
+                            await pong_queue.put("pong")
+                            continue
+
+                        data = json.loads(message)
+
+                        match data:
+                            case {"sessionId": _, "sessionSecret": _}:
+                                try:
+                                    session_payload = SessionPayload(**data)
+                                    if on_event is not None:
+                                        on_event(EventSessionPayload(session_payload))
+                                    # Make sure that after we connect the session is
+                                    # always the same for reconnects.
+                                    # Note: tricky detail: because we're reconnecting
+                                    # in the above `for` which already has the `extra_headers`
+                                    # bound, we just update the headers in-place...
+                                    # this could fail in the future is websockets.connect
+                                    # for some reason does a copy of the extra headers,
+                                    # so, we have to be careful (probably not the best
+                                    # approach, but working for a fast fix).
+                                    headers.update(
+                                        _headers_from_session_payload(session_payload)
+                                    )
+                                    handle_session_payload(
+                                        session_payload, expose_url, datadir, api_key
+                                    )
+                                except ValidationError as e:
+                                    if not session_payload:
+                                        log.error(
+                                            "Expose session initialization failed", e
+                                        )
+                                        continue
+                            case _:
+                                try:
+                                    body_payload = BodyPayload(**data)
+                                    asyncio.create_task(
+                                        handle_body_payload(
+                                            session,
+                                            ws,
+                                            body_payload,
+                                            f"http://{host}:{port}",
+                                        )
+                                    )
+                                except ValidationError as e:
+                                    log.error("Expose request validation failed", e)
+                                    continue
+                except websockets.exceptions.ConnectionClosedError:
+                    log.info("Lost connection. Reconnecting to expose server...")
+                except socket.gaierror as e:
+                    log.info(f"Socket error: {e}")
+                except Exception as e:
+                    log.error(f"Unexpected exception: {e}")
+                finally:
+                    ping_task.cancel()
+                    try:
+                        await ping_task
+                    except asyncio.CancelledError:
+                        pass
+            else:
+                log.info("Expose server connection closed")
 
     task = asyncio.create_task(listen_for_requests())
-    await task  # Wait for listen_for_requests to complete
+    if on_event is not None:
+        on_event(EventTaskListenForRequests(task))
+    try:
+        await task  # Wait for listen_for_requests to complete
+    except asyncio.CancelledError:
+        log.info("Expose server listen requests cancelled.")
+    finally:
+        if on_event is not None:
+            on_event(EventTaskListenForRequestsFinished())
+
+
+def _setup_logging(verbose="v", force=False):
+    logging.basicConfig(
+        level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
+        format="%(message)s",
+        datefmt="[%X]",
+        force=force,
+    )
+
+    def remove_traceback(record):
+        if record.levelname == "INFO":
+            if record.exc_info:
+                record.exc_info = None
+        return True
+
+    # Don't bee too verbose when attempting to reconnect.
+    log.addFilter(remove_traceback)
 
 
 def main(
@@ -274,7 +361,7 @@ def main(
     expose_url: str,
     datadir: str,
     expose_session: str,
-    api_key: str,
+    api_key: str | None,
     config_logging: bool = True,
 ) -> None:
     """
@@ -327,20 +414,7 @@ def main(
     from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
     if config_logging:
-        logging.basicConfig(
-            level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
-            format="%(message)s",
-            datefmt="[%X]",
-        )
-
-        def remove_traceback(record):
-            if record.levelname == "INFO":
-                if record.exc_info:
-                    record.exc_info = None
-            return True
-
-        # Don't bee too verbose when attempting to reconnect.
-        log.addFilter(remove_traceback)
+        _setup_logging(verbose)
 
     if parent_pid:
         exit_when_pid_exists(int(parent_pid))

@@ -3,12 +3,17 @@ import concurrent.futures
 import json
 import socket
 import threading
+import typing
 import uuid
+from concurrent import futures
 from queue import Queue
+from typing import TypeVar
 
 import pytest
 
 from robocorp.action_server._selftest import ActionServerProcess
+
+T = TypeVar("T")
 
 
 class DummyRobocorpLinkWebsocketServer:
@@ -141,7 +146,7 @@ def dummy_robocorp_link_server():
         )
         t_dummy.start()
         dummy_host, dummy_port = host_port_future.result(5)
-        dummy_robocorp_link_server.websocket_url = f"wss://{dummy_host}:{dummy_port}"
+        dummy_robocorp_link_server.websocket_url = f"ws://{dummy_host}:{dummy_port}"
         print(f"Dummy server started at: {dummy_robocorp_link_server.websocket_url}")
 
         yield dummy_robocorp_link_server
@@ -209,3 +214,158 @@ def todo_test_server_expose(
 
     print("started")
     print("test...")
+
+
+def todo_test_server_expose_local(
+    datadir,
+    action_server_process: ActionServerProcess,
+    data_regression,
+) -> None:
+    """
+    This tests the "real" exposed server but in a local version.
+
+    To work it requires `action-server-tunnel` (private repo).
+
+    -- After cloning it must be bootstrapped with:
+
+    npm i
+    npm dev
+
+    Then this test can be run.
+    """
+    from robocorp.action_server import _server_expose
+    from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
+    from robocorp.action_server._selftest import ActionServerClient
+    from robocorp.action_server._server_expose import (
+        EventAsyncIOLoop,
+        EventConnected,
+        EventSessionPayload,
+        EventTaskListenForRequests,
+        EventTaskListenForRequestsFinished,
+        ServerEvent,
+    )
+
+    action_server_process.start(
+        db_file="server.db",
+        cwd=datadir,
+        actions_sync=True,
+        timeout=300,
+        lint=True,
+        min_processes=2,
+        max_processes=2,
+        reuse_processes=True,
+    )
+
+    host = action_server_process.host
+    port = action_server_process.port
+
+    events_queue: Queue[ServerEvent] = Queue()
+
+    def wait_for_ev(cls: typing.Type[T]) -> T:
+        while True:
+            try:
+                ev = events_queue.get(timeout=3)
+            except Exception:
+                raise AssertionError(f"Timed out waiting for event of type: {cls}")
+            if isinstance(ev, cls):
+                return ev
+            # If it wasn't, wait for the next event.
+
+    def expose():
+        _server_expose._setup_logging(force=True)
+        asyncio.run(
+            _server_expose.expose_server(
+                port=int(port),
+                host=host,
+                expose_url="ws://127.0.0.1:8787",  # localhost
+                datadir=datadir,
+                expose_session=None,
+                api_key=None,
+                on_event=events_queue.put,
+            )
+        )
+
+    server_expose_thread = threading.Thread(
+        target=expose, name="Server Expose Thread", daemon=True
+    )
+    server_expose_thread.start()
+
+    loop_ev = wait_for_ev(EventAsyncIOLoop)
+    listen_task: asyncio.Task = wait_for_ev(EventTaskListenForRequests).task
+    loop: asyncio.AbstractEventLoop = loop_ev.loop
+
+    def run_in_loop(func, timeout=10):
+        fut = futures.Future()
+
+        def callback():
+            try:
+                result = func()
+            except BaseException as e:
+                fut.set_exception(e)
+            else:
+                fut.set_result(result)
+
+        loop.call_soon_threadsafe(callback)
+        return fut.result(timeout)
+
+    def run_coro_in_loop(coro, timeout=10):
+        fut = futures.Future()
+
+        async def callback():
+            try:
+                result = await coro
+            except BaseException as e:
+                fut.set_exception(e)
+            else:
+                fut.set_result(result)
+
+        asyncio.run_coroutine_threadsafe(callback(), loop)
+        return fut.result(timeout)
+
+    connected_ev = wait_for_ev(EventConnected)
+    session_payload_ev = wait_for_ev(EventSessionPayload)
+
+    client = ActionServerClient("http://127.0.0.1:8787")
+    data_regression.check(
+        json.loads(
+            client.get_openapi_json(
+                params={"sessionId": session_payload_ev.session_payload.sessionId}
+            )
+        )
+    )
+
+    # Close the connection: a new one must be done.
+    run_coro_in_loop(connected_ev.ws.close())
+    _connected_ev2 = wait_for_ev(EventConnected)
+    session_payload_ev2 = wait_for_ev(EventSessionPayload)
+    # The session id cannot have changed in the meanwhile.
+    assert (
+        session_payload_ev2.session_payload.sessionId
+        == session_payload_ev.session_payload.sessionId
+    )
+
+    def call_sleep(time_to_sleep: float):
+        def func():
+            ret = client.post_get_str(
+                "/api/actions/test-server-expose/sleep-a-while/run",
+                {"time_to_sleep": time_to_sleep},
+                params={"sessionId": session_payload_ev.session_payload.sessionId},
+            )
+            return float(ret)
+
+        fut = run_in_thread(func)
+        return fut
+
+    first = call_sleep(3)
+    second = call_sleep(0.1)
+
+    first_finished_at = first.result(timeout=10)
+    second_finished_at = second.result(timeout=10)
+    # The second must've finished before the first!
+    assert second_finished_at < first_finished_at
+
+    # Teardown
+    run_in_loop(listen_task.cancel)
+    wait_for_ev(EventTaskListenForRequestsFinished)
+    server_expose_thread.join(timeout=2)
+    assert not server_expose_thread.is_alive()
