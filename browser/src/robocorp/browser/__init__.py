@@ -42,7 +42,8 @@ def configure(**kwargs) -> None:
             choices=["chromium", "chrome", "chrome-beta", "msedge",
                      "msedge-beta", "msedge-dev", "firefox", "webkit"]
                      
-        install: Install browser or not. If not defined, download is only
+        install: 
+            Install browser or not. If not defined, download is only
             attempted if the browser fails to launch.
             
         headless:

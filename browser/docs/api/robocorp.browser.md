@@ -1,6 +1,8 @@
 <!-- markdownlint-disable -->
 
-# module `robocorp.browser` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L0"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# module `robocorp.browser`
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L0)
 
 Main module for doing browser automation with Playwright.
 
@@ -10,7 +12,7 @@ This library can be made available by pinning ![](https://img.shields.io/pypi/v/
 
 ______________________________________________________________________
 
-## `configure` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L26"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `configure`
 
 Configures browser settings before any other method is called.
 
@@ -26,7 +28,7 @@ browser.configure(browser_engine="firefox", slowmo=100)
 
 - <b>`browser_engine`</b>:  Browser engine which should be used default="chromium" choices=\["chromium", "chrome", "chrome-beta", "msedge", "msedge-beta", "msedge-dev", "firefox", "webkit"\]
 
-- <b>`install`</b>:  Install browser or not. If not defined, download is only attempted if the browser fails to launch.
+- <b>`install`</b>:   Install browser or not. If not defined, download is only attempted if the browser fails to launch.
 
 - <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True the browser UI will be kept hidden. If unset or set to None it'll show the browser UI only if a debugger is detected.
 
@@ -44,9 +46,11 @@ browser.configure(browser_engine="firefox", slowmo=100)
 
 > See also: `robocorp.browser.configure_context` to change other arguments related to the browser context creation.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L26)
+
 ______________________________________________________________________
 
-## `configure_context` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L99"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `configure_context`
 
 Customizes browser context settings beyond those covered by the `configure` method.
 
@@ -66,9 +70,11 @@ browser.configure_context(ignore_https_errors = True)
 
 > The changes done persist through the full session, so, new tasks which create a browser context will also get the configuration changes. If the change should not be used across tasks it's possible to call `robocorp.browser.context(...)` with the required arguments directly.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L100)
+
 ______________________________________________________________________
 
-## `page` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L128"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `page`
 
 Provides a managed instance of the browser page to interact with.
 
@@ -91,9 +97,11 @@ If a new page is required without closing the current page use:
  page = browser.context().new_page()
 ```
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L129)
+
 ______________________________________________________________________
 
-## `browser` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L156"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `browser`
 
 Provides a managed instance of the browser to interact with.
 
@@ -118,9 +126,11 @@ To customize the browser use the `configure` method (prior to calling this metho
 
 > The returned browser must not be closed. It will be automatically closed when the task run session finishes.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L157)
+
 ______________________________________________________________________
 
-## `playwright` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L190"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `playwright`
 
 Provides a managed instance of playwright to interact with.
 
@@ -139,9 +149,11 @@ To customize it use the `configure` method (prior to calling this method).
 
 Note that the returned instance must not be closed. It will be automatically closed when the task run session finishes.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L191)
+
 ______________________________________________________________________
 
-## `context` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L216"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `context`
 
 Provides a managed instance of the browser context to interact with.
 
@@ -163,9 +175,11 @@ Note that the returned instance must not be closed. It will be automatically clo
 > If the context is not created it's possible to customize the context arguments through the kwargs provided, by using the `configure(...)` method or by editing the `configure_context(...)` returned dict.
 > If the context was already previously created the \*\*kwargs passed will be ignored.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L217)
+
 ______________________________________________________________________
 
-## `goto` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L247"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `goto`
 
 Changes the url of the current page (creating a page if needed).
 
@@ -182,9 +196,11 @@ Changes the url of the current page (creating a page if needed).
 **Returns:**
 The page instance managed by the robocorp.tasks framework(it will be automatically closed when the task finishes).
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L248)
+
 ______________________________________________________________________
 
-## `screenshot` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L268"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `screenshot`
 
 Takes a screenshot of the given page/element/locator and saves it to the log. If no element is provided the screenshot will target the current page.
 
@@ -212,9 +228,11 @@ The bytes from the screenshot.
 
 > The element.screenshot can be used if the screenshot is not expected to be added to the log.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L269)
+
 ______________________________________________________________________
 
-## `install` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L328"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+## `install`
 
 Downloads and installs the given browser engine.
 
@@ -228,17 +246,17 @@ Downloads and installs the given browser engine.
 
 > Google Chrome or Microsoft Edge installations will be installed at the default global location of your operating system overriding your current browser installation.
 
-# Classes
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L329)
 
 ______________________________________________________________________
 
-## `BrowserConfig` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L349"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# class `BrowserConfig`
 
 Browser config description here.
 
 Put what you want in it. Testing.
 
-### `__init__` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L355"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### `__init__`
 
 Configure browser engire class.
 
@@ -258,7 +276,9 @@ Configure browser engire class.
 
 - <b>`skip_playwright_stop`</b>:  Can be used to skip the playwright stop. Not recommended in general, only meant to be used to diagnose and workaround specific issues on the playwright stop coupled with an early os.\_exit shutdown in `robocorp-tasks`. Can cause a process leak and even a shutdown deadlock if used alone.
 
-### Properties
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L356)
+
+## Properties
 
 - `browser_engine`
 
@@ -268,11 +288,11 @@ Configure browser engire class.
 
 - `slowmo`
 
-### Methods
+## Methods
 
 ______________________________________________________________________
 
-#### `first_method` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L448"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### `first_method`
 
 First method of this class description, yes yes.
 
@@ -292,9 +312,11 @@ browser.first_method(name="yes", level=1)
 
 > The changes done persist through the full session, so, new tasks which directly.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L449)
+
 ______________________________________________________________________
 
-#### `second_method` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L469"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+### `second_method`
 
 Second test method of this class description.
 
@@ -314,15 +336,19 @@ browser.first_method(name="yes", level=1)
 
 > The changes done persist through the full session, so, new tasks which directly.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L470)
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L350)
+
 # Exceptions
 
 ______________________________________________________________________
 
-## `BrowserNotFound` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L6"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# `BrowserNotFound`
 
 No matching browser found in the environment.
 
-### Properties
+## Properties
 
 - `message`
 
@@ -330,21 +356,25 @@ No matching browser found in the environment.
 
 - `stack`
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L6)
+
 ______________________________________________________________________
 
-## `InstallError` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L10"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# `InstallError`
 
 Error encountered during browser install.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L10)
 
 # Enums
 
 ______________________________________________________________________
 
-## `BrowserEngine` <a href="https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L14"><img align="right" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+# `BrowserEngine`
 
 Valid browser engines for Playwright.
 
-### Values
+## Values
 
 - **CHROMIUM** = chromium
 - **CHROME** = chrome
@@ -354,3 +384,7 @@ Valid browser engines for Playwright.
 - **MSEDGE_DEV** = msedge-dev
 - **FIREFOX** = firefox
 - **WEBKIT** = webkit
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/_types.py#L14)
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L0)
