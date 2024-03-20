@@ -7,7 +7,9 @@ from types import ModuleType
 from typing import Callable, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 from robocorp import log
-from robocorp.tasks._protocols import ITask
+
+from ._customization._plugin_manager import PluginManager
+from ._protocols import ITask
 
 
 def module_name_from_path(path: Path, root: Path) -> str:
@@ -138,13 +140,15 @@ def clear_previously_collected_tasks():
 
 
 def collect_tasks(
-    path: Path, task_names: Sequence[str] = (), glob: Optional[str] = None
+    pm: PluginManager,
+    path: Path,
+    task_names: Sequence[str] = (),
+    glob: Optional[str] = None,
 ) -> Iterator[ITask]:
     """
     Note: collecting tasks is not thread-safe.
     """
     from robocorp.tasks import _constants, _hooks
-    from robocorp.tasks._task import Task
 
     path = path.absolute()
     task_names_as_set = set(task_names)
@@ -219,11 +223,14 @@ def collect_tasks(
                 f"Expected {path} to map to a directory or file."
             )
 
+    from robocorp.tasks._task import Task
+
     for method, options in _methods_marked_as_tasks_found:
         module_name = method.__module__
         module_file = method.__code__.co_filename
 
-        task = Task(module_name, module_file, method, options=options)
+        task = Task(pm, module_name, module_file, method, options=options)
+
         if accept_task(task):
             yield task
 

@@ -11,6 +11,7 @@ class CondaDepInfo:
     value: str  # The full value of the dep (i.e.: python=3.7)
     version_spec: str  # The version SPEC of the dep (as seen by conda: '3.7.*' or '>3.2')
     dep_range: _RangeTypedDict
+    error_msg: Optional[str] = None
 
     def get_dep_vspec(self) -> Optional[conda_version.VersionSpec]:
         try:
@@ -50,5 +51,5 @@ class CondaDeps:
     def get_dep_range(self, spec_name: str) -> _RangeTypedDict:
         return self._deps[spec_name].dep_range
 
-    def iter_conda_dep_infos(self) -> Iterator[CondaDepInfo]:
+    def iter_deps_infos(self) -> Iterator[CondaDepInfo]:
         yield from self._deps.values()

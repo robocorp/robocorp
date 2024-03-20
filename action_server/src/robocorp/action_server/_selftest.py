@@ -3,6 +3,7 @@ This module contains utilities for testing and to do a 'selftest' of the
 executable even in release mode.
 """
 
+import json
 import os
 import re
 import subprocess
@@ -185,7 +186,7 @@ class ActionServerClient:
     def __init__(self, action_server_process: ActionServerProcess):
         self.action_server_process = action_server_process
 
-    def build_full_url(self, url):
+    def build_full_url(self, url: str) -> str:
         host = self.action_server_process.host
         port = self.action_server_process.port
         if url.startswith("/"):
@@ -203,18 +204,24 @@ class ActionServerClient:
         return self.get_str("openapi.json")
 
     def get_json(self, url, params: Optional[dict] = None):
-        import json
-
         contents = self.get_str(url, params=params)
         try:
             return json.loads(contents)
         except Exception:
             raise AssertionError(f"Unable to load: {contents!r}")
 
-    def post_get_str(self, url, data, headers: Optional[dict] | None = None):
+    def post_get_str(
+        self,
+        url,
+        data,
+        headers: Optional[dict] | None = None,
+        cookies: Optional[dict] | None = None,
+    ):
         import requests
 
-        result = requests.post(self.build_full_url(url), headers=headers, json=data)
+        result = requests.post(
+            self.build_full_url(url), headers=headers, json=data, cookies=cookies
+        )
         assert result.status_code == 200
         return result.text
 
@@ -376,8 +383,12 @@ def check_new_template(
         if verbose:
             print("Using post to call action.")
 
+        # open_api = client.get_openapi_json()
+        # decoded = json.loads(open_api)
+        # print(json.dumps(decoded, indent=4))
+
         found = client.post_get_str(
-            "/api/actions/my-project/compare-time-zones/run",
+            "/api/actions/package-name/compare-time-zones/run",
             {
                 "user_timezone": "Europe/Helsinki",
                 "compare_to_timezones": "America/New_York, Asia/Kolkata",

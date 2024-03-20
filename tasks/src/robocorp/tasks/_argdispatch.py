@@ -1,7 +1,8 @@
 from logging import getLogger
-from typing import List
+from typing import List, Optional
 
-from robocorp.tasks import _constants
+from . import _constants
+from ._customization._plugin_manager import PluginManager
 
 log = getLogger(__name__)
 
@@ -10,7 +11,7 @@ class _ArgDispatcher:
     def __init__(self):
         self._name_to_func = {}
 
-    def _dispatch(self, parsed) -> int:
+    def _dispatch(self, parsed, pm: Optional[PluginManager] = None) -> int:
         if not parsed.command:
             self._create_argparser().print_help()
             return 1
@@ -18,6 +19,8 @@ class _ArgDispatcher:
         method = self._name_to_func[parsed.command]
         dct = parsed.__dict__.copy()
         dct.pop("command")
+        if pm is not None:
+            dct["pm"] = pm
 
         return method(**dct)
 
@@ -210,7 +213,7 @@ class _ArgDispatcher:
             parsed.additional_arguments = additional_args
         return parsed
 
-    def process_args(self, args: List[str]) -> int:
+    def process_args(self, args: List[str], pm: Optional[PluginManager] = None) -> int:
         """
         Processes the arguments and return the returncode.
         """
@@ -224,7 +227,7 @@ class _ArgDispatcher:
                 return 0
             return int(code)
 
-        return self._dispatch(parsed)
+        return self._dispatch(parsed, pm)
 
 
 arg_dispatch = _ArgDispatcher()

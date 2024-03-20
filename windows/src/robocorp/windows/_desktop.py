@@ -355,7 +355,8 @@ class Desktop(ControlElement):
         self.send_keys("{Enter}")
         time.sleep(wait_time)
 
-    def get_win_version(self) -> str:
+    @staticmethod
+    def get_win_version() -> str:
         """
         Windows only utility which returns the current Windows major version.
 
@@ -366,10 +367,15 @@ class Desktop(ControlElement):
         #  number. (the same applies for `platform.version()`)
         import platform
 
+        WINDOWS_11_BUILD = 22000
+        WINDOWS_10 = "10"
+        WINDOWS_11 = "11"
+
         version_parts = platform.version().split(".")
         major = version_parts[0]
-        if major == "10" and int(version_parts[2]) >= 22000:
-            major = "11"
+
+        if major == WINDOWS_10 and int(version_parts[2]) >= WINDOWS_11_BUILD:
+            major = WINDOWS_11
 
         return major
 

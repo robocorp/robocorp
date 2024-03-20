@@ -1,5 +1,44 @@
 # Changelog
 
+## Unreleased
+
+## 0.1.1 - 2024-03-15
+
+- Fixed issue running `action-server start --expose`.
+
+## 0.1.0 - 2024-03-15
+
+- Support parsing Custom Types in Action Server UI action run view
+- Add Console output to Action Server UI action run view
+- Add Public URL link to Action Server UI if Action Server is started with `--expose`
+- When used with `robocorp-actions 0.1.0`, the `headers` can now be gotten in the `request`.
+- Action server's public URL no longer changes on reconnection (with `--expose`).
+
+## 0.0.28 - 2024-03-11
+
+- `pydantic` models are accepted as the input and output of `@action`s.
+
+- The action package name is now gotten from the `package.yaml` and not from the directory name
+  (it's still gotten from the directory name when `conda.yaml` is used for backward compatibility).
+  
+- The action package name and action name are slugified to be ascii only and replace
+  unwanted chars for `-` in the urls.
+  
+- A `--whitelist` argument is accepted in the command line for `start` and `import` and
+  it allows whitelisting action package names as well as action names. 
+
+## 0.0.27 - 2024-03-04
+
+- Same as 0.0.26, but had issues publishing the actual binary.
+
+## 0.0.26 - 2024-03-01
+
+- Worked around bug in which `import numpy` halts if `sys.stdin` is being read when it's imported.
+
+## 0.0.25 - 2024-02-29
+
+- `action-server package --update` properly adds the 'name' to the package.yaml
+
 ## 0.0.24 - 2024-02-23
 
 - Properly use all lines from docstring description to feed to the `openapi.json`.

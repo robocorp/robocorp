@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Iterator, List, Optional, Set
 
+from starlette.requests import Request
 from termcolor import colored
 
 from robocorp.action_server._models import Action, ActionPackage
@@ -92,6 +93,7 @@ class ProcessHandle:
             JsonRpcStreamWriter,
         )
         from robocorp.action_server._robo_utils.callback import Callback
+        from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
 
         from ._actions_run_helpers import (
             _add_preload_actions_dir_to_env_pythonpath,
@@ -122,10 +124,37 @@ class ProcessHandle:
 
             python_exe = sys.executable
 
-        use_tcp = False
+        # stdin/stdout is no longer an option because numpy gets halted
+        # if stdin is being read while importing numpy.
+        # https://github.com/numpy/numpy/issues/24290
+        # https://github.com/robocorp/robocorp/issues/271
+        use_tcp = True
+
+        cwd = get_action_package_cwd(settings, action_package)
+        subprocess_kwargs = dict(
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=cwd,
+            env=env,
+        )
+
+        def _process_stream_reader(stderr_or_stdout):
+            while True:
+                line_bytes = stderr_or_stdout.readline()
+                if not line_bytes:
+                    break
+                line_as_str = line_bytes.decode("utf-8", "replace")
+                print(
+                    colored(f"output (pid: {pid}): ", attrs=["dark"])
+                    + f"{line_as_str.strip()}\n",
+                    end="",
+                )
+                self._on_output(line_bytes)
+
+        self._read_queue: "Queue[dict]" = Queue()
+
         if use_tcp:
-            assert False, "Not currently supported!"
-            server_socket = _create_server_socket("", 0)
+            server_socket = _create_server_socket("127.0.0.1", 0)
             host, port = server_socket.getsockname()
             cmdline = [
                 python_exe,
@@ -135,6 +164,48 @@ class ProcessHandle:
                 f"--host={host}",
                 f"--port={port}",
             ]
+
+            def accept_connection():
+                server_socket.listen(1)
+                sock, _addr = server_socket.accept()
+                return sock
+
+            connection_future = run_in_thread(accept_connection)
+
+            self._process = subprocess.Popen(cmdline, **subprocess_kwargs)
+            self._on_output = Callback()
+
+            pid = self._process.pid
+
+            stderr = self._process.stderr
+            stdout = self._process.stdout
+
+            t = threading.Thread(
+                target=_process_stream_reader, args=(stderr,), daemon=True
+            )
+            t.name = f"Stderr reader (pid: {pid})"
+            t.start()
+
+            t = threading.Thread(
+                target=_process_stream_reader, args=(stdout,), daemon=True
+            )
+            t.name = f"Stdout reader (pid: {pid})"
+            t.start()
+
+            try:
+                s = connection_future.result(10)
+            except Exception:
+                log.exception(
+                    "Process that runs action did not connect back in the available timeout."
+                )
+                raise
+            read_from = s.makefile("rb")
+            write_to = s.makefile("wb")
+
+            self._writer = JsonRpcStreamWriter(write_to, sort_keys=True)
+            self._reader = JsonRpcStreamReaderThread(
+                read_from, self._read_queue, lambda *args, **kwargs: None
+            )
         else:
             # Will start things using the stdin/stdout for communicating.
             cmdline = [
@@ -142,45 +213,24 @@ class ProcessHandle:
                 "-m",
                 "preload_actions_server_main",
             ]
-        cwd = get_action_package_cwd(settings, action_package)
+            subprocess_kwargs["stdin"] = subprocess.PIPE
 
-        self._process = subprocess.Popen(
-            cmdline,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            stdin=subprocess.PIPE,
-            cwd=cwd,
-            env=env,
-        )
-        self._on_stderr = Callback()
+            self._process = subprocess.Popen(cmdline, **subprocess_kwargs)
+            self._on_output = Callback()
 
-        pid = self._process.pid
+            pid = self._process.pid
 
-        def _stderr_reader(stderr):
-            while True:
-                line = stderr.readline()
-                if not line:
-                    break
-                line = line.decode("utf-8", "replace")
-                print(
-                    colored(f"output (pid: {pid}): ", attrs=["dark"])
-                    + f"{line.strip()}\n",
-                    end="",
-                )
-                self._on_stderr(line)
+            stderr = self._process.stderr
+            t = threading.Thread(target=_process_stream_reader, args=(stderr,))
+            t.name = f"Stderr reader (pid: {pid})"
+            t.start()
 
-        stderr = self._process.stderr
-        t = threading.Thread(target=_stderr_reader, args=(stderr,))
-        t.name = f"Stderr reader (pid: {pid})"
-        t.start()
-
-        write_to = self._process.stdin
-        read_from = self._process.stdout
-        self._writer = JsonRpcStreamWriter(write_to, sort_keys=True)
-        self._read_queue: "Queue[dict]" = Queue()
-        self._reader = JsonRpcStreamReaderThread(
-            read_from, self._read_queue, lambda *args, **kwargs: None
-        )
+            write_to = self._process.stdin
+            read_from = self._process.stdout
+            self._writer = JsonRpcStreamWriter(write_to, sort_keys=True)
+            self._reader = JsonRpcStreamReaderThread(
+                read_from, self._read_queue, lambda *args, **kwargs: None
+            )
         self._reader.start()
 
     @property
@@ -210,7 +260,7 @@ class ProcessHandle:
         input_json: Path,
         robot_artifacts: Path,
         result_json: Path,
-        headers: Dict[str, str],
+        request: Request,
         reuse_process: bool,
     ) -> int:
         msg = {
@@ -220,7 +270,8 @@ class ProcessHandle:
             "input_json": f"{input_json}",
             "robot_artifacts": f"{robot_artifacts}",
             "result_json": f"{result_json}",
-            "headers": headers,
+            "headers": dict(request.headers),
+            "cookies": dict(request.cookies),
             "reuse_process": reuse_process,
         }
         self._writer.write(msg)
@@ -235,7 +286,7 @@ class ProcessHandle:
         robot_artifacts: Path,
         output_file: Path,
         result_json: Path,
-        headers: Dict[str, str],
+        request: Request,
         reuse_process: bool,
     ) -> int:
         """
@@ -243,19 +294,19 @@ class ProcessHandle:
 
         (returncode=0 means everything is Ok).
         """
-        with output_file.open("w") as stream:
+        with output_file.open("wb") as stream:
 
-            def on_output(line):
-                stream.write(line)
+            def on_output(line_bytes: bytes):
+                stream.write(line_bytes)
 
-            with self._on_stderr.register(on_output):
+            with self._on_output.register(on_output):
                 # stdout is now used for communicating, so, don't hear on it.
                 returncode = self._do_run_action(
                     action,
                     input_json,
                     robot_artifacts,
                     result_json,
-                    headers,
+                    request,
                     reuse_process,
                 )
                 return returncode

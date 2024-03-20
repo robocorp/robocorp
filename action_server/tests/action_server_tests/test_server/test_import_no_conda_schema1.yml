@@ -1,6 +1,6 @@
-another_action: '{"additionalProperties": false, "properties": {"a1": {"type": "string",
-  "description": "", "title": "A1"}, "a2": {"type": "string", "description": "", "title":
-  "A2"}}, "type": "object", "required": ["a1", "a2"]}'
-calculator_sum: '{"additionalProperties": false, "properties": {"v1": {"type": "string",
-  "description": "", "title": "V1"}, "v2": {"type": "string", "description": "", "title":
-  "V2"}}, "type": "object", "required": ["v1", "v2"]}'
+another_action: '{"properties": {"a1": {"type": "string", "description": "", "title":
+  "A1"}, "a2": {"type": "string", "description": "", "title": "A2"}}, "type": "object",
+  "required": ["a1", "a2"]}'
+calculator_sum: '{"properties": {"v1": {"type": "string", "description": "", "title":
+  "V1"}, "v2": {"type": "string", "description": "", "title": "V2"}}, "type": "object",
+  "required": ["v1", "v2"]}'

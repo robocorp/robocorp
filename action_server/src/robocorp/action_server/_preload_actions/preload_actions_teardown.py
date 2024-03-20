@@ -13,4 +13,8 @@ def on_teardown_save_result(action: IAction):
         result = action.result
         p = Path(RC_ACTION_RESULT_LOCATION)
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(json.dumps(result))
+        if hasattr(result, "model_dump_json"):
+            # Support for pydantic
+            p.write_text(result.model_dump_json())
+        else:
+            p.write_text(json.dumps(result))

@@ -1,5 +1,14 @@
 from enum import Enum
-from typing import Any, Generic, Optional, TypedDict, TypeVar
+from typing import (
+    Any,
+    Generic,
+    Literal,
+    Optional,
+    Protocol,
+    Sequence,
+    TypedDict,
+    TypeVar,
+)
 
 T = TypeVar("T")
 
@@ -72,3 +81,45 @@ def check_implements(x: T) -> T:
     Mypy should complain if `self` is not implementing the IExpectedProtocol.
     """
     return x
+
+
+class ArgumentsNamespace(Protocol):
+    """
+    This is the argparse.Namespace with the arguments provided by the user.
+    """
+
+    command: Literal["download-rcc", "package", "import", "start", "version"]
+    verbose: bool
+    db_file: str
+    datadir: str
+
+
+class ArgumentsNamespaceDownloadRcc(ArgumentsNamespace):
+    command: Literal["download-rcc"]
+    file: str
+
+
+class ArgumentsNamespacePackage(ArgumentsNamespace):
+    command: Literal["package"]
+    update: bool
+    dry_run: bool
+    no_backup: bool
+
+
+class ArgumentsNamespaceBaseImportOrStart(ArgumentsNamespace):
+    command: Literal["import", "start"]
+    dir: Sequence[str]
+    skip_lint: bool
+    whitelist: str
+
+
+class ArgumentsNamespaceImport(ArgumentsNamespaceBaseImportOrStart):
+    command: Literal["import"]
+
+
+class ArgumentsNamespaceStart(ArgumentsNamespaceBaseImportOrStart):
+    command: Literal["start"]
+    actions_sync: bool
+    expose: bool
+    expose_allow_reuse: bool
+    api_key: str

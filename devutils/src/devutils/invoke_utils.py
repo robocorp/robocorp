@@ -1,10 +1,12 @@
 import os
 import re
+import shlex
 import subprocess
 import sys
 import tempfile
 import textwrap
 from contextlib import contextmanager
+from datetime import datetime
 from functools import lru_cache
 from itertools import chain
 from pathlib import Path
@@ -12,7 +14,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 from invoke import task
 
-ROOT = Path(__file__).parent.parent.parent
+ROOT = Path(__file__).absolute().parent.parent.parent
 REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
 
 
@@ -62,22 +64,19 @@ def get_tag(tag_prefix: str) -> str:
     Args:
         tag_prefix: The tag prefix to match (i.e.: "robocorp-tasks")
     """
-    # i.e.: Gets the last tagged version
-    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}-[0-9]*".split()
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    stdout, stderr = popen.communicate()
-
-    # Something as: b'robocorp-tasks-0.0.1'
-    return stdout.decode("utf-8").strip()
+    # Get the last tagged version.
+    cmd = f"git describe --tags --abbrev=0 --match {tag_prefix}-[0-9]*"
+    proc = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
+    # Something like 'robocorp-tasks-0.0.1'
+    return proc.stdout.strip()
 
 
 def get_all_tags(tag_prefix: str) -> List[str]:
-    cmd = "git tag".split()
-    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    stdout, stderr = popen.communicate()
-
-    found = stdout.decode("utf-8").strip()
-    return [x for x in found.splitlines() if x.startswith(tag_prefix)]
+    cmd = "git tag"
+    proc = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
+    tags = proc.stdout.strip().splitlines()
+    regex = re.compile(rf"{tag_prefix}-[\d.]+$")
+    return [tag for tag in tags if regex.match(tag)]
 
 
 def to_identifier(value: str) -> str:
@@ -110,7 +109,8 @@ def _use_conda() -> bool:
 
 def _conda_env_name_to_conda_prefix() -> Dict[str, str]:
     ret = {}
-    output = subprocess.check_output(["conda", "env", "list"], encoding="utf-8")
+    cmd = "conda env list"
+    output = subprocess.check_output(shlex.split(cmd), encoding="utf-8")
     for line in output.splitlines():
         line = line.strip()
         if line.startswith("#") or not line:
@@ -171,11 +171,14 @@ def build_common_tasks(
         args = " ".join(str(c) for c in cmd)
         return ctx.run(args, **options)
 
-    def poetry(ctx, *cmd):
+    def poetry(ctx, *cmd, verbose: bool = False):
         prefix = []
         if _use_conda():
             prefix.extend(["conda", "run", "--no-capture-output", "-n", CONDA_ENV_NAME])
         prefix.append("poetry")
+
+        if verbose:
+            prefix.append("-vv")
 
         return run(ctx, *prefix, *cmd)
 
@@ -183,29 +186,57 @@ def build_common_tasks(
         if _use_conda():
             if not _env_in_conda(CONDA_ENV_NAME):
                 print(f"Conda env: {CONDA_ENV_NAME} not found. Creating now.")
-                subprocess.check_call(
-                    [
-                        "conda",
-                        "create",
-                        "-c",
-                        "conda-forge",
-                        "-n",
-                        CONDA_ENV_NAME,
-                        "python=3.10",
-                        "-y",
-                    ]
-                )
+                cmd = f"conda create -c conda-forge -n {CONDA_ENV_NAME} python=3.10 -y"
+                subprocess.check_call(shlex.split(cmd))
 
     @task
-    def install(ctx):
-        """Install dependencies"""
+    def install(
+        ctx, local: Optional[str] = None, update: bool = False, verbose: bool = False
+    ):
+        """
+        Installs or updates dependencies.
+
+        Args:
+            local: A comma-separated list of local projects to install in develop mode.
+            update: Whether to update the dependencies.
+            verbose: Whether to run in verbose mode.
+        """
         _make_conda_env_if_needed()
-        poetry(ctx, "install")
+
+        if update:
+            poetry(ctx, "update", verbose=verbose)
+            return
+
+        projects = (
+            [package.replace("robocorp-", "") for package in local.split(",")]
+            if local
+            else None
+        )
+        if projects:
+            with mark_as_develop_mode(projects):
+                poetry(ctx, "lock --no-update")
+                poetry(ctx, "install", verbose=verbose)
+        else:
+            poetry(ctx, "install", verbose=verbose)
 
     @task
-    def devinstall(ctx):
-        """Install dependencies with deps in dev mode"""
+    def devinstall(ctx, verbose: bool = False):
+        """
+        Install the package in develop mode and its dependencies.
+
+        Args:
+            verbose: Whether to run in verbose mode.
+        """
         _make_conda_env_if_needed()
+
+        with mark_as_develop_mode(all_packages=True):
+            poetry(ctx, "lock --no-update")
+            poetry(ctx, "install", verbose=verbose)
+
+    @contextmanager
+    def mark_as_develop_mode(
+        projects: Optional[list[str]] = None, all_packages: bool = False
+    ):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
 
@@ -217,21 +248,22 @@ def build_common_tasks(
             for pyproject in all_pyprojects:
                 roundtrip_py_project = RoundtripPyProject(pyproject)
                 roundtrips.append(roundtrip_py_project)
+
                 with roundtrip_py_project.update() as contents:
                     dependencies = contents["tool"]["poetry"]["dependencies"]
 
                     for key, value in tuple(dependencies.items()):
+                        if not key.startswith("robocorp-"):
+                            continue
+
                         # Changes something as:
                         # robocorp-log = "0.1.0"
                         # to:
-                        # robocorp-log = {path = "../log/", develop = true}
-                        if key.startswith("robocorp-"):
-                            name = key[len("robocorp-") :]
-                            value = dict(path=f"../{name}/", develop=True)
-                            dependencies[key] = value
-
-            poetry(ctx, "lock --no-update")
-            poetry(ctx, "install")
+                        # robocorp-log = {path = "../log/", develop = true
+                        name = key[len("robocorp-") :]
+                        if all_packages or (projects and name in projects):
+                            dependencies[key] = dict(path=f"../{name}/", develop=True)
+            yield
         finally:
             for roundtrip in roundtrips:
                 roundtrip.restore()
@@ -271,11 +303,16 @@ def build_common_tasks(
         poetry(ctx, f"run isort {targets}")
 
     @task
-    def test(ctx):
+    def test(ctx, test: Optional[str] = None):
         """Run unittests"""
         cmd = "run pytest -rfE -vv"
+
+        if test:
+            cmd += f" {test}"
+
         if parallel_tests:
             cmd += " -n auto"
+
         poetry(ctx, cmd)
 
     @task
@@ -318,26 +355,25 @@ def build_common_tasks(
             tmp.close()  # Fix for Windows
             poetry(ctx, f"run mypy --strict {tmp.name}")
 
-    @task(lint, typecheck, test)
-    def check_all(ctx):
-        """Run all checks"""
-        pass
-
     @task
     def build(ctx):
         """Build distributable .tar.gz and .wheel files"""
         poetry(ctx, "build")
 
     @task
-    def lock(ctx):
-        """Run poetry lock"""
-        poetry(ctx, "lock")
+    def publish(ctx, token: str):
+        """Publish to PyPI"""
+        poetry(ctx, f"config pypi-token.pypi {token}")
+        poetry(ctx, "publish")
 
     @task
-    def docs(ctx):
+    def docs(ctx, check: bool = False):
         """Build API documentation"""
         output_path = root / "docs" / "api"
-        output_path.mkdir(exist_ok=True)
+        if not output_path.exists():
+            print("Docs output path does not exist. Skipping...")
+            return
+
         for path in output_path.iterdir():
             path.unlink()
 
@@ -353,11 +389,41 @@ def build_common_tasks(
             package_name,
         )
 
+        if check:
+            if check_document_changes(ctx):
+                output = run(ctx, "git --no-pager diff -- docs/api")
+                raise RuntimeError(
+                    f"There are uncommitted docs changes. Changes: {output.stdout}"
+                )
+
+    def check_document_changes(ctx):
+        """
+        Check if there were new document changes generated by lazydocs and
+        are uncommited.
+
+        Returns:
+            True if there are new changes, False otherwise.
+        """
+        changed_files = (
+            run(ctx, "git --no-pager diff --name-only -- docs/api", hide=True)
+            .stdout.strip()
+            .splitlines()
+        )
+
+        return bool(changed_files)
+
+    @task(lint, typecheck, test)
+    def check_all(ctx):
+        """Run all checks"""
+        ctx.run("inv docs --check")
+
+    def _get_module_version(ctx) -> str:
+        command = f"import {package_name}; print({package_name}.__version__)"
+        return poetry(ctx, f"run python -c {command!r}").stdout.strip()
+
     @task
     def make_release(ctx):
         """Create a release tag"""
-        import importlib
-
         import semver
 
         result = run(ctx, "git rev-parse --abbrev-ref HEAD", hide=True)
@@ -366,8 +432,7 @@ def build_common_tasks(
             sys.stderr.write(f"Not on master branch: {branch}\n")
             sys.exit(1)
 
-        current_version = importlib.import_module(package_name).__version__
-
+        current_version = _get_module_version(ctx)
         previous_tag = get_tag(tag_prefix)
         previous_version = previous_tag.split("-")[-1]
 
@@ -375,7 +440,8 @@ def build_common_tasks(
             print(f"No previous release for {package_name}")
         elif semver.compare(current_version, previous_version) <= 0:
             sys.stderr.write(
-                f"Current version older/same than previous: {current_version} <= {previous_version}\n"
+                f"Current version older/same than previous:"
+                f" {current_version} <= {previous_version}\n"
             )
             sys.exit(1)
 
@@ -390,7 +456,8 @@ def build_common_tasks(
             echo=True,
         )
 
-        print(f"Trigger the release with: git push origin {current_tag}")
+        print(f"Pushing tag: {current_tag}")
+        run(ctx, f"git push origin {current_tag}")
 
     @task
     def check_tag_version(ctx):
@@ -398,27 +465,72 @@ def build_common_tasks(
         Checks if the current tag matches the latest version (exits with 1 if it
         does not match and with 0 if it does match).
         """
-        import importlib
-
-        mod = importlib.import_module(package_name)
-
+        module_version = _get_module_version(ctx)
         tag = get_tag(tag_prefix)
         version = tag[tag.rfind("-") + 1 :]
 
-        if mod.__version__ == version:
+        if module_version == version:
             sys.stderr.write(f"Version matches ({version}) (exit(0))\n")
             sys.exit(0)
         else:
             sys.stderr.write(
-                f"Version does not match ({tag_prefix}: {mod.__version__} != repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
+                f"Version does not match ({tag_prefix}: {module_version} !="
+                f" repo tag: {version}).\nTags:{get_all_tags(tag_prefix)}\n(exit(1))\n"
             )
+            sys.exit(1)
+
+    def update_changelog_file(file: Path, version: str):
+        """Update the changelog file with the new version and changes"""
+
+        if not file.exists():  # usually happening with the meta one
+            print("No CHANGELOG file found, skipping update.")
+            return
+
+        with open(file, "r+") as stream:
+            content = stream.read()
+
+            new_version = f"## {version} - {datetime.today().strftime('%Y-%m-%d')}"
+            changelog_start = re.search(r"# Changelog", content).end()
+            if not changelog_start:
+                print(
+                    f"Did not find # Changelog in the changelog:\n{file}\n"
+                    f"Please update Changelog before proceeding."
+                )
+                sys.exit(1)
+
+            unreleased_match = re.search(r"## Unreleased", content, flags=re.IGNORECASE)
+            double_newline = "\n\n"
+
+            new_content = content[:changelog_start] + double_newline + "## Unreleased"
+            if unreleased_match:
+                released_content = content.replace(
+                    unreleased_match.group(), new_version
+                )
+                new_content += released_content[changelog_start:]
+            else:
+                new_content += double_newline + new_version + content[changelog_start:]
+
+            stream.seek(0)
+            stream.write(new_content)
+            print("Changed: ", file)
+
+            if not unreleased_match:
+                print(
+                    f"\nDid not find ## Unreleased in the changelog:\n{file}\n"
+                    f"Please update Changelog before proceeding.\n"
+                    f"It was updated to have the proper sessions already..."
+                )
             sys.exit(1)
 
     @task
     def set_version(ctx, version):
         """Sets a new version for the project in all the needed files"""
-        import re
-        from pathlib import Path
+        valid_version_pattern = re.compile(r"^\d+\.\d+\.\d+$")
+        if not valid_version_pattern.match(version):
+            print(
+                f"Invalid version: {version}. Must be in the format major.minor.hotfix"
+            )
+            return
 
         version_patterns = (
             re.compile(r"(version\s*=\s*)\"\d+\.\d+\.\d+"),
@@ -445,6 +557,8 @@ def build_common_tasks(
         # Update version in current project __init__.py
         package_path = package_name.split(".")
         init_file = Path(root, "src", *package_path, "__init__.py")
+
         update_version(version, init_file)
+        update_changelog_file(Path(root, "docs", "CHANGELOG.md"), version)
 
     return locals()

@@ -154,6 +154,14 @@ def handle_body_payload(
     )
 
 
+def _headers_from_session_payload(session_payload: SessionPayload):
+    headers = {
+        "x-session-id": session_payload.sessionId,
+        "x-session-secret": session_payload.sessionSecret,
+    }
+    return headers
+
+
 async def expose_server(
     port: int,
     host: str,
@@ -176,16 +184,19 @@ async def expose_server(
         )
 
         headers = (
-            {
-                "x-session-id": session_payload.sessionId,
-                "x-session-secret": session_payload.sessionSecret,
-            }
-            if session_payload
-            else {}
+            _headers_from_session_payload(session_payload) if session_payload else {}
         )
 
+        # In testing wss:// is added (in production it's just robocorp.link and
+        # we connect to wss://client.robocorp.link and when we receive the session
+        # id/secret we print it as: https://{session_payload.sessionId}.{expose_url}).
+        if not expose_url.startswith("wss://"):
+            use_url = f"wss://client.{expose_url}"
+        else:
+            use_url = expose_url
+
         async for ws in websockets.connect(
-            f"wss://client.{expose_url}",
+            use_url,
             extra_headers=headers,
             logger=log,
             open_timeout=2,
@@ -208,6 +219,18 @@ async def expose_server(
                         case {"sessionId": _, "sessionSecret": _}:
                             try:
                                 session_payload = SessionPayload(**data)
+                                # Make sure that after we connect the session is
+                                # always the same for reconnects.
+                                # Note: tricky detail: because we're reconnecting
+                                # in the above `for` which already has the `extra_headers`
+                                # bound, we just update the headers in-place...
+                                # this could fail in the future is websockets.connect
+                                # for some reason does a copy of the extra headers,
+                                # so, we have to be careful (probably not the best
+                                # approach, but working for a fast fix).
+                                headers.update(
+                                    _headers_from_session_payload(session_payload)
+                                )
                                 handle_session_payload(
                                     session_payload, expose_url, datadir, api_key
                                 )
@@ -215,7 +238,6 @@ async def expose_server(
                                 if not session_payload:
                                     log.error("Expose session initialization failed", e)
                                     continue
-                                pass
                         case _:
                             try:
                                 body_payload = BodyPayload(**data)
@@ -244,16 +266,85 @@ async def expose_server(
     await task  # Wait for listen_for_requests to complete
 
 
-def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session, api_key):
+def main(
+    parent_pid: str,
+    port: str,
+    verbose: str,
+    host: str,
+    expose_url: str,
+    datadir: str,
+    expose_session: str,
+    api_key: str,
+    config_logging: bool = True,
+) -> None:
+    """
+    Args:
+        parent_pid:
+            The pid of the parent (when the given pid exists, this process must
+            also exit itself). If it's an empty string, it's ignored.
+
+        verbose:
+            A string with `v` chars (currently a single `v` means debug, otherwise
+            info).
+
+        host:
+            The host to where the data should be forwarded.
+
+        port:
+            The port to where the data should be forwarded.
+
+        expose_url:
+            The url for the expose (usually "robocorp.link").
+
+            Note that the protocol here is that it'll connect to something as:
+
+            wss://client.{expose_url}
+
+            Which will then provide a message with a payload such as:
+
+                {"sessionId": _, "sessionSecret": _}
+
+            and then the server will start accepting connections at:
+
+            https://{session_payload.sessionId}.{expose_url}
+
+            and then messages can be sent to that address to be received
+            by the action server.
+
+        datadir:
+            The directory where the expose session information should
+            be stored.
+
+        expose_session:
+            A string with the information of a previous session which
+            should be restored (or 'None' if there's no previous session
+            information to be restored).
+
+        api_key:
+            The api key that should be passed to the action server along with
+            the forwarded messages so that the action server accepts it.
+    """
     from robocorp.action_server._robo_utils.process import exit_when_pid_exists
 
-    logging.basicConfig(
-        level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
-        format="%(message)s",
-        datefmt="[%X]",
-    )
+    if config_logging:
+        logging.basicConfig(
+            level=logging.DEBUG if verbose.count("v") > 0 else logging.INFO,
+            format="%(message)s",
+            datefmt="[%X]",
+        )
 
-    exit_when_pid_exists(int(parent_pid))
+        def remove_traceback(record):
+            if record.levelname == "INFO":
+                if record.exc_info:
+                    record.exc_info = None
+            return True
+
+        # Don't bee too verbose when attempting to reconnect.
+        log.addFilter(remove_traceback)
+
+    if parent_pid:
+        exit_when_pid_exists(int(parent_pid))
+
     try:
         asyncio.run(
             expose_server(
@@ -270,4 +361,27 @@ def main(parent_pid, port, verbose, host, expose_url, datadir, expose_session, a
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:])
+    try:
+        (
+            parent_pid,
+            port,
+            verbose,
+            host,
+            expose_url,
+            datadir,
+            expose_session,
+            api_key,
+        ) = sys.argv[1:]
+    except Exception:
+        raise RuntimeError(f"Unable to initialize with sys.argv: {sys.argv}")
+
+    main(
+        parent_pid,
+        port,
+        verbose,
+        host,
+        expose_url,
+        datadir,
+        expose_session,
+        api_key,
+    )

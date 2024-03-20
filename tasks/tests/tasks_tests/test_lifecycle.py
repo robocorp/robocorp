@@ -1,7 +1,28 @@
 import itertools
 
+import pytest
+
 from robocorp.tasks import session_cache
-from robocorp.tasks._hooks import after_all_tasks_run
+from robocorp.tasks._hooks import (
+    after_all_tasks_run,
+    after_task_run,
+    before_all_tasks_run,
+    before_task_run,
+)
+
+
+def _clear_callbacks():
+    before_task_run._callbacks = ()
+    before_all_tasks_run._callbacks = ()
+    after_task_run._callbacks = ()
+    after_all_tasks_run._callbacks = ()
+
+
+@pytest.fixture(autouse=True)
+def clear_callbacks():
+    _clear_callbacks()
+    yield
+    _clear_callbacks()
 
 
 def test_session_cache_yield():

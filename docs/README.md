@@ -3,21 +3,24 @@
 ## Overview
 
 The repository contains the essential parts of the Robocorp Automation Stack for Python:
-- AI Actions and Action Server are described in the [main readme](../README.md)
-- To create your Actions or [Tasks](guides/using-with-rcc.md) the repo also houses the sources for the new automation libraries for Python
+- AI Actions and Action Server are described in the [main readme](../README.md).
+- To create your Actions or [Tasks](guides/using-with-rcc.md) the repo also houses the sources for the new automation libraries for Python.
 
 ## Python Libraries
 
-The framework includes Python libraries for configuring project entry points and controlling features such as logging. The project also provides an extensive selection of libraries for the most common automation tasks, and anything else can be easily done through what is already available in the Python ecosystem.
+The framework includes Python libraries for configuring project entry points and controlling features such as logging.
+The project also provides an extensive selection of libraries for the most common automation tasks, and anything else
+can be easily done through what is already available in the Python ecosystem.
 
 You can find the source codes and library API documentation in this repository.
 
-You can also use the our [documentation -site](https://robocorp.com/docs/python)
+You can also use our [documentation -site](https://robocorp.com/docs/python)
 
-### The 'robocorp' -meta package
+### The `robocorp` -meta package
 [![robocorp](https://img.shields.io/pypi/v/robocorp?label=robocorp)](https://pypi.org/project/robocorp/)
 
-The easiest way to get started is to install the [`robocorp`](../meta/README.md) meta-package, which includes the framework's core features, such as logging, Vault, Asset Storage, and Control Room integrations.
+The easiest way to get started is to install the [`robocorp`](../meta/README.md) meta-package, which includes the framework's core
+features, such as logging, _Vault_, _Asset Storage_, and _Control Room_ integrations.
 
 
 ### Packages
@@ -44,20 +47,23 @@ It's possible to install individual components of the project as separate depend
 > - _action-package.yaml_ for an automation Action Package
 > - _requirements.txt_, _pyproject.toml_ etc. for the rest
 
-> **On versions:** <br/>
+#### On versions
+
 We follow [semver](https://semver.org) to the best of our ability in library versioning.<br/>
-This means that libraries with version `v0.x.x' are in the development phase, so there can be breaking changes on any version update.<br/>
-We aim to get libraries to `v1` as soon as possible and after that again follow the normal `semver` rules.
+This means that libraries with version `v0.x.x` are in the development phase, so there can be breaking changes on any
+version update.<br/>
+We aim to get libraries to `v1` as soon as possible and after that following the normal `semver` rules.
 
 ### Other libraries
 
-- [RPA Framework for Python](https://robocorp.com/docs/python/rpa-framework)
-  - For additional automation capabilities on the Robocorp platform, please refer to the wide array of libraries and keywords available in 'rpaframework'
+- [**RPA Framework for Python**](https://robocorp.com/docs/python/rpa-framework)
+  - For additional automation capabilities on the Robocorp platform, please refer to the wide array of libraries and
+    keywords available in **rpaframework**.
   - [PyPI](https://pypi.org/project/rpaframework/)
   - [GitHub](https://github.com/robocorp/rpaframework)
 
-- [3rd-party libraries](3rd_party/README.md)
-  - We are also collecting pointers to other 3rd-party libraries that we see as commonly used or just beneficial to automation cases.
-  - We try to collect the needed links and provide some common code snippets to help you on your way
-  - [List in this repo](./3rd_party/README.md)
-  - [Docs-site (coming soon...)](https://robocorp.com/docs/python/3rd-party)
+- [**3rd-party libraries**](3rd_party/README.md)
+  - We are also collecting pointers to other 3rd-party libraries that we see as commonly used or just beneficial to
+    automation cases.
+  - We try to collect the needed links and provide some common code snippets to help you on your way.
+  - [Docs](https://robocorp.com/docs/python/3rd-party-libraries)
