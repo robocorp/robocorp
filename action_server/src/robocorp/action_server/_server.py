@@ -128,7 +128,7 @@ def start_server(
                 continue
 
         func, openapi_extra = _actions_run.generate_func_from_action(action)
-        if action.is_consequential:
+        if action.is_consequential is not None:
             openapi_extra["x-openai-isConsequential"] = action.is_consequential
 
         app.add_api_route(

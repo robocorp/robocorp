@@ -3,6 +3,7 @@
 ## Unreleased
 
 - `action-server start --expose` now accepts concurrent requests.
+- `x-openai-isConsequential: false` is now properly set again for `@action(is_consequential=False)`.
 
 ## 0.1.1 - 2024-03-15
 
