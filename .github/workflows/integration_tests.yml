@@ -10,6 +10,8 @@ name: Integration Tests
     - .github/workflows/integration_tests.yml
     - devutils/**
     - log/**
+    - browser/**
+    - tasks/**
   pull_request:
     branches:
     - master
@@ -18,6 +20,8 @@ name: Integration Tests
     - .github/workflows/integration_tests.yml
     - devutils/**
     - log/**
+    - browser/**
+    - tasks/**
 defaults:
   run:
     working-directory: ./integration_tests

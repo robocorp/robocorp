@@ -221,7 +221,7 @@ class ActionServerClient:
         result.raise_for_status()
         return result.text
 
-    def _get_default_timeout(self) -> int:
+    def _get_default_timeout(self) -> Optional[int]:
         if is_debugger_active():
             return None
         return 10
