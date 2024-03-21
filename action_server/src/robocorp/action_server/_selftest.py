@@ -214,10 +214,17 @@ class ActionServerClient:
         import requests
 
         result = requests.get(
-            self.build_full_url(url), params=(params or {}), timeout=5
+            self.build_full_url(url),
+            params=(params or {}),
+            timeout=self._get_default_timeout(),
         )
         result.raise_for_status()
         return result.text
+
+    def _get_default_timeout(self) -> int:
+        if is_debugger_active():
+            return None
+        return 10
 
     def get_openapi_json(self, params: Optional[dict] = None):
         return self.get_str("openapi.json", params=params)
@@ -245,7 +252,7 @@ class ActionServerClient:
             json=data,
             cookies=cookies,
             params=params,
-            timeout=5,
+            timeout=self._get_default_timeout(),
         )
         result.raise_for_status()
         return result.text
@@ -253,7 +260,11 @@ class ActionServerClient:
     def post_error(self, url, status_code, data=None):
         import requests
 
-        result = requests.post(self.build_full_url(url), json=data or {}, timeout=5)
+        result = requests.post(
+            self.build_full_url(url),
+            json=data or {},
+            timeout=self._get_default_timeout(),
+        )
         if result.status_code != status_code:
             raise AssertionError(
                 (
@@ -267,7 +278,9 @@ class ActionServerClient:
     def get_error(self, url, status_code):
         import requests
 
-        result = requests.get(self.build_full_url(url), timeout=5)
+        result = requests.get(
+            self.build_full_url(url), timeout=self._get_default_timeout()
+        )
         assert result.status_code == status_code
 
 
