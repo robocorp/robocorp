@@ -50,12 +50,15 @@ def start_server(
     from starlette.requests import Request
     from starlette.responses import HTMLResponse
 
+    from robocorp.action_server._server_websockets import (
+        include_websocket_socketio_routing,
+    )
+
     from . import _actions_process_pool, _actions_run
     from ._api_action_package import action_package_api_router
     from ._api_run import run_api_router
     from ._app import get_app
     from ._models import Action, ActionPackage, get_db
-    from ._server_websockets import websocket_api_router
     from ._settings import get_settings
 
     settings = get_settings()
@@ -166,7 +169,7 @@ def start_server(
     app.include_router(
         action_package_api_router, include_in_schema=settings.full_openapi_spec
     )
-    app.include_router(websocket_api_router)
+    include_websocket_socketio_routing(app)
 
     @app.get("/config", include_in_schema=settings.full_openapi_spec)
     async def serve_config():

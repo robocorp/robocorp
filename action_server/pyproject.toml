@@ -32,6 +32,7 @@ psutil = "^5"
 pydantic = "^2.4.2"
 pyyaml = "^6"
 python = "^3.10"
+python-socketio = {version = "^5.11.1", extras = ["asyncio_client"]}
 requests = "^2"
 robocorp-actions = "^0.1.0"
 termcolor = "^2.4.0"

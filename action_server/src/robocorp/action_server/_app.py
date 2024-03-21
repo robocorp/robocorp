@@ -56,7 +56,7 @@ class _CustomFastAPI(FastAPI):
 
 
 @cache
-def get_app():
+def get_app() -> FastAPI:
     settings = get_settings()
 
     server = {"url": settings.server_url}
@@ -70,9 +70,9 @@ def get_app():
         allow_credentials=True,
     )
 
-    app.add_exception_handler(_errors.RequestError, _errors.request_error_handler)
-    app.add_exception_handler(HTTPException, _errors.http_error_handler)
-    app.add_exception_handler(RequestValidationError, _errors.http422_error_handler)
+    app.add_exception_handler(_errors.RequestError, _errors.request_error_handler)  # type: ignore
+    app.add_exception_handler(HTTPException, _errors.http_error_handler)  # type: ignore
+    app.add_exception_handler(RequestValidationError, _errors.http422_error_handler)  # type: ignore
     app.add_exception_handler(Exception, _errors.http500_error_handler)
 
     return app

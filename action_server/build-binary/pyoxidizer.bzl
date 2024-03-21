@@ -263,6 +263,7 @@ def make_exe():
             "psutil~=5.9",
             "pydantic~=2.4",
             "pyyaml~=6.0",
+            "python-socketio~=5.11.1",
             "requests~=2.31",
             "robocorp-actions~=0.1",
             "termcolor~=2.4",

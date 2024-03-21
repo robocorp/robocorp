@@ -1,12 +1,9 @@
 import asyncio
 import logging
-import threading
 import typing
 from dataclasses import asdict
 from functools import partial
-
-from fastapi.routing import APIRouter
-from starlette.websockets import WebSocket, WebSocketDisconnect
+from typing import Optional
 
 if typing.TYPE_CHECKING:
     from ._models import Run
@@ -15,98 +12,138 @@ if typing.TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-websocket_api_router = APIRouter(prefix="/api/ws")
+def include_websocket_socketio_routing(app):
+    import socketio  # type: ignore
 
+    sio_async_server = socketio.AsyncServer(
+        async_mode="asgi",
+        cors_allowed_origins="*",
+        # logger=True,
+        # engineio_logger=True,
+    )
+    ws_app = socketio.ASGIApp(socketio_server=sio_async_server, socketio_path="/api/ws")
+    app.mount("/api/ws", ws_app)
 
-class RunNotificationsThread(threading.Thread):
-    def __init__(self, loop, websocket):
-        super().__init__()
+    # A set with the client ids which are listening to runs
+    clients_listening_runs = set()
 
-        self.loop = loop
-        self.websocket = websocket
-        self._disposed = threading.Event()
-        self.daemon = True
+    # List just to hold the callback called to notify that a change happened.
+    on_run_change_callback: Optional[callable] = None
 
-    def __call__(self, run_change_event: "RunChangeEvent"):
-        asyncio.run_coroutine_threadsafe(
-            self._report_change_event(run_change_event), self.loop
-        )
+    @sio_async_server.on("connect")
+    async def handle_connect(sid, data):
+        pass
+        # print("Connected", sid)
 
-    def run(self):
-        # Collect the runs, send them and register for additional changes until
-        # `dispose` is called.
+    @sio_async_server.on("disconnect")
+    async def handle_disconnect(sid):
+        # print("Disconnected", sid)
+        nonlocal on_run_change_callback
+
         from robocorp.action_server._runs_state_cache import get_global_runs_state
 
         global_runs_state = get_global_runs_state()
 
         with global_runs_state.semaphore:
+            clients_listening_runs.discard(sid)
+            await sio_async_server.leave_room(sid, room="run_listeners")
+            if not clients_listening_runs:
+                # No one listening: no need to listen for run changes
+                if on_run_change_callback is not None:
+                    global_runs_state.unregister(on_run_change_callback)
+                    on_run_change_callback = None
+
+    @sio_async_server.on("echo")
+    async def handle_echo(sid, data):
+        # Just echo something (testing)
+        await sio_async_server.emit("echo", data)
+
+    @sio_async_server.on("request")
+    async def handle_request(sid, request_data):
+        from starlette.concurrency import run_in_threadpool
+
+        method = request_data.get("method")
+        loop = asyncio.get_running_loop()
+        if method == "GET":
+            message_id = request_data.get("message_id")
+            url = request_data.get("url")
+            if url == "/api/actionPackages":
+
+                async def _report_listed_actions(message: dict):
+                    await sio_async_server.emit(
+                        message["message_type"], message["data"], to=sid
+                    )
+
+                def on_listed_actions(message: dict):
+                    asyncio.run_coroutine_threadsafe(
+                        _report_listed_actions(message), loop
+                    )
+
+                loop.create_task(
+                    run_in_threadpool(
+                        partial(
+                            _list_actions_in_threadpool,
+                            on_listed_actions,
+                            message_id,
+                        )
+                    )
+                )
+
+    @sio_async_server.on("start_listen_run_events")
+    async def handle_start_listen_run_events(sid):
+        from robocorp.action_server._runs_state_cache import get_global_runs_state
+
+        nonlocal on_run_change_callback
+
+        global_runs_state = get_global_runs_state()
+        loop = asyncio.get_running_loop()
+
+        with global_runs_state.semaphore:
             runs = global_runs_state.get_current_run_state()
-            asyncio.run_coroutine_threadsafe(self._report_runs(runs), self.loop)
-            global_runs_state.register(self)
+            await _report_runs(sid, runs)
+            if not clients_listening_runs:
+                # Start listening if this is the first client added.
+                if on_run_change_callback is None:
+                    on_run_change_callback = partial(
+                        _on_run_change_found_in_thread, loop
+                    )
+                    global_runs_state.register(on_run_change_callback)
 
-        try:
-            self._disposed.wait()
-        finally:
-            with global_runs_state.semaphore:
-                global_runs_state.unregister(self)
+            clients_listening_runs.add(sid)
+            await sio_async_server.enter_room(sid, room="run_listeners")
 
-    async def _report_change_event(self, run_change_event: "RunChangeEvent"):
+    async def _report_runs(sid, runs: list["Run"]):
+        await sio_async_server.emit(
+            "runs_collected", {"runs": [asdict(run) for run in runs]}, to=sid
+        )
+
+    def _on_run_change_found_in_thread(loop, run_change_event: "RunChangeEvent"):
         """
-        This is run in asyncio, not in this thread.
+        Note that this callback is called from a different thread.
         """
-        if self._disposed.is_set():
-            return
+        asyncio.run_coroutine_threadsafe(_report_change_event(run_change_event), loop)
 
+    async def _report_change_event(run_change_event: "RunChangeEvent"):
         try:
             if run_change_event.ev == "added":
-                await self.websocket.send_json(
-                    {
-                        "message_type": "run_added",
-                        "run": asdict(run_change_event.run),
-                    }
+                await sio_async_server.emit(
+                    "run_added", {"run": asdict(run_change_event.run)}
                 )
             elif run_change_event.ev == "changed":
-                await self.websocket.send_json(
+                await sio_async_server.emit(
+                    "run_changed",
                     {
-                        "message_type": "run_changed",
                         "run_id": run_change_event.run.id,
                         "changes": run_change_event.changes,
-                    }
+                    },
                 )
             else:
                 log.critical(f"Unexpected run change event: {run_change_event}.")
         except Exception:
             log.exception("Error reporting change event to json.")
-            raise
-
-    async def send_json(self, data: list[dict] | dict):
-        """
-        This is run in asyncio, not in this thread.
-        """
-        if self._disposed.is_set():
-            return
-
-        await self.websocket.send_json(data)
-
-    async def _report_runs(self, runs: list["Run"]):
-        """
-        This is run in asyncio, not in this thread.
-        """
-        await self.send_json(
-            {
-                "message_type": "runs_collected",
-                "runs": [asdict(run) for run in runs],
-            }
-        )
-
-    def dispose(self):
-        """
-        Disposes of this thread.
-        """
-        self._disposed.set()
 
 
-def _list_actions_in_threadpool(run_notifications, message_id):
+def _list_actions_in_threadpool(on_response_run_coroutine, message_id):
     from robocorp.action_server._api_action_package import list_action_packages
 
     try:
@@ -115,72 +152,12 @@ def _list_actions_in_threadpool(run_notifications, message_id):
         log.exception("Error collection action packages.")
         action_packages = []
 
-    asyncio.run_coroutine_threadsafe(
-        run_notifications.send_json(
-            {
-                "message_type": "response",
-                "data": {
-                    "message_id": message_id,
-                    "result": [asdict(p) for p in action_packages],
-                },
-            }
-        ),
-        run_notifications.loop,
+    on_response_run_coroutine(
+        {
+            "message_type": "response",
+            "data": {
+                "message_id": message_id,
+                "result": [asdict(p) for p in action_packages],
+            },
+        }
     )
-
-
-@websocket_api_router.websocket("")
-async def websocket_endpoint(websocket: WebSocket):
-    from starlette.concurrency import run_in_threadpool
-
-    loop = asyncio.get_running_loop()
-
-    await websocket.accept()
-    run_notifications = RunNotificationsThread(loop, websocket)
-    try:
-        while True:
-            data = await websocket.receive_json()
-            message_type = data.get("message_type")
-            if message_type == "ping":
-                await websocket.send_json({"message_type": "pong"})
-
-            elif message_type == "request":
-                # We received some request from the UI, let's handle it.
-                try:
-                    request_data = data.get("data")
-                    method = request_data.get("method")
-                    if method == "GET":
-                        message_id = request_data.get("message_id")
-                        url = request_data.get("url")
-                        if url == "/api/actionPackages":
-                            loop.create_task(
-                                run_in_threadpool(
-                                    partial(
-                                        _list_actions_in_threadpool,
-                                        run_notifications,
-                                        message_id,
-                                    )
-                                )
-                            )
-
-                except Exception:
-                    log.exception("Unexpected exception handling a request")
-
-            elif message_type == "start_listen_run_events":
-                # In this case we have to:
-                # 1. Send the current runs to the client.
-                # 2. When run changes are done, notify the client.
-                # The thread should take care of this after it's started.
-                if not run_notifications.is_alive():
-                    run_notifications.start()
-                else:
-                    # If the client calls start_listen_run_events, should we send
-                    # it again? Right now clients are not expected to do that, so
-                    # just log it and ignore.
-                    log.info('Ignoring additional call to "start_listen_run_events"')
-    except WebSocketDisconnect:
-        log.debug("Client disconnected from websocket.")
-    except Exception:
-        log.exception("Unexpected exception from websocket.")
-    finally:
-        run_notifications.dispose()
