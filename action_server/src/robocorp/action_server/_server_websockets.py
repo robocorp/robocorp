@@ -3,23 +3,32 @@ import logging
 import typing
 from dataclasses import asdict
 from functools import partial
-from typing import Optional
+from typing import Any, Callable, Optional
 
 if typing.TYPE_CHECKING:
+    from fastapi.applications import FastAPI
+
     from ._models import Run
     from ._runs_state_cache import RunChangeEvent
 
 log = logging.getLogger(__name__)
 
 
-def include_websocket_socketio_routing(app):
+def include_websocket_socketio_routing(app: "FastAPI"):
     import socketio  # type: ignore
 
     sio_async_server = socketio.AsyncServer(
         async_mode="asgi",
-        cors_allowed_origins="*",
-        # logger=True,
-        # engineio_logger=True,
+        # Setting cors_allowed_origins="*" ends up putting
+        # 'http://localhost:8085' in 'Access-Control-Allow-Origin'
+        # which would end up giving an error such as:
+        # 'Access-Control-Allow-Origin' header contains multiple values 'http://localhost:8085, *', but only one is allowed.
+        # (because '*' is added by fastapi).
+        # Setting [] makes it work properly and not add the additional 'Access-Control-Allow-Origin'
+        # cors_allowed_origins="*",
+        cors_allowed_origins=[],
+        logger=log,
+        engineio_logger=log,
     )
     ws_app = socketio.ASGIApp(socketio_server=sio_async_server, socketio_path="/api/ws")
     app.mount("/api/ws", ws_app)
@@ -28,7 +37,7 @@ def include_websocket_socketio_routing(app):
     clients_listening_runs = set()
 
     # List just to hold the callback called to notify that a change happened.
-    on_run_change_callback: Optional[callable] = None
+    on_run_change_callback: Optional[Callable[..., Any]] = None
 
     @sio_async_server.on("connect")
     async def handle_connect(sid, data):

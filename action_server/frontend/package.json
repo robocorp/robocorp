@@ -35,7 +35,8 @@
     "openapi-types": "^12.1.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.3"
+    "react-router-dom": "^6.21.3",
+    "socket.io-client": "^4.7.5"
   },
   "devDependencies": {
     "@robocorp/eslint-config-frontend": "^1.1.0",

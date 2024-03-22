@@ -83,18 +83,22 @@ async def check_websocket_runs(
             await sio.emit("start_listen_run_events")
 
             # First message has the runs currently available
-            event, _runs = await sio.receive()
+            event, runs = await sio.receive()
             assert event == "runs_collected"
+            assert runs == []
 
             # Request for a run to be created
             queue.put("create_run")
 
             # Run was created
-            event, _current_run_events = await sio.receive()
+            event, added = await sio.receive()
+            assert tuple(added.keys()) == ("run",)
+            assert added["run"]["numbered_id"] == 1
             assert event == "run_added"
 
             # Run was changed (running -> complete)
-            event, _current_run_events = await sio.receive()
+            event, changed = await sio.receive()
+            assert tuple(changed.keys()) == ("run_id", "changes")
             assert event == "run_changed"
 
     except Exception as e:
