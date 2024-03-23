@@ -6,6 +6,8 @@
     - Fixed issue where the number of runs shown in the UI would not match the 
       actual number of runs (i.e.: updated data was not collected on websocket 
       reconnection).
+- Fixed issue where `"sqlite3.OperationalError: database is locked"` could be raised
+  when executing multiple actions in parallel.
 
 ## 0.1.4 - 2024-03-20
 
