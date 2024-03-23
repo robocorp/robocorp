@@ -72,4 +72,4 @@ paths:
           description: Validation Error
       summary: Sleep A While
 servers:
-- url: https://127.0.0.1:8787
+- url: https://127.0.0.1:8788

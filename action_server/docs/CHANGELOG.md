@@ -8,6 +8,9 @@
       reconnection).
 - Fixed issue where `"sqlite3.OperationalError: database is locked"` could be raised
   when executing multiple actions in parallel.
+- In `action-server start --expose`, if an action run starts and the connection 
+  is broken and a new websocket connection is created to the tunnel, the results
+  of the action run are sent to the new websocket.
 
 ## 0.1.4 - 2024-03-20
 

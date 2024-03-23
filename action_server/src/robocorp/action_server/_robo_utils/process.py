@@ -110,15 +110,18 @@ class Process:
             )
         self._proc.wait()
 
-    def start(self, read_stderr: bool = True, read_stdout: bool = True) -> None:
-        kwargs = build_subprocess_kwargs(
+    def start(
+        self, read_stderr: bool = True, read_stdout: bool = True, **kwargs
+    ) -> None:
+        new_kwargs = build_subprocess_kwargs(
             self._cwd, self._env, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         )
+        new_kwargs.update(kwargs)
         log.debug(
             "Subprocess start [args=%s,cwd=%s,uid=%d]", self._args, self._cwd, self._uid
         )
         proc = self._proc = _run_in_thread_and_get_result(
-            partial(_popen_raise, self._args, **kwargs)
+            partial(_popen_raise, self._args, **new_kwargs)
         )
         log.debug("Subprocess started [pid=%s,uid=%d]", proc.pid, self._uid)
         on_stdout = None

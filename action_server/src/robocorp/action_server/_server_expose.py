@@ -5,9 +5,10 @@ import logging
 import os
 import socket
 import sys
+import time
 import typing
 from dataclasses import dataclass
-from typing import Callable, Optional, Tuple
+from typing import Any, Callable, Coroutine, Literal, Optional, Tuple, Union
 
 from pydantic import BaseModel, ValidationError
 from termcolor import colored
@@ -136,7 +137,9 @@ def handle_session_payload(
 
 async def handle_body_payload(
     session: "ClientSession",
-    ws: "websockets.WebSocketClientProtocol",
+    get_ws_coro: Coroutine[
+        Any, Any, Union["websockets.WebSocketClientProtocol", Literal["FINISH"]]
+    ],
     payload: BodyPayload,
     base_url: str,
 ):
@@ -155,7 +158,28 @@ async def handle_body_payload(
             }
         )
 
-        await ws.send(response_converted)
+        timeout_at = time.time() + 30  # Retry up to 30 seconds before giving up
+        while True:
+            ws = await get_ws_coro
+
+            if ws == "FINISH":
+                # It seems it won't be made available, so, just finish it and
+                # stop waiting.
+                break
+
+            try:
+                await ws.send(response_converted)
+            except Exception:
+                if timeout_at > time.time():
+                    log.exception(
+                        "Error sending body payload (timed out: will not retry)"
+                    )
+                    break
+                log.exception("Error sending body payload (will retry)")
+            else:
+                # No exception: finish
+                break
+
     except Exception:
         log.exception("Error handling body payload")
 
@@ -201,7 +225,7 @@ class EventTaskListenForRequestsFinished(ServerEvent):
     pass
 
 
-async def expose_server(
+async def listen_for_requests(
     port: int,
     host: str,
     expose_url: str,
@@ -210,36 +234,44 @@ async def expose_server(
     ping_interval: int = 4,
     api_key: str | None = None,
     on_event: Callable[[ServerEvent], None] | None = None,
-):
-    """
-    Exposes the server to the world.
-    """
+) -> None:
     import websockets
+    from aiohttp import ClientSession
 
     pong_queue: asyncio.Queue = asyncio.Queue(maxsize=1)
-    if on_event is not None:
-        loop = asyncio.get_running_loop()
-        on_event(EventAsyncIOLoop(loop))
 
-    async def listen_for_requests() -> None:
-        from aiohttp import ClientSession
+    session_payload: Optional[SessionPayload] = (
+        get_expose_session_payload(expose_session) if expose_session else None
+    )
 
-        session_payload: Optional[SessionPayload] = (
-            get_expose_session_payload(expose_session) if expose_session else None
-        )
+    headers = _headers_from_session_payload(session_payload) if session_payload else {}
 
-        headers = (
-            _headers_from_session_payload(session_payload) if session_payload else {}
-        )
+    # In testing wss:// is added (in production it's just robocorp.link and
+    # we connect to wss://client.robocorp.link and when we receive the session
+    # id/secret we print it as: https://{session_payload.sessionId}.{expose_url}).
+    if not expose_url.startswith("wss://") and not expose_url.startswith("ws://"):
+        use_url = f"wss://client.{expose_url}"
+    else:
+        use_url = expose_url
 
-        # In testing wss:// is added (in production it's just robocorp.link and
-        # we connect to wss://client.robocorp.link and when we receive the session
-        # id/secret we print it as: https://{session_payload.sessionId}.{expose_url}).
-        if not expose_url.startswith("wss://") and not expose_url.startswith("ws://"):
-            use_url = f"wss://client.{expose_url}"
-        else:
-            use_url = expose_url
+    use_ws: Optional[
+        Union["websockets.WebSocketClientProtocol", Literal["FINISH"]]
+    ] = None
+    use_ws_event = asyncio.Event()
 
+    async def get_ws_coro() -> (
+        Union["websockets.WebSocketClientProtocol", Literal["FINISH"]]
+    ):
+        nonlocal use_ws
+        nonlocal use_ws_event
+
+        while use_ws is None:
+            use_ws_event.clear()
+            await use_ws_event.wait()
+
+        return use_ws
+
+    try:
         ws: websockets.WebSocketClientProtocol
         async with ClientSession() as session:
             async for ws in websockets.connect(
@@ -251,6 +283,9 @@ async def expose_server(
             ):
                 if on_event is not None:
                     on_event(EventConnected(ws))
+                use_ws = ws
+                use_ws_event.set()
+
                 ping_task = asyncio.create_task(
                     handle_ping_pong(ws, pong_queue, ping_interval)
                 )
@@ -286,12 +321,16 @@ async def expose_server(
                                         _headers_from_session_payload(session_payload)
                                     )
                                     handle_session_payload(
-                                        session_payload, expose_url, datadir, api_key
+                                        session_payload,
+                                        expose_url,
+                                        datadir,
+                                        api_key,
                                     )
                                 except ValidationError as e:
                                     if not session_payload:
                                         log.error(
-                                            "Expose session initialization failed", e
+                                            "Expose session initialization failed",
+                                            e,
                                         )
                                         continue
                             case _:
@@ -300,7 +339,7 @@ async def expose_server(
                                     asyncio.create_task(
                                         handle_body_payload(
                                             session,
-                                            ws,
+                                            get_ws_coro(),
                                             body_payload,
                                             f"http://{host}:{port}",
                                         )
@@ -310,10 +349,19 @@ async def expose_server(
                                     continue
                 except websockets.exceptions.ConnectionClosedError:
                     log.info("Lost connection. Reconnecting to expose server...")
+                    use_ws = None
+                    use_ws_event.clear()
+
                 except socket.gaierror as e:
                     log.info(f"Socket error: {e}")
+                    use_ws = None
+                    use_ws_event.clear()
+
                 except Exception as e:
                     log.error(f"Unexpected exception: {e}")
+                    use_ws = None
+                    use_ws_event.clear()
+
                 finally:
                     ping_task.cancel()
                     try:
@@ -322,14 +370,50 @@ async def expose_server(
                         pass
             else:
                 log.info("Expose server connection closed")
+                use_ws = None
+                use_ws_event.clear()
+    finally:
+        use_ws = "FINISH"
+        use_ws_event.set()
 
-    task = asyncio.create_task(listen_for_requests())
+
+async def expose_server(
+    port: int,
+    host: str,
+    expose_url: str,
+    datadir: str,
+    expose_session: str | None = None,
+    ping_interval: int = 4,
+    api_key: str | None = None,
+    on_event: Callable[[ServerEvent], None] | None = None,
+):
+    """
+    Exposes the server to the world.
+    """
+    if on_event is not None:
+        loop = asyncio.get_running_loop()
+        on_event(EventAsyncIOLoop(loop))
+
+    task = asyncio.create_task(
+        listen_for_requests(
+            port,
+            host,
+            expose_url,
+            datadir,
+            expose_session,
+            ping_interval,
+            api_key,
+            on_event,
+        )
+    )
     if on_event is not None:
         on_event(EventTaskListenForRequests(task))
     try:
         await task  # Wait for listen_for_requests to complete
     except asyncio.CancelledError:
         log.info("Expose server listen requests cancelled.")
+    except Exception:
+        log.exception("Expose server finished with unexpected exception.")
     finally:
         if on_event is not None:
             on_event(EventTaskListenForRequestsFinished())
