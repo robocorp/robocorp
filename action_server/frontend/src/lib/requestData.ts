@@ -12,11 +12,12 @@ import {
 } from './types';
 import { Counter, copyArrayAndInsertElement, logError } from './helpers';
 import { CachedModel, ModelContainer, ModelType } from './modelContainer';
+import { WebsocketConn } from './websocketConn';
 
 export const baseUrl = '';
 export const baseUrlWs = `ws://${window.location.host}`;
-// export const baseUrl = 'http://localhost:8090';
-// export const baseUrlWs = 'ws://localhost:8090';
+// export const baseUrl = 'http://localhost:8080';
+// export const baseUrlWs = 'ws://localhost:8080';
 
 interface Opts {
   body?: string;
@@ -75,100 +76,6 @@ const loadAsync = async <T>(
 
 const globalModelContainer = new ModelContainer();
 
-export class WebsocketConn {
-  private ws: WebSocket | null = null;
-
-  private connected = false;
-
-  private connecting = false;
-
-  // TODO: Make ping-pong to verify if it's still alive.
-  private lastPingTime = 0;
-
-  private lastPongTime = 0;
-  // this.lastPingTime = performance.now();
-
-  constructor(
-    private url: string,
-    private onReceivedMessage: (event: MessageEvent) => void,
-  ) {
-    this.url = url;
-    this.onReceivedMessage = onReceivedMessage;
-  }
-
-  public connect(): Promise<void> {
-    this.connecting = true;
-    return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(this.url);
-
-      this.ws.onopen = () => {
-        this.connected = true;
-        this.connecting = false;
-        resolve();
-      };
-
-      this.ws.onmessage = this.handleMessage;
-      this.ws.onclose = this.handleClose;
-      const markNotConnectingAndReject = () => {
-        this.connected = false;
-        this.connecting = false;
-        reject();
-      };
-      this.ws.onerror = markNotConnectingAndReject;
-    });
-  }
-
-  public isConnected() {
-    if (this.ws && this.connected) {
-      return true;
-    }
-    return false;
-  }
-
-  public isConnecting() {
-    if (this.ws && this.connecting) {
-      return true;
-    }
-    return false;
-  }
-
-  public send(message: string | ArrayBuffer): void {
-    if (!this.isConnected() || !this.ws) {
-      throw new Error('Unable to send, websocket is not connected');
-    }
-    // That's sync but it doesn't block (just enqueues data to send).
-    this.ws.send(message);
-  }
-
-  public close(): void {
-    if (this.ws) {
-      this.connected = false;
-      this.connecting = false;
-      const { ws } = this;
-      this.ws = null;
-      ws.close();
-    }
-  }
-
-  private handleMessage = (message: MessageEvent) => {
-    this.onReceivedMessage(message);
-  };
-
-  private handleClose = () => {
-    this.connected = false;
-    this.connecting = false;
-
-    if (!this.ws) {
-      // It was finished for good.
-      return;
-    }
-
-    setTimeout(() => {
-      this.connect();
-    }, 5000);
-  };
-}
-
 /**
  * Runs are sorted in descending order as this is the way we
  * should usually iterate over it.
@@ -191,89 +98,119 @@ interface IResponse<T> {
 class ModelUpdater {
   private modelContainer: ModelContainer;
 
-  private conn: WebsocketConn;
+  private sio: WebsocketConn;
 
   private messageIdToHandler = new Map();
 
   constructor(modelContainer: ModelContainer) {
     this.modelContainer = modelContainer;
-    this.conn = new WebsocketConn(`${baseUrlWs}/api/ws`, this.onReceivedMessage.bind(this));
-  }
+    this.sio = new WebsocketConn(`${baseUrlWs}/api/ws`);
 
-  public async onReceivedMessage(message: MessageEvent) {
-    const dataStr = message.data;
-    if (dataStr) {
-      const data = JSON.parse(dataStr);
-      const messageType = data.message_type;
+    this.sio.on('echo', (echoVal: string) => {
+      // console.log('echo val was', echoVal);
+    });
 
-      if (messageType === 'runs_collected') {
-        const { runs } = data;
-        sortRuns(runs);
+    this.sio.on('runs_collected', (runs: any) => {
+      // console.log('runs collected', runs);
+      sortRuns(runs);
 
-        this.modelContainer.onModelUpdated(ModelType.RUNS, { isPending: false, data: runs });
-      } else if (messageType === 'run_added') {
-        const runsModel = this.modelContainer.getCurrentModel<Run>(ModelType.RUNS);
-        // Runs should be reverse ordered by their id.
-        if (runsModel !== undefined && runsModel.data !== undefined && !runsModel.isPending) {
-          const { run } = data;
-          // Insert but make sure we keep the (reverse) order.
-          let newRunData;
-          for (let i = 0; i < runsModel.data.length - 1; i += 1) {
-            if (run.numbered_id > runsModel.data[i].numbered_id) {
-              newRunData = copyArrayAndInsertElement(runsModel.data, run, i);
-              break;
-            }
+      this.modelContainer.onModelUpdated(ModelType.RUNS, { isPending: false, data: runs });
+    });
+
+    this.sio.on('run_added', (data: any) => {
+      // console.log('run added', data);
+      const { run } = data;
+      const runsModel = this.modelContainer.getCurrentModel<Run>(ModelType.RUNS);
+      // Runs should be reverse ordered by their id.
+      if (runsModel !== undefined && runsModel.data !== undefined && !runsModel.isPending) {
+        // Insert but make sure we keep the (reverse) order.
+        let newRunData;
+        for (let i = 0; i < runsModel.data.length - 1; i += 1) {
+          if (run.numbered_id > runsModel.data[i].numbered_id) {
+            newRunData = copyArrayAndInsertElement(runsModel.data, run, i);
+            break;
           }
-          if (newRunData === undefined) {
-            // Case for len==0 or if it was lowest than any existing run.
-            newRunData = runsModel.data.slice();
-            newRunData.push(run);
-          }
-          this.modelContainer.onModelUpdated(ModelType.RUNS, {
-            isPending: false,
-            data: newRunData,
-          });
         }
-      } else if (messageType === 'response') {
-        const responseData = data.data;
-        const messageId = responseData.message_id;
-        const handler = this.messageIdToHandler.get(messageId);
-        if (handler !== undefined) {
-          this.messageIdToHandler.delete(messageId);
-          handler(responseData);
-        } else {
-          // eslint-disable-next-line no-console
-          console.log(`Error: no handler for response: ${JSON.stringify(data)}`);
+        if (newRunData === undefined) {
+          // Case for len==0 or if it was lowest than any existing run.
+          newRunData = runsModel.data.slice();
+          newRunData.push(run);
         }
-      } else if (messageType === 'run_changed') {
-        const runId = data.run_id;
-        const { changes } = data;
+        this.modelContainer.onModelUpdated(ModelType.RUNS, {
+          isPending: false,
+          data: newRunData,
+        });
+      }
+    });
 
-        const runsModel = this.modelContainer.getCurrentModel<Run>(ModelType.RUNS);
-        if (runsModel !== undefined && runsModel.data !== undefined) {
-          // Runs should be reverse ordered by their id and changes are
-          // usually in the latest runs, so, just iterating to find
-          // that should actually be fast as it should be one
-          // of the first items.
-          for (let i = 0; i < runsModel.data.length; i += 1) {
-            if (runId === runsModel.data[i].id) {
-              const run = runsModel.data[i];
-              const newRun = { ...run, ...changes };
-              const newRunData = runsModel.data.slice();
-              newRunData[i] = newRun;
-              this.modelContainer.onModelUpdated(ModelType.RUNS, {
-                isPending: false,
-                data: newRunData,
-              });
-              break;
-            }
+    this.sio.on('run_changed', (run: any) => {
+      // console.log('run changed', run);
+      const runId = run.run_id;
+      const { changes } = run;
+
+      const runsModel = this.modelContainer.getCurrentModel<Run>(ModelType.RUNS);
+      if (runsModel !== undefined && runsModel.data !== undefined) {
+        // Runs should be reverse ordered by their id and changes are
+        // usually in the latest runs, so, just iterating to find
+        // that should actually be fast as it should be one
+        // of the first items.
+        for (let i = 0; i < runsModel.data.length; i += 1) {
+          if (runId === runsModel.data[i].id) {
+            const run = runsModel.data[i];
+            const newRun = { ...run, ...changes };
+            const newRunData = runsModel.data.slice();
+            newRunData[i] = newRun;
+            this.modelContainer.onModelUpdated(ModelType.RUNS, {
+              isPending: false,
+              data: newRunData,
+            });
+            break;
           }
         }
       }
-    }
+    });
+
+    this.sio.on('response', (response: any) => {
+      // console.log('response', response);
+      const messageId = response.message_id;
+      const handler = this.messageIdToHandler.get(messageId);
+      if (handler !== undefined) {
+        this.messageIdToHandler.delete(messageId);
+        handler(response);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(`Error: no handler for response: ${JSON.stringify(response)}`);
+      }
+    });
+
+    this.sio.on('connect', () => {
+      // On any new connection we have to start listening again
+      // (either being the first or not as new connections later
+      // on probably mean we missed updates).
+      this.sio.emit('start_listen_run_events');
+    });
   }
 
-  private async request<T>(req: IRequest): Promise<IResponse<T>> {
+  public async startUpdating() {
+    // Load initial data (actions/runs)
+    const loadActionsPromise = loadAsync<Action>(`${baseUrl}/api/actionPackages`, 'GET');
+    const loadRunsPromise = loadAsync<Run>(`${baseUrl}/api/runs`, 'GET');
+
+    const actions = await loadActionsPromise;
+    const runs = await loadRunsPromise;
+
+    if (runs.data !== undefined) {
+      sortRuns(runs.data);
+    }
+
+    this.modelContainer.onModelUpdated(ModelType.ACTIONS, actions);
+    this.modelContainer.onModelUpdated(ModelType.RUNS, runs);
+
+    // Connect now to automatically start tracking run changes.
+    this.sio.connect();
+  }
+
+  public async request<T>(req: IRequest): Promise<IResponse<T>> {
     let onResolve: (value: IResponse<T>) => void;
 
     const promise: Promise<IResponse<T>> = new Promise((resolve) => {
@@ -287,73 +224,9 @@ class ModelUpdater {
 
     const messageId = globalCounter.next();
     this.messageIdToHandler.set(messageId, messageHandler);
-
-    const msg = JSON.stringify({
-      message_type: 'request',
-      data: { method: req.method, url: req.url, message_id: messageId },
-    });
-
-    this.conn.send(msg);
+    this.sio.emit('request', { method: req.method, url: req.url, message_id: messageId });
 
     return promise;
-  }
-
-  public async startUpdating() {
-    if (!this.conn.isConnected() && !this.conn.isConnecting()) {
-      const connectPromise = this.conn.connect();
-      const timeoutPromise = new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('Timeout')), 5000);
-      });
-
-      try {
-        await Promise.race([connectPromise, timeoutPromise]);
-      } catch (error) {
-        // timed out, let's stop waiting and go without websockets
-      }
-    }
-
-    if (this.conn.isConnected()) {
-      // Use websocket when we can.
-      this.conn.send(JSON.stringify({ message_type: 'start_listen_run_events' }));
-
-      // Everything available through a regular connection is also available through
-      // the websocket (that is better when available).
-      this.modelContainer.onModelUpdated(
-        ModelType.ACTIONS,
-        await loadAsync<Action>(`${baseUrl}/api/actionPackages`, 'GET'),
-      );
-
-      const loadActionsPromise = this.request<ActionPackage[]>({
-        method: 'GET',
-        url: '/api/actionPackages',
-      });
-
-      loadActionsPromise.then((actions) => {
-        this.modelContainer.onModelUpdated(ModelType.ACTIONS, {
-          isPending: false,
-          data: actions.result,
-        });
-      });
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(
-        'Unable to use websockets (no connection was made in 5 seconds). Proceeding with regular http.',
-      );
-
-      // Approach not using websocket.
-      const loadActionsPromise = loadAsync<Action>(`${baseUrl}/api/actionPackages`, 'GET');
-      const loadRunsPromise = loadAsync<Run>(`${baseUrl}/api/runs`, 'GET');
-
-      const actions = await loadActionsPromise;
-      const runs = await loadRunsPromise;
-
-      if (runs.data !== undefined) {
-        sortRuns(runs.data);
-      }
-
-      this.modelContainer.onModelUpdated(ModelType.ACTIONS, actions);
-      this.modelContainer.onModelUpdated(ModelType.RUNS, runs);
-    }
   }
 }
 
