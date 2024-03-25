@@ -2,12 +2,7 @@
 import type { OpenAPIV3_1 } from 'openapi-types';
 import { InputProperty } from './types';
 
-export type PropertyFormDataType =
-  | string
-  | number
-  | boolean
-  | object
-  | Array<string | number | boolean>;
+export type PropertyFormDataType = string | number | boolean | Array<PropertyFormData>;
 
 export type PropertyFormData = {
   name: string;
