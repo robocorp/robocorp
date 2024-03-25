@@ -2,14 +2,7 @@
 /* eslint-disable max-classes-per-file */
 
 import { Dispatch, SetStateAction } from 'react';
-import {
-  Action,
-  ActionPackage,
-  AsyncLoaded,
-  LoadedActionsPackages,
-  LoadedRuns,
-  Run,
-} from './types';
+import { Action, AsyncLoaded, LoadedActionsPackages, LoadedRuns, Run } from './types';
 import { Counter, copyArrayAndInsertElement, logError } from './helpers';
 import { CachedModel, ModelContainer, ModelType } from './modelContainer';
 import { WebsocketConn } from './websocketConn';
@@ -106,7 +99,7 @@ class ModelUpdater {
     this.modelContainer = modelContainer;
     this.sio = new WebsocketConn(`${baseUrlWs}/api/ws`);
 
-    this.sio.on('echo', (echoVal: string) => {
+    this.sio.on('echo', () => {
       // console.log('echo val was', echoVal);
     });
 
@@ -156,8 +149,7 @@ class ModelUpdater {
         // of the first items.
         for (let i = 0; i < runsModel.data.length; i += 1) {
           if (runId === runsModel.data[i].id) {
-            const run = runsModel.data[i];
-            const newRun = { ...run, ...changes };
+            const newRun = { ...runsModel.data[i], ...changes };
             const newRunData = runsModel.data.slice();
             newRunData[i] = newRun;
             this.modelContainer.onModelUpdated(ModelType.RUNS, {

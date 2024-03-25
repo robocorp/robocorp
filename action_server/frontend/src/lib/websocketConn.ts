@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { logError } from './helpers';
 
 /**
@@ -62,6 +63,7 @@ export class WebsocketConn {
   private notify(event: string, ...args: any[]) {
     const handlers = this.eventToHandlers.get(event);
     if (handlers) {
+      // eslint-disable-next-line no-restricted-syntax
       for (const handler of handlers) {
         // console.log('notify', event, handler, args);
         try {
@@ -77,7 +79,7 @@ export class WebsocketConn {
    * Emits an event to the server.
    */
   public async emit(event: string, data: any = undefined) {
-    const msg: any = { event: event };
+    const msg: any = { event };
     if (data !== undefined) {
       msg.data = data;
     }
@@ -103,17 +105,18 @@ export class WebsocketConn {
     }
   }
 
-  public connect(): Promise<void> | void {
+  public connect(): Promise<void> {
     if (this.connecting) {
       // console.log('Websocket: connect ignored (already connecting).');
-      return;
+      return Promise.resolve(undefined);
     }
     if (this.connected) {
       // console.log('Websocket: connect ignored (already connected).');
-      return;
+      return Promise.resolve(undefined);
     }
     // console.log('Websocket: starting connection.');
     this.connecting = true;
+
     return new Promise((resolve, reject) => {
       // console.log('Websocket: connecting to: ', this.url);
       this.ws = new WebSocket(this.url);
@@ -146,9 +149,7 @@ export class WebsocketConn {
     const dataStr = message.data;
     if (dataStr) {
       // console.log('Received data', dataStr);
-      const obj = JSON.parse(dataStr);
-      const event = obj['event'];
-      const data = obj['data'];
+      const { event, data } = JSON.parse(dataStr);
       if (event) {
         if (data !== undefined) {
           this.notify(event, data);
