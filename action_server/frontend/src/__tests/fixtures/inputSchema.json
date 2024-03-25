@@ -51,9 +51,37 @@
           ],
           "description": "The user's gender, optional",
           "default": "female"
+        },
+        "education": {
+          "properties": {
+            "rows": {
+              "items": {
+                "properties": {
+                  "columns": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "title": "Columns",
+                    "description": "List of Education Properties"
+                  }
+                },
+                "type": "object",
+                "required": ["columns"],
+                "title": "Row"
+              },
+              "type": "array",
+              "title": "Rows",
+              "description": "Individual education degrees"
+            }
+          },
+          "type": "object",
+          "required": ["rows"],
+          "title": "Rows To Add",
+          "description": "the rows to be added to the sheet."
         }
       },
-      "required": ["name", "age", "address", "agreed_to_terms", "gender"],
+      "required": ["name", "age", "address", "agreed_to_terms", "gender", "education"],
       "title": "Prospect",
       "type": "object"
     }
