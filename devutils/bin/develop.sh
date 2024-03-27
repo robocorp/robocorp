@@ -29,8 +29,8 @@ fi
 # Create a new or replace an already existing virtual environment.
 cd ..  # place/check the new/existing venv in the devtools root dir
 if [ -d $venvDir ]; then
-    echo "Detected existing development environment!"
-    read -r -p "Do you want to create a clean environment? (Y/N) " response
+    echo "Detected existing development environment."
+    read -r -p "Do you want to create a clean environment? [Y/N] " response
     if [[ "$response" =~ ^[Yy] ]]; then
         echo "Replacing existing environment with a clean one..."
         newEnv=true
@@ -47,7 +47,8 @@ if $newEnv; then
     ./bin/rcc venv development-environment.yaml --space robocorp-development --force
 fi
 . ./$venvDir/bin/activate  # environment already exists at this point
-pip install -Ur requirements.txt  # install requirements all the time (due to updates)
+# Install requirements all the time (due to updates).
+python -m pip install -Ur requirements.txt
 
 # Start VS Code over the repo to open the project for development.
 code .. || echo "VSCode binary not available in PATH! (skip opening)"

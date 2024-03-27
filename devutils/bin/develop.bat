@@ -1,49 +1,49 @@
 @echo off
-pushd .
 
+pushd .
 SET scriptPath=%~dp0
 SET scriptPath=%scriptPath:~0,-1%
 cd /D %scriptPath%
 
-:: Get RCC
+SET venvDir=venv
+
+:: Get RCC, binary with which we're going to create the master environment.
+SET rccUrl=https://downloads.robocorp.com/rcc/releases/latest/windows64/rcc.exe
 IF NOT EXIST ".\rcc.exe" (
-    curl -o rcc.exe https://downloads.robocorp.com/rcc/releases/latest/windows64/rcc.exe --fail || goto :error
+    curl -o rcc.exe %rccUrl% --fail || goto venv_error
 )
 
-:: Go to repo root
-cd ..
-
-:: Check if .venv folder exists
-IF EXIST ".\venv" (
-    echo Detected existing developement environment.
+:: Create a new or replace an already existing virtual environment.
+cd .. & REM place/check the new/existing venv in the devtools root dir
+IF EXIST ".\%venvDir%" (
+    echo Detected existing development environment.
     echo Do you want to create a clean environment? [Y/N]
-    choice /C YN /N /M "Select Y for Yes (clean environment) or N for No (use existing):"
-    IF ERRORLEVEL 2 GOTO USE_EXISTING
+    choice /C YN /N /M "Select [Y]es (clean environment) or [N]o (use existing):"
+    IF ERRORLEVEL 2 GOTO venv_setup
 )
 
-rcc venv devutils\dev-env-libraries.yaml -s dev-library-env --force
+:venv_new
+echo Creating a clean environment...
+.\bin\rcc.exe venv development-environment.yaml --space robocorp-development --force
 
-::INSTALL_DEPENDENCIES
-call .\venv\Scripts\activate.bat
-
-pip install -Ur devutils/requirements.txt
-
-:: Start VS Code 
-code .
-
+:venv_setup
+:: Activate the virtual environment and install dependencies everytime.
+call .\%venvDir%\Scripts\activate.bat
+python -m pip install -Ur requirements.txt
+:: Start VS Code over the repo to open the project for development.
+code . || goto vscode_error
 goto end
 
-:USE_EXISTING
-echo Using existing environment.
-call .\venv\Scripts\activate.bat
-code .
-
-goto end
-
-:error
+:venv_error
 echo.
-echo Developement environment setup failed.
+echo Development environment setup failed!
+goto end
+
+:vscode_error
+echo.
+echo Running VSCode failed!
+goto end
 
 :end
-pause
 popd
+pause
