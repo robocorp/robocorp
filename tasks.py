@@ -1,3 +1,4 @@
+import sys
 import subprocess
 from pathlib import Path
 
@@ -16,8 +17,8 @@ def poetry_lock(ctx: invoke.Context) -> None:
 
 
 @task
-def docs(ctx: invoke.Context) -> None:
-    """Regenerate documentation for each library."""
+def poetry_install(ctx: invoke.Context) -> None:
+    """Run install for all projects"""
     ignored = [
         "devutils",
         "integration_tests",
@@ -28,8 +29,49 @@ def docs(ctx: invoke.Context) -> None:
         if project_dir.name in ignored:
             continue
 
-        # subprocess.check_call(["poetry", "lock"], cwd=project_dir)
-        subprocess.check_call(["poetry", "install"], cwd=project_dir)
+        print()
+        print(f">> Installing packages in: {project_dir} ...")
+        subprocess.check_call(["poetry", "run", "invoke", "install"], cwd=project_dir)
+
+
+@task
+def poetry_update(ctx: invoke.Context) -> None:
+    """Run install update for all projects"""
+    ignored = [
+        "devutils",
+        "integration_tests",
+        "meta",
+    ]
+
+    for project_dir in _iter_project_dirs():
+        if project_dir.name in ignored:
+            continue
+
+        print()
+        print(f">> Updating packages in: {project_dir} ...")
+        subprocess.check_call(
+            ["poetry", "run", "invoke", "install", "-u"], cwd=project_dir
+        )
+
+
+@task(pre=[poetry_install])
+def docs(ctx: invoke.Context) -> None:
+    """Regenerate documentation for each library."""
+    ignored = [
+        "devutils",
+        "integration_tests",
+        "meta",
+    ]
+
+    if not sys.platform.lower().startswith("win"):
+        ignored.append("windows")
+
+    for project_dir in _iter_project_dirs():
+        if project_dir.name in ignored:
+            continue
+
+        print()
+        print(f">> Invoking docs in: {project_dir} ...")
         subprocess.check_call(["poetry", "run", "invoke", "docs"], cwd=project_dir)
 
 

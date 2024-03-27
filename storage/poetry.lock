@@ -825,6 +825,7 @@ files = []
 develop = true
 
 [package.dependencies]
+black = "^24.3.0"
 invoke = "^2.2.0"
 isort = {version = "^5.12.0", markers = "python_version >= \"3.8\" and python_version < \"4.0\""}
 lazydocs = {git = "https://github.com/robocorp/lazydocs.git"}
@@ -1120,4 +1121,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "5634e1c8d09327fb3b62e11ca767573ee38324766c2d84e3c7b095a5fd076844"
+content-hash = "5842588c2ef9a080629b589997b1605deadfc12092563eac2658bf2bbff7c347"

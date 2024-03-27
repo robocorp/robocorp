@@ -26,7 +26,6 @@ typing-extensions = { version = "^4.6.3", python = "<3.8" }
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = { path = "../devutils/", develop = true }
 types-requests = "^2.30.0.0"
-black = { version = "^24.3.0" }
 
 [build-system]
 requires = ["poetry-core"]
