@@ -56,7 +56,7 @@ class _BrowserConfig:
             skip_playwright_stop: Can be used to skip the playwright stop. Not recommended in
                 general, only meant to be used to diagnose and workaround
                 specific issues on the playwright stop coupled with an early
-                os._exit shutdown in `robocorp-tasks`. Can cause a process leak
+                `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak
                 and even a shutdown deadlock if used alone.
         """  # noqa
         self.browser_engine = browser_engine
