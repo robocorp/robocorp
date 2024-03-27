@@ -1,6 +1,6 @@
 # Contributing
 
-This is a contribution guide for the `robocorp` project and its associated libraries.
+This is a contribution guide for the Robocorp project and its associated libraries.
 
 ## Libraries
 
@@ -9,7 +9,7 @@ This is a contribution guide for the `robocorp` project and its associated libra
 The tool used for Python dependency management is Poetry (`poetry`), and the commands to manage the project are run
 with Invoke (`invoke` / `inv`).
 
-These, along the rest of the other required master dependencies, should be installed from our
+These, along the rest of the other required initial dependencies, should be installed from our
 [requirements.txt][requirements] file.
 
 ```
@@ -24,16 +24,17 @@ pip install -r devutils/requirements.txt
 Sometimes you don't want to end up with development dependencies in your system's Python, or simply, you want to be in
 control of the interpreter version you use without affecting the default Python.
 
-Therefore, you have a couple of options to achieve this top-level isolation:
+Therefore, you have a couple of flexible options to achieve this top-level isolation:
 
 ##### RCC
 
-Leveraging `rcc venv` power on creating ready for development virtual environments with a single script run.
+Leveraging `rcc venv` power on creating ready-for-development virtual environments with a simple script run.
 
 ###### Mac / Linux
 
 ```bash
 % ./devutils/bin/develop.sh
+% . ./devutils/bin/develop.sh
 ```
 
 ###### Windows
@@ -63,8 +64,8 @@ pyenv local 3.10.12
 Check with `pyenv versions` your currently active interpreter to be used as default under any package, and with
 `pyenv which <executable>` the absolute path to the resolved executable you want to run.
 
-> When using Conda or Pyenv, Poetry and Invoke should've been installed in the base environment by _pip_ installing the
-> [requirements.txt][requirements].
+> When using Conda or Pyenv, Poetry and Invoke should have been installed in the base environment by _pip_ installing
+> the [requirements.txt][requirements] first.
 
 ### Development
 
@@ -84,11 +85,7 @@ libraries in development mode right in the same Python virtual environment.
 
 ### Calling Invoke tasks
 
-To see all the available tasks, run `invoke --list` (`inv -l` for short):
-
-```
-invoke --list
-```
+To see all the available tasks, run `invoke --list` (`inv -l` for short).
 
 For instance, linting can be run with:
 
@@ -108,7 +105,7 @@ Type-checking can be checked with:
 inv typecheck
 ```
 
-Docs should be generated after each change:
+Docs should be generated after each change with:
 
 ```
 inv docs
@@ -122,7 +119,7 @@ inv check-all
 
 ### Testing
 
-Testing is done with `pytest` for the Python libraries. For javascript `jest` is the one used.
+Testing is done with `pytest` for the Python libraries. For javascript `jest` is the used one.
 
 To run all tests for a given project, go to the project's folder in the monorepo and then run `inv test`. If you want
 a specific test to be run, then `inv test -t path/to/test.py::function_name` would do it.
@@ -169,7 +166,7 @@ inv update
 ```
 
 The `update` task also automatically bumps the version of the meta-package based on the changed versions of the
-dependencies. Releasing it, is done similarly as with the other libraries, ending in running the very same
+dependencies. Releasing it, is done similarly as with the other libraries, ending by running the very same
 `inv make-release` command.
 
 

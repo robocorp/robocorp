@@ -50,7 +50,7 @@ fi
 # Install requirements all the time (due to updates).
 python -m pip install -Ur requirements.txt
 
-# Start VS Code over the repo to open the project for development.
+# Start VS Code over the repo to open the entire project for development.
 code .. || echo "VSCode binary not available in PATH! (skip opening)"
 
 # Bring back the initial working directory.

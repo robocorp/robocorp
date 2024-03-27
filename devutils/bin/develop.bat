@@ -30,8 +30,8 @@ echo Creating a clean environment...
 :: Activate the virtual environment and install dependencies everytime.
 call .\%venvDir%\Scripts\activate.bat
 python -m pip install -Ur requirements.txt
-:: Start VS Code over the repo to open the project for development.
-code . || goto vscode_error
+:: Start VS Code over the repo to open the entire project for development.
+code .. || goto vscode_error
 goto end
 
 :venv_error
