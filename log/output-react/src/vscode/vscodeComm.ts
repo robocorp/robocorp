@@ -145,7 +145,7 @@ export const requestToHandler: any = {
 // i.e.: Receive message from client
 let { addEventListener } = windowPlaceholder;
 if (addEventListener === undefined) {
-  addEventListener = function (type: any, callback: any) { };
+  addEventListener = function (type: any, callback: any) {};
 }
 
 addEventListener('message', (event: any) => {
@@ -159,17 +159,20 @@ addEventListener('message', (event: any) => {
         // Response to something we posted.
         try {
           const responseMsg: IResponseMessage = msg;
-          if (Object.hasOwn(msgIdToSeq, responseMsg.request_seq) || responseMsg.request_seq in msgIdToSeq) {
+          if (
+            Object.hasOwn(msgIdToSeq, responseMsg.request_seq) ||
+            responseMsg.request_seq in msgIdToSeq
+          ) {
             const resolvePromise = msgIdToSeq[responseMsg.request_seq];
             if (resolvePromise) {
               delete msgIdToSeq[responseMsg.request_seq];
               resolvePromise(responseMsg);
-              return
+              return;
             }
           }
           console.warn('vscodeComm: Unhandled response: ', responseMsg);
         } catch (e) {
-          console.error('vscodeComm: Response raised exception:', e)
+          console.error('vscodeComm: Response raised exception:', e);
         }
         break;
       case 'event':
@@ -180,28 +183,31 @@ addEventListener('message', (event: any) => {
             const handler = eventToHandler[eventMsg.event];
             if (handler) {
               handler(eventMsg);
-              return
+              return;
             }
           }
           console.warn('vscodeComm: Unhandled event: ', eventMsg);
         } catch (e) {
-          console.error('vscodeComm: Event raised exception:', e)
+          console.error('vscodeComm: Event raised exception:', e);
         }
         break;
       case 'request':
         // Process some request
         try {
           const requestMsg: IRequestMessage = msg;
-          if (Object.hasOwn(requestToHandler, requestMsg.command) || requestMsg.command in requestMsg) {
+          if (
+            Object.hasOwn(requestToHandler, requestMsg.command) ||
+            requestMsg.command in requestMsg
+          ) {
             const requestHandler = requestToHandler[requestMsg.command];
             if (requestHandler) {
               requestHandler(requestMsg);
-              return
+              return;
             }
           }
           console.warn('vscodeComm: Unhandled request: ', requestMsg);
         } catch (e) {
-          console.error('vscodeComm: Request raised exception:', e)
+          console.error('vscodeComm: Request raised exception:', e);
         }
         break;
     }
@@ -220,7 +226,7 @@ export function getState(): IState {
   let vscodeRef: IVSCode | undefined;
   try {
     vscodeRef = vscode;
-  } catch (err) { }
+  } catch (err) {}
 
   if (vscodeRef) {
     let ret: IState = vscodeRef.getState();
@@ -255,7 +261,7 @@ export function setState(state: IState) {
   let vscodeRef: IVSCode | undefined;
   try {
     vscodeRef = vscode;
-  } catch (err) { }
+  } catch (err) {}
 
   if (vscodeRef) {
     vscodeRef.setState(state);
