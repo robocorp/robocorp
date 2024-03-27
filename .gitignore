@@ -12,6 +12,7 @@ __pycache__/
 .mypy_cache/
 .coverage
 .idea/
+/devutils/bin/rcc*
 
 # Eclipse / PyDev
 # Please keep these as they contain instructions for Eclipse/PyDev to
@@ -26,6 +27,7 @@ __pycache__/
 
 # Virtual envs
 .venv
+venv
 
 # Project generated files
 dist/
