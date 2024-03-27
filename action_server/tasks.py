@@ -45,10 +45,32 @@ def run(ctx: Context, *args: str, **options):
     ctx.run(cmd, **options)
 
 
+@contextmanager
+def _change_to_frontend_dir():
+    RESOLVED_CURDIR = CURDIR.resolve()
+
+    # vite build has a bug which makes it misbehave when working with a subst
+    # (presumably this is because it's resolving the actual location of
+    # things and then compares with unresolved paths).
+    # In order to fix that we resolve the directory ourselves prior to the
+    # build and switch to that directory.
+    with chdir(RESOLVED_CURDIR / "frontend"):
+        yield
+
+
+@task
+def dev_frontend(ctx: Context):
+    """Run the frentend in dev mode (starts its own localhost server using vite)."""
+
+    with _change_to_frontend_dir():
+        run(ctx, "npm", "run", "dev")
+
+
 @task
 def build_frontend(ctx: Context, debug: bool = False, install: bool = True):
     """Build static .html frontend"""
-    with chdir(CURDIR / "frontend"):
+
+    with _change_to_frontend_dir():
         if install:
             run(ctx, "npm", "ci", "--no-audit", "--no-fund")
         if debug:

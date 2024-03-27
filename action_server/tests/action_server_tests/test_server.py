@@ -285,6 +285,35 @@ def calculator_sum(v1: int = 5) -> float:
             }
 
 
+def test_is_consequential_openapi_spec(
+    action_server_process: ActionServerProcess,
+    data_regression,
+    tmpdir,
+    action_server_datadir: Path,
+    client: ActionServerClient,
+) -> None:
+    action_server_datadir.mkdir(parents=True, exist_ok=True)
+    db_path = action_server_datadir / "server.db"
+    assert not db_path.exists()
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action(is_consequential=False)
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+"""
+    )
+
+    action_server_process.start(
+        actions_sync=True, cwd=calculator.parent, db_file="server.db"
+    )
+    data_regression.check(json.loads(client.get_openapi_json()))
+
+
 def test_import_no_conda(
     action_server_process: ActionServerProcess,
     data_regression,

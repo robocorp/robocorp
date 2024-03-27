@@ -162,6 +162,10 @@ class Database:
 
         SQLite can't deal with multiple writers, so, we use a lock in Python
         which will prevent other threads from writing at the same time.
+
+        Important: as a lock is held in python, it's important to try to minimize
+        the transaction size as much as possible as a transaction in one thread
+        will prevent other threads from starting a transaction.
         """
 
         try:
@@ -178,40 +182,56 @@ class Database:
         except AttributeError:
             in_transaction = self._tlocal.in_transaction = 0
 
-        if in_transaction:
-            # Nested transactions are not supported, so, don't start a new one
-            # here, but we can still use savepoints.
-            self._tlocal.in_transaction += 1
-            savepoint_name = self._next_savepoint_name()
-            self.execute(f"savepoint {savepoint_name};")
-            try:
-                yield
-            except BaseException:
-                self.execute(f"rollback to savepoint {savepoint_name};")
-                raise
-            finally:
-                self._tlocal.in_transaction -= 1
-            return
+        with self._write_lock:
+            # Note: the write lock is now used whenever a transaction is asked for
+            # -- this is done because although on some cases sqlite can handle
+            # updates in parallel in non-related fields, it doesn't do a good
+            # job and can be much slower...
+            #
+            # i.e.
+            # action_server_tests.test_database.test_database_concurrency
+            # runs much slower if this lock isn't in place.
+            #
+            # Also, this should prevent errors where the same place is updated
+            # in different places (each with its own transaction) such as:
+            #
+            # https://github.com/robocorp/robocorp/issues/309
+            # "sqlite3.OperationalError: database is locked"
 
-        assert (
-            self._tlocal.in_transaction == 0
-        ), "Error transaction nesting logic not correct!"
+            if in_transaction:
+                # Nested transactions are not supported, so, don't start a new one
+                # here, but we can still use savepoints.
+                self._tlocal.in_transaction += 1
+                savepoint_name = self._next_savepoint_name()
+                self.execute(f"savepoint {savepoint_name};")
+                try:
+                    yield
+                except BaseException:
+                    self.execute(f"rollback to savepoint {savepoint_name};")
+                    raise
+                finally:
+                    self._tlocal.in_transaction -= 1
+                return
 
-        self._tlocal.in_transaction += 1
-        try:
-            self.execute("BEGIN")
-            yield
-        except BaseException:
-            log.exception("Error. Rolling back database")
-            conn.rollback()
-            raise
-        else:
-            conn.commit()
-        finally:
-            self._tlocal.in_transaction -= 1
             assert (
                 self._tlocal.in_transaction == 0
             ), "Error transaction nesting logic not correct!"
+
+            self._tlocal.in_transaction += 1
+            try:
+                self.execute("BEGIN")
+                yield
+            except BaseException:
+                log.exception("Error. Rolling back database")
+                conn.rollback()
+                raise
+            else:
+                conn.commit()
+            finally:
+                self._tlocal.in_transaction -= 1
+                assert (
+                    self._tlocal.in_transaction == 0
+                ), "Error transaction nesting logic not correct!"
 
     def update(self, instance, *fields: str):
         """

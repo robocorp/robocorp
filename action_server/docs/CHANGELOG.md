@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+- Improved handling of websockets when used from the builtin UI (not the `--expose` one).
+    - Fixed issue where the number of runs shown in the UI would not match the 
+      actual number of runs (i.e.: updated data was not collected on websocket 
+      reconnection).
+- Fixed issue where `"sqlite3.OperationalError: database is locked"` could be raised
+  when executing multiple actions in parallel.
+- In `action-server start --expose`, if an action run starts and the connection 
+  is broken and a new websocket connection is created to the tunnel, the results
+  of the action run are sent to the new websocket.
+
+## 0.1.4 - 2024-03-20
+
+- Fixed issue in action-server binary build. 
+
+## 0.1.3 - 2024-03-20
+
+- Fixed issue in action-server binary build. 
+
+## 0.1.2 - 2024-03-20
+
+- `action-server start --expose` now accepts concurrent requests.
+- `x-openai-isConsequential: false` is now properly set again for `@action(is_consequential=False)`.
+
 ## 0.1.1 - 2024-03-15
 
 - Fixed issue running `action-server start --expose`.

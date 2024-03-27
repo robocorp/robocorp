@@ -1,211 +1,316 @@
 import asyncio
-import concurrent.futures
 import json
-import socket
+import sys
 import threading
-import uuid
+import time
+import typing
+from concurrent import futures
+from pathlib import Path
 from queue import Queue
+from typing import Iterator, Optional, TypeVar
 
 import pytest
 
 from robocorp.action_server._selftest import ActionServerProcess
 
+T = TypeVar("T")
 
-class DummyRobocorpLinkWebsocketServer:
-    """
-    This class is a dummy class to test websocket connections.
 
-    When a connection is received, the first message it sends is a message
-    with the session id and the related secret (so that the session can be
-    reconnected again later on).
+def wait_for_expose_session_info(action_server_process):
+    import time
+    from json import JSONDecodeError
 
-    Example:
-
-        {"sessionId":"my-custom-session-id","sessionSecret":"secret-string"}
-
-    Internally it has 2 queues, a write queue, where information may be written
-    to which should be written to the websocket and a read queue, where information
-    can be read from.
-
-    Also, it should continually send a message with a "pong" string and then
-    check if a "ping" is received after some timeout (if it's not received
-    the connection can be considered closed).
-    """
-
-    def __init__(self):
-        self.write_queue = Queue()
-        self.read_queue = Queue()
-        self.session_id = str(uuid.uuid4())
-        self.session_secret = str(uuid.uuid4())
-        self.websocket = None
-        self.pong_task = None
-        self.websocket_url = ""
-        self.log_info = ["initial"]
-
-    async def handle_connection(self, websocket):
-        self.log_info.append("connected")
-        self.websocket = websocket
-        await self.send_session_info()
-        self.log_info.append("sent session info")
-        await self.start_ping_pong_loop()
-        self.log_info.append("started ping-pong")
-
+    timeout_at = time.time() + 15
+    target = action_server_process.datadir / "expose_session.json"
+    while time.time() < timeout_at:
         try:
-            while True:
-                message = await self.read_message()
-                await self.handle_message(message)
-        except asyncio.CancelledError:
-            pass
-        finally:
-            await self.cleanup_connection()
+            expose_session_info = json.loads(target.read_text())
+            return expose_session_info
+        except (FileNotFoundError, JSONDecodeError):
+            continue
 
-    async def send_session_info(self):
-        session_info = {
-            "sessionId": self.session_id,
-            "sessionSecret": self.session_secret,
-        }
-        await self.websocket.send(json.dumps(session_info))
-
-    async def start_ping_pong_loop(self):
-        self.pong_task = asyncio.create_task(self.pong_loop())
-
-    async def pong_loop(self):
-        while True:
-            await self.websocket.send("pong")
-            try:
-                await asyncio.wait_for(self.websocket.recv(), timeout=5)
-            except asyncio.TimeoutError:
-                await self.close_connection()
-                return
-
-    async def handle_message(self, message):
-        self.read_queue.put(message)
-
-    async def write_message(self, message):
-        await self.websocket.send(message)
-
-    async def read_message(self):
-        message = await self.websocket.recv()
-        self.write_queue.put(message)  # For testing purposes
-        return message
-
-    async def close_connection(self):
-        if self.pong_task:
-            self.pong_task.cancel()
-        await self.websocket.close()
-
-    async def cleanup_connection(self):
-        await self.close_connection()
-        self.websocket = None
-        self.pong_task = None
+    raise AssertionError(f"The file: {target} was not generated in the given timeout.")
 
 
-def _start_dummy_server(
-    dummy_server: DummyRobocorpLinkWebsocketServer,
-    stop: asyncio.Future,
-    host_port_future: concurrent.futures.Future,
+def manual_test_server_expose(
+    datadir,
+    action_server_process: ActionServerProcess,
+    data_regression,
 ):
-    async def start() -> None:  # Add a start method to create the server
-        import websockets
+    """
+    Tests the action server --expose against the real server.
+    """
+    from robocorp.action_server._selftest import ActionServerClient
 
-        async with websockets.serve(
-            dummy_server.handle_connection, "localhost", 0
-        ) as server:
-            for s in server.server.sockets:
-                if s.family == socket.AF_INET:
-                    host, port = s.getsockname()
-                    host_port_future.set_result((host, port))
-                    break
-            else:
-                raise RuntimeError("Unable to find ipv4 socket")
+    action_server_process.start(
+        db_file="server.db",
+        cwd=datadir,
+        actions_sync=True,
+        timeout=300,
+        lint=True,
+        min_processes=2,
+        max_processes=2,
+        reuse_processes=True,
+        additional_args=["--expose"],
+    )
 
-            await stop
-            server.close()
+    expose_session_info = wait_for_expose_session_info(action_server_process)
+    api_key = (action_server_process.datadir / ".api_key").read_text()
 
-    asyncio.run(start())
+    target_url = expose_session_info["url"]
+    headers = {"Authorization": f"Bearer {api_key}"}
+
+    client = ActionServerClient(target_url)
+    openapi = json.loads(client.get_openapi_json())
+    assert openapi.pop("servers") == [{"url": target_url}]
+
+    data_regression.check(openapi)
+
+    from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
+
+    def call_sleep(time_to_sleep: float):
+        def func():
+            ret = client.post_get_str(
+                "/api/actions/test-server-expose/sleep-a-while/run",
+                {"time_to_sleep": time_to_sleep},
+                headers=headers,
+            )
+            return float(ret)
+
+        fut = run_in_thread(func)
+        return fut
+
+    first = call_sleep(3)
+    second = call_sleep(0.1)
+
+    first_finished_at = first.result(timeout=10)
+    second_finished_at = second.result(timeout=10)
+    # The second must've finished before the first!
+    assert second_finished_at < first_finished_at
+
+
+def run_in_loop(loop: asyncio.AbstractEventLoop, func, timeout=10):
+    fut: futures.Future = futures.Future()
+
+    def callback():
+        try:
+            result = func()
+        except BaseException as e:
+            fut.set_exception(e)
+        else:
+            fut.set_result(result)
+
+    loop.call_soon_threadsafe(callback)
+    return fut.result(timeout)
+
+
+def run_coro_in_loop(loop: asyncio.AbstractEventLoop, coro, timeout=10):
+    fut: futures.Future = futures.Future()
+
+    async def callback():
+        try:
+            result = await coro
+        except BaseException as e:
+            fut.set_exception(e)
+        else:
+            fut.set_result(result)
+
+    asyncio.run_coroutine_threadsafe(callback(), loop)
+    return fut.result(timeout)
+
+
+class WranglerProcess:
+    def __init__(self) -> None:
+        import subprocess
+
+        from robocorp.action_server._robo_utils.process import Process
+
+        self.host = "127.0.0.1"
+        self.port = 8788
+
+        this_file = Path(__file__).absolute()
+        action_server_dir = this_file.parent.parent.parent
+        assert action_server_dir.name == "action_server"
+        robo_dir = action_server_dir.parent
+        action_server_tunnel_dir = robo_dir.parent / "action-server-tunnel"
+        if not action_server_tunnel_dir.exists():
+            raise pytest.skip(
+                reason="action-server-tunnel not cloned along the robocorp repo"
+            )
+        self.action_server_tunnel_dir = action_server_tunnel_dir
+        subprocess.check_call(["npm", "i"], shell=True, cwd=action_server_tunnel_dir)
+        self.process: Optional[Process] = None
+
+    def start(self):
+        assert self.process is None, "Process is already started"
+        from robocorp.action_server._robo_utils.process import Process
+
+        self.process = Process(
+            ["npm", "run", "dev", "--", f"--port={self.port}", f"--ip={self.host}"],
+            cwd=self.action_server_tunnel_dir,
+        )
+
+        self.process.on_stderr.register(sys.stderr.write)
+        self.process.on_stdout.register(sys.stdout.write)
+
+        self.process.start(shell=True)
+
+    def stop(self):
+        if self.process:
+            self.process.stop()
+            self.process = None
 
 
 @pytest.fixture
-def dummy_robocorp_link_server():
-    dummy_robocorp_link_server = DummyRobocorpLinkWebsocketServer()
-    stop = asyncio.Future()
-
-    try:
-        # Start the dummy server.
-        host_port_future = concurrent.futures.Future()
-
-        t_dummy = threading.Thread(
-            target=_start_dummy_server,
-            args=(dummy_robocorp_link_server, stop, host_port_future),
-            name="_Dummy Server (robocorp.link)",
-        )
-        t_dummy.start()
-        dummy_host, dummy_port = host_port_future.result(5)
-        dummy_robocorp_link_server.websocket_url = f"wss://{dummy_host}:{dummy_port}"
-        print(f"Dummy server started at: {dummy_robocorp_link_server.websocket_url}")
-
-        yield dummy_robocorp_link_server
-
-    finally:
-        stop.set_result("done")
+def wrangler_process() -> Iterator[WranglerProcess]:
+    wrangler_process = WranglerProcess()
+    wrangler_process.start()
+    yield wrangler_process
+    wrangler_process.stop()
 
 
-def todo_test_server_expose(
+def test_server_expose_local(
     datadir,
-    dummy_robocorp_link_server: DummyRobocorpLinkWebsocketServer,
     action_server_process: ActionServerProcess,
-):
+    data_regression,
+    wrangler_process: WranglerProcess,
+) -> None:
     """
-    Note: this test is unfinished and is marked as todo...
-    Hopefully this is tackled when we touch the server expose code again!
+    This tests the "real" exposed server but in a local version.
+
+    To work it requires `action-server-tunnel` (private repo) and 'npm' in the env.
+
+    -- It must be cloned alongside the `robocorp` repo for it to work.
+
+    npm i
+    npm run dev
+
+    Then this test can be run.
     """
-    # Start the action server.
+    from robocorp.action_server import _server_expose
+    from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
+    from robocorp.action_server._selftest import ActionServerClient
+    from robocorp.action_server._server_expose import (
+        EventAsyncIOLoop,
+        EventConnected,
+        EventSessionPayload,
+        EventTaskListenForRequests,
+        EventTaskListenForRequestsFinished,
+        ServerEvent,
+    )
 
-    # Start the server expose (in this case, requests will be
-    # sent to the dummy server and then should be forwarded to
-    # the action server -- and its result should be sent back
-    # afterwards).
-    from action_server_tests.fixtures import get_in_resources
+    ws_host, ws_port = wrangler_process.host, wrangler_process.port
+    websocket_expose_url = f"ws://{ws_host}:{ws_port}"
 
-    calculator = get_in_resources("no_conda", "calculator")
     action_server_process.start(
         db_file="server.db",
-        cwd=calculator,
+        cwd=datadir,
         actions_sync=True,
         timeout=300,
-        lint=False,
+        lint=True,
+        min_processes=2,
+        max_processes=2,
+        reuse_processes=True,
     )
 
     host = action_server_process.host
     port = action_server_process.port
 
-    assert dummy_robocorp_link_server.websocket_url
+    events_queue: Queue[ServerEvent] = Queue()
 
-    parent_pid = ""
-    config_logging = True
-    api_key = "this-is-the-api-key"
+    def wait_for_ev(cls: typing.Type[T]) -> T:
+        while True:
+            try:
+                ev = events_queue.get(timeout=20)
+            except Exception:
+                raise AssertionError(f"Timed out waiting for event of type: {cls}")
+            if isinstance(ev, cls):
+                return ev
+            # If it wasn't, wait for the next event.
 
-    args = [
-        parent_pid,
-        str(port),
-        "v",  # verbose
-        host,
-        dummy_robocorp_link_server.websocket_url,
-        str(datadir),
-        "None",
-        api_key,
-        config_logging,
-    ]
+    def expose():
+        _server_expose._setup_logging(force=True)
+        asyncio.run(
+            _server_expose.expose_server(
+                port=int(port),
+                host=host,
+                expose_url=websocket_expose_url,  # localhost
+                datadir=datadir,
+                expose_session=None,
+                api_key=None,
+                on_event=events_queue.put,
+            )
+        )
 
-    from robocorp.action_server import _server_expose
-
-    t1 = threading.Thread(
-        target=_server_expose.main, args=args, name="Server Expose Thread"
+    server_expose_thread = threading.Thread(
+        target=expose, name="Server Expose Thread", daemon=True
     )
-    t1.start()
+    server_expose_thread.start()
 
-    # Ok, the full setup should be done at this point. Let's start
-    # the actual testing.
+    loop_ev = wait_for_ev(EventAsyncIOLoop)
+    listen_task: asyncio.Task = wait_for_ev(EventTaskListenForRequests).task
+    loop: asyncio.AbstractEventLoop = loop_ev.loop
 
-    print("started")
-    print("test...")
+    connected_ev = wait_for_ev(EventConnected)
+    session_payload_ev = wait_for_ev(EventSessionPayload)
+
+    target_url = f"http://{ws_host}:{ws_port}"
+    params = {"sessionId": session_payload_ev.session_payload.sessionId}
+
+    client = ActionServerClient(target_url)
+    data_regression.check(json.loads(client.get_openapi_json(params=params)))
+
+    # Close the connection: a new one must be done.
+    run_coro_in_loop(loop, connected_ev.ws.close())
+    connected_ev = wait_for_ev(EventConnected)
+    session_payload_ev2 = wait_for_ev(EventSessionPayload)
+    # The session id cannot have changed in the meanwhile.
+    assert (
+        session_payload_ev2.session_payload.sessionId
+        == session_payload_ev.session_payload.sessionId
+    )
+
+    def call_sleep(time_to_sleep: float):
+        def func():
+            ret = client.post_get_str(
+                "/api/actions/test-server-expose/sleep-a-while/run",
+                {"time_to_sleep": time_to_sleep},
+                params={"sessionId": session_payload_ev.session_payload.sessionId},
+            )
+            return float(ret)
+
+        fut = run_in_thread(func)
+        return fut
+
+    first = call_sleep(3)
+    second = call_sleep(1)
+
+    time.sleep(0.2)
+    # Close it: the result must still be received when the websocket reconnection is done!
+    run_coro_in_loop(loop, connected_ev.ws.close())
+
+    first_finished_at = first.result(timeout=10)
+    second_finished_at = second.result(timeout=10)
+    # The second must've finished before the first!
+    assert second_finished_at < first_finished_at
+
+    # Teardown
+    run_in_loop(loop, listen_task.cancel)
+    wait_for_ev(EventTaskListenForRequestsFinished)
+    server_expose_thread.join(timeout=2)
+    assert not server_expose_thread.is_alive()
+
+
+# def manual_tests_on_url():
+#     from robocorp.action_server._selftest import ActionServerClient
+#
+#     url = "https://twenty-four-tame-rabbits.robocorp.link"
+#     client = ActionServerClient(url)
+#     print(client.get_openapi_json())
+#     print(
+#         client.post_get_str(
+#             "/api/actions/action-package/tell-me-some-joke/run",
+#             {"joke_theme": "Some theme"},
+#             {"Authorization": "Bearer <token>"},
+#         )
+#     )

@@ -418,8 +418,8 @@ def build_common_tasks(
         ctx.run("inv docs --check")
 
     def _get_module_version(ctx) -> str:
-        command = f"import {package_name}; print({package_name}.__version__)"
-        return poetry(ctx, f"run python -c {command!r}").stdout.strip()
+        command = f'"import {package_name}; print({package_name}.__version__)"'
+        return poetry(ctx, f"run python -c {command}").stdout.strip()
 
     @task
     def make_release(ctx):
