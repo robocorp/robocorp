@@ -32,10 +32,9 @@ class _BrowserConfig:
     ):
         """
         Args:
-            browser_engine: Browser engine which should be used
-                default="chromium"
-                choices=["chromium", "chrome", "chrome-beta", "msedge",
-                         "msedge-beta", "msedge-dev", "firefox", "webkit"]
+            browser_engine: Browser engine which should be used.
+                Possible choices are `"chromium"`, `"chrome"`, `"chrome-beta"`, `"msedge"`,
+                `"msedge-beta"`, `"msedge-dev"`, `"firefox"` and `"webkit"` (defaults to `"chromium"`).
             install: Install browser or not. If not defined, download is only
                 attempted if the browser fails to launch.
             headless: If set to False the browser UI will be shown. If set to True
