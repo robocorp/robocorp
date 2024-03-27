@@ -2,6 +2,8 @@ import ast as ast_module
 from dataclasses import dataclass
 from typing import Any, Iterator, List, Optional, Tuple, TypedDict, Union, overload
 
+from robocorp.tasks._customization._plugin_manager import PluginManager
+
 
 def _iter_nodes(
     node, internal_stack: Optional[List[Any]] = None, recursive=True
@@ -217,33 +219,54 @@ def _check_return_statement(node: ast_module.FunctionDef) -> Iterator[Error]:
         )
 
 
-def _check_arguments(node: ast_module.FunctionDef, docstring: str) -> Iterator[Error]:
+def _check_docstring_contents(
+    pm: Optional[PluginManager], node: ast_module.FunctionDef, docstring: str
+) -> Iterator[Error]:
+    import docstring_parser
+    from robocorp.tasks._commands import _is_managed_param
+
+    assert docstring, "Expected docstring to be given."
+
     arguments = node.args
+    contents = docstring_parser.parse(docstring)
+
+    param_name_to_description = {}
+    for docparam in contents.params:
+        if docparam.description:
+            param_name_to_description[docparam.arg_name] = docparam.description
+
+    if not contents.short_description or contents.short_description.strip() == "Args:":
+        yield _make_error(
+            node,
+            "No description found in docstring. "
+            "Please update docstring to add it as an LLM needs this info "
+            "to understand when to call this action.",
+            coldelta=4,
+        )
+        return
+
+    if contents.short_description and contents.long_description:
+        doc_desc = f"{contents.short_description}\n{contents.long_description}"
+    else:
+        doc_desc = contents.long_description or contents.short_description or ""
+
+    doc_desc_len = len(doc_desc)
+    if doc_desc_len > 300:
+        yield _make_error(
+            node,
+            f"Description has {doc_desc_len} chars. OpenAI just supports "
+            "300 chars in the description (note: this may not be a problem "
+            "in other integrations).",
+            coldelta=4,
+            severity=DiagnosticSeverity.Warning,
+        )
+
     if arguments.args:
-        param_name_to_description = {}
-        if docstring:
-            import docstring_parser
-
-            contents = docstring_parser.parse(docstring)
-            for docparam in contents.params:
-                if docparam.description:
-                    param_name_to_description[docparam.arg_name] = docparam.description
-
-            if (
-                not contents.short_description
-                or contents.short_description.strip() == "Args:"
-            ):
-                yield _make_error(
-                    node,
-                    "No description found in docstring. "
-                    "Please update docstring to add it as an LLM needs this info "
-                    "to understand when to call this action.",
-                    coldelta=4,
-                )
-                return
-
         for arg in arguments.args:
             desc = param_name_to_description.pop(arg.arg, None)
+            if pm is not None and _is_managed_param(pm, arg.arg):
+                continue
+
             if not desc:
                 yield _make_error(
                     arg,
@@ -261,7 +284,9 @@ def _check_arguments(node: ast_module.FunctionDef, docstring: str) -> Iterator[E
                 )
 
 
-def iter_lint_errors(action_contents_file: str | bytes) -> Iterator[Error]:
+def iter_lint_errors(
+    action_contents_file: str | bytes, pm: Optional[PluginManager] = None
+) -> Iterator[Error]:
     ast = ast_module.parse(action_contents_file, "<string>")
     for _stack, node in _iter_nodes(ast, recursive=False):
         if isinstance(node, ast_module.FunctionDef):
@@ -274,6 +299,9 @@ def iter_lint_errors(action_contents_file: str | bytes) -> Iterator[Error]:
                     if docstring:
                         docstring = docstring.strip()
 
+                    yield from _check_return_type(node)
+                    yield from _check_return_statement(node)
+
                     if not docstring:
                         yield _make_error(
                             node,
@@ -281,10 +309,8 @@ def iter_lint_errors(action_contents_file: str | bytes) -> Iterator[Error]:
                             "an LLM would use to decide whether to call this action.",
                             coldelta=4,
                         )
-
-                    yield from _check_return_type(node)
-                    yield from _check_return_statement(node)
-                    yield from _check_arguments(node, docstring)
+                    else:
+                        yield from _check_docstring_contents(pm, node, docstring)
 
 
 _severity_id_to_severity = {

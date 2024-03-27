@@ -101,8 +101,9 @@ class _RunInfo:
 
 
 class _DummyRequest:
-    def __init__(self, headers=None):
+    def __init__(self, headers=None, cookies=None):
         self.headers = headers or {}
+        self.cookies = cookies or {}
 
 
 @contextmanager

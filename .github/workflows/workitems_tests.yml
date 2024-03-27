@@ -9,6 +9,8 @@ name: Work Items Tests
     - workitems/**
     - .github/workflows/workitems_tests.yml
     - devutils/**
+    - tasks/**
+    - log/**
   pull_request:
     branches:
     - master
@@ -16,6 +18,8 @@ name: Work Items Tests
     - workitems/**
     - .github/workflows/workitems_tests.yml
     - devutils/**
+    - tasks/**
+    - log/**
 defaults:
   run:
     working-directory: ./workitems

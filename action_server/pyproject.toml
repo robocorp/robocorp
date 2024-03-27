@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-action-server"
-version = "0.0.28"
+version = "0.1.4"
 description = "Robocorp local task server"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -23,6 +23,7 @@ action-server = "robocorp.action_server.cli:main"
 # Important: when these versions change, pyoxidizer.bzl needs
 # to be updated too for the binary build.
 # This should be updated. See: https://github.com/robocorp/robocorp/issues/173
+aiohttp = "^3.9.3"
 fastapi = "^0.110.0"
 fastjsonschema = "^2.19.1"
 jsonschema = "^4.19.2"
@@ -32,7 +33,7 @@ pydantic = "^2.4.2"
 pyyaml = "^6"
 python = "^3.10"
 requests = "^2"
-robocorp-actions = "^0.0.9"
+robocorp-actions = "^0.1.0"
 termcolor = "^2.4.0"
 uvicorn = "^0.23.2"
 websockets = "^12.0"

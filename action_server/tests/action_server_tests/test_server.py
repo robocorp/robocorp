@@ -285,6 +285,35 @@ def calculator_sum(v1: int = 5) -> float:
             }
 
 
+def test_is_consequential_openapi_spec(
+    action_server_process: ActionServerProcess,
+    data_regression,
+    tmpdir,
+    action_server_datadir: Path,
+    client: ActionServerClient,
+) -> None:
+    action_server_datadir.mkdir(parents=True, exist_ok=True)
+    db_path = action_server_datadir / "server.db"
+    assert not db_path.exists()
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action(is_consequential=False)
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+"""
+    )
+
+    action_server_process.start(
+        actions_sync=True, cwd=calculator.parent, db_file="server.db"
+    )
+    data_regression.check(json.loads(client.get_openapi_json()))
+
+
 def test_import_no_conda(
     action_server_process: ActionServerProcess,
     data_regression,
@@ -762,24 +791,3 @@ def calculator_sum(v1: str, v2: str) -> str:
             actions = db.all(Action)
             assert len(actions) == 1
             assert actions[0].is_consequential is False
-
-
-def todo_issue_167_access_headers(action_server_process: ActionServerProcess):
-    from action_server_tests.fixtures import get_in_resources
-
-    pack = get_in_resources("no_conda", "check_headers")
-    action_server_process.start(
-        cwd=pack,
-        actions_sync=True,
-        db_file="server.db",
-    )
-
-    client = ActionServerClient(action_server_process)
-
-    found = client.post_get_str(
-        "api/actions/check-headers/check-headers/run",
-        {"name": "Foo"},
-        headers={"header1": "value-header1"},
-        cookies=dict(cookie1="foo", cookie2="bar"),
-    )
-    print(found)

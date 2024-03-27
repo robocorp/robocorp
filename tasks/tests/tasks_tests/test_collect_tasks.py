@@ -1,38 +1,17 @@
 import json
 import os
 
-import pytest
 from devutils.fixtures import robocorp_tasks_run
 
 
-@pytest.fixture(autouse=True)
-def _fix_pythonpath():
-    import sys
-
-    if "tasks" in sys.modules:
-        # We have tasks.py and tasks/__init__.py in different tests, so, proactively
-        # remove it.
-        del sys.modules["tasks"]
-
-    from robocorp.tasks._collect_tasks import clear_previously_collected_tasks
-
-    clear_previously_collected_tasks()
-
-    yield
-
-    if "tasks" in sys.modules:
-        # We have tasks.py and tasks/__init__.py in different tests, so, proactively
-        # remove it.
-        del sys.modules["tasks"]
-
-
-def test_colect_tasks(datadir):
+def test_colect_tasks(datadir) -> None:
     from robocorp.tasks._collect_tasks import collect_tasks
+    from robocorp.tasks._customization._plugin_manager import PluginManager
 
-    tasks = tuple(collect_tasks(datadir, "main"))
+    tasks = tuple(collect_tasks(PluginManager(), datadir, "main"))
     assert len(tasks) == 1
 
-    tasks = tuple(collect_tasks(datadir, ""))
+    tasks = tuple(collect_tasks(PluginManager(), datadir, ""))
     assert len(tasks) == 4
     assert {t.name for t in tasks} == {"main", "sub", "main_errors", "task_with_args"}
     name_to_task = dict((t.name, f"{t.module_name}.{t.name}") for t in tasks)
@@ -43,18 +22,19 @@ def test_colect_tasks(datadir):
         "task_with_args": "tasks.task_with_args",
     }
 
-    tasks = tuple(collect_tasks(datadir, "not_there"))
+    tasks = tuple(collect_tasks(PluginManager(), datadir, "not_there"))
     assert len(tasks) == 0
 
 
-def test_colect_tasks_from_package(datadir):
+def test_colect_tasks_from_package(datadir) -> None:
     from robocorp.tasks._collect_tasks import collect_tasks
+    from robocorp.tasks._customization._plugin_manager import PluginManager
 
-    tasks = tuple(collect_tasks(datadir / "in_init"))
+    tasks = tuple(collect_tasks(PluginManager(), datadir / "in_init"))
     assert len(tasks) == 1
 
 
-def test_collect_tasks_integrated_error(tmpdir):
+def test_collect_tasks_integrated_error(tmpdir) -> None:
     result = robocorp_tasks_run(
         ["run", "dir_not_there", "-t=main"], returncode=1, cwd=str(tmpdir)
     )
@@ -64,7 +44,7 @@ def test_collect_tasks_integrated_error(tmpdir):
         raise AssertionError(f"Unexpected stdout: {decoded}")
 
 
-def test_collect_tasks_integrated(datadir):
+def test_collect_tasks_integrated(datadir) -> None:
     from robocorp.log import verify_log_messages_from_log_html
 
     result = robocorp_tasks_run(
@@ -89,7 +69,7 @@ def test_collect_tasks_integrated(datadir):
     )
 
 
-def test_list_tasks_api(datadir, tmpdir, data_regression):
+def test_list_tasks_api(datadir, tmpdir, data_regression) -> None:
     def check(result):
         output = result.stdout.decode("utf-8")
         loaded = json.loads(output)
@@ -107,7 +87,7 @@ def test_list_tasks_api(datadir, tmpdir, data_regression):
     check(result)
 
 
-def test_provide_output_in_stdout(datadir, tmpdir):
+def test_provide_output_in_stdout(datadir, tmpdir) -> None:
     from robocorp.log import verify_log_messages_from_decoded_str
 
     result = robocorp_tasks_run(
@@ -128,7 +108,7 @@ def test_provide_output_in_stdout(datadir, tmpdir):
     )
 
 
-def test_error_in_stdout(datadir, tmpdir):
+def test_error_in_stdout(datadir, tmpdir) -> None:
     from robocorp.log import verify_log_messages_from_decoded_str
 
     result = robocorp_tasks_run(
@@ -156,7 +136,7 @@ def test_error_in_stdout(datadir, tmpdir):
     assert count == 1, "Only one Start Traceback message expected."
 
 
-def test_collect_duplicated_tasks(datadir, tmpdir):
+def test_collect_duplicated_tasks(datadir, tmpdir) -> None:
     result = robocorp_tasks_run(
         ["run", str(datadir / "dupe" / "dupe.py")],
         returncode=1,

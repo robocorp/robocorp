@@ -10,6 +10,9 @@ name: Action Server Tests
     - .github/workflows/action_server_tests.yml
     - devutils/**
     - log/**
+    - actions/**
+    - tasks/**
+    - log_pytest/**
   pull_request:
     branches:
     - master
@@ -18,6 +21,9 @@ name: Action Server Tests
     - .github/workflows/action_server_tests.yml
     - devutils/**
     - log/**
+    - actions/**
+    - tasks/**
+    - log_pytest/**
 defaults:
   run:
     working-directory: ./action_server

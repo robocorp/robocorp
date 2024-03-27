@@ -2,6 +2,8 @@ from typing import Union
 
 from pydantic import BaseModel
 
+from robocorp.tasks._customization._plugin_manager import PluginManager
+
 
 def methoda(a: str) -> int:
     """
@@ -42,7 +44,7 @@ def methodc(a: int = 1) -> int:
 def test_task_schema():
     from robocorp.tasks._task import Task
 
-    task = Task(__name__, __file__, methoda)
+    task = Task(PluginManager(), __name__, __file__, methoda)
     input_schema = task.input_schema
     assert input_schema == {
         "properties": {
@@ -52,7 +54,7 @@ def test_task_schema():
         "type": "object",
     }
 
-    task = Task(__name__, __file__, methodb)
+    task = Task(PluginManager(), __name__, __file__, methodb)
     input_schema = task.input_schema
     assert input_schema == {
         "properties": {
@@ -66,11 +68,17 @@ def test_task_schema():
         "type": "object",
     }
 
-    task = Task(__name__, __file__, methodb)
+    task = Task(PluginManager(), __name__, __file__, methodb)
     output_schema = task.output_schema
     assert output_schema == {"type": "integer", "description": "The number 1."}
 
-    task = Task(__name__, __file__, methoda, options=dict(is_consequential=True))
+    task = Task(
+        PluginManager(),
+        __name__,
+        __file__,
+        methoda,
+        options=dict(is_consequential=True),
+    )
     options = task.options
     assert options["is_consequential"] is True
 
@@ -78,7 +86,7 @@ def test_task_schema():
 def test_task_schema_default_value_type():
     from robocorp.tasks._task import Task
 
-    task = Task(__name__, __file__, methodc)
+    task = Task(PluginManager(), __name__, __file__, methodc)
     input_schema = task.input_schema
     assert input_schema == {
         "properties": {
@@ -112,7 +120,7 @@ def unicode_ação_Σ(ação: int = 1) -> int:
 def test_task_unicode():
     from robocorp.tasks._task import Task
 
-    task = Task(__name__, __file__, unicode_ação_Σ)
+    task = Task(PluginManager(), __name__, __file__, unicode_ação_Σ)
     input_schema = task.input_schema
     assert input_schema == {
         "properties": {
@@ -140,7 +148,7 @@ def method_custom_type(a: MyCustomData) -> MyCustomData:
 def test_task_schema_custom_type():
     from robocorp.tasks._task import Task
 
-    task = Task(__name__, __file__, method_custom_type)
+    task = Task(PluginManager(), __name__, __file__, method_custom_type)
     input_schema = task.input_schema
     assert input_schema == {
         "properties": {
@@ -155,7 +163,7 @@ def test_task_schema_custom_type():
                     },
                 },
                 "required": ["name", "price"],
-                "title": "MyCustomData",
+                "title": "A",
                 "type": "object",
             }
         },
@@ -196,7 +204,7 @@ def method_custom_dependent_type(a: MyDataWithDependent) -> MyDataWithDependent:
 def test_task_schema_dependent_type():
     from robocorp.tasks._task import Task
 
-    task = Task(__name__, __file__, method_custom_dependent_type)
+    task = Task(PluginManager(), __name__, __file__, method_custom_dependent_type)
     input_schema = task.input_schema
     assert input_schema == {
         "properties": {
@@ -211,7 +219,7 @@ def test_task_schema_dependent_type():
                     },
                 },
                 "required": ["name", "dependent"],
-                "title": "MyDataWithDependent",
+                "title": "A",
                 "type": "object",
             }
         },

@@ -1,0 +1,65 @@
+[
+  {
+    "name": "data.name",
+    "property": {
+      "title": "Name",
+      "description": "User's name",
+      "type": "string"
+    },
+    "required": true,
+    "value": "John",
+    "title": "Prospect"
+  },
+  {
+    "name": "data.age",
+    "property": {
+      "title": "Age",
+      "description": "User's age",
+      "type": "integer"
+    },
+    "required": true,
+    "value": "21"
+  },
+  {
+    "name": "data.address.city",
+    "property": {
+      "title": "City",
+      "description": "The city of the address",
+      "type": "string"
+    },
+    "required": true,
+    "value": "",
+    "title": "Address"
+  },
+  {
+    "name": "data.address.street",
+    "property": {
+      "title": "Street",
+      "description": "The street name of the address",
+      "type": "string"
+    },
+    "required": true,
+    "value": ""
+  },
+  {
+    "name": "data.agreed_to_terms",
+    "property": {
+      "title": "Agreed To Terms",
+      "description": "Indicates whether the user has agreed to the terms of service",
+      "type": "boolean"
+    },
+    "required": true,
+    "value": "False"
+  },
+  {
+    "name": "data.gender",
+    "property": {
+      "title": "gender",
+      "description": "The user's gender, optional",
+      "type": "enum"
+    },
+    "required": true,
+    "value": "female",
+    "options": ["male", "female", "not_specified"]
+  }
+]

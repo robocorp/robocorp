@@ -9,6 +9,8 @@ name: Windows Tests
     - windows/**
     - .github/workflows/windows_tests.yml
     - devutils/**
+    - log_pytest/**
+    - log/**
   pull_request:
     branches:
     - master
@@ -16,6 +18,8 @@ name: Windows Tests
     - windows/**
     - .github/workflows/windows_tests.yml
     - devutils/**
+    - log_pytest/**
+    - log/**
 defaults:
   run:
     working-directory: ./windows

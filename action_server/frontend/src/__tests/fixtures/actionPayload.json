@@ -1,0 +1,12 @@
+{
+  "data": {
+    "name": "John",
+    "age": 21,
+    "address": {
+      "city": "",
+      "street": ""
+    },
+    "agreed_to_terms": false,
+    "gender": "female"
+  }
+}

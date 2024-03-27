@@ -14,3 +14,4 @@ dependencies:
       - openpyxl
       - typing-extensions
       - robocorp-http==0.4.0
+      - packaging

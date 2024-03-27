@@ -1,8 +1,33 @@
 from pathlib import Path
+from typing import Iterator
 
 import yaml
 
 CURDIR = Path(__file__).absolute().parent
+
+
+def collect_deps_pyprojects(root_pyproject: Path, found=None) -> Iterator[Path]:
+    if found is None:
+        found = set()
+
+    import tomlkit  # allows roundtrip of toml files
+
+    contents: dict = tomlkit.loads(root_pyproject.read_bytes().decode("utf-8"))
+
+    dependencies = list(contents["tool"]["poetry"]["dependencies"])
+    try:
+        dependencies.extend(contents["tool"]["poetry"]["group"]["dev"]["dependencies"])
+    except Exception:
+        pass  # Ignore if it's not there.
+    for key in dependencies:
+        if key.startswith("robocorp-"):
+            dep_name = key[len("robocorp-") :].replace("-", "_")
+            dep_pyproject = root_pyproject.parent.parent / dep_name / "pyproject.toml"
+            assert dep_pyproject.exists(), f"Expected {dep_pyproject} to exist."
+            if dep_pyproject not in found:
+                found.add(dep_pyproject)
+                yield dep_pyproject
+                yield from collect_deps_pyprojects(dep_pyproject, found)
 
 
 class BaseTests:
@@ -60,6 +85,13 @@ class BaseTests:
         ]
         if self.require_log_built:
             paths.append("log/**")
+
+        dep_pyprojects = list(collect_deps_pyprojects(project_dir / "pyproject.toml"))
+        for dep_pyproject in dep_pyprojects:
+            dep_name = dep_pyproject.parent.name
+            add_dep = f"{dep_name}/**"
+            if add_dep not in paths:
+                paths.append(add_dep)
 
         self.on_part = {
             "on": {
