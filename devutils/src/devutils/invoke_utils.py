@@ -235,7 +235,7 @@ def build_common_tasks(
 
     @contextmanager
     def mark_as_develop_mode(
-        projects: Optional[list[str]] = None, all_packages: bool = False
+        projects: Optional[List[str]] = None, all_packages: bool = False
     ):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
