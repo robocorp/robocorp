@@ -63,7 +63,7 @@ def docs(ctx: invoke.Context) -> None:
         "meta",
     ]
 
-    if not sys.platform.lower().startswith("win"):
+    if sys.platform != "win32":
         ignored.append("windows")
 
     for project_dir in _iter_project_dirs():
