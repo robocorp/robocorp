@@ -2,32 +2,26 @@
 
 # module `robocorp.storage`
 
-**Source:** [`__init__.py:0`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L0)
+# Functions
 
 ______________________________________________________________________
 
-## function `list_assets`
-
-**Source:** [`__init__.py:45`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L45)
-
-```python
-list_assets() → List[str]
-```
+## `list_assets`
 
 List all the existing assets.
 
 **Returns:**
 A list of available assets' names
 
-______________________________________________________________________
-
-## function `delete_asset`
-
-**Source:** [`__init__.py:74`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L74)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L45)
 
 ```python
-delete_asset(name: str)
+list_assets() → List[str]
 ```
+
+______________________________________________________________________
+
+## `delete_asset`
 
 Delete an asset by providing its `name`.
 
@@ -41,15 +35,15 @@ This operation cannot be undone.
 
 - <b>`AssetNotFound`</b>:  Asset with the given name does not exist
 
-______________________________________________________________________
-
-## function `get_text`
-
-**Source:** [`__init__.py:114`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L114)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L74)
 
 ```python
-get_text(name: str) → str
+delete_asset(name: str)
 ```
+
+______________________________________________________________________
+
+## `get_text`
 
 Return the given asset as text.
 
@@ -64,18 +58,15 @@ Asset content as text
 
 - <b>`AssetNotFound`</b>:  No asset defined with given name
 
-______________________________________________________________________
-
-## function `get_json`
-
-**Source:** [`__init__.py:130`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L130)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L114)
 
 ```python
-get_json(
-    name: str,
-    **kwargs
-) → Union[Dict[str, ForwardRef('JSON')], List[ForwardRef('JSON')], str, int, float, bool, NoneType]
+get_text(name: str) → str
 ```
+
+______________________________________________________________________
+
+## `get_json`
 
 Return the given asset as a deserialized JSON object.
 
@@ -92,15 +83,18 @@ Asset content as a Python object (dict, list etc.)
 - <b>`AssetNotFound`</b>:  No asset defined with given name
 - <b>`JSONDecodeError`</b>:  Asset was not valid JSON
 
-______________________________________________________________________
-
-## function `get_file`
-
-**Source:** [`__init__.py:148`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L148)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L130)
 
 ```python
-get_file(name: str, path: Union[PathLike, str], exist_ok=False) → Path
+get_json(
+    name: str,
+    **kwargs
+) → Union[Dict[str, ForwardRef('JSON')], List[ForwardRef('JSON')], str, int, float, bool, NoneType]
 ```
+
+______________________________________________________________________
+
+## `get_file`
 
 Fetch the given asset and store it in a file.
 
@@ -118,15 +112,15 @@ Path to created file
 - <b>`AssetNotFound`</b>:  No asset defined with given name
 - <b>`FileExistsError`</b>:  Destination already exists
 
-______________________________________________________________________
-
-## function `get_bytes`
-
-**Source:** [`__init__.py:173`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L173)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L148)
 
 ```python
-get_bytes(name: str) → bytes
+get_file(name: str, path: Union[PathLike, str], exist_ok=False) → Path
 ```
+
+______________________________________________________________________
+
+## `get_bytes`
 
 Return the given asset as bytes.
 
@@ -141,15 +135,15 @@ Asset content as bytes
 
 - <b>`AssetNotFound`</b>:  No asset defined with given name
 
-______________________________________________________________________
-
-## function `set_text`
-
-**Source:** [`__init__.py:204`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L204)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L173)
 
 ```python
-set_text(name: str, text: str, wait: bool = True)
+get_bytes(name: str) → bytes
 ```
+
+______________________________________________________________________
+
+## `set_text`
 
 Create or update an asset to contain the given string.
 
@@ -159,20 +153,15 @@ Create or update an asset to contain the given string.
 - <b>`text`</b>:  Text content for asset
 - <b>`wait`</b>:  Wait for asset to update
 
-______________________________________________________________________
-
-## function `set_json`
-
-**Source:** [`__init__.py:217`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L217)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L204)
 
 ```python
-set_json(
-    name: str,
-    value: Optional[Dict[str, ForwardRef('JSON')], List[ForwardRef('JSON')], str, int, float, bool],
-    wait: bool = True,
-    **kwargs
-)
+set_text(name: str, text: str, wait: bool = True)
 ```
+
+______________________________________________________________________
+
+## `set_json`
 
 Create or update an asset to contain the given object, serialized as JSON.
 
@@ -183,20 +172,20 @@ Create or update an asset to contain the given object, serialized as JSON.
 - <b>`wait`</b>:  Wait for asset to update
 - <b>`**kwargs`</b>:  Additional arguments for `json.dumps`
 
-______________________________________________________________________
-
-## function `set_file`
-
-**Source:** [`__init__.py:231`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L231)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L217)
 
 ```python
-set_file(
+set_json(
     name: str,
-    path: Union[PathLike, str],
-    content_type: Optional[str] = None,
-    wait: bool = True
+    value: Optional[Dict[str, ForwardRef('JSON')], List[ForwardRef('JSON')], str, int, float, bool],
+    wait: bool = True,
+    **kwargs
 )
 ```
+
+______________________________________________________________________
+
+## `set_file`
 
 Create or update an asset to contain the contents of the given file.
 
@@ -207,20 +196,20 @@ Create or update an asset to contain the contents of the given file.
 - <b>`content_type`</b>:  Content type (or mimetype) of file, detected automatically from file extension if not defined
 - <b>`wait`</b>:  Wait for asset to update
 
-______________________________________________________________________
-
-## function `set_bytes`
-
-**Source:** [`__init__.py:261`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L261)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L231)
 
 ```python
-set_bytes(
+set_file(
     name: str,
-    data: bytes,
-    content_type='application/octet-stream',
+    path: Union[PathLike, str],
+    content_type: Optional[str] = None,
     wait: bool = True
 )
 ```
+
+______________________________________________________________________
+
+## `set_bytes`
 
 Create or update an asset to contain the given bytes.
 
@@ -231,18 +220,27 @@ Create or update an asset to contain the given bytes.
 - <b>`content_type`</b>:  Content type (or mimetype) of asset
 - <b>`wait`</b>:  Wait for asset to update
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L261)
+
+```python
+set_bytes(
+    name: str,
+    data: bytes,
+    content_type='application/octet-stream',
+    wait: bool = True
+)
+```
+
+# Exceptions
+
 ______________________________________________________________________
 
-## exception `AssetNotFound`
-
-**Source:** [`_client.py:30`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/_client.py#L30)
+## `AssetNotFound`
 
 No asset with given name/id found.
 
 ______________________________________________________________________
 
-## exception `AssetUploadFailed`
-
-**Source:** [`_client.py:34`](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/_client.py#L34)
+## `AssetUploadFailed`
 
 There was an unexpected error while uploading an asset.
