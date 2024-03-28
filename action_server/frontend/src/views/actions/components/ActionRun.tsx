@@ -1,5 +1,15 @@
-import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
-import { Box, Button, Checkbox, Form, Input, Select, Typography } from '@robocorp/components';
+import { FC, FormEvent, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Code,
+  Form,
+  Input,
+  Select,
+  Switch,
+  Typography,
+} from '@robocorp/components';
 
 import { Action, ActionPackage } from '~/lib/types';
 import { toKebabCase } from '~/lib/helpers';
@@ -38,6 +48,8 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [formData, setFormData] = useState<PropertyFormData[]>([]);
   const { mutate: runAction, isPending, isSuccess, data, reset } = useActionRunMutation();
 
+  const [useRawJSON, setUseRawJSON] = useState<boolean>(false);
+
   useEffect(() => {
     setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
   }, [action, actionPackage]);
@@ -64,6 +76,25 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     [action, actionPackage, formData, apiKey, serverConfig],
   );
 
+  const inputs = useMemo(() => {
+    try {
+      const props = propertiesToFormData(JSON.parse(action.input_schema));
+      if (props.length === 0) {
+        return 'No inputs sent';
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const output: { [key: string]: any } = {};
+      props.forEach((prop) => {
+        output[prop.property.title.toLowerCase()] = prop.value;
+      });
+
+      return JSON.stringify(output, null, 4);
+    } catch (err) {
+      return `Error collecting inputs: ${JSON.stringify(err)}`;
+    }
+  }, [action]);
+
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
       {serverConfig?.auth_enabled && (
@@ -77,88 +108,100 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         </Form.Fieldset>
       )}
       <Form.Fieldset>
-        {formData.map((item, index) => {
-          const title = `${item.property.title}${item.required ? ' *' : ''}`;
+        {useRawJSON ? (
+          <Code lang="json" aria-label="Run input" value={inputs} />
+        ) : (
+          formData.map((item, index) => {
+            const title = `${item.property.title}${item.required ? ' *' : ''}`;
 
-          switch (item.property.type) {
-            case 'boolean':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Checkbox
-                    key={item.name}
-                    label={title}
-                    description={item.property.description}
-                    checked={item.value === 'True'}
-                    required={item.required}
-                    onChange={(e) => handleInputChange(e.target.checked ? 'True' : 'False', index)}
-                  />
-                </Item>
-              );
-            case 'number':
-            case 'integer':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Input
-                    key={item.name}
-                    label={title}
-                    description={item.property.description}
-                    required={item.required}
-                    value={item.value}
-                    type="number"
-                    onChange={(e) => handleInputChange(e.target.value, index)}
-                  />
-                </Item>
-              );
-            case 'object':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Input
-                    key={item.name}
-                    label={title}
-                    description={item.property.description}
-                    required={item.required}
-                    value={item.value}
-                    rows={4}
-                    onChange={(e) => handleInputChange(e.target.value, index)}
-                  />
-                </Item>
-              );
-            case 'enum':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Select
-                    key={item.name}
-                    label={title}
-                    description={item.property.description}
-                    required={item.required}
-                    value={item.value}
-                    items={item.options?.map((value) => ({ label: value, value })) || []}
-                    onChange={(e) => handleInputChange(e, index)}
-                  />
-                </Item>
-              );
-            case 'string':
-            default:
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Input
-                    key={item.name}
-                    label={title}
-                    description={item.property.description}
-                    rows={1}
-                    required={item.required}
-                    value={item.value}
-                    onChange={(e) => handleInputChange(e.target.value, index)}
-                  />
-                </Item>
-              );
-          }
-        })}
+            switch (item.property.type) {
+              case 'boolean':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Checkbox
+                      key={item.name}
+                      label={title}
+                      description={item.property.description}
+                      checked={item.value === 'True'}
+                      required={item.required}
+                      onChange={(e) =>
+                        handleInputChange(e.target.checked ? 'True' : 'False', index)
+                      }
+                    />
+                  </Item>
+                );
+              case 'number':
+              case 'integer':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={item.name}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={item.value}
+                      type="number"
+                      onChange={(e) => handleInputChange(e.target.value, index)}
+                    />
+                  </Item>
+                );
+              case 'object':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={item.name}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={item.value}
+                      rows={4}
+                      onChange={(e) => handleInputChange(e.target.value, index)}
+                    />
+                  </Item>
+                );
+              case 'enum':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Select
+                      key={item.name}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={item.value}
+                      items={item.options?.map((value) => ({ label: value, value })) || []}
+                      onChange={(e) => handleInputChange(e, index)}
+                    />
+                  </Item>
+                );
+              case 'string':
+              default:
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={item.name}
+                      label={title}
+                      description={item.property.description}
+                      rows={1}
+                      required={item.required}
+                      value={item.value}
+                      onChange={(e) => handleInputChange(e.target.value, index)}
+                    />
+                  </Item>
+                );
+            }
+          })
+        )}
       </Form.Fieldset>
-      <Button.Group align="right">
+      <Button.Group align="right" justifyContent="space-between">
         <Button loading={isPending} type="submit" variant="primary">
           Run
         </Button>
+        <Switch
+          label=""
+          value="Use JSON"
+          checked={useRawJSON}
+          onChange={(e) => setUseRawJSON(e.target.checked)}
+        />
       </Button.Group>
       {isSuccess && <ActionRunResult result={data.response} runId={data.runId} />}
     </Form>
