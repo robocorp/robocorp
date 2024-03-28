@@ -782,7 +782,7 @@ def _make_import_migrate_or_start(
 
             if not is_new and db_migration_pending(db_path):
                 print(
-                    f"""It was not possible to start the server because a 
+                    f"""It was not possible to start the server because a
 database migration is required to use with this version of the
 Robocorp Action Server.
 
@@ -791,7 +791,7 @@ Please run the command:
 {cmdline} migrate
 
 To migrate the database to the current version
--- or start from scratch by erasing the file: 
+-- or start from scratch by erasing the file:
 {db_path}
 """
                 )
