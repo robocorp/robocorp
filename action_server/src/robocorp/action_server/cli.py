@@ -5,7 +5,7 @@ import sys
 import time
 import typing
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from termcolor import colored
 
@@ -333,7 +333,7 @@ def _create_parser():
     return base_parser
 
 
-def main(args: Optional[list[str]] = None, *, exit=True) -> int:
+def main(args: Optional[List[str]] = None, *, exit=True) -> int:
     if args is None:
         args = sys.argv[1:]
 
@@ -453,7 +453,7 @@ def _import_actions(
     return 0
 
 
-def _main_retcode(args: Optional[list[str]], exit) -> int:
+def _main_retcode(args: Optional[List[str]], exit) -> int:
     from robocorp.action_server._settings import is_frozen
 
     from ._download_rcc import download_rcc
@@ -558,7 +558,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     _setup_stdout_logging(log_level)
 
     log.info(
-        colored("\n  ⚡️ Starting Action Server ", attrs=["bold"])
+        colored("\n  ⚡️ Starting Action Server... ", attrs=["bold"])
         + colored(f"v{__version__}\n", attrs=["dark"])
     )
 
@@ -661,7 +661,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
 
                     if not is_new and db_migration_pending(db_path):
                         print(
-                            f"""It was not possible to start the server because a 
+                            f"""It was not possible to start the server because a
 database migration is required to use with this version of the
 Robocorp Action Server.
 
@@ -670,7 +670,7 @@ Please run the command:
 {cmdline} migrate
 
 To migrate the database to the current version
--- or start from scratch by erasing the file: 
+-- or start from scratch by erasing the file:
 {db_path}
 """
                         )
