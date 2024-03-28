@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import sys
 import threading
 from queue import Queue
 from typing import Any
@@ -54,7 +55,7 @@ def asyncio_thread():
     asyncio_thread.join()
 
 
-def build_ws_url(action_server_process, url):
+def build_ws_url(action_server_process, url="api/ws"):
     host = action_server_process.host
     port = action_server_process.port
     if url.startswith("/"):
@@ -62,44 +63,65 @@ def build_ws_url(action_server_process, url):
     return f"ws://{host}:{port}/{url}"
 
 
+class SocketClient:
+    def __init__(self, ws):
+        self.ws = ws
+
+    async def emit(self, event, data=None):
+        msg = {"event": event}
+        if data is not None:
+            msg["data"] = data
+        await self.ws.send(json.dumps(msg))
+
+    async def receive(self):
+        received = json.loads(await self.ws.recv())
+        return received["event"], received.get("data")
+
+
 async def check_websocket_runs(
     action_server_process: ActionServerProcess, queue: Queue[Any]
 ):
     try:
-        url = build_ws_url(action_server_process, "api/ws")
+        url = build_ws_url(action_server_process)
 
         import websockets
 
         async with websockets.connect(
-            url,
-            logger=log,
+            url, logger=log, open_timeout=_get_timeout()
         ) as ws:
-            await ws.send(json.dumps({"message_type": "ping"}))
+            sio = SocketClient(ws)
+            await sio.emit("echo", "echo-val")
 
-            received = json.loads(await ws.recv())
-            assert received == {
-                "message_type": "pong"
-            }, f"Received unexpected: {received!r}"
+            event, val = await sio.receive()
+            assert event == "echo"
+            assert val == "echo-val"
 
             # Ok, echo is there, let's start to listen run events
-            await ws.send(json.dumps({"message_type": "start_listen_run_events"}))
+            await sio.emit("start_listen_run_events")
 
             # First message has the runs currently available
-            current_run_events = json.loads(await ws.recv())
-            assert current_run_events["message_type"] == "runs_collected"
+            event, runs = await sio.receive()
+            assert event == "runs_collected"
+            assert runs == []
 
             # Request for a run to be created
             queue.put("create_run")
 
             # Run was created
-            current_run_events = json.loads(await ws.recv())
-            assert current_run_events["message_type"] == "run_added"
+            event, added = await sio.receive()
+            assert tuple(added.keys()) == ("run",)
+            assert added["run"]["numbered_id"] == 1
+            assert event == "run_added"
 
             # Run was changed (running -> complete)
-            current_run_events = json.loads(await ws.recv())
-            assert current_run_events["message_type"] == "run_changed"
+            event, changed = await sio.receive()
+            assert tuple(changed.keys()) == ("run_id", "changes")
+            assert event == "run_changed"
 
     except Exception as e:
+        import traceback
+
+        traceback.print_exc()
         queue.put(e)
     else:
         queue.put("worked")
@@ -109,48 +131,38 @@ async def check_websocket_action_package(
     action_server_process: ActionServerProcess, queue: Queue[Any]
 ):
     try:
-        url = build_ws_url(action_server_process, "api/ws")
+        url = build_ws_url(action_server_process)
 
         import websockets
 
         async with websockets.connect(
-            url,
-            logger=log,
+            url, logger=log, open_timeout=_get_timeout()
         ) as ws:
-            await ws.send(
-                json.dumps(
-                    {
-                        "message_type": "request",
-                        "data": {
-                            "method": "GET",
-                            "url": "/api/actionPackages",
-                            "message_id": 22,
-                        },
-                    }
-                )
+            sio = SocketClient(ws)
+
+            await sio.emit(
+                "request",
+                {
+                    "method": "GET",
+                    "url": "/api/actionPackages",
+                    "message_id": 22,
+                },
             )
 
-            received = json.loads(await ws.recv())
-            {
-                "message_type": "response",
-                "data": {
-                    "message_id": 22,
-                    "result": [],
-                },
-            }
-            assert (
-                received["message_type"] == "response"
-            ), f"Received unexpected: {received!r}"
-            assert (
-                received["data"]["message_id"] == 22
-            ), f"Received unexpected: {received!r}"
-            assert (
-                len(received["data"]["result"]) == 2
-            ), f"Received unexpected: {received!r}"
+            event, data = await sio.receive()
+            assert event == "response", f"Received unexpected: {event!r}"
+            assert data["message_id"] == 22, f"Received unexpected: {data!r}"
+            assert len(data["result"]) == 2, f"Received unexpected: {data!r}"
     except Exception as e:
         queue.put(e)
     else:
         queue.put("worked")
+
+
+def _get_timeout():
+    if "pydevd" in sys.modules:
+        return None
+    return 20
 
 
 def test_server_websockets(
@@ -162,7 +174,7 @@ def test_server_websockets(
     queue: Queue[Any] = Queue()
     asyncio_thread.submit_async(check_websocket_runs(action_server_process, queue))
     while True:
-        curr = queue.get(timeout=20)
+        curr = queue.get(timeout=_get_timeout())
         if curr == "worked":
             break
 
@@ -177,7 +189,7 @@ def test_server_websockets(
         check_websocket_action_package(action_server_process, queue)
     )
     while True:
-        curr = queue.get(timeout=20)
+        curr = queue.get(timeout=_get_timeout())
         if curr == "worked":
             break
 

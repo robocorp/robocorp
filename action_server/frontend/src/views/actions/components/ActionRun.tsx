@@ -61,7 +61,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
       });
     },
-    [action, actionPackage, formData],
+    [action, actionPackage, formData, apiKey, serverConfig],
   );
 
   return (

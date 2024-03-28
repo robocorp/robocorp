@@ -1,7 +1,9 @@
 import datetime
+import itertools
 import threading
 import typing
 from concurrent import futures
+from functools import partial
 from pathlib import Path
 from typing import Optional
 
@@ -371,3 +373,52 @@ def test_database_transactions_nested():
         assert str(db.all(SomeActionPackage)) == str(
             [SomeActionPackage(2, "bar", "bar")]
         )
+
+
+def test_database_concurrency(datadir):
+    db = Database(datadir / "my.db")
+    with db.connect():
+        db.initialize([SomeActionPackage, SomeAction, SomeRun])
+        db.create_tables(_db_rules)
+
+        assert len(db.all(SomeActionPackage)) == 0
+
+    next_id = partial(next, itertools.count())
+
+    ROUNDS = 8
+    ENTRIES_IN_ROUND = 40
+
+    def update_db():
+        with db.connect():
+            for _i in range(ENTRIES_IN_ROUND):
+                with db.transaction():
+                    db.insert(SomeActionPackage(next_id(), "foo", "foo"))
+        return True
+
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(update_db) for _i in range(ROUNDS)]
+
+        for future in concurrent.futures.as_completed(futures):
+            assert future.result()
+
+    # reset numbering and check updates
+    next_id = partial(next, itertools.count())
+
+    def update_record():
+        with db.connect():
+            for _i in range(ENTRIES_IN_ROUND):
+                with db.transaction():
+                    db.update_by_id(SomeActionPackage, next_id(), {"name": "bar"})
+        return True
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(update_record) for _i in range(ROUNDS)]
+
+        for future in concurrent.futures.as_completed(futures):
+            assert future.result()
+
+    with db.connect():
+        for action_package in db.all(SomeActionPackage):
+            assert action_package.name == "bar"
