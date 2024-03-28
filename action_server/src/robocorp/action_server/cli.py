@@ -5,7 +5,7 @@ import sys
 import time
 import typing
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from termcolor import colored
 
@@ -333,7 +333,7 @@ def _create_parser():
     return base_parser
 
 
-def main(args: Optional[list[str]] = None, *, exit=True) -> int:
+def main(args: Optional[List[str]] = None, *, exit=True) -> int:
     if args is None:
         args = sys.argv[1:]
 
@@ -453,7 +453,85 @@ def _import_actions(
     return 0
 
 
-def _main_retcode(args: Optional[list[str]], exit) -> int:
+def _check_latest_version():
+    import requests
+    import time
+
+    MAX_RETRIEVE_ATTEMPTS = 3
+
+    # default to the current version to match equality
+    latest_version = __version__
+
+    # attempt to retrieve the latest version of action-server
+    try:
+        for attempt in range(MAX_RETRIEVE_ATTEMPTS):
+            version_request = requests.get(
+                url="https://downloads.robocorp.com/action-server/releases/latest/version.txt",
+                timeout=1.5,
+            )
+            if version_request.status_code and version_request.status_code == 200:
+                latest_version = version_request.text
+                break
+            else:
+                time.sleep(0.5)
+        if attempt >= MAX_RETRIEVE_ATTEMPTS:
+            raise ValueError(
+                "Latest version could not be retrieved after several attempts"
+            )
+    except Exception as e:
+        log.warning(
+            colored(
+                "Could not retrieve the latest version of the action-server:",
+                "yellow",
+            ),
+            e,
+        )
+
+        return
+
+    # parse_semantic_version - return a tuple of the version if correct
+    def parse_semantic_version(version) -> tuple[int, ...]:
+        try:
+            return tuple(map(int, version.split(".")))
+        except ValueError as e:
+            log.warning(
+                colored(
+                    f"Invalid semantic version detected: {version} . Exception",
+                    "yellow",
+                ),
+                e,
+            )
+
+    # compare the current version with the latest version
+    current_v, latest_v = (
+        parse_semantic_version(__version__),
+        parse_semantic_version(latest_version),
+    )
+    result = (latest_v > current_v) - (latest_v < current_v)
+    if result == 0:
+        log.debug(
+            colored("The latest version of action-server is installed.", attrs=["dark"])
+        )
+    elif result == 1:
+        log.info(
+            colored(
+                "  ⏫ A new release of Action Server is available: ",
+                attrs=["bold"],
+            )
+            + colored(f"v{__version__}", attrs=["dark"])
+            + " -> "
+            + colored(f"v{latest_version}\n", "green")
+        )
+    else:
+        log.warn(
+            colored(
+                "The latest version seems older than the current version. Please report if necessary.",
+                "yellow",
+            )
+        )
+
+
+def _main_retcode(args: Optional[List[str]], exit) -> int:
     from robocorp.action_server._settings import is_frozen
 
     from ._download_rcc import download_rcc
@@ -562,6 +640,9 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         + colored(f"v{__version__}\n", attrs=["dark"])
     )
 
+    # check if the current version is the latest version
+    _check_latest_version()
+
     from ._settings import setup_settings
 
     with setup_settings(base_args) as settings:
@@ -661,7 +742,7 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
 
                     if not is_new and db_migration_pending(db_path):
                         print(
-                            f"""It was not possible to start the server because a 
+                            f"""It was not possible to start the server because a
 database migration is required to use with this version of the
 Robocorp Action Server.
 
@@ -670,7 +751,7 @@ Please run the command:
 {cmdline} migrate
 
 To migrate the database to the current version
--- or start from scratch by erasing the file: 
+-- or start from scratch by erasing the file:
 {db_path}
 """
                         )
