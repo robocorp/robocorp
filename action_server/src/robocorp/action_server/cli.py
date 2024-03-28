@@ -646,7 +646,7 @@ def _main_retcode(
         return 1
 
     log.info(
-        colored("\n  ⚡️ Starting Action Server ", attrs=["bold"])
+        colored("\n  ⚡️ Starting Action Server... ", attrs=["bold"])
         + colored(f"v{__version__}\n", attrs=["dark"])
     )
 
