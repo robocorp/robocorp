@@ -1,10 +1,15 @@
 import asyncio
 import json
+import sys
 import threading
+import time
 import typing
 from concurrent import futures
+from pathlib import Path
 from queue import Queue
-from typing import TypeVar
+from typing import Iterator, Optional, TypeVar
+
+import pytest
 
 from robocorp.action_server._selftest import ActionServerProcess
 
@@ -114,20 +119,71 @@ def run_coro_in_loop(loop: asyncio.AbstractEventLoop, coro, timeout=10):
     return fut.result(timeout)
 
 
-def manual_test_server_expose_local(
+class WranglerProcess:
+    def __init__(self) -> None:
+        import subprocess
+
+        from robocorp.action_server._robo_utils.process import Process
+
+        self.host = "127.0.0.1"
+        self.port = 8788
+
+        this_file = Path(__file__).absolute()
+        action_server_dir = this_file.parent.parent.parent
+        assert action_server_dir.name == "action_server"
+        robo_dir = action_server_dir.parent
+        action_server_tunnel_dir = robo_dir.parent / "action-server-tunnel"
+        if not action_server_tunnel_dir.exists():
+            raise pytest.skip(
+                reason="action-server-tunnel not cloned along the robocorp repo"
+            )
+        self.action_server_tunnel_dir = action_server_tunnel_dir
+        subprocess.check_call(["npm", "i"], shell=True, cwd=action_server_tunnel_dir)
+        self.process: Optional[Process] = None
+
+    def start(self):
+        assert self.process is None, "Process is already started"
+        from robocorp.action_server._robo_utils.process import Process
+
+        self.process = Process(
+            ["npm", "run", "dev", "--", f"--port={self.port}", f"--ip={self.host}"],
+            cwd=self.action_server_tunnel_dir,
+        )
+
+        self.process.on_stderr.register(sys.stderr.write)
+        self.process.on_stdout.register(sys.stdout.write)
+
+        self.process.start(shell=True)
+
+    def stop(self):
+        if self.process:
+            self.process.stop()
+            self.process = None
+
+
+@pytest.fixture
+def wrangler_process() -> Iterator[WranglerProcess]:
+    wrangler_process = WranglerProcess()
+    wrangler_process.start()
+    yield wrangler_process
+    wrangler_process.stop()
+
+
+def test_server_expose_local(
     datadir,
     action_server_process: ActionServerProcess,
     data_regression,
+    wrangler_process: WranglerProcess,
 ) -> None:
     """
     This tests the "real" exposed server but in a local version.
 
-    To work it requires `action-server-tunnel` (private repo).
+    To work it requires `action-server-tunnel` (private repo) and 'npm' in the env.
 
-    -- After cloning it must be bootstrapped with:
+    -- It must be cloned alongside the `robocorp` repo for it to work.
 
     npm i
-    npm dev
+    npm run dev
 
     Then this test can be run.
     """
@@ -143,7 +199,8 @@ def manual_test_server_expose_local(
         ServerEvent,
     )
 
-    websocket_expose_url = "ws://127.0.0.1:8787"
+    ws_host, ws_port = wrangler_process.host, wrangler_process.port
+    websocket_expose_url = f"ws://{ws_host}:{ws_port}"
 
     action_server_process.start(
         db_file="server.db",
@@ -164,7 +221,7 @@ def manual_test_server_expose_local(
     def wait_for_ev(cls: typing.Type[T]) -> T:
         while True:
             try:
-                ev = events_queue.get(timeout=3)
+                ev = events_queue.get(timeout=20)
             except Exception:
                 raise AssertionError(f"Timed out waiting for event of type: {cls}")
             if isinstance(ev, cls):
@@ -197,7 +254,7 @@ def manual_test_server_expose_local(
     connected_ev = wait_for_ev(EventConnected)
     session_payload_ev = wait_for_ev(EventSessionPayload)
 
-    target_url = "http://127.0.0.1:8787"
+    target_url = f"http://{ws_host}:{ws_port}"
     params = {"sessionId": session_payload_ev.session_payload.sessionId}
 
     client = ActionServerClient(target_url)
@@ -205,7 +262,7 @@ def manual_test_server_expose_local(
 
     # Close the connection: a new one must be done.
     run_coro_in_loop(loop, connected_ev.ws.close())
-    _connected_ev2 = wait_for_ev(EventConnected)
+    connected_ev = wait_for_ev(EventConnected)
     session_payload_ev2 = wait_for_ev(EventSessionPayload)
     # The session id cannot have changed in the meanwhile.
     assert (
@@ -226,7 +283,11 @@ def manual_test_server_expose_local(
         return fut
 
     first = call_sleep(3)
-    second = call_sleep(0.1)
+    second = call_sleep(1)
+
+    time.sleep(0.2)
+    # Close it: the result must still be received when the websocket reconnection is done!
+    run_coro_in_loop(loop, connected_ev.ws.close())
 
     first_finished_at = first.result(timeout=10)
     second_finished_at = second.result(timeout=10)

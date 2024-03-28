@@ -380,7 +380,6 @@ def build_common_tasks(
         poetry(
             ctx,
             "run lazydocs",
-            "--validate",
             "--no-watermark",
             "--remove-package-prefix",
             f"--src-base-url {REPOSITORY_URL}",

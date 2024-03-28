@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.3.2 - 2024-03-27
+
+- Docstrings improvements by following the Google style guide.
+
 ## 2.3.1 - 2024-03-19
 
 - Enables compatibility with Action Server `0.1.0` by accepting **robocorp-tasks**
