@@ -1,5 +1,15 @@
 import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
-import { Box, Button, Checkbox, Form, Input, Select, Typography } from '@robocorp/components';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Form,
+  Input,
+  Select,
+  Typography,
+} from '@robocorp/components';
+import { IconBolt } from '@robocorp/icons/iconic';
 
 import { Action, ActionPackage } from '~/lib/types';
 import { toKebabCase } from '~/lib/helpers';
@@ -155,12 +165,25 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           }
         })}
       </Form.Fieldset>
-      <Button.Group align="right">
-        <Button loading={isPending} type="submit" variant="primary">
-          Run
+      <Button.Group align="right" marginBottom={16}>
+        <Button
+          loading={isPending}
+          type="submit"
+          variant="primary"
+          icon={IconBolt}
+          style={{ width: '160px' }}
+        >
+          {isPending ? 'Executing...' : 'Execute Action'}
         </Button>
       </Button.Group>
-      {isSuccess && <ActionRunResult result={data.response} runId={data.runId} />}
+      <Divider />
+      {isSuccess && (
+        <ActionRunResult
+          result={data.response}
+          runId={data.runId}
+          outputSchemaType={JSON.parse(action.output_schema) as { type: string }}
+        />
+      )}
     </Form>
   );
 };
