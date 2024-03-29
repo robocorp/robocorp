@@ -75,8 +75,8 @@ def error():
 ```
 
 
-> AI/LLM's are quite good with `oauthlib`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `oauthlib`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ## Links and references
 

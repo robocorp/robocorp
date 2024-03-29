@@ -13,8 +13,8 @@ print(df.to_string())
 ```
 
 
-> AI/LLM's are quite good with `pandas`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `pandas`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 
