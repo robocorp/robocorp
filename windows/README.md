@@ -14,7 +14,7 @@ There are three fundamental abstractions in the library:
 
 ## Usage
 
-[![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)]((https://pypi.org/project/robocorp-windows/))
+[![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)](https://pypi.org/project/robocorp-windows/)
 
 > 👉 Check that you have added the dependency in your configuration; this library is not part of the [**robocorp**](https://pypi.org/project/robocorp/) bundle.
 > - _conda.yaml_ for automation [Task Packages](https://robocorp.com/docs/robot-structure)
