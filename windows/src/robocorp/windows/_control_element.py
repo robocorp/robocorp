@@ -1466,7 +1466,7 @@ class ControlElement:
         enter: bool = False,
         newline: bool = False,
         send_keys_fallback: bool = True,
-        validator: Optional[Callable] = _SentinelValidator,
+        validator: Optional[Callable] = _SentinelValidator(),
         locator: Optional[Locator] = None,
         search_depth: int = 8,
         timeout: Optional[float] = None,
@@ -1566,7 +1566,7 @@ class ControlElement:
         get_value_pattern = self._get_value_pattern(element.ui_automation_control)
         action = "Appending" if append else "Setting"
 
-        if validator is _SentinelValidator:
+        if isinstance(validator, _SentinelValidator):
             validator = set_value_validator
 
         if get_value_pattern:
