@@ -1,6 +1,6 @@
-# robocorp -package
+# robocorp
 
-The purpose of this meta package is to simplify dependency management by having all the essentials packed in a single easy-to-install dependency.
+The purpose of this meta-package is to simplify dependency management by having all the essentials packed in a single easy-to-install dependency.
 
 [![robocorp](https://img.shields.io/pypi/v/robocorp?label=robocorp)](https://pypi.org/project/robocorp/)
 
@@ -14,5 +14,4 @@ The following libraries are currently included:
 | [![robocorp-workitems](https://img.shields.io/pypi/v/robocorp-workitems?label=robocorp-workitems)](https://pypi.org/project/robocorp-workitems/) | Interact with [Control Room Work Items](https://robocorp.com/docs/control-room/unattended/work-data-management) in your unattended processes; Read data from previous steps, create output data.  |
 | [![robocorp-storage](https://img.shields.io/pypi/v/robocorp-storage?label=robocorp-storage)](https://pypi.org/project/robocorp-storage/)         | Interact with [Control Room Asset Storage](https://robocorp.com/docs/control-room/asset-storage) and manage them during the execution.                                                            |
 
-
-For further documentation on robocorp Python libraries, check out [more details here](https://github.com/robocorp/robocorp/blob/master/docs/README.md).
+For any other library, you should include it explicitly in your dependency configuration. Check out more on [Robocorp Libraries](https://github.com/robocorp/robocorp/blob/master/docs/README.md)
