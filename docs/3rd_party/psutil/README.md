@@ -12,8 +12,8 @@ for proc in psutil.process_iter(['pid', 'name', 'username']):
     print(proc.info)
 ```
 
-> AI/LLM's are quite good with `psutil`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `psutil`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

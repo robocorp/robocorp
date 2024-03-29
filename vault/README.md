@@ -1,14 +1,10 @@
 # robocorp-vault
 
-`robocorp-vault` is a library that provides read and write access to the
-[Vault](https://robocorp.com/docs/development-guide/variables-and-secrets/vault)
-in Robocorp Control Room, which can be used to store and retrieve secret values such as passwords.
+`robocorp-vault` is a library that provides read and write access to the [Vault](https://robocorp.com/docs/development-guide/variables-and-secrets/vault) in Robocorp Control Room, which can be used to store and retrieve secret values such as passwords.
 
 ## Getting started
 
-A secret consists of a name, an optional description, and a map of
-keys and values. For instance, one secret can be login credentials for a website,
-which includes both a username and a password:
+A secret consists of a name, an optional description, and a map of keys and values. For instance, one secret can be login credentials for a website, which includes both a username and a password:
 
 ```python
 from robocorp.tasks import task
@@ -33,7 +29,7 @@ Further user guides and tutorials can be found in [Robocorp Docs](https://roboco
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.vault](https://github.com/robocorp/robocorp/blob/master/vault/docs/api/robocorp.vault.md)
+Explore our [API](https://github.com/robocorp/robocorp/blob/master/vault/docs/api/README.md) for extensive documentation.
 
 ## Changelog
 

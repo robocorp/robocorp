@@ -23,8 +23,8 @@ def download_file(url: str, filename: str) -> str:
     return filename
 ```
 
-> AI/LLM's are quite good with `requests`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `requests`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 
