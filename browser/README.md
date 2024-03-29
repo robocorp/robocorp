@@ -6,7 +6,7 @@ The **robocorp-browser** package is a light wrapper for the [Playwright](https:/
 
 [![`robocorp-browser`](https://img.shields.io/pypi/v/robocorp-browser?label=robocorp-browser)](https://pypi.org/project/robocorp-browser/)
 
-> 👉 Check that you have added the dependency in your configuration; this library is not part of the `robocop` bundle.
+> 👉 Check that you have added the dependency in your configuration; this library is not part of the [**robocorp**](https://pypi.org/project/robocorp/) bundle.
 > - _conda.yaml_ for automation [Task Packages](https://robocorp.com/docs/robot-structure)
 > - _package.yaml_ for automation Action Packages
 > - _requirements.txt_, _pyproject.toml_, _setup.py|cfg_ etc. for the rest
