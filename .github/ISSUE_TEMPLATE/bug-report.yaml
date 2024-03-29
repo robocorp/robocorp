@@ -36,7 +36,7 @@ body:
       description: >-
         Give details on what you are doing, what you expect to happen, and what
         is currently happening.
-      placeholder: >-
+      placeholder: |
         * I'm trying to use the `robocorp` library to do X
         * I expected to get Y
         * Instead it does Z
@@ -46,10 +46,10 @@ body:
     attributes:
       label: System info
       description: Sharing your system information will help us with debugging.
-      placeholder: >-
-        * Library version
+      placeholder: |
+        * Target component / library version
         * Python version
-        * Operating System version
+        * OS version (Windows: ´ver´ / macOS: `sw_vers` / linux: `uname -r` )
     validations:
       required: true
   - type: textarea
@@ -59,7 +59,7 @@ body:
         If possible, please provide an automation example which replicates the problem.
         Including any input/output data sample to test the example with.
         (⚠️do not share sensitive information as this is a public source)
-      placeholder: >-
+      placeholder: |
         * Here's the isolated script block which highlights the bug
         * Which is operating on this file
         * And produces this behaviour/output instead of the expected one

@@ -3,6 +3,7 @@ This module contains utilities for testing and to do a 'selftest' of the
 executable even in release mode.
 """
 
+import json
 import os
 import re
 import subprocess
@@ -182,46 +183,88 @@ class ActionServerProcess:
 
 
 class ActionServerClient:
-    def __init__(self, action_server_process: ActionServerProcess):
-        self.action_server_process = action_server_process
+    _base_url: Optional[str]
+    action_server_process: Optional[ActionServerProcess]
 
-    def build_full_url(self, url):
+    def __init__(self, action_server_process_or_base_url: ActionServerProcess | str):
+        if isinstance(action_server_process_or_base_url, str):
+            self._base_url = action_server_process_or_base_url
+            assert not self._base_url.endswith("/")
+            self.action_server_process = None
+        else:
+            self.action_server_process = action_server_process_or_base_url
+            self._base_url = None
+
+    @property
+    def base_url(self):
+        if self._base_url:
+            assert not self.action_server_process
+            return self._base_url
+
         host = self.action_server_process.host
         port = self.action_server_process.port
+        return f"http://{host}:{port}"
+
+    def build_full_url(self, url: str) -> str:
         if url.startswith("/"):
             url = url[1:]
-        return f"http://{host}:{port}/{url}"
+        return f"{self.base_url}/{url}"
 
     def get_str(self, url, params: Optional[dict] = None) -> str:
         import requests
 
-        result = requests.get(self.build_full_url(url), params=(params or {}))
-        assert result.status_code == 200
+        result = requests.get(
+            self.build_full_url(url),
+            params=(params or {}),
+            timeout=self._get_default_timeout(),
+        )
+        result.raise_for_status()
         return result.text
 
-    def get_openapi_json(self):
-        return self.get_str("openapi.json")
+    def _get_default_timeout(self) -> Optional[int]:
+        if is_debugger_active():
+            return None
+        return 10
+
+    def get_openapi_json(self, params: Optional[dict] = None):
+        return self.get_str("openapi.json", params=params)
 
     def get_json(self, url, params: Optional[dict] = None):
-        import json
-
         contents = self.get_str(url, params=params)
         try:
             return json.loads(contents)
         except Exception:
             raise AssertionError(f"Unable to load: {contents!r}")
 
-    def post_get_str(self, url, data, headers: Optional[dict] | None = None):
+    def post_get_str(
+        self,
+        url,
+        data,
+        headers: Optional[dict] = None,
+        cookies: Optional[dict] = None,
+        params: Optional[dict] = None,
+    ):
         import requests
 
-        result = requests.post(self.build_full_url(url), headers=headers, json=data)
-        assert result.status_code == 200
+        result = requests.post(
+            self.build_full_url(url),
+            headers=headers,
+            json=data,
+            cookies=cookies,
+            params=params,
+            timeout=self._get_default_timeout(),
+        )
+        result.raise_for_status()
         return result.text
 
     def post_error(self, url, status_code, data=None):
         import requests
 
-        result = requests.post(self.build_full_url(url), json=data or {})
+        result = requests.post(
+            self.build_full_url(url),
+            json=data or {},
+            timeout=self._get_default_timeout(),
+        )
         if result.status_code != status_code:
             raise AssertionError(
                 (
@@ -235,7 +278,9 @@ class ActionServerClient:
     def get_error(self, url, status_code):
         import requests
 
-        result = requests.get(self.build_full_url(url))
+        result = requests.get(
+            self.build_full_url(url), timeout=self._get_default_timeout()
+        )
         assert result.status_code == status_code
 
 
@@ -344,16 +389,14 @@ def check_new_template(
             print("Template creation stderr: ", output.stderr)
 
         my_project_dir = tmpdir / "my_project"
-        my_project_dir_conda = my_project_dir / "conda.yaml"
-        if not my_project_dir.exists():
-            my_project_dir_conda = my_project_dir / "action-server.yaml"
+        my_project_package_yaml = my_project_dir / "package.yaml"
 
         if verbose:
             print(my_project_dir, "exists", my_project_dir.exists())
-            print(my_project_dir_conda, "exists", my_project_dir_conda.exists())
+            print(my_project_package_yaml, "exists", my_project_package_yaml.exists())
 
-        if not my_project_dir_conda.exists():
-            raise RuntimeError(f"Expected {my_project_dir_conda} to exist.")
+        if not my_project_package_yaml.exists():
+            raise RuntimeError(f"Expected {my_project_package_yaml} to exist.")
 
         # Note: timeout is big because it'll use rcc to bootstrap the env here.
         if verbose:
@@ -378,8 +421,12 @@ def check_new_template(
         if verbose:
             print("Using post to call action.")
 
+        # open_api = client.get_openapi_json()
+        # decoded = json.loads(open_api)
+        # print(json.dumps(decoded, indent=4))
+
         found = client.post_get_str(
-            "/api/actions/my-project/compare-time-zones/run",
+            "/api/actions/package-name/compare-time-zones/run",
             {
                 "user_timezone": "Europe/Helsinki",
                 "compare_to_timezones": "America/New_York, Asia/Kolkata",

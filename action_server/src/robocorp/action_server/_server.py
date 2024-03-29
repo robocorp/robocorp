@@ -17,15 +17,32 @@ def _name_as_summary(name):
 
 
 def _name_to_url(name):
-    return name.replace("_", "-")
+    from robocorp.action_server._slugify import slugify
+
+    return slugify(name.replace("_", "-"))
+
+
+def get_action_description_from_docs(docs: str) -> str:
+    import docstring_parser
+
+    doc_desc: str
+    try:
+        parsed = docstring_parser.parse(docs)
+        if parsed.short_description and parsed.long_description:
+            doc_desc = f"{parsed.short_description}\n{parsed.long_description}"
+        else:
+            doc_desc = parsed.long_description or parsed.short_description or ""
+    except Exception:
+        log.exception("Error parsing docstring: %s", docs)
+        doc_desc = str(docs or "")
+    return doc_desc
 
 
 def start_server(
-    expose: bool, api_key: str | None = None, expose_session: str | None = None
+    expose: bool, api_key: str | None, expose_session: str | None, whitelist: str | None
 ) -> None:
     from dataclasses import asdict
 
-    import docstring_parser
     import uvicorn
     from fastapi import Depends, HTTPException, Security
     from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -87,12 +104,7 @@ def start_server(
 
         doc_desc: Optional[str] = ""
         if action.docs:
-            try:
-                parsed = docstring_parser.parse(action.docs)
-                doc_desc = parsed.long_description or parsed.short_description
-            except Exception:
-                log.exception("Error parsing docstring: %s", action.docs)
-                doc_desc = str(action.docs or "")
+            doc_desc = get_action_description_from_docs(action.docs)
 
         if not doc_desc:
             doc_desc = ""
@@ -104,20 +116,31 @@ def start_server(
             log.critical("Unable to find action package: %s", action.action_package_id)
             continue
 
+        if whitelist:
+            from ._whitelist import accept_action
+
+            if not accept_action(whitelist, action_package.name, action.name):
+                log.info(
+                    "Skipping action %s / %s (not in whitelist)",
+                    action_package.name,
+                    action.name,
+                )
+                continue
+
+        func, openapi_extra = _actions_run.generate_func_from_action(action)
+        if action.is_consequential is not None:
+            openapi_extra["x-openai-isConsequential"] = action.is_consequential
+
         app.add_api_route(
             f"/api/actions/{_name_to_url(action_package.name)}/{_name_to_url(action.name)}/run",
-            _actions_run.generate_func_from_action(action),
+            func,
             name=action.name,
             summary=_name_as_summary(action.name),
             description=doc_desc,
             operation_id=action.name,
             methods=["POST"],
             dependencies=endpoint_dependencies,
-            openapi_extra={
-                "x-openai-isConsequential": action.is_consequential,
-            }
-            if action.is_consequential is not None
-            else None,
+            openapi_extra=openapi_extra,
         )
 
     if os.getenv("RC_ADD_SHUTDOWN_API", "").lower() in ("1", "true"):

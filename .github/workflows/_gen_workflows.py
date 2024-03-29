@@ -1,8 +1,33 @@
 from pathlib import Path
+from typing import Iterator
 
 import yaml
 
 CURDIR = Path(__file__).absolute().parent
+
+
+def collect_deps_pyprojects(root_pyproject: Path, found=None) -> Iterator[Path]:
+    if found is None:
+        found = set()
+
+    import tomlkit  # allows roundtrip of toml files
+
+    contents: dict = tomlkit.loads(root_pyproject.read_bytes().decode("utf-8"))
+
+    dependencies = list(contents["tool"]["poetry"]["dependencies"])
+    try:
+        dependencies.extend(contents["tool"]["poetry"]["group"]["dev"]["dependencies"])
+    except Exception:
+        pass  # Ignore if it's not there.
+    for key in dependencies:
+        if key.startswith("robocorp-"):
+            dep_name = key[len("robocorp-") :].replace("-", "_")
+            dep_pyproject = root_pyproject.parent.parent / dep_name / "pyproject.toml"
+            assert dep_pyproject.exists(), f"Expected {dep_pyproject} to exist."
+            if dep_pyproject not in found:
+                found.add(dep_pyproject)
+                yield dep_pyproject
+                yield from collect_deps_pyprojects(dep_pyproject, found)
 
 
 class BaseTests:
@@ -44,7 +69,7 @@ class BaseTests:
             "CI_CREDENTIALS": "${{ secrets.CI_CREDENTIALS }}",
             "CI_ENDPOINT": "${{ secrets.CI_ENDPOINT }}",
         },
-        "run": "python -m invoke test",
+        "run": "inv test",
     }
 
     def __init__(self):
@@ -56,10 +81,17 @@ class BaseTests:
         paths = [
             f"{self.project_name}/**",
             f".github/workflows/{self.target}",
-            f"devutils/**",
+            "devutils/**",
         ]
         if self.require_log_built:
             paths.append("log/**")
+
+        dep_pyprojects = list(collect_deps_pyprojects(project_dir / "pyproject.toml"))
+        for dep_pyproject in dep_pyprojects:
+            dep_name = dep_pyproject.parent.name
+            add_dep = f"{dep_name}/**"
+            if add_dep not in paths:
+                paths.append(add_dep)
 
         self.on_part = {
             "on": {
@@ -103,12 +135,12 @@ class BaseTests:
         devinstall = {
             "name": "Install project (dev)",
             "if": "contains(matrix.name, '-devmode')",
-            "run": "python -m invoke devinstall",
+            "run": "inv devinstall",
         }
         install = {
             "name": "Install project (not dev)",
             "if": "contains(matrix.name, '-devmode') == false",
-            "run": "python -m invoke install",
+            "run": "inv install",
         }
         setup_node = {
             "name": "Setup node",
@@ -138,7 +170,7 @@ class BaseTests:
 poetry run python -c "import sys;print('\n'.join(str(x) for x in sys.path))"
 poetry run python -c "from robocorp import log;print(log.__file__)"
 cd ../log
-python -m invoke build-output-view-react
+inv build-output-view-react
 """,
                 "env": {
                     "CI": True,
@@ -149,7 +181,7 @@ python -m invoke build-output-view-react
 
         build_frontend = {
             "name": "Build frontend",
-            "run": "python -m invoke build-frontend",
+            "run": "inv build-frontend",
             "env": {
                 "CI": True,
                 "NODE_AUTH_TOKEN": "${{ secrets.CI_GITHUB_TOKEN }}",
@@ -173,16 +205,33 @@ python -m invoke build-output-view-react
                 "cache": "poetry",
             },
         }
-        install_tomlkit = {
-            "name": "Install invoke/tomlkit",
-            "run": "pip install invoke tomlkit",
+
+        install_devutils = {
+            "name": "Install devutils requirements",
+            "run": "python -m pip install -r ../devutils/requirements.txt",
         }
+
         run_lint = {
-            "name": "`inv lint`/`inv typecheck`, potentially fixed with `inv pretty`",
+            "name": "`inv lint`, potentially fixed with `inv pretty`",
             "if": "always()",
             "run": """
-python -m invoke lint
-python -m invoke typecheck
+inv lint
+""",
+        }
+
+        run_typecheck = {
+            "name": "`inv typecheck`",
+            "if": "always()",
+            "run": """
+inv typecheck
+""",
+        }
+
+        run_docs = {
+            "name": "`inv docs` with checking on files changed",
+            "if": "always()",
+            "run": """
+inv docs --check
 """,
         }
 
@@ -190,17 +239,12 @@ python -m invoke typecheck
             checkout_repo,
             install_poetry,
             setup_python,
-            install_tomlkit,
+            install_devutils,
         ]
         if self.require_node or self.require_log_built:
             steps.append(setup_node)
 
-        steps.extend(
-            [
-                install,
-                devinstall,
-            ]
-        )
+        steps.extend([install, devinstall])
 
         if self.require_log_built:
             steps.extend(build_log_react_view_steps)
@@ -210,12 +254,7 @@ python -m invoke typecheck
 
         steps.extend(self.before_run_custom_additional_steps)
 
-        steps.extend(
-            [
-                self.run_tests,
-                run_lint,
-            ]
-        )
+        steps.extend([self.run_tests, run_lint, run_typecheck, run_docs])
         steps.extend(self.after_run_custom_additional_steps)
         return steps
 
@@ -285,7 +324,7 @@ class LogPyTestTests(BaseTests):
             # Must be customized to include the PYTHONPATH for the log tests.
             "PYTHONPATH": "../log/tests",
         },
-        "run": "python -m invoke test",
+        "run": "inv test",
     }
 
 

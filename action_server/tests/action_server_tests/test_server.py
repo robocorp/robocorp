@@ -50,8 +50,8 @@ def test_bad_return_on_no_conda(
     )
     found = client.post_error("api/actions/calculator/bad-return-none/run", 500)
     assert found.json()["message"] == (
-        "Error in action. Expected return type: string. "
-        "Found return type: <class 'NoneType'> (value: None)."
+        "Inconsistent value returned from action: data must be string -- i.e.: the returned "
+        "value (None) does not match the expected output schema ({'type': 'string', 'description': ''})."
     )
 
 
@@ -273,7 +273,6 @@ def calculator_sum(v1: int = 5) -> float:
             actions = db.all(Action)
             assert len(actions) == 1
             assert json.loads(actions[0].input_schema) == {
-                "additionalProperties": False,
                 "properties": {
                     "v1": {
                         "type": "integer",
@@ -284,6 +283,35 @@ def calculator_sum(v1: int = 5) -> float:
                 },
                 "type": "object",
             }
+
+
+def test_is_consequential_openapi_spec(
+    action_server_process: ActionServerProcess,
+    data_regression,
+    tmpdir,
+    action_server_datadir: Path,
+    client: ActionServerClient,
+) -> None:
+    action_server_datadir.mkdir(parents=True, exist_ok=True)
+    db_path = action_server_datadir / "server.db"
+    assert not db_path.exists()
+
+    calculator = Path(tmpdir) / "v1" / "calculator" / "action_calculator.py"
+    calculator.parent.mkdir(parents=True, exist_ok=True)
+    calculator.write_text(
+        """
+from robocorp.actions import action
+
+@action(is_consequential=False)
+def calculator_sum(v1: float, v2: float) -> float:
+    return v1 + v2
+"""
+    )
+
+    action_server_process.start(
+        actions_sync=True, cwd=calculator.parent, db_file="server.db"
+    )
+    data_regression.check(json.loads(client.get_openapi_json()))
 
 
 def test_import_no_conda(

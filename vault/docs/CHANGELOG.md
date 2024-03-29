@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+## 1.3.4 - 2024-03-08
+
+- Security update fixed by cryptography `42.0.4` version.
+
 ## 1.3.3 - 2024-02-01
 
 - Leave the range more flexible for cryptography so that users can use a newer

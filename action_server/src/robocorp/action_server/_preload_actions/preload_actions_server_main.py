@@ -9,6 +9,7 @@ import argparse
 import os
 import sys
 import traceback
+from typing import Any, Dict
 
 DEFAULT_TIMEOUT = 10
 NO_TIMEOUT = None
@@ -49,25 +50,7 @@ class _DummyStdin(object):
 
 
 def binary_stdio():
-    """Construct binary stdio streams (not text mode).
-
-    This seems to be different for Window/Unix Python2/3, so going by:
-        https://stackoverflow.com/questions/2850893/reading-binary-data-from-stdin
-    """
-    PY3K = sys.version_info >= (3, 0)
-
-    if PY3K:
-        stdin, stdout = sys.stdin.buffer, sys.stdout.buffer
-    else:
-        # Python 2 on Windows opens sys.stdin in text mode, and
-        # binary data that read from it becomes corrupted on \r\n
-        if sys.platform == "win32":
-            # set sys.stdin to binary mode
-            import msvcrt
-
-            msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
-            msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
-        stdin, stdout = sys.stdin, sys.stdout
+    stdin, stdout = sys.stdin.buffer, sys.stdout.buffer
 
     # The original stdin cannot be used and anything written to stdout will
     # be put in the stderr.
@@ -191,10 +174,6 @@ class MessagesHandler:
         #
         # env["ROBOT_ARTIFACTS"] = robot_artifacts
         # env["RC_ACTION_RESULT_LOCATION"] = result_json
-        #
-        # for key, value in headers.items():
-        #     if value:
-        #         env[key.upper()] = value
         command = message.get("command")
         if command == "run_action":
             from robocorp.actions import cli
@@ -207,6 +186,7 @@ class MessagesHandler:
                 robot_artifacts = message["robot_artifacts"]
                 result_json = message["result_json"]
                 headers = message["headers"]
+                cookies = message["cookies"]
                 reuse_process = message["reuse_process"]
 
                 os.environ["ROBOT_ARTIFACTS"] = robot_artifacts
@@ -225,7 +205,7 @@ class MessagesHandler:
 
                 if headers:
                     for key, value in headers.items():
-                        if key and value:
+                        if key and value and key.upper() == "X_ACTION_TRACE":
                             os.environ[key.upper()] = value
 
                 # The preloaded actions must be always in place.
@@ -239,12 +219,48 @@ class MessagesHandler:
                     action_file,
                     f"--json-input={input_json}",
                 ]
-                returncode = cli.main(args, exit=False)
+
+                returncode = cli.main(
+                    args,
+                    exit=False,
+                    **self._plugin_manager_kwargs(
+                        {"request": {"headers": headers, "cookies": cookies}}
+                    ),
+                )
             except BaseException:
                 traceback.print_exc()
 
             finally:
                 self._jsonrpc_stream_writer.write({"returncode": returncode})
+
+    def _plugin_manager_kwargs(self, managed_parameters) -> Dict[str, Any]:
+        try:
+            from robocorp.actions._managed_parameters import ManagedParameters
+            from robocorp.actions._request import Request
+            from robocorp.tasks._customization._extension_points import (
+                EPManagedParameters,
+            )
+            from robocorp.tasks._customization._plugin_manager import PluginManager
+
+        except ImportError:
+            return {}
+
+        # Ok, we're dealing with a newer version of robocorp.actions and
+        # robocorp.tasks, so add the customization of parameters to
+        # add the 'request' parameter.
+
+        try:
+            pm = getattr(self, "_pm")
+        except AttributeError:
+            pm = self._pm = PluginManager()
+        pm.set_instance(
+            EPManagedParameters,
+            ManagedParameters(
+                {"request": Request.model_validate(managed_parameters["request"])}
+            ),
+        )
+
+        return {"plugin_manager": pm}
 
 
 def main(args=None):

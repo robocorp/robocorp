@@ -37,7 +37,7 @@ from .protocols import IReadLines, LogHTMLStyle, Status
 if typing.TYPE_CHECKING:
     from ._robo_logger import _RoboLogger
 
-__version__ = "2.9.0"
+__version__ = "2.9.1"
 version_info = [int(x) for x in __version__.split(".")]
 
 
@@ -296,6 +296,12 @@ class ConsoleMessageKind:
 class _SentinelUseStdout:
     pass
 
+    def __repr__(self):
+        return "_SentinelUseStdout"
+
+    def __str__(self):
+        return "_SentinelUseStdout"
+
 
 class _ConsoleMessagesLock:
     tlocal = threading.local()
@@ -333,6 +339,8 @@ def console_message(
         flush: Whether we should flush after sending the message (if None
                it's flushed if the end char ends with '\n').
     """
+    from ._safe_write_to_stream import safe_write_to_stream
+
     try:
         writing = _ConsoleMessagesLock.tlocal._writing
     except Exception:
@@ -371,7 +379,7 @@ def console_message(
                 ctx = nullcontext()
 
             with ctx:
-                stream.write(message)
+                safe_write_to_stream(stream, message)
 
             if flush is None:
                 flush = message.endswith("\n")

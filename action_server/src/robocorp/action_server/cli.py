@@ -2,6 +2,8 @@ import argparse
 import logging
 import os.path
 import sys
+import time
+import typing
 from pathlib import Path
 from typing import Optional, Union
 
@@ -9,6 +11,17 @@ from termcolor import colored
 
 from . import __version__
 from ._errors_action_server import ActionServerValidationError
+from ._protocols import (
+    ArgumentsNamespace,
+    ArgumentsNamespaceBaseImportOrStart,
+    ArgumentsNamespaceDownloadRcc,
+    ArgumentsNamespaceImport,
+    ArgumentsNamespacePackage,
+    ArgumentsNamespaceStart,
+)
+
+if typing.TYPE_CHECKING:
+    from ._settings import Settings
 
 log = logging.getLogger(__name__)
 
@@ -72,6 +85,14 @@ def _add_verbose_args(parser, defaults):
         action="store_true",
         default=False,
         help="Be more talkative (default: %(default)s)",
+    )
+
+
+def _add_whitelist_args(parser, defaults):
+    parser.add_argument(
+        "--whitelist",
+        default="",
+        help="Allows whitelisting the actions/packages to be used",
     )
 
 
@@ -208,6 +229,7 @@ def _create_parser():
 
     _add_data_args(start_parser, defaults)
     _add_verbose_args(start_parser, defaults)
+    _add_whitelist_args(start_parser, defaults)
 
     # Import
     import_parser = subparsers.add_parser(
@@ -224,6 +246,7 @@ def _create_parser():
     _add_skip_lint(import_parser, defaults)
     _add_data_args(import_parser, defaults)
     _add_verbose_args(import_parser, defaults)
+    _add_whitelist_args(import_parser, defaults)
 
     # Download RCC
     rcc_parser = subparsers.add_parser(
@@ -390,6 +413,46 @@ def _setup_logging(datadir: Path, log_level):
     logger.addHandler(rotating_handler)
 
 
+def _import_actions(
+    base_args: Union[ArgumentsNamespaceBaseImportOrStart],
+    settings: "Settings",
+    disable_not_imported: bool,
+) -> int:
+    """
+    Args:
+        base_args: The base arguments collected from the cli input.
+        settings: The settings for the action server.
+        disable_not_imported: Whether actions which were not imported should be disabled.
+
+    Returns: 0 if everything is correct and some other number if some error happened
+        while importing the actions.
+    """
+    from . import _actions_import
+
+    if not base_args.dir:
+        base_args.dir = ["."]
+
+    try:
+        for action_package_dir in base_args.dir:
+            _actions_import.import_action_package(
+                datadir=settings.datadir,
+                action_package_dir=os.path.abspath(action_package_dir),
+                skip_lint=base_args.skip_lint,
+                disable_not_imported=disable_not_imported,
+                whitelist=base_args.whitelist,
+            )
+    except ActionServerValidationError as e:
+        log.critical(
+            colored(
+                f"\nUnable to import action. Please fix the error below and retry.\n{e}",
+                color="red",
+                attrs=["bold"],
+            )
+        )
+        return 1
+    return 0
+
+
 def _main_retcode(args: Optional[list[str]], exit) -> int:
     from robocorp.action_server._settings import is_frozen
 
@@ -407,11 +470,34 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         # for it.
         from . import _server_expose
 
-        _server_expose.main(*args[1:])
+        try:
+            (
+                expose_server_parent_pid,
+                expose_server_port,
+                expose_server_verbose,
+                expose_server_host,
+                expose_server_expose_url,
+                expose_server_datadir,
+                expose_server_expose_session,
+                expose_server_api_key,
+            ) = args[1:]
+        except Exception:
+            raise RuntimeError(f"Unable to initialize server with sys.argv: {sys.argv}")
+
+        _server_expose.main(
+            expose_server_parent_pid,
+            expose_server_port,
+            expose_server_verbose,
+            expose_server_host,
+            expose_server_expose_url,
+            expose_server_datadir,
+            expose_server_expose_session,
+            expose_server_api_key,
+        )
         return 0
 
     parser = _create_parser()
-    base_args = parser.parse_args(args)
+    base_args: ArgumentsNamespace = parser.parse_args(args)
 
     command = base_args.command
     if not command:
@@ -430,19 +516,25 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
     #     return
 
     if command == "download-rcc":
-        download_rcc(target=base_args.file, force=True)
+        download_args: ArgumentsNamespaceDownloadRcc = typing.cast(
+            ArgumentsNamespaceDownloadRcc, base_args
+        )
+        download_rcc(target=download_args.file, force=True)
         return 0
 
     if command == "package":
-        if base_args.update:
+        package_args: ArgumentsNamespacePackage = typing.cast(
+            ArgumentsNamespacePackage, base_args
+        )
+        if package_args.update:
             from robocorp.action_server.vendored_deps.action_package_handling import (
                 update_package,
             )
 
             update_package(
                 Path(".").absolute(),
-                dry_run=base_args.dry_run,
-                backup=not base_args.no_backup,
+                dry_run=package_args.dry_run,
+                backup=not package_args.no_backup,
             )
             return 0
         print("Flag for package operation not specified.", file=sys.stderr)
@@ -484,16 +576,44 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
                 create_new_project(directory=base_args.name)
                 return 0
 
-            mutex = SystemMutex("action_server.lock", base_dir=str(settings.datadir))
-            if not mutex.get_mutex_aquired():
-                print(
-                    f"An action server is already started in this datadir ({settings.datadir})."
-                    f"\nPlease exit it before starting a new one."
-                    f"\nInformation on mutex holder:\n"
-                    f"{mutex.mutex_creation_info}",
-                    file=sys.stderr,
+            timeout = 3
+            timeout_at = time.time() + timeout
+
+            shown_first_message = False
+            while True:
+                mutex = SystemMutex(
+                    "action_server.lock", base_dir=str(settings.datadir)
                 )
-                return 1
+                acquired = mutex.get_mutex_aquired()
+                if acquired:
+                    if shown_first_message:
+                        print("Exited. Proceeding with action server startup.")
+                    break
+
+                msg = mutex.mutex_creation_info or ""
+                i = msg.find("--- Stack ---")
+                if i > 0:
+                    msg = msg[:i]
+                msg = msg.strip()
+
+                if not shown_first_message:
+                    shown_first_message = True
+                    print(
+                        f"An action server is already started in this datadir ({settings.datadir}).\n"
+                        f"\nInformation on mutex holder:\n"
+                        f"{msg}",
+                    )
+
+                print("Waiting for it to exit...")
+                time.sleep(0.3)
+
+                timed_out = time.time() > timeout_at
+                if timed_out:
+                    print(
+                        "\nAction server not started (timed out waiting for mutex to be released).",
+                        file=sys.stderr,
+                    )
+                    return 1
 
             # Log to file in datadir, always in debug mode
             # (only after lock is in place as multiple loggers to the same
@@ -557,65 +677,31 @@ To migrate the database to the current version
                         return 1
 
                 with use_db_ctx(db_path) as db:
-                    from . import _actions_import
-
                     if command == "import":
-                        if not base_args.dir:
-                            base_args.dir = ["."]
-
-                        try:
-                            for action_package_dir in base_args.dir:
-                                _actions_import.import_action_package(
-                                    datadir=settings.datadir,
-                                    action_package_dir=os.path.abspath(
-                                        action_package_dir
-                                    ),
-                                    skip_lint=base_args.skip_lint,
-                                    disable_not_imported=False,
-                                    name=None,
-                                )
-                        except ActionServerValidationError as e:
-                            log.critical(
-                                colored(
-                                    f"\nUnable to import action. Please fix the error below and retry.\n{e}",
-                                    color="red",
-                                    attrs=["bold"],
-                                )
-                            )
-                            return 1
-                        return 0
+                        return _import_actions(
+                            typing.cast(ArgumentsNamespaceImport, base_args),
+                            settings,
+                            disable_not_imported=False,
+                        )
 
                     elif command == "start":
+                        start_args: ArgumentsNamespaceStart = typing.cast(
+                            ArgumentsNamespaceStart, base_args
+                        )
                         # start imports the current directory by default
                         # (unless --actions-sync=false is specified).
-                        log.debug("Synchronize actions: %s", base_args.actions_sync)
+                        log.debug("Synchronize actions: %s", start_args.actions_sync)
 
                         rcc.feedack_metric("action-server.started", __version__)
 
-                        if base_args.actions_sync:
-                            if not base_args.dir:
-                                base_args.dir = ["."]
-
-                            try:
-                                for action_package_dir in base_args.dir:
-                                    _actions_import.import_action_package(
-                                        datadir=settings.datadir,
-                                        action_package_dir=os.path.abspath(
-                                            action_package_dir
-                                        ),
-                                        disable_not_imported=base_args.actions_sync,
-                                        skip_lint=base_args.skip_lint,
-                                        name=None,
-                                    )
-                            except ActionServerValidationError as e:
-                                log.critical(
-                                    colored(
-                                        f"\nUnable to import action. Please fix the error below and retry.\n{e}",
-                                        color="red",
-                                        attrs=["bold"],
-                                    )
-                                )
-                                return 1
+                        if start_args.actions_sync:
+                            code = _import_actions(
+                                start_args,
+                                settings,
+                                disable_not_imported=start_args.actions_sync,
+                            )
+                            if code != 0:
+                                return code
 
                         with use_runs_state_ctx(db):
                             from ._server import start_server
@@ -623,13 +709,13 @@ To migrate the database to the current version
                             settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
 
                             expose_session = None
-                            if base_args.expose:
+                            if start_args.expose:
                                 from ._server_expose import read_expose_session_json
 
                                 expose_session = read_expose_session_json(
                                     datadir=str(settings.datadir)
                                 )
-                                if expose_session and not base_args.expose_allow_reuse:
+                                if expose_session and not start_args.expose_allow_reuse:
                                     confirm = input(
                                         colored(
                                             "> Resume previous expose URL ",
@@ -645,19 +731,20 @@ To migrate the database to the current version
                                         expose_session = None
 
                             api_key = None
-                            if base_args.api_key:
-                                api_key = base_args.api_key
-                            elif base_args.expose:
+                            if start_args.api_key:
+                                api_key = start_args.api_key
+                            elif start_args.expose:
                                 from ._robo_utils.auth import get_api_key
 
                                 api_key = get_api_key(settings.datadir)
 
                             start_server(
-                                expose=base_args.expose,
+                                expose=start_args.expose,
                                 api_key=api_key,
                                 expose_session=expose_session.expose_session
                                 if expose_session
                                 else None,
+                                whitelist=start_args.whitelist,
                             )
                             return 0
 

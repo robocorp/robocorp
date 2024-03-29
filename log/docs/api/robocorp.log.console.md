@@ -2,9 +2,7 @@
 
 # module `robocorp.log.console`
 
-**Source:** [`console.py:0`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L0)
-
-## Variables
+# Variables
 
 - **COLOR_BLACK**
 - **COLOR_BLUE**
@@ -15,31 +13,34 @@
 - **COLOR_WHITE**
 - **COLOR_YELLOW**
 
+# Functions
+
 ______________________________________________________________________
 
-## function `set_color`
-
-**Source:** [`console.py:215`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L215)
-
-```python
-set_color(foreground_color: str) → _OnExitContextManager
-```
+## `set_color`
 
 To be used as:
 
 with set_color(COLOR_BLACK): ...
 
 **Args:**
-foreground_color: The foreground color to be set (see COLOR_XXX constants).
+
+- <b>`foreground_color`</b>:  The foreground color to be set (see COLOR_XXX constants).
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L215)
+
+```python
+set_color(foreground_color: str) → _OnExitContextManager
+```
 
 ______________________________________________________________________
 
-## function `set_mode`
+## `set_mode`
 
-**Source:** [`console.py:229`](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L229)
+Can be used to set the mode of the console. Options: "auto": uses the default console"plain": disables colors"ansi": forces ansi color mode
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L229)
 
 ```python
 set_mode(mode: str) → None
 ```
-
-Can be used to set the mode of the console. Options: "auto": uses the default console"plain": disables colors"ansi": forces ansi color mode

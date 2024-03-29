@@ -11,6 +11,7 @@
 
 - [`_protocols.ITask`](./robocorp.tasks._protocols.md#class-itask)
 - [`_protocols.Status`](./robocorp.tasks._protocols.md#class-status): Task state
+- [`cli.IArgumentsHandler`](./robocorp.tasks.cli.md#class-iargumentshandler)
 
 ## Functions
 

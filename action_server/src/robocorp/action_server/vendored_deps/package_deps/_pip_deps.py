@@ -24,7 +24,7 @@ class PipDeps:
     """
 
     def __init__(self):
-        self._pip_versions = {}
+        self._deps = {}
 
     def add_dep(self, value, as_range):
         from .pip_impl.pip_distlib_util import IDENTIFIER, parse_requirement
@@ -40,7 +40,7 @@ class PipDeps:
             if value.startswith(("git+http", "http")) or value.endswith(
                 (".whl", ".zip", "bz2", "gz")
             ):
-                self._pip_versions[value] = PipDepInfo(
+                self._deps[value] = PipDepInfo(
                     name=value,
                     extras=None,
                     constraints=None,
@@ -58,7 +58,7 @@ class PipDeps:
             else:
                 name = m.groups()[0]
 
-            self._pip_versions[name] = PipDepInfo(
+            self._deps[name] = PipDepInfo(
                 name=name,
                 extras=None,
                 constraints=None,
@@ -69,9 +69,9 @@ class PipDeps:
                 error_msg=f"Error parsing '{value}': {e}",
             )
         else:
-            self._pip_versions[req.name] = PipDepInfo(
+            self._deps[req.name] = PipDepInfo(
                 **req.__dict__, error_msg=None, dep_range=as_range
             )
 
-    def iter_pip_dep_infos(self) -> Iterator[PipDepInfo]:
-        yield from self._pip_versions.values()
+    def iter_deps_infos(self) -> Iterator[PipDepInfo]:
+        yield from self._deps.values()

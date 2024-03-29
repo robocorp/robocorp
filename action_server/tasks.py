@@ -4,30 +4,24 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
-# Add the devutils even if the poetry env isn't setup (to do a 'inv devinstall').
+ROOT = Path(__file__).absolute().parent
+
 try:
     import devutils
-
-    devutils_found = True
 except ImportError:
-    devutils_src = Path(__file__).absolute().parent.parent / "devutils" / "src"
-    devutils_found = devutils_src.exists()
+    devutils_src = ROOT.parent / "devutils" / "src"
+    assert devutils_src.exists(), f"{devutils_src} does not exist!"
+    sys.path.append(str(devutils_src))
 
-    if not devutils_found:
-        print(f"{devutils_src} does not exist.", file=sys.stderr)
-    else:
-        sys.path.append(str(devutils_src))
+from devutils.invoke_utils import build_common_tasks
 
-if devutils_found:
-    from devutils.invoke_utils import build_common_tasks
-
-    globals().update(
-        build_common_tasks(
-            Path(__file__).absolute().parent,
-            "robocorp.action_server",
-            ruff_format_arguments=r"--exclude=_static_contents.py",
-        )
+globals().update(
+    build_common_tasks(
+        ROOT,
+        "robocorp.action_server",
+        ruff_format_arguments=r"--exclude=_static_contents.py",
     )
+)
 
 from invoke import Context, task
 
@@ -51,10 +45,32 @@ def run(ctx: Context, *args: str, **options):
     ctx.run(cmd, **options)
 
 
+@contextmanager
+def _change_to_frontend_dir():
+    RESOLVED_CURDIR = CURDIR.resolve()
+
+    # vite build has a bug which makes it misbehave when working with a subst
+    # (presumably this is because it's resolving the actual location of
+    # things and then compares with unresolved paths).
+    # In order to fix that we resolve the directory ourselves prior to the
+    # build and switch to that directory.
+    with chdir(RESOLVED_CURDIR / "frontend"):
+        yield
+
+
+@task
+def dev_frontend(ctx: Context):
+    """Run the frentend in dev mode (starts its own localhost server using vite)."""
+
+    with _change_to_frontend_dir():
+        run(ctx, "npm", "run", "dev")
+
+
 @task
 def build_frontend(ctx: Context, debug: bool = False, install: bool = True):
     """Build static .html frontend"""
-    with chdir(CURDIR / "frontend"):
+
+    with _change_to_frontend_dir():
         if install:
             run(ctx, "npm", "ci", "--no-audit", "--no-fund")
         if debug:

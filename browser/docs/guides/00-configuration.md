@@ -71,4 +71,4 @@ the persistent context should be stored/loaded from (it can be used to store
 the state of the automation to allow for sessions and cookies to be reused in a
 new automation).
 
-See: [Persistent Context Directory Guide](https://github.com/robocorp/robocorp/blob/master/browser/docs/guides/01-persistent_context.md)
+See: [Persistent Context Directory Guide](https://github.com/robocorp/robocorp/blob/master/browser/docs/guides/01-persistent-context.md)

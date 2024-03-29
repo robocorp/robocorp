@@ -12,12 +12,18 @@ from robocorp.tasks._hooks import (
 )
 
 
-@pytest.fixture(autouse=True)
-def clear_callbacks():
+def _clear_callbacks():
     before_task_run._callbacks = ()
     before_all_tasks_run._callbacks = ()
     after_task_run._callbacks = ()
     after_all_tasks_run._callbacks = ()
+
+
+@pytest.fixture(autouse=True)
+def clear_callbacks():
+    _clear_callbacks()
+    yield
+    _clear_callbacks()
 
 
 def test_setup_default():
