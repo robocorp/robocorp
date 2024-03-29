@@ -64,7 +64,7 @@ def _login():
 
 ## API Reference
 
-Explore our [API](https://github.com/robocorp/robocorp/blob/master/browser/docs/api) for extensive documentation.
+Explore our [API](https://github.com/robocorp/robocorp/blob/master/browser/docs/api/README.md) for extensive documentation.
 
 ## Changelog
 

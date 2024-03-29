@@ -1,3 +1,5 @@
+# robocorp-windows
+
 The **robocop-windows** package brings a library that can be used for Windows desktop automation.
 
 The basic idea of the library is to enable windows and controls to be found by leveraging "locators" (strings that identify how to reach some window or control), then interacting with such elements.
@@ -49,7 +51,7 @@ calc.send_keys(keys="96+4=")
 
 ## API Reference
 
-Information on specific functions or classes: [robocorp.windows](https://github.com/robocorp/robocorp/blob/master/windows/docs/api/robocorp.windows.md)
+Explore our [API](https://github.com/robocorp/robocorp/blob/master/windows/docs/api/README.md) for extensive documentation.
 
 ## Changelog
 
