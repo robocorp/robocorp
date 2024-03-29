@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update package's main README.
+
 ## 0.1.0 - 2024-03-15
 
 - `request: Request` is now a managed parameter when using `robocorp-actions`. Note

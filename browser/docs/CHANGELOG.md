@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update package's main README.
+
 ## 2.3.2 - 2024-03-27
 
 - Docstrings improvements by following the Google style guide.

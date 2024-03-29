@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update package's main README.
+
 ## 1.3.4 - 2024-03-08
 
 - Security update fixed by cryptography `42.0.4` version.
