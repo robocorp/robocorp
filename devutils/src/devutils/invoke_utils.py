@@ -167,7 +167,7 @@ def build_common_tasks(
     DIST = root / "dist"
     CONDA_ENV_NAME = package_name.replace(".", "-").replace("_", "-")
     TARGETS = " ".join(source_directories)
-    RUFF_ARGS = f"--config {ROOT / 'ruff.toml'} {ruff_format_arguments}"
+    RUFF_ARGS = f"--config {ROOT / 'ruff.toml'} {ruff_format_arguments}".strip()
 
     def run(ctx, *cmd, **options):
         options.setdefault("pty", sys.platform != "win32")
