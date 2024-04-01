@@ -15,6 +15,7 @@ export interface CodeProps
   lineWrapping?: boolean;
   height?: number;
   copyValue?: string;
+  readOnly?: boolean;
 }
 
 export const Code: FC<CodeProps> = ({
@@ -24,6 +25,7 @@ export const Code: FC<CodeProps> = ({
   height,
   value,
   copyValue,
+  readOnly = true,
   ...restProps
 }) => {
   const codemirror = useRef<EditorView>();
@@ -68,7 +70,7 @@ export const Code: FC<CodeProps> = ({
         theme="dark"
         value={value}
         toolbar={toolbar}
-        readOnly
+        readOnly={readOnly}
         lineNumbers={false}
         {...restProps}
       />

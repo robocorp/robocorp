@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Code,
   Form,
   Input,
   Select,
@@ -17,6 +16,7 @@ import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import { formDatatoPayload, propertiesToFormData, PropertyFormData } from '~/lib/formData';
 import { useActionRunMutation } from '~/queries/actions';
+import { Code } from '~/components/Code';
 import { ActionRunResult } from './ActionRunResult';
 
 type Props = {
@@ -42,62 +42,6 @@ const Item: FC<{ children?: ReactNode; title?: string; name: string }> = ({
   );
 };
 
-const CodeComponent: FC<{
-  formData: PropertyFormData[];
-  updateWhenFormChanges?: boolean;
-  onCodeChange: (value: unknown) => void;
-}> = ({ formData, updateWhenFormChanges = true, onCodeChange }) => {
-  const [rawJSONInput, setRawJSONInput] = useState<string>('');
-
-  const updateCodeInput = (propData: PropertyFormData[]) => {
-    console.log('Data changed...');
-    try {
-      if (propData.length === 0) {
-        return;
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const output: { [key: string]: any } = {};
-      propData.forEach((prop) => {
-        switch (prop.property.type) {
-          case 'boolean':
-            output[prop.name.toLowerCase()] = prop.value.toLowerCase() === 'true';
-            break;
-          case 'number':
-          case 'integer':
-            output[prop.name.toLowerCase()] = parseFloat(prop.value);
-            break;
-          case 'object':
-            output[prop.name.toLowerCase()] = JSON.parse(prop.value);
-            break;
-          case 'enum':
-            output[prop.name.toLowerCase()] = prop.value;
-            break;
-          default:
-            output[prop.name.toLowerCase()] = prop.value;
-            break;
-        }
-      });
-
-      setRawJSONInput(JSON.stringify(output, null, 4));
-    } catch (e) {
-      console.error(`Error collecting rawJSONInput: ${JSON.stringify(e)}`);
-    }
-  };
-  const updateInputAtChange = useCallback(() => {
-    if (updateWhenFormChanges) {
-      updateCodeInput(formData);
-    }
-  }, [updateWhenFormChanges, formData]);
-
-  // useEffect(updateInputAtChange, [formData]);
-  useEffect(() => {
-    updateCodeInput(formData);
-  }, []);
-
-  return <Code lang="json" aria-label="Run input" value={rawJSONInput} onChange={onCodeChange} />;
-};
-
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
@@ -105,6 +49,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const { mutate: runAction, isPending, isSuccess, data, reset } = useActionRunMutation();
 
   const [useRawJSON, setUseRawJSON] = useState<boolean>(false);
+  const [errorJSON, setErrorJSON] = useState<string>();
 
   useEffect(() => {
     setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
@@ -133,26 +78,64 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   );
 
   const onCodeChange = useCallback(
-    (code: unknown) => {
-      const rawInputData = JSON.parse(code as string);
-      const tempForm = [...formData];
+    (code: string) => {
+      try {
+        setErrorJSON(undefined);
+        const rawInputData = JSON.parse(code as string);
+        const tempForm = [...formData];
 
-      Object.entries(rawInputData).forEach(([key, val]) => {
-        const foundFormItem = tempForm.find(
-          (elem) => elem.name.toLowerCase() === key.toLowerCase(),
-        );
-        if (foundFormItem) {
-          const foundFormItemIndex = tempForm.findIndex(
+        Object.entries(rawInputData).forEach(([key, val]) => {
+          const foundFormItem = tempForm.find(
             (elem) => elem.name.toLowerCase() === key.toLowerCase(),
           );
-          tempForm[foundFormItemIndex] = { ...foundFormItem, value: val as string };
-        }
-      });
+          if (foundFormItem) {
+            const foundFormItemIndex = tempForm.findIndex(
+              (elem) => elem.name.toLowerCase() === key.toLowerCase(),
+            );
+            tempForm[foundFormItemIndex] = { ...foundFormItem, value: val as string };
+          }
+        });
 
-      debounce(() => setFormData(tempForm), 2000)();
+        debounce(() => setFormData([...tempForm]), 750)();
+      } catch (e) {
+        console.error(`Error while generating entries: ${JSON.stringify(e)}`);
+        setErrorJSON('Validating JSON syntax failed. Please verify the input and try again.');
+      }
     },
     [formData],
   );
+
+  const rawJSONInput = useMemo(() => {
+    try {
+      if (formData.length === 0) {
+        return 'No input data...';
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const output: { [key: string]: any } = {};
+      formData.forEach((prop) => {
+        switch (prop.property.type) {
+          case 'boolean':
+            output[prop.name.toLowerCase()] = prop.value.toLowerCase() === 'true';
+            break;
+          case 'number':
+          case 'integer':
+            output[prop.name.toLowerCase()] = parseFloat(prop.value);
+            break;
+          case 'object':
+            output[prop.name.toLowerCase()] = JSON.parse(prop.value);
+            break;
+          case 'enum':
+          default:
+            output[prop.name.toLowerCase()] = prop.value;
+            break;
+        }
+      });
+      return JSON.stringify(output, null, 4);
+    } catch (e) {
+      console.error(`Error collecting raw JSON input: ${JSON.stringify(e)}`);
+      return 'There was an error while parsing form data...';
+    }
+  }, [formData]);
 
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
@@ -168,10 +151,13 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       )}
       <Form.Fieldset>
         {useRawJSON ? (
-          <CodeComponent
-            formData={formData}
-            updateWhenFormChanges={!useRawJSON}
-            onCodeChange={onCodeChange}
+          <Code
+            lang="json"
+            aria-label="Run JSON input"
+            value={rawJSONInput}
+            onChange={onCodeChange}
+            error={errorJSON}
+            readOnly={false}
           />
         ) : (
           formData.map((item, index) => {
@@ -255,7 +241,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           })
         )}
       </Form.Fieldset>
-      <Button.Group align="right" justifyContent="space-between" pb={16}>
+      <Button.Group align="right" justifyContent="space-between" alignItems="center" pb={16}>
         <Button loading={isPending} type="submit" variant="primary">
           Run
         </Button>
