@@ -98,7 +98,6 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
 
         debounce(() => setFormData([...tempForm]), 750)();
       } catch (e) {
-        console.error(`Error while generating entries: ${JSON.stringify(e)}`);
         setErrorJSON('Validating JSON syntax failed. Please verify the input and try again.');
       }
     },
@@ -132,7 +131,6 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       });
       return JSON.stringify(output, null, 4);
     } catch (e) {
-      console.error(`Error collecting raw JSON input: ${JSON.stringify(e)}`);
       return 'There was an error while parsing form data...';
     }
   }, [formData]);
