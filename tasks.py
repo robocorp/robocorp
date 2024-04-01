@@ -12,7 +12,12 @@ DOCS_IGNORE = ["devutils"]
 
 
 @task
-def install(ctx: invoke.Context, update: bool = False, verbose: bool = False, skip: Optional[list[str]] = None) -> None:
+def install(
+    ctx: invoke.Context,
+    update: bool = False,
+    verbose: bool = False,
+    skip: Optional[list[str]] = None,
+) -> None:
     """Refresh/Install all Poetry-based projects' environments.
 
     Args:
@@ -47,12 +52,13 @@ def docs(ctx: invoke.Context) -> None:
     if sys.platform != "win32":
         ignored.append("windows")
 
+    cmd = "invoke docs"
     for project_dir in _iter_project_dirs():
         if project_dir.name in ignored:
             continue
 
         print(f"Generating docs in {project_dir!r}...")
-        subprocess.check_call(["invoke", "docs"], cwd=project_dir)
+        subprocess.check_call(shlex.split(cmd), cwd=project_dir)
 
 
 @task
