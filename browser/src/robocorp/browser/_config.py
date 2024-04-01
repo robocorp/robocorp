@@ -32,45 +32,30 @@ class _BrowserConfig:
     ):
         """
         Args:
-            browser_engine:
-                Browser engine which should be used
-                default="chromium"
-                choices=["chromium", "chrome", "chrome-beta", "msedge",
-                         "msedge-beta", "msedge-dev", "firefox", "webkit"]
-
-            install:
-                Install browser or not. If not defined, download is only
+            browser_engine: Browser engine which should be used.
+                Possible choices are `"chromium"`, `"chrome"`, `"chrome-beta"`, `"msedge"`,
+                `"msedge-beta"`, `"msedge-dev"`, `"firefox"` and `"webkit"` (defaults to `"chromium"`).
+            install: Install browser or not. If not defined, download is only
                 attempted if the browser fails to launch.
-
             headless: If set to False the browser UI will be shown. If set to True
                 the browser UI will be kept hidden. If unset or set to None it'll
                 show the browser UI only if a debugger is detected.
-
-            slowmo:
-                Run interactions in slow motion (number in millis).
-
-            screenshot:
-                Whether to automatically capture a screenshot after each task.
+            slowmo: Run interactions in slow motion (number in millis).
+            screenshot: Whether to automatically capture a screenshot after each task.
                 default="only-on-failure"
                 choices=["on", "off", "only-on-failure"]
-
-            isolated:
-                Used to define where the browser should be downloaded. If
+            isolated: Used to define where the browser should be downloaded. If
                 `True`, it'll be installed inside the isolated environment. If
                 `False` (default) it'll be installed in a global cache folder.
-
-            persistent_context_directory:
-                If a persistent context should be used, this should be the
+            persistent_context_directory: If a persistent context should be used, this should be the
                 directory in which the persistent context should be
                 stored/loaded from (it can be used to store the state of the
                 automation to allow for sessions and cookies to be reused in a
                 new automation).
-
-            skip_playwright_stop:
-                Can be used to skip the playwright stop. Not recommended in
+            skip_playwright_stop: Can be used to skip the playwright stop. Not recommended in
                 general, only meant to be used to diagnose and workaround
                 specific issues on the playwright stop coupled with an early
-                os._exit shutdown in `robocorp-tasks`. Can cause a process leak
+                `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak
                 and even a shutdown deadlock if used alone.
         """  # noqa
         self.browser_engine = browser_engine

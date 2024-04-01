@@ -24,5 +24,5 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - ...
 
 
-> AI/LLM's are quite good with the most used Python libaries:<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with the most used Python libaries:  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)

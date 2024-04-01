@@ -17,11 +17,9 @@ def store_email():
 
 - [Handling different asset types](https://github.com/robocorp/robocorp/blob/master/storage/docs/guides/00-asset-types.md)
 
-Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
-
 ## API Reference
 
-Information on specific functions or classes: [robocorp.storage](https://github.com/robocorp/robocorp/blob/master/storage/docs/api/robocorp.storage.md)
+Explore our [API](https://github.com/robocorp/robocorp/blob/master/storage/docs/api/README.md) for extensive documentation.
 
 ## Changelog
 

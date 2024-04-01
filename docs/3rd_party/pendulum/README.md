@@ -13,8 +13,8 @@ dt_vancouver = pendulum.datetime(2024, 1, 1, tz='America/Vancouver')
 print(dt_vancouver.diff(dt_toronto).in_hours())
 ```
 
-> AI/LLM's are quite good with `pendulum`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `pendulum`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

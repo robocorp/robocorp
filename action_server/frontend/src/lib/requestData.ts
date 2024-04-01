@@ -149,7 +149,8 @@ class ModelUpdater {
         // of the first items.
         for (let i = 0; i < runsModel.data.length; i += 1) {
           if (runId === runsModel.data[i].id) {
-            const newRun = { ...runsModel.data[i], ...changes };
+            const runData = runsModel.data[i];
+            const newRun = { ...runData, ...changes };
             const newRunData = runsModel.data.slice();
             newRunData[i] = newRun;
             this.modelContainer.onModelUpdated(ModelType.RUNS, {

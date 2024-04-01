@@ -1,15 +1,13 @@
 # robocorp-action-server
 
-[Robocorp Action Server](https://github.com/robocorp/robocorp#readme) is a Python framework designed to simplify the deployment
-of actions (AI or otherwise).
+[Robocorp Action Server](https://github.com/robocorp/robocorp#readme) is a Python framework designed to simplify the deployment of actions (AI or otherwise).
 
-An `action` in this case is defined as a Python function (which has inputs/outputs
-defined), which is served by the `Robocorp Action Server`.
+An `action` in this case is defined as a Python function (which has inputs/outputs defined), which is served by the `Robocorp Action Server`.
 
 The `Robocorp Action Server` automatically generates an OpenAPI spec for your Python code, enabling different AI/LLM Agents to understand and call your Action. It also manages the Action lifecycle and provides full traceability of what happened during runs.
 
-
 ## 1. Install Action Server
+
 Action Server is available as a stand-alone fully signed executable and via `pip install robocorp-action-server`.
 > We recommend the executable to prevent confusion in case you have multiple/crowded Python environments, etc.
 
@@ -60,15 +58,11 @@ action-server start --expose
 
 ## What do you need in your Action Package
 
-An `Action Package` is currently defined as a local folder that contains at least one Python file containing an action entry point 
-(a Python function marked with `@action` -decorator from `robocorp.actions`).
+An `Action Package` is currently defined as a local folder that contains at least one Python file containing an action entry point (a Python function marked with `@action` -decorator from `robocorp.actions`).
 
-The `package.yaml` file is required for specifying the Python environment and dependencies for 
-your Action ([RCC](https://github.com/robocorp/rcc/) will be used to 
-automatically bootstrap it and keep it updated given the `package.yaml` contents).
+The `package.yaml` file is required for specifying the Python environment and dependencies for your Action ([RCC](https://github.com/robocorp/rcc/) will be used to automatically bootstrap it and keep it updated given the `package.yaml` contents).
 
-Note: the `package.yaml` is optional if the action server is not being used as a standalone
-(i.e.: if it was pip-installed it can use the same python environment where it's installed).
+> Note: the `package.yaml` is optional if the action server is not being used as a standalone (i.e.: if it was pip-installed it can use the same python environment where it's installed).
 
 ### Bootstrapping a new Action
 
@@ -78,8 +72,7 @@ Start new projects with:
 
 Note: the `action-server` executable should be automatically added to your python installation after `pip install robocorp-action-server`, but if for some reason it wasn't pip-installed, it's also possible to use `python -m robocorp.action_server` instead of `action-server`.
 
-After creating the project, it's possible to serve the actions under the
-current directory with:
+After creating the project, it's possible to serve the actions under the current directory with:
 
 `action-server start`
 
@@ -91,10 +84,9 @@ After it's started, it's possible to access the following URLs:
 - `/openapi.json`: Provides the openapi spec for the action server.
 - `/docs`: Provides access to the APIs available in the server and a UI to test it.
 
+## Documentation
 
-## API Reference
-
-Information on specific functions or classes: [robocorp.action-server](https://github.com/robocorp/robocorp/blob/master/action_server/docs/api/README.md)
+Explore our [docs](https://github.com/robocorp/robocorp/tree/master/action_server/docs) for extensive documentation.
 
 ## Changelog
 
