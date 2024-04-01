@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Stable API documentation generation impacting parameters taking functions as defaults.
 - Update package's main README.
 - Make `get_win_version` a static method of `windows.Desktop` for easier usage.
 

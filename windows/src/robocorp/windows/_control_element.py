@@ -30,6 +30,21 @@ PatternType = Union["ValuePattern", "LegacyIAccessiblePattern"]
 DEFAULT_SEND_KEYS_INTERVAL = 0.01
 
 
+class _SentinelValidator:
+    # Used to determine the validator function for `ControlElement.set_value` method.
+    #  If a validator is not passed explicitly, then the `set_value_validator` function
+    #  will be used as default.
+
+    def __call__(self, *args, **kwargs):
+        pass
+
+    def __repr__(self):
+        return "_SentinelValidator"
+
+    def __str__(self):
+        return "_SentinelValidator"
+
+
 def set_value_validator(expected: str, actual: str) -> bool:
     """Checks the passed against the final set value and returns status."""
     return actual.strip() == expected.strip()  # due to EOLs inconsistency
@@ -1455,7 +1470,7 @@ class ControlElement:
         enter: bool = False,
         newline: bool = False,
         send_keys_fallback: bool = True,
-        validator: Optional[Callable] = set_value_validator,
+        validator: Optional[Callable] = _SentinelValidator(),
         locator: Optional[Locator] = None,
         search_depth: int = 8,
         timeout: Optional[float] = None,
@@ -1554,6 +1569,9 @@ class ControlElement:
 
         get_value_pattern = self._get_value_pattern(element.ui_automation_control)
         action = "Appending" if append else "Setting"
+
+        if isinstance(validator, _SentinelValidator):
+            validator = set_value_validator
 
         if get_value_pattern:
             self._set_value_with_pattern(
