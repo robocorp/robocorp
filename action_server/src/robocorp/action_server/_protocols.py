@@ -101,9 +101,22 @@ class ArgumentsNamespaceDownloadRcc(ArgumentsNamespace):
 
 class ArgumentsNamespacePackage(ArgumentsNamespace):
     command: Literal["package"]
-    update: bool
+    package_command: Literal["update"] | Literal["build"]
+
+
+class ArgumentsNamespacePackageUpdate(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["update"]
     dry_run: bool
     no_backup: bool
+
+
+class ArgumentsNamespacePackageBuild(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["build"]
+    output_dir: str
+    datadir: str
+    override: bool
 
 
 class ArgumentsNamespaceBaseImportOrStart(ArgumentsNamespace):
