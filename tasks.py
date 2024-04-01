@@ -7,8 +7,12 @@ from typing import Optional
 import invoke
 from invoke import call, task
 
+
 ROOT: Path = Path(__file__).absolute().parent
+
 DOCS_IGNORE = ["devutils"]
+if sys.platform != "win32":
+    DOCS_IGNORE.append("windows")
 
 
 @task
@@ -29,8 +33,9 @@ def install(
         Can't use threads to speed it up. (Poetry or pip will just fail)
     """
     for project_dir in _iter_project_dirs():
-        if skip and project_dir in skip:
-            print(f"Skipping project {str(project_dir)!r}.")
+        project_name = project_dir.name
+        if skip and project_name in skip:
+            print(f"Skipping project {project_name!r}.")
             continue
 
         inv_cmd, poetry_cmd = "invoke install", "poetry install"
@@ -48,13 +53,9 @@ def install(
 @task(pre=[call(install, skip=DOCS_IGNORE)])
 def docs(ctx: invoke.Context) -> None:
     """Regenerate documentation for each library."""
-    ignored = DOCS_IGNORE[:]
-    if sys.platform != "win32":
-        ignored.append("windows")
-
     cmd = "invoke docs"
     for project_dir in _iter_project_dirs():
-        if project_dir.name in ignored:
+        if project_dir.name in DOCS_IGNORE:
             continue
 
         print(f"Generating docs in {str(project_dir)!r}...")
