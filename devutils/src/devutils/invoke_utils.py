@@ -148,11 +148,15 @@ def build_common_tasks(
     parallel_tests: bool = True,
     source_directories: Tuple[str, ...] = ("src", "tests"),
 ):
-    """
+    """Builds the common tasks in every task.py file of the inheriting packages.
+
     Args:
-        root: The path to the package root (i.e.: /tasks in the repo)
-        package_name: The name of the python package (i.e.: robocorp.tasks)
-        tag_prefix: Prefix for tags / PyPI package name
+        root: The path to the package root. (i.e.: ./tasks in the repo)
+        package_name: The name of the python package. (i.e.: "robocorp.tasks")
+        tag_prefix: Optional prefix for tags / PyPI package name.
+        ruff_format_arguments: Pass extra options to the ruff formatting commands.
+        parallel_tests: Runs tests in parallels. (enabled by default)
+        source_directories: Default Python source directories.
     """
     if tag_prefix is None:
         # The tag for releases should be `robocorp-tasks-{version}`
@@ -162,6 +166,8 @@ def build_common_tasks(
 
     DIST = root / "dist"
     CONDA_ENV_NAME = package_name.replace(".", "-").replace("_", "-")
+    TARGETS = " ".join(source_directories)
+    RUFF_ARGS = f"--config {ROOT / 'ruff.toml'} {ruff_format_arguments}"
 
     def run(ctx, *cmd, **options):
         options.setdefault("pty", sys.platform != "win32")
@@ -235,7 +241,7 @@ def build_common_tasks(
 
     @contextmanager
     def mark_as_develop_mode(
-        projects: Optional[list[str]] = None, all_packages: bool = False
+        projects: Optional[List[str]] = None, all_packages: bool = False
     ):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
@@ -271,10 +277,9 @@ def build_common_tasks(
     @task
     def lint(ctx, strict: bool = False):
         """Run static analysis and formatting checks"""
-        targets = " ".join(source_directories)
-        poetry(ctx, f"run ruff {targets}")
-        poetry(ctx, f"run ruff format --check {targets} {ruff_format_arguments}")
-        poetry(ctx, f"run isort --check {targets}")
+        poetry(ctx, f"run ruff {TARGETS}")
+        poetry(ctx, f"run ruff format --check {RUFF_ARGS} {TARGETS}")
+        poetry(ctx, f"run isort --check {TARGETS}")
         if strict:
             poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
 
@@ -297,10 +302,9 @@ def build_common_tasks(
     @task
     def pretty(ctx):
         """Auto-format code and sort imports"""
-        targets = " ".join(source_directories)
-        poetry(ctx, f"run ruff --fix {targets}")
-        poetry(ctx, f"run ruff format {targets} {ruff_format_arguments}")
-        poetry(ctx, f"run isort {targets}")
+        poetry(ctx, f"run ruff --fix {TARGETS}")
+        poetry(ctx, f"run ruff format {RUFF_ARGS} {TARGETS}")
+        poetry(ctx, f"run isort {TARGETS}")
 
     @task
     def test(ctx, test: Optional[str] = None):
