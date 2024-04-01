@@ -110,3 +110,69 @@ def download_rcc(ctx: Context, system: Optional[str] = None) -> None:
     curr_pythonpath = env.get("PYTHONPATH", "")
     env["PYTHONPATH"] = curr_pythonpath + os.pathsep + str(CURDIR / "src")
     run(ctx, "python -m robocorp.action_server download-rcc", env=env)
+
+
+def _replace_deps(content, new_deps):
+    """Replaces the contents between ## START DEPS and ## ENDS DEPS with new_deps.
+
+    Args:
+      content: The content of the file as a string.
+      new_deps: The new dependencies to insert.
+
+    Returns:
+      The content of the file with the dependencies replaced.
+    """
+
+    start_marker = "## START DEPS\n"
+    end_marker = "## END DEPS\n"
+
+    start_pos = content.find(start_marker)
+    end_pos = content.find(end_marker)
+
+    if start_pos == -1 or end_pos == -1:
+        raise ValueError("Markers not found in content")
+
+    return content[:start_pos] + start_marker + new_deps + content[end_pos:]
+
+
+@task
+def update_pyoxidizer_versions(ctx: Context):
+    """
+    Updates the dependencies for pyoxidizer given the versions in pyproject.toml.
+    """
+    import tomlkit
+
+    pyproject: dict = tomlkit.loads(Path("pyproject.toml").read_text(encoding="utf-8"))
+    deps = pyproject["tool"]["poetry"]["dependencies"]
+    use_versions = []
+    for dep_name, version in deps.items():
+        if dep_name == "python":
+            continue
+
+        parts = version.split(".")
+        if len(parts) >= 3:
+            # Drop the minor for compatibility
+            version = ".".join(parts[:-1])
+
+        elif len(parts) == 1:
+            # Just the major version is specified
+            assert version.startswith("^")
+            v = int(version[1:])
+            version = f">={v},<{v+1}"
+
+        version = version.replace("^", "~=")
+        use_versions.append(f'"{dep_name}{version}",')
+    use_versions = sorted(use_versions)
+
+    blz_file = CURDIR / "build-binary" / "pyoxidizer.bzl"
+    assert blz_file.exists()
+    contents = blz_file.read_text().replace("\r\n", "\n").replace("\r", "\n")
+    indent = "            "
+    new_contents = _replace_deps(
+        contents, indent + f"\n{indent}".join(use_versions) + f"\n{indent}"
+    )
+    if new_contents != contents:
+        blz_file.write_text(new_contents)
+        print("pyoxidizer.bzl updated.")
+    else:
+        print("pyoxidizer.bzl already up to date.")

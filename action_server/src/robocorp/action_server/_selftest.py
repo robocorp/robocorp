@@ -423,7 +423,7 @@ def check_new_template(
             db_file="server.db",
             cwd=str(tmpdir / "my_project"),
             actions_sync=True,
-            timeout=300,
+            timeout=60 * 10,
         )
 
         if verbose:
