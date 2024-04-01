@@ -14,8 +14,8 @@ print("Current OTP:", totp.now())
 ```
 
 
-> AI/LLM's are quite good with `pyotp`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `pyotp`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

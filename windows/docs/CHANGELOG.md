@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update package's main README.
 - Make `get_win_version` a static method of `windows.Desktop` for easier usage.
 
 ## 1.0.2 - 2024-02-01

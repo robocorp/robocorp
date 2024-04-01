@@ -23,8 +23,8 @@ with webdriver.Chrome() as driver:
     driver.get_screenshot_as_file("robotsparebin.png")
 ```
 
-> AI/LLM's are quite good with `Selenium`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `Selenium`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

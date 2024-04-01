@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update package's main README.
+
 ## 3.0.1 - 2024-03-19
 
 - The truststore SSL patching warning is issued now even when the minimum Python and/or pip versions aren't met.

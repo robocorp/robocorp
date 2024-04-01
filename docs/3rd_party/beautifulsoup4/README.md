@@ -31,8 +31,8 @@ for link in soup.find_all('a'):
     print(link.get('href'))
 ```
 
-> AI/LLM's are quite good with `beautifulsoup4`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `beautifulsoup4`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

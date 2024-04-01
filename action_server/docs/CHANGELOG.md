@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update package's main README.
 - Improved handling of websockets when used from the builtin UI (not the `--expose` one).
     - Fixed issue where the number of runs shown in the UI would not match the 
       actual number of runs (i.e.: updated data was not collected on websocket 

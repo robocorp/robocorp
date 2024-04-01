@@ -87,8 +87,8 @@ db.connect()
 db.create_tables([User])
 ```
 
-> AI/LLM's are quite good with `orms`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `orms`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 
