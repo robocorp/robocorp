@@ -217,7 +217,7 @@ Class used to interact with a control.
 
 ### `__init__`
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L79)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L80)
 
 ```python
 __init__(wrapped: '_UIAutomationControlWrapper')
@@ -407,7 +407,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>:  if element does not allow the Click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L811)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L812)
 
 ```python
 click(
@@ -469,7 +469,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>:  if element does not allow the double-click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L872)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L873)
 
 ```python
 double_click(
@@ -501,7 +501,7 @@ The first matching element is returned.
 **Raises:**
 `ElementNotFound` if an element with the given locator could not befound.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L516)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L517)
 
 ```python
 find(
@@ -534,7 +534,7 @@ This method may be used to find multiple descendants of the current element matc
 
 > Keep in mind that by default the search strategy is for searching `siblings` of the initial element found (so, by default, after the first element is found a tree traversal is not done and only sibling elements from the initial element are found). Use the `all` search strategy to search for all elements.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L563)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L564)
 
 ```python
 find_many(
@@ -553,7 +553,7 @@ ______________________________________________________________________
 **Returns:**
 The parent element for this control.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L113)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L114)
 
 ```python
 get_parent() → Optional[ForwardRef('ControlElement')]
@@ -587,7 +587,7 @@ date = window.get_text('type:Edit name:"Date of birth"')
 **Raises:**
 ActionNotPossible if the text cannot be gotten from this element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1286)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1287)
 
 ```python
 get_text(
@@ -625,7 +625,7 @@ date = window.get_value('type:Edit name:"Date of birth"')
 **Raises:**
 ActionNotPossible if the text cannot be gotten from this element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1344)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1345)
 
 ```python
 get_value(
@@ -642,7 +642,7 @@ ______________________________________________________________________
 **Returns:**
 True if this control currently has keyboard focus.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L191)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L192)
 
 ```python
 has_keyboard_focus() → bool
@@ -659,7 +659,7 @@ True if the geometry of this element is valid and False otherwise.
 
 > This value is based on cached coordinates. Call `update_geometry()` to check it based on the current bounds of the control.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L380)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L381)
 
 ```python
 has_valid_geometry() → bool
@@ -678,7 +678,7 @@ from robocorp import windows
 windows.find_window('Calculator').inspect()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L94)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L95)
 
 ```python
 inspect() → None
@@ -691,7 +691,7 @@ ______________________________________________________________________
 **Returns:**
 True if the underlying control is already disposed and False otherwise.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L169)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L170)
 
 ```python
 is_disposed() → bool
@@ -708,7 +708,7 @@ ______________________________________________________________________
 **Returns:**
 True if this elements points to the same element representedby the other control.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L123)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L124)
 
 ```python
 is_same_as(other: 'ControlElement') → bool
@@ -731,7 +731,7 @@ An iterator of `ControlElement` which provides the descendants ofthis element.
 
 > Iteration over too many items can be slow. Try to keep the max depth up to a minimum to avoid slow iterations.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L652)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L653)
 
 ```python
 iter_children(max_depth: int = 8) → Iterator[ForwardRef('ControlElement')]
@@ -766,7 +766,7 @@ windows.desktop().log_screenshot('ERROR')
 **Raises:**
 ElementNotFound if the locator was passed but it was not possibleto find the element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1719)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1720)
 
 ```python
 log_screenshot(
@@ -828,7 +828,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>:  if element does not allow the middle-click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1002)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1003)
 
 ```python
 middle_click(
@@ -845,7 +845,7 @@ ______________________________________________________________________
 
 Moves the mouse to the center of this element to simulate a mouse hovering.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L798)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L799)
 
 ```python
 mouse_hover() → None
@@ -889,7 +889,7 @@ from robocorp import windows
 windows.find("Calculator > path:2|3").print_tree()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L680)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L681)
 
 ```python
 print_tree(
@@ -947,7 +947,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>:  if element does not allow the right-click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L939)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L940)
 
 ```python
 right_click(
@@ -990,7 +990,7 @@ The absolute path to the image saved or None if it was not possibleto obtain the
 **Raises:**
 ElementNotFound if the locator was passed but it was not possibleto find the element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1661)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1662)
 
 ```python
 screenshot(
@@ -1031,7 +1031,7 @@ The PIL image if it was possible to do the screenshot or None ifit was not possi
 **Raises:**
 ElementNotFound if the locator was passed but it was not possibleto find the element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1610)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1611)
 
 ```python
 screenshot_pil(
@@ -1073,7 +1073,7 @@ ActionNotPossible if the element does not allow the `Select` action.
 element.select("22", locator="id:FontSizeComboBox")
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1124)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1125)
 
 ```python
 select(
@@ -1137,7 +1137,7 @@ windows.find_window('Calculator').send_keys('96+4=', send_enter=True)
 
 - <b>`ActionNotPossible`</b>:  if the element does not allow the SendKeys action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1184)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1185)
 
 ```python
 send_keys(
@@ -1173,7 +1173,7 @@ chrome = windows.find_window('executable:chrome')
 bt = chrome.set_focus('name:Buy type:Button')
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1783)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1784)
 
 ```python
 set_focus(
@@ -1263,7 +1263,7 @@ text = element.get_value(elem)
 print(text)
 
 
- [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1465)
+ [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1466)
 
 ```python
 set_value(
@@ -1285,7 +1285,7 @@ ______________________________________________________________________
 
 This method may be called to update the cached coordinates of the control bounds.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L395)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L396)
 
 ```python
 update_geometry() → None
