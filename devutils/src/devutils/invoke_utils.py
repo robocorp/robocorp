@@ -199,19 +199,22 @@ def build_common_tasks(
     def install(
         ctx, local: Optional[str] = None, update: bool = False, verbose: bool = False
     ):
-        """
-        Installs or updates dependencies.
+        """Optionally updates then also installs dependencies.
+
+        This also supports specifying local dependencies installed in development mode
+        through the `local` argument. Enable `verbose` to increase logging. Passing
+        `-u` / `--update` will update the dependencies in the *.lock file first, then
+        it will continue with the installation as usual.
 
         Args:
             local: A comma-separated list of local projects to install in develop mode.
-            update: Whether to update the dependencies.
+            update: Whether to update the dependencies first.
             verbose: Whether to run in verbose mode.
         """
         _make_conda_env_if_needed()
 
         if update:
             poetry(ctx, "update", verbose=verbose)
-            return
 
         projects = (
             [package.replace("robocorp-", "") for package in local.split(",")]
