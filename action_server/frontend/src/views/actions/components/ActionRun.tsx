@@ -12,7 +12,7 @@ import {
 } from '@robocorp/components';
 
 import { Action, ActionPackage } from '~/lib/types';
-import { toKebabCase } from '~/lib/helpers';
+import { debounce, toKebabCase } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import { formDatatoPayload, propertiesToFormData, PropertyFormData } from '~/lib/formData';
@@ -40,6 +40,62 @@ const Item: FC<{ children?: ReactNode; title?: string; name: string }> = ({
       {children}
     </Box>
   );
+};
+
+const CodeComponent: FC<{
+  formData: PropertyFormData[];
+  updateWhenFormChanges?: boolean;
+  onCodeChange: (value: unknown) => void;
+}> = ({ formData, updateWhenFormChanges = true, onCodeChange }) => {
+  const [rawJSONInput, setRawJSONInput] = useState<string>('');
+
+  const updateCodeInput = (propData: PropertyFormData[]) => {
+    console.log('Data changed...');
+    try {
+      if (propData.length === 0) {
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const output: { [key: string]: any } = {};
+      propData.forEach((prop) => {
+        switch (prop.property.type) {
+          case 'boolean':
+            output[prop.name.toLowerCase()] = prop.value.toLowerCase() === 'true';
+            break;
+          case 'number':
+          case 'integer':
+            output[prop.name.toLowerCase()] = parseFloat(prop.value);
+            break;
+          case 'object':
+            output[prop.name.toLowerCase()] = JSON.parse(prop.value);
+            break;
+          case 'enum':
+            output[prop.name.toLowerCase()] = prop.value;
+            break;
+          default:
+            output[prop.name.toLowerCase()] = prop.value;
+            break;
+        }
+      });
+
+      setRawJSONInput(JSON.stringify(output, null, 4));
+    } catch (e) {
+      console.error(`Error collecting rawJSONInput: ${JSON.stringify(e)}`);
+    }
+  };
+  const updateInputAtChange = useCallback(() => {
+    if (updateWhenFormChanges) {
+      updateCodeInput(formData);
+    }
+  }, [updateWhenFormChanges, formData]);
+
+  // useEffect(updateInputAtChange, [formData]);
+  useEffect(() => {
+    updateCodeInput(formData);
+  }, []);
+
+  return <Code lang="json" aria-label="Run input" value={rawJSONInput} onChange={onCodeChange} />;
 };
 
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
@@ -76,24 +132,27 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     [action, actionPackage, formData, apiKey, serverConfig],
   );
 
-  const inputs = useMemo(() => {
-    try {
-      const props = propertiesToFormData(JSON.parse(action.input_schema));
-      if (props.length === 0) {
-        return 'No inputs sent';
-      }
+  const onCodeChange = useCallback(
+    (code: unknown) => {
+      const rawInputData = JSON.parse(code as string);
+      const tempForm = [...formData];
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const output: { [key: string]: any } = {};
-      props.forEach((prop) => {
-        output[prop.property.title.toLowerCase()] = prop.value;
+      Object.entries(rawInputData).forEach(([key, val]) => {
+        const foundFormItem = tempForm.find(
+          (elem) => elem.name.toLowerCase() === key.toLowerCase(),
+        );
+        if (foundFormItem) {
+          const foundFormItemIndex = tempForm.findIndex(
+            (elem) => elem.name.toLowerCase() === key.toLowerCase(),
+          );
+          tempForm[foundFormItemIndex] = { ...foundFormItem, value: val as string };
+        }
       });
 
-      return JSON.stringify(output, null, 4);
-    } catch (err) {
-      return `Error collecting inputs: ${JSON.stringify(err)}`;
-    }
-  }, [action]);
+      debounce(() => setFormData(tempForm), 2000)();
+    },
+    [formData],
+  );
 
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
@@ -109,7 +168,11 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       )}
       <Form.Fieldset>
         {useRawJSON ? (
-          <Code lang="json" aria-label="Run input" value={inputs} />
+          <CodeComponent
+            formData={formData}
+            updateWhenFormChanges={!useRawJSON}
+            onCodeChange={onCodeChange}
+          />
         ) : (
           formData.map((item, index) => {
             const title = `${item.property.title}${item.required ? ' *' : ''}`;
@@ -192,7 +255,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           })
         )}
       </Form.Fieldset>
-      <Button.Group align="right" justifyContent="space-between">
+      <Button.Group align="right" justifyContent="space-between" pb={16}>
         <Button loading={isPending} type="submit" variant="primary">
           Run
         </Button>

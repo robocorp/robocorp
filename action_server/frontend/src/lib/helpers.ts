@@ -55,3 +55,13 @@ export const prettyPrint = (input: string) => {
 export const toKebabCase = (str: string): string => {
   return str.replace(/[\s_]+/g, '-').toLowerCase();
 };
+
+let debounceTimer: NodeJS.Timeout;
+export const debounce = (func: (...data: unknown[]) => void, timeout = 300) => {
+  return (...args: unknown[]) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
+  };
+};
