@@ -659,7 +659,7 @@ dev = ["black", "flake8", "isort", "mypy", "pydocstyle", "pytest", "pytest-cov",
 type = "git"
 url = "https://github.com/robocorp/lazydocs.git"
 reference = "HEAD"
-resolved_reference = "cffd8abafa5db34661458e456ffb47e828f19cd6"
+resolved_reference = "cb3e5131c2db290222052d86469482d1e02e9c9e"
 
 [[package]]
 name = "linkify-it-py"
