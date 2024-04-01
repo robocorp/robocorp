@@ -31,10 +31,9 @@ DEFAULT_SEND_KEYS_INTERVAL = 0.01
 
 
 class _SentinelValidator:
-    """
-    Used to determine the validator function for ControlElement.set_value method.
-    If a validator is not passed then set_value_validator will be used as default.
-    """
+    # Used to determine the validator function for `ControlElement.set_value` method.
+    #  If a validator is not passed explicitly, then the `set_value_validator` function
+    #  will be used as default.
 
     def __call__(self, *args, **kwargs):
         pass
