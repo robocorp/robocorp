@@ -8,7 +8,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/robocorp/robocorp?color=%232080C0)](https://github.com/robocorp/robocorp/issues)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Create, deploy and operate 🐍 Python Automations <br/> and AI Actions anywhere.
+# Create, deploy and operate 🐍 Python Automations and AI Actions anywhere.
 
 Robocorp is the easiest way to extend the capabilities of AI agents, assistants and copilots with custom actions, written in Python. Create and deploy tools, skills, loaders and plugins that securely connect any AI Assistant platform to your data and applications.
 
@@ -178,7 +178,7 @@ Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 
 Adding the Action Server-hosted AI Action to your custom GPT is super simple: basically just navigate to “Actions” section of the GPT configuration, add the link to import the actions, and **Add Authentication** with **Authentication method** set to _“API key”_ and **Auth Type** to _“Bearer”_.
 
-> **TIP:**<br/>
+> **TIP:**  
 > Use the `@action(is_consequential=False)` flag to avoid the user needing to accept the action execution separately each time on your GPT.
 
 <div id="langchain"></div>

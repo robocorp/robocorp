@@ -13,8 +13,8 @@ sf = Salesforce(username='myemail@example.com', password='password', security_to
 sf.Contact.create({'FirstName': 'John', 'LastName': 'Smith','Email': 'example@example.com'})
 ```
 
-> AI/LLM's are quite good with `simple-salesforce`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `simple-salesforce`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

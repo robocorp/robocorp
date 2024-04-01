@@ -47,8 +47,8 @@ pdf.cell(200, 10, txt="Hello World!", ln=1, align='C')
 pdf.output("info.pdf")
 ```
 
-> AI/LLM's are quite good with `pdfs`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `pdfs`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 
