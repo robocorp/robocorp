@@ -2,13 +2,13 @@
 
 # module `robocorp.excel.tables`
 
-**Source:** [`tables.py:0`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L0)
+# Functions
 
 ______________________________________________________________________
 
-## function `return_table_as_raw_list`
+## `return_table_as_raw_list`
 
-**Source:** [`tables.py:35`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L35)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L35)
 
 ```python
 return_table_as_raw_list(table, heading=False)
@@ -16,85 +16,69 @@ return_table_as_raw_list(table, heading=False)
 
 ______________________________________________________________________
 
-## function `to_list`
+## `to_list`
 
-**Source:** [`tables.py:47`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L47)
+Convert (possibly scalar) value to list of `size`.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L47)
 
 ```python
 to_list(obj: Any, size: int = 1)
 ```
 
-Convert (possibly scalar) value to list of `size`.
-
 ______________________________________________________________________
 
-## function `to_identifier`
+## `to_identifier`
 
-**Source:** [`tables.py:55`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L55)
+Convert string to valid identifier.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L55)
 
 ```python
 to_identifier(val: Any)
 ```
 
-Convert string to valid identifier.
-
 ______________________________________________________________________
 
-## function `to_condition`
+## `to_condition`
 
-**Source:** [`tables.py:71`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L71)
+Convert string operator into callable condition function.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L71)
 
 ```python
 to_condition(operator: str, value: Any) → Callable[[Any], bool]
 ```
 
-Convert string operator into callable condition function.
-
 ______________________________________________________________________
 
-## function `if_none`
+## `if_none`
 
-**Source:** [`tables.py:95`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L95)
+Return default if value is None.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L95)
 
 ```python
 if_none(value: Any, default: Any)
 ```
 
-Return default if value is None.
-
 ______________________________________________________________________
 
-## function `uniq`
-
-**Source:** [`tables.py:100`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L100)
-
-```python
-uniq(seq: Iterable)
-```
+## `uniq`
 
 Return list of unique values while preserving order.
 
 Values must be hashable.
 
-______________________________________________________________________
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L100)
 
-## enum `Dialect`
-
-**Source:** [`tables.py:114`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L114)
-
-CSV dialect.
-
-### Values
-
-- **Excel** = excel
-- **ExcelTab** = excel-tab
-- **Unix** = unix
+```python
+uniq(seq: Iterable)
+```
 
 ______________________________________________________________________
 
-## class `Table`
-
-**Source:** [`tables.py:122`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L122)
+# Class `Table`
 
 Container class for tabular data.
 
@@ -105,16 +89,7 @@ Container class for tabular data.
 > - empty: None values populated according to columns/index - list: list of data Rows - dict: Dictionary of columns as keys and Rows as values - table: An existing Table
 >   Row: a namedtuple, dictionary, list or a tuple
 
-### method `__init__`
-
-**Source:** [`tables.py:137`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L137)
-
-```python
-__init__(
-    data: Optional[Dict[Union[int, str], Union[Dict, List, Tuple, NamedTuple, set]], List[Union[Dict, List, Tuple, NamedTuple, set]], ForwardRef('Table')] = None,
-    columns: Optional[List[str]] = None
-)
-```
+### `__init__`
 
 Creates a Table object.
 
@@ -123,21 +98,34 @@ Creates a Table object.
 - <b>`data`</b>:      Values for table,  see `Supported data formats`
 - <b>`columns`</b>:   Names for columns, should match data dimensions
 
-#### property `columns`
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L137)
 
-#### property `data`
+```python
+__init__(
+    data: Optional[Dict[Union[int, str], Union[Dict, List, Tuple, NamedTuple, set]], List[Union[Dict, List, Tuple, NamedTuple, set]], ForwardRef('Table')] = None,
+    columns: Optional[List[str]] = None
+)
+```
 
-#### property `dimensions`
+## Properties
 
-#### property `index`
+- `columns`
 
-#### property `size`
+- `data`
+
+- `dimensions`
+
+- `index`
+
+- `size`
+
+## Methods
 
 ______________________________________________________________________
 
-### method `append_column`
+### `append_column`
 
-**Source:** [`tables.py:702`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L702)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L702)
 
 ```python
 append_column(column=None, values=None)
@@ -145,105 +133,109 @@ append_column(column=None, values=None)
 
 ______________________________________________________________________
 
-### method `append_row`
+### `append_row`
 
-**Source:** [`tables.py:693`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L693)
+Append new row to table.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L693)
 
 ```python
 append_row(row=None)
 ```
 
-Append new row to table.
-
 ______________________________________________________________________
 
-### method `append_rows`
+### `append_rows`
 
-**Source:** [`tables.py:697`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L697)
+Append multiple rows to table.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L697)
 
 ```python
 append_rows(rows)
 ```
 
-Append multiple rows to table.
-
 ______________________________________________________________________
 
-### method `append_table`
+### `append_table`
 
-**Source:** [`tables.py:735`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L735)
+Append data from table to current data.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L735)
 
 ```python
 append_table(table)
 ```
 
-Append data from table to current data.
-
 ______________________________________________________________________
 
-### method `clear`
+### `clear`
 
-**Source:** [`tables.py:468`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L468)
+Remove all rows from this table.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L468)
 
 ```python
 clear()
 ```
 
-Remove all rows from this table.
-
 ______________________________________________________________________
 
-### method `column_location`
+### `column_location`
 
-**Source:** [`tables.py:384`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L384)
+Find location for column value.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L384)
 
 ```python
 column_location(value)
 ```
 
-Find location for column value.
-
 ______________________________________________________________________
 
-### method `copy`
+### `copy`
 
-**Source:** [`tables.py:464`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L464)
+Create a copy of this table.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L464)
 
 ```python
 copy()
 ```
 
-Create a copy of this table.
-
 ______________________________________________________________________
 
-### method `delete_columns`
+### `delete_columns`
 
-**Source:** [`tables.py:720`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L720)
+Remove columns with matching names.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L720)
 
 ```python
 delete_columns(columns)
 ```
 
-Remove columns with matching names.
-
 ______________________________________________________________________
 
-### method `delete_rows`
+### `delete_rows`
 
-**Source:** [`tables.py:708`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L708)
+Remove rows with matching indexes.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L708)
 
 ```python
 delete_rows(indexes: Union[int, str, List[Union[int, str]]])
 ```
 
-Remove rows with matching indexes.
-
 ______________________________________________________________________
 
-### method `filter_all`
+### `filter_all`
 
-**Source:** [`tables.py:806`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L806)
+Remove rows by evaluating `condition` for every row.
+
+The filtering will be done in-place and all the rows evaluating as falsy through the provided condition will be removed.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L806)
 
 ```python
 filter_all(
@@ -251,33 +243,23 @@ filter_all(
 )
 ```
 
-Remove rows by evaluating `condition` for every row.
-
-The filtering will be done in-place and all the rows evaluating as falsy through the provided condition will be removed.
-
 ______________________________________________________________________
 
-### method `filter_by_column`
-
-**Source:** [`tables.py:819`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L819)
-
-```python
-filter_by_column(column: Union[int, str], condition: Callable[[Any], bool])
-```
+### `filter_by_column`
 
 Remove rows by evaluating `condition` for cells in `column`.
 
 The filtering will be done in-place and all the rows where it evaluates to falsy are removed.
 
-______________________________________________________________________
-
-### method `get`
-
-**Source:** [`tables.py:482`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L482)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L819)
 
 ```python
-get(indexes=None, columns=None, as_list=False)
+filter_by_column(column: Union[int, str], condition: Callable[[Any], bool])
 ```
+
+______________________________________________________________________
+
+### `get`
 
 Get values from table. Return type depends on input dimensions.
 
@@ -293,27 +275,27 @@ If both `indexes` and `columns` are lists: Returns a new Table instance with mat
 - <b>`columns`</b>:  List of columns, or all if not given.
 - <b>`as_list`</b>:  Return as list, instead of dictionary.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L482)
+
+```python
+get(indexes=None, columns=None, as_list=False)
+```
+
 ______________________________________________________________________
 
-### method `get_cell`
+### `get_cell`
 
-**Source:** [`tables.py:511`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L511)
+Get single cell value.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L511)
 
 ```python
 get_cell(index, column)
 ```
 
-Get single cell value.
-
 ______________________________________________________________________
 
-### method `get_column`
-
-**Source:** [`tables.py:542`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L542)
-
-```python
-get_column(column, indexes=None, as_list=False)
-```
+### `get_column`
 
 Get row values from column.
 
@@ -323,15 +305,15 @@ Get row values from column.
 - <b>`indexes`</b>:  Row indexes to include, or all if not given
 - <b>`as_list`</b>:  Return column as dictionary, instead of list
 
-______________________________________________________________________
-
-### method `get_row`
-
-**Source:** [`tables.py:518`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L518)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L542)
 
 ```python
-get_row(index: Union[int, str], columns=None, as_list=False)
+get_column(column, indexes=None, as_list=False)
 ```
+
+______________________________________________________________________
+
+### `get_row`
 
 Get column values from row.
 
@@ -341,23 +323,31 @@ Get column values from row.
 - <b>`columns`</b>:  Column names to include, or all if not given.
 - <b>`as_list`</b>:  Return row as list, instead of dictionary.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L518)
+
+```python
+get_row(index: Union[int, str], columns=None, as_list=False)
+```
+
 ______________________________________________________________________
 
-### method `get_slice`
+### `get_slice`
 
-**Source:** [`tables.py:585`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L585)
+Get a new table from rows between start and end index.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L585)
 
 ```python
 get_slice(start: Optional[int, str] = None, end: Optional[int, str] = None)
 ```
 
-Get a new table from rows between start and end index.
-
 ______________________________________________________________________
 
-### method `get_table`
+### `get_table`
 
-**Source:** [`tables.py:566`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L566)
+Get a new table from all cells matching indexes and columns.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L566)
 
 ```python
 get_table(
@@ -367,37 +357,35 @@ get_table(
 ) → Union[List, ForwardRef('Table')]
 ```
 
-Get a new table from all cells matching indexes and columns.
-
 ______________________________________________________________________
 
-### method `group_by_column`
+### `group_by_column`
 
-**Source:** [`tables.py:785`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L785)
+Group rows by column value and return as list of tables.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L785)
 
 ```python
 group_by_column(column)
 ```
 
-Group rows by column value and return as list of tables.
-
 ______________________________________________________________________
 
-### method `head`
+### `head`
 
-**Source:** [`tables.py:472`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L472)
+Return first n rows of table.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L472)
 
 ```python
 head(rows, as_list=False)
 ```
 
-Return first n rows of table.
-
 ______________________________________________________________________
 
-### method `index_location`
+### `index_location`
 
-**Source:** [`tables.py:367`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L367)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L367)
 
 ```python
 index_location(value: Union[int, str]) → int
@@ -405,9 +393,11 @@ index_location(value: Union[int, str]) → int
 
 ______________________________________________________________________
 
-### method `iter_dicts`
+### `iter_dicts`
 
-**Source:** [`tables.py:840`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L840)
+Iterate rows with values as dicts.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L840)
 
 ```python
 iter_dicts(
@@ -415,43 +405,35 @@ iter_dicts(
 ) → Generator[Dict[Union[int, str], Any], NoneType, NoneType]
 ```
 
-Iterate rows with values as dicts.
-
 ______________________________________________________________________
 
-### method `iter_lists`
+### `iter_lists`
 
-**Source:** [`tables.py:832`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L832)
+Iterate rows with values as lists.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L832)
 
 ```python
 iter_lists(with_index=True)
 ```
 
-Iterate rows with values as lists.
-
 ______________________________________________________________________
 
-### method `iter_tuples`
-
-**Source:** [`tables.py:848`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L848)
-
-```python
-iter_tuples(with_index=True, name='Row')
-```
+### `iter_tuples`
 
 Iterate rows with values as namedtuples.
 
 Converts column names to valid Python identifiers, e.g. "First Name" -> "First_Name"
 
-______________________________________________________________________
-
-### method `set`
-
-**Source:** [`tables.py:625`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L625)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L848)
 
 ```python
-set(indexes=None, columns=None, values=None)
+iter_tuples(with_index=True, name='Row')
 ```
+
+______________________________________________________________________
+
+### `set`
 
 Sets multiple cell values at a time.
 
@@ -459,97 +441,101 @@ Both `indexes` and `columns` can be scalar or list-like, which enables setting i
 
 If `values` is scalar, all matching cells will be set to that value. Otherwise, the length should match the cell count defined by the other parameters.
 
-______________________________________________________________________
-
-### method `set_cell`
-
-**Source:** [`tables.py:649`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L649)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L625)
 
 ```python
-set_cell(index, column, value)
+set(indexes=None, columns=None, values=None)
 ```
+
+______________________________________________________________________
+
+### `set_cell`
 
 Set individual cell value.
 
 If either index or column is missing, they are created.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L649)
+
+```python
+set_cell(index, column, value)
+```
+
 ______________________________________________________________________
 
-### method `set_column`
+### `set_column`
 
-**Source:** [`tables.py:678`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L678)
+Set values in column. If column is missing, it is created.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L678)
 
 ```python
 set_column(column, values)
 ```
 
-Set values in column. If column is missing, it is created.
-
 ______________________________________________________________________
 
-### method `set_row`
+### `set_row`
 
-**Source:** [`tables.py:666`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L666)
+Set values in row. If index is missing, it is created.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L666)
 
 ```python
 set_row(index, values)
 ```
 
-Set values in row. If index is missing, it is created.
-
 ______________________________________________________________________
 
-### method `sort_by_column`
+### `sort_by_column`
 
-**Source:** [`tables.py:747`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L747)
+Sort table by columns.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L747)
 
 ```python
 sort_by_column(columns, ascending=False)
 ```
 
-Sort table by columns.
-
 ______________________________________________________________________
 
-### method `tail`
+### `tail`
 
-**Source:** [`tables.py:477`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L477)
+Return last n rows of table.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L477)
 
 ```python
 tail(rows, as_list=False)
 ```
 
-Return last n rows of table.
-
 ______________________________________________________________________
 
-### method `to_dict`
+### `to_dict`
 
-**Source:** [`tables.py:878`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L878)
+Convert table to dict representation.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L878)
 
 ```python
 to_dict(with_index=True)
 ```
 
-Convert table to dict representation.
-
 ______________________________________________________________________
 
-### method `to_list`
+### `to_list`
 
-**Source:** [`tables.py:864`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L864)
+Convert table to list representation.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L864)
 
 ```python
 to_list(with_index=True)
 ```
 
-Convert table to list representation.
-
 ______________________________________________________________________
 
-## class `Tables`
-
-**Source:** [`tables.py:896`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L896)
+# Class `Tables`
 
 `Tables` is a library for manipulating tabular data.
 
@@ -595,23 +581,19 @@ tables = Tables()orders = tables.read_table_from_csv("orders.csv", columns=\["na
 
 customers = tables.group_table_by_column(rows, "mail")for customer in customers:for order in customer:add_cart(order)make_order()
 
-### method `__init__`
+### `__init__`
 
-**Source:** [`tables.py:977`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L977)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L977)
 
 ```python
 __init__()
 ```
 
+## Methods
+
 ______________________________________________________________________
 
-### method `add_table_column`
-
-**Source:** [`tables.py:1250`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1250)
-
-```python
-add_table_column(table: Table, name: Optional[str] = None, values: Any = None)
-```
+### `add_table_column`
 
 Append a column to a table.
 
@@ -634,15 +616,15 @@ The `values` can either be a list of values, one for each row, or one single val
 
 # Add new column where every row has a unique value${is_first}=    Create list    ${TRUE}    ${FALSE}    ${FALSE}Add table column    ${table}    name=IsFirst    values=${is_first}
 
-______________________________________________________________________
-
-### method `add_table_row`
-
-**Source:** [`tables.py:1283`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1283)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1250)
 
 ```python
-add_table_row(table: Table, values: Any = None)
+add_table_column(table: Table, name: Optional[str] = None, values: Any = None)
 ```
+
+______________________________________________________________________
+
+### `add_table_row`
 
 Append rows to a table.
 
@@ -664,15 +646,15 @@ It can also be a single value that is set for all columns, which is `None` by de
 
 # Add values per column${values}=    Create dictionary    Username=Mark    Mail=mark@robocorp.comAdd table row    ${table}    ${values}
 
-______________________________________________________________________
-
-### method `clear_table`
-
-**Source:** [`tables.py:1080`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1080)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1283)
 
 ```python
-clear_table(table: Table)
+add_table_row(table: Table, values: Any = None)
 ```
+
+______________________________________________________________________
+
+### `clear_table`
 
 Clear table in-place, but keep columns.
 
@@ -685,15 +667,15 @@ Clear table in-place, but keep columns.
 
 tables = Tables()tables.clear_table(table)
 
-______________________________________________________________________
-
-### method `copy_table`
-
-**Source:** [`tables.py:1067`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1067)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1080)
 
 ```python
-copy_table(table: Table) → Table
+clear_table(table: Table)
 ```
+
+______________________________________________________________________
+
+### `copy_table`
 
 Make a copy of a table object.
 
@@ -705,19 +687,15 @@ Make a copy of a table object.
 
 - <b>`Table`</b>:   Table object
 
-______________________________________________________________________
-
-### method `create_table`
-
-**Source:** [`tables.py:985`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L985)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1067)
 
 ```python
-create_table(
-    data: Optional[Dict[Union[int, str], Union[Dict, List, Tuple, NamedTuple, set]], List[Union[Dict, List, Tuple, NamedTuple, set]], ForwardRef('Table')] = None,
-    trim: bool = False,
-    columns: List[str] = None
-) → Table
+copy_table(table: Table) → Table
 ```
+
+______________________________________________________________________
+
+### `create_table`
 
 Create Table object from data.
 
@@ -744,19 +722,19 @@ tables = Tables()
 
 table_data_name = \["Mark", "John", "Amy"\]table_data_age = \[58, 22, 67\]table_data = { name: table_data_name, age: table_data_age }table = tables.create_table(table_data)
 
-______________________________________________________________________
-
-### method `export_table`
-
-**Source:** [`tables.py:1031`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1031)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L985)
 
 ```python
-export_table(
-    table: Table,
-    with_index: bool = False,
-    as_list: bool = True
-) → Union[List, Dict]
+create_table(
+    data: Optional[Dict[Union[int, str], Union[Dict, List, Tuple, NamedTuple, set]], List[Union[Dict, List, Tuple, NamedTuple, set]], ForwardRef('Table')] = None,
+    trim: bool = False,
+    columns: List[str] = None
+) → Table
 ```
+
+______________________________________________________________________
+
+### `export_table`
 
 Convert a table object into standard Python containers.
 
@@ -766,9 +744,7 @@ Convert a table object into standard Python containers.
 - <b>`with_index`</b>:   Include index in values
 - <b>`as_list`</b>:      Export data as list instead of dict
 
-Returns
-
-- <b>`(Union[list, dict])`</b>:  A List or Dictionary that represents the table
+Returns (Union\[list, dict\]): A List or Dictionary that represents the table
 
 **Example:**
 .. code-block:: python
@@ -783,15 +759,19 @@ table_data_name = \["Mark", "John", "Amy"\]table_data_age = \[58, 22, 67\]table_
 
 export = tables.export_table(table)
 
-______________________________________________________________________
-
-### method `filter_empty_rows`
-
-**Source:** [`tables.py:1840`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1840)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1031)
 
 ```python
-filter_empty_rows(table: Table)
+export_table(
+    table: Table,
+    with_index: bool = False,
+    as_list: bool = True
+) → Union[List, Dict]
 ```
+
+______________________________________________________________________
+
+### `filter_empty_rows`
 
 Remove all rows from a table which have only `None` values.
 
@@ -806,20 +786,15 @@ The filtering will be done in-place.
 
 Filter empty rows    ${table}
 
-______________________________________________________________________
-
-### method `filter_table_by_column`
-
-**Source:** [`tables.py:1741`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1741)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1840)
 
 ```python
-filter_table_by_column(
-    table: Table,
-    column: Union[int, str],
-    operator: str,
-    value: Any
-)
+filter_empty_rows(table: Table)
 ```
+
+______________________________________________________________________
+
+### `filter_table_by_column`
 
 Remove all rows where column values don't match the given condition.
 
@@ -841,15 +816,20 @@ The filtering will be done in-place.
 
 # Remove uwnanted product types@{types}=    Create list    Unknown    RemovedFilter table by column    ${table}   product_type  not in  ${types}
 
-______________________________________________________________________
-
-### method `filter_table_with_function`
-
-**Source:** [`tables.py:1778`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1778)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1741)
 
 ```python
-filter_table_with_function(table: Table, func: Callable, *args)
+filter_table_by_column(
+    table: Table,
+    column: Union[int, str],
+    operator: str,
+    value: Any
+)
 ```
+
+______________________________________________________________________
+
+### `filter_table_with_function`
 
 Filters the table rows with the given func.
 
@@ -865,20 +845,15 @@ Can be used to create custom RF keyword based filters.
 
 The row object will be given as the first argument to the filtering keyword.
 
-______________________________________________________________________
-
-### method `find_table_rows`
-
-**Source:** [`tables.py:1632`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1632)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1778)
 
 ```python
-find_table_rows(
-    table: Table,
-    column: Union[int, str],
-    operator: str,
-    value: Any
-) → Table
+filter_table_with_function(table: Table, func: Callable, *args)
 ```
+
+______________________________________________________________________
+
+### `find_table_rows`
 
 Find all the rows in a table which match a condition for a given column.
 
@@ -906,19 +881,20 @@ Returns the matches as a new `Table` instance.
 
 # Find all rows where the status does not contain "removed"@{rows} =    Find table rows    ${table}    Status  not contains  removed
 
-______________________________________________________________________
-
-### method `get_table_cell`
-
-**Source:** [`tables.py:1574`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1574)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1632)
 
 ```python
-get_table_cell(
+find_table_rows(
     table: Table,
-    row: Union[int, str],
-    column: Union[int, str]
-) → Any
+    column: Union[int, str],
+    operator: str,
+    value: Any
+) → Table
 ```
+
+______________________________________________________________________
+
+### `get_table_cell`
 
 Get a cell value from a table.
 
@@ -929,8 +905,7 @@ Get a cell value from a table.
 - <b>`column`</b>:   Column of cell
 
 **Returns:**
-
-- <b>`(Any)`</b>:  Cell value
+(Any): Cell value
 
 **Examples:**
 .. code-block:: robotframework
@@ -943,15 +918,19 @@ Get a cell value from a table.
 
 # Get the value in the third row and column "Name"Get table cell    ${table}    2    Name
 
-______________________________________________________________________
-
-### method `get_table_column`
-
-**Source:** [`tables.py:1341`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1341)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1574)
 
 ```python
-get_table_column(table: Table, column: Union[int, str]) → List
+get_table_cell(
+    table: Table,
+    row: Union[int, str],
+    column: Union[int, str]
+) → Any
 ```
+
+______________________________________________________________________
+
+### `get_table_column`
 
 Get all values for a single column in a table.
 
@@ -969,15 +948,15 @@ Get all values for a single column in a table.
 
 ${emails}=    Get table column    ${users}    E-Mail Address
 
-______________________________________________________________________
-
-### method `get_table_dimensions`
-
-**Source:** [`tables.py:1186`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1186)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1341)
 
 ```python
-get_table_dimensions(table: Table) → Tuple[int, int]
+get_table_column(table: Table, column: Union[int, str]) → List
 ```
+
+______________________________________________________________________
+
+### `get_table_dimensions`
 
 Return table dimensions, as (rows, columns).
 
@@ -986,19 +965,40 @@ Return table dimensions, as (rows, columns).
 - <b>`table`</b>:     Table to inspect
 
 **Returns:**
-
-- <b>`(Tuple[int, int])`</b>:  Two integer values that represent the number of rows and columns
+(Tuple\[int, int\]): Two integer values that represent the number of rows and columns
 
 **Example:**
 .. code-block:: robotframework
 
 ${rows}  ${columns}=    Get table dimensions    ${table}Log    Table has ${rows} rows and ${columns} columns.
 
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1186)
+
+```python
+get_table_dimensions(table: Table) → Tuple[int, int]
+```
+
 ______________________________________________________________________
 
-### method `get_table_row`
+### `get_table_row`
 
-**Source:** [`tables.py:1314`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1314)
+Get a single row from a table.
+
+**Args:**
+
+- <b>`table`</b>:    Table to read:param row:     Row to read:param as_list: Return list instead of dictionary
+
+**Returns:**
+(Union\[dict, list\]): Dictionary or List of table row
+
+**Example:**
+.. code-block:: robotframework
+
+# returns the first row in the table${first}=    Get table row    ${orders}
+
+# returns the last row in the table${last}=      Get table row    ${orders}    -1    as_list=${TRUE}
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1314)
 
 ```python
 get_table_row(
@@ -1008,38 +1008,9 @@ get_table_row(
 ) → Union[Dict, List]
 ```
 
-Get a single row from a table.
-
-**Args:**
-
-- <b>`table`</b>:    Table to read
-- <b>`:param row`</b>:      Row to read
-- <b>`:param as_list`</b>:  Return list instead of dictionary
-
-**Returns:**
-
-- <b>`(Union[dict, list])`</b>:  Dictionary or List of table row
-
-**Example:**
-.. code-block:: robotframework
-
-# returns the first row in the table${first}=    Get table row    ${orders}
-
-# returns the last row in the table${last}=      Get table row    ${orders}    -1    as_list=${TRUE}
-
 ______________________________________________________________________
 
-### method `get_table_slice`
-
-**Source:** [`tables.py:1480`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1480)
-
-```python
-get_table_slice(
-    table: Table,
-    start: Optional[int, str] = None,
-    end: Optional[int, str] = None
-) → Union[Table, List[List]]
-```
+### `get_table_slice`
 
 Return a new Table from a range of given Table rows.
 
@@ -1050,8 +1021,7 @@ Return a new Table from a range of given Table rows.
 - <b>`start`</b>:    End index (exclusive)
 
 **Returns:**
-
-- <b>`(Union[Table, list[list]])`</b>:  Table object of the selected rows
+(Union\[Table, list\[list\]\]): Table object of the selected rows
 
 If `start` is not defined, starts from the first row. If `end` is not defined, stops at the last row.
 
@@ -1064,15 +1034,19 @@ If `start` is not defined, starts from the first row. If `end` is not defined, s
 
 # Get all rows except last five${slice}=    Get table slice    ${table}    end=-5
 
-______________________________________________________________________
-
-### method `group_table_by_column`
-
-**Source:** [`tables.py:1713`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1713)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1480)
 
 ```python
-group_table_by_column(table: Table, column: Union[int, str]) → List[Table]
+get_table_slice(
+    table: Table,
+    start: Optional[int, str] = None,
+    end: Optional[int, str] = None
+) → Union[Table, List[List]]
 ```
+
+______________________________________________________________________
+
+### `group_table_by_column`
 
 Group a table by `column` and return a list of grouped Tables.
 
@@ -1082,23 +1056,22 @@ Group a table by `column` and return a list of grouped Tables.
 - <b>`column`</b>:   Column which is used as grouping criteria
 
 **Returns:**
-
-- <b>`(List[Table])`</b>:  List of Table objects
+(List\[Table\]): List of Table objects
 
 **Example:**
 .. code-block:: robotframework
 
 # Groups rows of matching customers from the `customer` column# and returns the groups or rows as Tables@{groups}=    Group table by column    ${orders}    customer# An example of how to use the List of Tables once returnedFOR    ${group}    IN    @{groups}# Process all orders for the customer at onceProcess order    ${group}END
 
-______________________________________________________________________
-
-### method `map_column_values`
-
-**Source:** [`tables.py:1804`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1804)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1713)
 
 ```python
-map_column_values(table: Table, column: Union[int, str], func: Callable, *args)
+group_table_by_column(table: Table, column: Union[int, str]) → List[Table]
 ```
+
+______________________________________________________________________
+
+### `map_column_values`
 
 Maps given function to column values.
 
@@ -1122,15 +1095,15 @@ The cell value will be given as the first argument to the mapping keyword.
 
 # Look up values with a custom keywordMap column values    ${table}    User     Map user ID to name
 
-______________________________________________________________________
-
-### method `merge_tables`
-
-**Source:** [`tables.py:1097`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1097)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1804)
 
 ```python
-merge_tables(*tables: Table, index: Optional[str] = None) → Table
+map_column_values(table: Table, column: Union[int, str], func: Callable, *args)
 ```
+
+______________________________________________________________________
+
+### `merge_tables`
 
 Create a union of two tables and their contents.
 
@@ -1158,18 +1131,15 @@ tables = Tables()
 
 products = tables.merge_tables(prices, stock, index="Name")for product in products:print(f'Product: {product\["Name"\]}, Product: {product\["Price"\]}'
 
-______________________________________________________________________
-
-### method `pop_table_column`
-
-**Source:** [`tables.py:1448`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1448)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1097)
 
 ```python
-pop_table_column(
-    table: Table,
-    column: Optional[int, str] = None
-) → Union[Dict, List]
+merge_tables(*tables: Table, index: Optional[str] = None) → Table
 ```
+
+______________________________________________________________________
+
+### `pop_table_column`
 
 Remove column from table and return it.
 
@@ -1179,8 +1149,7 @@ Remove column from table and return it.
 - <b>`column`</b>:   Column to remove
 
 **Returns:**
-
-- <b>`(Union[dict, list])`</b>:  Dictionary or List of the removed, popped, column
+(Union\[dict, list\]): Dictionary or List of the removed, popped, column
 
 **Examples:**
 .. code-block:: robotframework
@@ -1189,19 +1158,18 @@ Remove column from table and return it.
 
 # Remove column from table and iterate over it${ids}=    Pop table column    ${users}    userIdFOR    ${id}    IN    @{ids}Log    User id: ${id}END
 
-______________________________________________________________________
-
-### method `pop_table_row`
-
-**Source:** [`tables.py:1418`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1418)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1448)
 
 ```python
-pop_table_row(
+pop_table_column(
     table: Table,
-    row: Optional[int, str] = None,
-    as_list: bool = False
+    column: Optional[int, str] = None
 ) → Union[Dict, List]
 ```
+
+______________________________________________________________________
+
+### `pop_table_row`
 
 Remove row from table and return it.
 
@@ -1212,8 +1180,7 @@ Remove row from table and return it.
 - <b>`as_list`</b>:  Return list instead of dictionary
 
 **Returns:**
-
-- <b>`(Union[dict, list])`</b>:  Dictionary or List of the removed, popped, row
+(Union\[dict, list\]): Dictionary or List of the removed, popped, row
 
 **Examples:**
 .. code-block:: robotframework
@@ -1222,23 +1189,19 @@ Remove row from table and return it.
 
 # Pop the last row in the table and store it${row}=      Pop table row    ${data}    -1    as_list=${TRUE}
 
-______________________________________________________________________
-
-### method `read_table_from_csv`
-
-**Source:** [`tables.py:1912`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1912)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1418)
 
 ```python
-read_table_from_csv(
-    path: str,
-    header: Optional[bool] = None,
-    columns: Optional[List[str]] = None,
-    dialect: Optional[str, Dialect] = None,
-    delimiters: Optional[str] = None,
-    column_unknown: str = 'Unknown',
-    encoding: Optional[str] = None
-) → Table
+pop_table_row(
+    table: Table,
+    row: Optional[int, str] = None,
+    as_list: bool = False
+) → Union[Dict, List]
 ```
+
+______________________________________________________________________
+
+### `read_table_from_csv`
 
 Read a CSV file as a table.
 
@@ -1271,19 +1234,23 @@ If the source data has a header and rows have more fields than the header define
 
 # Source dialect is known and given explicitly${table}=    Read table from CSV    export-excel.csv    dialect=excelLog   Found columns: ${table.columns}
 
-______________________________________________________________________
-
-### method `rename_table_columns`
-
-**Source:** [`tables.py:1205`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1205)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1912)
 
 ```python
-rename_table_columns(
-    table: Table,
-    names: List[Optional[str]],
-    strict: bool = False
-)
+read_table_from_csv(
+    path: str,
+    header: Optional[bool] = None,
+    columns: Optional[List[str]] = None,
+    dialect: Optional[str, Dialect] = None,
+    delimiters: Optional[str] = None,
+    column_unknown: str = 'Unknown',
+    encoding: Optional[str] = None
+) → Table
 ```
+
+______________________________________________________________________
+
+### `rename_table_columns`
 
 Renames columns in the Table with given values.
 
@@ -1304,15 +1271,19 @@ The renaming will be done in-place.
 
 # Update the first and second column names to Uno and Dos${columns}=    Create list   Uno  DosRename table columns    ${table}    ${columns}# Uno, Dos, Third
 
-______________________________________________________________________
-
-### method `set_row_as_column_names`
-
-**Source:** [`tables.py:1512`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1512)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1205)
 
 ```python
-set_row_as_column_names(table: Table, row: Union[int, str])
+rename_table_columns(
+    table: Table,
+    names: List[Optional[str]],
+    strict: bool = False
+)
 ```
+
+______________________________________________________________________
+
+### `set_row_as_column_names`
 
 Set existing row as names for columns.
 
@@ -1326,20 +1297,15 @@ Set existing row as names for columns.
 
 # Set the column names based on the first rowSet row as column names    ${table}    0
 
-______________________________________________________________________
-
-### method `set_table_cell`
-
-**Source:** [`tables.py:1604`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1604)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1512)
 
 ```python
-set_table_cell(
-    table: Table,
-    row: Union[int, str],
-    column: Union[int, str],
-    value: Any
-)
+set_row_as_column_names(table: Table, row: Union[int, str])
 ```
+
+______________________________________________________________________
+
+### `set_table_cell`
 
 Set a cell value in a table.
 
@@ -1361,15 +1327,20 @@ Set a cell value in a table.
 
 # Set the value in the third row and column "Name" to "Unknown"Set table cell    ${table}    2    Name    Unknown
 
-______________________________________________________________________
-
-### method `set_table_column`
-
-**Source:** [`tables.py:1393`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1393)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1604)
 
 ```python
-set_table_column(table: Table, column: Union[int, str], values: Any)
+set_table_cell(
+    table: Table,
+    row: Union[int, str],
+    column: Union[int, str],
+    value: Any
+)
 ```
+
+______________________________________________________________________
+
+### `set_table_column`
 
 Assign values to a column in the table.
 
@@ -1388,15 +1359,15 @@ The `values` can either be a list of values, one for each row, or one single val
 
 # Set the same value for all rowsSet table column    ${users}    email     ${NONE}
 
-______________________________________________________________________
-
-### method `set_table_row`
-
-**Source:** [`tables.py:1361`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1361)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1393)
 
 ```python
-set_table_row(table: Table, row: Union[int, str], values: Any)
+set_table_column(table: Table, column: Union[int, str], values: Any)
 ```
+
+______________________________________________________________________
+
+### `set_table_row`
 
 Assign values to a row in the table.
 
@@ -1421,19 +1392,15 @@ ${values}=   Create dictionary    One=1  Two=2  Three=3Set table row    ${table}
 
 Set table row    ${table}    2    ${NONE}
 
-______________________________________________________________________
-
-### method `sort_table_by_column`
-
-**Source:** [`tables.py:1690`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1690)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1361)
 
 ```python
-sort_table_by_column(
-    table: Table,
-    column: Union[int, str],
-    ascending: bool = True
-)
+set_table_row(table: Table, row: Union[int, str], values: Any)
 ```
+
+______________________________________________________________________
+
+### `sort_table_by_column`
 
 Sort a table in-place according to `column`.
 
@@ -1450,19 +1417,19 @@ Sort a table in-place according to `column`.
 
 # Sorts the `order_date` column descendingSort table by column    ${orders}    order_date    ascending=${FALSE}
 
-______________________________________________________________________
-
-### method `table_head`
-
-**Source:** [`tables.py:1529`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1529)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1690)
 
 ```python
-table_head(
+sort_table_by_column(
     table: Table,
-    count: int = 5,
-    as_list: bool = False
-) → Union[Table, List[List]]
+    column: Union[int, str],
+    ascending: bool = True
+)
 ```
+
+______________________________________________________________________
+
+### `table_head`
 
 Return first `count` rows from a table.
 
@@ -1473,27 +1440,26 @@ Return first `count` rows from a table.
 - <b>`as_list`</b>:  Return list instead of Table
 
 **Returns:**
-
-- <b>`(Union[Table, List[List]])`</b>:  Return Table object or List of the selected rows
+(Union\[Table, List\[List\]\]): Return Table object or List of the selected rows
 
 **Example:**
 .. code-block:: robotframework
 
 # Get the first 10 employees${first}=    Table head    ${employees}    10
 
-______________________________________________________________________
-
-### method `table_tail`
-
-**Source:** [`tables.py:1551`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1551)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1529)
 
 ```python
-table_tail(
+table_head(
     table: Table,
     count: int = 5,
     as_list: bool = False
 ) → Union[Table, List[List]]
 ```
+
+______________________________________________________________________
+
+### `table_tail`
 
 Return last `count` rows from a table.
 
@@ -1504,23 +1470,26 @@ Return last `count` rows from a table.
 - <b>`as_list`</b>:  Return list instead of Table
 
 **Returns:**
-
-- <b>`(Union[Table, List[List]])`</b>:  Return Table object or List of the selected rows
+(Union\[Table, List\[List\]\]): Return Table object or List of the selected rows
 
 **Example:**
 .. code-block:: robotframework
 
 # Get the last 10 orders${latest}=    Table tail    ${orders}    10
 
-______________________________________________________________________
-
-### method `trim_column_names`
-
-**Source:** [`tables.py:1888`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1888)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1551)
 
 ```python
-trim_column_names(table: Table)
+table_tail(
+    table: Table,
+    count: int = 5,
+    as_list: bool = False
+) → Union[Table, List[List]]
 ```
+
+______________________________________________________________________
+
+### `trim_column_names`
 
 Remove all extraneous whitespace from column names.
 
@@ -1535,15 +1504,15 @@ The filtering will be done in-place.
 
 # This example will take colums such as:# "One", "Two ", "  Three "# and trim them to become the below:# "One", "Two", "Three"Trim column names     ${table}
 
-______________________________________________________________________
-
-### method `trim_empty_rows`
-
-**Source:** [`tables.py:1863`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1863)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1888)
 
 ```python
-trim_empty_rows(table: Table)
+trim_column_names(table: Table)
 ```
+
+______________________________________________________________________
+
+### `trim_empty_rows`
 
 Remove all rows from the *end* of a table, which have only `None` as values.
 
@@ -1558,22 +1527,15 @@ The filtering will be done in-place.
 
 Trim empty rows    ${table}
 
-______________________________________________________________________
-
-### method `write_table_to_csv`
-
-**Source:** [`tables.py:1999`](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1999)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1863)
 
 ```python
-write_table_to_csv(
-    table: Table,
-    path: str,
-    header: bool = True,
-    dialect: Union[str, Dialect] = <Dialect.Excel: 'excel'>,
-    encoding: Optional[str] = None,
-    delimiter: Optional[str] = ','
-)
+trim_empty_rows(table: Table)
 ```
+
+______________________________________________________________________
+
+### `write_table_to_csv`
 
 Write a table as a CSV file.
 
@@ -1592,3 +1554,30 @@ Builtin `dialect` values are `excel`, `excel-tab`, and `unix`.
 .. code-block:: robotframework
 
 ${sheet}=    Read worksheet as table    orders.xlsx    header=${TRUE}Write table to CSV    ${sheet}    output.csv
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L1999)
+
+```python
+write_table_to_csv(
+    table: Table,
+    path: str,
+    header: bool = True,
+    dialect: Union[str, Dialect] = <Dialect.Excel: 'excel'>,
+    encoding: Optional[str] = None,
+    delimiter: Optional[str] = ','
+)
+```
+
+# Enums
+
+______________________________________________________________________
+
+## `Dialect`
+
+CSV dialect.
+
+### Values
+
+- **Excel** = excel
+- **ExcelTab** = excel-tab
+- **Unix** = unix
