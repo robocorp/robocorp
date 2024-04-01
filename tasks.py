@@ -1,36 +1,64 @@
+import shlex
 import subprocess
+import sys
 from pathlib import Path
+from typing import Optional
 
 import invoke
-from invoke import task
+from invoke import call, task
 
-CURDIR: Path = Path(__file__).absolute().parent
+ROOT: Path = Path(__file__).absolute().parent
+DOCS_IGNORE = ["devutils"]
 
 
 @task
-def poetry_lock(ctx: invoke.Context) -> None:
-    """Runs 'poetry lock' on all projects with a pyproject.toml."""
+def install(
+    ctx: invoke.Context,
+    update: bool = False,
+    verbose: bool = False,
+    skip: Optional[list[str]] = None,
+) -> None:
+    """Refresh/Install all Poetry-based projects' environments.
+
+    Args:
+        update: Whether to update the dependencies or just installing them.
+        verbose: Whether to run in verbose mode.
+        skip: List of project directories to skip.
+
+    Note:
+        Can't use threads to speed it up. (Poetry or pip will just fail)
+    """
     for project_dir in _iter_project_dirs():
-        # Note: can't use threads to speed it up. poetry (or pip) just fail...
-        subprocess.check_call(["poetry", "lock"], cwd=project_dir)
+        if skip and project_dir in skip:
+            print(f"Skipping project {str(project_dir)!r}.")
+            continue
+
+        inv_cmd, poetry_cmd = "invoke install", "poetry install"
+        if update:
+            inv_cmd += " -u"
+            poetry_cmd = poetry_cmd.replace("install", "update")
+        if verbose:
+            inv_cmd += " -v"
+            poetry_cmd += " -vv"
+
+        cmd = inv_cmd if (project_dir / "tasks.py").exists() else poetry_cmd
+        subprocess.check_call(shlex.split(cmd), cwd=project_dir)
 
 
-@task
+@task(pre=[call(install, skip=DOCS_IGNORE)])
 def docs(ctx: invoke.Context) -> None:
     """Regenerate documentation for each library."""
-    ignored = [
-        "devutils",
-        "integration_tests",
-        "meta",
-    ]
+    ignored = DOCS_IGNORE[:]
+    if sys.platform != "win32":
+        ignored.append("windows")
 
+    cmd = "invoke docs"
     for project_dir in _iter_project_dirs():
         if project_dir.name in ignored:
             continue
 
-        # subprocess.check_call(["poetry", "lock"], cwd=project_dir)
-        subprocess.check_call(["poetry", "install"], cwd=project_dir)
-        subprocess.check_call(["poetry", "run", "invoke", "docs"], cwd=project_dir)
+        print(f"Generating docs in {str(project_dir)!r}...")
+        subprocess.check_call(shlex.split(cmd), cwd=project_dir)
 
 
 @task
@@ -57,17 +85,17 @@ def unreleased(ctx: invoke.Context) -> None:
         remote = _pypi_version(name)
 
         if current != remote:
-            print(f"Package '{name}' version mismatch: {current} != {remote}")
+            print(f"Package {name!r} version mismatch: {current} != {remote}")
             ok = False
 
     if ok:
-        print("All packages up-to-date")
+        print("All packages are up-to-date!")
     else:
         raise invoke.Exit(code=1)
 
 
 def _iter_project_dirs():
-    for path in CURDIR.iterdir():
+    for path in ROOT.iterdir():
         if path.is_dir():
             if (path / "pyproject.toml").exists():
                 yield path
