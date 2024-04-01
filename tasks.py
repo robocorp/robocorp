@@ -30,7 +30,7 @@ def install(
     """
     for project_dir in _iter_project_dirs():
         if skip and project_dir in skip:
-            print(f"Skipping project {project_dir!r}.")
+            print(f"Skipping project {str(project_dir)!r}.")
             continue
 
         inv_cmd, poetry_cmd = "invoke install", "poetry install"
@@ -57,7 +57,7 @@ def docs(ctx: invoke.Context) -> None:
         if project_dir.name in ignored:
             continue
 
-        print(f"Generating docs in {project_dir!r}...")
+        print(f"Generating docs in {str(project_dir)!r}...")
         subprocess.check_call(shlex.split(cmd), cwd=project_dir)
 
 
