@@ -255,19 +255,21 @@ def make_exe():
     # This should be updated. See: https://github.com/robocorp/robocorp/issues/173
     for resource in exe.pip_install(
         [
+            ## START DEPS
             "aiohttp~=3.9",
             "fastapi~=0.110",
             "fastjsonschema~=2.19",
             "jsonschema~=4.19",
             "msgspec~=0.18",
-            "psutil~=5.9",
+            "psutil>=5,<6",
             "pydantic~=2.4",
-            "pyyaml~=6.0",
-            "requests~=2.31",
+            "pyyaml>=6,<7",
+            "requests>=2,<3",
             "robocorp-actions~=0.1",
             "termcolor~=2.4",
             "uvicorn~=0.23",
             "websockets~=12.0",
+            ## END DEPS
         ]
     ):
         if resource.name in ("py.typed",) or resource.name.endswith(".pyi"):
