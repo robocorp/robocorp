@@ -155,7 +155,7 @@ dependencies:
 
     if op == "dry_run.no_backup":
         result = robocorp_action_server_run(
-            ["package", "--update", "--dry-run", "--no-backup"], returncode=0, cwd=tmp
+            ["package", "update", "--dry-run", "--no-backup"], returncode=0, cwd=tmp
         )
         assert (tmp / "robot.yaml").exists()
         assert (tmp / "conda.yaml").exists()
@@ -163,7 +163,7 @@ dependencies:
 
     elif op == "dry_run.backup":
         result = robocorp_action_server_run(
-            ["package", "--update", "--dry-run"], returncode=0, cwd=tmp
+            ["package", "update", "--dry-run"], returncode=0, cwd=tmp
         )
         assert (tmp / "robot.yaml").exists()
         assert (tmp / "conda.yaml").exists()
@@ -171,7 +171,7 @@ dependencies:
 
     elif op == "update.backup":
         result = robocorp_action_server_run(
-            ["package", "--update"], returncode=0, cwd=tmp
+            ["package", "update"], returncode=0, cwd=tmp
         )
         assert (tmp / "robot.yaml.bak").exists()
         assert (tmp / "conda.yaml.bak").exists()
@@ -179,7 +179,7 @@ dependencies:
 
     elif op == "update.no_backup":
         result = robocorp_action_server_run(
-            ["package", "--update", "--no-backup"], returncode=0, cwd=tmp
+            ["package", "update", "--no-backup"], returncode=0, cwd=tmp
         )
         assert not (tmp / "robot.yaml.bak").exists()
         assert not (tmp / "conda.yaml.bak").exists()

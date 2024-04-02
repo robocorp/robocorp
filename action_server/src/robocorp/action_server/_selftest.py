@@ -286,31 +286,44 @@ class ActionServerClient:
 
 def robocorp_action_server_run(
     cmdline,
-    returncode: Union[Literal["error"], int],
+    returncode: Optional[Union[Literal["error"], int]],
     cwd=None,
     additional_env: Optional[Dict[str, str]] = None,
     timeout=None,
+    capture_output=True,
 ) -> CompletedProcess:
     from robocorp.action_server._settings import is_frozen
 
     if is_frozen():
         # i.e.: The entry point is our own executable.
         return run_command_line(
-            [sys.executable] + cmdline, returncode, cwd, additional_env, timeout
+            [sys.executable] + cmdline,
+            returncode,
+            cwd,
+            additional_env,
+            timeout,
+            capture_output=capture_output,
         )
     else:
         return run_python_module(
-            "robocorp.action_server", cmdline, returncode, cwd, additional_env, timeout
+            "robocorp.action_server",
+            cmdline,
+            returncode,
+            cwd,
+            additional_env,
+            timeout,
+            capture_output=capture_output,
         )
 
 
 def run_python_module(
     python_module: str,
     cmdline,
-    returncode: Union[Literal["error"], int],
+    returncode: Optional[Union[Literal["error"], int]],
     cwd=None,
     additional_env: Optional[Dict[str, str]] = None,
     timeout=None,
+    capture_output=True,
 ) -> CompletedProcess:
     return run_command_line(
         [sys.executable, "-m", python_module] + cmdline,
@@ -318,15 +331,17 @@ def run_python_module(
         cwd=cwd,
         additional_env=additional_env,
         timeout=timeout,
+        capture_output=capture_output,
     )
 
 
 def run_command_line(
     cmdline,
-    returncode: Union[Literal["error"], int],
+    returncode: Optional[Union[Literal["error"], int]],
     cwd=None,
     additional_env: Optional[Dict[str, str]] = None,
     timeout=None,
+    capture_output=True,
 ) -> CompletedProcess:
     cp = os.environ.copy()
     cp["PYTHONPATH"] = os.pathsep.join([x for x in sys.path if x])
@@ -335,13 +350,16 @@ def run_command_line(
         cp.update(additional_env)
     result = subprocess.run(
         cmdline,
-        capture_output=True,
+        capture_output=capture_output,
         text=True,
         env=cp,
         cwd=cwd,
         timeout=timeout,
         encoding="utf-8",
     )
+
+    if returncode is None:
+        return result
 
     if returncode == "error" and result.returncode:
         return result

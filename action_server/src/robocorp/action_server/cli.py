@@ -4,8 +4,10 @@ import os.path
 import sys
 import time
 import typing
+from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Union
+from typing import Literal, Optional, Union
 
 from termcolor import colored
 
@@ -21,6 +23,9 @@ from ._protocols import (
 )
 
 if typing.TYPE_CHECKING:
+    from robocorp.action_server._database import Database
+    from robocorp.action_server._rcc import Rcc
+
     from ._settings import Settings
 
 log = logging.getLogger(__name__)
@@ -311,24 +316,45 @@ def _create_parser():
         "package",
         help="Utilities to manage the action package",
     )
-    package_parser.add_argument(
-        "--update",
-        action="store_true",
+
+    package_subparsers = package_parser.add_subparsers(dest="package_command")
+
+    update_parser = package_subparsers.add_parser(
+        "update",
         help="Updates the structure of a previous version of an action package to the latest version supported by the action server",
     )
-    package_parser.add_argument(
+    update_parser.add_argument(
         "--dry-run",
         action="store_true",
         help="If passed, changes aren't actually done, they'll just be printed",
         default=False,
     )
-    package_parser.add_argument(
+    update_parser.add_argument(
         "--no-backup",
         action="store_true",
         help="If passed, file may be directly removed or overwritten, otherwise, a '.bak' file will be created prior to the operation",
         default=False,
     )
-    _add_verbose_args(package_parser, defaults)
+    _add_verbose_args(update_parser, defaults)
+
+    build_parser = package_subparsers.add_parser(
+        "build",
+        help="Creates a .zip with the contents of the action package so that it can be deployed",
+    )
+    build_parser.add_argument(
+        "--output-dir",
+        dest="output_dir",
+        help="The output file for saving the action package built file",
+        default=None,
+    )
+    build_parser.add_argument(
+        "--override",
+        action="store_true",
+        help="If passed if the target .zip is already present it'll be overridden without asking",
+        default=False,
+    )
+    _add_data_args(build_parser, defaults)
+    _add_verbose_args(build_parser, defaults)
 
     return base_parser
 
@@ -366,7 +392,7 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:
 
             sys.exit(_selftest.do_selftest())
 
-    retcode = _main_retcode(args, exit=exit)
+    retcode = _main_retcode(args)
     if exit:
         sys.exit(retcode)
     return retcode
@@ -453,13 +479,33 @@ def _import_actions(
     return 0
 
 
-def _main_retcode(args: Optional[list[str]], exit) -> int:
-    from robocorp.action_server._settings import is_frozen
+def _get_log_level(base_args):
+    verbose = getattr(base_args, "verbose", False)
+    log_level = logging.DEBUG if verbose else logging.INFO
+    return log_level
 
-    from ._download_rcc import download_rcc
-    from ._rcc import initialize_rcc
-    from ._robo_utils.system_mutex import SystemMutex
-    from ._runs_state_cache import use_runs_state_ctx
+
+def _main_retcode(
+    args: Optional[list[str]],
+    is_subcommand: bool = False,
+    use_db: Optional["Database"] = None,
+) -> int:
+    """
+    The main entrypoint that returns the returncode.
+    Args:
+        args: The (cli) arguments to run.
+        is_subcommand: This call may be recursive on cases where one command
+            calls another command (such as the package build which makes an in-
+            memory import). In these cases, is_subcommand must be True.
+        use_db: If given this in the db used to run the command (otherwise
+            one is either created or loaded from the datadir).
+
+    Returns: The returncode for the process (0 means all was ok).
+    """
+    from robocorp.action_server._protocols import (
+        ArgumentsNamespacePackageBuild,
+        ArgumentsNamespacePackageUpdate,
+    )
 
     if args is None:
         args = sys.argv[1:]
@@ -508,6 +554,17 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         print(__version__)
         return 0
 
+    if not is_subcommand:
+        # Setup logging for the command (only if this is not a subcommand
+        # as if it's a subcommand we're actually recursing here).
+        log_level = _get_log_level(base_args)
+
+        logger = logging.root
+        logger.setLevel(log_level)
+
+        # Log to stdout.
+        _setup_stdout_logging(log_level)
+
     # if command == "schema":
     # This doesn't work at this point because we have to register the
     # actions first for it to work.
@@ -519,6 +576,8 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         download_args: ArgumentsNamespaceDownloadRcc = typing.cast(
             ArgumentsNamespaceDownloadRcc, base_args
         )
+        from ._download_rcc import download_rcc
+
         download_rcc(target=download_args.file, force=True)
         return 0
 
@@ -526,18 +585,55 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         package_args: ArgumentsNamespacePackage = typing.cast(
             ArgumentsNamespacePackage, base_args
         )
-        if package_args.update:
+        package_command = package_args.package_command
+        if not package_command:
+            print("Flag for package operation not specified.", file=sys.stderr)
+            return 1
+
+        if package_command == "update":
+            package_update_args: ArgumentsNamespacePackageUpdate = typing.cast(
+                ArgumentsNamespacePackageUpdate, base_args
+            )
+
             from robocorp.action_server.vendored_deps.action_package_handling import (
                 update_package,
             )
 
             update_package(
                 Path(".").absolute(),
-                dry_run=package_args.dry_run,
-                backup=not package_args.no_backup,
+                dry_run=package_update_args.dry_run,
+                backup=not package_update_args.no_backup,
             )
             return 0
-        print("Flag for package operation not specified.", file=sys.stderr)
+
+        elif package_command == "build":
+            from robocorp.action_server.package._package_build import build_package
+
+            package_build_args: ArgumentsNamespacePackageBuild = typing.cast(
+                ArgumentsNamespacePackageBuild, base_args
+            )
+
+            # action-server package build --output-dir=<zipfile> --datadir=<directory> <source-directory>:
+            try:
+                retcode = build_package(
+                    Path(".").absolute(),
+                    output_dir=package_build_args.output_dir,
+                    datadir=package_build_args.datadir,
+                    override=package_build_args.override,
+                    log_level=log_level,
+                )
+            except ActionServerValidationError as e:
+                log.critical(
+                    colored(
+                        f"\nUnable to build action package. Please fix the error below and retry.\n{e}",
+                        color="red",
+                        attrs=["bold"],
+                    )
+                )
+                retcode = 1
+            return retcode
+
+        print("Invalid package command.", file=sys.stderr)
         return 1
 
     if command not in (
@@ -549,19 +645,34 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         print(f"Unexpected command: {command}.", file=sys.stderr)
         return 1
 
-    # Log to stdout.
-    log_level = logging.DEBUG if base_args.verbose else logging.INFO
-
-    logger = logging.root
-    logger.setLevel(log_level)
-
-    _setup_stdout_logging(log_level)
-
     log.info(
         colored("\n  ⚡️ Starting Action Server ", attrs=["bold"])
         + colored(f"v{__version__}\n", attrs=["dark"])
     )
 
+    if command == "new":
+        with _basic_setup(base_args):
+            from ._new_project import create_new_project
+
+            create_new_project(directory=base_args.name)
+            return 0
+
+    with _basic_setup(base_args) as setup_info:
+        return _make_import_migrate_or_start(
+            base_args, command, setup_info, use_db=use_db
+        )
+
+
+@dataclass
+class _SetupInfo:
+    rcc: "Rcc"
+    settings: "Settings"
+
+
+@contextmanager
+def _basic_setup(base_args):
+    from ._download_rcc import download_rcc
+    from ._rcc import initialize_rcc
     from ._settings import setup_settings
 
     with setup_settings(base_args) as settings:
@@ -570,98 +681,108 @@ def _main_retcode(args: Optional[list[str]], exit) -> int:
         robocorp_home.mkdir(parents=True, exist_ok=True)
 
         with initialize_rcc(download_rcc(force=False), robocorp_home) as rcc:
-            if command == "new":
-                from ._new_project import create_new_project
+            yield _SetupInfo(rcc=rcc, settings=settings)
 
-                create_new_project(directory=base_args.name)
-                return 0
 
-            timeout = 3
-            timeout_at = time.time() + timeout
+def _make_import_migrate_or_start(
+    base_args,
+    command: Literal["import"] | Literal["migrate"] | Literal["start"],
+    setup_info: _SetupInfo,
+    use_db: Optional["Database"] = None,
+) -> int:
+    from robocorp.action_server._settings import is_frozen
 
-            shown_first_message = False
-            while True:
-                mutex = SystemMutex(
-                    "action_server.lock", base_dir=str(settings.datadir)
+    from ._robo_utils.system_mutex import SystemMutex
+    from ._runs_state_cache import use_runs_state_ctx
+
+    timeout = 3
+    timeout_at = time.time() + timeout
+    settings: "Settings" = setup_info.settings
+
+    shown_first_message = False
+    while True:
+        mutex = SystemMutex("action_server.lock", base_dir=str(settings.datadir))
+        acquired = mutex.get_mutex_aquired()
+        if acquired:
+            if shown_first_message:
+                print("Exited. Proceeding with action server startup.")
+            break
+
+        msg = mutex.mutex_creation_info or ""
+        i = msg.find("--- Stack ---")
+        if i > 0:
+            msg = msg[:i]
+        msg = msg.strip()
+
+        if not shown_first_message:
+            shown_first_message = True
+            print(
+                f"An action server is already started in this datadir ({settings.datadir}).\n"
+                f"\nInformation on mutex holder:\n"
+                f"{msg}",
+            )
+
+        print("Waiting for it to exit...")
+        time.sleep(0.3)
+
+        timed_out = time.time() > timeout_at
+        if timed_out:
+            print(
+                "\nAction server not started (timed out waiting for mutex to be released).",
+                file=sys.stderr,
+            )
+            return 1
+
+    # Log to file in datadir, always in debug mode
+    # (only after lock is in place as multiple loggers to the same
+    # file would be troublesome).
+    _setup_logging(settings.datadir, _get_log_level(base_args))
+
+    try:
+        db_path: Union[Path, str]
+        if settings.db_file != ":memory:":
+            db_path = settings.datadir / settings.db_file
+        else:
+            db_path = settings.db_file
+
+        from robocorp.action_server._models import create_db, load_db
+        from robocorp.action_server.migrations import db_migration_pending, migrate_db
+
+        is_new = db_path == ":memory:" or not os.path.exists(db_path)
+
+        if use_db is not None:
+
+            @contextmanager
+            def _use_db_ctx(*args, **kwags):
+                yield use_db
+
+            use_db_ctx = _use_db_ctx
+
+        elif is_new:
+            log.info("Database file does not exist. Creating it at: %s", db_path)
+            use_db_ctx = create_db
+        else:
+            use_db_ctx = load_db
+
+        if command == "migrate":
+            if db_path == ":memory:":
+                print(
+                    "Cannot do migration of in-memory databases",
+                    file=sys.stderr,
                 )
-                acquired = mutex.get_mutex_aquired()
-                if acquired:
-                    if shown_first_message:
-                        print("Exited. Proceeding with action server startup.")
-                    break
+                return 1
+            if not migrate_db(db_path):
+                return 1
+            return 0
+        else:
+            if is_frozen():
+                cmdline = "action-server"
+            else:
+                cmdline = "python -m robocorp.action_server"
 
-                msg = mutex.mutex_creation_info or ""
-                i = msg.find("--- Stack ---")
-                if i > 0:
-                    msg = msg[:i]
-                msg = msg.strip()
-
-                if not shown_first_message:
-                    shown_first_message = True
-                    print(
-                        f"An action server is already started in this datadir ({settings.datadir}).\n"
-                        f"\nInformation on mutex holder:\n"
-                        f"{msg}",
-                    )
-
-                print("Waiting for it to exit...")
-                time.sleep(0.3)
-
-                timed_out = time.time() > timeout_at
-                if timed_out:
-                    print(
-                        "\nAction server not started (timed out waiting for mutex to be released).",
-                        file=sys.stderr,
-                    )
-                    return 1
-
-            # Log to file in datadir, always in debug mode
-            # (only after lock is in place as multiple loggers to the same
-            # file would be troublesome).
-            _setup_logging(settings.datadir, log_level)
-
-            try:
-                db_path: Union[Path, str]
-                if settings.db_file != ":memory:":
-                    db_path = settings.datadir / settings.db_file
-                else:
-                    db_path = settings.db_file
-
-                from robocorp.action_server._models import create_db, load_db
-                from robocorp.action_server.migrations import (
-                    db_migration_pending,
-                    migrate_db,
-                )
-
-                is_new = db_path == ":memory:" or not os.path.exists(db_path)
-
-                if is_new:
-                    log.info(
-                        "Database file does not exist. Creating it at: %s", db_path
-                    )
-                    use_db_ctx = create_db
-                else:
-                    use_db_ctx = load_db
-
-                if command == "migrate":
-                    if db_path == ":memory:":
-                        print(
-                            "Cannot do migration of in-memory databases",
-                            file=sys.stderr,
-                        )
-                        return 1
-                    if not migrate_db(db_path):
-                        return 1
-                    return 0
-                else:
-                    if is_frozen():
-                        cmdline = "action-server"
-                    else:
-                        cmdline = "python -m robocorp.action_server"
-
-                    if not is_new and db_migration_pending(db_path):
-                        print(
-                            f"""It was not possible to start the server because a 
+            if not is_new and db_migration_pending(db_path):
+                print(
+                    f"""It was not possible to start the server because a 
 database migration is required to use with this version of the
 Robocorp Action Server.
 
@@ -673,86 +794,86 @@ To migrate the database to the current version
 -- or start from scratch by erasing the file: 
 {db_path}
 """
+                )
+                return 1
+
+        with use_db_ctx(db_path) as db:
+            if command == "import":
+                return _import_actions(
+                    typing.cast(ArgumentsNamespaceImport, base_args),
+                    settings,
+                    disable_not_imported=False,
+                )
+
+            elif command == "start":
+                start_args: ArgumentsNamespaceStart = typing.cast(
+                    ArgumentsNamespaceStart, base_args
+                )
+                # start imports the current directory by default
+                # (unless --actions-sync=false is specified).
+                log.debug("Synchronize actions: %s", start_args.actions_sync)
+
+                setup_info.rcc.feedack_metric("action-server.started", __version__)
+
+                if start_args.actions_sync:
+                    code = _import_actions(
+                        start_args,
+                        settings,
+                        disable_not_imported=start_args.actions_sync,
+                    )
+                    if code != 0:
+                        return code
+
+                with use_runs_state_ctx(db):
+                    from ._server import start_server
+
+                    settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+                    expose_session = None
+                    if start_args.expose:
+                        from ._server_expose import read_expose_session_json
+
+                        expose_session = read_expose_session_json(
+                            datadir=str(settings.datadir)
                         )
-                        return 1
-
-                with use_db_ctx(db_path) as db:
-                    if command == "import":
-                        return _import_actions(
-                            typing.cast(ArgumentsNamespaceImport, base_args),
-                            settings,
-                            disable_not_imported=False,
-                        )
-
-                    elif command == "start":
-                        start_args: ArgumentsNamespaceStart = typing.cast(
-                            ArgumentsNamespaceStart, base_args
-                        )
-                        # start imports the current directory by default
-                        # (unless --actions-sync=false is specified).
-                        log.debug("Synchronize actions: %s", start_args.actions_sync)
-
-                        rcc.feedack_metric("action-server.started", __version__)
-
-                        if start_args.actions_sync:
-                            code = _import_actions(
-                                start_args,
-                                settings,
-                                disable_not_imported=start_args.actions_sync,
-                            )
-                            if code != 0:
-                                return code
-
-                        with use_runs_state_ctx(db):
-                            from ._server import start_server
-
-                            settings.artifacts_dir.mkdir(parents=True, exist_ok=True)
-
-                            expose_session = None
-                            if start_args.expose:
-                                from ._server_expose import read_expose_session_json
-
-                                expose_session = read_expose_session_json(
-                                    datadir=str(settings.datadir)
+                        if expose_session and not start_args.expose_allow_reuse:
+                            confirm = input(
+                                colored(
+                                    "> Resume previous expose URL ",
+                                    attrs=["bold"],
                                 )
-                                if expose_session and not start_args.expose_allow_reuse:
-                                    confirm = input(
-                                        colored(
-                                            "> Resume previous expose URL ",
-                                            attrs=["bold"],
-                                        )
-                                        + colored(expose_session.url, "light_blue")
-                                        + colored(" Y/N?", attrs=["bold"])
-                                        + colored(" [Y]", attrs=["dark"])
-                                    )
-                                    if confirm.lower() == "y" or confirm == "":
-                                        log.debug("Resuming previous expose session")
-                                    else:
-                                        expose_session = None
-
-                            api_key = None
-                            if start_args.api_key:
-                                api_key = start_args.api_key
-                            elif start_args.expose:
-                                from ._robo_utils.auth import get_api_key
-
-                                api_key = get_api_key(settings.datadir)
-
-                            start_server(
-                                expose=start_args.expose,
-                                api_key=api_key,
-                                expose_session=expose_session.expose_session
-                                if expose_session
-                                else None,
-                                whitelist=start_args.whitelist,
+                                + colored(expose_session.url, "light_blue")
+                                + colored(" Y/N?", attrs=["bold"])
+                                + colored(" [Y]", attrs=["dark"])
                             )
-                            return 0
+                            if confirm.lower() == "y" or confirm == "":
+                                log.debug("Resuming previous expose session")
+                            else:
+                                expose_session = None
 
-                    else:
-                        print(f"Unexpected command: {command}.", file=sys.stderr)
-                        return 1
-            finally:
-                mutex.release_mutex()
+                    api_key = None
+                    if start_args.api_key:
+                        api_key = start_args.api_key
+                    elif start_args.expose:
+                        from ._robo_utils.auth import get_api_key
+
+                        api_key = get_api_key(settings.datadir)
+
+                    start_server(
+                        expose=start_args.expose,
+                        api_key=api_key,
+                        expose_session=expose_session.expose_session
+                        if expose_session
+                        else None,
+                        whitelist=start_args.whitelist,
+                    )
+                    return 0
+
+            else:
+                print(f"Unexpected command: {command}.", file=sys.stderr)
+                return 1
+    finally:
+        mutex.release_mutex()
 
 
 if __name__ == "__main__":
