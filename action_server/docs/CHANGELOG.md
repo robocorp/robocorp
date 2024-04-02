@@ -22,7 +22,6 @@
 ## 0.1.4 - 2024-03-20
 
 - Fixed issue in action-server binary build. 
-- Add support parsing Array type in Action Server UI action run view
 
 ## 0.1.3 - 2024-03-20
 
