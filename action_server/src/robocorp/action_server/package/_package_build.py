@@ -87,7 +87,7 @@ def _collect_files_excluding_patterns(
 
 
 def build_package(
-    input_dir: Path, output_dir: str, datadir: str, override: bool, log_level: int
+    input_dir: Path, output_dir: str, datadir: str, override: bool
 ) -> int:
     """
     Builds an action package.

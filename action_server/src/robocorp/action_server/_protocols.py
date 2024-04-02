@@ -88,10 +88,15 @@ class ArgumentsNamespace(Protocol):
     This is the argparse.Namespace with the arguments provided by the user.
     """
 
-    command: Literal["download-rcc", "package", "import", "start", "version"]
+    command: Literal[
+        "download-rcc", "package", "import", "start", "version", "new", "migrate"
+    ]
     verbose: bool
-    db_file: str
-    datadir: str
+
+
+class ArgumentsNamespaceNew(ArgumentsNamespace):
+    command: Literal["new"]
+    name: str
 
 
 class ArgumentsNamespaceDownloadRcc(ArgumentsNamespace):
@@ -119,7 +124,24 @@ class ArgumentsNamespacePackageBuild(ArgumentsNamespace):
     override: bool
 
 
-class ArgumentsNamespaceBaseImportOrStart(ArgumentsNamespace):
+class ArgumentsNamespacePackageExtract(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["extract"]
+    output_dir: str
+    override: bool
+
+
+class ArgumentsNamespaceMigrateImportOrStart(ArgumentsNamespace):
+    command: Literal["migrate", "import", "start"]
+    datadir: str
+    db_file: str
+
+
+class ArgumentsNamespaceMigrate(ArgumentsNamespaceMigrateImportOrStart):
+    command: Literal["migrate"]
+
+
+class ArgumentsNamespaceBaseImportOrStart(ArgumentsNamespaceMigrateImportOrStart):
     command: Literal["import", "start"]
     dir: Sequence[str]
     skip_lint: bool

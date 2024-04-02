@@ -1,3 +1,14 @@
+"""
+Important: 
+
+robocorp.action_server.cli.main() 
+
+is the only public API supported from the action-server.
+
+Everything else is considered private and can be broken/changed without
+being considered a backward-incompatible change!
+"""
+
 import argparse
 import logging
 import os.path
@@ -18,7 +29,8 @@ from ._protocols import (
     ArgumentsNamespaceBaseImportOrStart,
     ArgumentsNamespaceDownloadRcc,
     ArgumentsNamespaceImport,
-    ArgumentsNamespacePackage,
+    ArgumentsNamespaceMigrateImportOrStart,
+    ArgumentsNamespaceNew,
     ArgumentsNamespaceStart,
 )
 
@@ -29,6 +41,11 @@ if typing.TYPE_CHECKING:
     from ._settings import Settings
 
 log = logging.getLogger(__name__)
+
+# Important: main() is the only public API supported from the action-server.
+# Everything else is considered private and can be broken/changed without
+# being considered a backward-incompatible change!
+__all__ = ["main"]
 
 
 # def _write_schema(path: Optional[str]):
@@ -62,37 +79,6 @@ def _add_skip_lint(parser, defaults):
     )
 
 
-def _add_data_args(parser, defaults):
-    parser.add_argument(
-        "-d",
-        "--datadir",
-        metavar="PATH",
-        default="",
-        help=(
-            "Directory to store the data for operating the actions server "
-            "(by default a datadir will be generated based on the current directory)."
-        ),
-    )
-    parser.add_argument(
-        "--db-file",
-        help=(
-            "The name of the database file, relative to the datadir "
-            "(default: %(default)s)"
-        ),
-        default=defaults["db_file"],
-    )
-
-
-def _add_verbose_args(parser, defaults):
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        action="store_true",
-        default=False,
-        help="Be more talkative (default: %(default)s)",
-    )
-
-
 def _add_whitelist_args(parser, defaults):
     parser.add_argument(
         "--whitelist",
@@ -112,20 +98,10 @@ def str2bool(v):
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
 
-def _create_parser():
-    from ._settings import Settings
+def _add_start_server_command(command_parser, defaults):
+    from robocorp.action_server._cli_helpers import add_data_args, add_verbose_args
 
-    defaults = Settings.defaults()
-    base_parser = argparse.ArgumentParser(
-        prog="action-server",
-        description="Robocorp Action Server",
-        formatter_class=argparse.RawTextHelpFormatter,
-    )
-
-    subparsers = base_parser.add_subparsers(dest="command")
-
-    # Starts the server
-    start_parser = subparsers.add_parser(
+    start_parser = command_parser.add_parser(
         "start",
         help=(
             "Starts the Robocorp Action Server (importing the actions in the "
@@ -232,12 +208,26 @@ def _create_parser():
         "available will be defined in the public OpenAPI specification.",
     )
 
-    _add_data_args(start_parser, defaults)
-    _add_verbose_args(start_parser, defaults)
+    add_data_args(start_parser, defaults)
+    add_verbose_args(start_parser, defaults)
     _add_whitelist_args(start_parser, defaults)
 
-    # Import
-    import_parser = subparsers.add_parser(
+
+def _add_migrate_command(command_subparser, defaults):
+    from robocorp.action_server._cli_helpers import add_data_args, add_verbose_args
+
+    migration_parser = command_subparser.add_parser(
+        "migrate",
+        help="Makes a database migration (if needed) and exits",
+    )
+    add_data_args(migration_parser, defaults)
+    add_verbose_args(migration_parser, defaults)
+
+
+def _add_import_command(command_subparser, defaults):
+    from robocorp.action_server._cli_helpers import add_data_args, add_verbose_args
+
+    import_parser = command_subparser.add_parser(
         "import",
         help="Imports an Action Package and exits",
     )
@@ -249,12 +239,34 @@ def _create_parser():
         action="append",
     )
     _add_skip_lint(import_parser, defaults)
-    _add_data_args(import_parser, defaults)
-    _add_verbose_args(import_parser, defaults)
+    add_data_args(import_parser, defaults)
+    add_verbose_args(import_parser, defaults)
     _add_whitelist_args(import_parser, defaults)
 
+
+def _create_parser():
+    from robocorp.action_server._cli_helpers import add_verbose_args
+    from robocorp.action_server.package._package_build_cli import add_package_command
+
+    from ._settings import Settings
+
+    defaults = Settings.defaults()
+    base_parser = argparse.ArgumentParser(
+        prog="action-server",
+        description="Robocorp Action Server",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+
+    command_subparser = base_parser.add_subparsers(dest="command")
+
+    # Starts the server
+    _add_start_server_command(command_subparser, defaults)
+
+    # Import
+    _add_import_command(command_subparser, defaults)
+
     # Download RCC
-    rcc_parser = subparsers.add_parser(
+    rcc_parser = command_subparser.add_parser(
         "download-rcc",
         help=(
             "Downloads RCC (by default to the location required by the "
@@ -270,7 +282,7 @@ def _create_parser():
     )
 
     # New project from template
-    new_parser = subparsers.add_parser(
+    new_parser = command_subparser.add_parser(
         "new",
         help="Bootstrap new project from template",
     )
@@ -278,11 +290,10 @@ def _create_parser():
         "--name",
         help="Name for the project",
     )
-    _add_data_args(new_parser, defaults)
-    _add_verbose_args(new_parser, defaults)
+    add_verbose_args(new_parser, defaults)
 
     # Schema
-    # schema_parser = subparsers.add_parser(
+    # schema_parser = command_subparser.add_parser(
     #     "schema",
     #     help="Prints the schema and exits",
     # )
@@ -298,68 +309,19 @@ def _create_parser():
     # )
 
     # Version
-    subparsers.add_parser(
+    command_subparser.add_parser(
         "version",
         help="Prints the version and exits",
     )
 
-    # Migration
-    migration_parser = subparsers.add_parser(
-        "migrate",
-        help="Makes a database migration (if needed) and exits",
-    )
-    _add_data_args(migration_parser, defaults)
-    _add_verbose_args(migration_parser, defaults)
+    _add_migrate_command(command_subparser, defaults)
 
-    # Package handling
-    package_parser = subparsers.add_parser(
-        "package",
-        help="Utilities to manage the action package",
-    )
-
-    package_subparsers = package_parser.add_subparsers(dest="package_command")
-
-    update_parser = package_subparsers.add_parser(
-        "update",
-        help="Updates the structure of a previous version of an action package to the latest version supported by the action server",
-    )
-    update_parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="If passed, changes aren't actually done, they'll just be printed",
-        default=False,
-    )
-    update_parser.add_argument(
-        "--no-backup",
-        action="store_true",
-        help="If passed, file may be directly removed or overwritten, otherwise, a '.bak' file will be created prior to the operation",
-        default=False,
-    )
-    _add_verbose_args(update_parser, defaults)
-
-    build_parser = package_subparsers.add_parser(
-        "build",
-        help="Creates a .zip with the contents of the action package so that it can be deployed",
-    )
-    build_parser.add_argument(
-        "--output-dir",
-        dest="output_dir",
-        help="The output file for saving the action package built file",
-        default=None,
-    )
-    build_parser.add_argument(
-        "--override",
-        action="store_true",
-        help="If passed if the target .zip is already present it'll be overridden without asking",
-        default=False,
-    )
-    _add_data_args(build_parser, defaults)
-    _add_verbose_args(build_parser, defaults)
+    add_package_command(command_subparser, defaults)
 
     return base_parser
 
 
-def main(args: Optional[list[str]] = None, *, exit=True) -> int:
+def main(args: Optional[list[str]] = None, *, exit=True) -> int:  # noqa
     if args is None:
         args = sys.argv[1:]
 
@@ -440,7 +402,7 @@ def _setup_logging(datadir: Path, log_level):
 
 
 def _import_actions(
-    base_args: Union[ArgumentsNamespaceBaseImportOrStart],
+    base_args: ArgumentsNamespaceBaseImportOrStart,
     settings: "Settings",
     disable_not_imported: bool,
 ) -> int:
@@ -453,6 +415,8 @@ def _import_actions(
     Returns: 0 if everything is correct and some other number if some error happened
         while importing the actions.
     """
+    from robocorp.action_server.vendored_deps.termcolors import bold_red
+
     from . import _actions_import
 
     if not base_args.dir:
@@ -469,10 +433,8 @@ def _import_actions(
             )
     except ActionServerValidationError as e:
         log.critical(
-            colored(
+            bold_red(
                 f"\nUnable to import action. Please fix the error below and retry.\n{e}",
-                color="red",
-                attrs=["bold"],
             )
         )
         return 1
@@ -502,10 +464,6 @@ def _main_retcode(
 
     Returns: The returncode for the process (0 means all was ok).
     """
-    from robocorp.action_server._protocols import (
-        ArgumentsNamespacePackageBuild,
-        ArgumentsNamespacePackageUpdate,
-    )
 
     if args is None:
         args = sys.argv[1:]
@@ -582,59 +540,11 @@ def _main_retcode(
         return 0
 
     if command == "package":
-        package_args: ArgumentsNamespacePackage = typing.cast(
-            ArgumentsNamespacePackage, base_args
+        from robocorp.action_server.package._package_build_cli import (
+            handle_package_command,
         )
-        package_command = package_args.package_command
-        if not package_command:
-            print("Flag for package operation not specified.", file=sys.stderr)
-            return 1
 
-        if package_command == "update":
-            package_update_args: ArgumentsNamespacePackageUpdate = typing.cast(
-                ArgumentsNamespacePackageUpdate, base_args
-            )
-
-            from robocorp.action_server.vendored_deps.action_package_handling import (
-                update_package,
-            )
-
-            update_package(
-                Path(".").absolute(),
-                dry_run=package_update_args.dry_run,
-                backup=not package_update_args.no_backup,
-            )
-            return 0
-
-        elif package_command == "build":
-            from robocorp.action_server.package._package_build import build_package
-
-            package_build_args: ArgumentsNamespacePackageBuild = typing.cast(
-                ArgumentsNamespacePackageBuild, base_args
-            )
-
-            # action-server package build --output-dir=<zipfile> --datadir=<directory> <source-directory>:
-            try:
-                retcode = build_package(
-                    Path(".").absolute(),
-                    output_dir=package_build_args.output_dir,
-                    datadir=package_build_args.datadir,
-                    override=package_build_args.override,
-                    log_level=log_level,
-                )
-            except ActionServerValidationError as e:
-                log.critical(
-                    colored(
-                        f"\nUnable to build action package. Please fix the error below and retry.\n{e}",
-                        color="red",
-                        attrs=["bold"],
-                    )
-                )
-                retcode = 1
-            return retcode
-
-        print("Invalid package command.", file=sys.stderr)
-        return 1
+        return handle_package_command(base_args)
 
     if command not in (
         "migrate",
@@ -651,15 +561,18 @@ def _main_retcode(
     )
 
     if command == "new":
-        with _basic_setup(base_args):
-            from ._new_project import create_new_project
+        new_args: ArgumentsNamespaceNew = typing.cast(ArgumentsNamespaceNew, base_args)
+        from ._new_project import create_new_project
 
-            create_new_project(directory=base_args.name)
-            return 0
+        create_new_project(directory=new_args.name)
+        return 0
 
-    with _basic_setup(base_args) as setup_info:
+    migrate_import_or_start_args = typing.cast(
+        ArgumentsNamespaceMigrateImportOrStart, base_args
+    )
+    with _basic_setup(migrate_import_or_start_args) as setup_info:
         return _make_import_migrate_or_start(
-            base_args, command, setup_info, use_db=use_db
+            migrate_import_or_start_args, command, setup_info, use_db=use_db
         )
 
 
@@ -670,7 +583,9 @@ class _SetupInfo:
 
 
 @contextmanager
-def _basic_setup(base_args):
+def _basic_setup(
+    base_args: ArgumentsNamespaceMigrateImportOrStart,
+):
     from ._download_rcc import download_rcc
     from ._rcc import initialize_rcc
     from ._settings import setup_settings
@@ -685,7 +600,7 @@ def _basic_setup(base_args):
 
 
 def _make_import_migrate_or_start(
-    base_args,
+    base_args: ArgumentsNamespaceMigrateImportOrStart,
     command: Literal["import"] | Literal["migrate"] | Literal["start"],
     setup_info: _SetupInfo,
     use_db: Optional["Database"] = None,
