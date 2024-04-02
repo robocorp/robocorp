@@ -17,6 +17,7 @@
   session).
 - Backward-incompatibility: `action-server package update` needs to be used
   instead of `action-server package --update`.
+- Add support parsing Array type in Action Server UI action run view
 
 ## 0.1.4 - 2024-03-20
 
