@@ -114,7 +114,12 @@ func checkAvailableUpdate(version string) {
 		}
 		urlPath, _ := url.JoinPath(ACTION_SERVER_LATEST_BASE_URL, actionOS, actionExe)
 		fmt.Printf("\n ⏫ A new version of action-server is now available: %s → %s \n", version, latestVersion)
-		fmt.Printf("    To update, download from: %s \n\n", urlPath)
+		if runtime.GOOS == "darwin" {
+			fmt.Printf("    To update, download from: %s \n", urlPath)
+			fmt.Printf("    Or run: brew update && brew install robocorp/tools/action-server\n\n")
+		} else {
+			fmt.Printf("    To update, download from: %s \n\n", urlPath)
+		}
 	}
 }
 
