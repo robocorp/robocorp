@@ -75,7 +75,7 @@ def _change_to_build_go_wrapper():
 
 
 @task
-def frontend_dev(ctx: Context):
+def dev_frontend(ctx: Context):
     """Run the frontend in dev mode (starts its own localhost server using vite)."""
 
     with _change_to_frontend_dir():
@@ -83,7 +83,7 @@ def frontend_dev(ctx: Context):
 
 
 @task
-def frontend_build(ctx: Context, debug: bool = False, install: bool = True):
+def build_frontend(ctx: Context, debug: bool = False, install: bool = True):
     """Build static .html frontend"""
 
     with _change_to_frontend_dir():

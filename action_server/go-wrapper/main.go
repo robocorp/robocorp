@@ -10,16 +10,17 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
+
+	"golang.org/x/mod/semver"
 )
 
 //go:embed all:assets/*
 var content embed.FS
 
 // Constants
-const VERSION_LATEST_URL = "https://downloads.robocorp.com/action-server/releases/latest/version.txt"
 const ACTION_SERVER_LATEST_BASE_URL = "https://downloads.robocorp.com/action-server/releases/latest/"
+const VERSION_LATEST_URL = ACTION_SERVER_LATEST_BASE_URL + "version.txt"
 
 func getLatestVersion() (string, error) {
 	// Get the data from the URL
@@ -39,47 +40,6 @@ func getLatestVersion() (string, error) {
 	return strings.TrimSpace(versionAsString), nil
 }
 
-func parseVersion(version string) ([]int, error) {
-	versionParts := strings.Split(version, ".")
-	parsed := make([]int, len(versionParts))
-	for i, part := range versionParts {
-		num, err := strconv.Atoi(part)
-		if err != nil {
-			return make([]int, 0), fmt.Errorf("invalid semantic version format")
-		}
-		parsed[i] = num
-	}
-	return parsed, nil
-}
-
-func compareSemanticVersions(v1 string, v2 string) (int, error) {
-	// Parse given versions
-	v1Parsed, err1 := parseVersion(v1)
-	if err1 != nil {
-		return -2, err1
-	}
-	v2Parsed, err2 := parseVersion(v2)
-	if err2 != nil {
-		return -2, err2
-	}
-
-	// Compare versions
-	if len(v1Parsed) != len(v2Parsed) {
-		return -2, fmt.Errorf("incompatible semantic versions found: '%s' or '%s'", v1, v2)
-	}
-
-	for i, v := range v1Parsed {
-		if v != v2Parsed[i] {
-			if v < v2Parsed[i] {
-				return -1, nil
-			} else {
-				return 1, nil
-			}
-		}
-	}
-	return 0, nil
-}
-
 func checkAvailableUpdate(version string) {
 	// Get the latest version
 	latestVersion, err := getLatestVersion()
@@ -88,11 +48,7 @@ func checkAvailableUpdate(version string) {
 		return
 	}
 	// Compare the given version with the latest one
-	compareResult, err := compareSemanticVersions(version, latestVersion)
-	if err != nil {
-		fmt.Println("An error occurred while comparing versions:", err)
-		return
-	}
+	compareResult := semver.Compare(strings.TrimSpace("v"+version), strings.TrimSpace("v"+latestVersion))
 
 	switch compareResult {
 	case -1:
