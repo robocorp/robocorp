@@ -3,7 +3,7 @@
 Module used to interact with native widgets on the Windows OS through UI Automation.
 
 This library can be made available by pinning
-![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)
+[![`robocorp-windows`](https://img.shields.io/pypi/v/robocorp-windows?label=robocorp-windows)](https://pypi.org/project/robocorp-windows/)
 in your dependencies' configuration.
 """
 
