@@ -58,9 +58,25 @@ def _change_to_frontend_dir():
         yield
 
 
+@contextmanager
+def _change_to_build_binary():
+    RESOLVED_CURDIR = CURDIR.resolve()
+
+    with chdir(RESOLVED_CURDIR / "build-binary"):
+        yield
+
+
+@contextmanager
+def _change_to_build_go_wrapper():
+    RESOLVED_CURDIR = CURDIR.resolve()
+
+    with chdir(RESOLVED_CURDIR / "go-wrapper"):
+        yield
+
+
 @task
 def dev_frontend(ctx: Context):
-    """Run the frentend in dev mode (starts its own localhost server using vite)."""
+    """Run the frontend in dev mode (starts its own localhost server using vite)."""
 
     with _change_to_frontend_dir():
         run(ctx, "npm", "run", "dev")
@@ -99,6 +115,18 @@ def build_frontend(ctx: Context, debug: bool = False, install: bool = True):
 FILE_CONTENTS = {repr(file_contents)}
 """
         )
+
+
+@task
+def build_binary(ctx: Context) -> None:
+    with _change_to_build_binary():
+        run(ctx, "pyoxidizer", "run", "--release")
+
+
+@task
+def build_go_wrapper(ctx: Context) -> None:
+    with _change_to_build_go_wrapper():
+        run(ctx, "go", "build", "-o", "action-server-unsigned")
 
 
 @task
