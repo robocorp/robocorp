@@ -29,7 +29,7 @@ def _log_deprecated_conda():
         bold_red(
             "Deprecated: The file for defining the environment is now `package.yaml`.\n"
             "It's not a one to one mapping for action-server.yaml, but\n"
-            f"`{cmd} package --update` can be used to make most of the needed changes.\n"
+            f"`{cmd} package update` can be used to make most of the needed changes.\n"
             "See: https://github.com/robocorp/robocorp/blob/master/action_server/docs/guides/01-package-yaml.md for more details."
         )
     )

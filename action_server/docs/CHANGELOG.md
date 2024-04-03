@@ -12,6 +12,12 @@
 - In `action-server start --expose`, if an action run starts and the connection 
   is broken and a new websocket connection is created to the tunnel, the results
   of the action run are sent to the new websocket.
+- Added support for `action-server package build` to create a .zip file with the
+  package contents (excluding contents based on the `package.yaml` `packaging/exclude` 
+  session).
+- Backward-incompatibility: `action-server package update` needs to be used
+  instead of `action-server package --update`.
+- Add support parsing Array type in Action Server UI action run view
 
 ## 0.1.4 - 2024-03-20
 

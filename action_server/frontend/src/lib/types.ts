@@ -57,7 +57,7 @@ export type LoadedActionsPackages = AsyncLoaded<ActionPackage[]>;
 export type LoadedArtifacts = AsyncLoaded<Artifact>;
 
 export interface InputProperty {
-  type: OpenAPIV3_1.NonArraySchemaObjectType | 'enum';
+  type: OpenAPIV3_1.NonArraySchemaObjectType | 'enum' | 'array';
   description: string;
   title: string;
   default?: string;

@@ -1,0 +1,15 @@
+name: pack2 name
+version: 0.2a1
+
+dependencies:
+  conda-forge: 
+    - python=3.10.12
+    - pip=24
+  pypi:
+    - robocorp-actions
+
+packaging:
+  exclude:
+  - ignore/**
+  - not_ok.txt
+  - "*.foo"
