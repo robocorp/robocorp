@@ -61,9 +61,12 @@ export const Code: FC<CodeProps> = ({
     }
   }, [autoFocus]);
 
+  console.warn('! Code re-rendering!');
+
   return (
-    <Box height={height} mb="$24">
+    <Box key="base-code-input-wrapper" height={height} mb="$24">
       <BaseCode
+        key="base-code-input"
         extensions={extensions}
         codemirrorRef={codemirror}
         aria-labelledby="code"

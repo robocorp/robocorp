@@ -137,12 +137,12 @@ export const propertiesToFormData = (
   return entries;
 };
 
-type Payload = {
+export type Payload = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 
-export const formDatatoPayload = (data: PropertyFormData[]): Payload => {
+export const formDataToPayload = (data: PropertyFormData[]): Payload => {
   const result: Payload = {};
 
   data.forEach(({ name, value, property }) => {
