@@ -15,6 +15,11 @@
 - Added support for `action-server package build` to create a .zip file with the
   package contents (excluding contents based on the `package.yaml` `packaging/exclude` 
   session).
+- Added support for `action-server package extract` to extract the contents of the
+  package created with `action-server package build`.
+- Added support for `action-server package metadata` to extract metadata from the
+  action package (in the current directory). Currently outputs to stdout 
+  a json containing a map from `openapi.json` to its contents. 
 - Backward-incompatibility: `action-server package update` needs to be used
   instead of `action-server package --update`.
 - Add support parsing Array type in Action Server UI action run view
