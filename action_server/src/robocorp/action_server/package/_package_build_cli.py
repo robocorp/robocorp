@@ -9,6 +9,7 @@ from robocorp.action_server._protocols import (
     ArgumentsNamespacePackage,
     ArgumentsNamespacePackageBuild,
     ArgumentsNamespacePackageExtract,
+    ArgumentsNamespacePackageMetadata,
     ArgumentsNamespacePackageUpdate,
 )
 
@@ -90,6 +91,15 @@ def add_package_command(command_subparser, defaults):
         "filename", help="The .zip file that should be extracted"
     )
 
+    ### Metadata
+
+    extract_parser = package_subparsers.add_parser(
+        "metadata",
+        help="Collects metadata from the action package in the current cwd and prints it to stdout",
+    )
+    add_data_args(extract_parser, defaults)
+    add_verbose_args(extract_parser, defaults)
+
 
 def handle_package_command(base_args: ArgumentsNamespace):
     from robocorp.action_server._errors_action_server import ActionServerValidationError
@@ -100,7 +110,7 @@ def handle_package_command(base_args: ArgumentsNamespace):
     )
     package_command = package_args.package_command
     if not package_command:
-        print("Flag for package operation not specified.", file=sys.stderr)
+        log.critical("Command for package operation not specified.")
         return 1
 
     if package_command == "update":
@@ -171,6 +181,38 @@ def handle_package_command(base_args: ArgumentsNamespace):
         with zipfile.ZipFile(zip_filename, "r") as zip_ref:
             zip_ref.extractall(target_dir)
         return 0
+
+    elif package_command == "metadata":
+        from robocorp.action_server.package._package_metadata import (
+            collect_package_metadata,
+        )
+
+        package_metadata_args: ArgumentsNamespacePackageMetadata = typing.cast(
+            ArgumentsNamespacePackageBuild, base_args
+        )
+
+        # action-server package metadata --datadir=<directory>
+        retcode = 0
+        try:
+            package_metadata_or_returncode: str | int = collect_package_metadata(
+                Path(".").absolute(),
+                datadir=package_metadata_args.datadir,
+            )
+            if isinstance(package_metadata_or_returncode, str):
+                print(package_metadata_or_returncode)
+                sys.stdout.flush()
+            else:
+                assert package_metadata_or_returncode != 0
+                retcode = package_metadata_or_returncode
+
+        except ActionServerValidationError as e:
+            log.critical(
+                bold_red(
+                    f"\nUnable to collect package metadata. Please fix the error below and retry.\n{e}",
+                )
+            )
+            retcode = 1
+        return retcode
 
     log.critical(f"Invalid package command: {package_command}")
     return 1

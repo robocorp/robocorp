@@ -5,9 +5,11 @@ import socket
 import subprocess
 import sys
 from functools import partial
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 
 from termcolor import colored
+
+from ._protocols import IBeforeStartCallback
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +41,11 @@ def get_action_description_from_docs(docs: str) -> str:
 
 
 def start_server(
-    expose: bool, api_key: str | None, expose_session: str | None, whitelist: str | None
+    expose: bool,
+    api_key: str | None,
+    expose_session: str | None,
+    whitelist: str | None,
+    before_start: Sequence[IBeforeStartCallback],
 ) -> None:
     from dataclasses import asdict
 
@@ -213,6 +219,14 @@ def start_server(
             response_class=HTMLResponse,
             include_in_schema=settings.full_openapi_spec,
         )
+
+    # At this point the FastAPI app should be configured. What's missing now
+    # is setup callbacks related to the startup and actuall start the async
+    # loop.
+
+    for callback in before_start:
+        if not callback(app):
+            return
 
     expose_subprocess = None
 

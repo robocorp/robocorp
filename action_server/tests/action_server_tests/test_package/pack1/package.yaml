@@ -6,7 +6,7 @@ dependencies:
     - python=3.10.12
     - pip=24
   pypi:
-    - robocorp-actions
+    - robocorp-actions=0.1.0
 
 packaging:
   exclude:

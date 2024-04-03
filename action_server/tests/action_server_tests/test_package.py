@@ -101,3 +101,21 @@ def test_package_zip_no_actions(datadir):
         cwd=datadir / "pack2",
     )
     assert "No actions found in " in output.stderr
+
+
+def test_package_metadata(datadir, data_regression):
+    import json
+
+    from robocorp.action_server._selftest import robocorp_action_server_run
+
+    output = robocorp_action_server_run(
+        [
+            "package",
+            "metadata",
+            "--datadir",
+            str(datadir / "data"),
+        ],
+        returncode=0,
+        cwd=datadir / "pack1",
+    )
+    data_regression.check(json.loads(output.stdout))
