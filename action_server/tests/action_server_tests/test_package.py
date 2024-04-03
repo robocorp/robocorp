@@ -55,6 +55,35 @@ def test_package_zip(datadir):
         "folder/ignore_only_at_root",
     }
 
+    # Extract it
+    extract_to = datadir / "extracted"
+
+    def extract():
+        robocorp_action_server_run(
+            [
+                "package",
+                "extract",
+                "--override",
+                "--output-dir",
+                str(extract_to),
+                str(target_zip),
+            ],
+            returncode=0,
+            cwd=datadir,
+        )
+        files = set(f.name for f in extract_to.glob("*"))
+        assert files == {
+            "another",
+            "folder",
+            "hello_action.py",
+            "package.yaml",
+        }
+
+    extract()
+    # Just remove the package.yaml and see if it's restored.
+    os.remove(extract_to / "package.yaml")
+    extract()
+
 
 def test_package_zip_no_actions(datadir):
     from robocorp.action_server._selftest import robocorp_action_server_run
