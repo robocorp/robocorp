@@ -157,29 +157,57 @@ addEventListener('message', (event: any) => {
     switch (msg.type) {
       case 'response':
         // Response to something we posted.
-        const responseMsg: IResponseMessage = msg;
-        const resolvePromise = msgIdToSeq[responseMsg.request_seq];
-        if (resolvePromise) {
-          delete msgIdToSeq[responseMsg.request_seq];
-          resolvePromise(responseMsg);
+        try {
+          const responseMsg: IResponseMessage = msg;
+          if (
+            Object.hasOwn(msgIdToSeq, responseMsg.request_seq) ||
+            responseMsg.request_seq in msgIdToSeq
+          ) {
+            const resolvePromise = msgIdToSeq[responseMsg.request_seq];
+            if (resolvePromise) {
+              delete msgIdToSeq[responseMsg.request_seq];
+              resolvePromise(responseMsg);
+              return;
+            }
+          }
+          console.warn('vscodeComm: Unhandled response: ', responseMsg);
+        } catch (e) {
+          console.error('vscodeComm: Response raised exception:', e);
         }
         break;
       case 'event':
         // Process some event
-        const handler = eventToHandler[msg.event];
-        if (handler) {
-          handler(msg);
-        } else {
-          console.log('Unhandled event: ', msg);
+        try {
+          const eventMsg: IEventMessage = msg;
+          if (Object.hasOwn(eventToHandler, eventMsg.event) || eventMsg.event in eventToHandler) {
+            const handler = eventToHandler[eventMsg.event];
+            if (handler) {
+              handler(eventMsg);
+              return;
+            }
+          }
+          console.warn('vscodeComm: Unhandled event: ', eventMsg);
+        } catch (e) {
+          console.error('vscodeComm: Event raised exception:', e);
         }
         break;
       case 'request':
         // Process some request
-        const requestHandler = requestToHandler[msg.command];
-        if (requestHandler) {
-          requestHandler(msg);
-        } else {
-          console.log('Unhandled request: ', msg);
+        try {
+          const requestMsg: IRequestMessage = msg;
+          if (
+            Object.hasOwn(requestToHandler, requestMsg.command) ||
+            requestMsg.command in requestMsg
+          ) {
+            const requestHandler = requestToHandler[requestMsg.command];
+            if (requestHandler) {
+              requestHandler(requestMsg);
+              return;
+            }
+          }
+          console.warn('vscodeComm: Unhandled request: ', requestMsg);
+        } catch (e) {
+          console.error('vscodeComm: Request raised exception:', e);
         }
         break;
     }

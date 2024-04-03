@@ -21,8 +21,8 @@ print(f"Matrix multiplication result: {result}")
 ```
 
 
-> AI/LLM's are quite good with `numpy`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `numpy`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

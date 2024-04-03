@@ -23,8 +23,8 @@ group_b.update_cell(1, 1, 'John')
 sh.share('my-personal-email@gmail.com', perm_type='user', role='writer')
 ```
 
-> AI/LLM's are quite good with `gspread`.<br/>
-👉 Try asking [ReMark](https://chat.robocorp.com)
+> AI/LLM's are quite good with `gspread`.  
+> 👉 Try asking [ReMark](https://chat.robocorp.com)
 
 ###### Various [snippets](snippets)
 

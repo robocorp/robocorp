@@ -1,6 +1,6 @@
 pip==23.2.1
 invoke~=2.2.0
-poetry~=1.7.1
+poetry~=1.8.2
 robocorp-truststore~=0.8.0
 semver~=3.0.0
-tomlkit~=0.11.8
+tomlkit~=0.12.4

@@ -99,8 +99,7 @@ class ModelUpdater {
     this.modelContainer = modelContainer;
     this.sio = new WebsocketConn(`${baseUrlWs}/api/ws`);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    this.sio.on('echo', (echoVal: string) => {
+    this.sio.on('echo', () => {
       // console.log('echo val was', echoVal);
     });
 

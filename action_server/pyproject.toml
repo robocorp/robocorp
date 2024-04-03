@@ -45,6 +45,7 @@ types-requests = "^2"
 types-PyYAML = "^6"
 robocorp-log-pytest = "^0.0.2"
 types-psutil = "^5"
+pyoxidizer = "^0.24.0"
 
 
 [tool.mypy]

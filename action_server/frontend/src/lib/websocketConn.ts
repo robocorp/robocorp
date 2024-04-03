@@ -108,16 +108,15 @@ export class WebsocketConn {
   public connect(): Promise<void> {
     if (this.connecting) {
       // console.log('Websocket: connect ignored (already connecting).');
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     }
     if (this.connected) {
       // console.log('Websocket: connect ignored (already connected).');
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     }
     // console.log('Websocket: starting connection.');
     this.connecting = true;
+
     return new Promise((resolve, reject) => {
       // console.log('Websocket: connecting to: ', this.url);
       this.ws = new WebSocket(this.url);
@@ -150,9 +149,7 @@ export class WebsocketConn {
     const dataStr = message.data;
     if (dataStr) {
       // console.log('Received data', dataStr);
-      const obj = JSON.parse(dataStr);
-      const { event } = obj;
-      const { data } = obj;
+      const { event, data } = JSON.parse(dataStr);
       if (event) {
         if (data !== undefined) {
           this.notify(event, data);

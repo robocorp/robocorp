@@ -88,10 +88,15 @@ class ArgumentsNamespace(Protocol):
     This is the argparse.Namespace with the arguments provided by the user.
     """
 
-    command: Literal["download-rcc", "package", "import", "start", "version"]
+    command: Literal[
+        "download-rcc", "package", "import", "start", "version", "new", "migrate"
+    ]
     verbose: bool
-    db_file: str
-    datadir: str
+
+
+class ArgumentsNamespaceNew(ArgumentsNamespace):
+    command: Literal["new"]
+    name: str
 
 
 class ArgumentsNamespaceDownloadRcc(ArgumentsNamespace):
@@ -101,12 +106,42 @@ class ArgumentsNamespaceDownloadRcc(ArgumentsNamespace):
 
 class ArgumentsNamespacePackage(ArgumentsNamespace):
     command: Literal["package"]
-    update: bool
+    package_command: Literal["update"] | Literal["build"]
+
+
+class ArgumentsNamespacePackageUpdate(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["update"]
     dry_run: bool
     no_backup: bool
 
 
-class ArgumentsNamespaceBaseImportOrStart(ArgumentsNamespace):
+class ArgumentsNamespacePackageBuild(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["build"]
+    output_dir: str
+    datadir: str
+    override: bool
+
+
+class ArgumentsNamespacePackageExtract(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["extract"]
+    output_dir: str
+    override: bool
+
+
+class ArgumentsNamespaceMigrateImportOrStart(ArgumentsNamespace):
+    command: Literal["migrate", "import", "start"]
+    datadir: str
+    db_file: str
+
+
+class ArgumentsNamespaceMigrate(ArgumentsNamespaceMigrateImportOrStart):
+    command: Literal["migrate"]
+
+
+class ArgumentsNamespaceBaseImportOrStart(ArgumentsNamespaceMigrateImportOrStart):
     command: Literal["import", "start"]
     dir: Sequence[str]
     skip_lint: bool
