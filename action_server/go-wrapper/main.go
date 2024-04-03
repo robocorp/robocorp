@@ -22,6 +22,18 @@ var content embed.FS
 const ACTION_SERVER_LATEST_BASE_URL = "https://downloads.robocorp.com/action-server/releases/latest/"
 const VERSION_LATEST_URL = ACTION_SERVER_LATEST_BASE_URL + "version.txt"
 
+type ColorType struct{}
+
+func (ct *ColorType) Bold(str string) string {
+	return fmt.Sprintf("\033[1m%s\033[0m", str)
+}
+func (ct *ColorType) Yellow(str string) string {
+	return fmt.Sprintf("\033[33m%s\033[0m", str)
+}
+func (ct *ColorType) Green(str string) string {
+	return fmt.Sprintf("\033[32m%s\033[0m", str)
+}
+
 func getLatestVersion() (string, error) {
 	// Get the data from the URL
 	versionResponse, err := http.Get(VERSION_LATEST_URL)
@@ -50,8 +62,8 @@ func checkAvailableUpdate(version string) {
 	// Compare the given version with the latest one
 	compareResult := semver.Compare(strings.TrimSpace("v"+version), strings.TrimSpace("v"+latestVersion))
 
-	switch compareResult {
-	case -1:
+	// If the current version is a previous version than the latest print the update suggestions
+	if compareResult == -1 {
 		// Construct the needed URL path to get to the downloadable object
 		var actionOS, actionExe string
 		switch runtime.GOOS {
@@ -68,13 +80,14 @@ func checkAvailableUpdate(version string) {
 			fmt.Println("Unsupported operating system")
 			os.Exit(1)
 		}
+		colorT := &ColorType{}
 		urlPath, _ := url.JoinPath(ACTION_SERVER_LATEST_BASE_URL, actionOS, actionExe)
-		fmt.Printf("\n ⏫ A new version of action-server is now available: %s → %s \n", version, latestVersion)
+		fmt.Printf("\n ⏫ A new version of action-server is now available: %s → %s \n", colorT.Yellow(version), colorT.Green(latestVersion))
 		if runtime.GOOS == "darwin" {
-			fmt.Printf("    To update, download from: %s \n", urlPath)
-			fmt.Printf("    Or run: brew update && brew install robocorp/tools/action-server\n\n")
+			fmt.Printf("    To update, download from: %s \n", colorT.Bold(urlPath))
+			fmt.Printf("    Or run: %s \n\n", colorT.Bold("brew update && brew install robocorp/tools/action-server"))
 		} else {
-			fmt.Printf("    To update, download from: %s \n\n", urlPath)
+			fmt.Printf("    To update, download from: %s \n\n", colorT.Bold(urlPath))
 		}
 	}
 }
