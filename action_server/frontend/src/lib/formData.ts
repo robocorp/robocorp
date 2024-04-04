@@ -174,3 +174,24 @@ export const formDataToPayload = (data: PropertyFormData[]): Payload => {
 
   return result;
 };
+
+export const payloadToFormData = (
+  payload: Payload,
+  formData: PropertyFormData[],
+  path = '',
+): PropertyFormData[] => {
+  const result: PropertyFormData[] = [];
+
+  Object.entries(payload).forEach(([key, val]) => {
+    const fullPath = path ? `${path}.${key}` : key;
+    if (typeof val === 'object' && !Array.isArray(val)) {
+      result.push(...payloadToFormData(val, formData, fullPath));
+    }
+    const foundData = formData.find((elem) => elem.name === fullPath);
+    if (foundData) {
+      result.push({ ...foundData, value: val });
+    }
+  });
+
+  return result;
+};

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   Box,
@@ -19,6 +20,7 @@ import { useLocalStorage } from '~/lib/useLocalStorage';
 import {
   formDataToPayload,
   Payload,
+  payloadToFormData,
   propertiesToFormData,
   PropertyFormData,
   PropertyFormDataType,
@@ -163,6 +165,13 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     setFormRawJSON(JSON.stringify(payload, null, 4));
   }, [formData]);
 
+  useEffect(() => {
+    if (!useRawJSON && formRawJSON && formData.length >= 0) {
+      setFormData(payloadToFormData(JSON.parse(formRawJSON), formData));
+    }
+  }, [useRawJSON]);
+
+  console.warn('FormData:', formData);
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
       {serverConfig?.auth_enabled && (
@@ -197,6 +206,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
                     <Checkbox
+                      key={`${title}-${item.name}-${index}`}
                       label={title}
                       description={item.property.description}
                       checked={typeof item.value === 'boolean' && item.value}
@@ -210,12 +220,13 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
                     <Input
+                      key={`${title}-${item.name}-${index}`}
                       label={title}
                       description={item.property.description}
                       required={item.required}
-                      value={typeof item.value === 'number' ? item.value.toString() : '0'}
+                      value={typeof item.value === 'number' ? item.value : item.value.toString()}
                       type="number"
-                      onChange={(e) => handleInputChange(e.target.value, index)}
+                      onChange={(e) => handleInputChange(Number(e.target.value), index)}
                     />
                   </Item>
                 );
@@ -223,6 +234,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
                     <Input
+                      key={`${title}-${item.name}-${index}`}
                       label={title}
                       description={item.property.description}
                       required={item.required}
@@ -236,6 +248,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
                     <Select
+                      key={`${title}-${item.name}-${index}`}
                       label={title}
                       description={item.property.description}
                       required={item.required}
@@ -260,6 +273,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
                     <Input
+                      key={`${title}-${item.name}-${index}`}
                       label={title}
                       description={item.property.description}
                       rows={1}
