@@ -187,9 +187,27 @@ export const payloadToFormData = (
     if (typeof val === 'object' && !Array.isArray(val)) {
       result.push(...payloadToFormData(val, formData, fullPath));
     }
-    const foundData = formData.find((elem) => elem.name === fullPath);
-    if (foundData) {
-      result.push({ ...foundData, value: val });
+    if (typeof val === 'object' && Array.isArray(val)) {
+      const foundData = formData.find((elem) => elem.name === fullPath);
+      if (foundData) {
+        result.push(foundData);
+      }
+      val.forEach((elemValue, index) => {
+        const foundElem = formData.find((elem) => elem.name === `${fullPath}.${index}`);
+        if (foundElem) {
+          result.push({ ...foundElem, value: elemValue });
+        } else {
+          const prev = formData.find((elem) => elem.name === `${fullPath}.0`);
+          if (prev) {
+            result.push({ ...prev, value: elemValue, name: `${fullPath}.${index}` });
+          }
+        }
+      });
+    } else {
+      const foundData = formData.find((elem) => elem.name === fullPath);
+      if (foundData) {
+        result.push({ ...foundData, value: val });
+      }
     }
   });
 

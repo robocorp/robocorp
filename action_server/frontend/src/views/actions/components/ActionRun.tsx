@@ -171,7 +171,6 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     }
   }, [useRawJSON]);
 
-  console.warn('FormData:', formData);
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
       {serverConfig?.auth_enabled && (
