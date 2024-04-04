@@ -18,9 +18,11 @@ import typing
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Sequence, Union
 
 from termcolor import colored
+
+from robocorp.action_server._protocols import IBeforeStartCallback
 
 from . import __version__
 from ._errors_action_server import ActionServerValidationError
@@ -332,7 +334,7 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:  # noqa
             "1",
             "true",
         ):
-            print(
+            log.info(
                 "As RC_ACTION_SERVER_FORCE_DOWNLOAD_RCC is set and no arguments were "
                 "passed, rcc will be downloaded."
             )
@@ -347,7 +349,7 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:  # noqa
         ):
             from . import _selftest
 
-            print(
+            log.info(
                 "As RC_ACTION_SERVER_DO_SELFTEST is set and no arguments were passed, "
                 "a selftest will be run."
             )
@@ -360,10 +362,11 @@ def main(args: Optional[list[str]] = None, *, exit=True) -> int:  # noqa
     return retcode
 
 
-def _setup_stdout_logging(log_level):
+def _setup_stderr_logging(log_level):
     from logging import StreamHandler
 
-    stream_handler = StreamHandler()
+    # stderr is the default, but make it explicit.
+    stream_handler = StreamHandler(sys.stderr)
     stream_handler.setLevel(log_level)
     if log_level == logging.DEBUG:
         os.environ["NO_COLOR"] = "true"
@@ -451,6 +454,7 @@ def _main_retcode(
     args: Optional[list[str]],
     is_subcommand: bool = False,
     use_db: Optional["Database"] = None,
+    before_start: Sequence[IBeforeStartCallback] = (),
 ) -> int:
     """
     The main entrypoint that returns the returncode.
@@ -461,6 +465,9 @@ def _main_retcode(
             memory import). In these cases, is_subcommand must be True.
         use_db: If given this in the db used to run the command (otherwise
             one is either created or loaded from the datadir).
+        before_start: If given it's a list of callbacks which should be called
+            before the app is actually started (note that if a callback returns
+            False the startup process will be halted).
 
     Returns: The returncode for the process (0 means all was ok).
     """
@@ -510,6 +517,7 @@ def _main_retcode(
 
     if command == "version":
         print(__version__)
+        sys.stdout.flush()
         return 0
 
     if not is_subcommand:
@@ -520,8 +528,8 @@ def _main_retcode(
         logger = logging.root
         logger.setLevel(log_level)
 
-        # Log to stdout.
-        _setup_stdout_logging(log_level)
+        # Log to stderr.
+        _setup_stderr_logging(log_level)
 
     # if command == "schema":
     # This doesn't work at this point because we have to register the
@@ -552,7 +560,7 @@ def _main_retcode(
         "start",
         "new",
     ):
-        print(f"Unexpected command: {command}.", file=sys.stderr)
+        log.critical(f"Unexpected command: {command}.")
         return 1
 
     log.info(
@@ -572,7 +580,11 @@ def _main_retcode(
     )
     with _basic_setup(migrate_import_or_start_args) as setup_info:
         return _make_import_migrate_or_start(
-            migrate_import_or_start_args, command, setup_info, use_db=use_db
+            migrate_import_or_start_args,
+            command,
+            setup_info,
+            use_db=use_db,
+            before_start=before_start,
         )
 
 
@@ -604,6 +616,7 @@ def _make_import_migrate_or_start(
     command: Literal["import"] | Literal["migrate"] | Literal["start"],
     setup_info: _SetupInfo,
     use_db: Optional["Database"] = None,
+    before_start: Sequence[IBeforeStartCallback] = (),
 ) -> int:
     from robocorp.action_server._settings import is_frozen
 
@@ -620,7 +633,7 @@ def _make_import_migrate_or_start(
         acquired = mutex.get_mutex_aquired()
         if acquired:
             if shown_first_message:
-                print("Exited. Proceeding with action server startup.")
+                log.info("Exited. Proceeding with action server startup.")
             break
 
         msg = mutex.mutex_creation_info or ""
@@ -631,20 +644,19 @@ def _make_import_migrate_or_start(
 
         if not shown_first_message:
             shown_first_message = True
-            print(
+            log.info(
                 f"An action server is already started in this datadir ({settings.datadir}).\n"
                 f"\nInformation on mutex holder:\n"
                 f"{msg}",
             )
 
-        print("Waiting for it to exit...")
+        log.info("Waiting for it to exit...")
         time.sleep(0.3)
 
         timed_out = time.time() > timeout_at
         if timed_out:
-            print(
+            log.critical(
                 "\nAction server not started (timed out waiting for mutex to be released).",
-                file=sys.stderr,
             )
             return 1
 
@@ -681,9 +693,8 @@ def _make_import_migrate_or_start(
 
         if command == "migrate":
             if db_path == ":memory:":
-                print(
+                log.critical(
                     "Cannot do migration of in-memory databases",
-                    file=sys.stderr,
                 )
                 return 1
             if not migrate_db(db_path):
@@ -696,7 +707,7 @@ def _make_import_migrate_or_start(
                 cmdline = "python -m robocorp.action_server"
 
             if not is_new and db_migration_pending(db_path):
-                print(
+                log.critical(
                     f"""It was not possible to start the server because a
 database migration is required to use with this version of the
 Robocorp Action Server.
@@ -781,11 +792,12 @@ To migrate the database to the current version
                         if expose_session
                         else None,
                         whitelist=start_args.whitelist,
+                        before_start=before_start,
                     )
                     return 0
 
             else:
-                print(f"Unexpected command: {command}.", file=sys.stderr)
+                log.critical(f"Unexpected command: {command}.")
                 return 1
     finally:
         mutex.release_mutex()

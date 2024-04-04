@@ -1,3 +1,4 @@
+import typing
 from enum import Enum
 from typing import (
     Any,
@@ -9,6 +10,9 @@ from typing import (
     TypedDict,
     TypeVar,
 )
+
+if typing.TYPE_CHECKING:
+    from fastapi.applications import FastAPI
 
 T = TypeVar("T")
 
@@ -64,6 +68,17 @@ class RCCActionResult(ActionResult[str]):
     ):
         ActionResult.__init__(self, success, message, result)
         self.command_line = command_line
+
+
+class IBeforeStartCallback(Protocol):
+    def __call__(self, app: "FastAPI") -> bool:
+        """
+        Args:
+            app: The (fully-configured) fast api app
+
+        Returns: True if it's ok to continue starting up or
+            False if the startup process should be stopped.
+        """
 
 
 def check_implements(x: T) -> T:
@@ -129,6 +144,11 @@ class ArgumentsNamespacePackageExtract(ArgumentsNamespace):
     package_command: Literal["extract"]
     output_dir: str
     override: bool
+
+
+class ArgumentsNamespacePackageMetadata(ArgumentsNamespace):
+    command: Literal["package"]
+    package_command: Literal["metadata"]
 
 
 class ArgumentsNamespaceMigrateImportOrStart(ArgumentsNamespace):

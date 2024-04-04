@@ -149,7 +149,7 @@ dependencies:
     )
 
     assert (
-        "Flag for package operation not specified."
+        "Command for package operation not specified."
         in robocorp_action_server_run(["package"], returncode=1).stderr
     )
 
