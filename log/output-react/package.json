@@ -48,7 +48,7 @@
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4",
-    "vite": "^4.5.2",
+    "vite": "^4.5.3",
     "vite-plugin-singlefile": "^0.13.5"
   },
   "prettier": "@robocorp/prettier-config-robocorp"
