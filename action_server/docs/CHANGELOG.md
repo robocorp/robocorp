@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 0.2.1 - 2024-04-04
+
+- `action-server package build` no longer includes the `.zip` being created in the 
+  `.zip` itself if it's created in the current directory.
+- `action-server package extract` uses the current dir by default as a target for
+  extraction.
+- A traceback is no longer shown if the user does `Ctrl+C` when waiting for the
+  user input on whether to override or not files in the related 
+  `action-server package` commands.
+- Fixed issue where items could be overridden in the `action-server package` commands
+  even if the user answered `n` to the prompt.
+
+## 0.2.0 - 2024-04-03
+
 - Update package's main README.
 - Improved handling of websockets when used from the builtin UI (not the `--expose` one).
     - Fixed issue where the number of runs shown in the UI would not match the 
@@ -15,6 +29,11 @@
 - Added support for `action-server package build` to create a .zip file with the
   package contents (excluding contents based on the `package.yaml` `packaging/exclude` 
   session).
+- Added support for `action-server package extract` to extract the contents of the
+  package created with `action-server package build`.
+- Added support for `action-server package metadata` to extract metadata from the
+  action package (in the current directory). Currently outputs to stdout 
+  a json containing a map from `openapi.json` to its contents. 
 - Backward-incompatibility: `action-server package update` needs to be used
   instead of `action-server package --update`.
 - Add support parsing Array type in Action Server UI action run view

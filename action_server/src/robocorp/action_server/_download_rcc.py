@@ -49,7 +49,7 @@ def download_rcc(
 
     rcc_url = RCC_URLS[system or platform.system()]
 
-    print(f"Downloading '{rcc_url}' to '{rcc_path}'")
+    log.info(f"Downloading '{rcc_url}' to '{rcc_path}'")
 
     # Cloudflare seems to be blocking "User-Agent: Python-urllib/3.9".
     # Use a different one as that must be sorted out.

@@ -9,6 +9,7 @@ from robocorp.action_server._protocols import (
     ArgumentsNamespacePackage,
     ArgumentsNamespacePackageBuild,
     ArgumentsNamespacePackageExtract,
+    ArgumentsNamespacePackageMetadata,
     ArgumentsNamespacePackageUpdate,
 )
 
@@ -56,7 +57,7 @@ def add_package_command(command_subparser, defaults):
         "--output-dir",
         dest="output_dir",
         help="The output file for saving the action package built file",
-        default=None,
+        default=".",
     )
     build_parser.add_argument(
         "--override",
@@ -90,9 +91,19 @@ def add_package_command(command_subparser, defaults):
         "filename", help="The .zip file that should be extracted"
     )
 
+    ### Metadata
+
+    extract_parser = package_subparsers.add_parser(
+        "metadata",
+        help="Collects metadata from the action package in the current cwd and prints it to stdout",
+    )
+    add_data_args(extract_parser, defaults)
+    add_verbose_args(extract_parser, defaults)
+
 
 def handle_package_command(base_args: ArgumentsNamespace):
     from robocorp.action_server._errors_action_server import ActionServerValidationError
+    from robocorp.action_server.package._ask_user import ask_user_input_to_proceed
     from robocorp.action_server.vendored_deps.termcolors import bold_red
 
     package_args: ArgumentsNamespacePackage = typing.cast(
@@ -100,7 +111,7 @@ def handle_package_command(base_args: ArgumentsNamespace):
     )
     package_command = package_args.package_command
     if not package_command:
-        print("Flag for package operation not specified.", file=sys.stderr)
+        log.critical("Command for package operation not specified.")
         return 1
 
     if package_command == "update":
@@ -157,20 +168,56 @@ def handle_package_command(base_args: ArgumentsNamespace):
         if not package_extract_args.override:
             if os.path.exists(target_dir):
                 if len(os.listdir(target_dir)) > 1:
+                    if os.path.realpath(target_dir) == os.path.realpath("."):
+                        msg = "the current directory is not empty"
+                    else:
+                        msg = f"{target_dir} already exists and is not empty"
+
                     # Check if we should override.
-                    while c := input(
-                        f"It seems that {target_dir} already exists and is not empty. Are you sure you want to extract to it? (y/n)"
-                    ).lower() not in ("y", "n"):
-                        continue
-                    if c == "n":
+                    if not ask_user_input_to_proceed(
+                        f"It seems that {msg}. Are you sure you want to extract to it? (y/n)\n"
+                    ):
                         return 1
-                    # otherwise 'y', keep on going...
 
         import zipfile
+
+        log.debug(f"Extracting {zip_filename} to {target_dir}")
 
         with zipfile.ZipFile(zip_filename, "r") as zip_ref:
             zip_ref.extractall(target_dir)
         return 0
+
+    elif package_command == "metadata":
+        from robocorp.action_server.package._package_metadata import (
+            collect_package_metadata,
+        )
+
+        package_metadata_args: ArgumentsNamespacePackageMetadata = typing.cast(
+            ArgumentsNamespacePackageBuild, base_args
+        )
+
+        # action-server package metadata --datadir=<directory>
+        retcode = 0
+        try:
+            package_metadata_or_returncode: str | int = collect_package_metadata(
+                Path(".").absolute(),
+                datadir=package_metadata_args.datadir,
+            )
+            if isinstance(package_metadata_or_returncode, str):
+                print(package_metadata_or_returncode)
+                sys.stdout.flush()
+            else:
+                assert package_metadata_or_returncode != 0
+                retcode = package_metadata_or_returncode
+
+        except ActionServerValidationError as e:
+            log.critical(
+                bold_red(
+                    f"\nUnable to collect package metadata. Please fix the error below and retry.\n{e}",
+                )
+            )
+            retcode = 1
+        return retcode
 
     log.critical(f"Invalid package command: {package_command}")
     return 1
