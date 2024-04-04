@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- `action-server package build` no longer includes the `.zip` being created in the 
+  `.zip` itself if it's created in the current directory.
+- `action-server package extract` uses the current dir by default as a target for
+  extraction.
+- A traceback is no longer shown if the user does `Ctrl+C` when waiting for the
+  user input on whether to override or not files in the related 
+  `action-server package` commands.
+- Fixed issue where items could be overridden in the `action-server package` commands
+  even if the user answered `n` to the prompt.
+
 ## 0.2.0 - 2024-04-03
 
 - Update package's main README.

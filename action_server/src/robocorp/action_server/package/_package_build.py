@@ -110,6 +110,7 @@ def build_package(
     from robocorp.action_server._models import Action, create_db
     from robocorp.action_server._slugify import slugify
     from robocorp.action_server.cli import _main_retcode
+    from robocorp.action_server.package._ask_user import ask_user_input_to_proceed
 
     from .._errors_action_server import ActionServerValidationError
 
@@ -144,13 +145,10 @@ def build_package(
 
     output_file = Path(output_dir) / target_zip_name
     if not override and output_file.exists():
-        while c := input(
-            f"It seems that {target_zip_name} already exists. Do you want to override it? (y/n)"
-        ).lower() not in ("y", "n"):
-            continue
-        if c == "n":
+        if not ask_user_input_to_proceed(
+            f"It seems that {target_zip_name} already exists. Do you want to override it? (y/n)\n"
+        ):
             return 1
-        # otherwise keep on going...
 
     packaging: dict = {}
 
@@ -222,6 +220,9 @@ def build_package(
         for path, relative_path in _collect_files_excluding_patterns(
             input_dir, exclude_patterns
         ):
+            # Don't add the .zip itself.
+            if os.path.samefile(path, output_file):
+                continue
             zip_file.writestr(relative_path, path.read_bytes())
 
     log.info(f"Created {output_file}")

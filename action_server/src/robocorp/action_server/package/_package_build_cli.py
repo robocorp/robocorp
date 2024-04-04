@@ -57,7 +57,7 @@ def add_package_command(command_subparser, defaults):
         "--output-dir",
         dest="output_dir",
         help="The output file for saving the action package built file",
-        default=None,
+        default=".",
     )
     build_parser.add_argument(
         "--override",
@@ -103,6 +103,7 @@ def add_package_command(command_subparser, defaults):
 
 def handle_package_command(base_args: ArgumentsNamespace):
     from robocorp.action_server._errors_action_server import ActionServerValidationError
+    from robocorp.action_server.package._ask_user import ask_user_input_to_proceed
     from robocorp.action_server.vendored_deps.termcolors import bold_red
 
     package_args: ArgumentsNamespacePackage = typing.cast(
@@ -167,16 +168,20 @@ def handle_package_command(base_args: ArgumentsNamespace):
         if not package_extract_args.override:
             if os.path.exists(target_dir):
                 if len(os.listdir(target_dir)) > 1:
+                    if os.path.realpath(target_dir) == os.path.realpath("."):
+                        msg = "the current directory is not empty"
+                    else:
+                        msg = f"{target_dir} already exists and is not empty"
+
                     # Check if we should override.
-                    while c := input(
-                        f"It seems that {target_dir} already exists and is not empty. Are you sure you want to extract to it? (y/n)"
-                    ).lower() not in ("y", "n"):
-                        continue
-                    if c == "n":
+                    if not ask_user_input_to_proceed(
+                        f"It seems that {msg}. Are you sure you want to extract to it? (y/n)\n"
+                    ):
                         return 1
-                    # otherwise 'y', keep on going...
 
         import zipfile
+
+        log.debug(f"Extracting {zip_filename} to {target_dir}")
 
         with zipfile.ZipFile(zip_filename, "r") as zip_ref:
             zip_ref.extractall(target_dir)
