@@ -2,7 +2,7 @@
 Main module for doing Excel automation.
 
 This library can be made available by pinning
-![`robocorp-excel`](https://img.shields.io/pypi/v/robocorp-excel?label=robocorp-excel)
+[![`robocorp-excel`](https://img.shields.io/pypi/v/robocorp-excel?label=robocorp-excel)](https://pypi.org/project/robocorp-excel/)
 in your dependencies' configuration.
 """
 

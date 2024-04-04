@@ -1,0 +1,8 @@
+# Set the default behavior, in case people don't have `core.autocrlf` set.
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted
+# to native OS line endings on checkout, but committing those with LF in the repo.
+*.py text
+*.js text
+*.md text
