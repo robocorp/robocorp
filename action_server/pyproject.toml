@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-action-server"
-version = "0.2.0"
+version = "0.2.1"
 description = "Robocorp local task server"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",

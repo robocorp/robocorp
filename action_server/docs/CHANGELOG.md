@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.1 - 2024-04-04
+
 - `action-server package build` no longer includes the `.zip` being created in the 
   `.zip` itself if it's created in the current directory.
 - `action-server package extract` uses the current dir by default as a target for
