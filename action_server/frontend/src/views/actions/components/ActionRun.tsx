@@ -1,4 +1,4 @@
-import { FC, FormEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -13,7 +13,7 @@ import {
 import { IconBolt } from '@robocorp/icons/iconic';
 
 import { Action, ActionPackage } from '~/lib/types';
-import { debounce, toKebabCase } from '~/lib/helpers';
+import { toKebabCase } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import {
@@ -73,7 +73,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
 
   const [formData, setFormData] = useState<PropertyFormData[]>([]);
   const [useRawJSON, setUseRawJSON] = useState<boolean>(false);
-  const formRawJSON = useRef<string>('');
+  const [formRawJSON, setFormRawJSON] = useState<string>('');
   const [errorJSON, setErrorJSON] = useState<string>();
 
   const handleInputChange = useCallback((value: PropertyFormDataType, index: number) => {
@@ -130,11 +130,24 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       runAction({
         actionPackageName: toKebabCase(actionPackage.name),
         actionName: toKebabCase(action.name),
-        args: useRawJSON ? JSON.parse(formRawJSON.current) : formDataToPayload(formData),
+        args: useRawJSON ? JSON.parse(formRawJSON) : formDataToPayload(formData),
         apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
       });
     },
-    [action, actionPackage, formData, apiKey, serverConfig, useRawJSON, formRawJSON.current],
+    [action, actionPackage, formData, apiKey, serverConfig, useRawJSON, formRawJSON],
+  );
+
+  const onCodeChange = useCallback(
+    (value: string) => {
+      setFormRawJSON(value);
+      try {
+        JSON.parse(value) as Payload;
+        setErrorJSON(undefined);
+      } catch (_) {
+        setErrorJSON('Error while parsing JSON. Please review value and try again');
+      }
+    },
+    [setFormRawJSON, setErrorJSON],
   );
 
   useEffect(() => {
@@ -143,11 +156,11 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
 
   useEffect(() => {
     if (formData.length === 0) {
-      formRawJSON.current = 'No input data...';
+      setFormRawJSON('No input data...');
       return;
     }
     const payload = formDataToPayload(formData);
-    formRawJSON.current = JSON.stringify(payload, null, 4);
+    setFormRawJSON(JSON.stringify(payload, null, 4));
   }, [formData]);
 
   return (
@@ -167,22 +180,11 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           key="form-raw-json-input"
           lang="json"
           aria-label="Run JSON input"
-          value={formRawJSON.current}
-          onChange={(e) => {
-            formRawJSON.current = e;
-            try {
-              // debounce(() => setFormRawJSON(e), 750)();
-              JSON.parse(e) as Payload;
-              debounce(() => setErrorJSON(''), 750)();
-            } catch (_) {
-              debounce(
-                () => setErrorJSON('Error while parsing JSON. Please review value and try again'),
-                750,
-              )();
-            }
-          }}
+          value={formRawJSON}
+          onChange={onCodeChange}
           error={errorJSON}
           readOnly={false}
+          lineNumbers
           autoFocus
         />
       ) : (
@@ -273,14 +275,14 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           })}
         </Form.Fieldset>
       )}
-      <Button.Group align="right" marginBottom={16} justifyContent="space-between">
+      <Button.Group align="right" marginBottom={isSuccess ? 16 : 32} justifyContent="space-between">
         <Button
           loading={isPending}
           type="submit"
           variant="primary"
           icon={IconBolt}
           style={{ width: '160px' }}
-          disabled={errorJSON !== ''}
+          disabled={errorJSON !== undefined}
         >
           {isPending ? 'Executing...' : 'Execute Action'}
         </Button>
