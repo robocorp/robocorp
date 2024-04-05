@@ -7,7 +7,6 @@ from typing import Optional
 import invoke
 from invoke import call, task
 
-
 ROOT: Path = Path(__file__).absolute().parent
 
 DOCS_IGNORE = ["devutils"]
@@ -95,6 +94,22 @@ def unreleased(ctx: invoke.Context) -> None:
         raise invoke.Exit(code=1)
 
 
+@task
+def lock(ctx: invoke.Context, skip: Optional[list[str]] = None) -> None:
+    """Make lock for all Poetry-based projects' environments.
+
+    Args:
+        skip: List of project directories to skip.
+    """
+    for project_dir in _iter_project_dirs():
+        project_name = project_dir.name
+        if skip and project_name in skip:
+            print(f"Skipping project {project_name!r}.")
+            continue
+
+        subprocess.check_call(["poetry", "lock"], cwd=project_dir)
+
+
 def _iter_project_dirs():
     for path in ROOT.iterdir():
         if path.is_dir():
@@ -105,6 +120,7 @@ def _iter_project_dirs():
 def _pypi_version(name: str) -> str:
     import json
     import urllib.request
+
     import semver
 
     with urllib.request.urlopen(f"https://pypi.org/pypi/{name}/json") as response:

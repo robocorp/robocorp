@@ -28,3 +28,6 @@ profile = "black"
 
 [tool.mypy]
 mypy_path = "src:tests"
+
+[tool.lazydocs]
+validate = "true"

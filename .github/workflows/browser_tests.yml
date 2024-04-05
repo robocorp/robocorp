@@ -117,3 +117,10 @@ jobs:
         inv docs --check
 
         '
+    - name: '`inv docs --validate`'
+      if: always()
+      run: '
+
+        inv docs --validate
+
+        '

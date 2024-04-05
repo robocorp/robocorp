@@ -99,7 +99,7 @@ If a new page is required without closing the current page use:
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L109)
 
 ```python
-page(ceva='true') → Page
+page() → Page
 ```
 
 ______________________________________________________________________
