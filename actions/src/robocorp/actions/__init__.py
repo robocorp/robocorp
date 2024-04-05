@@ -6,6 +6,7 @@ from ._action_options import ActionOptions
 from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
 from ._request import Request
+from ._secret import Secret
 
 __version__ = "0.1.3"
 version_info = [int(x) for x in __version__.split(".")]
@@ -126,6 +127,7 @@ def get_current_action() -> Optional[IAction]:
 __all__ = [
     "IAction",
     "Request",
+    "Secret",
     "Status",
     "action",
     "action_cache",

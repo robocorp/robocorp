@@ -5,8 +5,10 @@ import sys
 import typing
 from pathlib import Path
 
+from robocorp.actions._protocols import ActionsListActionTypedDict
 from termcolor import colored
 
+from robocorp.action_server._robo_utils.callback import Callback, OnExitContextManager
 from robocorp.action_server.vendored_deps.action_package_handling.cli_errors import (
     ActionPackageError,
 )
@@ -16,6 +18,34 @@ if typing.TYPE_CHECKING:
     from robocorp.action_server._models import ActionPackage
 
 log = logging.getLogger(__name__)
+
+
+class IHookOnActionsListCallback(typing.Protocol):
+    def __call__(
+        self,
+        action_package: "ActionPackage",
+        actions_list_result: list[ActionsListActionTypedDict],
+    ):
+        ...
+
+
+class IHookOnActionsList(typing.Protocol):
+    def register(
+        self,
+        callback: IHookOnActionsListCallback,
+    ) -> OnExitContextManager:
+        ...
+
+    def __call__(
+        self,
+        action_package: "ActionPackage",
+        actions_list_result: list[ActionsListActionTypedDict],
+    ):
+        ...
+
+
+# Called as: hook_on_actions_list(action_package, actions_list_result)
+hook_on_actions_list: IHookOnActionsList = Callback(raise_exceptions=True)
 
 
 def _log_deprecated_conda():
@@ -289,6 +319,7 @@ def _add_actions_to_db(
     from dataclasses import asdict
 
     from robocorp.actions._lint_action import format_lint_results
+    from robocorp.actions._protocols import ActionsListActionTypedDict
 
     from robocorp.action_server._errors_action_server import ActionServerValidationError
     from robocorp.action_server._gen_ids import gen_uuid
@@ -345,14 +376,24 @@ def _add_actions_to_db(
         log.critical(bold_yellow(f"{decoded_stderr}\n"))
 
     try:
-        loaded = json.loads(stdout)
+        actions_list_result = json.loads(stdout)
     except json.JSONDecodeError:
         raise RuntimeError(
             f"It was not possible to load as json the contents >>{stdout!r}<<"
         )
     else:
+        if not isinstance(actions_list_result, list):
+            raise RuntimeError(
+                f"Expected robocorp.actions list to provide a list. Found: >>{stdout!r}<<"
+            )
+
+        hook_on_actions_list(
+            action_package,
+            typing.cast(list[ActionsListActionTypedDict], actions_list_result),
+        )
+
         actions = []
-        for action_fields in loaded:
+        for action_fields in actions_list_result:
             action_name = action_fields["name"]
             if whitelist:
                 if not accept_action(whitelist, action_package.name, action_name):

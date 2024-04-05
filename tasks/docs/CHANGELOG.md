@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `python -m robocorp.tasks list` now has information on the managed parameters
+  (`managed_params_schema`, which is a dict from parameter name to parameter
+   information is given for each task).
+   
 ## 3.0.3 - 2024-04-09
 
 - Properly added `packaging` as a dependency in production (not just dev-dependency).

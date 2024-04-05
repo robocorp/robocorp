@@ -108,6 +108,20 @@ class Task:
         return properties
 
     @property
+    def managed_params_schema(self) -> dict[str, Any]:
+        from robocorp.tasks._commands import _get_managed_param_type, _is_managed_param
+
+        managed_params_schema: Dict[str, Any] = {}
+        sig = inspect.signature(self.method)
+        for param in sig.parameters.values():
+            if _is_managed_param(self._pm, param.name, param=param):
+                tp = _get_managed_param_type(self._pm, param).__name__
+
+                managed_params_schema[param.name] = {"type": tp}
+
+        return managed_params_schema
+
+    @property
     def input_schema(self) -> dict[str, Any]:
         import docstring_parser
 
@@ -135,7 +149,7 @@ class Task:
         }
 
         for param in sig.parameters.values():
-            if _is_managed_param(self._pm, param.name):
+            if _is_managed_param(self._pm, param.name, param=param):
                 continue
             param_type = type_hints.get(param.name)
             description = param_name_to_description.get(param.name, "")

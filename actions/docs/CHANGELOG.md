@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- `python -m robocorp.actions list` now has information on the managed parameters
+  (`managed_params_schema`, which is a dict from parameter name to parameter
+   information is given for each task).
+- Parameters in `@action` typed as `robocorp.actions.Secret` will now be considered
+  managed parameters (the client must to provide the secret information when
+  running the action).
+
 ## 0.1.3 - 2024-04-09
 
 - Update **robocorp-tasks** dependency to `3.0.3`.

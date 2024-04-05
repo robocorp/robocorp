@@ -4,6 +4,7 @@
     properties: {}
     type: object
   line: 4
+  managed_params_schema: {}
   name: task_on_my_task
   options: null
   output_schema:

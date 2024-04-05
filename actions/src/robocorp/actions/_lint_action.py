@@ -264,7 +264,7 @@ def _check_docstring_contents(
     if arguments.args:
         for arg in arguments.args:
             desc = param_name_to_description.pop(arg.arg, None)
-            if pm is not None and _is_managed_param(pm, arg.arg):
+            if pm is not None and _is_managed_param(pm, arg.arg, node=node):
                 continue
 
             if not desc:

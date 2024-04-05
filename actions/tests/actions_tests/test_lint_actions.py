@@ -103,3 +103,29 @@ def test_lint_action_integrated(datadir, data_regression):
             new_dict[k] = v
 
     data_regression.check(new_dict)
+
+
+def test_lint_action_secret(data_regression):
+    from robocorp.tasks._customization._extension_points import EPManagedParameters
+    from robocorp.tasks._customization._plugin_manager import PluginManager
+
+    from robocorp.actions._lint_action import iter_lint_errors
+    from robocorp.actions._managed_parameters import ManagedParameters
+
+    contents = """
+from robocorp.actions import Secret
+from robocorp import actions
+
+@action
+def my_action(my_password: Secret, another: actions.Secret) -> str:
+    '''
+    This is an action.
+    '''
+    return ''
+"""
+
+    pm = PluginManager()
+    pm.set_instance(EPManagedParameters, ManagedParameters({}))
+    data_regression.check(
+        [x.to_lsp_diagnostic() for x in iter_lint_errors(contents, pm=pm)]
+    )

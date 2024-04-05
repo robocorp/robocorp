@@ -4,6 +4,7 @@
     properties: {}
     type: object
   line: 10
+  managed_params_schema: {}
   name: main
   options: null
   output_schema:
@@ -15,6 +16,7 @@
     properties: {}
     type: object
   line: 22
+  managed_params_schema: {}
   name: main_errors
   options: null
   output_schema:
@@ -37,6 +39,7 @@
     - multiplier
     type: object
   line: 27
+  managed_params_schema: {}
   name: task_with_args
   options: null
   output_schema:
@@ -48,6 +51,7 @@
     properties: {}
     type: object
   line: 8
+  managed_params_schema: {}
   name: sub
   options: null
   output_schema:

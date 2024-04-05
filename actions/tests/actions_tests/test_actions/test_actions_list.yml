@@ -4,6 +4,7 @@
     properties: {}
     type: object
   line: 19
+  managed_params_schema: {}
   name: broken_task
   options:
     is_consequential: null
@@ -28,6 +29,7 @@
     - v2
     type: object
   line: 4
+  managed_params_schema: {}
   name: calculator_sum
   options:
     is_consequential: null
@@ -53,6 +55,7 @@
     - name
     type: object
   line: 34
+  managed_params_schema: {}
   name: greet
   options:
     is_consequential: null

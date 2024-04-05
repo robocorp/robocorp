@@ -7,9 +7,10 @@ import time
 import traceback
 import typing
 from argparse import ArgumentParser, ArgumentTypeError
+from ast import FunctionDef
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Sequence, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Union, overload
 
 from robocorp.tasks._customization._extension_points import EPManagedParameters
 from robocorp.tasks._protocols import ITask
@@ -48,6 +49,7 @@ def list_tasks(
     from contextlib import redirect_stdout
 
     from robocorp.tasks._collect_tasks import collect_tasks
+    from robocorp.tasks._protocols import TasksListTaskTypedDict
     from robocorp.tasks._task import Context
 
     p = Path(path)
@@ -67,19 +69,19 @@ def list_tasks(
 
     with redirect_stdout(sys.stderr):
         task: ITask
-        tasks_found = []
+        tasks_found: List[TasksListTaskTypedDict] = []
         for task in collect_tasks(pm, p, glob=glob):
-            tasks_found.append(
-                {
-                    "name": task.name,
-                    "line": task.lineno,
-                    "file": task.filename,
-                    "docs": getattr(task.method, "__doc__") or "",
-                    "input_schema": task.input_schema,
-                    "output_schema": task.output_schema,
-                    "options": task.options,
-                }
-            )
+            entry: TasksListTaskTypedDict = {
+                "name": task.name,
+                "line": task.lineno,
+                "file": task.filename,
+                "docs": getattr(task.method, "__doc__") or "",
+                "input_schema": task.input_schema,
+                "output_schema": task.output_schema,
+                "managed_params_schema": task.managed_params_schema,
+                "options": task.options,
+            }
+            tasks_found.append(entry)
 
         write_to.write(json.dumps(tasks_found))
         write_to.flush()
@@ -588,11 +590,11 @@ def _validate_and_convert_kwargs(
     for param_name, param in sig.parameters.items():
         param_type = type_hints.get(param_name)
 
-        is_managed_param = _is_managed_param(pm, param.name)
+        is_managed_param = _is_managed_param(pm, param.name, param=param)
         if param_type is None:
             # If not given, default to `str`.
             if is_managed_param:
-                param_type = _get_managed_param_type(pm, param.name)
+                param_type = _get_managed_param_type(pm, param)
             else:
                 param_type = str
 
@@ -635,7 +637,7 @@ def _validate_and_convert_kwargs(
 
             new_kwargs[param_name] = passed_value
 
-    new_kwargs = _inject_managed_params(pm, sig, new_kwargs)
+    new_kwargs = _inject_managed_params(pm, sig, new_kwargs, kwargs)
     error_message = ""
     try:
         sig.bind(**new_kwargs)
@@ -648,25 +650,84 @@ def _validate_and_convert_kwargs(
 
 
 def _inject_managed_params(
-    pm: PluginManager, sig: inspect.Signature, kwargs: Dict[str, Any]
+    pm: PluginManager,
+    sig: inspect.Signature,
+    new_kwargs: Dict[str, Any],
+    original_kwargs: Dict[str, Any],
 ) -> Dict[str, Any]:
     if pm.has_instance(EPManagedParameters):
         ep_managed_parameters = pm.get_instance(EPManagedParameters)
-        return ep_managed_parameters.inject_managed_params(sig, kwargs)
-    return kwargs
+        return ep_managed_parameters.inject_managed_params(
+            sig, new_kwargs, original_kwargs
+        )
+    return new_kwargs
 
 
-def _is_managed_param(pm: PluginManager, param_name: str) -> bool:
+@overload
+def _is_managed_param(
+    pm: PluginManager,
+    param_name: str,
+    *,
+    node: FunctionDef,
+) -> bool:
+    pass
+
+
+@overload
+def _is_managed_param(
+    pm: PluginManager,
+    param_name: str,
+    *,
+    param: inspect.Parameter,
+) -> bool:
+    pass
+
+
+def _is_managed_param(
+    pm: PluginManager,
+    param_name: str,
+    *,
+    node: Optional[FunctionDef] = None,
+    param: Optional[inspect.Parameter] = None,
+) -> bool:
+    """
+    Verified if the given parameter is a managed parameter.
+
+    Args:
+        pm: The plugin manager.
+        param_name: The name of the parameter to check.
+        node: The FunctionDef node (ast), should be passed when doing lint
+            analysis.
+        param: The actual introspected parameter of the function, should
+            be passed when actually calling the function.
+
+    Returns: True if the given parameter is managed and False otherwise.
+
+    Note: either node or param must be passed (but not both at the same time).
+    """
+    if node is None and param is None:
+        raise AssertionError("Either node or param must be passed.")
+
+    if node is not None and param is not None:
+        raise AssertionError(
+            "Either the node or param must be passed, but not both at the same time."
+        )
+
     if pm.has_instance(EPManagedParameters):
         ep_managed_parameters = pm.get_instance(EPManagedParameters)
-        return ep_managed_parameters.is_managed_param(param_name)
+        if node is not None:
+            return ep_managed_parameters.is_managed_param(param_name, node=node)
+        elif param is not None:
+            return ep_managed_parameters.is_managed_param(param_name, param=param)
+        else:
+            raise AssertionError("Not expected to get here.")
     return False
 
 
-def _get_managed_param_type(pm: PluginManager, param_name: str) -> type:
+def _get_managed_param_type(pm: PluginManager, param: inspect.Parameter) -> type:
     if pm.has_instance(EPManagedParameters):
         ep_managed_parameters = pm.get_instance(EPManagedParameters)
-        managed_param_type = ep_managed_parameters.get_managed_param_type(param_name)
+        managed_param_type = ep_managed_parameters.get_managed_param_type(param)
         assert managed_param_type is not None
         return managed_param_type
     raise RuntimeError(
@@ -695,7 +756,7 @@ def _normalize_arguments(
 
     # Add arguments to the parser based on the function signature and type hints
     for param_name, param in sig.parameters.items():
-        if _is_managed_param(pm, param.name):
+        if _is_managed_param(pm, param.name, param=param):
             continue
 
         param_type = type_hints.get(param_name)

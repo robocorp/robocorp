@@ -261,11 +261,61 @@ Returns true if the task failed. (in which case usually exc_info is not None).
 
 - `input_schema`
 
+The input schema from the function signature.
+
+**Example:**
+
+```
+{
+    "properties": {
+        "value": {
+            "type": "integer",
+            "description": "Some value.",
+            "title": "Value",
+            "default": 0
+        }
+    },
+    "type": "object"
+}
+```
+
 - `lineno`
+
+The line where the task is declared.
+
+- `managed_params_schema`
+
+The schema for the managed parameters.
+
+**Example:**
+
+```
+{
+    "my_password": {
+        "type": "Secret"
+    },
+    "request": {
+        "type": "Request"
+    }
+}
+```
 
 - `name`
 
+The name of the task.
+
 - `output_schema`
+
+The output schema based on the function signature.
+
+**Example:**
+
+```
+{
+    "type": "string",
+    "description": ""
+}
+```
 
 ## Methods
 
@@ -273,7 +323,9 @@ ______________________________________________________________________
 
 ### `run`
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L82)
+Runs the task and returns its result.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_protocols.py#L137)
 
 ```python
 run() → Any

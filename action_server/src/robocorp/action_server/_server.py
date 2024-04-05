@@ -24,6 +24,10 @@ def _name_to_url(name):
     return slugify(name.replace("_", "-"))
 
 
+def build_url_api_run(action_package_name: str, action_name: str) -> str:
+    return f"/api/actions/{_name_to_url(action_package_name)}/{_name_to_url(action_name)}/run"
+
+
 def get_action_description_from_docs(docs: str) -> str:
     import docstring_parser
 
@@ -138,7 +142,7 @@ def start_server(
             openapi_extra["x-openai-isConsequential"] = action.is_consequential
 
         app.add_api_route(
-            f"/api/actions/{_name_to_url(action_package.name)}/{_name_to_url(action.name)}/run",
+            build_url_api_run(action_package.name, action.name),
             func,
             name=action.name,
             summary=_name_as_summary(action.name),
