@@ -106,7 +106,7 @@ def configure_context(**kwargs) -> None:
     browser_context_kwargs.update(kwargs)
 
 
-def page(ceva="true") -> Page:
+def page() -> Page:
     """Provides a managed instance of the browser page to interact with.
 
     Example:
