@@ -34,6 +34,7 @@ class BaseTests:
     require_node = False
     require_log_built = False
     require_build_frontend = False
+    validate_docstrings = False
     before_run_custom_additional_steps = ()
     after_run_custom_additional_steps = ()
 
@@ -235,6 +236,14 @@ inv docs --check
 """,
         }
 
+        run_docstrings_validation = {
+            "name": "`inv docs --validate`",
+            "if": "always()",
+            "run": """
+inv docs --validate
+""",
+        }
+
         steps = [
             checkout_repo,
             install_poetry,
@@ -255,6 +264,10 @@ inv docs --check
         steps.extend(self.before_run_custom_additional_steps)
 
         steps.extend([self.run_tests, run_lint, run_typecheck, run_docs])
+
+        if self.validate_docstrings:
+            steps.append(run_docstrings_validation)
+
         steps.extend(self.after_run_custom_additional_steps)
         return steps
 
@@ -292,6 +305,7 @@ class BrowserTests(BaseTests):
     project_name = "browser"
     require_node = True
     require_log_built = True
+    validate_docstrings = True
 
 
 class ExcelTests(BaseTests):

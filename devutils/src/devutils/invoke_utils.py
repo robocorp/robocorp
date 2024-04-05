@@ -374,8 +374,20 @@ def build_common_tasks(
         poetry(ctx, "publish")
 
     @task
-    def docs(ctx, check: bool = False):
+    def docs(ctx, check: bool = False, validate: bool = False):
         """Build API documentation"""
+        if validate:
+            poetry(
+                ctx,
+                "run lazydocs",
+                "--validate",
+                "--no-watermark",
+                "--remove-package-prefix",
+                f"--src-base-url {REPOSITORY_URL}",
+                package_name,
+            )
+            return
+
         output_path = root / "docs" / "api"
         if not output_path.exists():
             print("Docs output path does not exist. Skipping...")
