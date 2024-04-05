@@ -1,6 +1,7 @@
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -10,7 +11,7 @@ from datetime import datetime
 from functools import lru_cache
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 from invoke import task
 
@@ -277,14 +278,54 @@ def build_common_tasks(
             for roundtrip in roundtrips:
                 roundtrip.restore()
 
+    def _collect_docs_to_lint() -> List[Union[str, Path]]:
+        # Collects Markdown documents paths to be passed to the Markdown lint tool.
+        # FIXME(cmin764; 3 Apr 2024): Improve this into a dynamic path list by keeping
+        #  only the *.md files not containing the linting-ignore HTML comment tag as
+        #  observed with the generated API ones.
+        docs_path = Path("docs")
+        static_paths = [
+            "README.md",
+            docs_path / "guides",
+            docs_path / "CHANGELOG.md",
+        ]
+        # Required since the Markdown lint tool doesn't currently have a way to
+        #  configure directories/files to exclude.
+        # See GH Issue: https://github.com/markdownlint/markdownlint/issues/368
+        return static_paths
+
     @task
     def lint(ctx, strict: bool = False):
-        """Run static analysis and formatting checks"""
+        """Run static analysis and formatting checks.
+
+        Currently, it runs the following in this order:
+            - Ruff basic checks, then the formatting ones
+            - isort for sorting the imports
+            - Optionally Pylint if enabled through the `strict` switch
+            - Markdown lint if available in the system
+
+        Args:
+            strict: Whether to enable the more strict Pylint as well.
+        """
         poetry(ctx, f"run ruff {TARGETS}")
         poetry(ctx, f"run ruff format --check {RUFF_ARGS} {TARGETS}")
         poetry(ctx, f"run isort --check {TARGETS}")
         if strict:
             poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
+
+        # NOTE(cmin764): Markdown lint can be installed as a gem with Ruby.
+        #  Instructions on GitHub page: https://github.com/markdownlint/markdownlint
+        resolved_path = shutil.which("mdl")
+        if resolved_path:
+            print("Running Markdown lint over the hand-written docs...")
+            docs_paths = " ".join(map(str, _collect_docs_to_lint()))
+            cmd = f"{resolved_path} --config {ROOT / '.mdlrc'} {docs_paths}"
+            subprocess.check_call(shlex.split(cmd))
+        else:
+            print(
+                "Markdown lint wasn't found in PATH, consider installing and adding it"
+                " in order to be able to lint package's *.md documents."
+            )
 
     @task
     def typecheck(ctx, strict: bool = False):

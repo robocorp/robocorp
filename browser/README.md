@@ -25,12 +25,12 @@ def automate_browser():
         # If this function finishes with an exception, it will make a screenshot and
         #  embed it into the logs.
         screenshot="only-on-failure",
-        
+
         # By default, `headless` is False, unless running in a Linux container
         #  without a DISPLAY/WAYLAND_DISPLAY environment variable, but it
         #  can also be manually overridden.
         headless=True,  # won't display the browser window
-        
+
         # Interactions may be run in slow motion (given in milliseconds).
         slowmo=100,
     )
