@@ -377,15 +377,7 @@ def build_common_tasks(
     def docs(ctx, check: bool = False, validate: bool = False):
         """Build API documentation"""
         if validate:
-            poetry(
-                ctx,
-                "run lazydocs",
-                "--validate",
-                "--no-watermark",
-                "--remove-package-prefix",
-                f"--src-base-url {REPOSITORY_URL}",
-                package_name,
-            )
+            poetry(ctx, "run lazydocs", "--validate", package_name)
             return
 
         output_path = root / "docs" / "api"
