@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-storage"
-version = "1.0.3"
+version = "1.0.4"
 description = "Robocorp Asset Storage library"
 authors = [
 	"Cosmin P. <cosmin@robocorp.com>",

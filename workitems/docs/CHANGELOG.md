@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.5 - 2024-04-08
+
 - Update package's main README.
 
 ## 1.4.4 - 2024-03-19
