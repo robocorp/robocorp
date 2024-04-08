@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-windows"
-version = "1.0.2"
+version = "1.0.3"
 description = "Robocorp Windows Automation (API to automate Windows)"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",

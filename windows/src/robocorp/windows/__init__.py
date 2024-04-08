@@ -29,7 +29,7 @@ from .protocols import Locator
 if typing.TYPE_CHECKING:
     from PIL.Image import Image
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 version_info = [int(x) for x in __version__.split(".")]
 
 

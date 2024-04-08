@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.2 - 2024-04-08
+
 - Update package's main README.
 
 ## 2.9.1 - 2024-03-11

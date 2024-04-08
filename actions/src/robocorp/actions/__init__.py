@@ -7,7 +7,7 @@ from ._fixtures import setup, teardown
 from ._protocols import IAction, Status
 from ._request import Request
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 version_info = [int(x) for x in __version__.split(".")]
 
 

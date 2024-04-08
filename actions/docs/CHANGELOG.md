@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.1.2 - 2024-04-08
+
+- Alignment with **robocorp-tasks** `3.0.2`.
+
 ## 0.1.1 - 2024-04-08
 
 - Update package's main README.
