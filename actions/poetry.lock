@@ -844,13 +844,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.9.1"
+version = "2.9.2"
 description = "Automatic trace logging for Python"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_log-2.9.1-py3-none-any.whl", hash = "sha256:62a9a5946cac126116fbddd8d77da0c951c9098eaf42f3f85fd0057193db923f"},
-    {file = "robocorp_log-2.9.1.tar.gz", hash = "sha256:b01e4832f9a8f0afb592ba6cd85ee6e83af02224e8a33827389ab0143d8a1ff5"},
+    {file = "robocorp_log-2.9.2-py3-none-any.whl", hash = "sha256:e4efdf9a7fc8f949be3fafc24016943a7449e113fc30ca40807ab9b0e54dba68"},
+    {file = "robocorp_log-2.9.2.tar.gz", hash = "sha256:8917057b2eb5fc6713ff4aa255b43cce809bdc6a59ab637630b8444fe4bba0a6"},
 ]
 
 [package.dependencies]
@@ -859,17 +859,18 @@ tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "robocorp-tasks"
-version = "3.0.2"
+version = "3.0.3"
 description = "The automation framework for Python"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_tasks-3.0.2-py3-none-any.whl", hash = "sha256:c66ef6688a9f4599838aaa9138fed83e45cc5a6c9d8a8a9d04c144ecf1ad92b5"},
-    {file = "robocorp_tasks-3.0.2.tar.gz", hash = "sha256:edee961a8e6183088079c5f5c75de25dec5c4d1592b21632f72336268e2bebfe"},
+    {file = "robocorp_tasks-3.0.3-py3-none-any.whl", hash = "sha256:082bbb5d0546e8cc1979a6dc84d6394c01fe9e46596c4c991296238d3fa11dd8"},
+    {file = "robocorp_tasks-3.0.3.tar.gz", hash = "sha256:7a7fe2d58d762bfbd9e41052da70bf53920ef9f55d3f8ed6f2d18af7de40a635"},
 ]
 
 [package.dependencies]
 docstring_parser_fork = ">=0.0.5,<0.0.6"
+packaging = ">=24.0,<25.0"
 psutil = ">=5.0,<6.0"
 robocorp-log = ">=2.4,<3"
 
@@ -967,13 +968,13 @@ files = [
 
 [[package]]
 name = "typer"
-version = "0.12.1"
+version = "0.12.2"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typer-0.12.1-py3-none-any.whl", hash = "sha256:43ebb23c8a358c3d623e31064359a65f50229d0bf73ae8dfd203f49d9126ae06"},
-    {file = "typer-0.12.1.tar.gz", hash = "sha256:72d218ef3c686aed9c6ff3ca25b238aee0474a1628b29c559b18b634cfdeca88"},
+    {file = "typer-0.12.2-py3-none-any.whl", hash = "sha256:e1accbaa7e2b2350753acec896ac30493ac573211a8d4603e88f8356217e01f7"},
+    {file = "typer-0.12.2.tar.gz", hash = "sha256:977929604fde12aeada011852ad9c64370501be6ac2eac248f3161cdc9eeb7c9"},
 ]
 
 [package.dependencies]
@@ -1115,4 +1116,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "41ce60430559a0a18523e4871192158e616f18236e594418ee88c7334a403003"
+content-hash = "93ba1e167f0d52e58d70d90aeb4fd528711376a19a67de7707d1827d7c9e908e"

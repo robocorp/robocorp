@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update **robocorp-tasks** dependency to `3.0.3`.
+
 ## 0.1.2 - 2024-04-08
 
 - Alignment with **robocorp-tasks** `3.0.2`.
