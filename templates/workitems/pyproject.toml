@@ -1,8 +1,0 @@
-[tool.robo]
-name = "Work Items"
-description = "Example of using work items in Control Room"
-python = "3.10.12"
-
-[tool.robo.dependencies]
-robocorp="1.0.1"
-robocorp-excel="0.4.0"
