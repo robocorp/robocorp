@@ -325,25 +325,21 @@ def my_action(password: Secret):
     login(password.value)
 ```
 
-### `__init__`
-
-**Args:**
-
-- <b>`value`</b>:  The secret value to be wrapped in this class (note that it's automatically hidden in the logs).
-
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L19)
-
-```python
-__init__(value: str)
-```
-
 ## Properties
 
 - `value`
 
-Provides the actual secret wrapped in this class.
-
 ## Methods
+
+______________________________________________________________________
+
+### `from_action_context`
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L38)
+
+```python
+from_action_context(value: 'ActionContext', path: str) → Secret
+```
 
 ______________________________________________________________________
 
@@ -357,7 +353,7 @@ Creates a secret given a string (expected when the user is passing the arguments
 
 Return: A Secret instance with the given value.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L38)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L25)
 
 ```python
 model_validate(value: str) → Secret

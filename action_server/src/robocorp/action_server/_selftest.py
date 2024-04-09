@@ -83,6 +83,7 @@ class ActionServerProcess:
         reuse_processes: bool = False,
         lint: bool = False,
         additional_args: Optional[list[str]] = None,
+        env: Optional[Dict[str, str]] = None,
     ) -> None:
         from robocorp.action_server._robo_utils.process import Process
         from robocorp.action_server._settings import is_frozen
@@ -124,10 +125,12 @@ class ActionServerProcess:
         if additional_args:
             new_args = new_args + additional_args
 
-        env = {}
+        use_env: Dict[str, str] = {}
         if add_shutdown_api:
-            env["RC_ADD_SHUTDOWN_API"] = "1"
-        process = self._process = Process(new_args, cwd=cwd, env=env)
+            use_env["RC_ADD_SHUTDOWN_API"] = "1"
+        if env:
+            use_env.update(env)
+        process = self._process = Process(new_args, cwd=cwd, env=use_env)
 
         compiled = re.compile(r"Local Action Server: http://([\w.-]+):(\d+)")
         future: Future[Tuple[str, str]] = Future()

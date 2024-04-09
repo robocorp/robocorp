@@ -74,11 +74,16 @@ class ManagedParameters:
         new_kwargs: Dict[str, Any],
         original_kwargs: Dict[str, Any],
     ) -> Dict[str, Any]:
+        from robocorp.actions._action_context import ActionContext
         from robocorp.actions._secret import Secret
 
         use_kwargs = new_kwargs.copy()
 
-        request = self._param_name_to_instance.get("request")
+        request = new_kwargs.get("request")
+        if request is None:
+            request = self._param_name_to_instance.get("request")
+
+        x_action_context = ActionContext.from_request(request)
 
         for param in sig.parameters.values():
             if (
@@ -90,28 +95,16 @@ class ManagedParameters:
             elif param.annotation and issubclass(param.annotation, Secret):
                 # Handle a secret
                 secret_value = original_kwargs.get(param.name)
+
                 if secret_value is not None:
                     # Gotten directly from the input.json (or command line)
                     # as a value in the root.
-                    value = secret_value
-                elif request is not None:
-                    # Gotten from the request headers.
-                    request_in_params = original_kwargs.get("request")
-                    value = None
-                    secret_header_name = _get_secret_header_name(param.name)
+                    use_kwargs[param.name] = Secret.model_validate(secret_value)
 
-                    if request_in_params is not None:
-                        json_input_headers = request_in_params.get("headers")
-                        if isinstance(json_input_headers, dict):
-                            value = json_input_headers.get(secret_header_name)
-
-                    if value is None:
-                        # If not passed in the original args (i.e.: input.json),
-                        # get it from the managed request.
-                        value = request.headers.get(secret_header_name)
-
-                if value is not None:
-                    use_kwargs[param.name] = Secret(value)
+                elif x_action_context is not None:
+                    use_kwargs[param.name] = Secret.from_action_context(
+                        x_action_context, f"secrets/{param.name}"
+                    )
 
         return use_kwargs
 

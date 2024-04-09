@@ -1,3 +1,4 @@
+import base64
 import json
 from pathlib import Path
 
@@ -48,7 +49,15 @@ def test_actions_secret_run_with_request(datadir: Path):
     # Specifies the request in the json input.
     json_output = datadir / "json.output"
     json_input_contents = {
-        "request": {"headers": {"x-secret-my-password": "this-is-the-secret"}},
+        "request": {
+            "headers": {
+                "x-action-context": base64.b64encode(
+                    json.dumps(
+                        {"secrets": {"my_password": "this-is-the-secret"}}
+                    ).encode("utf-8")
+                ).decode("ascii")
+            }
+        },
     }
 
     input_json = datadir / "json.input"

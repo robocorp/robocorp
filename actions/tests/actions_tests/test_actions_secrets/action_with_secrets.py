@@ -24,6 +24,5 @@ def action_with_secret_and_request(
     Args:
         value: Some value.
     """
-    assert request.headers["x-secret-my-password"] == "this-is-the-secret"
     Path("json.output").write_text(my_password.value)
     return my_password.value

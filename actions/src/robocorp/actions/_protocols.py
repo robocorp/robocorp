@@ -1,5 +1,5 @@
 import typing
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Sequence, TypeAlias
 
 from robocorp.tasks import ITask as _ITask
 from robocorp.tasks import Status as _Status
@@ -18,3 +18,8 @@ IActionsCallback = Callable[[Sequence[IAction]], Any]
 
 class ActionsListActionTypedDict(TasksListTaskTypedDict):
     pass
+
+
+JSONValue: TypeAlias = (
+    dict[str, "JSONValue"] | list["JSONValue"] | str | int | float | bool | None
+)

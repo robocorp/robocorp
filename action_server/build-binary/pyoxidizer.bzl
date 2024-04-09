@@ -257,6 +257,7 @@ def make_exe():
         [
             ## START DEPS
             "aiohttp~=3.9",
+            "cryptography~=42.0",
             "fastapi~=0.110",
             "fastjsonschema~=2.19",
             "jsonschema~=4.19",

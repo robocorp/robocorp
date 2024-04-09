@@ -5,7 +5,6 @@ import sys
 import typing
 from pathlib import Path
 
-from robocorp.actions._protocols import ActionsListActionTypedDict
 from termcolor import colored
 
 from robocorp.action_server._robo_utils.callback import Callback, OnExitContextManager
@@ -15,6 +14,8 @@ from robocorp.action_server.vendored_deps.action_package_handling.cli_errors imp
 from robocorp.action_server.vendored_deps.termcolors import bold_red, bold_yellow
 
 if typing.TYPE_CHECKING:
+    from robocorp.actions._protocols import ActionsListActionTypedDict
+
     from robocorp.action_server._models import ActionPackage
 
 log = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ class IHookOnActionsListCallback(typing.Protocol):
     def __call__(
         self,
         action_package: "ActionPackage",
-        actions_list_result: list[ActionsListActionTypedDict],
+        actions_list_result: list["ActionsListActionTypedDict"],
     ):
         ...
 
@@ -39,7 +40,7 @@ class IHookOnActionsList(typing.Protocol):
     def __call__(
         self,
         action_package: "ActionPackage",
-        actions_list_result: list[ActionsListActionTypedDict],
+        actions_list_result: list["ActionsListActionTypedDict"],
     ):
         ...
 
@@ -319,7 +320,6 @@ def _add_actions_to_db(
     from dataclasses import asdict
 
     from robocorp.actions._lint_action import format_lint_results
-    from robocorp.actions._protocols import ActionsListActionTypedDict
 
     from robocorp.action_server._errors_action_server import ActionServerValidationError
     from robocorp.action_server._gen_ids import gen_uuid
@@ -389,7 +389,7 @@ def _add_actions_to_db(
 
         hook_on_actions_list(
             action_package,
-            typing.cast(list[ActionsListActionTypedDict], actions_list_result),
+            typing.cast(list["ActionsListActionTypedDict"], actions_list_result),
         )
 
         actions = []
