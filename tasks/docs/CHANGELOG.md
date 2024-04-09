@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.0.3 - 2024-04-09
+
+- Properly added `packaging` as a dependency in production (not just dev-dependency).
+
 ## 3.0.2 - 2024-04-08
 
 - Update package's main README.

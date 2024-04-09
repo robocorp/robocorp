@@ -23,11 +23,11 @@ python = "^3.9"
 robocorp-log = ">=2.4,<3"
 psutil = "^5.0"
 docstring_parser_fork = "^0.0.5"
+packaging = "^24.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}
 types-psutil = "^5.9"
-packaging = "^24.0"
 
 # We just need it for tests. In runtime duck-typing is used to
 # check for `cls.parse_obj(dict)` and `cls.model_json_schema()`

@@ -844,13 +844,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.9.1"
+version = "2.9.2"
 description = "Automatic trace logging for Python"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_log-2.9.1-py3-none-any.whl", hash = "sha256:62a9a5946cac126116fbddd8d77da0c951c9098eaf42f3f85fd0057193db923f"},
-    {file = "robocorp_log-2.9.1.tar.gz", hash = "sha256:b01e4832f9a8f0afb592ba6cd85ee6e83af02224e8a33827389ab0143d8a1ff5"},
+    {file = "robocorp_log-2.9.2-py3-none-any.whl", hash = "sha256:e4efdf9a7fc8f949be3fafc24016943a7449e113fc30ca40807ab9b0e54dba68"},
+    {file = "robocorp_log-2.9.2.tar.gz", hash = "sha256:8917057b2eb5fc6713ff4aa255b43cce809bdc6a59ab637630b8444fe4bba0a6"},
 ]
 
 [package.dependencies]
@@ -951,13 +951,13 @@ files = [
 
 [[package]]
 name = "typer"
-version = "0.12.1"
+version = "0.12.2"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typer-0.12.1-py3-none-any.whl", hash = "sha256:43ebb23c8a358c3d623e31064359a65f50229d0bf73ae8dfd203f49d9126ae06"},
-    {file = "typer-0.12.1.tar.gz", hash = "sha256:72d218ef3c686aed9c6ff3ca25b238aee0474a1628b29c559b18b634cfdeca88"},
+    {file = "typer-0.12.2-py3-none-any.whl", hash = "sha256:e1accbaa7e2b2350753acec896ac30493ac573211a8d4603e88f8356217e01f7"},
+    {file = "typer-0.12.2.tar.gz", hash = "sha256:977929604fde12aeada011852ad9c64370501be6ac2eac248f3161cdc9eeb7c9"},
 ]
 
 [package.dependencies]
@@ -1110,4 +1110,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "674aa293b440fb82bf942dcc1637ca95c1bca607c94516a1c14f278ca2f199c2"
+content-hash = "0f12afb70ead7aa1d6f5f8dbd09843be78296e4d50ff5fc6f1ecf6181a1c4029"
