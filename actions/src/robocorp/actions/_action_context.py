@@ -1,13 +1,13 @@
 import base64
 import json
 import os
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from robocorp.actions._protocols import JSONValue
 from robocorp.actions._request import Request
 
 
-def _get_str_list_from_env(env_name: str, env) -> list[str]:
+def _get_str_list_from_env(env_name: str, env) -> List[str]:
     # Verify if it's an encrypted header.
     in_env: str = env.get(env_name, "")
     if not in_env:
@@ -92,10 +92,10 @@ class ActionContext:
             and "iv" in loaded_data
         ):
             self._encrypted = True
-            self._encrypted_data: dict[str, JSONValue] = loaded_data
+            self._encrypted_data: Dict[str, JSONValue] = loaded_data
         else:
             self._encrypted = False
-            self._raw_data: dict[str, JSONValue] = loaded_data
+            self._raw_data: Dict[str, JSONValue] = loaded_data
             self._hide_secrets()
 
     @property
