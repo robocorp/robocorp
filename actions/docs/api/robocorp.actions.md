@@ -325,6 +325,8 @@ def my_action(password: Secret):
     login(password.value)
 ```
 
+Note: this class is abstract and is not meant to be instanced by clients. An instance can be created from one of the factory methods (`model_validate`or `from_action_context`).
+
 ## Properties
 
 - `value`
@@ -335,10 +337,20 @@ ______________________________________________________________________
 
 ### `from_action_context`
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L38)
+Creates a secret given the action context (which may be encrypted in memory until the actual secret value is requested).
+
+**Args:**
+
+- <b>`action_context`</b>:  The action context which has the secret.
+
+- <b>`path`</b>:  The path inside of the action context for the secret datarequested (Example: 'secrets/my_secret_name').
+
+Return: A Secret instance collected from the passed action context.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L45)
 
 ```python
-from_action_context(value: 'ActionContext', path: str) → Secret
+from_action_context(action_context: 'ActionContext', path: str) → Secret
 ```
 
 ______________________________________________________________________
@@ -353,7 +365,9 @@ Creates a secret given a string (expected when the user is passing the arguments
 
 Return: A Secret instance with the given value.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L25)
+Note: the model_validate method is used for compatibility with the pydantic API.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L29)
 
 ```python
 model_validate(value: str) → Secret
