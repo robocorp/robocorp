@@ -10,7 +10,7 @@
 - Parameters in `@action` typed as `robocorp.actions.Secret` will now be considered
   managed parameters (the client must to provide the secret information when
   running the action).
-- Update **robocorp-tasks** dependency to `3.1.0`.
+- Update **robocorp-tasks** dependency to `3.1.1`.
 
 ## 0.1.3 - 2024-04-09
 
