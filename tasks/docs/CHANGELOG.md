@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.1 - 2024-04-10
+
 - Fixed some typings which were only valid for Python 3.10.
 
 ## 3.1.0 - 2024-04-10
