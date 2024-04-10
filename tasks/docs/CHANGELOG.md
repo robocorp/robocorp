@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 - 2024-04-10
+
 - `python -m robocorp.tasks list` now has information on the managed parameters
   (`managed_params_schema`, which is a dict from parameter name to parameter
    information is given for each task).
