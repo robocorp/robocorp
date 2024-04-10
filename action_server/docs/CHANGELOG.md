@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.3.0 - 2024-04-10
+
 - `action-server package metadata` now includes information on the secrets required
   for each action.
 - Passing secrets now works (requires `robocorp-actions=0.2.0`)

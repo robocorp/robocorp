@@ -1574,17 +1574,18 @@ jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
 name = "robocorp-actions"
-version = "0.1.3"
+version = "0.2.0"
 description = "Robocorp Actions"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_actions-0.1.3-py3-none-any.whl", hash = "sha256:8c7e8fa79e34a2335e3a614f9225c9f67b7d9137a804ed5e60a1f4330df833b4"},
-    {file = "robocorp_actions-0.1.3.tar.gz", hash = "sha256:471a2f1b6f47028d292383ee186cf0752dbbea4d83faeeba3b447b08051d87f7"},
+    {file = "robocorp_actions-0.2.0-py3-none-any.whl", hash = "sha256:bfc88b331ef9ffc37b34e81d8992b83f18a0e6c807f065e71c56ed0e4acc46e3"},
+    {file = "robocorp_actions-0.2.0.tar.gz", hash = "sha256:cf4efce6badbcdf2acda47b2abd8ba7d5a75b5bec8761e7c4a03e9f2f3bdf1f9"},
 ]
 
 [package.dependencies]
-robocorp-tasks = "3.0.3"
+cryptography = ">=42.0.5,<43.0.0"
+robocorp-tasks = "3.1.1"
 
 [[package]]
 name = "robocorp-devutils"
@@ -1646,13 +1647,13 @@ robocorp-log = ">=2.5,<3"
 
 [[package]]
 name = "robocorp-tasks"
-version = "3.0.3"
+version = "3.1.1"
 description = "The automation framework for Python"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_tasks-3.0.3-py3-none-any.whl", hash = "sha256:082bbb5d0546e8cc1979a6dc84d6394c01fe9e46596c4c991296238d3fa11dd8"},
-    {file = "robocorp_tasks-3.0.3.tar.gz", hash = "sha256:7a7fe2d58d762bfbd9e41052da70bf53920ef9f55d3f8ed6f2d18af7de40a635"},
+    {file = "robocorp_tasks-3.1.1-py3-none-any.whl", hash = "sha256:8b40a810ebf110e8e212e155b3c232c2b271abdd18074b91c6393d1c5b840a7c"},
+    {file = "robocorp_tasks-3.1.1.tar.gz", hash = "sha256:a866861da0135230738ba70b591fe23b7abad08e8e21a03ffe08b413a56526cb"},
 ]
 
 [package.dependencies]
@@ -2294,4 +2295,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "973e0cf228b82cb2b12774e2e22b4cd771f697b0550d99ae7d82edf0e7473693"
+content-hash = "f4b2464159f2130f38dcf5f651719925fcee5b1ce0716d99006d3d7b9877b4df"
