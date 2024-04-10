@@ -34,17 +34,17 @@ jobs:
       fail-fast: false
       matrix:
         name:
-        - ubuntu-py310-devmode
-        - windows-py310-devmode
-        - macos-py310-devmode
+        - ubuntu-py3.10-devmode
+        - windows-py3.10-devmode
+        - macos-py3.10-devmode
         include:
-        - name: ubuntu-py310-devmode
+        - name: ubuntu-py3.10-devmode
           python: '3.10'
           os: ubuntu-latest
-        - name: windows-py310-devmode
+        - name: windows-py3.10-devmode
           python: '3.10'
           os: windows-latest
-        - name: macos-py310-devmode
+        - name: macos-py3.10-devmode
           os: macos-latest
           python: '3.10'
     steps:

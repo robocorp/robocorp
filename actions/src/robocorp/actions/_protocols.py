@@ -1,5 +1,5 @@
 import typing
-from typing import Any, Callable, Dict, List, Sequence
+from typing import Any, Callable, Dict, List, Sequence, Union
 
 from robocorp.tasks import ITask as _ITask
 from robocorp.tasks import Status as _Status
@@ -20,4 +20,6 @@ class ActionsListActionTypedDict(TasksListTaskTypedDict):
     pass
 
 
-JSONValue = Dict[str, "JSONValue"] | List["JSONValue"] | str | int | float | bool | None
+JSONValue = Union[
+    Dict[str, "JSONValue"], List["JSONValue"], str, int, float, bool, None
+]

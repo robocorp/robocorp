@@ -737,7 +737,7 @@ def _get_managed_param_type(pm: PluginManager, param: inspect.Parameter) -> type
 
 def _normalize_arguments(
     pm: PluginManager, task: ITask, args: list[str]
-) -> dict[str, Any]:
+) -> Dict[str, Any]:
     from typing import get_type_hints
 
     from robocorp.tasks._exceptions import InvalidArgumentsError

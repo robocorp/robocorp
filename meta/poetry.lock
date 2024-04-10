@@ -1072,13 +1072,13 @@ tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
 name = "robocorp-tasks"
-version = "3.0.3"
+version = "3.1.0"
 description = "The automation framework for Python"
 optional = false
 python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_tasks-3.0.3-py3-none-any.whl", hash = "sha256:082bbb5d0546e8cc1979a6dc84d6394c01fe9e46596c4c991296238d3fa11dd8"},
-    {file = "robocorp_tasks-3.0.3.tar.gz", hash = "sha256:7a7fe2d58d762bfbd9e41052da70bf53920ef9f55d3f8ed6f2d18af7de40a635"},
+    {file = "robocorp_tasks-3.1.0-py3-none-any.whl", hash = "sha256:d24dfef4962c87209eaaf09e4bdc11ce21e0b45d0883f0c6f39dfba0d7f20173"},
+    {file = "robocorp_tasks-3.1.0.tar.gz", hash = "sha256:e15aa035af1d1aefc5575e238424048cd0bf41ddc9d134acfa440bb83bc06596"},
 ]
 
 [package.dependencies]

@@ -108,7 +108,7 @@ class Task:
         return properties
 
     @property
-    def managed_params_schema(self) -> dict[str, Any]:
+    def managed_params_schema(self) -> Dict[str, Any]:
         from robocorp.tasks._commands import _get_managed_param_type, _is_managed_param
 
         managed_params_schema: Dict[str, Any] = {}
@@ -122,7 +122,7 @@ class Task:
         return managed_params_schema
 
     @property
-    def input_schema(self) -> dict[str, Any]:
+    def input_schema(self) -> Dict[str, Any]:
         import docstring_parser
 
         from robocorp.tasks._commands import _is_managed_param
@@ -169,7 +169,7 @@ class Task:
         return schema
 
     @property
-    def output_schema(self) -> dict[str, Any]:
+    def output_schema(self) -> Dict[str, Any]:
         import docstring_parser
 
         method_name = self.method.__code__.co_name

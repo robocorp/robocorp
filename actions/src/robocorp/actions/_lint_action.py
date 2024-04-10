@@ -285,7 +285,7 @@ def _check_docstring_contents(
 
 
 def iter_lint_errors(
-    action_contents_file: str | bytes, pm: Optional[PluginManager] = None
+    action_contents_file: Union[str, bytes], pm: Optional[PluginManager] = None
 ) -> Iterator[Error]:
     ast = ast_module.parse(action_contents_file, "<string>")
     for _stack, node in _iter_nodes(ast, recursive=False):
