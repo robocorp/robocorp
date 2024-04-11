@@ -18,8 +18,7 @@ def _check_multiple_interactions():
 
     desktop = windows.desktop()
     desktop.windows_run("chrome.exe")
-    w = desktop.wait_for_active_window("executable:chrome.exe", timeout=20)
-    desktop.print_tree()
+    desktop.wait_for_active_window("executable:chrome.exe", timeout=20)
 
     sample_html = os.path.join(os.path.dirname(__file__), "sample.html")
     assert os.path.exists(sample_html)
@@ -28,14 +27,12 @@ def _check_multiple_interactions():
     # In GitHub Actions on a fresh install Chrome asks to sign in.
     # We have to decline
     try:
-        w.find("automationid:declineSignInButton").click()
-        w.find(
-            'automationid:"declineSignInButton" > automationid:"skip-button"'
-        ).click()
-
+        app = windows.find_window("regex:.*Sign in to Chrome")
+        app.find('control:"ButtonControl" and name:"Close"').click()
     except windows.ElementNotFound:
         pass  # Ignore if not there.
 
+    w = windows.find_window("regex:.*New Tab - Google Chrome")
     w.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
     w.send_keys(url, wait_time=3, send_enter=True)
 
