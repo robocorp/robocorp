@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, test } from 'vitest';
-import { propertiesToFormData, formDatatoPayload } from '../lib/formData';
+import { propertiesToFormData, formDataToPayload } from '../lib/formData';
 
 import inputSchema from './fixtures/inputSchema.json';
 import formData from './fixtures/formData.json';
@@ -11,5 +11,5 @@ test('Properties to Form Data', () => {
 });
 
 test('Form Data to Payload', () => {
-  expect(formDatatoPayload(formData as any)).toStrictEqual(actionPayload);
+  expect(formDataToPayload(formData as any)).toStrictEqual(actionPayload);
 });

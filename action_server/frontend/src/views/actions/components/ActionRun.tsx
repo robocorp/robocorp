@@ -8,6 +8,7 @@ import {
   Form,
   Input,
   Select,
+  Switch,
   Typography,
 } from '@robocorp/components';
 import { IconBolt } from '@robocorp/icons/iconic';
@@ -17,12 +18,15 @@ import { toKebabCase } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import {
-  formDatatoPayload,
+  formDataToPayload,
+  Payload,
+  payloadToFormData,
   propertiesToFormData,
   PropertyFormData,
   PropertyFormDataType,
 } from '~/lib/formData';
 import { useActionRunMutation } from '~/queries/actions';
+import { Code } from '~/components/Code';
 import { ActionRunResult } from './ActionRunResult';
 
 type Props = {
@@ -67,8 +71,11 @@ const ItemArray: FC<{ children?: ReactNode; title?: string; name: string }> = ({
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
-  const [formData, setFormData] = useState<PropertyFormData[]>([]);
   const { mutate: runAction, isPending, isSuccess, data, reset } = useActionRunMutation();
+  const [formData, setFormData] = useState<PropertyFormData[]>([]);
+  const [useRawJSON, setUseRawJSON] = useState<boolean>(false);
+  const [formRawJSON, setFormRawJSON] = useState<string>('');
+  const [errorJSON, setErrorJSON] = useState<string>();
 
   useEffect(() => {
     setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
@@ -128,12 +135,50 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       runAction({
         actionPackageName: toKebabCase(actionPackage.name),
         actionName: toKebabCase(action.name),
-        args: formDatatoPayload(formData),
+        args: useRawJSON ? JSON.parse(formRawJSON) : formDataToPayload(formData),
         apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
       });
     },
-    [action, actionPackage, formData, apiKey, serverConfig],
+    [action, actionPackage, formData, apiKey, serverConfig, useRawJSON, formRawJSON],
   );
+
+  const onCodeChange = useCallback(
+    (value: string) => {
+      setFormRawJSON(value);
+      try {
+        JSON.parse(value) as Payload;
+        setErrorJSON(undefined);
+      } catch (_) {
+        setErrorJSON('Error while parsing JSON. Please review value and try again');
+      }
+    },
+    [setFormRawJSON, setErrorJSON],
+  );
+
+  useEffect(() => {
+    setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
+  }, [action, actionPackage]);
+
+  useEffect(() => {
+    if (!useRawJSON) {
+      try {
+        setFormData(payloadToFormData(JSON.parse(formRawJSON), formData));
+      } catch (err) {
+        setFormRawJSON('Bad input data...');
+      }
+    } else {
+      try {
+        if (formData.length === 0) {
+          setFormRawJSON('No input data...');
+        } else {
+          const payload = formDataToPayload(formData);
+          setFormRawJSON(JSON.stringify(payload, null, 4));
+        }
+      } catch (err) {
+        setFormRawJSON('Bad input data...');
+      }
+    }
+  }, [useRawJSON]);
 
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
@@ -147,98 +192,128 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           />
         </Form.Fieldset>
       )}
-      <Form.Fieldset>
-        {formData.map((item, index) => {
-          const title = `${item.property.title}${item.required ? ' *' : ''}`;
+      {useRawJSON ? (
+        <Code
+          key="form-raw-json-input"
+          lang="json"
+          aria-label="Run JSON input"
+          value={formRawJSON}
+          onChange={onCodeChange}
+          error={errorJSON}
+          readOnly={false}
+          lineNumbers
+          autoFocus
+        />
+      ) : (
+        <Form.Fieldset key="form-field-sets">
+          {formData.map((item, index) => {
+            const title = `${item.property.title}${item.required ? ' *' : ''}`;
 
-          switch (item.property.type) {
-            case 'boolean':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Checkbox
-                    label={title}
-                    description={item.property.description}
-                    checked={typeof item.value === 'boolean' && item.value}
-                    required={item.required}
-                    onChange={(e) => handleInputChange(e.target.checked, index)}
-                  />
-                </Item>
-              );
-            case 'number':
-            case 'integer':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Input
-                    label={title}
-                    description={item.property.description}
-                    required={item.required}
-                    value={typeof item.value === 'number' ? item.value.toString() : '0'}
-                    type="number"
-                    onChange={(e) => handleInputChange(parseInt(e.target.value, 10), index)}
-                  />
-                </Item>
-              );
-            case 'object':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Input
-                    label={title}
-                    description={item.property.description}
-                    required={item.required}
-                    value={typeof item.value === 'object' ? JSON.stringify(item.value) : '{}'}
-                    rows={4}
-                    onChange={(e) => handleInputChange(e.target.value, index)}
-                  />
-                </Item>
-              );
-            case 'enum':
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Select
-                    label={title}
-                    description={item.property.description}
-                    required={item.required}
-                    value={typeof item.value === 'string' ? item.value : JSON.stringify(item.value)}
-                    items={item.options?.map((value) => ({ label: value, value })) || []}
-                    onChange={(e) => handleInputChange(e, index)}
-                  />
-                </Item>
-              );
-            case 'array':
-              return (
-                <ItemArray title={item.title} name={item.name} key={item.name}>
-                  <Button type="button" onClick={() => onAddRow(index)} size="small">
-                    Add row
-                  </Button>
-                </ItemArray>
-              );
-            case 'string':
-            default:
-              return (
-                <Item title={item.title} name={item.name} key={item.name}>
-                  <Input
-                    label={item.title}
-                    description={item.property.description}
-                    rows={1}
-                    required={item.required}
-                    value={typeof item.value === 'string' ? item.value : JSON.stringify(item.value)}
-                    onChange={(e) => handleInputChange(e.target.value, index)}
-                  />
-                </Item>
-              );
-          }
-        })}
-      </Form.Fieldset>
-      <Button.Group align="right" marginBottom={16}>
+            switch (item.property.type) {
+              case 'boolean':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Checkbox
+                      key={`${title}-${item.name}-${index}`}
+                      label={title}
+                      description={item.property.description}
+                      checked={typeof item.value === 'boolean' && item.value}
+                      required={item.required}
+                      onChange={(e) => handleInputChange(e.target.checked, index)}
+                    />
+                  </Item>
+                );
+              case 'number':
+              case 'integer':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={`${title}-${item.name}-${index}`}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={typeof item.value === 'number' ? item.value.toString() : '0'}
+                      type="number"
+                      onChange={(e) => handleInputChange(parseInt(e.target.value, 10), index)}
+                    />
+                  </Item>
+                );
+              case 'object':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={`${title}-${item.name}-${index}`}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={typeof item.value === 'object' ? JSON.stringify(item.value) : '{}'}
+                      rows={4}
+                      onChange={(e) => handleInputChange(e.target.value, index)}
+                    />
+                  </Item>
+                );
+              case 'enum':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Select
+                      key={`${title}-${item.name}-${index}`}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={
+                        typeof item.value === 'string' ? item.value : JSON.stringify(item.value)
+                      }
+                      items={item.options?.map((value) => ({ label: value, value })) || []}
+                      onChange={(e) => handleInputChange(e, index)}
+                    />
+                  </Item>
+                );
+              case 'array':
+                return (
+                  <ItemArray title={item.title} name={item.name} key={item.name}>
+                    <Button type="button" onClick={() => onAddRow(index)} size="small">
+                      Add row
+                    </Button>
+                  </ItemArray>
+                );
+              case 'string':
+              default:
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={`${item.title}-${item.name}-${index}`}
+                      label={item.title}
+                      description={item.property.description}
+                      rows={1}
+                      required={item.required}
+                      value={
+                        typeof item.value === 'string' ? item.value : JSON.stringify(item.value)
+                      }
+                      onChange={(e) => handleInputChange(e.target.value, index)}
+                    />
+                  </Item>
+                );
+            }
+          })}
+        </Form.Fieldset>
+      )}
+      <Button.Group align="right" marginBottom={isSuccess ? 16 : 32} justifyContent="space-between">
         <Button
           loading={isPending}
           type="submit"
           variant="primary"
           icon={IconBolt}
           style={{ width: '160px' }}
+          disabled={errorJSON !== undefined}
         >
           {isPending ? 'Executing...' : 'Execute Action'}
         </Button>
+        <Switch
+          label=""
+          value="Use JSON"
+          checked={useRawJSON}
+          onChange={(e) => setUseRawJSON(e.target.checked)}
+        />
       </Button.Group>
       <Divider />
       {isSuccess && (

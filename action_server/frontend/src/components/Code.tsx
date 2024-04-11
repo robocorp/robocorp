@@ -15,6 +15,7 @@ export interface CodeProps
   lineWrapping?: boolean;
   height?: number;
   copyValue?: string;
+  readOnly?: boolean;
 }
 
 export const Code: FC<CodeProps> = ({
@@ -24,6 +25,7 @@ export const Code: FC<CodeProps> = ({
   height,
   value,
   copyValue,
+  readOnly = true,
   ...restProps
 }) => {
   const codemirror = useRef<EditorView>();
@@ -60,15 +62,16 @@ export const Code: FC<CodeProps> = ({
   }, [autoFocus]);
 
   return (
-    <Box height={height} mb="$24">
+    <Box key="base-code-input-wrapper" height={height} mb="$24">
       <BaseCode
+        key="base-code-input"
         extensions={extensions}
         codemirrorRef={codemirror}
         aria-labelledby="code"
         theme="dark"
         value={value}
         toolbar={toolbar}
-        readOnly
+        readOnly={readOnly}
         lineNumbers={false}
         {...restProps}
       />

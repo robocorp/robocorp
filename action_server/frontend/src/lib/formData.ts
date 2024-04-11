@@ -137,12 +137,12 @@ export const propertiesToFormData = (
   return entries;
 };
 
-type Payload = {
+export type Payload = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 };
 
-export const formDatatoPayload = (data: PropertyFormData[]): Payload => {
+export const formDataToPayload = (data: PropertyFormData[]): Payload => {
   const result: Payload = {};
 
   data.forEach(({ name, value, property }) => {
@@ -169,6 +169,45 @@ export const formDatatoPayload = (data: PropertyFormData[]): Payload => {
       currentLevel.push(value);
     } else {
       currentLevel[propertyName] = value;
+    }
+  });
+
+  return result;
+};
+
+export const payloadToFormData = (
+  payload: Payload,
+  formData: PropertyFormData[],
+  path = '',
+): PropertyFormData[] => {
+  const result: PropertyFormData[] = [];
+
+  Object.entries(payload).forEach(([key, val]) => {
+    const fullPath = path ? `${path}.${key}` : key;
+    if (typeof val === 'object' && !Array.isArray(val)) {
+      result.push(...payloadToFormData(val, formData, fullPath));
+    }
+    if (typeof val === 'object' && Array.isArray(val)) {
+      const foundData = formData.find((elem) => elem.name === fullPath);
+      if (foundData) {
+        result.push(foundData);
+      }
+      val.forEach((elemValue, index) => {
+        const foundElem = formData.find((elem) => elem.name === `${fullPath}.${index}`);
+        if (foundElem) {
+          result.push({ ...foundElem, value: elemValue });
+        } else {
+          const prev = formData.find((elem) => elem.name === `${fullPath}.0`);
+          if (prev) {
+            result.push({ ...prev, value: elemValue, name: `${fullPath}.${index}` });
+          }
+        }
+      });
+    } else {
+      const foundData = formData.find((elem) => elem.name === fullPath);
+      if (foundData) {
+        result.push({ ...foundData, value: val });
+      }
     }
   });
 
