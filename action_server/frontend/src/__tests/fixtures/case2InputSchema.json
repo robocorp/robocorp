@@ -1,0 +1,21 @@
+{
+  "properties": {
+    "arg": { "type": "integer", "description": "Some arg", "title": "Arg" },
+    "data": {
+      "properties": {
+        "rows": { "items": { "type": "integer" }, "title": "Rows", "type": "array" },
+        "others": {
+          "additionalProperties": { "items": { "type": "boolean" }, "type": "array" },
+          "title": "Others",
+          "type": "object"
+        }
+      },
+      "required": ["rows", "others"],
+      "title": "Data",
+      "type": "object",
+      "description": "Some data"
+    }
+  },
+  "type": "object",
+  "required": ["arg", "data"]
+}

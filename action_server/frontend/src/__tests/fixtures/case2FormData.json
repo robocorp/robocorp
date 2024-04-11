@@ -1,0 +1,34 @@
+[
+  {
+    "name": "arg",
+    "property": { "title": "Arg", "description": "Some arg", "type": "integer" },
+    "required": true,
+    "value": 0
+  },
+  {
+    "name": "data.rows",
+    "title": "Rows",
+    "property": { "title": "Rows", "description": "", "type": "array" },
+    "required": true,
+    "value": [
+      {
+        "name": "data.rows.0",
+        "property": { "title": "Rows", "description": "", "type": "integer" },
+        "required": true,
+        "value": 0
+      }
+    ]
+  },
+  {
+    "name": "data.rows.0",
+    "property": { "title": "Rows", "description": "", "type": "integer" },
+    "required": true,
+    "value": 0
+  },
+  {
+    "name": "data.others",
+    "property": { "title": "Others", "description": "", "type": "object" },
+    "required": true,
+    "value": "{}"
+  }
+]

@@ -25,6 +25,10 @@ const getDefaultValue = (property: OpenAPIV3_1.SchemaObject): PropertyFormDataTy
       return false;
     case 'integer':
       return 0;
+    case 'array':
+      return '[]';
+    case 'object':
+      return '{}';
     case 'string':
     default:
       return '';
@@ -106,7 +110,7 @@ export const propertiesToFormData = (
                 : 'string',
           },
           required: schema.required?.includes(name) || false,
-          value: getDefaultValue(property),
+          value: getDefaultValue(property.items),
         };
         rowEntry.value = [rowProperty];
 
@@ -127,7 +131,7 @@ export const propertiesToFormData = (
       value: getDefaultValue(property),
     };
 
-    if (index === 0) {
+    if (index === 0 && schema.title !== undefined) {
       entry.title = schema.title;
     }
 
@@ -160,8 +164,9 @@ export const formDataToPayload = (data: PropertyFormData[]): Payload => {
 
       currentLevel = currentLevel[level];
     }
-
-    if (property.type === 'array') {
+    if (property.type === 'object') {
+      currentLevel[propertyName] = JSON.parse(value.toString());
+    } else if (property.type === 'array') {
       if (!currentLevel[propertyName]) {
         currentLevel[propertyName] = [];
       }

@@ -68,6 +68,26 @@ const ItemArray: FC<{ children?: ReactNode; title?: string; name: string }> = ({
   );
 };
 
+const asFloat = (v: string) => {
+  // note: the current approach of always converting to the actual
+  // data has a big drawback: the user can't have invalid data
+  // temporarily (so, he can't enter 10e-10 as the 'e' can never
+  // be entered and even if the user copies/pastes it the value
+  // will be converted from the internal float value -- maybe
+  // this should be revisited later on so that internal values
+  // for basic types are always strings).
+  // For the time being this is a limitation of the current approach
+  // (so, it's possible that a Nan is generated here and then
+  // the handleInputChange needs to guard against it).
+  let ret = parseFloat(v);
+  return ret;
+};
+
+const asInt = (v: string) => {
+  const ret = parseInt(v, 10);
+  return ret;
+};
+
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
@@ -82,6 +102,13 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   }, [action, actionPackage]);
 
   const handleInputChange = useCallback((value: PropertyFormDataType, index: number) => {
+    if (typeof value === 'number') {
+      if (isNaN(value)) {
+        // i.e.: this means the user entered a bad value. Don't enter it as the roundtrip
+        // would make the user loose the current value up to this point.
+        return;
+      }
+    }
     setFormData((curr) => curr.map((item, idx) => (idx === index ? { ...item, value } : item)));
     reset();
   }, []);
@@ -131,11 +158,20 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const onSubmit = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
-
+      let args;
+      try {
+        args = useRawJSON ? JSON.parse(formRawJSON) : formDataToPayload(formData);
+      } catch (err) {
+        // TODO: Use some better component from the design system.
+        alert(
+          'Unable to run action because the input is not valid (the input cannot be converted to JSON).',
+        );
+        return;
+      }
       runAction({
         actionPackageName: toKebabCase(actionPackage.name),
         actionName: toKebabCase(action.name),
-        args: useRawJSON ? JSON.parse(formRawJSON) : formDataToPayload(formData),
+        args: args,
         apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
       });
     },
@@ -163,20 +199,16 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     if (!useRawJSON) {
       try {
         setFormData(payloadToFormData(JSON.parse(formRawJSON), formData));
-      } catch (err) {
-        setFormRawJSON('Bad input data...');
-      }
+      } catch (err) {}
     } else {
       try {
         if (formData.length === 0) {
-          setFormRawJSON('No input data...');
+          setFormRawJSON('');
         } else {
           const payload = formDataToPayload(formData);
           setFormRawJSON(JSON.stringify(payload, null, 4));
         }
-      } catch (err) {
-        setFormRawJSON('Bad input data...');
-      }
+      } catch (err) {}
     }
   }, [useRawJSON]);
 
@@ -224,6 +256,19 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                   </Item>
                 );
               case 'number':
+                return (
+                  <Item title={item.title} name={item.name} key={item.name}>
+                    <Input
+                      key={`${title}-${item.name}-${index}`}
+                      label={title}
+                      description={item.property.description}
+                      required={item.required}
+                      value={typeof item.value === 'number' ? item.value.toString() : '0'}
+                      type="number"
+                      onChange={(e) => handleInputChange(asFloat(e.target.value), index)}
+                    />
+                  </Item>
+                );
               case 'integer':
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
@@ -234,7 +279,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                       required={item.required}
                       value={typeof item.value === 'number' ? item.value.toString() : '0'}
                       type="number"
-                      onChange={(e) => handleInputChange(parseInt(e.target.value, 10), index)}
+                      onChange={(e) => handleInputChange(asInt(e.target.value), index)}
                     />
                   </Item>
                 );
@@ -246,7 +291,11 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                       label={title}
                       description={item.property.description}
                       required={item.required}
-                      value={typeof item.value === 'object' ? JSON.stringify(item.value) : '{}'}
+                      value={
+                        typeof item.value === 'string'
+                          ? item.value.toString()
+                          : JSON.stringify(item.value)
+                      }
                       rows={4}
                       onChange={(e) => handleInputChange(e.target.value, index)}
                     />
