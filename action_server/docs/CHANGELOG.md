@@ -2,11 +2,19 @@
 
 ## Unreleased
 
+## 0.3.1 - 2024-04-11
+
+- Fixes in the builtin UI:
+    - There's a JSON toggle so that the data can be sent as JSON.
+    - Objects can now be properly edited.
+    - Entering a float or int now works properly.
+
 ## 0.3.0 - 2024-04-10
 
 - `action-server package metadata` now includes information on the secrets required
   for each action.
 - Passing secrets now works (requires `robocorp-actions=0.2.0`)
+    - Note: the builtin UI still has no support for passing secrets.
 
 ## 0.2.1 - 2024-04-04
 

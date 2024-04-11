@@ -17,9 +17,10 @@ def my_action(my_secret: Secret):
     login(my_secret.value)
 ```
 
-### Passing Secrets (Dev mode)
+### Passing Secrets (Development mode inside of VSCode)
 
-In development mode a secret can be passed by using the `input.json`
+In development mode a secret can be passed by using the `input.json` (which
+is automatically created when an action is about to be run).
 
 i.e.: in the case above a `my_secret` entry in the json will be automatically
 used as the `my_secret.value`.
