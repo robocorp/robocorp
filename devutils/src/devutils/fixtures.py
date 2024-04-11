@@ -279,7 +279,7 @@ def robocorp_tasks_run(
 
 def robocorp_actions_run(
     cmdline,
-    returncode: Union[Literal["error"], int],
+    returncode: Union[Literal["error"], Literal["any"], int],
     cwd=None,
     additional_env: Optional[Dict[str, str]] = None,
     timeout=None,
@@ -291,7 +291,7 @@ def robocorp_actions_run(
 
 def python_run(
     cmdline,
-    returncode: Union[Literal["error"], int],
+    returncode: Union[Literal["error"], Literal["any"], int],
     cwd=None,
     additional_env: Optional[Dict[str, str]] = None,
     timeout=None,
@@ -302,6 +302,9 @@ def python_run(
         cp.update(additional_env)
     args = [sys.executable] + cmdline
     result = subprocess.run(args, capture_output=True, env=cp, cwd=cwd, timeout=timeout)
+
+    if returncode == "any":
+        return result
 
     if returncode == "error" and result.returncode:
         return result
