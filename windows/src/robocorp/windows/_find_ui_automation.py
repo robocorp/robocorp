@@ -15,8 +15,10 @@ from ._ui_automation_wrapper import _UIAutomationControlWrapper
 if IS_WINDOWS:
     from ._vendored.uiautomation import Control
 else:
+
     class Control:  # type:ignore
         pass
+
 
 from .protocols import Locator
 
