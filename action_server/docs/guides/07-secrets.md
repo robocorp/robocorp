@@ -34,7 +34,7 @@ Example `input.json`:
 
 ### Passing Secrets (Production mode)
 
-In production secrets should be passed in the `X-Action-Server` header.
+In production secrets should be passed in the `X-Action-Context` header.
 
 The expected format of that header is a base64(JSON.stringify(content))
 where the content is a json object such as:
@@ -60,10 +60,10 @@ x_action_server_header = base64.b64encode(
 ).decode("ascii")
 ``` 
 
-Note: the `X-Action-Server` header can also be passed encrypted with a
+Note: the `X-Action-Context` header can also be passed encrypted with a
 key shared with the action server in the environment variables.
 
-In that case the `X-Action-Server` header contents should be something as:
+In that case the `X-Action-Context` header contents should be something as:
 
 ```
 base64({
