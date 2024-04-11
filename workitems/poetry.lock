@@ -913,13 +913,13 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.9.1"
+version = "2.9.2"
 description = "Automatic trace logging for Python"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_log-2.9.1-py3-none-any.whl", hash = "sha256:62a9a5946cac126116fbddd8d77da0c951c9098eaf42f3f85fd0057193db923f"},
-    {file = "robocorp_log-2.9.1.tar.gz", hash = "sha256:b01e4832f9a8f0afb592ba6cd85ee6e83af02224e8a33827389ab0143d8a1ff5"},
+    {file = "robocorp_log-2.9.2-py3-none-any.whl", hash = "sha256:e4efdf9a7fc8f949be3fafc24016943a7449e113fc30ca40807ab9b0e54dba68"},
+    {file = "robocorp_log-2.9.2.tar.gz", hash = "sha256:8917057b2eb5fc6713ff4aa255b43cce809bdc6a59ab637630b8444fe4bba0a6"},
 ]
 
 [package.dependencies]
@@ -928,17 +928,18 @@ tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "robocorp-tasks"
-version = "3.0.1"
+version = "3.1.0"
 description = "The automation framework for Python"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "robocorp_tasks-3.0.1-py3-none-any.whl", hash = "sha256:a1a276428406c252359e6cee7d3b031cc98c89ac0b5d0d0658bfebfa46d4850d"},
-    {file = "robocorp_tasks-3.0.1.tar.gz", hash = "sha256:fe736d9ce5d85a8a71d35459ee12a2ce047a46e68965ef620c26571c2729b5fb"},
+    {file = "robocorp_tasks-3.1.0-py3-none-any.whl", hash = "sha256:d24dfef4962c87209eaaf09e4bdc11ce21e0b45d0883f0c6f39dfba0d7f20173"},
+    {file = "robocorp_tasks-3.1.0.tar.gz", hash = "sha256:e15aa035af1d1aefc5575e238424048cd0bf41ddc9d134acfa440bb83bc06596"},
 ]
 
 [package.dependencies]
 docstring_parser_fork = ">=0.0.5,<0.0.6"
+packaging = ">=24.0,<25.0"
 psutil = ">=5.0,<6.0"
 robocorp-log = ">=2.4,<3"
 
@@ -1050,13 +1051,13 @@ files = [
 
 [[package]]
 name = "typer"
-version = "0.12.1"
+version = "0.12.3"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "typer-0.12.1-py3-none-any.whl", hash = "sha256:43ebb23c8a358c3d623e31064359a65f50229d0bf73ae8dfd203f49d9126ae06"},
-    {file = "typer-0.12.1.tar.gz", hash = "sha256:72d218ef3c686aed9c6ff3ca25b238aee0474a1628b29c559b18b634cfdeca88"},
+    {file = "typer-0.12.3-py3-none-any.whl", hash = "sha256:070d7ca53f785acbccba8e7d28b08dcd88f79f1fbda035ade0aecec71ca5c914"},
+    {file = "typer-0.12.3.tar.gz", hash = "sha256:49e73131481d804288ef62598d97a1ceef3058905aa536a1134f90891ba35482"},
 ]
 
 [package.dependencies]

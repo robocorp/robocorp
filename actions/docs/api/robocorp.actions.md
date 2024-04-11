@@ -31,7 +31,7 @@ python -m robocorp.actions run actions.py -a enter_user
 - <b>`func`</b>:  A function which is a action to `robocorp.actions`.
 - <b>`is_consequential`</b>:  Whether the action is consequential or not. This will add `x-openai-isConsequential: true` to the action metadata and shown in OpenApi spec.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L24)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L25)
 
 ```python
 action(*args, **kwargs)
@@ -51,7 +51,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 - <b>`func`</b>:  wrapped function.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L85)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L86)
 
 ```python
 action_cache(func)
@@ -63,7 +63,7 @@ ______________________________________________________________________
 
 Provides the action which is being currently run or None if not currently running an action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L116)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L117)
 
 ```python
 get_current_action() → Optional[IAction]
@@ -75,7 +75,7 @@ ______________________________________________________________________
 
 Provide the output directory being used for the run or None if there's no output dir configured.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L106)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L107)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -95,7 +95,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 - <b>`func`</b>:  wrapped function.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L64)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/__init__.py#L65)
 
 ```python
 session_cache(func)
@@ -221,11 +221,61 @@ Returns true if the task failed. (in which case usually exc_info is not None).
 
 - `input_schema`
 
+The input schema from the function signature.
+
+**Example:**
+
+```
+{
+    "properties": {
+        "value": {
+            "type": "integer",
+            "description": "Some value.",
+            "title": "Value",
+            "default": 0
+        }
+    },
+    "type": "object"
+}
+```
+
 - `lineno`
+
+The line where the task is declared.
+
+- `managed_params_schema`
+
+The schema for the managed parameters.
+
+**Example:**
+
+```
+{
+    "my_password": {
+        "type": "Secret"
+    },
+    "request": {
+        "type": "Request"
+    }
+}
+```
 
 - `name`
 
+The name of the task.
+
 - `output_schema`
+
+The output schema based on the function signature.
+
+**Example:**
+
+```
+{
+    "type": "string",
+    "description": ""
+}
+```
 
 ______________________________________________________________________
 
@@ -255,6 +305,72 @@ ______________________________________________________________________
 
 ```python
 model_validate(dct: dict) → Request
+```
+
+______________________________________________________________________
+
+# Class `Secret`
+
+This class should be used to receive secrets.
+
+The way to use it is by declaring a variable with the 'Secret' type in the @action.
+
+**Example:**
+
+```
+from robocorp.actions import action, Secret
+
+@action
+def my_action(password: Secret):
+    login(password.value)
+```
+
+Note: this class is abstract and is not meant to be instanced by clients. An instance can be created from one of the factory methods (`model_validate`or `from_action_context`).
+
+## Properties
+
+- `value`
+
+## Methods
+
+______________________________________________________________________
+
+### `from_action_context`
+
+Creates a secret given the action context (which may be encrypted in memory until the actual secret value is requested).
+
+**Args:**
+
+- <b>`action_context`</b>:  The action context which has the secret.
+
+- <b>`path`</b>:  The path inside of the action context for the secret datarequested (Example: 'secrets/my_secret_name').
+
+Return: A Secret instance collected from the passed action context.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L45)
+
+```python
+from_action_context(action_context: 'ActionContext', path: str) → Secret
+```
+
+______________________________________________________________________
+
+### `model_validate`
+
+Creates a secret given a string (expected when the user is passing the arguments using a json input).
+
+**Args:**
+
+- <b>`value`</b>:  The raw-text value to be used in the secret.
+
+Return: A Secret instance with the given value.
+
+Note: the model_validate method is used for compatibility with the pydantic API.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/actions/src/robocorp/actions/_secret.py#L29)
+
+```python
+model_validate(value: str) → Secret
 ```
 
 # Enums

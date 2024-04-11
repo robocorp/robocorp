@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 3.1.1 - 2024-04-10
+
+- Fixed some typings which were only valid for Python 3.10.
+
+## 3.1.0 - 2024-04-10
+
+- `python -m robocorp.tasks list` now has information on the managed parameters
+  (`managed_params_schema`, which is a dict from parameter name to parameter
+   information is given for each task).
+   
+## 3.0.3 - 2024-04-09
+
+- Properly added `packaging` as a dependency in production (not just dev-dependency).
+
 ## 3.0.2 - 2024-04-08
 
 - Update package's main README.

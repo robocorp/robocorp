@@ -26,13 +26,13 @@ class Callback:
         self._reversed = reversed
         self._callbacks = ()
 
-    def register(self, callback):
+    def register(self, callback) -> OnExitContextManager:
         self._callbacks = self._callbacks + (callback,)
 
         # Enable using as a context manager to automatically call the unregister.
         return OnExitContextManager(lambda: self.unregister(callback))
 
-    def unregister(self, callback):
+    def unregister(self, callback) -> None:
         self._callbacks = tuple(x for x in self._callbacks if x != callback)
 
     def __len__(self):

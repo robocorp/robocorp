@@ -119,3 +119,21 @@ def test_package_metadata(datadir, data_regression):
         cwd=datadir / "pack1",
     )
     data_regression.check(json.loads(output.stdout))
+
+
+def test_package_metadata_secrets(datadir, data_regression):
+    import json
+
+    from robocorp.action_server._selftest import robocorp_action_server_run
+
+    output = robocorp_action_server_run(
+        [
+            "package",
+            "metadata",
+            "--datadir",
+            str(datadir / "data"),
+        ],
+        returncode=0,
+        cwd=datadir / "pack_secrets",
+    )
+    data_regression.check(json.loads(output.stdout))

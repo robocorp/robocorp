@@ -11,6 +11,7 @@
 
 - [`_protocols.IAction`](./robocorp.actions._protocols.md#class-iaction)
 - [`_request.Request`](./robocorp.actions._request.md#class-request): Contains the information exposed in a request (such as headers and cookies).
+- [`_secret.Secret`](./robocorp.actions._secret.md#class-secret): This class should be used to receive secrets.
 - [`_protocols.Status`](./robocorp.tasks._protocols.md#class-status): Task state
 
 ## Functions
