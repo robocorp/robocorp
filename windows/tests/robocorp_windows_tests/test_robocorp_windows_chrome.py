@@ -19,7 +19,6 @@ def _check_multiple_interactions():
     desktop = windows.desktop()
     desktop.windows_run("chrome.exe")
     w = desktop.wait_for_active_window("executable:chrome.exe", timeout=20)
-    desktop.print_tree()
 
     sample_html = os.path.join(os.path.dirname(__file__), "sample.html")
     assert os.path.exists(sample_html)
@@ -32,10 +31,8 @@ def _check_multiple_interactions():
     except windows.ElementNotFound:
         pass  # Ignore if not there.
 
-    address_bar = w.find('control:MenuItemControl name:"Search tabs"')
-
-    address_bar.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
-    address_bar.send_keys(url, wait_time=3, send_enter=True)
+    w.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
+    w.send_keys(url, wait_time=3, send_enter=True)
 
     # Test select
     combo = w.find("control:ComboBoxControl id:cars", search_depth=10)
