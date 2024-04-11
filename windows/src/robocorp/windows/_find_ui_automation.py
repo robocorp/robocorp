@@ -5,12 +5,21 @@ from re import Pattern
 from typing import Dict, Iterator, List, Literal, Optional, Protocol, Set, Tuple, Union
 
 from ._com_error import COMError
+from ._config import IS_WINDOWS
 from ._errors import ElementNotFound
 from ._iter_tree import ControlTreeNode
 from ._match_ast import OrSearchParams, SearchParams
 from ._match_common import SearchType
 from ._ui_automation_wrapper import _UIAutomationControlWrapper
-from ._vendored.uiautomation import Control
+
+if IS_WINDOWS:
+    from ._vendored.uiautomation import Control
+else:
+
+    class Control:  # type:ignore
+        pass
+
+
 from .protocols import Locator
 
 

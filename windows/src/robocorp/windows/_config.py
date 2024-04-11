@@ -1,5 +1,9 @@
+import platform
 from contextlib import contextmanager
 from typing import Literal
+
+# When trying to execute imports on Mac/Linux.
+IS_WINDOWS = platform.system() == "Windows"
 
 
 class Config:
