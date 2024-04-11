@@ -1,6 +1,6 @@
 name: 🐛 Bug report
 description: Submit a bug report to help us make Robocorp better
-labels: [ bug ]
+labels: [ Bug ]
 body:
   - type: dropdown
     id: components
@@ -13,7 +13,6 @@ body:
         - action_server
         - actions
         - browser
-        - desktop
         - devutils
         - docs
         - excel
@@ -23,7 +22,6 @@ body:
         - meta
         - storage
         - tasks
-        - templates
         - vault
         - windows
         - workitems

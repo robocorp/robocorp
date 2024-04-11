@@ -6,15 +6,13 @@ policy:
         - name: 'Action Server'
           keys: [ 'action_server', 'actions' ]
         - name: 'Library'
-          keys: [ 'browser', 'desktop', 'excel', 'log', 'log_pytest', 'meta', 'storage', 'tasks', 'vault', 'windows', 'workitems' ]
+          keys: [ 'browser', 'excel', 'log', 'log_pytest', 'meta', 'storage', 'tasks', 'vault', 'windows', 'workitems' ]
         - name: 'robocorp'
           keys: [ 'meta' ]
         - name: 'robocorp-actions'
           keys: [ 'actions' ]
         - name: 'robocorp-browser'
           keys: [ 'browser' ]
-        - name: 'robocorp-desktop'
-          keys: [ 'desktop' ]
         - name: 'robocorp-excel'
           keys: [ 'excel' ]
         - name: 'robocorp-log'
@@ -29,7 +27,7 @@ policy:
           keys: [ 'windows' ]
         - name: 'robocorp-workitems'
           keys: [ 'workitems' ]
-        - name: 'chore'
+        - name: 'Chore / Tech Debt'
           keys: [ 'devutils', 'integration_tests' ]
         - name: 'documentation'
           keys: [ 'docs' ]
