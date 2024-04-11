@@ -19,6 +19,7 @@ def _check_multiple_interactions():
     desktop = windows.desktop()
     desktop.windows_run("chrome.exe")
     w = desktop.wait_for_active_window("executable:chrome.exe", timeout=20)
+    desktop.print_tree()
 
     sample_html = os.path.join(os.path.dirname(__file__), "sample.html")
     assert os.path.exists(sample_html)
