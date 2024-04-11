@@ -36,6 +36,9 @@ jobs:
           python: '3.9'
           os: windows-latest
     steps:
+    - uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: 123.0.6312.122
     - name: Checkout repository and submodules
       uses: actions/checkout@v3
     - name: Install poetry
