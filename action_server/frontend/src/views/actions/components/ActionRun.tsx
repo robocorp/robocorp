@@ -174,7 +174,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                     required={item.required}
                     value={typeof item.value === 'number' ? item.value.toString() : '0'}
                     type="number"
-                    onChange={(e) => handleInputChange(e.target.value, index)}
+                    onChange={(e) => handleInputChange(parseInt(e.target.value, 10), index)}
                   />
                 </Item>
               );
