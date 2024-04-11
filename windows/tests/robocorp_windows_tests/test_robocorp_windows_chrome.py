@@ -31,7 +31,7 @@ def _check_multiple_interactions():
     except windows.ElementNotFound:
         pass  # Ignore if not there.
 
-    address_bar = w.find('control:EditControl name:"Address and search bar"')
+    address_bar = w.find('control:MenuItemControl name:"Search tabs"')
 
     address_bar.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
     address_bar.send_keys(url, wait_time=3, send_enter=True)
