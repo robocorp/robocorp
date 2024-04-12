@@ -56,7 +56,7 @@ func checkAvailableUpdate(version string) {
 	// Get the latest version
 	latestVersion, err := getLatestVersion()
 	if err != nil {
-		fmt.Println("Verifying latest version failed:", err)
+		fmt.Fprintf(os.Stderr, "Verifying latest version failed:%s\n", err)
 		return
 	}
 	// Compare the given version with the latest one
@@ -77,17 +77,17 @@ func checkAvailableUpdate(version string) {
 			actionOS = "macos64"
 			actionExe = "action-server"
 		default:
-			fmt.Println("Unsupported operating system")
+			fmt.Fprintf(os.Stderr, "Unsupported operating system\n")
 			os.Exit(1)
 		}
 		colorT := &ColorType{}
 		urlPath, _ := url.JoinPath(ACTION_SERVER_LATEST_BASE_URL, actionOS, actionExe)
-		fmt.Printf("\n ⏫ A new version of action-server is now available: %s → %s \n", colorT.Yellow(version), colorT.Green(latestVersion))
+		fmt.Fprintf(os.Stderr, "\n ⏫ A new version of action-server is now available: %s → %s \n", colorT.Yellow(version), colorT.Green(latestVersion))
 		if runtime.GOOS == "darwin" {
-			fmt.Printf("    To update, download from: %s \n", colorT.Bold(urlPath))
-			fmt.Printf("    Or run: %s \n\n", colorT.Bold("brew update && brew install robocorp/tools/action-server"))
+			fmt.Fprintf(os.Stderr, "    To update, download from: %s \n", colorT.Bold(urlPath))
+			fmt.Fprintf(os.Stderr, "    Or run: %s \n\n", colorT.Bold("brew update && brew install robocorp/tools/action-server"))
 		} else {
-			fmt.Printf("    To update, download from: %s \n\n", colorT.Bold(urlPath))
+			fmt.Fprintf(os.Stderr, "    To update, download from: %s \n\n", colorT.Bold(urlPath))
 		}
 	}
 }
@@ -136,7 +136,7 @@ func main() {
 	// Read the version
 	versionData, err := content.ReadFile("assets/version.txt")
 	if err != nil {
-		fmt.Println("Error reading version.txt:", err)
+		fmt.Fprintf(os.Stderr, "Error reading version.txt: %s\n", err)
 		os.Exit(1)
 	}
 	version := strings.TrimSpace(string(versionData))
@@ -153,13 +153,13 @@ func main() {
 	case "linux", "darwin":
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
-			fmt.Println("Error getting user home directory:", err)
+			fmt.Fprintf(os.Stderr, "Error getting user home directory: %s\n", err)
 			os.Exit(1)
 		}
 		actionServerPath = fmt.Sprintf("%s/.robocorp/action-server/%s", homeDir, version)
 		executablePath = filepath.Join(actionServerPath, "action-server")
 	default:
-		fmt.Println("Unsupported operating system")
+		fmt.Fprintf(os.Stderr, "Unsupported operating system\n")
 		os.Exit(1)
 	}
 
@@ -168,13 +168,13 @@ func main() {
 	if os.IsNotExist(err) {
 		err = os.MkdirAll(actionServerPath, 0755)
 		if err != nil {
-			fmt.Println("Error creating directory:", err)
+			fmt.Fprintf(os.Stderr, "Error creating directory: %s\n", err)
 			os.Exit(1)
 		}
 
 		err = copyFiles("assets", actionServerPath)
 		if err != nil {
-			fmt.Println("Error copying files:", err)
+			fmt.Fprintf(os.Stderr, "Error copying files: %s\n", err)
 			os.Exit(1)
 		}
 	}
@@ -186,7 +186,7 @@ func main() {
 
 	err = cmd.Run()
 	if err != nil {
-		fmt.Println("Error executing action-server:", err)
+		fmt.Fprintf(os.Stderr, "Error executing action-server: %s\n", err)
 		os.Exit(1)
 	}
 }

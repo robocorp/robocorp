@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed issue where auto-update message could break commands which wrote to stdout (such as version or package metadata).
+
 ## 0.3.1 - 2024-04-11
 
 - Fixes in the builtin UI:
