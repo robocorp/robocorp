@@ -785,15 +785,19 @@ To migrate the database to the current version
 
                         api_key = get_api_key(settings.datadir)
 
-                    start_server(
-                        expose=start_args.expose,
-                        api_key=api_key,
-                        expose_session=expose_session.expose_session
-                        if expose_session
-                        else None,
-                        whitelist=start_args.whitelist,
-                        before_start=before_start,
-                    )
+                    try:
+                        start_server(
+                            expose=start_args.expose,
+                            api_key=api_key,
+                            expose_session=expose_session.expose_session
+                            if expose_session
+                            else None,
+                            whitelist=start_args.whitelist,
+                            before_start=before_start,
+                        )
+                    except KeyboardInterrupt:
+                        log.critical("Exiting action server...")
+                        return 1
                     return 0
 
             else:
