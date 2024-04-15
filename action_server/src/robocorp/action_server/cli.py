@@ -50,27 +50,6 @@ log = logging.getLogger(__name__)
 __all__ = ["main"]
 
 
-# def _write_schema(path: Optional[str]):
-#     from fastapi.openapi.utils import get_openapi
-#     from ._app import get_app
-#     app = get_app()
-#     schema = get_openapi(
-#         title=app.title,
-#         version=app.version,
-#         openapi_version=app.openapi_version,
-#         description=app.description,
-#         routes=app.routes,
-#     )
-#
-#     if path is None:
-#         print(json.dumps(schema, indent=4))
-#     else:
-#         output = Path(path)
-#         output.parent.mkdir(parents=True, exist_ok=True)
-#         with open(output, "w", encoding="utf-8") as file:
-#             json.dump(schema, file, indent=4)
-
-
 def _add_skip_lint(parser, defaults):
     parser.add_argument(
         "--skip-lint",
@@ -255,7 +234,7 @@ def _create_parser():
     defaults = Settings.defaults()
     base_parser = argparse.ArgumentParser(
         prog="action-server",
-        description="Robocorp Action Server",
+        description=f"Robocorp Action Server ({__version__})",
         formatter_class=argparse.RawTextHelpFormatter,
     )
 

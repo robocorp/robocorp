@@ -57,6 +57,7 @@
 - [`log.warn`](./robocorp.log.md#function-warn): Adds a new logging message with a warn level.
 - [`console.set_color`](./robocorp.log.console.md#function-set_color): To be used as:
 - [`console.set_mode`](./robocorp.log.console.md#function-set_mode): Can be used to set the mode of the console.
+- [`pyproject_config.PyProjectInfo.__init__`](./robocorp.log.pyproject_config.md#function-__init__)
 - [`pyproject_config.read_pyproject_toml`](./robocorp.log.pyproject_config.md#function-read_pyproject_toml): Args:
 - [`pyproject_config.read_robocorp_auto_log_config`](./robocorp.log.pyproject_config.md#function-read_robocorp_auto_log_config): Args:
 - [`pyproject_config.read_section_from_toml`](./robocorp.log.pyproject_config.md#function-read_section_from_toml): Args:

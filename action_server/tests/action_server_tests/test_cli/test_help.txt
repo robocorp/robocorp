@@ -2,7 +2,7 @@ usage: action-server [-h]
                      {start,import,download-rcc,new,version,migrate,package}
                      ...
 
-Robocorp Action Server
+Robocorp Action Server (0.3.2)
 
 positional arguments:
   {start,import,download-rcc,new,version,migrate,package}

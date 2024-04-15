@@ -35,7 +35,7 @@ def rcc_loc(tmpdir_factory):
 
         # tests_rcc_dir = tmpdir_factory.mktemp("rcc_dir")
 
-        location = os.path.join(str(tests_rcc_dir), f"rcc_{RCC_VERSION}")
+        location = os.path.join(str(tests_rcc_dir), f"rcc-{RCC_VERSION}")
         if sys.platform == "win32":
             location += ".exe"
         _download_rcc(location, force=False)
@@ -88,7 +88,7 @@ def robocorp_home(tmpdir_factory) -> str:
     return str(dirname)
 
 
-RCC_VERSION = "v17.13.0"
+RCC_VERSION = "v17.23.2"
 
 
 def _download_rcc(location: str, force: bool = False) -> None:

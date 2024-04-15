@@ -2,8 +2,12 @@
 
 ## Unreleased
 
-- Return package name in package metadata
-- Return package description in package metadata
+- Using `Ctrl+C` to stop action server should no longer show a traceback.
+- Return package name in package metadata.
+- Return package description in package metadata.
+- RCC updated to `v17.23.2`.
+- RCC `--bundled` flag now passed when called from the action server.
+- When the help is shown the action server version is shown in the description.
 
 ## 0.3.2 - 2024-04-12
 

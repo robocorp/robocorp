@@ -36,6 +36,13 @@ def disable_feedback(temp_directory_session, rcc_config_location) -> None:
     robocorp_home.mkdir(parents=True, exist_ok=True)
 
     rcc_location = get_default_rcc_location()
+    if not os.path.exists(rcc_location):
+        raise RuntimeError(
+            f"{rcc_location} does not exist.\n"
+            "Note: 'inv install' or 'inv devinstall' must be called to run\n"
+            "action_server/build.py, which downloads RCC to the proper location\n"
+            "as a part of the build process."
+        )
     rcc = Rcc(rcc_location, robocorp_home)
     result = rcc._run_rcc(
         "configure identity --do-not-track --config".split()
