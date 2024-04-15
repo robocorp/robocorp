@@ -8,7 +8,7 @@ from typing import Optional
 log = logging.getLogger(__name__)
 
 # Note: also referenced in action_server/build.py
-RCC_VERSION = "17.12.1"
+RCC_VERSION = "17.23.2"
 RCC_URLS = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
     "Darwin": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/macos64/rcc",
@@ -19,9 +19,9 @@ RCC_URLS = {
 def get_default_rcc_location() -> Path:
     CURDIR = Path(__file__).parent.absolute()
     if sys.platform == "win32":
-        rcc_path = CURDIR / "bin" / "rcc.exe"
+        rcc_path = CURDIR / "bin" / f"rcc-{RCC_VERSION}.exe"
     else:
-        rcc_path = CURDIR / "bin" / "rcc"
+        rcc_path = CURDIR / "bin" / f"rcc-{RCC_VERSION}"
     return rcc_path
 
 

@@ -37,6 +37,7 @@ jobs:
         cache: 'poetry'
 
     - name: Install project
+      # Note: inv install may download RCC as it'll execute action_server/build.py. 
       run: inv install
       env:
         ACTION_SERVER_SKIP_DOWNLOAD_IN_BUILD: true
@@ -48,7 +49,7 @@ jobs:
       run: |
         inv build-frontend
         # Make sure that we have no binaries present when doing the build.
-        rm src/robocorp/bin/rcc src/robocorp/bin/rcc.exe -f
+        rm src/robocorp/bin/rcc src/robocorp/bin/rcc* -f
         # Just sdist here, wheels are built in the manylinux job.
         poetry build -f sdist
       env:

@@ -30,19 +30,6 @@ def test_new(
     check_new_template(tmpdir, action_server_process, client)
 
 
-# def test_schema(str_regression, tmpdir) -> None:
-#     from action_server_tests.fixtures import robocorp_action_server_run
-#
-#     result = robocorp_action_server_run(["schema"], returncode=0)
-#     output = result.stdout
-#     str_regression.check(output)
-#
-#     out_json = Path(tmpdir / "out.json")
-#     robocorp_action_server_run(["schema", "--file", str(out_json)], returncode=0)
-#     contents = out_json.read_text()
-#     assert output.strip() == contents.strip()
-
-
 def test_help(str_regression):
     from action_server_tests.fixtures import robocorp_action_server_run
 

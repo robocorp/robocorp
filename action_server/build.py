@@ -7,7 +7,7 @@ from typing import Optional
 # No real build, just download RCC at this point.
 
 # Note: referenced here and in robocorp.action_server._download_rcc
-RCC_VERSION = "17.12.1"
+RCC_VERSION = "17.23.2"
 
 RCC_URLS = {
     "Windows": f"https://downloads.robocorp.com/rcc/releases/v{RCC_VERSION}/windows64/rcc.exe",
@@ -29,9 +29,23 @@ def _download_rcc(system: Optional[str] = None, target: Optional[str] = None):
         rcc_path = Path(target)
     else:
         if sys.platform == "win32":
-            rcc_path = CURDIR / "src" / "robocorp" / "action_server" / "bin" / "rcc.exe"
+            rcc_path = (
+                CURDIR
+                / "src"
+                / "robocorp"
+                / "action_server"
+                / "bin"
+                / f"rcc-{RCC_VERSION}.exe"
+            )
         else:
-            rcc_path = CURDIR / "src" / "robocorp" / "action_server" / "bin" / "rcc"
+            rcc_path = (
+                CURDIR
+                / "src"
+                / "robocorp"
+                / "action_server"
+                / "bin"
+                / f"rcc-{RCC_VERSION}"
+            )
 
     rcc_url = RCC_URLS[system or platform.system()]
 
