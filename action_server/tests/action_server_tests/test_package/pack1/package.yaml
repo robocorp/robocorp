@@ -1,4 +1,5 @@
 name: pack1 name
+description: pack1 description
 version: 0.2a1
 
 dependencies:
