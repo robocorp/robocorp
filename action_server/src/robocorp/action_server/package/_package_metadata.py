@@ -51,8 +51,20 @@ def collect_package_metadata(package_dir: Path, datadir: str) -> str | int:
                         "secrets": found_secrets,
                     }
 
-        metadata["metadata"] = {"secrets": secrets}
-        metadata["metadata"]["name"] = action_package.name
+        package_description = ""
+        package_yaml_path = Path(package_dir) / "package.yaml"
+        if package_yaml_path.exists():
+            import yaml
+
+            with package_yaml_path.open() as f:
+                package_yaml = yaml.safe_load(f)
+                package_description = package_yaml.get("description", "")
+
+        metadata["metadata"] = {
+            "name": action_package.name,
+            "description": package_description,
+            "secrets": secrets,
+        }
 
     def collect_metadata_and_cancel_startup(app: FastAPI) -> bool:
         nonlocal metadata

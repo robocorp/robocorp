@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Return package name in package metadata
+- Return package description in package metadata
 
 ## 0.3.2 - 2024-04-12
 
