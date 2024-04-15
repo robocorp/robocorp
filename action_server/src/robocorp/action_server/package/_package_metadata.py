@@ -52,6 +52,7 @@ def collect_package_metadata(package_dir: Path, datadir: str) -> str | int:
                     }
 
         metadata["metadata"] = {"secrets": secrets}
+        metadata["metadata"]["name"] = action_package.name
 
     def collect_metadata_and_cancel_startup(app: FastAPI) -> bool:
         nonlocal metadata

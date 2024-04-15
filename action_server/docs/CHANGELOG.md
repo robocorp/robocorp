@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Return package name in package metadata
+
 ## 0.3.2 - 2024-04-12
 
 - Fixed issue where auto-update message could break commands which wrote to stdout (such as version or package metadata).
