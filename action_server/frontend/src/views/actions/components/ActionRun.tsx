@@ -14,7 +14,7 @@ import {
 import { IconBolt } from '@robocorp/icons/iconic';
 
 import { Action, ActionPackage } from '~/lib/types';
-import { toKebabCase } from '~/lib/helpers';
+import { logError, toKebabCase } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import {
@@ -24,6 +24,7 @@ import {
   propertiesToFormData,
   PropertyFormData,
   PropertyFormDataType,
+  setArrayItemTitle,
 } from '~/lib/formData';
 import { useActionRunMutation } from '~/queries/actions';
 import { Code } from '~/components/Code';
@@ -79,13 +80,11 @@ const asFloat = (v: string) => {
   // For the time being this is a limitation of the current approach
   // (so, it's possible that a Nan is generated here and then
   // the handleInputChange needs to guard against it).
-  let ret = parseFloat(v);
-  return ret;
+  return parseFloat(v);
 };
 
 const asInt = (v: string) => {
-  const ret = parseInt(v, 10);
-  return ret;
+  return parseInt(v, 10);
 };
 
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
@@ -103,7 +102,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
 
   const handleInputChange = useCallback((value: PropertyFormDataType, index: number) => {
     if (typeof value === 'number') {
-      if (isNaN(value)) {
+      if (Number.isNaN(value)) {
         // i.e.: this means the user entered a bad value. Don't enter it as the roundtrip
         // would make the user loose the current value up to this point.
         return;
@@ -131,10 +130,12 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         const suffix = item.name.split('.').slice(depth).join('.');
         const newName = `${curr[index].name}.${newIndex}${suffix ? `.${suffix}` : suffix}`;
 
-        return {
+        const ret = {
           ...item,
           name: newName,
         };
+        setArrayItemTitle(item);
+        return ret;
       });
 
       let indexAt = index + 1;
@@ -163,6 +164,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         args = useRawJSON ? JSON.parse(formRawJSON) : formDataToPayload(formData);
       } catch (err) {
         // TODO: Use some better component from the design system.
+        // eslint-disable-next-line no-alert
         alert(
           'Unable to run action because the input is not valid (the input cannot be converted to JSON).',
         );
@@ -171,7 +173,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       runAction({
         actionPackageName: toKebabCase(actionPackage.name),
         actionName: toKebabCase(action.name),
-        args: args,
+        args,
         apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
       });
     },
@@ -199,7 +201,9 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
     if (!useRawJSON) {
       try {
         setFormData(payloadToFormData(JSON.parse(formRawJSON), formData));
-      } catch (err) {}
+      } catch (err) {
+        logError(err);
+      }
     } else {
       try {
         if (formData.length === 0) {
@@ -208,7 +212,9 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           const payload = formDataToPayload(formData);
           setFormRawJSON(JSON.stringify(payload, null, 4));
         }
-      } catch (err) {}
+      } catch (err) {
+        logError(err);
+      }
     }
   }, [useRawJSON]);
 
@@ -319,7 +325,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 );
               case 'array':
                 return (
-                  <ItemArray title={item.title} name={item.name} key={item.name}>
+                  <ItemArray title={title} name={item.name} key={item.name}>
                     <Button type="button" onClick={() => onAddRow(index)} size="small">
                       Add row
                     </Button>
@@ -330,8 +336,8 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
                 return (
                   <Item title={item.title} name={item.name} key={item.name}>
                     <Input
-                      key={`${item.title}-${item.name}-${index}`}
-                      label={item.title}
+                      key={`${title}-${item.name}-${index}`}
+                      label={title}
                       description={item.property.description}
                       rows={1}
                       required={item.required}

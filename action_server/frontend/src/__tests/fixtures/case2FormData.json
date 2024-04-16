@@ -13,7 +13,7 @@
     "value": [
       {
         "name": "data.rows.0",
-        "property": { "title": "Rows", "description": "", "type": "integer" },
+        "property": { "title": "Rows (item)", "description": "", "type": "integer" },
         "required": true,
         "value": 0
       }
@@ -21,7 +21,7 @@
   },
   {
     "name": "data.rows.0",
-    "property": { "title": "Rows", "description": "", "type": "integer" },
+    "property": { "title": "Rows (item)", "description": "", "type": "integer" },
     "required": true,
     "value": 0
   },

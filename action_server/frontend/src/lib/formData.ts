@@ -35,6 +35,24 @@ const getDefaultValue = (property: OpenAPIV3_1.SchemaObject): PropertyFormDataTy
   }
 };
 
+/**
+ * Sets the title for one item of a list (i.e.: each item of a list
+ * should not have the same title as the list itself so that it's
+ * clearer what's an item of a list vs the list itself).
+ *
+ * @param item The item which should have the title set.
+ */
+export const setArrayItemTitle = (item: PropertyFormData) => {
+  let newTitle = item.property.title;
+  if (newTitle.endsWith('*')) {
+    newTitle = newTitle.substring(0, newTitle.length - 1);
+  }
+  if (!newTitle.endsWith(' (item)')) {
+    newTitle += ' (item)';
+  }
+  item.property.title = newTitle; // eslint-disable-line no-param-reassign
+};
+
 export const propertiesToFormData = (
   schema: OpenAPIV3_1.BaseSchemaObject,
   parents: string[] = [],
@@ -113,6 +131,7 @@ export const propertiesToFormData = (
           value: getDefaultValue(property.items),
         };
         rowEntry.value = [rowProperty];
+        setArrayItemTitle(rowProperty);
 
         return [rowEntry, rowProperty];
       }

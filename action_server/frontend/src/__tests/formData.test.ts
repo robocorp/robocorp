@@ -54,7 +54,7 @@ test('Payload to Form Data, Case 2', () => {
       value: [
         {
           name: 'data.rows.0',
-          property: { title: 'Rows', description: '', type: 'integer' },
+          property: { title: 'Rows (item)', description: '', type: 'integer' },
           required: true,
           value: 0,
         },
@@ -62,13 +62,13 @@ test('Payload to Form Data, Case 2', () => {
     },
     {
       name: 'data.rows.0',
-      property: { title: 'Rows', description: '', type: 'integer' },
+      property: { title: 'Rows (item)', description: '', type: 'integer' },
       required: true,
       value: 3,
     },
     {
       name: 'data.rows.1',
-      property: { title: 'Rows', description: '', type: 'integer' },
+      property: { title: 'Rows (item)', description: '', type: 'integer' },
       required: true,
       value: 4,
     },
