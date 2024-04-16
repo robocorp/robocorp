@@ -8,6 +8,7 @@
 - RCC updated to `v17.23.2`.
 - RCC `--bundled` flag now passed when called from the action server.
 - When the help is shown the action server version is shown in the description.
+- The label referencing the encryption algorithm for the context is now properly specified as `aes256-gcm`.
 - Action Server Builtin UI:
     - Fix issue where the label for some entry would not be shown in the run. [#370](https://github.com/robocorp/robocorp/issues/370)
     - Show ` (item)` when editing an item from a list.
