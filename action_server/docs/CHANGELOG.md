@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.0 - 2024-04-16
+
 - Using `Ctrl+C` to stop action server should no longer show a traceback.
 - Return package name in package metadata.
 - Return package description in package metadata.
