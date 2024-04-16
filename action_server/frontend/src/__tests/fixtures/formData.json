@@ -86,7 +86,7 @@
             "name": "data.education.rows.0.columns.0",
             "property": {
               "description": "List of Education Properties",
-              "title": "Columns",
+              "title": "Columns (item)",
               "type": "string"
             },
             "required": true,
@@ -98,7 +98,7 @@
         "name": "data.education.rows.0.columns.0",
         "property": {
           "description": "List of Education Properties",
-          "title": "Columns",
+          "title": "Columns (item)",
           "type": "string"
         },
         "required": true,
@@ -120,7 +120,7 @@
         "name": "data.education.rows.0.columns.0",
         "property": {
           "description": "List of Education Properties",
-          "title": "Columns",
+          "title": "Columns (item)",
           "type": "string"
         },
         "required": true,
@@ -132,7 +132,7 @@
     "name": "data.education.rows.0.columns.0",
     "property": {
       "description": "List of Education Properties",
-      "title": "Columns",
+      "title": "Columns (item)",
       "type": "string"
     },
     "required": true,
