@@ -19,6 +19,7 @@ export interface Action {
   lineno: number; // Line for the action
   input_schema: string; // The json content for the schema input
   output_schema: string; // The json content for the schema output
+  managed_params_schema?: string; // The json content for the managed parameters.
 }
 
 export enum RunStatus {

@@ -29,6 +29,11 @@ components:
         lineno:
           title: Lineno
           type: integer
+        managed_params_schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Managed Params Schema
         name:
           title: Name
           type: string

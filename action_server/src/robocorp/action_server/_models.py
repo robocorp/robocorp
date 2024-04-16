@@ -58,6 +58,9 @@ class Action:  # Table name: action
 
     is_consequential: Optional[bool] = None
 
+    # The json content for the managed params schema
+    managed_params_schema: Optional[str] = None
+
 
 RUN_ID_COUNTER = "run_id"
 ALL_COUNTERS = (RUN_ID_COUNTER,)

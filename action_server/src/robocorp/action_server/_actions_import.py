@@ -408,6 +408,10 @@ def _add_actions_to_db(
             except ValueError:
                 pass
 
+            managed_params_str: str = ""
+            if action_fields.get("managed_params_schema"):
+                managed_params_str = json.dumps(action_fields["managed_params_schema"])
+
             actions.append(
                 Action(
                     id=gen_uuid("action"),
@@ -422,6 +426,7 @@ def _add_actions_to_db(
                     is_consequential=(action_fields.get("options") or {}).get(
                         "is_consequential", None
                     ),
+                    managed_params_schema=managed_params_str,
                 )
             )
 
