@@ -270,7 +270,8 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       {serverConfig?.auth_enabled && (
         <Form.Fieldset>
           <Input
-            label="API Key * (Bearer key printed out when '--expose' is used)"
+            label="API Key *"
+            description="Bearer key printed out when '--expose' is used"
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
