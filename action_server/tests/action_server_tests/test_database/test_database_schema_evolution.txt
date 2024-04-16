@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS action(
     output_schema TEXT NOT NULL,
     enabled INTEGER CHECK(enabled IN (0, 1)) NOT NULL DEFAULT 1,
     is_consequential INTEGER,
+    managed_params_schema TEXT,
     FOREIGN KEY (action_package_id) REFERENCES action_package(id)  
 )
 ''',

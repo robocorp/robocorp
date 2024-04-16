@@ -1,5 +1,7 @@
 /* eslint-disable react/no-array-index-key */
-import { FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ChangeEvent, FC, FormEvent, ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -14,7 +16,7 @@ import {
 import { IconBolt } from '@robocorp/icons/iconic';
 
 import { Action, ActionPackage } from '~/lib/types';
-import { logError, toKebabCase } from '~/lib/helpers';
+import { toKebabCase } from '~/lib/helpers';
 import { useActionServerContext } from '~/lib/actionServerContext';
 import { useLocalStorage } from '~/lib/useLocalStorage';
 import {
@@ -87,14 +89,32 @@ const asInt = (v: string) => {
   return parseInt(v, 10);
 };
 
+type ManagedParams = Record<string, any>;
+
 export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
   const [apiKey, setApiKey] = useLocalStorage<string>('api-key', '');
   const { serverConfig } = useActionServerContext();
   const { mutate: runAction, isPending, isSuccess, data, reset } = useActionRunMutation();
   const [formData, setFormData] = useState<PropertyFormData[]>([]);
+  const [secretsData, setSecretsData] = useState<Map<string, string>>(new Map());
   const [useRawJSON, setUseRawJSON] = useState<boolean>(false);
   const [formRawJSON, setFormRawJSON] = useState<string>('');
   const [errorJSON, setErrorJSON] = useState<string>();
+
+  useEffect(() => {
+    if (action.managed_params_schema) {
+      const managedParams: ManagedParams = JSON.parse(action.managed_params_schema);
+      const secretsMap: Map<string, string> = new Map();
+      for (const [key, val] of Object.entries(managedParams)) {
+        if (val?.type === 'Secret') {
+          secretsMap.set(key, '');
+        }
+      }
+      setSecretsData(secretsMap);
+    } else {
+      setSecretsData(new Map());
+    }
+  }, [action, actionPackage]);
 
   useEffect(() => {
     setFormData(propertiesToFormData(JSON.parse(action.input_schema)));
@@ -175,9 +195,10 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
         actionName: toKebabCase(action.name),
         args,
         apiKey: serverConfig?.auth_enabled ? apiKey : undefined,
+        secretsData,
       });
     },
-    [action, actionPackage, formData, apiKey, serverConfig, useRawJSON, formRawJSON],
+    [action, actionPackage, formData, apiKey, serverConfig, useRawJSON, formRawJSON, secretsData],
   );
 
   const onCodeChange = useCallback(
@@ -202,7 +223,7 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
       try {
         setFormData(payloadToFormData(JSON.parse(formRawJSON), formData));
       } catch (err) {
-        logError(err);
+        // eslint-disable-line no-empty
       }
     } else {
       try {
@@ -213,23 +234,51 @@ export const ActionRun: FC<Props> = ({ action, actionPackage }) => {
           setFormRawJSON(JSON.stringify(payload, null, 4));
         }
       } catch (err) {
-        logError(err);
+        // eslint-disable-line no-empty
       }
     }
   }, [useRawJSON]);
 
+  let secretsFields;
+  if (secretsData) {
+    const secretsFieldsChildren = [];
+    let i = 0;
+    for (const [key, value] of secretsData.entries()) {
+      i += 1;
+      const onChangeSecret = (e: ChangeEvent<HTMLInputElement>) => {
+        setSecretsData((old) => {
+          const newSecrets: Map<string, string> = new Map(old);
+          newSecrets.set(key, e.target.value);
+          return newSecrets;
+        });
+      };
+      secretsFieldsChildren.push(
+        <Input
+          key={`secret-${i}`}
+          label={`Secret: ${key} *`}
+          type="password"
+          value={value}
+          onChange={onChangeSecret}
+        />,
+      );
+    }
+
+    secretsFields = <Form.Fieldset>{secretsFieldsChildren}</Form.Fieldset>;
+  }
   return (
     <Form busy={isPending} onSubmit={onSubmit}>
       {serverConfig?.auth_enabled && (
         <Form.Fieldset>
           <Input
-            label="API Key"
+            label="API Key *"
+            description="Bearer key printed out when '--expose' is used"
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
           />
         </Form.Fieldset>
       )}
+      {secretsFields}
       {useRawJSON ? (
         <Code
           key="form-raw-json-input"
