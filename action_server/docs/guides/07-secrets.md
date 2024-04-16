@@ -69,7 +69,7 @@ In that case the `X-Action-Context` header contents should be something as:
 ```
 base64({
     "cipher": base64(encrypted_data(JSON.stringify(content))),
-    "algorithm": "aes256-cdc",
+    "algorithm": "aes256-gcm",
     "iv": base64(nonce),
 })
 ```
@@ -89,7 +89,7 @@ encrypted_data = encrypt(key, nonce, data)
 
 action_server_context = {
     "cipher": base64.b64encode(encrypted_data).decode("ascii"),
-    "algorithm": "aes256-cdc",
+    "algorithm": "aes256-gcm",
     "iv": base64.b64encode(nonce).decode("ascii"),
 }
 
