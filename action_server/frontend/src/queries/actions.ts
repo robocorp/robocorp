@@ -19,7 +19,7 @@ export const useActionRunMutation = () => {
       apiKey,
       secretsData,
     }: ActionRunPayload) => {
-      const headers: any = {
+      const headers: Record<string, string> = {
         Authorization: `Bearer ${apiKey}`,
       };
 
