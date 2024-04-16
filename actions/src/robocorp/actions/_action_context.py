@@ -53,7 +53,7 @@ class ActionContext:
 
                 base64(json.dumps({
                    cipher: blob_of_data
-                   algorithm: "aes256-cdc"
+                   algorithm: "aes256-gcm"
                    iv: nonce
                 }))
 
@@ -152,7 +152,7 @@ class ActionContext:
                     "Unable to decode the 'iv' field passed to X-Action-Context as base64."
                 )
 
-            if algorithm != "aes256-cdc":
+            if algorithm != "aes256-gcm":
                 raise RuntimeError(
                     f"Unable to recognize X-Action-Context encryption algorithm: {algorithm}"
                 )

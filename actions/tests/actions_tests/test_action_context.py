@@ -47,7 +47,7 @@ def test_action_context() -> None:
 
     action_server_context = {
         "cipher": base64.b64encode(encrypted_data).decode("ascii"),
-        "algorithm": "aes256-cdc",
+        "algorithm": "aes256-gcm",
         "iv": base64.b64encode(nonce).decode("ascii"),
     }
 
