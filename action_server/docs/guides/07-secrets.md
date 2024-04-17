@@ -1,6 +1,7 @@
 ## Secrets
 
 *Important*: Requires `robocorp-actions 0.2.0` onwards to work.
+*Important*: On `robocorp-actions 0.2.1` the `auth-tag` is accepted (on `0.2.0` an empty string would always be used as the auth-tag).
 
 ### Receiving a Secret
 
@@ -71,6 +72,7 @@ base64({
     "cipher": base64(encrypted_data(JSON.stringify(content))),
     "algorithm": "aes256-gcm",
     "iv": base64(nonce),
+    "auth-tag": base64(auth-tag),  # Note: requires robocorp-actions 0.2.1
 })
 ```
 
@@ -85,12 +87,13 @@ data: bytes = json.dumps(payload).encode("utf-8")
 
 # def encrypt(...) implementation can be created using the cryptography library.
 
-encrypted_data = encrypt(key, nonce, data)
+encrypted_data = encrypt(key, nonce, data, auth_tag)
 
 action_server_context = {
     "cipher": base64.b64encode(encrypted_data).decode("ascii"),
     "algorithm": "aes256-gcm",
     "iv": base64.b64encode(nonce).decode("ascii"),
+    "auth-tag": base64.b64encode(auth_tag).decode("ascii"),  # Note: requires robocorp-actions 0.2.1
 }
 
 x_action_server_header: str = base64.b64encode(

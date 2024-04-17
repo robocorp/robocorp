@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- `auth-tag` can be passed/used in the `X-Action-Context` header when encoding using `aes256-gcm` encryption.
+    - Note: requires `robocorp-actions=0.2.1`
+
+
 ## 0.4.0 - 2024-04-16
 
 - Using `Ctrl+C` to stop action server should no longer show a traceback.

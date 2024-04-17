@@ -57,3 +57,51 @@ def test_action_context() -> None:
 
     ctx = ActionContext(ctx_info, env=env)
     assert ctx.value == {"secrets": {"private_info": "my-secret-value"}}
+
+
+def test_action_context_auth_tag() -> None:
+    import base64
+    import json
+    import os
+
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+    from robocorp.actions._action_context import ActionContext
+
+    keys = [AESGCM.generate_key(bit_length=256), AESGCM.generate_key(bit_length=256)]
+    if USE_STATIC_INFO:
+        keys = [b"a" * len(keys[0])]
+
+    env = dict(
+        ACTION_SERVER_DECRYPT_INFORMATION=json.dumps(["header:x-action-context"]),
+        ACTION_SERVER_DECRYPT_KEYS=json.dumps(
+            [base64.b64encode(k).decode("ascii") for k in keys]
+        ),
+    )
+
+    data: bytes = json.dumps({"secrets": {"private_info": "my-secret-value"}}).encode(
+        "utf-8"
+    )
+    aesgcm = AESGCM(keys[0])
+    nonce = os.urandom(12)
+    if USE_STATIC_INFO:
+        nonce = b"b" * len(nonce)
+    auth_tag = os.urandom(12)
+    if USE_STATIC_INFO:
+        auth_tag = b"b" * len(auth_tag)
+
+    encrypted_data = aesgcm.encrypt(nonce, data, auth_tag)
+
+    action_server_context = {
+        "cipher": base64.b64encode(encrypted_data).decode("ascii"),
+        "algorithm": "aes256-gcm",
+        "iv": base64.b64encode(nonce).decode("ascii"),
+        "auth-tag": base64.b64encode(auth_tag).decode("ascii"),
+    }
+
+    ctx_info: str = base64.b64encode(
+        json.dumps(action_server_context).encode("utf-8")
+    ).decode("ascii")
+
+    ctx = ActionContext(ctx_info, env=env)
+    assert ctx.value == {"secrets": {"private_info": "my-secret-value"}}

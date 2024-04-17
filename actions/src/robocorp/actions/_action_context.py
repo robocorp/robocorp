@@ -126,17 +126,20 @@ class ActionContext:
             cipher = self._encrypted_data["cipher"]
             algorithm = self._encrypted_data["algorithm"]
             iv = self._encrypted_data["iv"]
+            auth_tag = self._encrypted_data.get("auth-tag")
 
             if not isinstance(cipher, str):
-                raise RuntimeError(f"Expected the cipher to be a str. Found: {cipher}")
+                raise RuntimeError(
+                    f"Expected the cipher to be a str. Found: {cipher!r}"
+                )
 
             if not isinstance(algorithm, str):
                 raise RuntimeError(
-                    f"Expected the algorithm to be a str. Found: {algorithm}"
+                    f"Expected the algorithm to be a str. Found: {algorithm!r}"
                 )
 
             if not isinstance(iv, str):
-                raise RuntimeError(f"Expected the iv to be a str. Found: {iv}")
+                raise RuntimeError(f"Expected the iv to be a str. Found: {iv!r}")
 
             try:
                 cipher_decoded_base_64: bytes = base64.b64decode(cipher)
@@ -152,6 +155,21 @@ class ActionContext:
                     "Unable to decode the 'iv' field passed to X-Action-Context as base64."
                 )
 
+            if not auth_tag:
+                auth_tag_decoded_base_64: bytes = b""
+            else:
+                if isinstance(auth_tag, str):
+                    try:
+                        auth_tag_decoded_base_64 = base64.b64decode(auth_tag)
+                    except Exception:
+                        raise RuntimeError(
+                            "Unable to decode the 'auth-tag' field passed to X-Action-Context as base64."
+                        )
+                else:
+                    raise RuntimeError(
+                        f"Expected the auth-tag to be a str. Found: {auth_tag!r}"
+                    )
+
             if algorithm != "aes256-gcm":
                 raise RuntimeError(
                     f"Unable to recognize X-Action-Context encryption algorithm: {algorithm}"
@@ -162,7 +180,9 @@ class ActionContext:
                 aesgcm = AESGCM(k)
                 try:
                     raw_data = aesgcm.decrypt(
-                        iv_decoded_base_64, cipher_decoded_base_64, None
+                        iv_decoded_base_64,
+                        cipher_decoded_base_64,
+                        auth_tag_decoded_base_64,
                     )
                     break
                 except Exception:
