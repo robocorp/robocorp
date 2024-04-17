@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.1 - 2024-04-17
+
 - Accepts `auth-tag` when using `aes256-gcm` for encrypting the `x-action-context` contents
   (previously it'd always be an empty string). 
 
