@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.1 - 2024-04-17
+
 - `auth-tag` can be passed/used in the `X-Action-Context` header when encoding using `aes256-gcm` encryption.
     - Note: requires `robocorp-actions=0.2.1`
 
