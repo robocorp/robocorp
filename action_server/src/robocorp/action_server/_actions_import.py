@@ -262,6 +262,18 @@ Note: no virtual environment will be used for the imported actions, they'll be r
                 f"Please update the `robocorp-actions` version in your python environment (python: {sys.executable})\n"
             )
 
+    min_version_for_encryption_with_auth_tag = (0, 2, 1)
+    if v < min_version_for_encryption_with_auth_tag:
+        v_as_str = ".".join(str(x) for x in v)
+        log.critical(
+            f"Warning: the `robocorp-actions` version is: {v_as_str}.\n"
+            f"To receive encrypted secrets, robocorp-actions 0.2.1 or newer is required.\n"
+            f"Please update the version in: {original_conda_yaml}\n"
+            "(proceeding with initalization but actions receiving encrypted secrets will\n"
+            "not work properly -- on future versions of the action server, support for \n"
+            "this version of robocorp-actions will be removed)."
+        )
+
     _add_actions_to_db(
         datadir,
         env,
