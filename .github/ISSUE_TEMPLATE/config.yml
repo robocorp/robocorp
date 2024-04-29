@@ -5,8 +5,8 @@ contact_links:
     about: Ask a question or ask about a problem in GitHub Discussions.
     url: https://github.com/robocorp/robocorp/discussions
   - name: 💬 Slack
-    url: https://discord.gg/6adMQxSpJS
+    url: https://robocorp-developers.slack.com/
     about: Join our Community Slack for more in-depth discussions.
   - name: 🚨 Report a Security Vulnerability
     about: Please refer to our security policy for more details.
-    url: https://robocorp.com/.well-known/security.txt
+    url: https://robocorp.com/security
