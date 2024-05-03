@@ -127,7 +127,7 @@ jobs:
     defaults:
       run:
         working-directory: ./action_server
-    runs-on: macos-latest
+    runs-on: macos-13
 
     steps:
       - uses: actions/checkout@v4
