@@ -1,6 +1,6 @@
 ![Robocorp](./docs/include/robocorp-header.svg)
 
-<samp>[Docs](https://robocorp.com/docs) | [Blog](https://robocorp.com/blog) | [Examples](https://github.com/robocorp/actions-cookbook) | [ReMark](https://chat.robocorp.com) | [Courses](https://robocorp.com/docs/courses) | [Slack](https://robocorp-developers.slack.com/) | [Youtube](https://www.youtube.com/@Robocorp) | [𝕏](https://twitter.com/RobocorpInc)</samp>
+<samp>[Docs](https://robocorp.com/docs) | [Blog](https://robocorp.com/blog) | [Examples](https://github.com/robocorp/actions-cookbook) | [ReMark](https://chat.robocorp.com) | [Courses](https://robocorp.com/docs/courses) | [Slack](http://sema4ai-users.slack.com/) | [Youtube](https://www.youtube.com/@Robocorp) | [𝕏](https://twitter.com/RobocorpInc)</samp>
 
 [![PyPI - Version](https://img.shields.io/pypi/v/robocorp?label=robocorp&color=%23733CFF)](https://pypi.org/project/robocorp)
 [![PyPI - Version](https://img.shields.io/pypi/v/robocorp-action-server?label=action-server&color=%23733CFF)](https://pypi.org/project/robocorp-action-server)
@@ -258,7 +258,7 @@ Check out these example projects for inspiration.
 - 🕸️ [Open a local Playwright browser and make some Google searches.](https://github.com/robocorp/actions-cookbook/tree/master/browser-google)
 - 🖥️ [Securely fetch contents of `.txt` and `.pdf` files from your local machine's folder in real time.](https://github.com/robocorp/actions-cookbook/tree/master/desktop-files)
 
-Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](https://robocorp-developers.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best from the community here!
+Build more `@actions` and be awesome! We'd love to hear and see what have you built. Join our [Slack community](http://sema4ai-users.slack.com/) to share your work, or post it in the [Discussions](https://github.com/robocorp/robocorp/discussions/categories/show-and-tell). We'll soon start showcasing the best from the community here!
 
 <div id="roadmap"></div>
 
@@ -286,7 +286,7 @@ Build more `@actions` and be awesome! We'd love to hear and see what have you bu
 > ⭐️ First, please star the repo - your support is highly appreciated!
 
 - 🚩 Issues – our [GitHub Issues](https://github.com/robocorp/robocorp/issues) is kept up to date with bugs, improvements, and feature requests
-- 🙋 Help - you are welcome to [join our Community Slack](https://robocorp-developers.slack.com/) if you experience any difficulty getting setup
+- 🙋 Help - you are welcome to [join our Community Slack](http://sema4ai-users.slack.com/) if you experience any difficulty getting setup
 - 🌟 Contribution and recognition – Start [here](https://github.com/robocorp/robocorp/blob/master/CONTRIBUTING.md), [PR's](https://github.com/robocorp/robocorp/pulls) are welcome!
 - 🔐 Refer to our [Security policy](https://robocorp.com/.well-known/security.txt) for details
 
