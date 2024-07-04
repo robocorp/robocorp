@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.3.6 - 2024-07-04
+
+- Improve error message during `truststore` infinite recursion bug.
+
 ## 1.3.5 - 2024-04-08
 
 - Update package's main README.

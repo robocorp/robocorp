@@ -247,6 +247,13 @@ class RobocorpVault(BaseSecretManager):
             else:
                 message = str(err)
             raise RobocorpVaultError(message) from err
+        except RecursionError as err:
+            message = (
+                "Infinite recursion detected due to SSL patching bug, please"
+                " remove `truststore` from your dependencies file and opt in for `uv`"
+                " instead of `pip`"
+            )
+            raise RobocorpVaultError(message) from err
         except Exception as err:
             raise RobocorpVaultError(str(err)) from err
 
