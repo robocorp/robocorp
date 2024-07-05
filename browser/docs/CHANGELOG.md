@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.4.0 - 2024-07-05
+
+- Adds new `maximized` switch to `robocorp.browser.configure` which maximizes the browser window on launch and disables the viewport.
+- Adds the `robocorp.browser.configure_launch` function with which custom browser type launch options can be passed.
+
 ## 2.3.3 - 2024-04-08
 
 - Update package's main README.
