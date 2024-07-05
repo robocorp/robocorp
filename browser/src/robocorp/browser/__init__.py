@@ -59,8 +59,8 @@ def configure(**kwargs) -> None:
             specific issues on the playwright stop coupled with an early
             `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak
             and even a shutdown deadlock if used alone.
-        viewport_size: Provide it in order to set an explicit viewport size as a tuple
-            of (width, height).
+        viewport_size: Provide it in order to set an explicit viewport size as a
+            dictionary of `{"width": <int>, "height": <int>}`.
         maximized: If `True`, the browser will start maximized and disable the viewport
             size, thus making it incompatible with `viewport_size`.
 
@@ -84,9 +84,15 @@ def configure(**kwargs) -> None:
             configure_context(viewport={"width": width, "height": height})
             continue
         elif key == "maximized" and value:
-            # Maximizes the browser window and ignores the viewport size.
+            if kwargs.get("headless", False):
+                raise ValueError(
+                    "Incompatible configuration passed: `maximized` and"
+                    " `headless=True`"
+                )
+            # Maximizes a displayed browser window and ignores the viewport size.
             configure_launch(args=["--start-maximized"], headless=False)
             configure_context(no_viewport=True)
+            configure_context(viewport=None)
             continue
 
         if not hasattr(config, key):

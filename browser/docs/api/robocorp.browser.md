@@ -32,6 +32,8 @@ browser.configure(browser_engine="firefox", slowmo=100)
 - <b>`isolated`</b>:  Used to define where the browser should be downloaded. If `True`, it'll be installed inside the isolated environment. If `False` (default) it'll be installed in a global cache folder.
 - <b>`persistent_context_directory`</b>:  If a persistent context should be used, this should be the directory in which the persistent context should be stored/loaded from (it can be used to store the state of the automation to allow for sessions and cookies to be reused in a new automation).
 - <b>`skip_playwright_stop`</b>:  Can be used to skip the playwright stop. Not recommended in general, only meant to be used to diagnose and workaround specific issues on the playwright stop coupled with an early `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak and even a shutdown deadlock if used alone.
+- <b>`viewport_size`</b>:  Provide it in order to set an explicit viewport size as a dictionary of `{"width": <int>, "height": <int>}`.
+- <b>`maximized`</b>:  If `True`, the browser will start maximized and disable the viewport size, thus making it incompatible with `viewport_size`.
 
 **Note:**
 
@@ -65,7 +67,7 @@ browser.configure_context(ignore_https_errors = True)
 
 > The changes done persist through the full session, so, new tasks which create a browser context will also get the configuration changes. If the change should not be used across tasks it's possible to call `robocorp.browser.context(...)` with the required arguments directly.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L82)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L127)
 
 ```python
 configure_context(**kwargs) → None
@@ -96,7 +98,7 @@ If a new page is required without closing the current page use:
  page = browser.context().new_page()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L109)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L154)
 
 ```python
 page() → Page
@@ -129,7 +131,7 @@ To customize the browser use the `configure` method (prior to calling this metho
 
 > The returned browser must not be closed. It will be automatically closed when the task run session finishes.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L136)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L181)
 
 ```python
 browser() → Browser
@@ -156,7 +158,7 @@ To customize it use the `configure` method (prior to calling this method).
 
 Note that the returned instance must not be closed. It will be automatically closed when the task run session finishes.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L168)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L213)
 
 ```python
 playwright() → Playwright
@@ -186,7 +188,7 @@ Note that the returned instance must not be closed. It will be automatically clo
 > If the context is not created it's possible to customize the context arguments through the kwargs provided, by using the `configure(...)` method or by editing the `configure_context(...)` returned dict.
 > If the context was already previously created the \*\*kwargs passed will be ignored.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L193)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L238)
 
 ```python
 context(**kwargs) → BrowserContext
@@ -211,7 +213,7 @@ Changes the url of the current page (creating a page if needed).
 **Returns:**
 The page instance managed by the robocorp.tasks framework(it will be automatically closed when the task finishes).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L223)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L268)
 
 ```python
 goto(url: str) → Page
@@ -246,7 +248,7 @@ The bytes from the screenshot.
 
 > The element.screenshot can be used if the screenshot is not expected to be added to the log.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L243)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L288)
 
 ```python
 screenshot(
@@ -272,7 +274,7 @@ Downloads and installs the given browser engine.
 
 > Google Chrome or Microsoft Edge installations will be installed at the default global location of your operating system overriding your current browser installation.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L296)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L341)
 
 ```python
 install(browser_engine: BrowserEngine, force: bool = False)

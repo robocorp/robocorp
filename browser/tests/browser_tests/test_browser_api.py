@@ -89,6 +89,34 @@ def test_browser_api(datadir, pyfile) -> None:
             p.goto((Path(os.path.abspath("page3.html"))).as_uri())
             assert p.viewport_size == {"width": 755, "height": 600}
 
+        @tasks.task
+        def check_browser_maximization() -> None:
+            import os
+            from pathlib import Path
+
+            from robocorp.browser import configure, configure_context, page
+            from robocorp.browser._context import (
+                browser_context_kwargs,
+                browser_type_launch_args,
+            )
+
+            assert "no_viewport" not in browser_context_kwargs()
+            configure(maximized=True)
+            configure_context(ignore_https_errors=True)
+
+            context = browser_context_kwargs()
+            assert context["no_viewport"]
+            assert context["viewport"] is None
+            assert context["ignore_https_errors"]
+
+            assert "--start-maximized" in browser_type_launch_args()["args"]
+
+            p = page()
+            p.goto((Path(os.path.abspath("page3.html"))).as_uri())
+            assert (
+                p.viewport_size is None
+            )  # running maximized happens without a viewport
+
     from devutils.fixtures import robocorp_tasks_run
 
     robocorp_tasks_run(["run", task_pyfile_run_tasks], returncode=0, cwd=datadir)
