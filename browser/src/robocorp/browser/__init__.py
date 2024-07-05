@@ -358,6 +358,7 @@ def install(browser_engine: BrowserEngine, force: bool = False):
 __all__ = [
     "configure",
     "configure_context",
+    "configure_launch",
     "page",
     "browser",
     "playwright",

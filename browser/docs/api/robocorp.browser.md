@@ -75,6 +75,34 @@ configure_context(**kwargs) → None
 
 ______________________________________________________________________
 
+## `configure_launch`
+
+Customizes browser launch options beyond those covered by the `configure` method.
+
+Use this method to tailor the keyword arguments passed to `playwright.BrowserType.launch` for scenarios requiring different context configurations.
+
+**Example:**
+
+```python
+browser.configure_launch(args=["--start-maximized"])
+```
+
+**Args:**
+
+- <b>`**kwargs`</b>:  Keyword arguments supported by the `playwright.BrowserType.launch` method.
+
+**Note:**
+
+> The changes done persist through the full session, so, new tasks which create a browser context will also get the configuration changes.
+
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/browser/src/robocorp/browser/__init__.py#L103)
+
+```python
+configure_launch(**kwargs) → None
+```
+
+______________________________________________________________________
+
 ## `page`
 
 Provides a managed instance of the browser page to interact with.
