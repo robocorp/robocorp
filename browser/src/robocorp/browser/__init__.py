@@ -18,7 +18,7 @@ from playwright.sync_api import (
 
 from ._types import BrowserEngine, BrowserNotFound, InstallError
 
-__version__ = "2.3.3"
+__version__ = "2.4.0"
 version_info = [int(x) for x in __version__.split(".")]
 
 
@@ -59,6 +59,10 @@ def configure(**kwargs) -> None:
             specific issues on the playwright stop coupled with an early
             `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak
             and even a shutdown deadlock if used alone.
+        viewport_size: Provide it in order to set an explicit viewport size as a tuple
+            of (width, height).
+        maximized: If `True`, the browser will start maximized and disable the viewport
+            size, thus making it incompatible with `viewport_size`.
 
     Note:
         See also: `robocorp.browser.configure_context` to change other
@@ -70,13 +74,48 @@ def configure(**kwargs) -> None:
 
     for key, value in kwargs.items():
         if key == "viewport_size":
+            if kwargs.get("maximized", False):
+                raise ValueError(
+                    "Incompatible configuration passed: `maximized` and"
+                    " `viewport_size`"
+                )
+            # Setting up the viewport size via context.
             width, height = value
             configure_context(viewport={"width": width, "height": height})
+            continue
+        elif key == "maximized" and value:
+            # Maximizes the browser window and ignores the viewport size.
+            configure_launch(args=["--start-maximized"], headless=False)
+            configure_context(no_viewport=True)
             continue
 
         if not hasattr(config, key):
             raise ValueError(f"Invalid configuration: {key}.")
         setattr(config, key, value)
+
+
+def configure_launch(**kwargs) -> None:
+    """Customizes browser launch options beyond those covered by the `configure` method.
+
+    Use this method to tailor the keyword arguments passed to `playwright.BrowserType.launch`
+    for scenarios requiring different context configurations.
+
+    Example:
+        ```python
+        browser.configure_launch(args=["--start-maximized"])
+        ```
+
+    Args:
+        **kwargs: Keyword arguments supported by the `playwright.BrowserType.launch` method.
+
+    Note:
+        The changes done persist through the full session, so, new tasks which
+        create a browser context will also get the configuration changes.
+    """
+    from . import _context
+
+    launch_options = _context.browser_type_launch_args()
+    launch_options.update(kwargs)
 
 
 def configure_context(**kwargs) -> None:
