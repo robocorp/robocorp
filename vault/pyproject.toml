@@ -13,8 +13,8 @@ packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-cryptography = ">=42.0.4,<44"
-requests = "^2.31"
+cryptography = ">=43.0.1,<44"
+requests = "^2.32.3"
 pyyaml = "^6.0"
 tenacity = "^8.0.1"
 

@@ -183,12 +183,18 @@ def _make_error(
             severity,
         )
     else:
+        lineno, end_lineno = getattr(node, "lineno", 0), getattr(node, "end_lineno", 0)
+        col_offset, end_col_offset = (
+            getattr(node, "col_offset", 0),
+            getattr(node, "end_col_offset", 0),
+        )
+
         return Error(
             msg,
-            (node.lineno, node.col_offset + coldelta),
+            (lineno, col_offset + coldelta),
             (
-                node.end_lineno or node.lineno,
-                (node.end_col_offset or node.col_offset) + coldelta,
+                end_lineno or lineno,
+                (end_col_offset or col_offset) + coldelta,
             ),
             severity,
         )
