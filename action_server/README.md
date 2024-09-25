@@ -1,5 +1,11 @@
 # robocorp-action-server
 
+> **⚠️ Deprecation Notice:**
+> Development of this package has moved and continues under a new PyPI package: [sema4ai-action-server](https://pypi.org/project/sema4ai-action-server/).
+> You can follow the development in this [GitHub repository](https://github.com/Sema4AI/actions).
+> The [robocorp-action-server](https://pypi.org/project/robocorp-action-server/) package will no longer receive updates, so please update your dependencies to ensure continued support and improvements.
+
+
 [Robocorp Action Server](https://github.com/robocorp/robocorp#readme) is a Python framework designed to simplify the deployment of actions (AI or otherwise).
 
 An `action` in this case is defined as a Python function (which has inputs/outputs defined), which is served by the `Robocorp Action Server`.
