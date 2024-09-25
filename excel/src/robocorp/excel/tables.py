@@ -16,20 +16,45 @@ from typing import (
     Generator,
     Iterable,
     List,
+    Literal,
     NamedTuple,
     Optional,
+    Sequence,
     Tuple,
+    Type,
+    TypeVar,
     Union,
+    overload,
 )
 
-from robocorp.excel._types import is_dict_like, is_list_like, is_namedtuple
+from typing_extensions import TypeGuard
 
 Index = Union[int, str]
 Column = Union[int, str]
-Row = Union[Dict, List, Tuple, NamedTuple, set]
-Data = Optional[Union[Dict[Column, Row], List[Row], "Table"]]
+Row = Union[Dict, Sequence, Tuple, NamedTuple, set, None]
+Data = Optional[Union[Dict[Column, Row], Sequence[Row], "Table"]]
 CellCondition = Callable[[Any], bool]
 RowCondition = Callable[[Union[Index, Row]], bool]
+
+
+T = TypeVar("T", bound=object)
+
+
+def _is_dict_like(obj) -> TypeGuard[Dict[Column, Row]]:
+    """Check if `obj` behaves like a dictionary."""
+    return all(
+        hasattr(obj, attr) for attr in ("__getitem__", "keys", "__contains__")
+    ) and not isinstance(obj, type)
+
+
+def _is_list_like(obj) -> TypeGuard[list[Row]]:
+    """Check if `obj` behaves like a list."""
+    return isinstance(obj, Iterable) and not isinstance(obj, (str, bytes))
+
+
+def _is_namedtuple(obj) -> TypeGuard[NamedTuple]:
+    """Check if `obj` is a namedtuple."""
+    return isinstance(obj, tuple) and hasattr(obj, "_fields")
 
 
 def return_table_as_raw_list(table, heading=False):
@@ -46,7 +71,7 @@ def return_table_as_raw_list(table, heading=False):
 
 def to_list(obj: Any, size: int = 1):
     """Convert (possibly scalar) value to list of `size`."""
-    if not is_list_like(obj):
+    if not _is_list_like(obj):
         return [obj] * int(size)
     else:
         return obj
@@ -92,7 +117,7 @@ def to_condition(operator: str, value: Any) -> CellCondition:
     return condition
 
 
-def if_none(value: Any, default: Any):
+def if_none(value: Optional[T], default: T) -> T:
     """Return default if value is None."""
     return value if value is not None else default
 
@@ -102,7 +127,10 @@ def uniq(seq: Iterable):
 
     Values must be hashable.
     """
-    seen, result = {}, []
+
+    seen: Dict = {}
+    result: List = []
+
     for item in seq:
         if item in seen:
             continue
@@ -141,8 +169,8 @@ class Table:
             data:     Values for table,  see ``Supported data formats``
             columns:  Names for columns, should match data dimensions
         """
-        self._data = []
-        self._columns = []
+        self._data: list[list[Row]] = []
+        self._columns: list[str] = []
 
         # Use public setter to validate data
         if columns is not None:
@@ -152,9 +180,9 @@ class Table:
             self._init_empty()
         elif isinstance(data, Table):
             self._init_table(data)
-        elif is_dict_like(data):
+        elif _is_dict_like(data):
             self._init_dict(data)
-        elif is_list_like(data):
+        elif _is_list_like(data):
             self._init_list(data)
         else:
             raise TypeError("Not a valid input format")
@@ -182,13 +210,13 @@ class Table:
         column_values = self._column_value_getter(obj)
 
         # Map of source to destination column
-        column_map = {}
+        column_map: dict = {}
 
         # Do not update columns if predefined
         add_columns = not bool(self._columns)
 
         for obj in data:
-            row = [None] * len(self._columns)
+            row: List[Row] = [None] * len(self._columns)
 
             for column_src in column_names(obj):
                 # Check if column has been added with different name
@@ -217,7 +245,9 @@ class Table:
     def _init_dict(self, data: Dict[Column, Row]):
         """Initialize table from dict-like container."""
         if not self._columns:
-            self._columns = list(data.keys())
+            self._columns = list(
+                map(str, data.keys())
+            )  # mypy: disable-error-code="no-redef"
 
         # Filter values by defined columns
         columns = (
@@ -271,7 +301,7 @@ class Table:
 
     def _validate_columns(self, names):
         """Validate that given column names can be used."""
-        if not is_list_like(names):
+        if not _is_list_like(names):
             raise ValueError("Columns should be list-like")
 
         if len(set(names)) != len(names):
@@ -282,17 +312,17 @@ class Table:
 
     def _column_name_getter(self, obj):
         """Create callable that returns column names for given obj types."""
-        if is_namedtuple(obj):
+        if _is_namedtuple(obj):
             # Use namedtuple fields as columns
             def get(obj):
                 return list(obj._fields)
 
-        elif is_dict_like(obj):
+        elif _is_dict_like(obj):
             # Use dictionary keys as columns
             def get(obj):
                 return list(obj.keys())
 
-        elif is_list_like(obj):
+        elif _is_list_like(obj):
             # Use either predefined columns, or
             # generate range-based column values
             predefined = list(self._columns)
@@ -317,17 +347,17 @@ class Table:
 
     def _column_value_getter(self, obj):
         """Create callable that returns column values for given object types."""
-        if is_namedtuple(obj):
+        if _is_namedtuple(obj):
             # Get values using properties
             def get(obj, column):
                 return getattr(obj, column, None)
 
-        elif is_dict_like(obj):
+        elif _is_dict_like(obj):
             # Get values using dictionary keys
             def get(obj, column):
                 return obj.get(column)
 
-        elif is_list_like(obj):
+        elif _is_list_like(obj):
             # Get values using list indexes
             def get(obj, column):
                 col = self.column_location(column)
@@ -499,11 +529,11 @@ class Table:
         indexes = if_none(indexes, self.index)
         columns = if_none(columns, self._columns)
 
-        if is_list_like(indexes) and is_list_like(columns):
+        if _is_list_like(indexes) and _is_list_like(columns):
             return self.get_table(indexes, columns, as_list)
-        elif not is_list_like(indexes) and is_list_like(columns):
+        elif not _is_list_like(indexes) and _is_list_like(columns):
             return self.get_row(indexes, columns, as_list)
-        elif is_list_like(indexes) and not is_list_like(columns):
+        elif _is_list_like(indexes) and not _is_list_like(columns):
             return self.get_column(columns, indexes, as_list)
         else:
             return self.get_cell(indexes, columns)
@@ -515,7 +545,9 @@ class Table:
 
         return self._data[idx][col]
 
-    def get_row(self, index: Index, columns=None, as_list=False):
+    def get_row(
+        self, index: Index, columns=None, as_list=False
+    ) -> Union[Dict[str, Row], List[Row]]:
         """Get column values from row.
 
         Args:
@@ -525,6 +557,8 @@ class Table:
         """
         columns = if_none(columns, self._columns)
         idx = self.index_location(index)
+
+        row: Union[Dict[str, Row], List[Row]]
 
         if as_list:
             row = []
@@ -562,6 +596,18 @@ class Table:
                 idx = self.index_location(index)
                 column[idx] = self._data[idx][col]
             return column
+
+    @overload
+    def get_table(
+        self, indexes=None, columns=None, as_list: Literal[False] = False
+    ) -> "Table":
+        ...
+
+    @overload
+    def get_table(
+        self, indexes=None, columns=None, as_list: Literal[True] = True
+    ) -> List:
+        ...
 
     def get_table(
         self, indexes=None, columns=None, as_list=False
@@ -707,14 +753,14 @@ class Table:
 
     def delete_rows(self, indexes: Union[Index, List[Index]]):
         """Remove rows with matching indexes."""
-        indexes = [self.index_location(idx) for idx in to_list(indexes)]
+        index_list: List[int] = [self.index_location(idx) for idx in to_list(indexes)]
 
-        unknown = set(indexes) - set(self.index)
+        unknown = set(index_list) - set(self.index)
         if unknown:
             names = ", ".join(str(name) for name in unknown)
             raise ValueError(f"Unable to remove unknown rows: {names}")
 
-        for index in sorted(indexes, reverse=True):
+        for index in sorted(index_list, reverse=True):
             del self._data[index]
 
     def delete_columns(self, columns):
@@ -810,9 +856,12 @@ class Table:
         through the provided condition will be removed.
         """
 
-        def _check_row(index: int) -> bool:
-            row = self.get_row(index)
-            return condition(row)
+        def _check_row(index: Union[Index, Row]) -> bool:
+            if isinstance(index, (str, int)):
+                row = self.get_row(index)
+                return condition(row)
+
+            return False
 
         self._filter(_check_row)
 
@@ -823,9 +872,12 @@ class Table:
         falsy are removed.
         """
 
-        def _check_cell(index: int) -> bool:
-            cell = self.get_cell(index, column)
-            return condition(cell)
+        def _check_cell(index: Union[Index, Row]) -> bool:
+            if isinstance(index, (str, int)):
+                cell = self.get_cell(index, column)
+                return condition(cell)
+
+            return False
 
         self._filter(_check_cell)
 
@@ -840,7 +892,7 @@ class Table:
     def iter_dicts(self, with_index=True) -> Generator[Dict[Column, Any], None, None]:
         """Iterate rows with values as dicts."""
         for index in self.index:
-            row = {"index": index} if with_index else {}
+            row: Dict[Column, Any] = {"index": index} if with_index else {}
             for column in self._columns:
                 row[column] = self.get_cell(index, column)
             yield row
@@ -983,7 +1035,7 @@ class Tables:
             raise TypeError("Method requires Table object")
 
     def create_table(
-        self, data: Data = None, trim: bool = False, columns: List[str] = None
+        self, data: Data = None, trim: bool = False, columns: Optional[List[str]] = None
     ) -> Table:
         """Create Table object from data.
 
@@ -1159,7 +1211,7 @@ class Tables:
         columns = uniq(column for table in tables for column in table.columns)
         merged = Table(columns=columns)
 
-        seen = {}
+        seen: Dict[str, Any] = {}
 
         def find_index(row):
             """Find index for row, if key already exists."""
@@ -1439,10 +1491,10 @@ class Tables:
 
         """
         self._requires_table(table)
-        row = if_none(row, table.index[0])
+        row_index: Index = if_none(row, table.index[0])
 
-        values = table.get_row(row, as_list=as_list)
-        table.delete_rows(row)
+        values = table.get_row(row_index, as_list=as_list)
+        table.delete_rows(row_index)
         return values
 
     def pop_table_column(
@@ -1471,10 +1523,10 @@ class Tables:
 
         """
         self._requires_table(table)
-        column: Column = if_none(column, table.columns[0])
+        column_name = if_none(column, table.columns[0])
 
-        values = self.get_table_column(table, column)
-        table.delete_columns(column)
+        values = self.get_table_column(table, column_name)
+        table.delete_columns(column_name)
         return values
 
     def get_table_slice(
@@ -1792,7 +1844,7 @@ class Tables:
         """
         self._requires_table(table)
 
-        def condition(row: Row) -> bool:
+        def condition(row: Union[Index, Row]) -> bool:
             return func(row, *args)
 
         before = len(table)
@@ -1966,6 +2018,8 @@ class Tables:
         with open(path, newline="", encoding=encoding) as fd:
             sample = fd.readline()
 
+        dialect_name: Union[str, Type[csv.Dialect]]
+
         if dialect is None:
             dialect_name = sniffer.sniff(sample, delimiters)
         elif isinstance(dialect, Dialect):
@@ -1975,6 +2029,8 @@ class Tables:
 
         if header is None:
             header = sniffer.has_header(sample)
+
+        reader: Any
 
         with open(path, newline="", encoding=encoding) as fd:
             if header:
@@ -2003,7 +2059,7 @@ class Tables:
         header: bool = True,
         dialect: Union[str, Dialect] = Dialect.Excel,
         encoding: Optional[str] = None,
-        delimiter: Optional[str] = ",",
+        delimiter: Optional[str] = None,
     ):
         """Write a table as a CSV file.
 
@@ -2025,6 +2081,7 @@ class Tables:
                 Write table to CSV    ${sheet}    output.csv
 
         """
+        delimiter = delimiter or ","
         self._requires_table(table)
 
         if isinstance(dialect, Dialect):

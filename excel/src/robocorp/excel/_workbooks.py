@@ -3,14 +3,16 @@ import pathlib
 from collections import defaultdict
 from contextlib import contextmanager
 from io import BytesIO
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import openpyxl
-import xlrd
-import xlwt
+import xlrd  # type: ignore[import-untyped]
+import xlwt  # type: ignore[import-untyped]
 from openpyxl.utils import get_column_letter
-from openpyxl.utils.exceptions import InvalidFileException
-from xlutils.copy import copy as xlutils_copy
+from openpyxl.utils.exceptions import (
+    InvalidFileException,  # type: ignore[import-untyped]
+)
+from xlutils.copy import copy as xlutils_copy  # type: ignore[import-untyped]
 
 from robocorp.excel._types import PathType
 from robocorp.excel.tables import Table
@@ -41,7 +43,7 @@ def _ensure_unique(values: Any) -> List[Any]:
 
     def to_unique(values: Any) -> List[Any]:
         output = []
-        seen = defaultdict(int)
+        seen: Dict[str, int] = defaultdict(int)
         for value in values:
             if seen[value] and isinstance(value, str):
                 output.append("%s_%d" % (value, seen[value] + 1))
@@ -66,6 +68,8 @@ def _load_workbook(
 ) -> Union["XlsWorkbook", "XlsxWorkbook"]:
     # pylint: disable=broad-except
     parsed_path = pathlib.Path(path).resolve(strict=True)
+
+    book: Union["XlsWorkbook", "XlsxWorkbook"]
 
     try:
         book = XlsxWorkbook()
@@ -111,7 +115,7 @@ class BaseWorkbook:
         self.path = path
 
     def worksheet(self, name: str) -> Worksheet:
-        return Worksheet(self, name)
+        return Worksheet(self, name)  # type: ignore
 
     def _validate_content(self, props_obj: Any):
         # Strips leading/trailing whitespace in Excel properties.
@@ -237,6 +241,9 @@ class XlsxWorkbook(BaseWorkbook):
         self._validate_content(self._book.properties)
 
     def save(self, path: Union[PathType, BytesIO]):
+        if self._book is None:
+            raise ValueError("Workbook is not open")
+
         if not isinstance(path, BytesIO):
             path = str(pathlib.Path(path))
         if not path:
@@ -249,6 +256,9 @@ class XlsxWorkbook(BaseWorkbook):
         self.active = name
 
     def read_worksheet(self, name=None, header=False, start=None) -> List[dict]:
+        if self._book is None:
+            raise ValueError("Workbook is not open")
+
         name = self._get_sheetname(name)
         sheet = self._book[name]
         start = self._to_index(start)
@@ -310,13 +320,13 @@ class XlsxWorkbook(BaseWorkbook):
         self.active = sheet_name
 
     def _append_on_first_empty_based_on_values(self, content, columns, sheet):
-        first_empty_row: Optional[int] = None
+        first_empty_row: Optional[int] = None  # type: ignore[annotation-unchecked]
         for row_num in range(sheet.max_row, 0, -1):
             if all(cell.value is None for cell in sheet[row_num]):
                 first_empty_row = row_num
             else:
                 break
-        first_empty_row: int = first_empty_row or sheet.max_row + 1
+        first_empty_row: int = first_empty_row or sheet.max_row + 1  # type: ignore[annotation-unchecked]
         for row_idx, row in enumerate(content):
             values = self._row_to_values(row, columns)
             for cell_idx, acell in enumerate(sheet[first_empty_row + row_idx]):
@@ -563,6 +573,9 @@ class XlsWorkbook(BaseWorkbook):
         self.active = name
 
     def read_worksheet(self, name=None, header=False, start=None) -> List[dict]:
+        if self._book is None:
+            raise ValueError("Workbook is not opened")
+
         name = self._get_sheetname(name)
         sheet = self._book.sheet_by_name(name)
         start = self._to_index(start)
@@ -650,13 +663,13 @@ class XlsWorkbook(BaseWorkbook):
         self.active = name
 
     def _return_first_empty_row(self, sheet):
-        first_empty_row: Optional[int] = None
+        first_empty_row: Optional[int] = None  # type: ignore[annotation-unchecked]
         for row_num in range(sheet.nrows - 1, 0, -1):
             if all(cell.value == "" for cell in sheet[row_num]):
                 first_empty_row = row_num
             else:
                 break
-        first_empty_row: int = first_empty_row or sheet.nrows
+        first_empty_row: int = first_empty_row or sheet.nrows  # type: ignore[annotation-unchecked]
         return first_empty_row
 
     def remove_worksheet(self, name=None):
