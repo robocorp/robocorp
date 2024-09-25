@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.5 - 2024-09-25
+
+- Bump requests to 2.32.3
+
 ## 1.0.4 - 2024-04-08
 
 - Update package's main README.
