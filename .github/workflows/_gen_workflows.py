@@ -476,7 +476,7 @@ class WindowsTests(BaseTests):
 
     after_run_custom_additional_steps = [
         {
-            "uses": "actions/upload-artifact@v1",
+            "uses": "actions/upload-artifact@v4",
             "if": "always()",
             "with": {
                 "name": "log.${{ matrix.name }}.html",
@@ -484,7 +484,7 @@ class WindowsTests(BaseTests):
             },
         },
         {
-            "uses": "actions/upload-artifact@v1",
+            "uses": "actions/upload-artifact@v4",
             "if": "always()",
             "with": {
                 "name": "log.${{ matrix.name }}.robolog",

@@ -34,9 +34,9 @@ def create_workbook(
     # removed path, as it is only used when saved
     # files.create_workbook()
     if fmt == "xlsx":
-        workbook = XlsxWorkbook()
+        workbook = XlsxWorkbook()  # type: ignore
     elif fmt == "xls":
-        workbook = XlsWorkbook()
+        workbook = XlsWorkbook()  # type: ignore
     else:
         raise ValueError(f"Unknown format: {fmt}")
 

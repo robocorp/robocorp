@@ -44,8 +44,8 @@ class Worksheet:
             fmt = image.format
             width = int(image.width * float(scale))
             height = int(image.height * float(scale))
-            image = image.resize((width, height), Image.LANCZOS)
-            image.format = fmt
+            img = image.resize((width, height), Image.Resampling.LANCZOS)
+            img.format = fmt  # type: ignore
 
         self._workbook.excel.insert_image(row, column, image, self.name)
         return self

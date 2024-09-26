@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-http"
-version = "0.4.2"
+version = "0.4.3"
 description = "Robocorp HTTP library (deprecated)"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -20,7 +20,7 @@ profile = "black"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-requests = "^2.31.0"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = {path = "../devutils/", develop = true}

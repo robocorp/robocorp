@@ -82,12 +82,12 @@ jobs:
         inv docs --check
 
         '
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: log.${{ matrix.name }}.html
         path: windows/output/log.html
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: log.${{ matrix.name }}.robolog

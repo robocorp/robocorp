@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.4.6 - 2024-09-25
+
+- bump certifi to 2024.8.30
+
 ## 1.4.5 - 2024-04-08
 
 - Update package's main README.

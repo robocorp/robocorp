@@ -11,10 +11,10 @@ from . import RESOURCES_DIR
 
 DATA_COLUMNS = ["one", "two", "three", "four"]
 
-TUPLE_THREE = namedtuple("Three", ["one", "two", "three"])
-TUPLE_FOUR = namedtuple("Four", ["one", "two", "three", "four"])
-TUPLE_SPARSE = namedtuple("Sparse", ["one", "two", "four"])
-TUPLE_EMPTY = namedtuple("Empty", [])
+TUPLE_THREE = namedtuple("Three", ["one", "two", "three"])  # type: ignore[name-match]
+TUPLE_FOUR = namedtuple("Four", ["one", "two", "three", "four"])  # type: ignore[name-match]
+TUPLE_SPARSE = namedtuple("Sparse", ["one", "two", "four"])  # type: ignore[name-match]
+TUPLE_EMPTY = namedtuple("Empty", [])  # type: ignore[name-match]
 
 DATA_NAMEDTUPLE = [
     TUPLE_THREE(1, 2, 3),

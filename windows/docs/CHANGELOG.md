@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.4 - 2024-09-25
+
+- Bump zipp to 3.20.2
+
 ## 1.0.3 - 2024-04-08
 
 - Stable API documentation generation impacting parameters taking functions as defaults.

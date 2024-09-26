@@ -8,7 +8,7 @@ def test_secrets_encryption_raw() -> None:
     from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
     data = b"a secret message"
-    key = AESGCM.generate_key(bit_length=256)
+    key = AESGCM.generate_key(256)
     aesgcm = AESGCM(key)
     nonce = os.urandom(12)
     ct = aesgcm.encrypt(nonce, data, None)
@@ -24,7 +24,7 @@ def test_action_context() -> None:
 
     from robocorp.actions._action_context import ActionContext
 
-    keys = [AESGCM.generate_key(bit_length=256), AESGCM.generate_key(bit_length=256)]
+    keys = [AESGCM.generate_key(256), AESGCM.generate_key(256)]
     if USE_STATIC_INFO:
         keys = [b"a" * len(keys[0])]
 
@@ -68,7 +68,7 @@ def test_action_context_auth_tag() -> None:
 
     from robocorp.actions._action_context import ActionContext
 
-    keys = [AESGCM.generate_key(bit_length=256), AESGCM.generate_key(bit_length=256)]
+    keys = [AESGCM.generate_key(256), AESGCM.generate_key(256)]
     if USE_STATIC_INFO:
         keys = [b"a" * len(keys[0])]
 

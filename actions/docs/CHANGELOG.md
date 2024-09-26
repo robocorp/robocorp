@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.2.2 - 2024-09-23
+- Update cryptography and zipp dependencies.  
+
 ## 0.2.1 - 2024-04-17
 
 - Accepts `auth-tag` when using `aes256-gcm` for encrypting the `x-action-context` contents

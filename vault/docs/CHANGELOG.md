@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.3.7 - 2024-09-25
+
+- Bump cryptography to 43.0.01
+- Bump requests to 2.32.3
+
 ## 1.3.6 - 2024-07-04
 
 - Improve error message during `truststore` infinite recursion bug.
