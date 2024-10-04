@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-## 0.4.3 - 2024-09-25
+## 0.4.3 - 2024-10-04
 
-- Bump requests to 2.32.3
+Update dependencies
 
 ## 0.4.2 - 2024-01-12 (deprecated)
 
