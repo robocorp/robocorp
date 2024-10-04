@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-## 0.4.3 - 2024-09-25
-
-- Bump requests to 2.32.3
 
 ## 0.4.2 - 2024-01-12 (deprecated)
 
