@@ -12,7 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.concurrency import run_in_threadpool
 
 if typing.TYPE_CHECKING:
-    from ._models import Action, Run
+    from sema4ai_action_server._models import Action, Run
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def _create_run_artifacts_dir(action: "Action", run_id: str) -> str:
         The path, relative to the settings.artifacts_dir which should be used
         to store the output of the given run.
     """
-    from ._settings import get_settings
+    from sema4ai_action_server._settings import get_settings
 
     settings = get_settings()
     artifacts_dir = settings.artifacts_dir
@@ -50,11 +50,11 @@ def _create_run_artifacts_dir(action: "Action", run_id: str) -> str:
 def _create_run(
     action: "Action", run_id: str, inputs: dict, relative_artifacts_dir: str
 ) -> "Run":
-    from robocorp.action_server._models import RUN_ID_COUNTER, Counter
+    from sema4ai_action_server._models import RUN_ID_COUNTER, Counter
 
-    from ._database import datetime_to_str
-    from ._models import Run, RunStatus, get_db
-    from ._runs_state_cache import get_global_runs_state
+    from sema4ai_action_server._database import datetime_to_str
+    from sema4ai_action_server._models import Run, RunStatus, get_db
+    from sema4ai_action_server._runs_state_cache import get_global_runs_state
 
     db = get_db()
     run_kwargs: Dict[str, Any] = dict(
@@ -93,8 +93,8 @@ def _create_run(
 
 
 def _update_run(run: "Run", initial_time: float, run_finished: bool, **changes):
-    from ._models import get_db
-    from ._runs_state_cache import get_global_runs_state
+    from sema4ai_action_server._models import get_db
+    from sema4ai_action_server._runs_state_cache import get_global_runs_state
 
     if run_finished:
         changes["run_time"] = time.monotonic() - initial_time
@@ -112,13 +112,13 @@ def _update_run(run: "Run", initial_time: float, run_finished: bool, **changes):
 
 
 def _set_run_as_finished_ok(run: "Run", result: str, initial_time: float):
-    from ._models import RunStatus
+    from sema4ai_action_server._models import RunStatus
 
     _update_run(run, initial_time, True, result=result, status=RunStatus.PASSED)
 
 
 def _set_run_as_finished_failed(run: "Run", error_message: str, initial_time: float):
-    from ._models import RunStatus
+    from sema4ai_action_server._models import RunStatus
 
     _update_run(
         run, initial_time, True, status=RunStatus.FAILED, error_message=error_message
@@ -126,7 +126,7 @@ def _set_run_as_finished_failed(run: "Run", error_message: str, initial_time: fl
 
 
 def _set_run_as_running(run: "Run", initial_time: float):
-    from ._models import RunStatus
+    from sema4ai_action_server._models import RunStatus
 
     _update_run(run, initial_time, False, status=RunStatus.RUNNING)
 
@@ -149,11 +149,11 @@ def _run_action_in_thread(
     We have to take care of making a run with the proper environment,
     creating the run, collecting output info, etc.
     """
-    from robocorp.action_server._gen_ids import gen_uuid
-    from robocorp.action_server._settings import get_settings
+    from sema4ai_action_server._gen_ids import gen_uuid
+    from sema4ai_action_server._settings import get_settings
 
-    from ._actions_process_pool import get_actions_process_pool
-    from ._models import Run, get_db
+    from sema4ai_action_server._actions_process_pool import get_actions_process_pool
+    from sema4ai_action_server._models import Run, get_db
 
     settings = get_settings()
 

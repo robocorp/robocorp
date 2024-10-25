@@ -14,7 +14,7 @@ The `Robocorp Action Server` automatically generates an OpenAPI spec for your Py
 
 ## 1. Install Action Server
 
-Action Server is available as a stand-alone fully signed executable and via `pip install robocorp-action-server`.
+Action Server is available as a stand-alone fully signed executable and via `pip install sema4ai-action-server`.
 > We recommend the executable to prevent confusion in case you have multiple/crowded Python environments, etc.
 
 #### For macOS
@@ -76,7 +76,7 @@ Start new projects with:
 
 `action-server new`
 
-Note: the `action-server` executable should be automatically added to your python installation after `pip install robocorp-action-server`, but if for some reason it wasn't pip-installed, it's also possible to use `python -m robocorp.action_server` instead of `action-server`.
+Note: the `action-server` executable should be automatically added to your python installation after `pip install sema4ai-action-server`, but if for some reason it wasn't pip-installed, it's also possible to use `python -m robocorp.action_server` instead of `action-server`.
 
 After creating the project, it's possible to serve the actions under the current directory with:
 
@@ -92,8 +92,8 @@ After it's started, it's possible to access the following URLs:
 
 ## Documentation
 
-Explore our [docs](https://github.com/robocorp/robocorp/tree/master/action_server/docs) for extensive documentation.
+Explore our [docs](https://github.com/Sema4AI/actions/tree/master/action_server/docs) for extensive documentation.
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/action_server/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/Sema4AI/actions/blob/master/action_server/docs/CHANGELOG.md).

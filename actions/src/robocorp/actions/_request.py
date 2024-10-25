@@ -99,6 +99,6 @@ class Request:
 
     @classmethod
     def model_validate(cls, dct: dict) -> "Request":
-        from robocorp.actions._request_impl import _RequestImpl
+        from sema4ai.actions._request_impl import _RequestImpl
 
         return _RequestImpl.model_validate(dct)

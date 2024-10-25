@@ -3,7 +3,7 @@ from typing import List
 
 from fastapi.routing import APIRouter
 
-from robocorp.action_server._models import Action, ActionPackage
+from sema4ai_action_server._models import Action, ActionPackage
 
 action_package_api_router = APIRouter(prefix="/api/actionPackages")
 
@@ -17,7 +17,7 @@ class ActionPackageApi:
 
 @action_package_api_router.get("", response_model=List[ActionPackageApi])
 def list_action_packages():
-    from robocorp.action_server._models import get_db
+    from sema4ai_action_server._models import get_db
 
     db = get_db()
     with db.connect():

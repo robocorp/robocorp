@@ -1,7 +1,7 @@
 import typing
 
 if typing.TYPE_CHECKING:
-    from robocorp.actions._action_context import ActionContext
+    from sema4ai_actions._action_context import ActionContext
 
 
 class Secret:
@@ -14,7 +14,7 @@ class Secret:
     Example:
 
         ```
-        from robocorp.actions import action, Secret
+        from sema4ai_actions import action, Secret
 
         @action
         def my_action(password: Secret):
@@ -78,7 +78,7 @@ class _RawSecret(Secret):
             value: The secret value to be wrapped in this class (note that
                 it's automatically hidden in the logs).
         """
-        from robocorp import log
+        from sema4ai import log
 
         log.hide_from_output(value)
         log.hide_from_output(repr(value))
@@ -115,7 +115,7 @@ class _SecretInActionContext(Secret):
         """
         Provides the actual secret wrapped in this class.
         """
-        from robocorp import log
+        from sema4ai import log
 
         with log.suppress():
             dct = self._action_context.value

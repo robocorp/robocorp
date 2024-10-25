@@ -3,8 +3,8 @@ import typing
 from contextlib import contextmanager
 from typing import Optional
 
-from robocorp.tasks._argdispatch import _ArgDispatcher
-from robocorp.tasks._customization._plugin_manager import PluginManager
+from sema4ai_tasks._argdispatch import _ArgDispatcher
+from sema4ai_tasks._customization._plugin_manager import PluginManager
 
 
 def _translate(msg):
@@ -26,17 +26,17 @@ class _ActionsArgDispatcher(_ArgDispatcher):
     def _register_lint(self, stream: typing.IO):
         from pathlib import Path
 
-        from robocorp.tasks import _hooks
+        from sema4ai_tasks import _hooks
 
-        from robocorp.actions import _lint_action
-        from robocorp.actions._lint_action import format_lint_results
+        from sema4ai_actions import _lint_action
+        from sema4ai_actions._lint_action import format_lint_results
 
         files_found = set()
 
         def on_func_found(func, *args, **kwargs) -> None:
             import json
 
-            from robocorp.actions._lint_action import (
+            from sema4ai_actions._lint_action import (
                 DiagnosticSeverity,
                 DiagnosticsTypedDict,
                 LintResultTypedDict,
@@ -82,7 +82,7 @@ class _ActionsArgDispatcher(_ArgDispatcher):
     def _list(self, *args, **kwargs):
         from contextlib import nullcontext, redirect_stdout
 
-        from robocorp.tasks import _commands
+        from sema4ai_tasks import _commands
 
         skip_lint = kwargs.pop("skip_lint", True)
 
@@ -96,12 +96,12 @@ class _ActionsArgDispatcher(_ArgDispatcher):
                 return _commands.list_tasks(*args, __stream__=original_stdout, **kwargs)
 
     def _run(self, *args, **kwargs):
-        from robocorp.tasks import _commands
+        from sema4ai_tasks import _commands
 
         return _commands.run(*args, **kwargs)
 
     def _get_description(self):
-        return "Robocorp Actions library"
+        return "Sema4AI Actions library"
 
     def _add_task_argument(self, run_parser):
         run_parser.add_argument(
