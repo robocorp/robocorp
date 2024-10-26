@@ -24,26 +24,26 @@ def action(func: Callable, **kwargs: Optional[ActionOptions]) -> Callable:
 
 def action(*args, **kwargs):
     """
-    Decorator for actions (entry points) which can be executed by `robocorp.actions`.
+    Decorator for actions (entry points) which can be executed by `sema4ai.actions`.
 
     i.e.:
 
     If a file such as actions.py has the contents below:
 
     ```python
-    from robocorp.actions import action
+    from sema4ai.actions import action
 
     @action
     def enter_user() -> str:
         ...
     ```
 
-    It'll be executable by robocorp actions as:
+    It'll be executable by sema4ai actions as:
 
-    python -m robocorp.actions run actions.py -a enter_user
+    python -m sema4ai.actions run actions.py -a enter_user
 
     Args:
-        func: A function which is a action to `robocorp.actions`.
+        func: A function which is a action to `sema4ai.actions`.
         is_consequential: Whether the action is consequential or not. This will add `x-openai-isConsequential: true` to the action metadata and shown in OpenApi spec.
     """
 
@@ -68,7 +68,7 @@ def session_cache(func):
     actions have been run.
 
     A decorator which automatically cache the result of the given function and
-    will return it on any new invocation until robocorp-actions finishes running
+    will return it on any new invocation until sema4ai-actions finishes running
     all actions.
 
     The function may be either a generator with a single yield (so, the first
@@ -89,7 +89,7 @@ def action_cache(func):
     current action has been run.
 
     A decorator which automatically cache the result of the given function and
-    will return it on any new invocation until robocorp-actions finishes running
+    will return it on any new invocation until sema4ai-actions finishes running
     the current action.
 
     The function may be either a generator with a single yield (so, the first

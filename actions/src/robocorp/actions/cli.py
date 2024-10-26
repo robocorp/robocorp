@@ -4,7 +4,7 @@ from typing import Optional
 
 if typing.TYPE_CHECKING:
     # Don't add to public API here.
-    from robocorp.tasks._customization._plugin_manager import (
+    from sema4ai_tasks._customization._plugin_manager import (
         PluginManager as _PluginManager,
     )
 
@@ -13,7 +13,7 @@ def main(
     args=None, exit: bool = True, plugin_manager: Optional["_PluginManager"] = None
 ) -> int:
     """
-    Entry point for running actions from robocorp-actions.
+    Entry point for running actions from sema4ai-actions.
 
     Args:
         args: The command line arguments.
@@ -27,9 +27,9 @@ def main(
     Returns:
         The exit code for the process.
     """
-    from robocorp.actions._args_dispatcher import _ActionsArgDispatcher
+    from sema4ai.actions._args_dispatcher import _ActionsArgDispatcher
 
-    # Note: robocorp-actions is almost only robocorp-tasks but with a few
+    # Note: sema4ai-actions is almost only sema4ai-tasks but with a few
     # different APIs.
     #
     # As both are under our control, we rely on internal APIs to make
@@ -39,20 +39,20 @@ def main(
     if args is None:
         args = sys.argv[1:]
 
-    from robocorp.tasks import _constants
-    from robocorp.tasks.cli import main
+    from sema4ai_tasks import _constants
+    from sema4ai_tasks.cli import main
 
     _constants.DEFAULT_TASK_SEARCH_GLOB = "*action*.py"
-    _constants.MODULE_ENTRY_POINT = "robocorp.actions"
+    _constants.MODULE_ENTRY_POINT = "sema4ai.actions"
 
     if plugin_manager is None:
         # If not provided, let's still add the 'request' as a managed parameter
         # (without any actual data).
-        from robocorp.tasks._customization._extension_points import EPManagedParameters
-        from robocorp.tasks._customization._plugin_manager import PluginManager
+        from sema4ai_tasks._customization._extension_points import EPManagedParameters
+        from sema4ai_tasks._customization._plugin_manager import PluginManager
 
-        from robocorp.actions._managed_parameters import ManagedParameters
-        from robocorp.actions._request import Request
+        from sema4ai.actions._managed_parameters import ManagedParameters
+        from sema4ai.actions._request import Request
 
         plugin_manager = PluginManager()
         plugin_manager.set_instance(

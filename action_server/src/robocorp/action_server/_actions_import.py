@@ -7,16 +7,16 @@ from pathlib import Path
 
 from termcolor import colored
 
-from robocorp.action_server._robo_utils.callback import Callback, OnExitContextManager
-from robocorp.action_server.vendored_deps.action_package_handling.cli_errors import (
+from sema4ai_action_server._robo_utils.callback import Callback, OnExitContextManager
+from sema4ai_action_server.vendored_deps.action_package_handling.cli_errors import (
     ActionPackageError,
 )
-from robocorp.action_server.vendored_deps.termcolors import bold_red, bold_yellow
+from sema4ai_action_server.vendored_deps.termcolors import bold_red, bold_yellow
 
 if typing.TYPE_CHECKING:
-    from robocorp.actions._protocols import ActionsListActionTypedDict
+    from sema4ai_actions._protocols import ActionsListActionTypedDict
 
-    from robocorp.action_server._models import ActionPackage
+    from sema4ai_action_server._models import ActionPackage
 
 log = logging.getLogger(__name__)
 
@@ -50,18 +50,18 @@ hook_on_actions_list: IHookOnActionsList = Callback(raise_exceptions=True)
 
 
 def _log_deprecated_conda():
-    from robocorp.action_server._settings import is_frozen
+    from sema4ai_action_server._settings import is_frozen
 
     if is_frozen():
         cmd = "action-server"
     else:
-        cmd = "python -m robocorp.action_server"
+        cmd = "python -m sema4ai_action_server"
     log.critical(
         bold_red(
             "Deprecated: The file for defining the environment is now `package.yaml`.\n"
             "It's not a one to one mapping for action-server.yaml, but\n"
             f"`{cmd} package update` can be used to make most of the needed changes.\n"
-            "See: https://github.com/robocorp/robocorp/blob/master/action_server/docs/guides/01-package-yaml.md for more details."
+            "See: https://github.com/Sema4AI/actions/blob/master/action_server/docs/guides/01-package-yaml.md for more details."
         )
     )
 
@@ -90,8 +90,8 @@ def import_action_package(
         environment.
     """
 
-    from robocorp.action_server._whitelist import accept_action_package
-    from robocorp.action_server.vendored_deps.action_package_handling import (
+    from sema4ai_action_server._whitelist import accept_action_package
+    from sema4ai_action_server.vendored_deps.action_package_handling import (
         create_conda_from_package_yaml,
     )
 
@@ -243,7 +243,7 @@ Note: no virtual environment will be used for the imported actions, they'll be r
 
     env = build_python_launch_env(use_env)
 
-    v = _get_robocorp_actions_version(env, import_path)
+    v = _get_sema4ai_actions_version(env, import_path)
     expected_version = (0, 0, 7)
     expected_version_str = ".".join(str(x) for x in expected_version)
     if v < expected_version:
@@ -251,27 +251,27 @@ Note: no virtual environment will be used for the imported actions, they'll be r
 
         if package_yaml_exists:
             raise ActionServerValidationError(
-                f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
-                f"Expected `robocorp-actions` version to be {expected_version_str} or higher.\n"
+                f"Error, the `sema4ai-actions` version is: {v_as_str}.\n"
+                f"Expected `sema4ai-actions` version to be {expected_version_str} or higher.\n"
                 f"Please update the version in: {original_conda_yaml}\n"
             )
         else:
             raise ActionServerValidationError(
-                f"Error, the `robocorp-actions` version is: {v_as_str}.\n"
+                f"Error, the `sema4ai-actions` version is: {v_as_str}.\n"
                 f"Expected it to be {expected_version_str} or higher.\n"
-                f"Please update the `robocorp-actions` version in your python environment (python: {sys.executable})\n"
+                f"Please update the `sema4ai-actions` version in your python environment (python: {sys.executable})\n"
             )
 
     min_version_for_encryption_with_auth_tag = (0, 2, 1)
     if v < min_version_for_encryption_with_auth_tag:
         v_as_str = ".".join(str(x) for x in v)
         log.critical(
-            f"Warning: the `robocorp-actions` version is: {v_as_str}.\n"
-            f"To receive encrypted secrets, robocorp-actions 0.2.1 or newer is required.\n"
+            f"Warning: the `sema4ai-actions` version is: {v_as_str}.\n"
+            f"To receive encrypted secrets, sema4ai-actions 0.2.1 or newer is required.\n"
             f"Please update the version in: {original_conda_yaml}\n"
             "(proceeding with initalization but actions receiving encrypted secrets will\n"
             "not work properly -- on future versions of the action server, support for \n"
-            "this version of robocorp-actions will be removed)."
+            "this version of sema4ai-actions will be removed)."
         )
 
     _add_actions_to_db(
@@ -285,20 +285,20 @@ Note: no virtual environment will be used for the imported actions, they'll be r
     )
 
 
-def _get_robocorp_actions_version(env, cwd) -> tuple[int, ...]:
-    from robocorp.action_server._settings import get_python_exe_from_env
+def _get_sema4ai_actions_version(env, cwd) -> tuple[int, ...]:
+    from sema4ai_action_server._settings import get_python_exe_from_env
 
     python = get_python_exe_from_env(env)
     cmdline: list[str] = [
         python,
         "-c",
-        "import robocorp.actions;print(robocorp.actions.__version__)",
+        "import sema4ai.actions;print(sema4ai.actions.__version__)",
     ]
-    msg = f"""Unable to get robocorp.actions version.
+    msg = f"""Unable to get sema4ai.actions version.
 
-This usually means that `robocorp.actions` is not installed in the python
-environment (if `action-server.yaml` is present, make sure that `robocorp-actions`
-is defined in the environment, otherwise make sure that `robocorp-actions`
+This usually means that `sema4ai.actions` is not installed in the python
+environment (if `action-server.yaml` is present, make sure that `sema4ai-actions`
+is defined in the environment, otherwise make sure that `sema4ai-actions`
 is installed in the same environment being used to run the action server).
 
 Python executable being used:
@@ -331,17 +331,17 @@ def _add_actions_to_db(
 ):
     from dataclasses import asdict
 
-    from robocorp.actions._lint_action import format_lint_results
+    from sema4ai_actions._lint_action import format_lint_results
 
-    from robocorp.action_server._errors_action_server import ActionServerValidationError
-    from robocorp.action_server._gen_ids import gen_uuid
-    from robocorp.action_server._models import Action, ActionPackage, get_db
-    from robocorp.action_server._settings import get_python_exe_from_env
-    from robocorp.action_server._whitelist import accept_action
+    from sema4ai_action_server._errors_action_server import ActionServerValidationError
+    from sema4ai_action_server._gen_ids import gen_uuid
+    from sema4ai_action_server._models import Action, ActionPackage, get_db
+    from sema4ai_action_server._settings import get_python_exe_from_env
+    from sema4ai_action_server._whitelist import accept_action
 
     python = get_python_exe_from_env(env)
 
-    cmdline = [python, "-m", "robocorp.actions", "list"]
+    cmdline = [python, "-m", "sema4ai.actions", "list"]
 
     if skip_lint:
         cmdline.append("--skip-lint")
@@ -396,7 +396,7 @@ def _add_actions_to_db(
     else:
         if not isinstance(actions_list_result, list):
             raise RuntimeError(
-                f"Expected robocorp.actions list to provide a list. Found: >>{stdout!r}<<"
+                f"Expected sema4ai.actions list to provide a list. Found: >>{stdout!r}<<"
             )
 
         hook_on_actions_list(

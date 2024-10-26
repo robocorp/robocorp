@@ -10,12 +10,12 @@ A Python library designed to simplify the development of Python actions _(AI or 
 
 ## Getting started
 
-If you have not setup Action Server already, see the [🏃‍♂️ Quickstart](https://github.com/robocorp/robocorp#quickstart) on how to do that.
+If you have not setup Action Server already, see the [🏃‍♂️ Quickstart](https://github.com/Sema4AI/actions#quickstart) on how to do that.
 
 Decorate your Python function with the `@action` decorator:
 
 ```py
-from robocorp.actions import action
+from sema4ai.actions import action
 
 @action
 def sum_numbers(a: float, b: float) -> float:
@@ -69,17 +69,17 @@ def get_weather_forecast(city: str, days: int, scale: str = "celsius") -> str:
 To get the full benefits of your actions, the suggested way to run them is using Action Server. But it's also possible to do that directly in command line by passing the named arguments:
 
 ```sh
-python -m robocorp.actions run -- --city=Helsinki --days=3
+python -m sema4ai.actions run -- --city=Helsinki --days=3
 ```
 
 ## Guides
 
-- [Request headers](https://github.com/robocorp/robocorp/blob/master/actions/docs/guides/00-request.md)
+- [Request headers](https://github.com/Sema4AI/actions/blob/master/actions/docs/guides/00-request.md)
 
 ## API Reference
 
-Explore our [API](https://github.com/robocorp/robocorp/blob/master/actions/docs/api/README.md) for extensive documentation.
+Explore our [API](https://github.com/Sema4AI/actions/blob/master/actions/docs/api/README.md) for extensive documentation.
 
 ## Changelog
 
-A list of releases and corresponding changes can be found in the [changelog](https://github.com/robocorp/robocorp/blob/master/actions/docs/CHANGELOG.md).
+A list of releases and corresponding changes can be found in the [changelog](https://github.com/Sema4AI/actions/blob/master/actions/docs/CHANGELOG.md).

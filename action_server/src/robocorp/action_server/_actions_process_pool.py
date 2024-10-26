@@ -12,7 +12,7 @@ from typing import Dict, Iterator, List, Optional, Set
 from starlette.requests import Request
 from termcolor import colored
 
-from robocorp.action_server._models import Action, ActionPackage
+from sema4ai_action_server._models import Action, ActionPackage
 
 from ._settings import Settings, is_frozen
 
@@ -89,11 +89,11 @@ class ProcessHandle:
     def __init__(self, settings: Settings, action_package: ActionPackage):
         from queue import Queue
 
-        from robocorp.action_server._preload_actions.preload_actions_streams import (
+        from sema4ai_action_server._preload_actions.preload_actions_streams import (
             JsonRpcStreamWriter,
         )
-        from robocorp.action_server._robo_utils.callback import Callback
-        from robocorp.action_server._robo_utils.run_in_thread import run_in_thread
+        from sema4ai_action_server._robo_utils.callback import Callback
+        from sema4ai_action_server._robo_utils.run_in_thread import run_in_thread
 
         from ._actions_run_helpers import (
             _add_preload_actions_dir_to_env_pythonpath,
