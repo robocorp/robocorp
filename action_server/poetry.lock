@@ -1987,7 +1987,7 @@ files = [
 
 [[package]]
 name = "starlette"
-version = "0.37.2"
+version = "0.40.0"
 description = "The little ASGI library that shines."
 optional = false
 python-versions = ">=3.8"
