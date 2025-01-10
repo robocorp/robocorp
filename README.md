@@ -3,11 +3,11 @@
 ## Overview
 
 The repository contains the essential parts of the Robocorp Automation Stack for Python:
-- AI Actions, Data Actions and Action Server can be found in Sema4.ai PyPI packages:
+- AI Actions, Data Actions and Action Server can be found in Sema4 Ai PyPI packages:
   - [sema4ai-actions](https://pypi.org/project/sema4ai-actions/)
   - [sema4ai-data](https://pypi.org/project/sema4ai-data/)
   - [sema4ai-action-server](https://pypi.org/project/sema4ai-action-server/)
-- Python Libraries with which the [AutomationTasks](guides/using-with-rcc.md) are created are housed and developed under this repository.
+- Python Libraries with which the [Automation Tasks](docs/guides/using-with-rcc.md) are created are housed and developed under this repository.
 
 ## Python Libraries
 
