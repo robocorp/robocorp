@@ -2,7 +2,6 @@
 
 > **⚠️ Deprecation Notice:**
 > Development of this package has moved and continues under a new PyPI package: [sema4ai-action-server](https://pypi.org/project/sema4ai-action-server/).
-> You can follow the development in this [GitHub repository](https://github.com/Sema4AI/actions).
 > The [robocorp-action-server](https://pypi.org/project/robocorp-action-server/) package will no longer receive updates, so please update your dependencies to ensure continued support and improvements.
 
 
