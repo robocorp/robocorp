@@ -12,8 +12,8 @@ license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-cryptography = ">=43.0.1,<44"
+python = ">3.9.1,<4.0"
+cryptography = ">=44.0.1,<45"
 requests = "^2.32.3"
 pyyaml = "^6.0"
 tenacity = "^8.0.1"
