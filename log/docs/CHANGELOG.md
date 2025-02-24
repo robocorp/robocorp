@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.9.4 - 2025-02-24
+
+- Update dependencies
+
 ## 2.9.3 - 2024-09-25
 
 - Update dependencies
@@ -39,7 +43,7 @@
 ## 2.7.0 - 2023-08-21
 
 - `if` statements now create a scope in `log.html` (when the function is not a generator).
-- If an exception has a cause or context the context/cause is now shown in the log 
+- If an exception has a cause or context the context/cause is now shown in the log
   - (i.e.: when an exception is raised from another exception or is raised while handling another exception all exceptions are shown).
 - `continue` and `break` inside a loop are properly handled.
 - `continue` and `break` are now shown in the logs.
@@ -51,12 +55,13 @@
 ## 2.6.0 - 2023-08-04
 
 - `log.html`:
-    - Tree usability improvements:
-        - When an item is expanded its children are scrolled into the tree.
-        - When row is focused, `Enter` can be used to open item details and `Space` to expand and collapse.
-        - When expand button is focused both `Enter` and `Space' can be used to expand and collapse.
-        - Clicking on row will show row focused.
-        - Clicking on row title will open item details.
+
+  - Tree usability improvements:
+    - When an item is expanded its children are scrolled into the tree.
+    - When row is focused, `Enter` can be used to open item details and `Space` to expand and collapse.
+    - When expand button is focused both `Enter` and `Space' can be used to expand and collapse.
+    - Clicking on row will show row focused.
+    - Clicking on row title will open item details.
 
 - Improved UI when logs are rotated out.
 - `log.html`: items are scrolled into the view when parent item is expanded.
@@ -81,26 +86,26 @@
 
 - It's possible to filter log levels by using `robocorp.log.setup_log`.
 
-    i.e.: `setup_log(log_level='warn')` will only show **warn** and **critical**
-    entries in the log (**info** and **debug** won't be added to the logs).
+  i.e.: `setup_log(log_level='warn')` will only show **warn** and **critical**
+  entries in the log (**info** and **debug** won't be added to the logs).
 
 - It's possible to also redirect to `sys.stdout` and `sys.stderr` the messages
   added with **log.debug**, **log.info**, **log.warn** and **log.critical**.
-    
-    **Note**: the default is only redirecting `log.critical` calls to `stderr`.
-    To redirect all, it's possible to customize the `output_log_level`.
-    i.e.: `setup_log(output_log_level='debug')`.
-    
-    **Note**: it's possible to customize for each log level to which stream it's 
-    redirected with `setup_log(output_stream={'debug': 'stderr'})`. By default
-    **warn** and **critical** go to **stderr** and **debug** and **info** go to **stdout**.
+
+  **Note**: the default is only redirecting `log.critical` calls to `stderr`.
+  To redirect all, it's possible to customize the `output_log_level`.
+  i.e.: `setup_log(output_log_level='debug')`.
+
+  **Note**: it's possible to customize for each log level to which stream it's
+  redirected with `setup_log(output_stream={'debug': 'stderr'})`. By default
+  **warn** and **critical** go to **stderr** and **debug** and **info** go to **stdout**.
 
 - In the `log.html`, it's possible to view log messages along with the terminal
   output.
 
 - Inside of VSCode, places showing the file/line of messages are now clickable and
   can be used to open the file location inside of VSCode.
-  
+
 - Fixed issue where some lines wouldn't map to the proper location in the file.
 
 - If the log format is newer than the one expected by the log.html the UI will show a message.
@@ -108,9 +113,9 @@
 ## 2.2.0 - 2023-07-06
 
 - Initial `VSCode` integration for `log.html`:
-    - A `compact` layout is now available (default on VSCode).
-    - Select for different runs available when inside of VSCode.
-    - Default theme based on VSCode theme.
+  - A `compact` layout is now available (default on VSCode).
+  - Select for different runs available when inside of VSCode.
+  - Default theme based on VSCode theme.
 
 ## 2.1.0 - 2023-06-30
 
@@ -123,8 +128,8 @@
 
 - Fixed handling `return` statement: when `log_on_project_call` matches for a module it'll only
   show the return value if the function was called from user code.
-  
-- Filters passed for the auto-logging now accept fnmatch-style names (i.e.: `Filter("*pydev*", kind="exclude")` 
+
+- Filters passed for the auto-logging now accept fnmatch-style names (i.e.: `Filter("*pydev*", kind="exclude")`
   or `Filter("*", kind="exclude")`).
 
 Backward incompatible changes:
@@ -132,8 +137,8 @@ Backward incompatible changes:
 - Log API changed: `robocorp.log.BaseConfig` was renamed to `robocorp.log.AutoLogConfigBase`.
 - Log API changed: `robocorp.log.ConfigFilesFiltering` was renamed to `robocorp.log.DefaultAutoLogConfig`.
 - The log configuration now has a setting specifying the default filter kind for modules not listed which is now `log_on_project_call`.
-    Note that previously it excluded from the logs anything that wasn't user code that didn't
-    match a filter, now it should log those when directly called from user code.
+  Note that previously it excluded from the logs anything that wasn't user code that didn't
+  match a filter, now it should log those when directly called from user code.
 
 ## 1.2.0 - 2023-06-23
 
@@ -146,30 +151,31 @@ Backward incompatible changes:
 
 - If the depth of a recursion is > 20 it will be shown in the same level so
   that messages are still readable.
-  
+
 - Fixes regarding reinitializing the stack state when a file is rotated.
 
 - If the log is partial a message is shown to the user.
-  
-- It's possible to specify whether the default theme to be used is `dark` 
-  or `light` by passing arguments in the `log.html`. 
-  
+
+- It's possible to specify whether the default theme to be used is `dark`
+  or `light` by passing arguments in the `log.html`.
+
   i.e.: `log.html?theme=dark`
-  
+
 - Variable pretty-printing improvements
-    - if a variable representation is considered small its contents won't be broken into new lines.
 
-      i.e.: `(a, b, c)` will be shown as is instead of being broken into 5 lines.
+  - if a variable representation is considered small its contents won't be broken into new lines.
 
-    - Unbalanced tokens such as `[` or `]` without a counterpart are better handled.
-  
+    i.e.: `(a, b, c)` will be shown as is instead of being broken into 5 lines.
+
+  - Unbalanced tokens such as `[` or `]` without a counterpart are better handled.
+
 - Improvements to the degenerate case where the chosen max log file
-is too close to the size of a single message:
+  is too close to the size of a single message:
 
-To improve this case, a `min_messages_per_file` was added to 
+To improve this case, a `min_messages_per_file` was added to
 `robocorp.log.add_log_output` where it'll only start rotating to a new file after
 a given amount of messages was given (the default is now `50`)
-and the maximum size for a repr can be set (by default it's now set to `200k` 
+and the maximum size for a repr can be set (by default it's now set to `200k`
 chars before clipping the `repr(obj)`).
 
 - New API: `robocorp.log.setup_log`:
@@ -194,21 +200,21 @@ def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
 
 - New parameter in `robocorp.log.add_log_output`:
 
-    `min_messages_per_file`: This is the minimum number of messages that need
-        to be added to a file for it to be rotated (if messages are too big
-        this may make the max_file_size be surpassed). This is needed to
-        prevent a case where a whole new file could be created after just
-        a single message if the message was too big for the max file size.
+  `min_messages_per_file`: This is the minimum number of messages that need
+  to be added to a file for it to be rotated (if messages are too big
+  this may make the max_file_size be surpassed). This is needed to
+  prevent a case where a whole new file could be created after just
+  a single message if the message was too big for the max file size.
 
 ## 1.0.1 - 2023-06-14
 
 - Improvements in `log.html`:
-    - Variables are now pretty-printed in details.
-    - Variables in the tree are always shown in a single line.
+  - Variables are now pretty-printed in details.
+  - Variables in the tree are always shown in a single line.
 
 ## 1.0.0 - 2023-06-13
 
-- `for` statement: code is no longer rewritten to add two `try..except..finally` blocks for each for loop. 
+- `for` statement: code is no longer rewritten to add two `try..except..finally` blocks for each for loop.
 - Semantic versioning now used.
 - Classifier changed to `Beta`.
 
@@ -222,17 +228,17 @@ def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
 ## 0.3.0
 
 - New API: `robocorp.log.process_snapshot()`:
-    Makes a process snapshot and adds it to the logs.
-    A process snapshot can include details on the python process and subprocesses
-    and should add a thread dump with the stack of all running threads.
+  Makes a process snapshot and adds it to the logs.
+  A process snapshot can include details on the python process and subprocesses
+  and should add a thread dump with the stack of all running threads.
 
 ## 0.2.0
 
 - New features in `log.html`:
-    - Redesigned (now uses react and the tree can handle much more items).
-    - Filtering is now available.
-    - It's possible to click elements to see details.
-    - Full traceback with variables available.
+  - Redesigned (now uses react and the tree can handle much more items).
+  - Filtering is now available.
+  - It's possible to click elements to see details.
+  - Full traceback with variables available.
 
 ## 0.1.1
 
@@ -256,17 +262,17 @@ def setup_log(*, max_value_repr_size: Optional[Union[str, int]] = None):
 
 - Log: Support `yield from` statements in the auto-logging.
 - Log: Fixes in support for `yield`.
-    - Current yield limitation: When yield is inside another expression it won't 
-      show the yielded value (i.e.: `x = call() and yield another()` won't show the `another()` value) 
-      as doing so could change the order of calls.
+  - Current yield limitation: When yield is inside another expression it won't
+    show the yielded value (i.e.: `x = call() and yield another()` won't show the `another()` value)
+    as doing so could change the order of calls.
 - Log cli: Properly assign args to generator.
 - Public API change: `critical`/`warn`/`info` methods now accept multiple arguments and all are
   concatenated and converted to `str`.
-    - Old api: `robocorp.log.info(messsage: str, html: bool=False)`
-    - New api: `robocorp.log.info(*message)`
+  - Old api: `robocorp.log.info(messsage: str, html: bool=False)`
+  - New api: `robocorp.log.info(*message)`
 - New API to embed html into the page:
-    - `robocorp.log.html(html: str, level: str = "INFO")`
-        - `level` may be `"INFO"`, `"WARN"` or `"ERROR"`
+  - `robocorp.log.html(html: str, level: str = "INFO")`
+    - `level` may be `"INFO"`, `"WARN"` or `"ERROR"`
 
 ## 0.0.12
 
