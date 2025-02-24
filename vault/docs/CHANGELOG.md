@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 1.3.8 - 2025-02-24
+
+- Bump cryptography to 44.0.1
+- Bump Python to >3.9.1 due to cryptography requirement
+
 ## 1.3.7 - 2024-09-25
 
 - Bump cryptography to 43.0.01
@@ -27,7 +32,7 @@
 ## 1.3.2 - 2024-01-14
 
 - Security update: use at least `cryptography` **41.0.6**.
-  ([*CVE-2023-49083*](https://nvd.nist.gov/vuln/detail/CVE-2023-49083))
+  ([_CVE-2023-49083_](https://nvd.nist.gov/vuln/detail/CVE-2023-49083))
 
 ## 1.3.1 - 2024-01-14
 
