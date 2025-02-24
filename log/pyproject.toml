@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-log"
-version = "2.9.3"
+version = "2.9.4"
 description = "Automatic trace logging for Python"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -37,7 +37,7 @@ profile = "black"
 [tool.ruff]
 ignore = [
     "E501", # Line-len.
-    "F541", # f-string without placeholders. 
+    "F541", # f-string without placeholders.
     "E731", # Use 'def' instead of lambda.
 ]
 
