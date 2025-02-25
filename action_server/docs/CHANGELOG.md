@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+## 0.4.2 - 2025-02-25
+
+- Add `deprecation` message
+
 ## 0.4.1 - 2024-04-17
 
 - `auth-tag` can be passed/used in the `X-Action-Context` header when encoding using `aes256-gcm` encryption.
-    - Note: requires `robocorp-actions=0.2.1`
-
+  - Note: requires `robocorp-actions=0.2.1`
 
 ## 0.4.0 - 2024-04-16
 
@@ -19,9 +22,9 @@
 - (Backward-Incompatibility) The label referencing the encryption algorithm for the context is now properly specified as `aes256-gcm`.
 - Note: New migration required with data related to required secrets (`action-server migrate` needs to be manually called).
 - Action Server Builtin UI:
-    - Fix issue where the label for some entry would not be shown in the run. [#370](https://github.com/robocorp/robocorp/issues/370)
-    - Show ` (item)` when editing an item from a list.
-    - Required secrets are now properly shown in the UI (so, it's possible to pass secrets from the Builtin UI).
+  - Fix issue where the label for some entry would not be shown in the run. [#370](https://github.com/robocorp/robocorp/issues/370)
+  - Show ` (item)` when editing an item from a list.
+  - Required secrets are now properly shown in the UI (so, it's possible to pass secrets from the Builtin UI).
 
 ## 0.3.2 - 2024-04-12
 
@@ -30,25 +33,25 @@
 ## 0.3.1 - 2024-04-11
 
 - Fixes in the builtin UI:
-    - There's a JSON toggle so that the data can be sent as JSON.
-    - Objects can now be properly edited.
-    - Entering a float or int now works properly.
+  - There's a JSON toggle so that the data can be sent as JSON.
+  - Objects can now be properly edited.
+  - Entering a float or int now works properly.
 
 ## 0.3.0 - 2024-04-10
 
 - `action-server package metadata` now includes information on the secrets required
   for each action.
 - Passing secrets now works (requires `robocorp-actions=0.2.0`)
-    - Note: the builtin UI still has no support for passing secrets.
+  - Note: the builtin UI still has no support for passing secrets.
 
 ## 0.2.1 - 2024-04-04
 
-- `action-server package build` no longer includes the `.zip` being created in the 
+- `action-server package build` no longer includes the `.zip` being created in the
   `.zip` itself if it's created in the current directory.
 - `action-server package extract` uses the current dir by default as a target for
   extraction.
 - A traceback is no longer shown if the user does `Ctrl+C` when waiting for the
-  user input on whether to override or not files in the related 
+  user input on whether to override or not files in the related
   `action-server package` commands.
 - Fixed issue where items could be overridden in the `action-server package` commands
   even if the user answered `n` to the prompt.
@@ -57,33 +60,33 @@
 
 - Update package's main README.
 - Improved handling of websockets when used from the builtin UI (not the `--expose` one).
-    - Fixed issue where the number of runs shown in the UI would not match the 
-      actual number of runs (i.e.: updated data was not collected on websocket 
-      reconnection).
+  - Fixed issue where the number of runs shown in the UI would not match the
+    actual number of runs (i.e.: updated data was not collected on websocket
+    reconnection).
 - Fixed issue where `"sqlite3.OperationalError: database is locked"` could be raised
   when executing multiple actions in parallel.
-- In `action-server start --expose`, if an action run starts and the connection 
+- In `action-server start --expose`, if an action run starts and the connection
   is broken and a new websocket connection is created to the tunnel, the results
   of the action run are sent to the new websocket.
 - Added support for `action-server package build` to create a .zip file with the
-  package contents (excluding contents based on the `package.yaml` `packaging/exclude` 
+  package contents (excluding contents based on the `package.yaml` `packaging/exclude`
   session).
 - Added support for `action-server package extract` to extract the contents of the
   package created with `action-server package build`.
 - Added support for `action-server package metadata` to extract metadata from the
-  action package (in the current directory). Currently outputs to stdout 
-  a json containing a map from `openapi.json` to its contents. 
+  action package (in the current directory). Currently outputs to stdout
+  a json containing a map from `openapi.json` to its contents.
 - Backward-incompatibility: `action-server package update` needs to be used
   instead of `action-server package --update`.
 - Add support parsing Array type in Action Server UI action run view
 
 ## 0.1.4 - 2024-03-20
 
-- Fixed issue in action-server binary build. 
+- Fixed issue in action-server binary build.
 
 ## 0.1.3 - 2024-03-20
 
-- Fixed issue in action-server binary build. 
+- Fixed issue in action-server binary build.
 
 ## 0.1.2 - 2024-03-20
 
@@ -108,12 +111,12 @@
 
 - The action package name is now gotten from the `package.yaml` and not from the directory name
   (it's still gotten from the directory name when `conda.yaml` is used for backward compatibility).
-  
+
 - The action package name and action name are slugified to be ascii only and replace
   unwanted chars for `-` in the urls.
-  
+
 - A `--whitelist` argument is accepted in the command line for `start` and `import` and
-  it allows whitelisting action package names as well as action names. 
+  it allows whitelisting action package names as well as action names.
 
 ## 0.0.27 - 2024-03-04
 
@@ -135,11 +138,11 @@
 ## 0.0.23 - 2024-02-23
 
 - Support for Action Packages with `package.yaml`.
-    - `conda.yaml` or `action-server.yaml` support is deprecated (but still supported).
-    - `action-server package --update` may be used to migrate an existing package.
+  - `conda.yaml` or `action-server.yaml` support is deprecated (but still supported).
+  - `action-server package --update` may be used to migrate an existing package.
 - When starting up, if a running server is detected the newly spawned server will wait a bit
   for the old one to exit before finishing with an error.
-  
+
 # 0.0.22 - 2024-02-23
 
 - Same as 0.0.23, but had issues publishing the actual binary.
@@ -162,7 +165,7 @@
 ## 0.0.18 - 2024-01-19
 
 - The response from a run now includes an `"X-Action-Server-Run-Id"` header containing the run id.
-    - This makes it possible to query more information from `api/runs/{run_id}` after the run finishes.
+  - This makes it possible to query more information from `api/runs/{run_id}` after the run finishes.
 - Fixed issue where `@action` code would not have logging in place.
 
 ## 0.0.17 - 2024-01-19
@@ -171,14 +174,14 @@
 - Console/log output improved.
 - Full traceback no longer shown if `robocorp-actions` version does not match the one expected.
 - Verify that the `robocorp-actions` version found is 0.0.6 or higher.
-    - Required for fixes running `@action` multiple times in the same process.
+  - Required for fixes running `@action` multiple times in the same process.
 
 ## 0.0.16 - 2024-01-18
 
 - If a process crashes while in the process pool idle processes it's not reused in a new run.
 - When reusing processes, `@setup(scope="session")` is only called once and `@teardown(scope="session")` is no longer called.
-    - Requires `robocorp-actions 0.0.6`.
-    - Also fixes issue where files containing `@action` would be reimported on each new run when process is reused.
+  - Requires `robocorp-actions 0.0.6`.
+  - Also fixes issue where files containing `@action` would be reimported on each new run when process is reused.
 
 ## 0.0.15 - 2024-01-16
 
@@ -190,9 +193,9 @@
 
 - It's now possible to specify the server url using the `--server-url` command line parameter.
 - A process pool is now available in the action server. The following new arguments are available:
-    `--min-processes=<n-processes>`
-    `--max-processes=<n-processes>`
-    `--reuse-process`
+  `--min-processes=<n-processes>`
+  `--max-processes=<n-processes>`
+  `--reuse-process`
 - If the return of an `@action` does not conform to the proper return type a better error message is given.
 - Improved keepalive/reconnection on the `--expose` tunnel (ping-pong messages).
 
@@ -229,7 +232,6 @@
 - When an action has default values it can be properly run without passing those as arguments.
 - Updated template to start action server project.
 
-
 ## 0.0.6 - 2024-01-05
 
 - `rcc` is now bundled in the action server wheel.
@@ -237,15 +239,13 @@
 - Pass `@action(is_consequential=True)` to add `x-openai-isConsequential` option to action openapi spec.
 - Can be started with `--expose-allow-reuse` to reuse the previously exposed url.
 
-
 ## 0.0.5 - 2023-12-14
 
 - Fixed issues in deployment:
-    - `requests` is now a required dep (for --expose to work).
-    - _static_contents now properly added by poetry (because it was in .gitignore it was not added to the distribution).
-    - "new" command properly checks that RCC is downloaded.
+  - `requests` is now a required dep (for --expose to work).
+  - \_static_contents now properly added by poetry (because it was in .gitignore it was not added to the distribution).
+  - "new" command properly checks that RCC is downloaded.
 - Running an action with multiple `_` now works from the UI.
-
 
 ## 0.0.4 - 2023-12-13
 
@@ -255,23 +255,23 @@
 - Instead of just a text showing the trace header a hyperlink to the trace is also available.
 - It's possible to bootstrap a project with `action-server new`.
 - Improvements when exposing a server with `--expose`:
-    - It's now possible to reuse a previously exposed session with `--expose-session`
-    - An API key may be used with `--api-key` for authentication (`--api-key=None` can
-      be used to disable authentication).
+  - It's now possible to reuse a previously exposed session with `--expose-session`
+  - An API key may be used with `--api-key` for authentication (`--api-key=None` can
+    be used to disable authentication).
 - By default, when the action server is started with `action-server start`, the
   current directory will be searched for actions and only those actions will be
   served (metadata will be stored in a datadir linked to the current folder).
 - For more advanced cases, it's still possible to import actions specifying a
   custom datadir and then start the action server with `--actions-sync=false`
   specifying the proper datadir).
-  
+
 i.e.:
 
 ```
 action-server import --dir=c:/temp=action-package1 --datadir=c:/temp/datadir
 action-server import --dir=c:/temp=action-package2 --datadir=c:/temp/datadir
 action-server start --actions-sync=false --datadir=c:/temp/datadir
-```   
+```
 
 ## 0.0.3 - 2023-12-08
 
@@ -286,11 +286,11 @@ action-server start --actions-sync=false --datadir=c:/temp/datadir
 - Still pre-alpha.
 - Internal DB migration available.
 - Initial UI available.
-    - Allows running from the UI.
-    - Shows action packages, actions and runs.
-    - The console and log.html can be seen.
-    - API to expose the server to the web.
-    - Known issue: requests for runs and actions are cached and a full page request is needed to get new information.
+  - Allows running from the UI.
+  - Shows action packages, actions and runs.
+  - The console and log.html can be seen.
+  - API to expose the server to the web.
+  - Known issue: requests for runs and actions are cached and a full page request is needed to get new information.
 
 ## 0.0.1 - 2023-11-29
 
