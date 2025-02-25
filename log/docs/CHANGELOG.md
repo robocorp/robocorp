@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 2.9.4 - 2025-02-24
+## 2.9.5 - 2025-02-25
 
 - Update dependencies
 
