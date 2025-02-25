@@ -28,7 +28,7 @@ jobs:
         scope: "@robocorp"
 
     - name: Install poetry
-      run: pipx install poetry
+      run: pipx install poetry==1.7.1
 
     - name: Set up Python 3.9
       uses: actions/setup-python@v5
