@@ -1,7 +1,0 @@
-channels:
-- conda-forge
-
-dependencies:
-- python=3.11.6
-- pip:
-  - robocorp-actions==0.0.9
