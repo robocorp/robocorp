@@ -2,19 +2,24 @@
 
 ## Unreleased
 
+## 0.2.3 - 2025-02-25
+
+- Add `deprecation` message
+
 ## 0.2.2 - 2024-09-23
-- Update cryptography and zipp dependencies.  
+
+- Update cryptography and zipp dependencies.
 
 ## 0.2.1 - 2024-04-17
 
 - Accepts `auth-tag` when using `aes256-gcm` for encrypting the `x-action-context` contents
-  (previously it'd always be an empty string). 
+  (previously it'd always be an empty string).
 
 ## 0.2.0 - 2024-04-10
 
 - `python -m robocorp.actions list` now has information on the managed parameters
   (`managed_params_schema`, which is a dict from parameter name to parameter
-   information is given for each task).
+  information is given for each task).
 - Parameters in `@action` typed as `robocorp.actions.Secret` will now be considered
   managed parameters (the client must to provide the secret information when
   running the action).
@@ -46,26 +51,26 @@
 
 ## 0.0.8 - 2024-03-11
 
-- `pydantic` models are accepted as the input and output of `@action`s. 
+- `pydantic` models are accepted as the input and output of `@action`s.
 
 ## 0.0.7 - 2024-01-31
 
 - When actions are imported they're also automatically linted for the following errors:
-    - Mising docstrings (error)
-    - Mising docstrings docstring (error)
-    - Return statement is found (error).
-    - Each argument has a description in the docstring (error).
-    - Arguments are properly typed (warning).
-    - Return is properly typed (warning).
+  - Mising docstrings (error)
+  - Mising docstrings docstring (error)
+  - Return statement is found (error).
+  - Each argument has a description in the docstring (error).
+  - Arguments are properly typed (warning).
+  - Return is properly typed (warning).
 - Files named `*task*.py` are no longer loaded by default in actions.
 
 ## 0.0.6 - 2024-01-18
 
 - Provides support for calling `main` multiple times.
-    - Modules containing `@action` are no longer reimported anymore.
-    - Any `@action` that was already imported is still available for running in a new `main` call.
-    - `RC_TASKS_SKIP_SESSION_SETUP` env variable may be used to skip setup of new `@setup`s found.
-    - `RC_TASKS_SKIP_SESSION_TEARDOWN` env variable may be used to skip teardon of `@teardown`s found.
+  - Modules containing `@action` are no longer reimported anymore.
+  - Any `@action` that was already imported is still available for running in a new `main` call.
+  - `RC_TASKS_SKIP_SESSION_SETUP` env variable may be used to skip setup of new `@setup`s found.
+  - `RC_TASKS_SKIP_SESSION_TEARDOWN` env variable may be used to skip teardon of `@teardown`s found.
 
 ## 0.0.5 - 2024-01-14
 
