@@ -122,3 +122,8 @@ def build_output_view_react(ctx, dev=False):
 FILE_CONTENTS = {repr(file_contents)}
 """
         )
+
+    # Verify that the file was created successfully
+    if not os.path.exists(index_in_src):
+        raise RuntimeError(f"Failed to create index file at: {index_in_src}")
+    print(f"Successfully created index file at: {index_in_src}")
