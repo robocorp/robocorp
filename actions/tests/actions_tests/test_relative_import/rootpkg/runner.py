@@ -1,2 +1,0 @@
-class ReplRunner:
-    pass
