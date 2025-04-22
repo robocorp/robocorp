@@ -79,8 +79,8 @@ Note: Files are not uploaded until the item is saved.
 
 **Args:**
 
-- <b>`path`</b>:  Path to attached file
-- <b>`name`</b>:  Custom name for file in work item
+- <b>`path`</b>: Path to attached file
+- <b>`name`</b>: Custom name for file in work item
 
 **Returns:**
 Resolved path to added file
@@ -101,7 +101,7 @@ Note: Files are not uploaded until the item is saved.
 
 **Args:**
 
-- <b>`pattern`</b>:  Glob pattern for attached file paths
+- <b>`pattern`</b>: Glob pattern for attached file paths
 
 **Returns:**
 List of added paths
@@ -144,16 +144,16 @@ Parse an email attachment from the work item.
 
 **Args:**
 
-- <b>`html`</b>:  Parse the HTML content into the `html` attribute
-- <b>`encoding`</b>:  Text encoding of the email
-- <b>`ignore_errors`</b>:  Ignore possible parsing errors from Control Room
+- <b>`html`</b>: Parse the HTML content into the `html` attribute
+- <b>`encoding`</b>: Text encoding of the email
+- <b>`ignore_errors`</b>: Ignore possible parsing errors from Control Room
 
 **Returns:**
 An email container with metadata and content
 
 **Raises:**
 
-- <b>`ValueError`</b>:  No email attached or content is malformed
+- <b>`ValueError`</b>: No email attached or content is malformed
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L294)
 
@@ -169,9 +169,9 @@ Mark this work item as failed, and release it.
 
 **Args:**
 
-- <b>`exception_type`</b>:  Type of failure (APPLICATION or BUSINESS)
-- <b>`code`</b>:  Custom error code for the failure
-- <b>`message`</b>:  Human-readable error message
+- <b>`exception_type`</b>: Type of failure (APPLICATION or BUSINESS)
+- <b>`code`</b>: Custom error code for the failure
+- <b>`message`</b>: Human-readable error message
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L459)
 
@@ -193,8 +193,8 @@ If a `path` is not defined, uses the Robot root or current working directory.
 
 **Args:**
 
-- <b>`name`</b>:  Name of file
-- <b>`path`</b>:  Path to created file
+- <b>`name`</b>: Name of file
+- <b>`path`</b>: Path to created file
 
 **Returns:**
 Path to created file
@@ -215,8 +215,8 @@ If a `path` is not defined, uses the Robot root or current working directory.
 
 **Args:**
 
-- <b>`pattern`</b>:  Glob pattern for file names
-- <b>`path`</b>:  Directory to store files in
+- <b>`pattern`</b>: Glob pattern for file names
+- <b>`path`</b>: Directory to store files in
 
 **Returns:**
 List of created file paths
@@ -249,8 +249,8 @@ Note: Files are not removed from Control Room until the item is saved.
 
 **Args:**
 
-- <b>`name`</b>:  Name of file
-- <b>`missing_ok`</b>:  Do nothing if given file does not exist
+- <b>`name`</b>: Name of file
+- <b>`missing_ok`</b>: Do nothing if given file does not exist
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167)
 
@@ -268,7 +268,7 @@ Note: Files are not removed from Control Room until the item is saved.
 
 **Args:**
 
-- <b>`pattern`</b>:  Glob pattern for file names
+- <b>`pattern`</b>: Glob pattern for file names
 
 **Returns:**
 List of matched names
@@ -328,7 +328,7 @@ Input work item
 
 **Raises:**
 
-- <b>`RuntimeError`</b>:  An input work item is already reservedworkitems.EmptyQueue: There are no further items in the queue
+- <b>`RuntimeError`</b>: An input work item is already reservedworkitems.EmptyQueue: There are no further items in the queue
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L99)
 
@@ -388,8 +388,8 @@ Note: Files are not uploaded until the item is saved.
 
 **Args:**
 
-- <b>`path`</b>:  Path to attached file
-- <b>`name`</b>:  Custom name for file in work item
+- <b>`path`</b>: Path to attached file
+- <b>`name`</b>: Custom name for file in work item
 
 **Returns:**
 Resolved path to added file
@@ -410,7 +410,7 @@ Note: Files are not uploaded until the item is saved.
 
 **Args:**
 
-- <b>`pattern`</b>:  Glob pattern for attached file paths
+- <b>`pattern`</b>: Glob pattern for attached file paths
 
 **Returns:**
 List of added paths
@@ -443,8 +443,8 @@ Note: Files are not removed from Control Room until the item is saved.
 
 **Args:**
 
-- <b>`name`</b>:  Name of file
-- <b>`missing_ok`</b>:  Do nothing if given file does not exist
+- <b>`name`</b>: Name of file
+- <b>`missing_ok`</b>: Do nothing if given file does not exist
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/_workitem.py#L167)
 
@@ -462,7 +462,7 @@ Note: Files are not removed from Control Room until the item is saved.
 
 **Args:**
 
-- <b>`pattern`</b>:  Glob pattern for file names
+- <b>`pattern`</b>: Glob pattern for file names
 
 **Returns:**
 List of matched names
@@ -513,13 +513,13 @@ Creating an output item requires an input to be currently reserved.
 
 **Args:**
 
-- <b>`payload`</b>:  JSON serializable data (dict, list, scalar, etc.)
-- <b>`files`</b>:  List of paths to files or glob pattern
-- <b>`save`</b>:  Immediately save item after creation
+- <b>`payload`</b>: JSON serializable data (dict, list, scalar, etc.)
+- <b>`files`</b>: List of paths to files or glob pattern
+- <b>`save`</b>: Immediately save item after creation
 
 **Raises:**
 
-- <b>`RuntimeError`</b>:  No input work item reserved
+- <b>`RuntimeError`</b>: No input work item reserved
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L140)
 

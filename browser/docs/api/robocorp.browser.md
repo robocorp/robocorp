@@ -24,14 +24,14 @@ browser.configure(browser_engine="firefox", slowmo=100)
 
 **Args:**
 
-- <b>`browser_engine`</b>:  Browser engine which should be used. Possible choices are `"chromium"`, `"chrome"`, `"chrome-beta"`, `"msedge"`, `"msedge-beta"`, `"msedge-dev"`, `"firefox"` and `"webkit"` (defaults to `"chromium"`).
-- <b>`install`</b>:  Install browser or not. If not defined, download is only attempted if the browser fails to launch.
-- <b>`headless`</b>:  If set to False the browser UI will be shown. If set to True the browser UI will be kept hidden. If unset or set to None it'll show the browser UI only if a debugger is detected.
-- <b>`slowmo`</b>:  Run interactions in slow motion (number in millis).
-- <b>`screenshot`</b>:  Whether to automatically capture a screenshot after each task. default="only-on-failure" choices=\["on", "off", "only-on-failure"\]
-- <b>`isolated`</b>:  Used to define where the browser should be downloaded. If `True`, it'll be installed inside the isolated environment. If `False` (default) it'll be installed in a global cache folder.
-- <b>`persistent_context_directory`</b>:  If a persistent context should be used, this should be the directory in which the persistent context should be stored/loaded from (it can be used to store the state of the automation to allow for sessions and cookies to be reused in a new automation).
-- <b>`skip_playwright_stop`</b>:  Can be used to skip the playwright stop. Not recommended in general, only meant to be used to diagnose and workaround specific issues on the playwright stop coupled with an early `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak and even a shutdown deadlock if used alone.
+- <b>`browser_engine`</b>: Browser engine which should be used. Possible choices are `"chromium"`, `"chrome"`, `"chrome-beta"`, `"msedge"`, `"msedge-beta"`, `"msedge-dev"`, `"firefox"` and `"webkit"` (defaults to `"chromium"`).
+- <b>`install`</b>: Install browser or not. If not defined, download is only attempted if the browser fails to launch.
+- <b>`headless`</b>: If set to False the browser UI will be shown. If set to True the browser UI will be kept hidden. If unset or set to None it'll show the browser UI only if a debugger is detected.
+- <b>`slowmo`</b>: Run interactions in slow motion (number in millis).
+- <b>`screenshot`</b>: Whether to automatically capture a screenshot after each task. default="only-on-failure" choices=["on", "off", "only-on-failure"]
+- <b>`isolated`</b>: Used to define where the browser should be downloaded. If `True`, it'll be installed inside the isolated environment. If `False` (default) it'll be installed in a global cache folder.
+- <b>`persistent_context_directory`</b>: If a persistent context should be used, this should be the directory in which the persistent context should be stored/loaded from (it can be used to store the state of the automation to allow for sessions and cookies to be reused in a new automation).
+- <b>`skip_playwright_stop`</b>: Can be used to skip the playwright stop. Not recommended in general, only meant to be used to diagnose and workaround specific issues on the playwright stop coupled with an early `os._exit` shutdown in **robocorp-tasks**. Can cause a process leak and even a shutdown deadlock if used alone.
 
 **Note:**
 
@@ -59,7 +59,7 @@ browser.configure_context(ignore_https_errors = True)
 
 **Args:**
 
-- <b>`**kwargs`</b>:  Keyword arguments supported by the `playwright.Browser.new_context` method.
+- <b>`**kwargs`</b>: Keyword arguments supported by the `playwright.Browser.new_context` method.
 
 **Note:**
 
@@ -123,7 +123,7 @@ To customize the browser use the `configure` method (prior to calling this metho
 
 **Raises:**
 
-- <b>`RuntimeError`</b>:  If `persistent_context_directory` is specified in the configuration and this method is called a RuntimeError is raised (as in this case this API is not applicable as the browser and the context must be created at once and the browser can't be reused for the session).
+- <b>`RuntimeError`</b>: If `persistent_context_directory` is specified in the configuration and this method is called a RuntimeError is raised (as in this case this API is not applicable as the browser and the context must be created at once and the browser can't be reused for the session).
 
 **Note:**
 
@@ -206,7 +206,7 @@ Changes the url of the current page (creating a page if needed).
 
 **Args:**
 
-- <b>`url`</b>:  Navigates to the provided URL.
+- <b>`url`</b>: Navigates to the provided URL.
 
 **Returns:**
 The page instance managed by the robocorp.tasks framework(it will be automatically closed when the task finishes).
@@ -234,10 +234,10 @@ browser.screenshot(locator)
 
 **Args:**
 
-- <b>`element`</b>:  The page/element/locator which should have its screenshot taken. If not given the managed page instance will be used.
-- <b>`timeout`</b>:  Maximum time in milliseconds. Defaults to `5000` (5 seconds). Pass `0` to disable timeout.
-- <b>`image_type`</b>:  Specify screenshot type, defaults to `png`.
-- <b>`log_level`</b>:  The level of the message ("INFO", "WARN" or "ERROR")
+- <b>`element`</b>: The page/element/locator which should have its screenshot taken. If not given the managed page instance will be used.
+- <b>`timeout`</b>: Maximum time in milliseconds. Defaults to `5000` (5 seconds). Pass `0` to disable timeout.
+- <b>`image_type`</b>: Specify screenshot type, defaults to `png`.
+- <b>`log_level`</b>: The level of the message ("INFO", "WARN" or "ERROR")
 
 **Returns:**
 The bytes from the screenshot.
@@ -265,8 +265,8 @@ Downloads and installs the given browser engine.
 
 **Args:**
 
-- <b>`browser_engine`</b>:  Browser engine which should be installed.
-- <b>`force`</b>:  Force reinstall of stable browser channels.
+- <b>`browser_engine`</b>: Browser engine which should be installed.
+- <b>`force`</b>: Force reinstall of stable browser channels.
 
 **Note:**
 

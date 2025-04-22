@@ -68,8 +68,8 @@ python -m robocorp.tasks run tasks.py -t enter_user
 
 **Args:**
 
-- <b>`func`</b>:  A function which is a task to `robocorp.tasks`.
-- <b>`**kwargs`</b>:  Options to be introspected by `task.options`.
+- <b>`func`</b>: A function which is a task to `robocorp.tasks`.
+- <b>`**kwargs`</b>: Options to be introspected by `task.options`.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L45)
 
@@ -197,7 +197,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 **Args:**
 
-- <b>`func`</b>:  wrapped function.
+- <b>`func`</b>: wrapped function.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L98)
 
@@ -217,7 +217,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 **Args:**
 
-- <b>`func`</b>:  wrapped function.
+- <b>`func`</b>: wrapped function.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L120)
 

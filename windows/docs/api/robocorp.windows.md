@@ -95,17 +95,17 @@ Finds the first window matching the passed locator.
 
 **Args:**
 
-- <b>`locator`</b>:  This is the locator which should be used to find the window.
+- <b>`locator`</b>: This is the locator which should be used to find the window.
 
-- <b>`search_depth`</b>:  The search depth to find the window (by default == 1, meaning that only top-level windows will be found).
+- <b>`search_depth`</b>: The search depth to find the window (by default == 1, meaning that only top-level windows will be found).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-- <b>`wait_time`</b>:  The time to wait after finding the window. If not passed the default value found in the config is used.
+- <b>`wait_time`</b>: The time to wait after finding the window. If not passed the default value found in the config is used.
 
-- <b>`foreground`</b>:  Whether the found window should be made top-level when found.
+- <b>`foreground`</b>: Whether the found window should be made top-level when found.
 
-- <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
+- <b>`raise_error`</b>: Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
 **Returns:**
 The `WindowElement` which should be used to interact with the window.
@@ -141,13 +141,13 @@ Finds all windows matching the given locator.
 
 **Args:**
 
-- <b>`locator`</b>:  The locator which should be used to find windows (if not given, all windows are returned).
+- <b>`locator`</b>: The locator which should be used to find windows (if not given, all windows are returned).
 
-- <b>`search_depth`</b>:  The search depth to be used to find windows (by default equals 1, meaning that only top-level windows will be found).
+- <b>`search_depth`</b>: The search depth to be used to find windows (by default equals 1, meaning that only top-level windows will be found).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_window` is True.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_window` is True.
 
-- <b>`wait_for_window`</b>:  Defines whether the search should keep on searching until a window with the given locator is found (note that if True and no window was found a ElementNotFound is raised).
+- <b>`wait_for_window`</b>: Defines whether the search should keep on searching until a window with the given locator is found (note that if True and no window was found a ElementNotFound is raised).
 
 **Returns:**
 The `WindowElement`s which should be used to interact with the window.
@@ -181,13 +181,13 @@ A helper function to wait for some condition.
 
 **Args:**
 
-- <b>`condition`</b>:  The condition to be waited for.
-- <b>`timeout`</b>:  The time to wait for the condition.
-- <b>`msg`</b>:  An optional message to be shown in the exception if the condition is not satisfied.
+- <b>`condition`</b>: The condition to be waited for.
+- <b>`timeout`</b>: The time to wait for the condition.
+- <b>`msg`</b>: An optional message to be shown in the exception if the condition is not satisfied.
 
 **Raises:**
 
-- <b>`TimeoutError`</b>:  If the condition was not satisfied in the given timeout.
+- <b>`TimeoutError`</b>: If the condition was not satisfied in the given timeout.
 
 **Example:**
 
@@ -367,10 +367,10 @@ Clicks an element using the mouse.
 
 **Args:**
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be clicked.
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
-- <b>`wait_time`</b>:  The time to wait after clicking the element. If not passed the default value found in the config is used.
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
+- <b>`locator`</b>: If given the child element which matches this locator will be clicked.
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`wait_time`</b>: The time to wait after clicking the element. If not passed the default value found in the config is used.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 **Example:**
 
@@ -405,7 +405,7 @@ The clicked element.
 
 **Raises:**
 
-- <b>`ActionNotPossible`</b>:  if element does not allow the Click action.
+- <b>`ActionNotPossible`</b>: if element does not allow the Click action.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L811)
 
@@ -426,13 +426,13 @@ Double-clicks an element using the mouse.
 
 **Args:**
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be double-clicked.
+- <b>`locator`</b>: If given the child element which matches this locator will be double-clicked.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
-- <b>`wait_time`</b>:  The time to wait after double-clicking the element. If not passed the default value found in the config is used.
+- <b>`wait_time`</b>: The time to wait after double-clicking the element. If not passed the default value found in the config is used.
 
 **Example:**
 
@@ -467,7 +467,7 @@ The clicked element.
 
 **Raises:**
 
-- <b>`ActionNotPossible`</b>:  if element does not allow the double-click action.
+- <b>`ActionNotPossible`</b>: if element does not allow the double-click action.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L872)
 
@@ -490,13 +490,13 @@ The first matching element is returned.
 
 **Args:**
 
-- <b>`locator`</b>:  The locator to be used to search a child control.
+- <b>`locator`</b>: The locator to be used to search a child control.
 
-- <b>`search_depth`</b>:  Up to which depth the hierarchy should be searched.
+- <b>`search_depth`</b>: Up to which depth the hierarchy should be searched.
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-- <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
+- <b>`raise_error`</b>: Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
 **Raises:**
 `ElementNotFound` if an element with the given locator could not befound.
@@ -520,15 +520,15 @@ This method may be used to find multiple descendants of the current element matc
 
 **Args:**
 
-- <b>`locator`</b>:  The locator that should be used to find elements.
+- <b>`locator`</b>: The locator that should be used to find elements.
 
-- <b>`search_depth`</b>:  Up to which depth the tree will be traversed.
+- <b>`search_depth`</b>: Up to which depth the tree will be traversed.
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_element` is True.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_element` is True.
 
-- <b>`search_strategy`</b>:  The search strategy to be used to find elements. `siblings` means that after the first element is found, the tree traversal should be stopped and only sibling elements will be searched. `all` means that all the elements up to the given search depth will be searched.
+- <b>`search_strategy`</b>: The search strategy to be used to find elements. `siblings` means that after the first element is found, the tree traversal should be stopped and only sibling elements will be searched. `all` means that all the elements up to the given search depth will be searched.
 
-- <b>`wait_for_element`</b>:  Defines whether the search should keep on searching until an element with the given locator is found (note that if True and no element was found an ElementNotFound is raised).
+- <b>`wait_for_element`</b>: Defines whether the search should keep on searching until an element with the given locator is found (note that if True and no element was found an ElementNotFound is raised).
 
 **Note:**
 
@@ -567,11 +567,11 @@ Get text from element (for elements which allow the GetWindowText action).
 
 **Args:**
 
-- <b>`locator`</b>:  Optional locator if it should target a child element.
+- <b>`locator`</b>: Optional locator if it should target a child element.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
 
 **Returns:**
 The window text of the element.
@@ -605,11 +605,11 @@ Get value from element (usually used with combo boxes or text controls).
 
 **Args:**
 
-- <b>`locator`</b>:  Optional locator if it should target a child element.
+- <b>`locator`</b>: Optional locator if it should target a child element.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
 
 **Returns:**
 The value of the element.
@@ -703,7 +703,7 @@ ______________________________________________________________________
 
 **Args:**
 
-- <b>`other`</b>:  The element to compare to.
+- <b>`other`</b>: The element to compare to.
 
 **Returns:**
 True if this elements points to the same element representedby the other control.
@@ -722,7 +722,7 @@ Iterates over all of the children of this element up to the max_depth provided.
 
 **Args:**
 
-- <b>`max_depth`</b>:  the maximum depth which should be iterated to.
+- <b>`max_depth`</b>: the maximum depth which should be iterated to.
 
 **Returns:**
 An iterator of `ControlElement` which provides the descendants ofthis element.
@@ -745,13 +745,13 @@ Makes a screenshot of the given element and saves it into the `log.html` using `
 
 **Args:**
 
-- <b>`level`</b>:  The log level for the screenshot.
+- <b>`level`</b>: The log level for the screenshot.
 
-- <b>`locator`</b>:  Optional locator if it should target a child element.
+- <b>`locator`</b>: Optional locator if it should target a child element.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
 
 **Returns:**
 True if the screenshot was successfuly saved using `robocorp-log`and False otherwise.
@@ -785,13 +785,13 @@ Middle-clicks an element using the mouse.
 
 **Args:**
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be middle-clicked.
+- <b>`locator`</b>: If given the child element which matches this locator will be middle-clicked.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
-- <b>`wait_time`</b>:  The time to wait after middle-clicking the element. If not passed the default value found in the config is used.
+- <b>`wait_time`</b>: The time to wait after middle-clicking the element. If not passed the default value found in the config is used.
 
 **Example:**
 
@@ -826,7 +826,7 @@ The clicked element.
 
 **Raises:**
 
-- <b>`ActionNotPossible`</b>:  if element does not allow the middle-click action.
+- <b>`ActionNotPossible`</b>: if element does not allow the middle-click action.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1002)
 
@@ -865,11 +865,11 @@ The printed element attributes correspond to the values that may be used to crea
 
 **Args:**
 
-- <b>`stream`</b>:  The stream to which the text should be printed (if not given, sys.stdout is used).
+- <b>`stream`</b>: The stream to which the text should be printed (if not given, sys.stdout is used).
 
-- <b>`show_properties`</b>:  Whether the properties of each element should be printed (off by default as it can be considerably slower and makes the output very verbose).
+- <b>`show_properties`</b>: Whether the properties of each element should be printed (off by default as it can be considerably slower and makes the output very verbose).
 
-- <b>`max_depth`</b>:  Up to which depth the tree should be printed.
+- <b>`max_depth`</b>: Up to which depth the tree should be printed.
 
 **Example:**
 
@@ -907,10 +907,10 @@ Right-clicks an element using the mouse.
 
 **Args:**
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be right-clicked.
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
-- <b>`wait_time`</b>:  The time to wait after right-clicking the element. If not passed the default value found in the config is used.
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
+- <b>`locator`</b>: If given the child element which matches this locator will be right-clicked.
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`wait_time`</b>: The time to wait after right-clicking the element. If not passed the default value found in the config is used.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 **Example:**
 
@@ -945,7 +945,7 @@ The clicked element.
 
 **Raises:**
 
-- <b>`ActionNotPossible`</b>:  if element does not allow the right-click action.
+- <b>`ActionNotPossible`</b>: if element does not allow the right-click action.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L939)
 
@@ -966,15 +966,15 @@ Makes a screenshot of the given element and saves it into the given file.
 
 **Args:**
 
-- <b>`filename`</b>:  The file where the image should be saved.
+- <b>`filename`</b>: The file where the image should be saved.
 
-- <b>`img_format`</b>:  The format in which the image should be saved (by default detects it from the filename).
+- <b>`img_format`</b>: The format in which the image should be saved (by default detects it from the filename).
 
-- <b>`locator`</b>:  Optional locator if it should target a child element.
+- <b>`locator`</b>: Optional locator if it should target a child element.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
 
 **Example:**
 
@@ -1010,11 +1010,11 @@ Makes a screenshot of the given element and returns it as a PIL image.
 
 **Args:**
 
-- <b>`locator`</b>:  Optional locator if it should target a child element.
+- <b>`locator`</b>: Optional locator if it should target a child element.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
 
 **Example:**
 
@@ -1049,13 +1049,13 @@ Select a value on the passed element if such action is supported.
 
 **Args:**
 
-- <b>`value`</b>:  value to select on element.
+- <b>`value`</b>: value to select on element.
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be used for the selection.
+- <b>`locator`</b>: If given the child element which matches this locator will be used for the selection.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
 **Returns:**
 The element used in the selection.
@@ -1092,7 +1092,7 @@ Sends the given keys to the element (simulates typing keys on the keyboard).
 
 **Args:**
 
-- <b>`keys`</b>:  The keys to be sent. Special keys may be sent as {Ctrl}{Alt}{Delete}, etc.
+- <b>`keys`</b>: The keys to be sent. Special keys may be sent as {Ctrl}{Alt}{Delete}, etc.
 
 Some examples of valid key combinations are shown below:
 
@@ -1109,17 +1109,17 @@ Some examples of valid key combinations are shown below:
  '[]{{}{}}\|;:'",<.>/?{Enter}'
 ```
 
-- <b>`interval`</b>:  Time between each sent key. (defaults to 0.01 seconds)
+- <b>`interval`</b>: Time between each sent key. (defaults to 0.01 seconds)
 
-- <b>`send_enter`</b>:  If `True` then the {Enter} key is pressed at the end of the sent keys.
+- <b>`send_enter`</b>: If `True` then the {Enter} key is pressed at the end of the sent keys.
 
-- <b>`locator`</b>:  If given the child element which matches this locator will be used to send the keys.
+- <b>`locator`</b>: If given the child element which matches this locator will be used to send the keys.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is passed.
 
-- <b>`wait_time`</b>:  The time to wait after sending the keys to the element. If not passed the default value found in the config is used.
+- <b>`wait_time`</b>: The time to wait after sending the keys to the element. If not passed the default value found in the config is used.
 
 **Returns:**
 The element to which the keys were sent.
@@ -1135,7 +1135,7 @@ windows.find_window('Calculator').send_keys('96+4=', send_enter=True)
 
 **Raises:**
 
-- <b>`ActionNotPossible`</b>:  if the element does not allow the SendKeys action.
+- <b>`ActionNotPossible`</b>: if the element does not allow the SendKeys action.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1184)
 
@@ -1159,11 +1159,11 @@ Sets the view focus to the element (or elemen specified by the locator).
 
 **Args:**
 
-- <b>`locator`</b>:  Optional locator if it should target a child element.
+- <b>`locator`</b>: Optional locator if it should target a child element.
 
-- <b>`search_depth`</b>:  Used as the depth to search for the locator (only used if the `locator` is specified).
+- <b>`search_depth`</b>: Used as the depth to search for the locator (only used if the `locator` is specified).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `locator` is given.
 
 **Example:**
 
@@ -1453,26 +1453,26 @@ Note that by default the process tree will be force-killed by using the `pid` as
 
 **Args:**
 
-- <b>`locator`</b>:  The locator which should be used to find windows to be closed.
+- <b>`locator`</b>: The locator which should be used to find windows to be closed.
 
-- <b>`search_depth`</b>:  The search depth to be used to find windows (by default equals 1, meaning that only top-level windows will be closed). Note that windows are closed by force-killing the pid related to the window.
+- <b>`search_depth`</b>: The search depth to be used to find windows (by default equals 1, meaning that only top-level windows will be closed). Note that windows are closed by force-killing the pid related to the window.
 
-- <b>`timeout`</b>:  The search for a window with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards (if `wait_for_window` is True). Only used if `wait_for_window` is True. If not given the global config timeout will be used.
+- <b>`timeout`</b>: The search for a window with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards (if `wait_for_window` is True). Only used if `wait_for_window` is True. If not given the global config timeout will be used.
 
-- <b>`wait_for_window`</b>:  If True windows this method will keep searching for windows until a window is found or until the timeout is reached (an ElementNotFound is raised if no window was found until the timeout is reached, otherwise an empty list is returned).
+- <b>`wait_for_window`</b>: If True windows this method will keep searching for windows until a window is found or until the timeout is reached (an ElementNotFound is raised if no window was found until the timeout is reached, otherwise an empty list is returned).
 
-- <b>`wait_time`</b>:  A time to wait after closing each window.
+- <b>`wait_time`</b>: A time to wait after closing each window.
 
-- <b>`use_close_button`</b>:  If True tries to close the window by searching for a button with the locator: 'control:ButtonControl name:Close' and clicking on it (in this case any confirmation dialog must be explicitly handled).
+- <b>`use_close_button`</b>: If True tries to close the window by searching for a button with the locator: 'control:ButtonControl name:Close' and clicking on it (in this case any confirmation dialog must be explicitly handled).
 
-- <b>`close_button_locator`</b>:  Only used if `use_close_button` is True. This is the locator to be used to find the close button.
+- <b>`close_button_locator`</b>: Only used if `use_close_button` is True. This is the locator to be used to find the close button.
 
 **Returns:**
 The number of closed windows.
 
 **Raises:**
 
-- <b>`ElementNotFound`</b>:  if wait_for_window is True and the timeout was reached.
+- <b>`ElementNotFound`</b>: if wait_for_window is True and the timeout was reached.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L244)
 
@@ -1496,11 +1496,11 @@ Drag and drop the source element into target element.
 
 **Args:**
 
-- <b>`source`</b>:  Source element for the operation.
-- <b>`target`</b>:  Target element for the operation
-- <b>`speed`</b>:  The speed at which the mouse should move to make the drag (1 means regular speed, values bigger than 1 mean that the mouse should move faster and values lower than 1 mean that the mouse should move slower).
-- <b>`hold_ctrl`</b>:  Whether the `Ctrl` key should be hold while doing the drag and drop (on some cases this means that a copy of the item should be done).
-- <b>`wait_time`</b>:  Time to wait after drop, defaults to 1.0 second.
+- <b>`source`</b>: Source element for the operation.
+- <b>`target`</b>: Target element for the operation
+- <b>`speed`</b>: The speed at which the mouse should move to make the drag (1 means regular speed, values bigger than 1 mean that the mouse should move faster and values lower than 1 mean that the mouse should move slower).
+- <b>`hold_ctrl`</b>: Whether the `Ctrl` key should be hold while doing the drag and drop (on some cases this means that a copy of the item should be done).
+- <b>`wait_time`</b>: Time to wait after drop, defaults to 1.0 second.
 
 **Example:**
 
@@ -1537,17 +1537,17 @@ Finds windows matching the given locator.
 
 **Args:**
 
-- <b>`locator`</b>:  The locator which should be used to find a window.
+- <b>`locator`</b>: The locator which should be used to find a window.
 
-- <b>`search_depth`</b>:  The search depth to be used to find the window (by default equals 1, meaning that only top-level windows will be found).
+- <b>`search_depth`</b>: The search depth to be used to find the window (by default equals 1, meaning that only top-level windows will be found).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-- <b>`wait_time`</b>:  The time to wait after the windows was found. If not given the global config wait_time will be used.
+- <b>`wait_time`</b>: The time to wait after the windows was found. If not given the global config wait_time will be used.
 
-- <b>`foreground`</b>:  If True the matched window will be made the foreground window.
+- <b>`foreground`</b>: If True the matched window will be made the foreground window.
 
-- <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
+- <b>`raise_error`</b>: Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
 **Raises:**
 `ElementNotFound` if a window with the given locator could not be found.
@@ -1573,13 +1573,13 @@ Finds windows matching the given locator.
 
 **Args:**
 
-- <b>`locator`</b>:  The locator which should be used to find windows (if not given, all windows are returned).
+- <b>`locator`</b>: The locator which should be used to find windows (if not given, all windows are returned).
 
-- <b>`search_depth`</b>:  The search depth to be used to find windows (by default equals 1, meaning that only top-level windows will be found).
+- <b>`search_depth`</b>: The search depth to be used to find windows (by default equals 1, meaning that only top-level windows will be found).
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_window` is True.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used. Only used if `wait_for_window` is True.
 
-- <b>`wait_for_window`</b>:  Defines whether the search should keep on searching until a window with the given locator is found (note that if True and no window was found a ElementNotFound is raised).
+- <b>`wait_for_window`</b>: Defines whether the search should keep on searching until a window with the given locator is found (note that if True and no window was found a ElementNotFound is raised).
 
 **Returns:**
 The `WindowElement`s which should be used to interact with the window.
@@ -1628,7 +1628,7 @@ Iterates over all of the children of this element up to the max_depth provided.
 
 **Args:**
 
-- <b>`max_depth`</b>:  the maximum depth which should be iterated to.
+- <b>`max_depth`</b>: the maximum depth which should be iterated to.
 
 **Returns:**
 An iterator of `ControlElement` which provides the descendants ofthis element.
@@ -1657,11 +1657,11 @@ The printed element attributes correspond to the values that may be used to crea
 
 **Args:**
 
-- <b>`stream`</b>:  The stream to which the text should be printed (if not given, sys.stdout is used).
+- <b>`stream`</b>: The stream to which the text should be printed (if not given, sys.stdout is used).
 
-- <b>`show_properties`</b>:  Whether the properties of each element should be printed (off by default as it can be considerably slower and makes the output very verbose).
+- <b>`show_properties`</b>: Whether the properties of each element should be printed (off by default as it can be considerably slower and makes the output very verbose).
 
-- <b>`max_depth`</b>:  Up to which depth the tree should be printed.
+- <b>`max_depth`</b>: Up to which depth the tree should be printed.
 
 **Example:**
 
@@ -1699,9 +1699,9 @@ Waits for a window with the given locator to be made active.
 
 **Args:**
 
-- <b>`locator`</b>:  The locator that the active window must match.
-- <b>`timeout`</b>:  Timeout (in **seconds**) to wait for a window with the given locator to be made active.
-- <b>`wait_time`</b>:  A time to wait after the active window is found.
+- <b>`locator`</b>: The locator that the active window must match.
+- <b>`timeout`</b>: Timeout (in **seconds**) to wait for a window with the given locator to be made active.
+- <b>`wait_time`</b>: A time to wait after the active window is found.
 
 **Raises:**
 ElementNotFound if no window was found as active until the timeoutwas reached.
@@ -1728,8 +1728,8 @@ Activated by pressing `Win + R`. Then the app name is typed in and finally the "
 
 **Args:**
 
-- <b>`text`</b>:  Text to enter into the Run input field. (e.g. `Notepad`)
-- <b>`wait_time`</b>:  Time to sleep after the searched app is executed. (1s by default)
+- <b>`text`</b>: Text to enter into the Run input field. (e.g. `Notepad`)
+- <b>`wait_time`</b>: Time to sleep after the searched app is executed. (1s by default)
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L320)
 
@@ -1747,8 +1747,8 @@ Activated by pressing `win + s`.
 
 **Args:**
 
-- <b>`text`</b>:  Text to enter into search input field (e.g. `Notepad`)
-- <b>`wait_time`</b>:  sleep time after search has been entered (default 3.0 seconds)
+- <b>`text`</b>: Text to enter into search input field (e.g. `Notepad`)
+- <b>`wait_time`</b>: sleep time after search has been entered (default 3.0 seconds)
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L340)
 
@@ -1760,7 +1760,7 @@ ______________________________________________________________________
 
 # Class `str`
 
-str(object='') -> str str(bytes_or_buffer\[, encoding\[, errors\]\]) -> str
+str(object='') -> str str(bytes_or_buffer\[, encoding[, errors]\]) -> str
 
 Create a new string object from the given object. If encoding or errors is specified, then the object must expose a data buffer that will be decoded using the given encoding and error handler. Otherwise, returns the result of object.__str__() (if defined) or repr(object). encoding defaults to sys.getdefaultencoding(). errors defaults to 'strict'.
 
@@ -1936,9 +1936,9 @@ Note that by default the process tree will be force-killed by using the `pid` as
 
 **Args:**
 
-- <b>`use_close_button`</b>:  If True tries to close the window by searching for a button with the locator: 'control:ButtonControl name:Close' and clicking on it (in this case any confirmation dialog must be explicitly handled).
+- <b>`use_close_button`</b>: If True tries to close the window by searching for a button with the locator: 'control:ButtonControl name:Close' and clicking on it (in this case any confirmation dialog must be explicitly handled).
 
-- <b>`close_button_locator`</b>:  Only used if `use_close_button` is True. This is the locator to be used to find the close button.
+- <b>`close_button_locator`</b>: Only used if `use_close_button` is True. This is the locator to be used to find the close button.
 
 **Returns:**
 True if the window was closed by this function and False otherwise.
@@ -1960,17 +1960,17 @@ Find a child window of this window given its locator.
 
 **Args:**
 
-- <b>`locator`</b>:  The locator which should be used to find a child window.
+- <b>`locator`</b>: The locator which should be used to find a child window.
 
-- <b>`search_depth`</b>:  The search depth to be used to find the window.
+- <b>`search_depth`</b>: The search depth to be used to find the window.
 
-- <b>`timeout`</b>:  The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
+- <b>`timeout`</b>: The search for a child with the given locator will be retried until the given timeout (in **seconds**) elapses. At least one full search up to the given depth will always be done and the timeout will only take place afterwards. If not given the global config timeout will be used.
 
-- <b>`wait_time`</b>:  The time to wait after the window was found. If not given the global config wait_time will be used.
+- <b>`wait_time`</b>: The time to wait after the window was found. If not given the global config wait_time will be used.
 
-- <b>`foreground`</b>:  If True the matched window will be made the foreground window.
+- <b>`foreground`</b>: If True the matched window will be made the foreground window.
 
-- <b>`raise_error`</b>:  Do not raise and return `None` when this is set to `True` and such a window isn't found.
+- <b>`raise_error`</b>: Do not raise and return `None` when this is set to `True` and such a window isn't found.
 
 **Raises:**
 `ElementNotFound` if a window with the given locator could not befound.
@@ -2121,10 +2121,10 @@ Sets the window position.
 
 **Args:**
 
-- <b>`x`</b>:  The x-coordinate of the window.
-- <b>`y`</b>:  The y-coordinate of the window.
-- <b>`width`</b>:  The width of the window.
-- <b>`height`</b>:  The height of the window.
+- <b>`x`</b>: The x-coordinate of the window.
+- <b>`y`</b>: The y-coordinate of the window.
+- <b>`width`</b>: The width of the window.
+- <b>`height`</b>: The height of the window.
 
 **Example:**
 

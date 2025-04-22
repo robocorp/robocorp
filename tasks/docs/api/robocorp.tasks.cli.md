@@ -18,11 +18,11 @@ Entry point for running tasks from robocorp-tasks.
 
 **Args:**
 
-- <b>`args`</b>:  The command line arguments.
+- <b>`args`</b>: The command line arguments.
 
-- <b>`exit`</b>:  Determines if the process should exit right after executing the command.
+- <b>`exit`</b>: Determines if the process should exit right after executing the command.
 
-- <b>`plugin_manager`</b>:  Provides a way to customize internal functionality (should not be used by external clients in general).
+- <b>`plugin_manager`</b>: Provides a way to customize internal functionality (should not be used by external clients in general).
 
 **Returns:**
 The exit code for the process.
@@ -50,8 +50,8 @@ ______________________________________________________________________
 
 **Args:**
 
-- <b>`args`</b>:  The arguments to process.
-- <b>`pm`</b>:  The plugin manager used to customize internal functionality.
+- <b>`args`</b>: The arguments to process.
+- <b>`pm`</b>: The plugin manager used to customize internal functionality.
 
 Returns: the exitcode.
 
