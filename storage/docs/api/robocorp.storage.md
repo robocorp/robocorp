@@ -29,11 +29,11 @@ This operation cannot be undone.
 
 **Args:**
 
-- <b>`name`</b>:  Asset to delete
+- <b>`name`</b>: Asset to delete
 
 **Raises:**
 
-- <b>`AssetNotFound`</b>:  Asset with the given name does not exist
+- <b>`AssetNotFound`</b>: Asset with the given name does not exist
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L74)
 
@@ -49,14 +49,14 @@ Return the given asset as text.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
+- <b>`name`</b>: Name of asset
 
 **Returns:**
 Asset content as text
 
 **Raises:**
 
-- <b>`AssetNotFound`</b>:  No asset defined with given name
+- <b>`AssetNotFound`</b>: No asset defined with given name
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L114)
 
@@ -72,16 +72,16 @@ Return the given asset as a deserialized JSON object.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
-- <b>`**kwargs`</b>:  Additional parameters for `json.loads`
+- <b>`name`</b>: Name of asset
+- <b>`**kwargs`</b>: Additional parameters for `json.loads`
 
 **Returns:**
 Asset content as a Python object (dict, list etc.)
 
 **Raises:**
 
-- <b>`AssetNotFound`</b>:  No asset defined with given name
-- <b>`JSONDecodeError`</b>:  Asset was not valid JSON
+- <b>`AssetNotFound`</b>: No asset defined with given name
+- <b>`JSONDecodeError`</b>: Asset was not valid JSON
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L130)
 
@@ -100,17 +100,17 @@ Fetch the given asset and store it in a file.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
-- <b>`path`</b>:  Destination path for downloaded file
-- <b>`exist_ok`</b>:  Overwrite file if it already exists
+- <b>`name`</b>: Name of asset
+- <b>`path`</b>: Destination path for downloaded file
+- <b>`exist_ok`</b>: Overwrite file if it already exists
 
 **Returns:**
 Path to created file
 
 **Raises:**
 
-- <b>`AssetNotFound`</b>:  No asset defined with given name
-- <b>`FileExistsError`</b>:  Destination already exists
+- <b>`AssetNotFound`</b>: No asset defined with given name
+- <b>`FileExistsError`</b>: Destination already exists
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L148)
 
@@ -126,14 +126,14 @@ Return the given asset as bytes.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
+- <b>`name`</b>: Name of asset
 
 **Returns:**
 Asset content as bytes
 
 **Raises:**
 
-- <b>`AssetNotFound`</b>:  No asset defined with given name
+- <b>`AssetNotFound`</b>: No asset defined with given name
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L173)
 
@@ -149,9 +149,9 @@ Create or update an asset to contain the given string.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
-- <b>`text`</b>:  Text content for asset
-- <b>`wait`</b>:  Wait for asset to update
+- <b>`name`</b>: Name of asset
+- <b>`text`</b>: Text content for asset
+- <b>`wait`</b>: Wait for asset to update
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L204)
 
@@ -167,10 +167,10 @@ Create or update an asset to contain the given object, serialized as JSON.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
-- <b>`value`</b>:  Value for asset, e.g. dict or list
-- <b>`wait`</b>:  Wait for asset to update
-- <b>`**kwargs`</b>:  Additional arguments for `json.dumps`
+- <b>`name`</b>: Name of asset
+- <b>`value`</b>: Value for asset, e.g. dict or list
+- <b>`wait`</b>: Wait for asset to update
+- <b>`**kwargs`</b>: Additional arguments for `json.dumps`
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L217)
 
@@ -191,10 +191,10 @@ Create or update an asset to contain the contents of the given file.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
-- <b>`path`</b>:  Path to file
-- <b>`content_type`</b>:  Content type (or mimetype) of file, detected automatically from file extension if not defined
-- <b>`wait`</b>:  Wait for asset to update
+- <b>`name`</b>: Name of asset
+- <b>`path`</b>: Path to file
+- <b>`content_type`</b>: Content type (or mimetype) of file, detected automatically from file extension if not defined
+- <b>`wait`</b>: Wait for asset to update
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L231)
 
@@ -215,10 +215,10 @@ Create or update an asset to contain the given bytes.
 
 **Arguments:**
 
-- <b>`name`</b>:  Name of asset
-- <b>`data`</b>:  Raw content
-- <b>`content_type`</b>:  Content type (or mimetype) of asset
-- <b>`wait`</b>:  Wait for asset to update
+- <b>`name`</b>: Name of asset
+- <b>`data`</b>: Raw content
+- <b>`content_type`</b>: Content type (or mimetype) of asset
+- <b>`wait`</b>: Wait for asset to update
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/storage/src/robocorp/storage/__init__.py#L261)
 
