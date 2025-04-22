@@ -602,9 +602,9 @@ class NodeFactory:
             next_var_id = partial(next, itertools.count())
         self.next_var_id = next_var_id
 
-    def _set_line_col(self, node: ast.AST):
-        node.lineno = self.lineno
-        node.col_offset = self.col_offset
+    def _set_line_col(self, node: T) -> T:
+        node.lineno = self.lineno  # type: ignore
+        node.col_offset = self.col_offset  # type: ignore
         return node
 
     def Call(self, func: ast.expr) -> ast.Call:
@@ -615,9 +615,7 @@ class NodeFactory:
         Example:
             factory.Call(factory.NameLoad("some_name"))
         """
-        call = ast.Call(keywords=[], args=[])
-        if func is not None:
-            call.func = func
+        call = ast.Call(keywords=[], args=[], func=func)
         return self._set_line_col(call)
 
     def FunctionDefTemp(self) -> ast.FunctionDef:
@@ -658,7 +656,7 @@ class NodeFactory:
     def NameStore(self, name) -> ast.Name:
         return self._set_line_col(ast.Name(name, ast.Store()))
 
-    def Attribute(self, name: ast.AST, attr_name: str) -> ast.Attribute:
+    def Attribute(self, name: ast.expr, attr_name: str) -> ast.Attribute:
         return self._set_line_col(ast.Attribute(name, attr_name, ast.Load()))
 
     def NameLoadRewriteCallback(self, builtin_name: str) -> ast.Attribute:
@@ -682,14 +680,14 @@ class NodeFactory:
     def Constant(self, s) -> ast.Constant:
         return self._set_line_col(ast.Constant(s))
 
-    def FormattedValue(self, s) -> ast.FormattedValue:
-        v = ast.FormattedValue(value=s)
+    def FormattedValue(self, s: ast.expr) -> ast.FormattedValue:
+        v = ast.FormattedValue(value=s, conversion=-1)
         v.conversion = -1
         v.format_spec = None
         return self._set_line_col(v)
 
     def If(self, cond: ast.expr) -> ast.If:
-        return self._set_line_col(ast.If(cond))
+        return self._set_line_col(ast.If(cond, body=[], orelse=[]))
 
     def NotUnaryOp(self, operand: ast.expr) -> ast.UnaryOp:
         return self._set_line_col(
@@ -706,14 +704,14 @@ class NodeFactory:
         return self._set_line_col(ast.Expr(expr))
 
     def Try(self) -> ast.Try:
-        try_node = ast.Try(handlers=[], orelse=[])
+        try_node = ast.Try(handlers=[], orelse=[], body=[], finalbody=[])
         return self._set_line_col(try_node)
 
     def WithStmt(self, **kwargs) -> ast.With:
         with_node = ast.With(**kwargs)
         return self._set_line_col(with_node)
 
-    def withitem(self, **kwargs) -> ast.With:
+    def withitem(self, **kwargs) -> ast.withitem:
         with_node = ast.withitem(**kwargs)
         return self._set_line_col(with_node)
 
@@ -723,13 +721,13 @@ class NodeFactory:
         final_body: List[ast.stmt],
         handlers: Optional[List[ast.ExceptHandler]] = None,
     ) -> ast.Try:
-        try_node = ast.Try(handlers=handlers or [], orelse=[])
+        try_node = ast.Try(handlers=handlers or [], orelse=[], body=[], finalbody=[])
         try_node.body = body
         try_node.finalbody = final_body
         return self._set_line_col(try_node)
 
     def Dict(self) -> ast.Dict:
-        return self._set_line_col(ast.Dict())
+        return self._set_line_col(ast.Dict(keys=[], values=[]))
 
     def LineConstantAt(self, lineno) -> ast.Constant:
         return self._set_line_col(ast.Constant(lineno))
@@ -747,4 +745,4 @@ class NodeFactory:
         return self._set_line_col(ast.Raise())
 
     def JoinedStr(self) -> ast.JoinedStr:
-        return self._set_line_col(ast.JoinedStr())
+        return self._set_line_col(ast.JoinedStr(values=[]))

@@ -25,7 +25,7 @@ with set_color(COLOR_BLACK): ...
 
 **Args:**
 
-- <b>`foreground_color`</b>:  The foreground color to be set (see COLOR_XXX constants).
+- <b>`foreground_color`</b>: The foreground color to be set (see COLOR_XXX constants).
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/console.py#L215)
 

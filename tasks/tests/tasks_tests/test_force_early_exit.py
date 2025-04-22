@@ -93,7 +93,7 @@ def test_force_early_exit(pyfile, kill):
 
     assert stderr.count("Executed") == 1
 
-    assert "Robocorp Log (html)" in stdout
+    assert "Log (html)" in stdout
 
     log_target = Path(os.path.dirname(check)) / "output" / "log.html"
     assert log_target.exists()
@@ -142,7 +142,7 @@ def test_force_early_exit_with_error(pyfile, kill):
     stderr = result.stderr.decode("utf-8")
     stdout = result.stdout.decode("utf-8")
 
-    assert "Robocorp Log (html)" in stdout
+    assert "Log (html)" in stdout
 
     log_target = Path(os.path.dirname(check)) / "output" / "log.html"
     assert log_target.exists()

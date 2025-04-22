@@ -20,12 +20,12 @@ Automatically also creates a new worksheet with the name `sheet_name`.
 
 **Args:**
 
-- <b>`fmt`</b>:  The file format for the workbook. Supported file formats: `xlsx`, `xls`.
-- <b>`sheet_name`</b>:  The name for the initial sheet. If None, then set to `Sheet`.
+- <b>`fmt`</b>: The file format for the workbook. Supported file formats: `xlsx`, `xls`.
+- <b>`sheet_name`</b>: The name for the initial sheet. If None, then set to `Sheet`.
 
 **Returns:**
 
-- <b>`Workbook`</b>:  The created Excel workbook object.
+- <b>`Workbook`</b>: The created Excel workbook object.
 
 **Example:**
 .. code-block:: python
@@ -51,12 +51,12 @@ Opens the workbook in memory. The file can be in either `.xlsx` or `.xls` format
 
 **Args:**
 
-- <b>`path`</b>:  path to Excel file
-- <b>`data_only`</b>:  controls whether cells with formulas have either the formula (default, False) or the value stored the last time Excel read the sheet (True). Affects only `.xlsx` files.
+- <b>`path`</b>: path to Excel file
+- <b>`data_only`</b>: controls whether cells with formulas have either the formula (default, False) or the value stored the last time Excel read the sheet (True). Affects only `.xlsx` files.
 
 **Returns:**
 
-- <b>`Workbook`</b>:  Workbook object
+- <b>`Workbook`</b>: Workbook object
 
 **Example:**
 
@@ -97,8 +97,8 @@ Creates a Table object.
 
 **Args:**
 
-- <b>`data`</b>:      Values for table,  see `Supported data formats`
-- <b>`columns`</b>:   Names for columns, should match data dimensions
+- <b>`data`</b>: Values for table, see `Supported data formats`
+- <b>`columns`</b>: Names for columns, should match data dimensions
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L165)
 
@@ -273,9 +273,9 @@ If both `indexes` and `columns` are lists: Returns a new Table instance with mat
 
 **Args:**
 
-- <b>`indexes`</b>:  List of indexes, or all if not given.
-- <b>`columns`</b>:  List of columns, or all if not given.
-- <b>`as_list`</b>:  Return as list, instead of dictionary.
+- <b>`indexes`</b>: List of indexes, or all if not given.
+- <b>`columns`</b>: List of columns, or all if not given.
+- <b>`as_list`</b>: Return as list, instead of dictionary.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L512)
 
@@ -303,9 +303,9 @@ Get row values from column.
 
 **Args:**
 
-- <b>`column`</b>:  Name for column
-- <b>`indexes`</b>:  Row indexes to include, or all if not given
-- <b>`as_list`</b>:  Return column as dictionary, instead of list
+- <b>`column`</b>: Name for column
+- <b>`indexes`</b>: Row indexes to include, or all if not given
+- <b>`as_list`</b>: Return column as dictionary, instead of list
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L576)
 
@@ -321,9 +321,9 @@ Get column values from row.
 
 **Args:**
 
-- <b>`index`</b>:    Index for row.
-- <b>`columns`</b>:  Column names to include, or all if not given.
-- <b>`as_list`</b>:  Return row as list, instead of dictionary.
+- <b>`index`</b>: Index for row.
+- <b>`columns`</b>: Column names to include, or all if not given.
+- <b>`as_list`</b>: Return row as list, instead of dictionary.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/excel/src/robocorp/excel/tables.py#L548)
 

@@ -12,8 +12,8 @@ Get a secret with the given name.
 
 **Args:**
 
-- <b>`name`</b>:  Name of secret to fetch
-- <b>`hide`</b>:  Hide secret values from log output
+- <b>`name`</b>: Name of secret to fetch
+- <b>`hide`</b>: Hide secret values from log output
 
 **Note:**
 
@@ -24,7 +24,7 @@ Secret container of name, description, and key-value pairs
 
 **Raises:**
 
-- <b>`RobocorpVaultError`</b>:  Error with API request or response payload.
+- <b>`RobocorpVaultError`</b>: Error with API request or response payload.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L19)
 
@@ -42,8 +42,8 @@ Set a secret value using an existing container.
 
 **Args:**
 
-- <b>`secret`</b>:  Secret container, created manually or returned by `get_secret`
-- <b>`hide`</b>:  Hide secret values from log output
+- <b>`secret`</b>: Secret container, created manually or returned by `get_secret`
+- <b>`hide`</b>: Hide secret values from log output
 
 **Note:**
 
@@ -51,7 +51,7 @@ Set a secret value using an existing container.
 
 **Raises:**
 
-- <b>`RobocorpVaultError`</b>:  Error with API request or response payload
+- <b>`RobocorpVaultError`</b>: Error with API request or response payload
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L47)
 
@@ -67,11 +67,11 @@ Create a new secret, or overwrite an existing one.
 
 **Args:**
 
-- <b>`name`</b>:  Name of secret
-- <b>`values`</b>:  Mapping of secret keys and values
-- <b>`description`</b>:  Optional description for secret
-- <b>`exist_ok`</b>:  Overwrite existing secret
-- <b>`hide`</b>:  Hide secret values from log output
+- <b>`name`</b>: Name of secret
+- <b>`values`</b>: Mapping of secret keys and values
+- <b>`description`</b>: Optional description for secret
+- <b>`exist_ok`</b>: Overwrite existing secret
+- <b>`hide`</b>: Hide secret values from log output
 
 **Note:**
 
@@ -82,7 +82,7 @@ Secret container of name, description, and key-value pairs
 
 **Raises:**
 
-- <b>`RobocorpVaultError`</b>:  Error with API request or response payload
+- <b>`RobocorpVaultError`</b>: Error with API request or response payload
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/__init__.py#L72)
 
@@ -110,9 +110,9 @@ Note that keys are always converted to str internally.
 
 **Args:**
 
-- <b>`name`</b>:         Name of secret
-- <b>`description`</b>:  Human-friendly description for secret
-- <b>`values`</b>:       Dictionary of key-value pairs stored in secret
+- <b>`name`</b>: Name of secret
+- <b>`description`</b>: Human-friendly description for secret
+- <b>`values`</b>: Dictionary of key-value pairs stored in secret
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/vault/src/robocorp/vault/_secrets.py#L13)
 

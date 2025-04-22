@@ -19,7 +19,7 @@ skip-magic-trailing-comma = false
 profile = "black"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.2"
 requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]

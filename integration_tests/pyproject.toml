@@ -18,7 +18,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.2"
 playwright = "^1.32.1"
 
 [tool.poetry.group.dev.dependencies]

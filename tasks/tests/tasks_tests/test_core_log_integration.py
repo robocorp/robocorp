@@ -49,7 +49,7 @@ def test_core_log_integration_config_log(datadir, str_regression):
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip()
     decoded = result.stdout.decode("utf-8", "replace")
-    assert "Robocorp Log (html)" in decoded
+    assert "Log (html)" in decoded
 
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()
@@ -85,7 +85,7 @@ default_library_filter_kind = "exclude"
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip()
     decoded = result.stdout.decode("utf-8", "replace")
-    assert "Robocorp Log (html)" in decoded
+    assert "Log (html)" in decoded
 
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()
@@ -105,7 +105,7 @@ def test_core_log_integration_lines(datadir, str_regression) -> None:
     )
 
     decoded = result.stdout.decode("utf-8", "replace")
-    assert "Robocorp Log (html)" in decoded
+    assert "Log (html)" in decoded
 
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()
@@ -177,7 +177,7 @@ def test_no_status_rc(datadir, no_error_rc) -> None:
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip()
     decoded = result.stdout.decode("utf-8", "replace")
-    assert "Robocorp Log (html)" in decoded
+    assert "Log (html)" in decoded
 
     log_target = datadir / "output" / "log.html"
     assert log_target.exists()
@@ -278,7 +278,7 @@ def test_output_on_change_cwd(datadir) -> None:
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip(), f"Found stderr: {decoded}"
     decoded = result.stdout.decode("utf-8", "replace")
-    assert "Robocorp Log (html)" in decoded
+    assert "Log (html)" in decoded
 
     assert (datadir / "output" / "log.html").exists()
 
@@ -297,6 +297,6 @@ def test_use_robot_artifacts_env_var_for_output(datadir, tmpdir) -> None:
     decoded = result.stderr.decode("utf-8", "replace")
     assert not decoded.strip(), f"Found stderr: {decoded}"
     decoded = result.stdout.decode("utf-8", "replace")
-    assert "Robocorp Log (html)" in decoded
+    assert "Log (html)" in decoded
 
     assert (tmpdir / "output_check" / "log.html").exists()

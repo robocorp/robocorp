@@ -16,9 +16,9 @@ The redirections needed are:
 
 **Args:**
 
-- <b>`mode`</b>:  "": query the RC_LOG_OUTPUT_STDOUT value. "no": don't provide log output to the stdout. "json": provide json output to the stdout.
+- <b>`mode`</b>: "": query the RC_LOG_OUTPUT_STDOUT value. "no": don't provide log output to the stdout. "json": provide json output to the stdout.
 
-- <b>`redirect_to_console_messages`</b>:  Whether messages sent to stdout and stderr should be redirected to console messages.
+- <b>`redirect_to_console_messages`</b>: Whether messages sent to stdout and stderr should be redirected to console messages.
 
 [**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/redirect/setup_stdout_logging#L136)
 
