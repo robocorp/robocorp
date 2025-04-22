@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.0.5 - 2025-04-22
+
+- Update robocorp-log dependency to 3.0.0
+
 ## 0.0.4 - 2024-04-08
 
 - Update package's main README.
