@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.3.5 - 2025-04-22
+
+- Update robocorp-tasks dependency to 2.3.6
+
 ## 2.3.4 - 2024-09-25
 
 - Update dependencies
