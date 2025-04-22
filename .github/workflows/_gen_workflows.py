@@ -39,10 +39,9 @@ def get_python_version(pyproject):
         if key == "python":
             version = value.strip("^")
             assert "." in version
-            assert tuple(int(x) for x in version.split(".")) > (
-                3,
-                7,
-            ), f"Bad version: {version}. pyproject: {pyproject}"
+            as_int = tuple(int(x) for x in version.split("."))
+            assert as_int > (3, 8), f"Bad version: {version}. pyproject: {pyproject}"
+            version = ".".join(str(x) for x in as_int[:2])
             return version
     raise RuntimeError(f"Unable to get python version in: {pyproject}")
 
@@ -170,9 +169,9 @@ class BaseTests:
         }
         setup_node = {
             "name": "Setup node",
-            "uses": "actions/setup-node@v3",
+            "uses": "actions/setup-node@v4",
             "with": {
-                "node-version": "20.x",
+                "node-version": "22.x",
                 "registry-url": "https://npm.pkg.github.com",
                 "scope": "@robocorp",
             },
@@ -220,12 +219,12 @@ inv build-output-view-react
         }
         checkout_repo = {
             "name": "Checkout repository and submodules",
-            "uses": "actions/checkout@v3",
+            "uses": "actions/checkout@v4",
         }
 
         setup_python = {
             "name": "Set up Python ${{ matrix.python }}",
-            "uses": "actions/setup-python@v4",
+            "uses": "actions/setup-python@v5",
             "with": {
                 "python-version": "${{ matrix.python }}",
                 "cache": "poetry",
@@ -305,23 +304,6 @@ inv docs --validate
 {contents}""",
             "utf-8",
         )
-
-
-class ActionServerTests(BaseTests):
-    name = "Action Server Tests"
-    target = "action_server_tests.yml"
-    project_name = "action_server"
-    require_node = True
-    require_log_built = True
-    require_build_frontend = True
-
-
-class ActionsTests(BaseTests):
-    name = "Actions Tests"
-    target = "actions_tests.yml"
-    project_name = "actions"
-    require_node = True
-    require_log_built = True
 
 
 class BrowserTests(BaseTests):
@@ -415,7 +397,7 @@ class LogTests(BaseTests):
 
     after_run_custom_additional_steps = [
         {
-            "uses": "actions/upload-artifact@v3",
+            "uses": "actions/upload-artifact@v4",
             "if": "always() && contains(matrix.name, '-outviewintegrationtests')",
             "with": {
                 "name": "robo_log_react.${{ matrix.name }}.html",
@@ -501,8 +483,6 @@ class WorkItemsTests(BaseTests):
 
 
 TEST_TARGETS = [
-    ActionServerTests(),
-    ActionsTests(),
     BrowserTests(),
     ExcelTests(),
     IntegrationTests(),

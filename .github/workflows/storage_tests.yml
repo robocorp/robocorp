@@ -26,26 +26,26 @@ jobs:
       fail-fast: false
       matrix:
         name:
-        - ubuntu-py3.8-devmode
-        - windows-py3.8-devmode
-        - macos-py3.8-devmode
+        - ubuntu-py3.9-devmode
+        - windows-py3.9-devmode
+        - macos-py3.9-devmode
         include:
-        - name: ubuntu-py3.8-devmode
-          python: '3.8'
+        - name: ubuntu-py3.9-devmode
+          python: '3.9'
           os: ubuntu-latest
-        - name: windows-py3.8-devmode
-          python: '3.8'
+        - name: windows-py3.9-devmode
+          python: '3.9'
           os: windows-latest
-        - name: macos-py3.8-devmode
+        - name: macos-py3.9-devmode
           os: macos-13
-          python: '3.8'
+          python: '3.9'
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install poetry
       run: pipx install poetry
     - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
         cache: poetry
