@@ -1101,14 +1101,14 @@ url = "../devutils"
 
 [[package]]
 name = "robocorp-log"
-version = "2.9.6"
+version = "3.0.0"
 description = "Automatic trace logging for Python"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4.0.0,>=3.9.2"
 groups = ["main"]
 files = [
-    {file = "robocorp_log-2.9.6-py3-none-any.whl", hash = "sha256:389515a0d8754d6fbb9355b24f871201b28d0214a889a65ba13c631a3edf94c7"},
-    {file = "robocorp_log-2.9.6.tar.gz", hash = "sha256:67f88dba5ce626b42e645e7dfe60abd78edd50d17a1a2f6c554c78c1d2ca1176"},
+    {file = "robocorp_log-3.0.0-py3-none-any.whl", hash = "sha256:aa65fca532ef3d193d26ae9a05a3b36fbe19653e801d0048f85bf3170d1384ad"},
+    {file = "robocorp_log-3.0.0.tar.gz", hash = "sha256:9abe0dfc3c56e9b50ab7cee43f6d43cddb82faa3d0b0e7ecbcf6e3395015170c"},
 ]
 
 [package.dependencies]
@@ -1133,21 +1133,21 @@ tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
 name = "robocorp-tasks"
-version = "3.1.2"
+version = "4.0.0"
 description = "The automation framework for Python"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4.0.0,>=3.9.2"
 groups = ["main"]
 files = [
-    {file = "robocorp_tasks-3.1.2-py3-none-any.whl", hash = "sha256:644b55979a2991183bf9e0af33a8020ef1168aa88568b8241d7d1ea09a709d0f"},
-    {file = "robocorp_tasks-3.1.2.tar.gz", hash = "sha256:bc0b45e81a6e3b1a0dd4df1b2328c2b5d5ce1cb59f779cdf6fa4b8cd8cabc40a"},
+    {file = "robocorp_tasks-4.0.0-py3-none-any.whl", hash = "sha256:07544753e6eb7652068f9bf2e60e70ca907b7937bb3dd004d15d3505a5118b73"},
+    {file = "robocorp_tasks-4.0.0.tar.gz", hash = "sha256:dbb7567539f04e60e91e2bf0a0a28ad4c545341dd83c8437b97bda0624eaad6f"},
 ]
 
 [package.dependencies]
 docstring_parser_fork = ">=0.0.5,<0.0.6"
 packaging = ">=24.0,<25.0"
 psutil = ">=5.0,<6.0"
-robocorp-log = ">=2.4,<3"
+robocorp-log = ">=2.4,<4"
 
 [[package]]
 name = "robocorp-vault"
@@ -1169,21 +1169,21 @@ tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
 name = "robocorp-workitems"
-version = "1.4.6"
+version = "1.4.7"
 description = "Robocorp Work Items library"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4.0.0,>=3.9.2"
 groups = ["main"]
 files = [
-    {file = "robocorp_workitems-1.4.6-py3-none-any.whl", hash = "sha256:a06483df3cee43ebc0c668c9eaa06fdea75acc6bf8d6a7aad069e286360f9852"},
-    {file = "robocorp_workitems-1.4.6.tar.gz", hash = "sha256:37d2c8c22262df313cf68694d015ebcd976f1f8b5ffdfcb5eb64492825e4d576"},
+    {file = "robocorp_workitems-1.4.7-py3-none-any.whl", hash = "sha256:39b73744365e171019b3ba85e9448bd3e9a3bd009be24e9e9e448d06c2f070a2"},
+    {file = "robocorp_workitems-1.4.7.tar.gz", hash = "sha256:c88734892fcb6c12c78fdb003cb5aadbc0c4227e540993aae3f832699af59ad1"},
 ]
 
 [package.dependencies]
 dataclasses-json = ">=0.6.1,<0.7.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 requests = ">=2.28.2,<3.0.0"
-robocorp-tasks = ">=1,<4"
+robocorp-tasks = ">=1,<5"
 tenacity = ">=8.0.1,<9.0.0"
 
 [[package]]
@@ -1533,4 +1533,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9.2"
-content-hash = "91b1c4255fae465c83e8932e68835f5239dae039271379db0bbab243502c55fe"
+content-hash = "511c1eb891b4720778f0bfe8c9918cff479fd900c0a8eee1aee45a9fa9a47509"
