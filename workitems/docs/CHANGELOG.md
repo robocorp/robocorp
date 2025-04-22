@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.4.7 - 2025-04-22
+
+- Bump to accept robocorp-tasks < 5.
+
 ## 1.4.6 - 2024-09-25
 
 - bump certifi to 2024.8.30
