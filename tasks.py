@@ -2,7 +2,7 @@ import shlex
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Iterator, Optional
 
 import invoke
 from invoke import call, task
@@ -107,10 +107,15 @@ def lock(ctx: invoke.Context, skip: Optional[list[str]] = None) -> None:
             print(f"Skipping project {project_name!r}.")
             continue
 
+        print(f"Poetry lock for: {project_name!r}")
+        try:
+            os.remove(project_dir / "poetry.lock")
+        except:
+            pass
         subprocess.check_call(["poetry", "lock"], cwd=project_dir)
 
 
-def _iter_project_dirs():
+def _iter_project_dirs() -> Iterator[Path]:
     for path in ROOT.iterdir():
         if path.is_dir():
             if (path / "pyproject.toml").exists():

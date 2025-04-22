@@ -12,7 +12,7 @@ license = "Apache-2.0"
 packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.2"
 playwright = "^1.32.1"
 robocorp-tasks = ">=1,<4"
 

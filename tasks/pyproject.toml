@@ -19,7 +19,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.2"
 robocorp-log = ">=2.4,<3"
 psutil = "^5.0"
 docstring_parser_fork = "^0.0.5"

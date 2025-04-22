@@ -12,7 +12,7 @@ license = "Apache-2.0"
 packages = [{include = "robocorp/windows", from="src"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.2"
 pillow = "^10.0.1"
 pywin32 = { version = ">=300,<304", platform = "win32", python = "!=3.8.1" }
 psutil = "^5.9.0"

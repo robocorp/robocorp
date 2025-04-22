@@ -20,7 +20,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.9.2"
 tomli = { version = "^2.0.1", python = "<3.11" }
 psutil = "^5.9"
 
