@@ -40,7 +40,6 @@ if typing.TYPE_CHECKING:
 __version__ = "2.9.6"
 version_info = [int(x) for x in __version__.split(".")]
 
-
 # --- Export parts of the public API below (imports above aren't part of
 # the public API).
 
@@ -54,7 +53,6 @@ AutoLogConfigBase = _config.AutoLogConfigBase
 # Subclass of the AutoLogConfigBase. Clients are expected to instance it to
 # configure auto-logging.
 DefaultAutoLogConfig = _config.DefaultAutoLogConfig
-
 
 # --- Logging methods for custom messaging.
 

@@ -17,7 +17,7 @@ Adds a new logging message with a critical (error) level.
 
 **Args:**
 
-- <b>`message`</b>:  The message which should be logged.
+- <b>`message`</b>: The message which should be logged.
 
 **Example:**
 
@@ -37,7 +37,7 @@ critical('Failed because', obj, 'is not', expected)
 
 > See: `setup_log()` for configurations which may filter out the logged calls and also print it to a stream (such stdout/stderr).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L107)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L105)
 
 ```python
 critical(*message: Any) → None
@@ -51,7 +51,7 @@ Adds a new logging message with a warn level.
 
 **Args:**
 
-- <b>`message`</b>:  The message which should be logged.
+- <b>`message`</b>: The message which should be logged.
 
 **Example:**
 
@@ -71,7 +71,7 @@ warn('Did not expect', obj)
 
 > See: `setup_log()` for configurations which may filter out the logged calls and also print it to a stream (such stdout/stderr).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L134)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L132)
 
 ```python
 warn(*message: Any) → None
@@ -85,7 +85,7 @@ Adds a new logging message with an info level.
 
 **Args:**
 
-- <b>`message`</b>:  The message which should be logged.
+- <b>`message`</b>: The message which should be logged.
 
 **Example:**
 
@@ -105,7 +105,7 @@ info('Received value', obj)
 
 > See: `setup_log()` for configurations which may filter out the logged calls and also print it to a stream (such stdout/stderr).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L161)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L159)
 
 ```python
 info(*message: Any) → None
@@ -119,7 +119,7 @@ Adds a new logging message with an debug level.
 
 **Args:**
 
-- <b>`message`</b>:  The message which should be logged.
+- <b>`message`</b>: The message which should be logged.
 
 **Example:**
 
@@ -139,7 +139,7 @@ debug('Received value', obj)
 
 > See: `setup_log()` for configurations which may filter out the logged calls and also print it to a stream (such stdout/stderr).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L189)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L187)
 
 ```python
 debug(*message: Any) → None
@@ -153,7 +153,7 @@ Adds to the logging the exceptions that's currently raised.
 
 **Args:**
 
-- <b>`message`</b>:  If given an additional error message to be shown.
+- <b>`message`</b>: If given an additional error message to be shown.
 
 **Note:**
 
@@ -163,7 +163,7 @@ Adds to the logging the exceptions that's currently raised.
 
 > A new line is automatically added at the end of the message (if a message was given for logging).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L217)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L215)
 
 ```python
 exception(*message: Any)
@@ -177,8 +177,8 @@ Adds html contents to the log.
 
 **Args:**
 
-- <b>`html`</b>:  The html content to be embedded in the page.
-- <b>`level`</b>:  The level of the message ("INFO", "WARN" or "ERROR")
+- <b>`html`</b>: The html content to be embedded in the page.
+- <b>`level`</b>: The level of the message ("INFO", "WARN" or "ERROR")
 
 Example adding an image:
 
@@ -188,7 +188,7 @@ html(
 )
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L241)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L239)
 
 ```python
 html(html: str, level: str = 'INFO')
@@ -202,7 +202,7 @@ Makes a process snapshot and adds it to the logs.
 
 A process snapshot can include details on the python process and subprocesses and should add a thread dump with the stack of all running threads.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L261)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L259)
 
 ```python
 process_snapshot() → None
@@ -222,12 +222,12 @@ Shows a message in the console and also adds it to the log output.
 ```
 
 Messages from the framework: "regular": Some regular message. "important": Some message which deserves a bit more attention. "task_name": The task name is being written. "error": Some error message. "traceback": Some traceback message.
-\- <b>`stream`</b>:  If specified this is the stream where the message should also be written.
+\- <b>`stream`</b>: If specified this is the stream where the message should also be written.
 \- if not specified (\_SentinelUseStdout) it's written to sys.stdout by default.
 \- if None it's not written.
-\- <b>`flush`</b>:  Whether we should flush after sending the message (if None it's flushed if the end char ends with '').
+\- <b>`flush`</b>: Whether we should flush after sending the message (if None it's flushed if the end char ends with '').
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L310)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L308)
 
 ```python
 console_message(
@@ -259,7 +259,7 @@ with suppress_methods():
     ...
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L419)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L417)
 
 ```python
 suppress_methods()
@@ -286,7 +286,7 @@ with suppress_variables():
     ...
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L440)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L438)
 
 ```python
 suppress_variables()
@@ -304,9 +304,9 @@ def suppress(variables:bool = True, methods:bool = True): ...
 
 **Args:**
 
-- <b>`variables`</b>:  Whether variables should be suppressed in the scope.
+- <b>`variables`</b>: Whether variables should be suppressed in the scope.
 
-- <b>`methods`</b>:  Whether method calls should be suppressed in the scope.
+- <b>`methods`</b>: Whether method calls should be suppressed in the scope.
 
 Usage as a decorator:
 
@@ -337,7 +337,7 @@ with log.suppress(methods=False):
     ....
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L489)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L487)
 
 ```python
 suppress(*args, **kwargs)
@@ -351,12 +351,12 @@ Returns true if the given variable name should be considered sensitive.
 
 **Args:**
 
-- <b>`variable_name`</b>:  The variable name to be checked.
+- <b>`variable_name`</b>: The variable name to be checked.
 
 **Returns:**
 True if the given variable name is considered to be sensitive (in whichcase its value should be redacted) and False otherwise.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L535)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L533)
 
 ```python
 is_sensitive_variable_name(variable_name: str) → bool
@@ -374,9 +374,9 @@ Note that this will add a patterns where any variable containing the given varia
 
 **Args:**
 
-- <b>`variable_name`</b>:  The variable name to be considered sensitive.
+- <b>`variable_name`</b>: The variable name to be considered sensitive.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L549)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L547)
 
 ```python
 add_sensitive_variable_name(variable_name: str) → None
@@ -392,9 +392,9 @@ Any variable name matching the given pattern will have its value redacted.
 
 **Args:**
 
-- <b>`variable_name_pattern`</b>:  The variable name pattern to be consideredsensitive.
+- <b>`variable_name_pattern`</b>: The variable name pattern to be consideredsensitive.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L565)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L563)
 
 ```python
 add_sensitive_variable_name_pattern(variable_name_pattern: str) → None
@@ -414,9 +414,9 @@ Will be automatically hidden and it's also possible to add new names to be autom
 
 **Args:**
 
-- <b>`string_to_hide`</b>:  The string that should be hidden from the output.
+- <b>`string_to_hide`</b>: The string that should be hidden from the output.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L578)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L576)
 
 ```python
 hide_from_output(string_to_hide: str) → None
@@ -450,7 +450,7 @@ config.hide_strings.add('True')
 config.dont_hide_strings_smaller_or_equal_to = 3
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L621)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L619)
 
 ```python
 hide_strings_config() → IRedactConfiguration
@@ -464,11 +464,11 @@ Starts a run session (adds the related event to the log).
 
 **Args:**
 
-- <b>`name`</b>:  The name of the run.
+- <b>`name`</b>: The name of the run.
 
 Note: robocorp-tasks calls this method automatically.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L653)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L651)
 
 ```python
 start_run(name: str) → None
@@ -482,12 +482,12 @@ Finishes a run session (adds the related event to the log).
 
 **Args:**
 
-- <b>`name`</b>:  The name of the run.
-- <b>`status`</b>:  The run status.
+- <b>`name`</b>: The name of the run.
+- <b>`status`</b>: The run status.
 
 Note: robocorp-tasks calls this method automatically.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L667)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L665)
 
 ```python
 end_run(name: str, status: str) → None
@@ -501,15 +501,15 @@ Starts a task (adds the related event to the log).
 
 **Args:**
 
-- <b>`name`</b>:  The name of the task.
-- <b>`libname`</b>:  The library (module name) where the task is defined.
-- <b>`source`</b>:  The source of the task.
-- <b>`lineno`</b>:  The line number of the task in the given source.
-- <b>`doc`</b>:  The documentation for the task.
+- <b>`name`</b>: The name of the task.
+- <b>`libname`</b>: The library (module name) where the task is defined.
+- <b>`source`</b>: The source of the task.
+- <b>`lineno`</b>: The line number of the task in the given source.
+- <b>`doc`</b>: The documentation for the task.
 
 Note: robocorp-tasks calls this method automatically.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L682)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L680)
 
 ```python
 start_task(
@@ -529,14 +529,14 @@ Ends a task (adds the related event to the log).
 
 **Args:**
 
-- <b>`name`</b>:  The name of the task.
-- <b>`libname`</b>:  The library (module name) where the task is defined.
-- <b>`status`</b>:  The pass/fail status of the task
-- <b>`message`</b>:  The message for a failed task
+- <b>`name`</b>: The name of the task.
+- <b>`libname`</b>: The library (module name) where the task is defined.
+- <b>`status`</b>: The pass/fail status of the task
+- <b>`message`</b>: The message for a failed task
 
 Note: robocorp-tasks calls this method automatically.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L702)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L700)
 
 ```python
 end_task(name: str, libname: str, status: str, message: str) → None
@@ -550,7 +550,7 @@ Iterates stream contents and decodes those as dicts.
 
 **Args:**
 
-- <b>`stream`</b>:  The stream which should be iterated in (anything with a `readlines()` method which should provide the messages encoded in the internal format).
+- <b>`stream`</b>: The stream which should be iterated in (anything with a `readlines()` method which should provide the messages encoded in the internal format).
 
 **Returns:**
 An iterator which will decode the messages and provides a dictionary foreach message found.
@@ -565,9 +565,9 @@ Example of messages provided:
 ...
 ```
 
-- <b>`Note`</b>:  the exact format of the messages provided is not stable acrossreleases.
+- <b>`Note`</b>: the exact format of the messages provided is not stable acrossreleases.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L722)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L720)
 
 ```python
 iter_decoded_log_format_from_stream(stream: IReadLines) → Iterator[dict]
@@ -592,9 +592,9 @@ Example of messages provided:
  ...
 ```
 
-- <b>`Note`</b>:  the exact format of the messages provided is not stable acrossreleases.
+- <b>`Note`</b>: the exact format of the messages provided is not stable acrossreleases.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L753)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L751)
 
 ```python
 iter_decoded_log_format_from_log_html(log_html: Path) → Iterator[dict]
@@ -619,9 +619,9 @@ Example of messages provided:
  ...
 ```
 
-- <b>`Note`</b>:  the exact format of the messages provided is not stable acrossreleases.
+- <b>`Note`</b>: the exact format of the messages provided is not stable acrossreleases.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L779)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L777)
 
 ```python
 iter_decoded_log_format_from_log_html_contents(
@@ -640,9 +640,9 @@ Can also check if a message is not found.
 
 **Args:**
 
-- <b>`messages_iterator`</b>:  An iterator over the messages found.
-- <b>`expected`</b>:  The messages which are expected to be found. If some message expected to be found is not found an AssertionError will be raised.
-- <b>`not_expected`</b>:  The messages that should not appear.
+- <b>`messages_iterator`</b>: An iterator over the messages found.
+- <b>`expected`</b>: The messages which are expected to be found. If some message expected to be found is not found an AssertionError will be raised.
+- <b>`not_expected`</b>: The messages that should not appear.
 
 **Example:**
 
@@ -671,7 +671,7 @@ messages_iterator,
 ]
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L845)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L843)
 
 ```python
 verify_log_messages_from_messages_iterator(
@@ -689,13 +689,13 @@ Verifies whether the given messages are available or not in the decoded messages
 
 **Args:**
 
-- <b>`s`</b>:  A string with the messages already decoded (where messages areseparated by lines and each message is a json string to be decoded).
-- <b>`expected`</b>:  The messages expected.
-- <b>`not_expected`</b>:  The messages that should not appear.
+- <b>`s`</b>: A string with the messages already decoded (where messages areseparated by lines and each message is a json string to be decoded).
+- <b>`expected`</b>: The messages expected.
+- <b>`not_expected`</b>: The messages that should not appear.
 
 See: `verify_log_messages_from_messages_iterator` for more details on the matching of messages.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L926)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L924)
 
 ```python
 verify_log_messages_from_decoded_str(
@@ -713,13 +713,13 @@ Verifies whether the given messages are available or not in the decoded messages
 
 **Args:**
 
-- <b>`log_html`</b>:  The path to the log_html where messages were embedded.
-- <b>`expected`</b>:  The messages expected.
-- <b>`not_expected`</b>:  The messages that should not appear.
+- <b>`log_html`</b>: The path to the log_html where messages were embedded.
+- <b>`expected`</b>: The messages expected.
+- <b>`not_expected`</b>: The messages that should not appear.
 
 See: `verify_log_messages_from_messages_iterator` for more details on the matching of messages.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L984)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L982)
 
 ```python
 verify_log_messages_from_log_html(
@@ -737,13 +737,13 @@ Verifies whether the given messages are available or not in the decoded messages
 
 **Args:**
 
-- <b>`stream`</b>:  A stream from where the encoded messages are expected to be read from.
-- <b>`expected`</b>:  The messages expected.
-- <b>`not_expected`</b>:  The messages that should not appear.
+- <b>`stream`</b>: A stream from where the encoded messages are expected to be read from.
+- <b>`expected`</b>: The messages expected.
+- <b>`not_expected`</b>: The messages that should not appear.
 
 See: `verify_log_messages_from_messages_iterator` for more details on the matching of messages.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1004)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1002)
 
 ```python
 verify_log_messages_from_stream(
@@ -761,21 +761,21 @@ Setups the log "general" settings.
 
 **Args:**
 
-- <b>`max_value_repr_size`</b>:  This is the maximum number of chars which may be used for a repr (values are clipped if a `repr(obj)` would return a bigger representation). May be passed directly as the value as an int or a string with the value and associated unit. Accepted units are: `k`, `m`.
-- <b>`Example`</b>:  `"1000k"`, `"1m"`.
+- <b>`max_value_repr_size`</b>: This is the maximum number of chars which may be used for a repr (values are clipped if a `repr(obj)` would return a bigger representation). May be passed directly as the value as an int or a string with the value and associated unit. Accepted units are: `k`, `m`.
+- <b>`Example`</b>: `"1000k"`, `"1m"`.
 
 The default value for this setting is "200k".
 
-- <b>`log_level`</b>:  Messages with a level higher or equal to the one specified will be logged in the `log.html`.
+- <b>`log_level`</b>: Messages with a level higher or equal to the one specified will be logged in the `log.html`.
 
 The default value for this setting is "FilterLogLevel.DEBUG", so, any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical` will be shown.
 
-- <b>`output_log_level`</b>:  Messages with a level higher or equal to the one specified will be printed to the output_stream configured.
+- <b>`output_log_level`</b>: Messages with a level higher or equal to the one specified will be printed to the output_stream configured.
 
 The default value for this setting is "FilterLogLevel.NONE", so, any message logged with `log.debug`, `log.info`, `log.warn` and `log.critical` is not shown in the output.
 
-- <b>`output_stream`</b>:  It's possible to specify the stream to output contents to be printed in the `log.debug`, `log.info`, `log.warn` and `log.critical` calls. If all messages should be streamed to the same place it can be the output stream (or its name) or it can be a dict mapping each level to a different stream (or its name).
-- <b>`Note`</b>:  if sys.stdout/sys.stderr are used it's preferred to pass it asa literal (`"stdout"` or `"stderr"`) as if the stream is redirected it'llstill print to the current `sys.stdout` / `sys.stderr`.
+- <b>`output_stream`</b>: It's possible to specify the stream to output contents to be printed in the `log.debug`, `log.info`, `log.warn` and `log.critical` calls. If all messages should be streamed to the same place it can be the output stream (or its name) or it can be a dict mapping each level to a different stream (or its name).
+- <b>`Note`</b>: if sys.stdout/sys.stderr are used it's preferred to pass it asa literal (`"stdout"` or `"stderr"`) as if the stream is redirected it'llstill print to the current `sys.stdout` / `sys.stderr`.
 
 **Returns:**
 A context manager, so, it's possible to use this method with a `with statement`so that the configuration is reverted to a previous configuration whenthe context manager exits (if not called with a `with statement` thenthe values won't be reverted).
@@ -812,7 +812,7 @@ log.setup_log(
 )
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1060)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1058)
 
 ```python
 setup_log(
@@ -833,13 +833,13 @@ This must be called prior to actually importing the modules which should be auto
 
 **Args:**
 
-- <b>`config`</b>:  The configuration specifying how modules should be automatically logged.
+- <b>`config`</b>: The configuration specifying how modules should be automatically logged.
 
 If not passed, by default all files which are library files (i.e.: in the python `Lib` or `site-packages`) won't be logged and all files which are not library files will be fully logged.
 
 Returns a context manager which will stop applying the auto-logging to new loaded modules. Note that modules which are already being tracked won't stop being tracked.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1194)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1192)
 
 ```python
 setup_auto_logging(
@@ -858,18 +858,18 @@ Optionally it's possible to collect all the output when the run is finished and 
 
 **Args:**
 
-- <b>`output_dir`</b>:  The output directory where the log contents should be saved.
-- <b>`max_file_size`</b>:  The maximum file size for one log file (as a string with the value and the unit -- accepted units are: `b`, `kb`, `mb`, `gb` if no unit is passed it's considered `b` (bytes)). Note that the max size is not a hard guarantee, rather it's a guideline that the logging tries to follow (usually it's very close, although on degenerate cases it can be considerably different).
-- <b>`max_files`</b>:  The maximum amount of files which can be added (if more would be needed the oldest one is erased).
-- <b>`log_html`</b>:  If given this is the path (file) where the log.html contents should be written (the log.html will include all the logs from the run along with a viewer for such logs).
-- <b>`log_html_style`</b>:  The style to be used for the log.html.
-- <b>`min_messages_per_file`</b>:  This is the minimum number of messages that need to be added to a file for it to be rotated (if messages are too big this may make the max_file_size be surpassed). This is needed to prevent a case where a whole new file could be created after just a single message if the message was too big for the max file size.
+- <b>`output_dir`</b>: The output directory where the log contents should be saved.
+- <b>`max_file_size`</b>: The maximum file size for one log file (as a string with the value and the unit -- accepted units are: `b`, `kb`, `mb`, `gb` if no unit is passed it's considered `b` (bytes)). Note that the max size is not a hard guarantee, rather it's a guideline that the logging tries to follow (usually it's very close, although on degenerate cases it can be considerably different).
+- <b>`max_files`</b>: The maximum amount of files which can be added (if more would be needed the oldest one is erased).
+- <b>`log_html`</b>: If given this is the path (file) where the log.html contents should be written (the log.html will include all the logs from the run along with a viewer for such logs).
+- <b>`log_html_style`</b>: The style to be used for the log.html.
+- <b>`min_messages_per_file`</b>: This is the minimum number of messages that need to be added to a file for it to be rotated (if messages are too big this may make the max_file_size be surpassed). This is needed to prevent a case where a whole new file could be created after just a single message if the message was too big for the max file size.
 
 **Note:**
 
 > It's Ok to add more than one log output, but if 2 log outputs point to the same directory there will be conflicts (in the future this should generate an error).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1227)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1225)
 
 ```python
 add_log_output(
@@ -890,7 +890,7 @@ This method must be called to close loggers.
 
 Note that some loggers such as the one which outputs html needs to bo closed to actually write the output.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1291)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1289)
 
 ```python
 close_log_outputs()
@@ -904,12 +904,12 @@ Adds a log output which is in-memory (receives a callable).
 
 **Args:**
 
-- <b>`write`</b>:  A callable which will be called as `write(msg)` whenevera message is sent from the logging.
+- <b>`write`</b>: A callable which will be called as `write(msg)` whenevera message is sent from the logging.
 
 **Returns:**
 A context manager which can be used to automatically remove andclose the related logger.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1308)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/__init__.py#L1306)
 
 ```python
 add_in_memory_log_output(write: Callable[[str], Any])

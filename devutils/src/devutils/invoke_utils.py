@@ -20,6 +20,7 @@ REPOSITORY_URL = "https://github.com/robocorp/robocorp/tree/master/"
 
 
 class RoundtripPyProject:
+
     def __init__(self, pyproject: Path):
         self.pyproject = pyproject
         self.original = pyproject.read_bytes()
@@ -51,7 +52,7 @@ def collect_deps_pyprojects(root_pyproject: Path, found=None) -> Iterator[Path]:
     dependencies = contents["tool"]["poetry"]["dependencies"]
     for key in dependencies:
         if key.startswith("robocorp-"):
-            dep_name = key[len("robocorp-") :]
+            dep_name = key[len("robocorp-"):]
             dep_pyproject = root_pyproject.parent.parent / dep_name / "pyproject.toml"
             assert dep_pyproject.exists(), f"Expected {dep_pyproject} to exist."
             if dep_pyproject not in found:
@@ -144,10 +145,10 @@ def _env_in_conda(env_name) -> bool:
 def build_common_tasks(
     root: Path,
     package_name: str,
-    tag_prefix: Optional[str] = None,
-    ruff_format_arguments: str = "",
-    parallel_tests: bool = True,
-    source_directories: Tuple[str, ...] = ("src", "tests"),
+    tag_prefix: Optional[str]=None,
+    ruff_format_arguments: str="",
+    parallel_tests: bool=True,
+    source_directories: Tuple[str, ...]=("src", "tests"),
 ):
     """Builds the common tasks in every task.py file of the inheriting packages.
 
@@ -178,7 +179,7 @@ def build_common_tasks(
         args = " ".join(str(c) for c in cmd)
         return ctx.run(args, **options)
 
-    def poetry(ctx, *cmd, verbose: bool = False):
+    def poetry(ctx, *cmd, verbose: bool=False):
         prefix = []
         if _use_conda():
             prefix.extend(["conda", "run", "--no-capture-output", "-n", CONDA_ENV_NAME])
@@ -198,7 +199,7 @@ def build_common_tasks(
 
     @task
     def install(
-        ctx, local: Optional[str] = None, update: bool = False, verbose: bool = False
+        ctx, local: Optional[str]=None, update: bool=False, verbose: bool=False
     ):
         """Optionally updates then also installs dependencies.
 
@@ -224,13 +225,13 @@ def build_common_tasks(
         )
         if projects:
             with mark_as_develop_mode(projects):
-                poetry(ctx, "lock --no-update")
+                poetry(ctx, "lock")
                 poetry(ctx, "install", verbose=verbose)
         else:
             poetry(ctx, "install", verbose=verbose)
 
     @task
-    def devinstall(ctx, verbose: bool = False):
+    def devinstall(ctx, verbose: bool=False):
         """
         Install the package in develop mode and its dependencies.
 
@@ -240,12 +241,12 @@ def build_common_tasks(
         _make_conda_env_if_needed()
 
         with mark_as_develop_mode(all_packages=True):
-            poetry(ctx, "lock --no-update")
+            poetry(ctx, "lock")
             poetry(ctx, "install", verbose=verbose)
 
     @contextmanager
     def mark_as_develop_mode(
-        projects: Optional[List[str]] = None, all_packages: bool = False
+        projects: Optional[List[str]]=None, all_packages: bool=False
     ):
         root_pyproject = root / "pyproject.toml"
         assert root_pyproject.exists(), f"Expected {root_pyproject} to exist."
@@ -270,7 +271,7 @@ def build_common_tasks(
                         # robocorp-log = "0.1.0"
                         # to:
                         # robocorp-log = {path = "../log/", develop = true
-                        name = key[len("robocorp-") :]
+                        name = key[len("robocorp-"):]
                         if all_packages or (projects and name in projects):
                             dependencies[key] = dict(path=f"../{name}/", develop=True)
             yield
@@ -295,7 +296,7 @@ def build_common_tasks(
         return static_paths
 
     @task
-    def lint(ctx, strict: bool = False):
+    def lint(ctx, strict: bool=False):
         """Run static analysis and formatting checks.
 
         Currently, it runs the following in this order:
@@ -328,7 +329,7 @@ def build_common_tasks(
             )
 
     @task
-    def typecheck(ctx, strict: bool = False):
+    def typecheck(ctx, strict: bool=False):
         """Type check code"""
         cmd = [
             ctx,
@@ -351,7 +352,7 @@ def build_common_tasks(
         poetry(ctx, f"run isort {TARGETS}")
 
     @task
-    def test(ctx, test: Optional[str] = None):
+    def test(ctx, test: Optional[str]=None):
         """Run unittests"""
         cmd = "run pytest -rfE -vv"
 
@@ -415,7 +416,7 @@ def build_common_tasks(
         poetry(ctx, "publish")
 
     @task
-    def docs(ctx, check: bool = False, validate: bool = False):
+    def docs(ctx, check: bool=False, validate: bool=False):
         """Build API documentation"""
         if validate:
             poetry(ctx, "run lazydocs", "--validate", package_name)
@@ -518,7 +519,7 @@ def build_common_tasks(
         """
         module_version = _get_module_version(ctx)
         tag = get_tag(tag_prefix)
-        version = tag[tag.rfind("-") + 1 :]
+        version = tag[tag.rfind("-") + 1:]
 
         if module_version == version:
             sys.stderr.write(f"Version matches ({version}) (exit(0))\n")

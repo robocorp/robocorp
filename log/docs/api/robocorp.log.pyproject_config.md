@@ -2,7 +2,7 @@
 
 # module `robocorp.log.pyproject_config`
 
-This module contains functions to read a pyproject.toml file and  read the related tool.robocorp.log section.
+This module contains functions to read a pyproject.toml file and read the related tool.robocorp.log section.
 
 # Functions
 
@@ -12,7 +12,7 @@ ______________________________________________________________________
 
 **Args:**
 
-- <b>`path`</b>:  This is the path where the `pyproject.toml` file should be found. If it's not found directly in the given path, parent folders will be searched for the `pyproject.toml`.
+- <b>`path`</b>: This is the path where the `pyproject.toml` file should be found. If it's not found directly in the given path, parent folders will be searched for the `pyproject.toml`.
 
 **Returns:**
 The information on the pyproject file (the toml contents and the actualpath where the pyproject.toml was found).
@@ -29,9 +29,9 @@ ______________________________________________________________________
 
 **Args:**
 
-- <b>`pyproject_info`</b>:  Information on the pyroject toml.
-- <b>`section_name`</b>:  The name of the section to be read i.e.: tool.robocorp.log
-- <b>`context`</b>:  The context used to report errors.
+- <b>`pyproject_info`</b>: Information on the pyroject toml.
+- <b>`section_name`</b>: The name of the section to be read i.e.: tool.robocorp.log
+- <b>`context`</b>: The context used to report errors.
 
 **Returns:**
 The section which was read.
@@ -52,8 +52,8 @@ ______________________________________________________________________
 
 **Args:**
 
-- <b>`context`</b>:  The context used to report errors.
-- <b>`pyproject`</b>:  The pyproject information from where the configuration should be loaded.
+- <b>`context`</b>: The context used to report errors.
+- <b>`pyproject`</b>: The pyproject information from where the configuration should be loaded.
 
 **Returns:**
 The autolog configuration read from the given pyproject information.

@@ -21,7 +21,6 @@ from .protocols import LogElementType, OptExcInfo
 
 WRITE_CONTENTS_TO_STDERR: bool = False
 
-
 _valid_chars = tuple(string.ascii_letters + string.digits)
 
 
@@ -1307,7 +1306,9 @@ Virtual Memory Size: {vms}"""
             # From output.xml it's "true", from listener it's "yes".
             msg_type = "LH "
 
-            message = _log_redacter.redact(message, "&lt;redacted&gt;")
+            if "<img" not in message:
+                # We don't redact images (see: https://github.com/robocorp/robocorp/issues/399)
+                message = _log_redacter.redact(message, "&lt;redacted&gt;")
         else:
             message = _log_redacter.redact(message)
 
@@ -1356,7 +1357,7 @@ Virtual Memory Size: {vms}"""
             dirname = os.path.dirname(target)
             if not os.path.exists(dirname):
                 os.makedirs(dirname, exist_ok=True)
-            print(f"Robocorp Log (html): {target}")
+            print(f"Log (html): {target}")
 
             from robocorp.log import _index_v3 as index
 

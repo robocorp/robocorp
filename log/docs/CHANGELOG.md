@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Fix issue where the `<img>` contents were being redacted (now, if `html` is `True` in `robocorp.log.info` the contents of `<img>` tags are not redacted).
+- The string printed to the output is now `Log (html): <path-to-log-file>` instead of `Robocorp Log (html): <path-to-log-file>`.
+
 ## 2.9.6 - 2025-02-25
 
 - Update dependencies

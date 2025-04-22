@@ -28,7 +28,7 @@
 - [`log.add_sensitive_variable_name`](./robocorp.log.md#function-add_sensitive_variable_name): Marks a given variable name as sensitive
 - [`log.add_sensitive_variable_name_pattern`](./robocorp.log.md#function-add_sensitive_variable_name_pattern): Adds a given pattern to consider a variable name as sensitive.
 - [`log.close_log_outputs`](./robocorp.log.md#function-close_log_outputs): This method must be called to close loggers.
-- [`log.console_message`](./robocorp.log.md#function-console_message):     Shows a message in the console and also adds it to the log output.
+- [`log.console_message`](./robocorp.log.md#function-console_message): Shows a message in the console and also adds it to the log output.
 - [`log.critical`](./robocorp.log.md#function-critical): Adds a new logging message with a critical (error) level.
 - [`log.debug`](./robocorp.log.md#function-debug): Adds a new logging message with an debug level.
 - [`log.end_run`](./robocorp.log.md#function-end_run): Finishes a run session (adds the related event to the log).

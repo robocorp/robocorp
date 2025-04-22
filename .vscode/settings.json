@@ -1,0 +1,41 @@
+{
+    "python.pydev.preferredImportLocation": "topOfMethod",
+  
+    "python.pydev.formatter": "ruff",
+    "python.pydev.lint.ruff.use": true,
+    "python.pydev.lint.ruff.showOutput": true,
+    "python.pydev.lint.mypy.use": true,
+    "python.pydev.lint.mypy.showOutput": true,
+    "python.pydev.lint.mypy.args": "--follow-imports=silent --show-column-numbers --namespace-packages --explicit-package-bases --strict",
+    "python.pydev.docstring.style": "google",
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+    "python.pydev.sortImportsOnFormat": "isort",
+  
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+      "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "files.exclude": {
+      "__pycache__": true,
+      ".ruff_cache": true,
+      ".pytest_cache": true,
+      ".venv": true,
+      "uv.lock": true
+    }
+  }
+  

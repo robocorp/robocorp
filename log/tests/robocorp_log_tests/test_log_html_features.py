@@ -3,6 +3,71 @@ import sys
 HTML_MESSAGE = '<p>Image is: <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAnBAMAAACGbbfxAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAbUExURR4nOzpCVI+Tnf///+Pk5qqutXN4hVZdbMbJzod39mUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDjLnZIxT8MwFITPqDQdG1rBGjX8AOBS0hG1ghnUhbFSBlZvMFbqH+fZaeMLBJA4KZHzyb7ce374l1we3vm0Ty/Ix7era1YvSjOeVBWCZx3mveBDwlWyH1OUXM5t0yJqS+4V33xdwWFCrvOoOfmA1r30Z+r9jHV7zmeKd7ADQEOvATkFlzGz13JqIGanYbexYLOldcY+IsniqrEyRrUj7xBwccRm/lSuPqysI3YBjzUfQproNOr/0tLEgE3CK8P2YG54K401XIeWHDw2Uo5H5UP1l1ZXr9+7U2ffRfhTC9HwFVMmqOzl7vTDnEwSvhXsNLaoGbIGurvf97ArhzYbj01sm6TKXm3yC3yX8/hdwCdipl9ujxriXgAAAABJRU5ErkJggg=="></p>'
 
 
+def test_log_html_does_not_do_log_redaction(tmpdir, ui_regenerate) -> None:
+    """
+    This is a test which should generate an output for a log.html which
+    showcases all the features available.
+    """
+    from pathlib import Path
+
+    from robocorp import log
+    from robocorp.log import DefaultAutoLogConfig, verify_log_messages_from_log_html
+
+    __tracebackhide__ = 1
+
+    log_target = Path(tmpdir.join("log.html"))
+
+    with log.setup_auto_logging(DefaultAutoLogConfig()):
+        with log.add_log_output(
+            tmpdir,
+            max_file_size="500kb",
+            max_files=1,
+            log_html=log_target,
+            log_html_style=ui_regenerate.LOG_HTML_STYLE,
+        ):
+            log.start_task("Setup", "setup", str(tmpdir), 0)
+
+            log.start_run("Test Log HTML Features")
+            log.start_task("my_task", "modname", str(tmpdir), 0)
+
+            log.hide_from_output("AAA")
+            HTML_MESSAGE_LINENO = sys._getframe().f_lineno + 1
+            log.html(HTML_MESSAGE)
+
+            log.end_task(
+                "my_task",
+                "modname",
+                "ERROR",
+                "Marking that it exited with error due to some reason...",
+            )
+            log.end_run("Test Log HTML Features", "ERROR")
+
+        assert log_target.exists()
+
+        msgs = verify_log_messages_from_log_html(
+            log_target,
+            [
+                {
+                    "message_type": "LH",
+                    "level": "I",
+                    "message": HTML_MESSAGE,
+                    "source": __file__,
+                    "lineno": HTML_MESSAGE_LINENO,
+                },
+            ],
+            [],
+        )
+
+        if ui_regenerate.PRINT_MESSAGES:
+            for m in msgs:
+                print(m)
+
+        if ui_regenerate.OPEN_IN_BROWSER:
+            import webbrowser
+
+            webbrowser.open(log_target.as_uri())
+
+
 def test_log_html_features(tmpdir, ui_regenerate) -> None:
     """
     This is a test which should generate an output for a log.html which
