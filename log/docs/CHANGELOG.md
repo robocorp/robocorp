@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.0.1 - 2025-06-23
+
+- Updating dependencies
+
 ## 3.0.0 - 2025-04-22
 
 - Fix issue where the `<img>` contents were being redacted (now, if `html` is `True` in `robocorp.log.info` the contents of `<img>` tags are not redacted).
