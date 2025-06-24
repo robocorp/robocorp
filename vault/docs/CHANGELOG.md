@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.3.9 - 2025-06-24
+
+- Looser version intervals for cryptography
+
 ## 1.3.8 - 2025-02-24
 
 - Bump cryptography to 44.0.1

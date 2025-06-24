@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-vault"
-version = "1.3.8"
+version = "1.3.9"
 description = "Robocorp Control Room Vault API integration library"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -13,7 +13,7 @@ packages = [{include = "robocorp", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9.2"
-cryptography = ">=44.0.1,<45"
+cryptography = ">=44.0.1,<46.0.0"
 requests = "^2.32.3"
 pyyaml = "^6.0"
 tenacity = "^8.0.1"
