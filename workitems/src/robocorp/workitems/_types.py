@@ -26,6 +26,10 @@ class ExceptionType(str, Enum):
     APPLICATION = "APPLICATION"  # logic issue/timeout, can be retried
 
 
+# TTL for work items (1 week in seconds)
+TTL_WEEK_SECONDS = 604_800
+
+
 @dataclass_json(letter_case=LetterCase.CAMEL)
 @dataclass
 class Address:

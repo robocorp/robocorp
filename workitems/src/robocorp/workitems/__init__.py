@@ -5,6 +5,9 @@ from typing import Callable, Optional, Union, cast
 from robocorp.tasks import get_current_task, task_cache
 
 from ._adapters import BaseAdapter, FileAdapter, RobocorpAdapter
+from ._adapters._docdb import DocumentDBAdapter
+from ._adapters._redis import RedisAdapter
+from ._adapters._sqlite import SQLiteAdapter
 from ._context import Context
 from ._exceptions import (
     ApplicationException,
@@ -192,4 +195,7 @@ __all__ = [
     "RobocorpAdapter",
     "FileAdapter",
     "BaseAdapter",
+    "SQLiteAdapter",
+    "RedisAdapter",
+    "DocumentDBAdapter",
 ]

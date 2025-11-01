@@ -43,6 +43,26 @@ jobs:
         - name: macos-py3.9-devmode
           os: macos-13
           python: '3.9'
+    # Add Redis and MongoDB services for Ubuntu integration tests
+    services:
+      redis:
+        image: redis:alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+        ports:
+        - 6379:6379
+      mongo:
+        image: mongo:7
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 30
+        ports:
+        - 27017:27017
     steps:
     - name: Checkout repository and submodules
       uses: actions/checkout@v4
@@ -61,11 +81,18 @@ jobs:
     - name: Install project (dev)
       if: contains(matrix.name, '-devmode')
       run: inv devinstall
+    - name: Install optional adapter dependencies (Ubuntu only)
+      if: matrix.os == 'ubuntu-latest'
+      run: poetry install --extras "redis docdb"
     - name: Test
       env:
         GITHUB_ACTIONS_MATRIX_NAME: ${{ matrix.name }}
         CI_CREDENTIALS: ${{ secrets.CI_CREDENTIALS }}
         CI_ENDPOINT: ${{ secrets.CI_ENDPOINT }}
+        RC_REDIS_URL: redis://localhost:6379/0
+        RC_MONGO_URL: mongodb://localhost:27017
+        RC_MONGO_DB: workitems_test
+        RC_MONGO_COLL_PREFIX: queue_
       run: inv test
     - name: '`inv lint`, potentially fixed with `inv pretty`'
       if: always()

@@ -330,7 +330,7 @@ Input work item
 
 - <b>`RuntimeError`</b>: An input work item is already reservedworkitems.EmptyQueue: There are no further items in the queue
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L99)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L102)
 
 ```python
 reserve() → Input
@@ -521,7 +521,7 @@ Creating an output item requires an input to be currently reserved.
 
 - <b>`RuntimeError`</b>: No input work item reserved
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L140)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/workitems/src/robocorp/workitems/__init__.py#L143)
 
 ```python
 create(

@@ -24,7 +24,9 @@ class BaseAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def create_output(self, parent_id: str, payload: Optional[JSONType] = None) -> str:
+    def create_output(
+        self, parent_id: Optional[str], payload: Optional[JSONType] = None
+    ) -> str:
         """Create new output for work item, and return created ID."""
         raise NotImplementedError
 
