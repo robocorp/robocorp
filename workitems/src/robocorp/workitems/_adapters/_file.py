@@ -189,7 +189,12 @@ class FileAdapter(BaseAdapter):
             exception,
         )
 
-    def create_output(self, parent_id: str, payload: Optional[JSONType] = None) -> str:
+    def create_output(
+        self, parent_id: Optional[str], payload: Optional[JSONType] = None
+    ) -> str:
+        if parent_id is None:
+            raise ValueError("File adapter requires an input parent for outputs")
+
         source, _ = self._get_item(parent_id)
         if source != "input":
             raise ValueError(f"Work item parent ({parent_id}) must be an input")

@@ -145,7 +145,12 @@ class RobocorpAdapter(BaseAdapter):
         )
         self._process_requests.post(url, json=body)
 
-    def create_output(self, parent_id: str, payload: Optional[JSONType] = None) -> str:
+    def create_output(
+        self, parent_id: Optional[str], payload: Optional[JSONType] = None
+    ) -> str:
+        if parent_id is None:
+            raise ValueError("Robocorp adapter requires an input parent for outputs")
+
         # Putting "output" for the current input work item identified by `parent_id`.
         url = url_join("work-items", parent_id, "output")
         body = {"payload": payload}

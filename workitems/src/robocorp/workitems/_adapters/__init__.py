@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Dict
 
 from robocorp.workitems._utils import import_by_name
 
@@ -25,6 +26,21 @@ To learn more, see this guide: https://robocorp.com/docs/development-guide/contr
 """  # noqa
 
 
+_ALIAS_MAP: Dict[str, str] = {
+    "file": "robocorp.workitems._adapters._file.FileAdapter",
+    "local": "robocorp.workitems._adapters._file.FileAdapter",
+    "robocorp": "robocorp.workitems._adapters._robocorp.RobocorpAdapter",
+    "cloud": "robocorp.workitems._adapters._robocorp.RobocorpAdapter",
+    "sqlite": "robocorp.workitems._adapters._sqlite.SQLiteAdapter",
+    "sqliteadapter": "robocorp.workitems._adapters._sqlite.SQLiteAdapter",
+    "redis": "robocorp.workitems._adapters._redis.RedisAdapter",
+    "redisadapter": "robocorp.workitems._adapters._redis.RedisAdapter",
+    "documentdb": "robocorp.workitems._adapters._docdb.DocumentDBAdapter",
+    "docdb": "robocorp.workitems._adapters._docdb.DocumentDBAdapter",
+    "docdbadapter": "robocorp.workitems._adapters._docdb.DocumentDBAdapter",
+}
+
+
 def create_adapter() -> BaseAdapter:
     """Resolve the correct API client/adapter to use based on the running
     environment.
@@ -43,15 +59,22 @@ def create_adapter() -> BaseAdapter:
 
 
 def _import_adapter(name: str):
-    # Backwards compatibility
-    if name in ("FileAdapter", "RPA.Robocorp.WorkItems.FileAdapter"):
+    alias = _normalise_adapter_name(name)
+
+    if alias in ("FileAdapter", "RPA.Robocorp.WorkItems.FileAdapter"):
         return FileAdapter()
 
-    klass = import_by_name(name, __name__)
+    klass = import_by_name(alias, __name__)
     if not isinstance(klass, type) or not issubclass(klass, BaseAdapter):
         raise ValueError(f"Adapter '{klass}' does not inherit from BaseAdapter")
 
     return klass()
+
+
+def _normalise_adapter_name(name: str) -> str:
+    key = name.strip()
+    lookup = key.lower()
+    return _ALIAS_MAP.get(lookup, key)
 
 
 def _detect_adapter() -> BaseAdapter:
