@@ -214,7 +214,7 @@ class RewriteHook(importlib.abc.MetaPathFinder, importlib.abc.Loader):
                 from importlib.resources.readers import FileReader
 
             return FileReader(  # type:ignore[no-any-return]
-                types.SimpleNamespace(path=self._rewritten_names[name])
+                types.SimpleNamespace(path=self._rewritten_names[name])  # type:ignore[arg-type]
             )
 
 

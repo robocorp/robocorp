@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.0.2 - 2026-01-12
+
+- CVE updates
+
 ## 3.0.1 - 2025-06-23
 
 - Updating dependencies
