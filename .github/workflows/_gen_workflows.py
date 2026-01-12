@@ -41,6 +41,9 @@ def get_python_version(pyproject):
             assert "." in version
             as_int = tuple(int(x) for x in version.split("."))
             assert as_int > (3, 8), f"Bad version: {version}. pyproject: {pyproject}"
+            # Use at least Python 3.10 for CI (better type stub support)
+            if as_int < (3, 10):
+                as_int = (3, 10)
             version = ".".join(str(x) for x in as_int[:2])
             return version
     raise RuntimeError(f"Unable to get python version in: {pyproject}")

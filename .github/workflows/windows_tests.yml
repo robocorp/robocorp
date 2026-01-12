@@ -30,10 +30,10 @@ jobs:
       fail-fast: false
       matrix:
         name:
-        - windows-py3.9-devmode
+        - windows-py3.10-devmode
         include:
-        - name: windows-py3.9-devmode
-          python: '3.9'
+        - name: windows-py3.10-devmode
+          python: '3.10'
           os: windows-latest
     steps:
     - name: Checkout repository and submodules
