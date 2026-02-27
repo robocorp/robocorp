@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-storage"
-version = "1.0.5"
+version = "1.1.0"
 description = "Robocorp Asset Storage library"
 authors = [
 	"Cosmin P. <cosmin@robocorp.com>",
@@ -18,7 +18,7 @@ skip-magic-trailing-comma = false
 profile = "black"
 
 [tool.poetry.dependencies]
-python = "^3.9.2"
+python = "^3.10"
 requests = "^2.32.3"
 tenacity = "^8.0.1"
 
