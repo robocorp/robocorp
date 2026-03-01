@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-windows"
-version = "1.0.4"
+version = "1.1.0"
 description = "Robocorp Windows Automation (API to automate Windows)"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -12,9 +12,9 @@ license = "Apache-2.0"
 packages = [{include = "robocorp/windows", from="src"}]
 
 [tool.poetry.dependencies]
-python = "^3.9.2"
-pillow = "^10.0.1"
-pywin32 = { version = ">=300,<304", platform = "win32", python = "!=3.8.1" }
+python = "^3.10"
+pillow = ">=10.0.1"
+pywin32 = { version = ">=300,<310", platform = "win32", python = "!=3.8.1" }
 psutil = "^5.9.0"
 comtypes = "^1.1"
 
@@ -22,7 +22,7 @@ comtypes = "^1.1"
 robocorp-devutils = {path = "../devutils/", develop = true}
 mock = "^5.0"
 types-mock = "^5.0"
-types-pywin32 = "304.0.0.6"
+types-pywin32 = ">=304.0.0.6"
 types-Pillow = "^10.0.1"
 robocorp-log-pytest = "^0.0.5"
 types-psutil = "^5.9.0"
