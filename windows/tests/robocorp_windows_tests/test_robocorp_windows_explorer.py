@@ -40,13 +40,15 @@ def test_copy_with_explorer(tmpdir):
 
     # copying a file, dummy_file.txt, from source (File Explorer) window
     # into a target (File Explorer) Window
+    # Use timeout to wait for folder view to populate with files
     report_html = explorer1.find(
         "(name:dummy_file.txt type:ListItem) or "
         "(name:dummy_file.txt control:ListItemControl) or "
         "(name:dummy_file control:ListItemControl)",
-        search_depth=12
+        search_depth=12,
+        timeout=5
     )
-    items_view = explorer2.find('name:"Items View"', search_depth=12)
+    items_view = explorer2.find('name:"Items View"', search_depth=12, timeout=5)
     desktop.drag_and_drop(report_html, items_view, hold_ctrl=True)
 
     wait_for_condition(dummy_to_create.exists)
