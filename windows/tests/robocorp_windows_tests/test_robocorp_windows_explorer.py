@@ -1,4 +1,5 @@
 def _start_explorer_at_folder(folder: str):
+    import time
     from robocorp import windows
 
     desktop = windows.desktop()
@@ -6,10 +7,15 @@ def _start_explorer_at_folder(folder: str):
     explorer = desktop.wait_for_active_window(
         'name:Home or name:"File Explorer" or name:"Home - File Explorer"', timeout=2
     )
-    explorer.send_keys("{alt}d")
-    # TODO: provide API related to checking focus.
-    # desktop.wait_for_focused_control('class:TextBox name:"Address Bar"')
+    # Use Ctrl+L to focus the address bar
+    explorer.send_keys("{ctrl}l")
+    time.sleep(0.5)  # Brief wait for address bar to become active
+    # Clear any existing text and type the folder path
+    explorer.send_keys("{ctrl}a")  # Select all
+    time.sleep(0.2)
     explorer.send_keys(folder, send_enter=True)
+    # Wait for folder view to load and render files in the accessibility tree
+    time.sleep(3)
     return explorer
 
 
