@@ -37,19 +37,19 @@ def _check_multiple_interactions():
     w.send_keys(url, wait_time=3, send_enter=True)
 
     # Test select
-    combo = w.find("control:ComboBoxControl id:cars", search_depth=10)
+    combo = w.find("control:ComboBoxControl id:cars", search_depth=12)
     combo.select("Audi")
     assert combo.get_value() == "Audi"
 
     # Test get_value/set_value
-    text_control = w.find('control:EditControl name:"First name:"', search_depth=9)
+    text_control = w.find("id:fname", search_depth=12)
     assert text_control.get_value() == ""
     text_control.set_value("22")
     assert text_control.get_value() == "22"
 
     # Test drag and drop
-    div_header_item = w.find("id:mydiv > id:mydivheader")
-    move_item = w.find("id:mydiv > control:TextControl name:Move")
+    div_header_item = w.find("id:mydiv > id:mydivheader", search_depth=12)
+    move_item = w.find("id:mydiv > control:TextControl name:Move", search_depth=12)
 
     original_top = div_header_item.top
     desktop.drag_and_drop(div_header_item, move_item)

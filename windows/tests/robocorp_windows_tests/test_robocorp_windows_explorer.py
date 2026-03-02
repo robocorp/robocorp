@@ -4,7 +4,7 @@ def _start_explorer_at_folder(folder: str):
     desktop = windows.desktop()
     desktop.send_keys("{win}e")
     explorer = desktop.wait_for_active_window(
-        'name:Home or name:"File Explorer"', timeout=2
+        'name:Home or name:"File Explorer" or name:"Home - File Explorer"', timeout=2
     )
     explorer.send_keys("{alt}d")
     # TODO: provide API related to checking focus.
@@ -43,9 +43,10 @@ def test_copy_with_explorer(tmpdir):
     report_html = explorer1.find(
         "(name:dummy_file.txt type:ListItem) or "
         "(name:dummy_file.txt control:ListItemControl) or "
-        "(name:dummy_file control:ListItemControl)"
+        "(name:dummy_file control:ListItemControl)",
+        search_depth=12
     )
-    items_view = explorer2.find('name:"Items View"')
+    items_view = explorer2.find('name:"Items View"', search_depth=12)
     desktop.drag_and_drop(report_html, items_view, hold_ctrl=True)
 
     wait_for_condition(dummy_to_create.exists)
