@@ -32,7 +32,7 @@ def _check_multiple_interactions():
     except windows.ElementNotFound:
         pass  # Ignore if not there.
 
-    w = windows.find_window("regex:.*New Tab - Google Chrome", wait_time=0.5, timeout=5)
+    w = windows.find_window("regex:.*Google Chrome", wait_time=0.5, timeout=5)
     w.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
     w.send_keys(url, wait_time=3, send_enter=True)
 

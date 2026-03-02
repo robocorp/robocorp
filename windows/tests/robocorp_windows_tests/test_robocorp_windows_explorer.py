@@ -1,5 +1,6 @@
 def _start_explorer_at_folder(folder: str):
     import time
+
     from robocorp import windows
 
     desktop = windows.desktop()
@@ -52,7 +53,7 @@ def test_copy_with_explorer(tmpdir):
         "(name:dummy_file.txt control:ListItemControl) or "
         "(name:dummy_file control:ListItemControl)",
         search_depth=12,
-        timeout=5
+        timeout=5,
     )
     items_view = explorer2.find('name:"Items View"', search_depth=12, timeout=5)
     desktop.drag_and_drop(report_html, items_view, hold_ctrl=True)
