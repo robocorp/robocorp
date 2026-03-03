@@ -9,7 +9,7 @@ def _start_explorer_at_folder(folder: str):
         'name:Home or name:"File Explorer" or name:"Home - File Explorer"',
         timeout=2,
     )
-    time.sleep(2)  # Brief wait for address bar to become active
+    time.sleep(3)  # Brief wait for address bar to become active
     # Use Ctrl+L to focus the address bar
     explorer.send_keys("{ctrl}l")
     time.sleep(0.5)  # Brief wait for address bar to become active
@@ -45,9 +45,7 @@ def test_copy_with_explorer(tmpdir):
     explorer1.set_window_pos(0, 0, desktop.width / 2, desktop.height)
 
     explorer2 = _start_explorer_at_folder(str(folder_b))
-    explorer2.set_window_pos(
-        desktop.width / 2, 0, desktop.width / 2, desktop.height
-    )
+    explorer2.set_window_pos(desktop.width / 2, 0, desktop.width / 2, desktop.height)
 
     # copying a file, dummy_file.txt, from source (File Explorer) window
     # into a target (File Explorer) Window
@@ -59,9 +57,7 @@ def test_copy_with_explorer(tmpdir):
         search_depth=12,
         timeout=5,
     )
-    items_view = explorer2.find(
-        'name:"Items View"', search_depth=12, timeout=5
-    )
+    items_view = explorer2.find('name:"Items View"', search_depth=12, timeout=5)
     desktop.drag_and_drop(report_html, items_view, hold_ctrl=True)
 
     wait_for_condition(dummy_to_create.exists)
