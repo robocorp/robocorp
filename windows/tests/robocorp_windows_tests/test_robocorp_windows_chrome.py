@@ -28,7 +28,12 @@ def _check_multiple_interactions():
     # We have to decline
     try:
         app = windows.find_window("regex:.*Google Chrome", timeout=5)
-        app.find('control:"ButtonControl" and name:"Close"').click()
+        app.find(
+            'control:"ButtonControl" and regex:Don.*sign.*in', search_depth=12
+        ).click()
+        app.find(
+            'control:"ButtonControl" and name:Skip', search_depth=12
+        ).click()
     except windows.ElementNotFound:
         pass  # Ignore if not there.
 
