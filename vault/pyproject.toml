@@ -2,24 +2,21 @@
 name = "robocorp-vault"
 version = "1.4.0"
 description = "Robocorp Control Room Vault API integration library"
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-	"Ossi R. <ossi@robocorp.com>",
-]
+authors = ["Fabio Z. <fabio@robocorp.com>", "Ossi R. <ossi@robocorp.com>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp", from="src"}]
+packages = [{ include = "robocorp", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-cryptography = ">=44.0.1,<46.0.0"
+cryptography = ">=46.0.5"
 requests = "^2.32.3"
 pyyaml = "^6.0"
-tenacity = "^8.0.1"
+tenacity = ">=8.0.1"
 
 [tool.poetry.group.dev.dependencies]
-robocorp-devutils = {path = "../devutils/", develop = true}
+robocorp-devutils = { path = "../devutils/", develop = true }
 mock = "^5.0"
 types-requests = "^2.31"
 types-mock = "^5.0"
