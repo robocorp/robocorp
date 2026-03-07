@@ -89,7 +89,7 @@ class BaseTests:
                 },
                 {
                     "name": f"macos-py{pyversion}-devmode",
-                    "os": "macos-13",
+                    "os": "macos-14",
                     "python": pyversion,
                 },
             ],
@@ -381,7 +381,7 @@ class LogTests(BaseTests):
                 },
                 {
                     "name": f"macos-py{pyversion}-devmode",
-                    "os": "macos-13",
+                    "os": "macos-14",
                     "python": pyversion,
                 },
             ],
