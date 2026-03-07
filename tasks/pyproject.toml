@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-tasks"
-version = "4.0.0"
+version = "4.1.0"
 description = "The automation framework for Python"
 authors = [
 	"Fabio Z. <fabio@robocorp.com>",
@@ -12,14 +12,13 @@ packages = [{include = "robocorp/tasks", from = "src"}]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9.2"
+python = "^3.10"
 robocorp-log = ">=2.4,<4"
 psutil = "^5.0"
 docstring_parser_fork = "^0.0.5"

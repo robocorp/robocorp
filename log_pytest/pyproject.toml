@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-log-pytest"
-version = "0.0.5"
+version = "0.1.0"
 description = "PyTest plugin for auto-logging of pytest tests with robocorp-log."
 authors = [
     "Fabio Zadrozny <fabio@robocorp.com>",
@@ -14,13 +14,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Logging",
     "Framework :: Pytest",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9.2"
+python = "^3.10"
 robocorp-log = ">=2.5,<4"
 pytest = ">=7"
 
