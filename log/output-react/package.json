@@ -1,7 +1,7 @@
 {
   "name": "log-ui",
   "description": "",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "copyright": "Copyright 2021 Robocorp Technologies, Inc.",
   "license": "SEE LICENSE IN LICENSE",
   "main": "index.js",
