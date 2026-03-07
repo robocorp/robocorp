@@ -317,7 +317,7 @@ def rewrite_ast_add_callbacks(
             and isinstance(item.value, ast.Str)
         ):
             doc = item.value.s
-            if is_rewrite_disabled(doc):
+            if isinstance(doc, str) and is_rewrite_disabled(doc):
                 return
             expect_docstring = False
         elif (
@@ -784,7 +784,7 @@ def _handle_before_assert(
                 joined_str.values.append(factory.Constant(f"Variables:"))
                 for tup in targets.elts:
                     if isinstance(tup, ast.Tuple):
-                        name = typing.cast(ast.Constant, tup.elts[0]).value
+                        name = str(typing.cast(ast.Constant, tup.elts[0]).value)
                         name_load = typing.cast(ast.Name, tup.elts[1]).id
                         joined_str.values.append(factory_msg.Constant(f"\n  {name} = "))
                         v = factory_msg.FormattedValue(factory_msg.NameLoad(name_load))
