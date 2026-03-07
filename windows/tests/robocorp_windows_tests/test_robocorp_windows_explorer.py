@@ -1,15 +1,24 @@
 def _start_explorer_at_folder(folder: str):
+    import time
+
     from robocorp import windows
 
     desktop = windows.desktop()
     desktop.send_keys("{win}e")
     explorer = desktop.wait_for_active_window(
-        'name:Home or name:"File Explorer"', timeout=2
+        'name:Home or name:"File Explorer" or name:"Home - File Explorer"',
+        timeout=2,
     )
-    explorer.send_keys("{alt}d")
-    # TODO: provide API related to checking focus.
-    # desktop.wait_for_focused_control('class:TextBox name:"Address Bar"')
+    time.sleep(3)  # Brief wait for address bar to become active
+    # Use Ctrl+L to focus the address bar
+    explorer.send_keys("{ctrl}l")
+    time.sleep(0.5)  # Brief wait for address bar to become active
+    # Clear any existing text and type the folder path
+    explorer.send_keys("{ctrl}a")  # Select all
+    time.sleep(0.2)
     explorer.send_keys(folder, send_enter=True)
+    # Wait for folder view to load and render files in the accessibility tree
+    time.sleep(3)
     return explorer
 
 
@@ -40,12 +49,15 @@ def test_copy_with_explorer(tmpdir):
 
     # copying a file, dummy_file.txt, from source (File Explorer) window
     # into a target (File Explorer) Window
+    # Use timeout to wait for folder view to populate with files
     report_html = explorer1.find(
         "(name:dummy_file.txt type:ListItem) or "
         "(name:dummy_file.txt control:ListItemControl) or "
-        "(name:dummy_file control:ListItemControl)"
+        "(name:dummy_file control:ListItemControl)",
+        search_depth=12,
+        timeout=5,
     )
-    items_view = explorer2.find('name:"Items View"')
+    items_view = explorer2.find('name:"Items View"', search_depth=12, timeout=5)
     desktop.drag_and_drop(report_html, items_view, hold_ctrl=True)
 
     wait_for_condition(dummy_to_create.exists)
