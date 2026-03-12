@@ -2,13 +2,9 @@
 name = "robocorp-devutils"
 version = "0.0.2"
 description = "Utilities for development in monorepo."
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-	"Cosmin P. <cosmin@robocorp.com>",
-	"Ovidiu R. <ovidiu@robocorp.com>",
-]
+authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
-packages = [{include = "devutils", from="src"}]
+packages = [{ include = "devutils", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -20,10 +16,10 @@ pytest-regressions = "1.0.6"
 pydocstyle = { git = "https://github.com/robocorp/pydocstyle" }
 isort = { version = "^5.12.0", python = "^3.10" }
 types-invoke = "^2.0"
-invoke = "^2.2.0"  # keep in sync with requirements.txt
+invoke = "^2.2.0"                                               # keep in sync with requirements.txt
 lazydocs = { git = "https://github.com/robocorp/lazydocs.git" }
-tomlkit = "^0.11.8"  # keep in sync with requirements.txt
-semver = "^3.0.0"  # keep in sync with requirements.txt
+tomlkit = "^0.11.8"                                             # keep in sync with requirements.txt
+semver = "^3.0.0"                                               # keep in sync with requirements.txt
 pylint = "^2.17.4"
 
 [build-system]

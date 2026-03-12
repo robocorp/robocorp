@@ -2,13 +2,11 @@
 name = "robocorp-tasks"
 version = "4.1.0"
 description = "The automation framework for Python"
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-]
+authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp/tasks", from = "src"}]
+packages = [{ include = "robocorp/tasks", from = "src" }]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
@@ -25,7 +23,7 @@ docstring_parser_fork = "^0.0.5"
 packaging = "^24.0"
 
 [tool.poetry.group.dev.dependencies]
-robocorp-devutils = {path = "../devutils/", develop = true}
+robocorp-devutils = { path = "../devutils/", develop = true }
 types-psutil = "^5.9"
 
 # We just need it for tests. In runtime duck-typing is used to

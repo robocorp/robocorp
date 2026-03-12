@@ -2,14 +2,11 @@
 name = "robocorp-excel"
 version = "0.5.0"
 description = "Robocorp Excel automation library"
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-	"Cosmin P. <cosmin@robocorp.com>",
-]
+authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp", from="src"}]
+packages = [{ include = "robocorp", from = "src" }]
 
 [tool.black]
 skip-string-normalization = false
@@ -33,7 +30,7 @@ mypy_path = "src:tests"
 
 
 [tool.poetry.group.dev.dependencies]
-robocorp-devutils = {path = "../devutils/", develop = true}
+robocorp-devutils = { path = "../devutils/", develop = true }
 
 [build-system]
 requires = ["poetry-core"]

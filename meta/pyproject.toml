@@ -2,14 +2,11 @@
 name = "robocorp"
 version = "3.1.0"
 description = "Robocorp core libraries for Python automation"
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-	"Cosmin P. <cosmin@robocorp.com>",
-]
+authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp", from="src"}]
+packages = [{ include = "robocorp", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -20,7 +17,7 @@ robocorp-vault = "^1.3.8"
 robocorp-storage = "^1.0.5"
 
 [tool.poetry.group.dev.dependencies]
-robocorp-devutils = {path = "../devutils/", develop = true}
+robocorp-devutils = { path = "../devutils/", develop = true }
 
 [tool.black]
 skip-string-normalization = false
