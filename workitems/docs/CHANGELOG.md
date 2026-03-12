@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.5.0 - 2026-03-12
+
+- Update dependencies
+
 ## 1.4.7 - 2025-04-22
 
 - Bump to accept robocorp-tasks < 5.

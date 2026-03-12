@@ -2,13 +2,11 @@
 name = "robocorp-log"
 version = "3.1.0"
 description = "Automatic trace logging for Python"
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-]
+authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp/log", from = "src"}]
+packages = [{ include = "robocorp/log", from = "src" }]
 include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -24,7 +22,7 @@ tomli = { version = "^2.0.1", python = "<3.11" }
 psutil = ">=5.0,<8.0"
 
 [tool.poetry.group.dev.dependencies]
-robocorp-devutils = {path = "../devutils/", develop = true}
+robocorp-devutils = { path = "../devutils/", develop = true }
 types-psutil = ">=5.9"
 
 [tool.mypy]

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.1.0 - 2026-03-12
+
+- Update dependencies
+
 ## 4.0.0 - 2025-04-22
 
 - Update robocorp-log to 3.0.0
@@ -18,8 +22,8 @@
 
 - `python -m robocorp.tasks list` now has information on the managed parameters
   (`managed_params_schema`, which is a dict from parameter name to parameter
-   information is given for each task).
-   
+  information is given for each task).
+
 ## 3.0.3 - 2024-04-09
 
 - Properly added `packaging` as a dependency in production (not just dev-dependency).
@@ -47,11 +51,11 @@
 
 ## 2.9.3 - 2024-03-11
 
-- `pydantic` models are accepted as the input and output of `@task`s. 
+- `pydantic` models are accepted as the input and output of `@task`s.
 
 ## 2.9.2 - 2024-03-06
 
-- Add `inject_truststore` util in `tasks.cli` for reuse in other libraries, then log a warning in case 
+- Add `inject_truststore` util in `tasks.cli` for reuse in other libraries, then log a warning in case
   the injection could not happen due to the missing `robocorp-truststore` dependency.
 
 ## 2.9.1 - 2024-01-31
@@ -61,10 +65,10 @@
 ## 2.9.0 - 2024-01-18
 
 - Provides support for calling `main` multiple times.
-    - Modules containing `@task` are no longer reimported anymore.
-    - Any `@task` that was already imported is still available for running in a new `main` call.
-    - `RC_TASKS_SKIP_SESSION_SETUP` env variable may be used to skip setup of new `@setup`s found.
-    - `RC_TASKS_SKIP_SESSION_TEARDOWN` env variable may be used to skip teardon of `@teardown`s found.
+  - Modules containing `@task` are no longer reimported anymore.
+  - Any `@task` that was already imported is still available for running in a new `main` call.
+  - `RC_TASKS_SKIP_SESSION_SETUP` env variable may be used to skip setup of new `@setup`s found.
+  - `RC_TASKS_SKIP_SESSION_TEARDOWN` env variable may be used to skip teardon of `@teardown`s found.
 
 ## 2.8.1 - 2024-01-14
 
@@ -76,23 +80,23 @@
 
 ## 2.7.0 - 2024-01-05
 
-- Fixed issue where imports would fail when collecting tasks because the path being used wasn't absolute. 
+- Fixed issue where imports would fail when collecting tasks because the path being used wasn't absolute.
 - The task may now have associated information passed as `**kwargs` in the task (available in `ITask.options`).
 
 ## 2.6.0 - 2023-12-13
 
 - It's now possible to define `--glob` to define which files should be searched for `@task`s.
-    - The default is `*task*.py` (which was hard-coded in previous versions).
-    - `|` can be used to specify multiple glob matches.
-    - The search is always recursive (thus `**/` does not need to be added to the glob as it's redundant).
-    - Example `task.py|my_entry_point.py|*case.py`.
+  - The default is `*task*.py` (which was hard-coded in previous versions).
+  - `|` can be used to specify multiple glob matches.
+  - The search is always recursive (thus `**/` does not need to be added to the glob as it's redundant).
+  - Example `task.py|my_entry_point.py|*case.py`.
 
 ## 2.5.0 - 2023-11-23
 
-- Methods decorated with `@task` now can accept parameters. 
-    - If the parameters have types declared, those are respected (but only str, bool, int and float are accepted).
-    - If the type is not specified, it's considered a string.
-    - Arguments passed to the task must be separated by a `--` and all arguments must be named.
+- Methods decorated with `@task` now can accept parameters.
+  - If the parameters have types declared, those are respected (but only str, bool, int and float are accepted).
+  - If the type is not specified, it's considered a string.
+  - Arguments passed to the task must be separated by a `--` and all arguments must be named.
 
 Example:
 
@@ -120,11 +124,10 @@ python -m robocorp.tasks -- --value=2
 - When listing the tasks, the `input_schema` and `output_schema` of the task will be available
   (as such, if values have arguments or outputs in the type definition, they'll be present according
   to the schema). Right now the schema only supports `int`, `float`, `str` and `bool`.
-  
 - It's possible to specify modules to be pre-loaded when running tasks (meaning that they'll
   be imported as the first step before collecting tasks).
   This enables the usage of `@setup` and `@teardown` in different modules (as `@setup` and
-  `@teardown` need to be in the same module where `@task` is defined to work right now). 
+  `@teardown` need to be in the same module where `@task` is defined to work right now).
 
 Example:
 
@@ -147,26 +150,25 @@ python -m robocorp.tasks --preload-module=my_setup --preload-module=my_teardown
 - `RC_DUMP_THREADS_AFTER_RUN` may be set to "0" or "false" to prevent threads from being dumped after the teardown
   (by default it'll dump threads 40 seconds after the tasks finish running, `RC_DUMP_THREADS_AFTER_RUN_TIMEOUT` may
   be used to configure a different timeout).
-  
 - Created an option to do an early `os._exit` after running all the tasks. It's possible to do
   an early exit with or without running the tasks teardown. When used the subprocesses are
-  killed and an `os._exit` is issued with a returncode based on whether the tasks 
+  killed and an `os._exit` is issued with a returncode based on whether the tasks
   failed (returncode=1) or not (returncode=0).
   To exit after all tasks finished running and after doing the teardown use: `--os-exit=after-teardown` in
   the command line or `RC_OS_EXIT=after-teardown` as an environment variable.
   To exit without doing the teardown after all tasks finished running: `--os-exit=before-teardown` in
   the command line or `RC_OS_EXIT=before-teardown` as an environment variable.
-  
+
 ## 2.3.0 - 2023-10-27
 
 - Use `truststore` for native system certificates, if available in environment
 
-- `--teardown-dump-threads-timeout` argument can now be used to specify a timeout (in seconds) to print running threads after the teardown starts 
-    - if not specified the `RC_TEARDOWN_DUMP_THREADS_TIMEOUT` may be used instead.
-    - Defaults to `5` (seconds) if not specified.
+- `--teardown-dump-threads-timeout` argument can now be used to specify a timeout (in seconds) to print running threads after the teardown starts
+  - if not specified the `RC_TEARDOWN_DUMP_THREADS_TIMEOUT` may be used instead.
+  - Defaults to `5` (seconds) if not specified.
 
-- `--teardown-interrupt-timeout` argument can now be used to specify a timeout (in seconds) to interrupt the teardown process. 
-    - If not specified the `RC_TEARDOWN_INTERRUPT_TIMEOUT` environment variable may also be used.
+- `--teardown-interrupt-timeout` argument can now be used to specify a timeout (in seconds) to interrupt the teardown process.
+  - If not specified the `RC_TEARDOWN_INTERRUPT_TIMEOUT` environment variable may also be used.
 
 - Add support for fixtures with the new `setup` and `teardown` decorators
 - Allow modifying the `status` of tasks in fixtures
@@ -177,9 +179,8 @@ python -m robocorp.tasks --preload-module=my_setup --preload-module=my_teardown
 - If 2 tasks are found with the same name in the same module a proper error is raised.
 - Logging info sent to `ROBOCORP_TASKS_LOG_LISTENER_PORT` is written in a thread.
 - The `ROBOT_ARTIFACTS` environment variable is now used for the `log.html` output dir (if available and not specified in the command line).
-- Fixed issue where a module with a task with a relative import would not be imported. 
-- If a directory is specified to load tasks from it, the folder __init__.py is also loaded when collecting tasks.
-
+- Fixed issue where a module with a task with a relative import would not be imported.
+- If a directory is specified to load tasks from it, the folder **init**.py is also loaded when collecting tasks.
 
 ## 2.1.3 - 2023-07-19
 
@@ -187,17 +188,14 @@ python -m robocorp.tasks --preload-module=my_setup --preload-module=my_teardown
   `robocorp.log` project public API.
 - Now requires `robocorp-log = ">=2.4,<3"`
 
-
 ## 2.1.2 - 2023-07-10
 
 - Fixed issue where the line number logged for the task had an off by 1 error.
-
 
 ## 2.1.1 - 2023-07-06
 
 - Properly marks that `robocorp-log 2.2` onwards is required.
 
-  
 ## 2.1.0 - 2023-07-06
 
 - If a `ROBOCORP_TASKS_LOG_LISTENER_PORT` is set, it'll connect to that port
@@ -257,8 +255,8 @@ default_library_filter_kind = "exclude"
 - During task teardown a process snapshot is now included.
 - After all tasks are run, if the process doesn't exit in 40 seconds
   (or the value specified in the `RC_DUMP_THREADS_AFTER_RUN_TIMEOUT`
-  environment variable), the stack of the running threads are printed 
-  to stderr. 
+  environment variable), the stack of the running threads are printed
+  to stderr.
 
 ## 0.3.0
 
@@ -272,8 +270,8 @@ default_library_filter_kind = "exclude"
 ## 0.2.0
 
 - New argument: `--no-status-rc`:
-    When set, if running tasks has an error inside the task the return code of the process is 0 (
-    if unsed the return code if an error is thrown inside a task the return code is 1).
+  When set, if running tasks has an error inside the task the return code of the process is 0 (
+  if unsed the return code if an error is thrown inside a task the return code is 1).
 - When collecting tasks redirect sys.stdout to sys.stderr so that only the expected json is outputed.
 - Allow running multiple tasks.
 - New decorator: `session_cache` allows a value to be cached until the task run session finishes.
@@ -285,27 +283,27 @@ default_library_filter_kind = "exclude"
 
 - Provide output in the console showing that a task is being run and the result of the run.
 - Redirecting messages written to the console to log messages.
-    The `--console-colors` arguments can be set to `auto` (where it'll decide the best approach to print with colors), `plain` to disable the colors or `ansi` to force colors to be printed with ansi chars.
+  The `--console-colors` arguments can be set to `auto` (where it'll decide the best approach to print with colors), `plain` to disable the colors or `ansi` to force colors to be printed with ansi chars.
 - It's possible to setup the messages redirection by using either command line arguments (`--log-output-to-stdout=json`) or the `RC_LOG_OUTPUT_STDOUT=json` environment variable.
-- Upgraded `robocorp-log` dependency to `0.0.15`. 
+- Upgraded `robocorp-log` dependency to `0.0.15`.
 
 ## 0.1.6
 
 - Fixed case where the log would not be properly setup if `[tool.robocorp.log`] was not in `pyproject.toml`.
-- Upgraded `robocorp-log` dependency to `0.0.13`. 
+- Upgraded `robocorp-log` dependency to `0.0.13`.
 
 ## 0.1.5
 
 - First alpha release for `robocorp-tasks`.
 - `@task` decorator to define entry points.
-- Automatic logging 
-    - Configures `robocorp-log` with reasonable defaults.
-        - Rotate files after 5 files
-        - Up to 1MB each
-        - Log to `output`
-        - Provide `output/log.html` when run finishes.
-    - Log customization through `pyproject.toml`.
+- Automatic logging
+  - Configures `robocorp-log` with reasonable defaults.
+    - Rotate files after 5 files
+    - Up to 1MB each
+    - Log to `output`
+    - Provide `output/log.html` when run finishes.
+  - Log customization through `pyproject.toml`.
 - Command line API which allows listing tasks with:
-    - python -m robocorp.tasks list <directory>
+  - python -m robocorp.tasks list <directory>
 - Command line API which allows running tasks with:
-    - python -m robocorp.tasks run <directory> -t <task_name>
+  - python -m robocorp.tasks run <directory> -t <task_name>

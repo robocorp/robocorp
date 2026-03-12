@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.1.0 - 2026-03-12
+
+- Dependecy updates
+
 ## 1.0.4 - 2024-09-25
 
 - Bump zipp to 3.20.2

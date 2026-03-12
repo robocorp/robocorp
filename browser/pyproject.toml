@@ -2,14 +2,11 @@
 name = "robocorp-browser"
 version = "2.4.0"
 description = "Robocorp browser automation library"
-authors = [
-	"Fabio Z. <fabio@robocorp.com>",
-	"Cosmin P. <cosmin@robocorp.com>",
-]
+authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
-packages = [{include = "robocorp", from="src"}]
+packages = [{ include = "robocorp", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -17,7 +14,7 @@ playwright = "^1.50.0"
 robocorp-tasks = ">=1,<5"
 
 [tool.poetry.group.dev.dependencies]
-robocorp-devutils = {path = "../devutils/", develop = true}
+robocorp-devutils = { path = "../devutils/", develop = true }
 
 [build-system]
 requires = ["poetry-core"]
