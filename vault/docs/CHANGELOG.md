@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.4.0 - 2026-03-12
+
+- Update dependencies
+
 ## 1.3.9 - 2025-06-24
 
 - Looser version intervals for cryptography

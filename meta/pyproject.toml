@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp"
-version = "3.1.0"
+version = "3.0.0"
 description = "Robocorp core libraries for Python automation"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
