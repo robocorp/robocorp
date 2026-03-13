@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp"
-version = "3.1.0"
+version = "3.1.1"
 description = "Robocorp core libraries for Python automation"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
@@ -11,7 +11,7 @@ packages = [{ include = "robocorp", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.10"
 robocorp-tasks = "^4.1.1"
-robocorp-log = "^3.1.0"
+robocorp-log = "^3.1.2"
 robocorp-workitems = "^1.5.0"
 robocorp-vault = "^1.4.0"
 robocorp-storage = "^1.1.0"
