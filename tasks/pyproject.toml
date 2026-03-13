@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-tasks"
-version = "4.1.0"
+version = "4.1.1"
 description = "The automation framework for Python"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
@@ -18,13 +18,13 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.10"
 robocorp-log = ">=2.4,<4"
-psutil = "^5.0"
+psutil = ">=5.0,<8.0"
 docstring_parser_fork = "^0.0.5"
 packaging = "^24.0"
 
 [tool.poetry.group.dev.dependencies]
 robocorp-devutils = { path = "../devutils/", develop = true }
-types-psutil = "^5.9"
+types-psutil = ">=5.9"
 
 # We just need it for tests. In runtime duck-typing is used to
 # check for `cls.parse_obj(dict)` and `cls.model_json_schema()`

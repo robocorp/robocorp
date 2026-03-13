@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.1.1 - 2026-03-13
+
+- Update `psutil` to match other packages
+
 ## 1.1.0 - 2026-03-12
 
 - Dependecy updates

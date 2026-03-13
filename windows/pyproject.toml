@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-windows"
-version = "1.1.0"
+version = "1.1.1"
 description = "Robocorp Windows Automation (API to automate Windows)"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
@@ -12,7 +12,7 @@ packages = [{ include = "robocorp/windows", from = "src" }]
 python = "^3.10"
 pillow = ">=10.0.1"
 pywin32 = { version = ">=300,<=311", platform = "win32", python = "!=3.8.1" }
-psutil = "^5.9.0"
+psutil = ">=5.0,<8.0"
 comtypes = "^1.1.11"
 
 [tool.poetry.group.dev.dependencies]
@@ -20,9 +20,9 @@ robocorp-devutils = { path = "../devutils/", develop = true }
 mock = "^5.0"
 types-mock = "^5.0"
 types-pywin32 = ">=304.0.0.6"
-types-Pillow = "^10.0.1"
+types-Pillow = ">=10.0.1"
 robocorp-log-pytest = "^0.0.5"
-types-psutil = "^5.9.0"
+types-psutil = ">=5.9"
 
 [build-system]
 requires = ["poetry-core"]
