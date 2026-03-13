@@ -138,6 +138,7 @@ class BaseTests:
         }
         self.jobs_build_in_jobs = {
             "runs-on": "${{ matrix.os }}",
+            "permissions": {"contents": "read"},
             "strategy": {
                 "fail-fast": False,
                 "matrix": self.matrix,
