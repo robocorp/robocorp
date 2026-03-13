@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+## 3.1.2 - 2026-03-13
+
+- Update react dependencies
+- Fix pyproject.toml
+
+## 3.1.1 - 2026-03-13
+
+- Updating react dependencies
+
 ## 3.1.0 - 2026-03-13
 
 - Updating dependencies
