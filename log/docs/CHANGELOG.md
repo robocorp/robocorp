@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 3.1.0 - 2026-03-13
+
+- Updating dependencies
+
 ## 3.0.2 - 2026-01-12
 
 - CVE updates
@@ -68,7 +72,6 @@
 ## 2.6.0 - 2023-08-04
 
 - `log.html`:
-
   - Tree usability improvements:
     - When an item is expanded its children are scrolled into the tree.
     - When row is focused, `Enter` can be used to open item details and `Space` to expand and collapse.
@@ -175,7 +178,6 @@ Backward incompatible changes:
   i.e.: `log.html?theme=dark`
 
 - Variable pretty-printing improvements
-
   - if a variable representation is considered small its contents won't be broken into new lines.
 
     i.e.: `(a, b, c)` will be shown as is instead of being broken into 5 lines.
