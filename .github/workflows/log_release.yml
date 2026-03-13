@@ -13,6 +13,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+
     strategy:
       fail-fast: true
 
@@ -28,7 +31,7 @@ jobs:
           scope: "@robocorp"
 
       - name: Install poetry
-        run: pipx install poetry==1.7.1
+        run: pipx install poetry
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
@@ -60,7 +63,7 @@ jobs:
       - name: Build with poetry
         run: poetry build
 
-      - name: Upload to PyPI
-        run: |
-          poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_LOG }}
-          poetry publish
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: log/dist
