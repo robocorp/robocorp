@@ -1,13 +1,26 @@
 [tool.poetry]
 name = "robocorp-log"
-version = "3.1.1"
+version = "3.1.2"
 description = "Automatic trace logging for Python"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
 repository = "https://github.com/robocorp/robocorp/"
 license = "Apache-2.0"
 packages = [{ include = "robocorp/log", from = "src" }]
-include = ["**/_index.py", "**/_index_v2.py", "**/_index_v3.py"]
+include = [
+    { path = "src/robocorp/log/_index.py", format = [
+        "sdist",
+        "wheel",
+    ] },
+    { path = "src/robocorp/log/_index_v2.py", format = [
+        "sdist",
+        "wheel",
+    ] },
+    { path = "src/robocorp/log/_index_v3.py", format = [
+        "sdist",
+        "wheel",
+    ] },
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Topic :: Software Development :: Libraries :: Python Modules",
