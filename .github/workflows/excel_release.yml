@@ -13,20 +13,23 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+
     strategy:
       fail-fast: true
 
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install poetry
       run: pipx install poetry
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: "3.10"
         cache: 'poetry'
 
     - name: Install project
@@ -38,7 +41,7 @@ jobs:
     - name: Build with poetry
       run: poetry build
 
-    - name: Upload to PyPI
-      run: |
-        poetry config pypi-token.pypi  ${{ secrets.PYPI_TOKEN_ROBOCORP_EXCEL }}
-        poetry publish
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: excel/dist
