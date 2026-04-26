@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 3.1.3 - 2026-04-26
+
+- Fix 13 npm security vulnerabilities in log output React UI (dompurify, vite, lodash, flatted, picomatch, postcss, brace-expansion, tmp)
+- Bump dompurify to ^3.4.0 and vite to ^6.4.2
+- Add npm overrides for transitive dependency security fixes
+- Rebuild embedded React output view
+
 ## 3.1.2 - 2026-03-13
 
 - Update react dependencies
