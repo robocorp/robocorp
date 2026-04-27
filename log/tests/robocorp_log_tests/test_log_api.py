@@ -1,6 +1,7 @@
 """
 This module should provide a basic example on the usage of the logging.
 """
+
 import contextlib
 import threading
 

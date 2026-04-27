@@ -2,6 +2,7 @@
 Unittests for testing fallback behaviour for missing Asset Storage
 endpoint and token in local runs.
 """
+
 import os
 from unittest.mock import patch
 

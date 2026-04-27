@@ -31,7 +31,7 @@ Then, later, to use it, it's possible to ask for instances through the PluginMan
 
 foo_instances = pm.get_implementations(EPFoo) # Each time this is called, new
                                               # foo_instances will be created
-                                              
+
 bar_instance = pm.get_instance(EPBar) # Each time this is called, the same bar_instance is returned.
 
 Alternatively, it's possible to use a decorator to use a dependency injection pattern -- i.e.:
@@ -42,8 +42,9 @@ def m1(foo_instance, bar_instances, pm):
     for bar in bar_instances:
         ...
     foo_instance.foo
-    
+
 """
+
 import functools
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Type, TypeVar, Union

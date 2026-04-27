@@ -91,9 +91,9 @@ class RedactConfiguration:
 
     @dont_hide_strings_smaller_or_equal_to.setter
     def dont_hide_strings_smaller_or_equal_to(self, minimum_string_size: int) -> None:
-        assert isinstance(
-            minimum_string_size, int
-        ), f"Expected int. Found: {minimum_string_size}."
+        assert isinstance(minimum_string_size, int), (
+            f"Expected int. Found: {minimum_string_size}."
+        )
         self._minimum_string_size = minimum_string_size
         self._on_changed()
 

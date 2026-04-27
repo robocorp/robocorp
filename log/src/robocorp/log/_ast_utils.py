@@ -439,9 +439,9 @@ class ASTRewriter:
                             new_value.extend(last_cursor_before)
                             changed = True
 
-                        last_cursor_current: Optional[
-                            Union[AST, List[AST]]
-                        ] = last_cursor.current
+                        last_cursor_current: Optional[Union[AST, List[AST]]] = (
+                            last_cursor.current
+                        )
                         if last_cursor_current is not None:
                             if isinstance(last_cursor_current, list):
                                 new_value.extend(last_cursor_current)

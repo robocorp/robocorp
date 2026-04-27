@@ -380,15 +380,22 @@ def run(
 
     retcode = 22  # Something went off if this was kept until the end.
     try:
-        with set_config(run_config), setup_cli_auto_logging(
-            # Note: we can't customize what's a "project" file or a "library" file,
-            # right now the customizations are all based on module names.
-            config
-        ), redirect.setup_stdout_logging(log_output_to_stdout), setup_log_output(
-            output_dir=output_dir_path,
-            max_files=max_log_files,
-            max_file_size=max_log_file_size,
-        ), setup_log_output_to_port(), context.register_lifecycle_prints():
+        with (
+            set_config(run_config),
+            setup_cli_auto_logging(
+                # Note: we can't customize what's a "project" file or a "library" file,
+                # right now the customizations are all based on module names.
+                config
+            ),
+            redirect.setup_stdout_logging(log_output_to_stdout),
+            setup_log_output(
+                output_dir=output_dir_path,
+                max_files=max_log_files,
+                max_file_size=max_log_file_size,
+            ),
+            setup_log_output_to_port(),
+            context.register_lifecycle_prints(),
+        ):
             run_name = os.path.basename(p)
             if task_name:
                 run_name += f" - {task_name}"
@@ -628,7 +635,7 @@ def _validate_and_convert_kwargs(
                     )
 
             check_type = param_type
-            if param_type == float:
+            if param_type is float:
                 check_type = (float, int)
             if not isinstance(passed_value, check_type):
                 raise InvalidArgumentsError(
@@ -772,7 +779,7 @@ def _normalize_arguments(
                     f"Error. The param type '{param_type.__name__}' in '{method_name}' is not supported. Supported parameter types: str, int, float, bool and pydantic.Model."
                 )
 
-            if param_type == bool:
+            if param_type is bool:
                 param_type = check_boolean
             if param.default is not inspect.Parameter.empty:
                 parser.add_argument(

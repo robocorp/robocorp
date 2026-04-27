@@ -37,7 +37,7 @@ def test_rotate_logs(tmpdir, str_regression) -> None:
 
     expected = 17
     assert set(name_to_file.keys()) == {
-        f"output_{expected-1}.robolog",
+        f"output_{expected - 1}.robolog",
         f"output_{expected}.robolog",
     }
     output_at_step = name_to_file[f"output_{expected}.robolog"]

@@ -31,6 +31,7 @@ Note: Using the `cli.main(args)` is possible to run tasks programmatically, but
 clients using this approach MUST make sure that any code which must be
 automatically logged is not imported prior the the `cli.main` call.
 """
+
 from functools import wraps
 from pathlib import Path
 from typing import Dict, Optional

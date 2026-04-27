@@ -9,18 +9,15 @@ Decorator = Callable[[T], T]
 
 
 @overload
-def setup(func: ITaskCallback) -> ITaskCallback:
-    ...
+def setup(func: ITaskCallback) -> ITaskCallback: ...
 
 
 @overload
-def setup(*, scope: Literal["task"] = "task") -> Decorator[ITaskCallback]:
-    ...
+def setup(*, scope: Literal["task"] = "task") -> Decorator[ITaskCallback]: ...
 
 
 @overload
-def setup(*, scope: Literal["session"]) -> Decorator[ITasksCallback]:
-    ...
+def setup(*, scope: Literal["session"]) -> Decorator[ITasksCallback]: ...
 
 
 def setup(
@@ -131,18 +128,15 @@ def setup(
 
 
 @overload
-def teardown(func: ITaskCallback) -> ITaskCallback:
-    ...
+def teardown(func: ITaskCallback) -> ITaskCallback: ...
 
 
 @overload
-def teardown(*, scope: Literal["task"] = "task") -> Decorator[ITaskCallback]:
-    ...
+def teardown(*, scope: Literal["task"] = "task") -> Decorator[ITaskCallback]: ...
 
 
 @overload
-def teardown(*, scope: Literal["session"]) -> Decorator[ITasksCallback]:
-    ...
+def teardown(*, scope: Literal["session"]) -> Decorator[ITasksCallback]: ...
 
 
 def teardown(

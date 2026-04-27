@@ -1386,9 +1386,9 @@ class _DispatchTable:
             call_rep = "(...)"
         else:
             call_rep = "()"
-        self.recorded_name_to_new_name[
-            store_name.id
-        ] = f"{ast.unparse(node.func)}{call_rep}"
+        self.recorded_name_to_new_name[store_name.id] = (
+            f"{ast.unparse(node.func)}{call_rep}"
+        )
         rewrite_ctx.cursor.current = factory.NameLoad(store_name.id)
         yield rewrite_ctx.DONT_GO_INTO_NODE
 
@@ -1445,9 +1445,9 @@ class _DispatchTable:
         if not @temp_name == 'foo':
             report_assert_failed(..., [('my.path', @temp_name)])
         """
-        with self.replace_before(
-            ast.Compare, self._handle_assert_compare
-        ), self.replace_before(ast.Call, self._handle_assert_call), self.replace_before(
-            ast.Attribute, self._handle_assert_attribute
+        with (
+            self.replace_before(ast.Compare, self._handle_assert_compare),
+            self.replace_before(ast.Call, self._handle_assert_call),
+            self.replace_before(ast.Attribute, self._handle_assert_attribute),
         ):
             yield

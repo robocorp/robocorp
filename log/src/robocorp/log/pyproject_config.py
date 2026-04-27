@@ -1,7 +1,8 @@
 """
-This module contains functions to read a pyproject.toml file and 
+This module contains functions to read a pyproject.toml file and
 read the related tool.robocorp.log section.
 """
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, List, Optional

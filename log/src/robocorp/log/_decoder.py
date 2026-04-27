@@ -32,9 +32,9 @@ class Decoder:
                     f"No return when decoding: {message_type} - {message}"
                 )
                 if not isinstance(r, dict):
-                    ret[
-                        "error"
-                    ] = f"Expected dict return when decoding: {message_type} - {message}. Found: {ret}"
+                    ret["error"] = (
+                        f"Expected dict return when decoding: {message_type} - {message}. Found: {ret}"
+                    )
 
             ret.update(r)
         except Exception as e:

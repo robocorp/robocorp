@@ -29,8 +29,9 @@ def setup_cli_auto_logging(config: Optional[log.AutoLogConfigBase]):
     from robocorp.tasks._hooks import after_task_run, before_task_run
 
     with log.setup_auto_logging(config):
-        with before_task_run.register(_log_before_task_run), after_task_run.register(
-            _log_after_task_run
+        with (
+            before_task_run.register(_log_before_task_run),
+            after_task_run.register(_log_after_task_run),
         ):
             try:
                 yield

@@ -347,8 +347,9 @@ class Context:
     def register_lifecycle_prints(self):
         from ._hooks import after_task_run, before_task_run
 
-        with before_task_run.register(self._before_task_run), after_task_run.register(
-            self._after_task_run
+        with (
+            before_task_run.register(self._before_task_run),
+            after_task_run.register(self._after_task_run),
         ):
             yield
 

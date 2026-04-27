@@ -187,10 +187,7 @@ def test_ast(str_regression):
 def test_tokenize(str_regression):
     check_tokenize(r"name:foo\"bar", str_regression, "name_slash_bar")
     check_tokenize(
-        (
-            '"Robocorp Window93" subname:Robocorp and class:"My Class" '
-            "Test regex:Robo.+"
-        ),
+        ('"Robocorp Window93" subname:Robocorp and class:"My Class" Test regex:Robo.+'),
         str_regression,
         "robocorp_window_93",
     )

@@ -59,13 +59,12 @@ def _setup_test_callbacks():
 
     setup_callback = _SetupCallback()
 
-    with _lifecycle_hooks.before_method.register(
-        setup_callback.before_method
-    ), _lifecycle_hooks.after_method.register(
-        setup_callback.after_method
-    ), _lifecycle_hooks.method_return.register(
-        setup_callback.method_return
-    ), _lifecycle_hooks.method_except.register(setup_callback.method_except):
+    with (
+        _lifecycle_hooks.before_method.register(setup_callback.before_method),
+        _lifecycle_hooks.after_method.register(setup_callback.after_method),
+        _lifecycle_hooks.method_return.register(setup_callback.method_return),
+        _lifecycle_hooks.method_except.register(setup_callback.method_except),
+    ):
         yield setup_callback
 
 

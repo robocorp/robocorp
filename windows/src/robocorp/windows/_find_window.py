@@ -46,8 +46,7 @@ def find_window(
     wait_time: Optional[float] = ...,
     foreground: bool = ...,
     raise_error: Literal[True] = ...,
-) -> WindowElement:
-    ...
+) -> WindowElement: ...
 
 
 @overload
@@ -59,8 +58,7 @@ def find_window(
     wait_time: Optional[float] = ...,
     foreground: bool = ...,
     raise_error: Literal[False] = ...,
-) -> Optional[WindowElement]:
-    ...
+) -> Optional[WindowElement]: ...
 
 
 @overload
@@ -72,8 +70,7 @@ def find_window(
     wait_time: Optional[float] = ...,
     foreground: bool = ...,
     raise_error: bool = ...,
-) -> Optional[WindowElement]:
-    ...
+) -> Optional[WindowElement]: ...
 
 
 def find_window(

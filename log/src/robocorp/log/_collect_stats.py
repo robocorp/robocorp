@@ -1,6 +1,7 @@
 """
 A helper module to collect statistics.
 """
+
 import atexit
 
 stats: dict = {}
