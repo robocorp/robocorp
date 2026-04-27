@@ -88,14 +88,14 @@ files = [
 
 [[package]]
 name = "invoke"
-version = "2.2.1"
+version = "3.0.3"
 description = "Pythonic task execution"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "invoke-2.2.1-py3-none-any.whl", hash = "sha256:2413bc441b376e5cd3f55bb5d364f973ad8bdd7bf87e53c79de3c11bf3feecc8"},
-    {file = "invoke-2.2.1.tar.gz", hash = "sha256:515bf49b4a48932b79b024590348da22f39c4942dff991ad1fb8b8baea1be707"},
+    {file = "invoke-3.0.3-py3-none-any.whl", hash = "sha256:f11327165e5cbb89b2ad1d88d3292b5113332c43b8553b494da435d6ec6f5053"},
+    {file = "invoke-3.0.3.tar.gz", hash = "sha256:437b6a622223824380bfb4e64f612711a6b648c795f565efc8625af66fb57f0c"},
 ]
 
 [[package]]
@@ -822,18 +822,6 @@ rich = ">=12.3.0"
 shellingham = ">=1.3.0"
 
 [[package]]
-name = "types-invoke"
-version = "2.0.0.10"
-description = "Typing stubs for invoke"
-optional = false
-python-versions = ">=3.7"
-groups = ["main"]
-files = [
-    {file = "types-invoke-2.0.0.10.tar.gz", hash = "sha256:a54d7ecdc19e0c22cd2786ef2e64c2631715c78eba8a1bf40b511d0608f33a88"},
-    {file = "types_invoke-2.0.0.10-py3-none-any.whl", hash = "sha256:2404e4279601fa96e14ef68321fd10a660a828677aabdcaeef6a5189778084ef"},
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.15.0"
 description = "Backported and Experimental Type Hints for Python 3.9+"
@@ -860,4 +848,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "9df0ec3efebe2e65c83fb26cfda14118d86333c139218290795f5a7267d4410a"
+content-hash = "3ea1035ef53909cd8c4364a8656b60b775614d575021a24258b2a8dfac584e16"
