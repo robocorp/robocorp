@@ -20,9 +20,6 @@ robocorp-devutils = { path = "../devutils/", develop = true }
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = "black"
-
 [tool.mypy]
 mypy_path = "src:tests"
 

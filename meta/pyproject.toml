@@ -23,9 +23,6 @@ robocorp-devutils = { path = "../devutils/", develop = true }
 skip-string-normalization = false
 skip-magic-trailing-comma = false
 
-[tool.isort]
-profile = "black"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

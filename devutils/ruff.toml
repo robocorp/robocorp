@@ -1,2 +1,5 @@
 line-length=88  # matches the .pylintrc one as well
 extend-exclude = ["*vendor*"]
+
+[lint]
+select = ["E", "F", "W", "I"]

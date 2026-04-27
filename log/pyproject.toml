@@ -41,10 +41,7 @@ types-psutil = ">=5.9"
 [tool.mypy]
 mypy_path = "src:tests"
 
-[tool.isort]
-profile = "black"
-
-[tool.ruff]
+[tool.ruff.lint]
 ignore = [
     "E501", # Line-len.
     "F541", # f-string without placeholders.
