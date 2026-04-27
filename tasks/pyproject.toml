@@ -30,10 +30,7 @@ types-psutil = ">=5.9"
 # check for `cls.parse_obj(dict)` and `cls.model_json_schema()`
 pydantic = "^2.6"
 
-[tool.isort]
-profile = "black"
-
-[tool.ruff]
+[tool.ruff.lint]
 ignore = ["E501"]
 
 [tool.mypy]

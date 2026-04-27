@@ -12,9 +12,6 @@ packages = [{ include = "robocorp", from = "src" }]
 skip-string-normalization = false
 skip-magic-trailing-comma = false
 
-[tool.isort]
-profile = "black"
-
 [tool.poetry.dependencies]
 python = "^3.10"
 pillow = ">=9.1.1"

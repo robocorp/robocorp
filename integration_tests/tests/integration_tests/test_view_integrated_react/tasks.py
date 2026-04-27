@@ -113,9 +113,9 @@ def case_failure():
     assert runStatus == "Run Failed"
 
     # Expand "case_failure"
-    assert (
-        page.query_selector("#root1-0-0") is not None
-    ), "Expected exception to be expanded by default."
+    assert page.query_selector("#root1-0-0") is not None, (
+        "Expected exception to be expanded by default."
+    )
 
 
 def collect_full_tree_contents(

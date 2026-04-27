@@ -12,9 +12,6 @@ packages = [{ include = "robocorp/workitems", from = "src" }]
 skip-string-normalization = false
 skip-magic-trailing-comma = false
 
-[tool.isort]
-profile = "black"
-
 [tool.mypy]
 mypy_path = "src:tests"
 

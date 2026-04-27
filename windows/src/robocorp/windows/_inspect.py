@@ -990,10 +990,7 @@ class ElementInspector:
                             if not found:
                                 print("No element found")
                             else:
-                                print(
-                                    f"\n=== Found new element (pick: "
-                                    f"{next_i()}) ==="
-                                )
+                                print(f"\n=== Found new element (pick: {next_i()}) ===")
                                 for f in found:
                                     print(f)
 

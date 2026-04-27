@@ -600,14 +600,12 @@ class Table:
     @overload
     def get_table(
         self, indexes=None, columns=None, as_list: Literal[False] = False
-    ) -> "Table":
-        ...
+    ) -> "Table": ...
 
     @overload
     def get_table(
         self, indexes=None, columns=None, as_list: Literal[True] = True
-    ) -> List:
-        ...
+    ) -> List: ...
 
     def get_table(
         self, indexes=None, columns=None, as_list=False

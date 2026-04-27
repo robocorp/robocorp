@@ -155,10 +155,6 @@ class _UIAutomationControlWrapper:
             self.xcenter = rect.xcenter()
             self.ycenter = rect.ycenter()
         else:
-            self.left = (
-                self.right
-            ) = (
-                self.top
-            ) = (
-                self.bottom
-            ) = self.width = self.height = self.xcenter = self.ycenter = -1
+            self.left = self.right = self.top = self.bottom = self.width = (
+                self.height
+            ) = self.xcenter = self.ycenter = -1

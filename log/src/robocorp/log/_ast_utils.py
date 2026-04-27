@@ -439,9 +439,9 @@ class ASTRewriter:
                             new_value.extend(last_cursor_before)
                             changed = True
 
-                        last_cursor_current: Optional[
-                            Union[AST, List[AST]]
-                        ] = last_cursor.current
+                        last_cursor_current: Optional[Union[AST, List[AST]]] = (
+                            last_cursor.current
+                        )
                         if last_cursor_current is not None:
                             if isinstance(last_cursor_current, list):
                                 new_value.extend(last_cursor_current)
@@ -625,7 +625,9 @@ class NodeFactory:
                 posonlyargs=[], args=[], kwonlyargs=[], defaults=[], kw_defaults=[]
             )
         )
-        function_def = ast.FunctionDef(name, body=[], decorator_list=[], args=args)
+        function_def = ast.FunctionDef(  # type: ignore[call-overload]
+            name=name, args=args, body=[], decorator_list=[]
+        )
         return self._set_line_col(function_def)
 
     def YieldFrom(self, value=None) -> ast.YieldFrom:

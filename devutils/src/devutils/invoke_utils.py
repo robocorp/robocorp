@@ -296,23 +296,15 @@ def build_common_tasks(
         return static_paths
 
     @task
-    def lint(ctx, strict: bool=False):
+    def lint(ctx):
         """Run static analysis and formatting checks.
 
         Currently, it runs the following in this order:
-            - Ruff basic checks, then the formatting ones
-            - isort for sorting the imports
-            - Optionally Pylint if enabled through the `strict` switch
+            - Ruff basic checks (including import sorting), then the formatting ones
             - Markdown lint if available in the system
-
-        Args:
-            strict: Whether to enable the more strict Pylint as well.
         """
-        poetry(ctx, f"run ruff {TARGETS}")
+        poetry(ctx, f"run ruff check {TARGETS}")
         poetry(ctx, f"run ruff format --check {RUFF_ARGS} {TARGETS}")
-        poetry(ctx, f"run isort --check {TARGETS}")
-        if strict:
-            poetry(ctx, f"run pylint --rcfile {ROOT / '.pylintrc'} src")
 
         # NOTE(cmin764): Markdown lint can be installed as a gem with Ruby.
         #  Instructions on GitHub page: https://github.com/markdownlint/markdownlint
@@ -347,9 +339,8 @@ def build_common_tasks(
     @task
     def pretty(ctx):
         """Auto-format code and sort imports"""
-        poetry(ctx, f"run ruff --fix {TARGETS}")
+        poetry(ctx, f"run ruff check --fix {TARGETS}")
         poetry(ctx, f"run ruff format {RUFF_ARGS} {TARGETS}")
-        poetry(ctx, f"run isort {TARGETS}")
 
     @task
     def test(ctx, test: Optional[str]=None):

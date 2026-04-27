@@ -13,9 +13,9 @@ def check(datadir, args, msg="", returncode=1):
 
     stdout = result.stdout.decode("utf-8")
     if returncode:
-        assert (
-            msg
-        ), f'When an error is expected, the "msg" must be given. Found stdout: {stdout}'
+        assert msg, (
+            f'When an error is expected, the "msg" must be given. Found stdout: {stdout}'
+        )
 
     assert msg in stdout, f"{msg}\nnot in\n{stdout}"
 

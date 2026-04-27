@@ -71,7 +71,7 @@ python -m robocorp.tasks run tasks.py -t enter_user
 - <b>`func`</b>: A function which is a task to `robocorp.tasks`.
 - <b>`**kwargs`</b>: Options to be introspected by `task.options`.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L45)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L46)
 
 ```python
 task(*args, **kwargs)
@@ -131,7 +131,7 @@ def my_long_task():
 
 **Note:** If fixtures are defined in another file, they need to be imported in the main tasks file to be taken into use
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L26)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L23)
 
 ```python
 setup(
@@ -176,7 +176,7 @@ By default, runs teardowns in `task` scope.
 
 **Note:** If fixtures are defined in another file, they need to be imported in the main tasks file to be taken into use
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L148)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/_fixtures.py#L142)
 
 ```python
 teardown(
@@ -199,7 +199,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 - <b>`func`</b>: wrapped function.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L98)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L99)
 
 ```python
 session_cache(func)
@@ -219,7 +219,7 @@ The function may be either a generator with a single yield (so, the first yielde
 
 - <b>`func`</b>: wrapped function.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L120)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L121)
 
 ```python
 task_cache(func)
@@ -231,7 +231,7 @@ ______________________________________________________________________
 
 Provide the output directory being used for the run or None if there's no output dir configured.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L142)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L143)
 
 ```python
 get_output_dir() → Optional[Path]
@@ -243,7 +243,7 @@ ______________________________________________________________________
 
 Provides the task which is being currently run or None if not currently running a task.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L155)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/tasks/src/robocorp/tasks/__init__.py#L156)
 
 ```python
 get_current_task() → Optional[ITask]

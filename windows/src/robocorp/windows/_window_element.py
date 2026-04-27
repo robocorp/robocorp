@@ -33,9 +33,9 @@ class WindowElement(ControlElement):
 
     def __init__(self, wrapped: "_UIAutomationControlWrapper"):
         super().__init__(wrapped)
-        self._executable: Union[
-            _ExecutableNotSetSentinel, Optional[str]
-        ] = _ExecutableNotSetSentinel()
+        self._executable: Union[_ExecutableNotSetSentinel, Optional[str]] = (
+            _ExecutableNotSetSentinel()
+        )
 
     def __str__(self) -> str:
         # Print what can be used to build a locator.
@@ -130,8 +130,7 @@ class WindowElement(ControlElement):
         wait_time: Optional[float] = ...,
         timeout: Optional[float] = ...,
         raise_error: Literal[True] = ...,
-    ) -> "WindowElement":
-        ...
+    ) -> "WindowElement": ...
 
     @overload
     def find_child_window(
@@ -142,8 +141,7 @@ class WindowElement(ControlElement):
         wait_time: Optional[float] = ...,
         timeout: Optional[float] = ...,
         raise_error: Literal[False] = ...,
-    ) -> Optional["WindowElement"]:
-        ...
+    ) -> Optional["WindowElement"]: ...
 
     @overload
     def find_child_window(
@@ -154,8 +152,7 @@ class WindowElement(ControlElement):
         wait_time: Optional[float] = ...,
         timeout: Optional[float] = ...,
         raise_error: bool = ...,
-    ) -> Optional["WindowElement"]:
-        ...
+    ) -> Optional["WindowElement"]: ...
 
     def find_child_window(
         self,

@@ -80,9 +80,9 @@ def test_find(tk_process):
             f"class:Button depth:{depth}", search_strategy="all"
         )
 
-        assert len(bts) == len(
-            at_depth
-        ), f"Error. Did not find expected items at depth: {depth}"
+        assert len(bts) == len(at_depth), (
+            f"Error. Did not find expected items at depth: {depth}"
+        )
 
         for expect_bt in bts:
             found = False
@@ -113,9 +113,9 @@ def test_find(tk_process):
                     check_bts.append(bt)
 
             at_depth = use_parent.find_many("class:Button depth:1")  # type: ignore
-            assert len(check_bts) == len(
-                at_depth
-            ), "Error. Did not find expected items at depth: 1"
+            assert len(check_bts) == len(at_depth), (
+                "Error. Did not find expected items at depth: 1"
+            )
 
             for expect_bt in check_bts:
                 found = False

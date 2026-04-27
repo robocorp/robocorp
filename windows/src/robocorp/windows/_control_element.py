@@ -490,8 +490,7 @@ class ControlElement:
         search_depth: int = ...,
         timeout: Optional[float] = ...,
         raise_error: Literal[True] = ...,
-    ) -> "ControlElement":
-        ...
+    ) -> "ControlElement": ...
 
     @overload
     def find(
@@ -500,8 +499,7 @@ class ControlElement:
         search_depth: int = ...,
         timeout: Optional[float] = ...,
         raise_error: Literal[False] = ...,
-    ) -> Optional["ControlElement"]:
-        ...
+    ) -> Optional["ControlElement"]: ...
 
     @overload
     def find(
@@ -510,8 +508,7 @@ class ControlElement:
         search_depth: int = ...,
         timeout: Optional[float] = ...,
         raise_error: bool = ...,
-    ) -> Optional["ControlElement"]:
-        ...
+    ) -> Optional["ControlElement"]: ...
 
     def find(
         self,
@@ -1281,7 +1278,7 @@ class ControlElement:
             if send_enter:
                 control.SendKeys(text="{Enter}", interval=interval, waitTime=wait_time)
         else:
-            raise ActionNotPossible("Element does not have " "SendKeys' attribute")
+            raise ActionNotPossible("Element does not have SendKeys' attribute")
 
     def get_text(
         self,

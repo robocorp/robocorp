@@ -17,7 +17,7 @@ ______________________________________________________________________
 **Returns:**
 The information on the pyproject file (the toml contents and the actualpath where the pyproject.toml was found).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L19)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L20)
 
 ```python
 read_pyproject_toml(path: Path) → Optional[PyProjectInfo]
@@ -36,7 +36,7 @@ ______________________________________________________________________
 **Returns:**
 The section which was read.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L63)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L64)
 
 ```python
 read_section_from_toml(
@@ -58,7 +58,7 @@ ______________________________________________________________________
 **Returns:**
 The autolog configuration read from the given pyproject information.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L110)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/src/robocorp/log/pyproject_config.py#L111)
 
 ```python
 read_robocorp_auto_log_config(

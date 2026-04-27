@@ -30,9 +30,6 @@ pytest11 = { robocorp_log_pytest = "robocorp.log_pytest" }
 [tool.mypy]
 mypy_path = "src:tests"
 
-[tool.isort]
-profile = "black"
-
 [[tool.mypy.overrides]]
 module = "setuptools.*"
 ignore_missing_imports = true

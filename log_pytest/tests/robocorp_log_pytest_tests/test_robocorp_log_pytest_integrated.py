@@ -20,10 +20,10 @@ def run_pytest(
         raise AssertionError(
             f"""Expected returncode: {returncode}. Found: {result.returncode}.
 === stdout:
-{result.stdout.decode('utf-8')}
+{result.stdout.decode("utf-8")}
 
 === stderr:
-{result.stderr.decode('utf-8')}
+{result.stderr.decode("utf-8")}
 
 === Env:
 {env_str}
