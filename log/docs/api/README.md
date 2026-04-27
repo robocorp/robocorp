@@ -13,7 +13,7 @@
 ## Classes
 
 - [`log.ConsoleMessageKind`](./robocorp.log.md#class-consolemessagekind)
-- [`log.FilterLogLevel`](./robocorp.log.md#class-filterloglevel)
+- [`log.FilterLogLevel`](./robocorp.log.md#class-filterloglevel): An enumeration.
 - [`log.IContextManager`](./robocorp.log.md#class-icontextmanager): Typing for a "generic" context manager.
 - [`log.IRedactConfiguration`](./robocorp.log.md#class-iredactconfiguration)
 - [`protocols.IContextErrorReport`](./robocorp.log.protocols.md#class-icontexterrorreport)

@@ -26,14 +26,14 @@ class ExceptionType(str, Enum):
     APPLICATION = "APPLICATION"  # logic issue/timeout, can be retried
 
 
-@dataclass_json(letter_case=LetterCase.CAMEL)
+@dataclass_json(letter_case=LetterCase.CAMEL)  # type: ignore[call-overload]
 @dataclass
 class Address:
     name: str
     address: str
 
 
-@dataclass_json(letter_case=LetterCase.CAMEL)
+@dataclass_json(letter_case=LetterCase.CAMEL)  # type: ignore[call-overload]
 @dataclass
 class Email:
     """Container for Email attached to work item."""
