@@ -1,5 +1,5 @@
 pip==26.0.1
 invoke~=3.0.0
-poetry~=1.8.2
+poetry~=2.3.0
 semver~=3.0.0
 tomlkit~=0.14.0
