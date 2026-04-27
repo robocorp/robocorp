@@ -403,7 +403,7 @@ dev = ["black", "flake8", "isort", "mypy", "pytest", "pytest-cov", "pytest-mock"
 type = "git"
 url = "https://github.com/robocorp/lazydocs.git"
 reference = "HEAD"
-resolved_reference = "ffe1b3a438008de2e7ec25f8599f4e5d915a8cf0"
+resolved_reference = "3eeda5b5012f698fad0be6272747c40052b3ec12"
 
 [[package]]
 name = "librt"

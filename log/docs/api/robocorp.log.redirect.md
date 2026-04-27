@@ -20,8 +20,6 @@ The redirections needed are:
 
 - <b>`redirect_to_console_messages`</b>: Whether messages sent to stdout and stderr should be redirected to console messages.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/log/robocorp/log/redirect/setup_stdout_logging#L136)
-
 ```python
 setup_stdout_logging(
     mode: str,
