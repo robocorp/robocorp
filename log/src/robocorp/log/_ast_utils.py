@@ -625,7 +625,9 @@ class NodeFactory:
                 posonlyargs=[], args=[], kwonlyargs=[], defaults=[], kw_defaults=[]
             )
         )
-        function_def = ast.FunctionDef(name, body=[], decorator_list=[], args=args)
+        function_def = ast.FunctionDef(  # type: ignore[call-overload]
+            name=name, args=args, body=[], decorator_list=[]
+        )
         return self._set_line_col(function_def)
 
     def YieldFrom(self, value=None) -> ast.YieldFrom:
