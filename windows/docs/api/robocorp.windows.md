@@ -120,7 +120,7 @@ window = find_window('regex:.*Notepad')
 window = find_window('executable:Spotify.exe')
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L157)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L154)
 
 ```python
 find_window(
@@ -162,7 +162,7 @@ window = find_windows('regex:.*Notepad')
 window = find_windows('executable:Spotify.exe')
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L206)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L203)
 
 ```python
 find_windows(
@@ -199,7 +199,7 @@ calc_window.click("Close Calculator")
 windows.wait_for_condition(calc_window.is_disposed)
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L250)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/__init__.py#L247)
 
 ```python
 wait_for_condition(
@@ -407,7 +407,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>: if element does not allow the Click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L811)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L808)
 
 ```python
 click(
@@ -469,7 +469,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>: if element does not allow the double-click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L872)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L869)
 
 ```python
 double_click(
@@ -501,7 +501,7 @@ The first matching element is returned.
 **Raises:**
 `ElementNotFound` if an element with the given locator could not befound.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L516)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L513)
 
 ```python
 find(
@@ -534,7 +534,7 @@ This method may be used to find multiple descendants of the current element matc
 
 > Keep in mind that by default the search strategy is for searching `siblings` of the initial element found (so, by default, after the first element is found a tree traversal is not done and only sibling elements from the initial element are found). Use the `all` search strategy to search for all elements.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L563)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L560)
 
 ```python
 find_many(
@@ -587,7 +587,7 @@ date = window.get_text('type:Edit name:"Date of birth"')
 **Raises:**
 ActionNotPossible if the text cannot be gotten from this element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1286)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1283)
 
 ```python
 get_text(
@@ -625,7 +625,7 @@ date = window.get_value('type:Edit name:"Date of birth"')
 **Raises:**
 ActionNotPossible if the text cannot be gotten from this element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1344)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1341)
 
 ```python
 get_value(
@@ -731,7 +731,7 @@ An iterator of `ControlElement` which provides the descendants ofthis element.
 
 > Iteration over too many items can be slow. Try to keep the max depth up to a minimum to avoid slow iterations.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L652)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L649)
 
 ```python
 iter_children(max_depth: int = 8) → Iterator[ForwardRef('ControlElement')]
@@ -766,7 +766,7 @@ windows.desktop().log_screenshot('ERROR')
 **Raises:**
 ElementNotFound if the locator was passed but it was not possibleto find the element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1719)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1716)
 
 ```python
 log_screenshot(
@@ -828,7 +828,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>: if element does not allow the middle-click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1002)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L999)
 
 ```python
 middle_click(
@@ -845,7 +845,7 @@ ______________________________________________________________________
 
 Moves the mouse to the center of this element to simulate a mouse hovering.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L798)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L795)
 
 ```python
 mouse_hover() → None
@@ -889,7 +889,7 @@ from robocorp import windows
 windows.find("Calculator > path:2|3").print_tree()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L680)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L677)
 
 ```python
 print_tree(
@@ -947,7 +947,7 @@ The clicked element.
 
 - <b>`ActionNotPossible`</b>: if element does not allow the right-click action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L939)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L936)
 
 ```python
 right_click(
@@ -990,7 +990,7 @@ The absolute path to the image saved or None if it was not possibleto obtain the
 **Raises:**
 ElementNotFound if the locator was passed but it was not possibleto find the element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1661)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1658)
 
 ```python
 screenshot(
@@ -1031,7 +1031,7 @@ The PIL image if it was possible to do the screenshot or None ifit was not possi
 **Raises:**
 ElementNotFound if the locator was passed but it was not possibleto find the element.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1610)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1607)
 
 ```python
 screenshot_pil(
@@ -1073,7 +1073,7 @@ ActionNotPossible if the element does not allow the `Select` action.
 element.select("22", locator="id:FontSizeComboBox")
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1124)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1121)
 
 ```python
 select(
@@ -1137,7 +1137,7 @@ windows.find_window('Calculator').send_keys('96+4=', send_enter=True)
 
 - <b>`ActionNotPossible`</b>: if the element does not allow the SendKeys action.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1184)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1181)
 
 ```python
 send_keys(
@@ -1173,7 +1173,7 @@ chrome = windows.find_window('executable:chrome')
 bt = chrome.set_focus('name:Buy type:Button')
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1783)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1780)
 
 ```python
 set_focus(
@@ -1263,7 +1263,7 @@ text = element.get_value(elem)
 print(text)
 
 
- [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1465)
+ [**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_control_element.py#L1462)
 
 ```python
 set_value(
@@ -1474,7 +1474,7 @@ The number of closed windows.
 
 - <b>`ElementNotFound`</b>: if wait_for_window is True and the timeout was reached.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L244)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L241)
 
 ```python
 close_windows(
@@ -1517,7 +1517,7 @@ items_view = explorer2.find('name:"Items View"')
 explorer.drag_and_drop(report_html, items_view, hold_ctrl=True)
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L498)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L495)
 
 ```python
 drag_and_drop(
@@ -1552,7 +1552,7 @@ Finds windows matching the given locator.
 **Raises:**
 `ElementNotFound` if a window with the given locator could not be found.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L155)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L152)
 
 ```python
 find_window(
@@ -1594,7 +1594,7 @@ window = find_windows('regex:.*Notepad')
 window = find_windows('executable:Spotify.exe')
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L196)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L193)
 
 ```python
 find_windows(
@@ -1614,7 +1614,7 @@ Windows only utility which returns the current Windows major version.
 **Returns:**
 The current Windows major version (i.e.: '10', '11').
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L358)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L355)
 
 ```python
 get_win_version() → str
@@ -1708,7 +1708,7 @@ ElementNotFound if no window was found as active until the timeoutwas reached.
 
 Note: if there's a matching window which matches the locator but it's not the active one, this will fail (consider using `find_window`for this use case).
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L382)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L379)
 
 ```python
 wait_for_active_window(
@@ -1731,7 +1731,7 @@ Activated by pressing `Win + R`. Then the app name is typed in and finally the "
 - <b>`text`</b>: Text to enter into the Run input field. (e.g. `Notepad`)
 - <b>`wait_time`</b>: Time to sleep after the searched app is executed. (1s by default)
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L320)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L317)
 
 ```python
 windows_run(text: str, wait_time: float = 1) → None
@@ -1750,7 +1750,7 @@ Activated by pressing `win + s`.
 - <b>`text`</b>: Text to enter into search input field (e.g. `Notepad`)
 - <b>`wait_time`</b>: sleep time after search has been entered (default 3.0 seconds)
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L340)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_desktop.py#L337)
 
 ```python
 windows_search(text: str, wait_time: float = 3.0) → None
@@ -1943,7 +1943,7 @@ Note that by default the process tree will be force-killed by using the `pid` as
 **Returns:**
 True if the window was closed by this function and False otherwise.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L350)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L347)
 
 ```python
 close_window(
@@ -1987,7 +1987,7 @@ sage = windows.find_window('subname:"Sage 50" type:Window')
 child_window = sage.find_child_window('subname:"Test Company" depth:1')
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L160)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L157)
 
 ```python
 find_child_window(
@@ -2015,7 +2015,7 @@ calculator = windows.find_window('Calculator', foreground=False)
 calculator.foreground_window()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L219)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L216)
 
 ```python
 foreground_window() → WindowElement
@@ -2041,7 +2041,7 @@ ______________________________________________________________________
 **Returns:**
 True if the pid associated to this window is still running and False otherwise.
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L330)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L327)
 
 ```python
 is_running() → bool
@@ -2063,7 +2063,7 @@ from robocorp import windows
 windows.find_window('executable:Spotify.exe').maximize_window()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L270)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L267)
 
 ```python
 maximize_window() → bool
@@ -2085,7 +2085,7 @@ from robocorp import windows
 windows.find_window('executable:Spotify.exe').minimize_window()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L254)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L251)
 
 ```python
 minimize_window() → bool
@@ -2107,7 +2107,7 @@ from robocorp import windows
 windows.find_window('executable:Spotify.exe').restore_window()
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L286)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L283)
 
 ```python
 restore_window() → bool
@@ -2136,7 +2136,7 @@ explorer = windows.find_window('executable:explorer.exe')
 explorer.set_window_pos(0, 0, desktop.width / 2, desktop.height)
 ```
 
-[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L302)
+[**Link to source**](https://github.com/robocorp/robocorp/tree/master/windows/src/robocorp/windows/_window_element.py#L299)
 
 ```python
 set_window_pos(x: int, y: int, width: int, height: int) → WindowElement
