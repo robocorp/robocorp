@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix `wait_for_condition()` ignoring the caller-supplied `timeout` and always waiting 8 seconds.
+
 ## 1.1.1 - 2026-03-13
 
 - Update `psutil` to match other packages
