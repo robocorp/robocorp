@@ -36,11 +36,11 @@ def _check_multiple_interactions():
         pass  # Ignore if not there.
 
     # The tab title may or may not carry a "New Tab" prefix depending on the
-    # Chrome first-run state, so match either form. Give it a longer timeout
-    # since the title can take a moment to settle after a fresh install.
-    w = windows.find_window(
-        "regex:(New Tab.*)?Google Chrome", wait_time=0.5, timeout=10
-    )
+    # Chrome first-run state, so match either form. Note: the locator DSL
+    # itself uses "(" / ")" for grouping, so a regex value can't contain
+    # literal parens here. Give it a longer timeout since the title can take
+    # a moment to settle after a fresh install.
+    w = windows.find_window("regex:.*Google Chrome", wait_time=0.5, timeout=10)
     w.send_keys("{Alt}d", wait_time=0.2, send_enter=False)
     w.send_keys(url, wait_time=3, send_enter=True)
 
