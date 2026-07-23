@@ -24,13 +24,22 @@ def _check_multiple_interactions():
     assert os.path.exists(sample_html)
     url = Path(sample_html).as_uri()
 
-    # In GitHub Actions on a fresh install Chrome asks to sign in.
-    # We have to decline
+    # In GitHub Actions on a fresh install Chrome asks to sign in. We have to
+    # decline. The exact dialog/button wording has changed across Chrome
+    # versions (e.g. "Don't sign in" -> "Stay signed out"), so match on the
+    # stable button id first and fall back to the older text pattern.
     try:
         app = windows.find_window("regex:.*Google Chrome", timeout=5)
         app.find(
-            'control:"ButtonControl" and regex:Don.*sign.*in', search_depth=12
+            "(id:declineSignInButton or regex:Don.*sign.*in) and "
+            'control:"ButtonControl"',
+            search_depth=12,
         ).click()
+    except windows.ElementNotFound:
+        pass  # Ignore if not there.
+
+    try:
+        app = windows.find_window("regex:.*Google Chrome", timeout=5)
         app.find('control:"ButtonControl" and name:Skip', search_depth=12).click()
     except windows.ElementNotFound:
         pass  # Ignore if not there.
