@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.2 - 2026-07-24
+
 - Fix `wait_for_condition()` ignoring the caller-supplied `timeout` and always waiting 8 seconds.
 
 ## 1.1.1 - 2026-03-13

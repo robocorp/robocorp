@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-windows"
-version = "1.1.1"
+version = "1.1.2"
 description = "Robocorp Windows Automation (API to automate Windows)"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"
