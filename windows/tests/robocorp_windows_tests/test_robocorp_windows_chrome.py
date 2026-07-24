@@ -27,22 +27,35 @@ def _check_multiple_interactions():
     # In GitHub Actions on a fresh install Chrome asks to sign in. We have to
     # decline. The exact dialog/button wording has changed across Chrome
     # versions (e.g. "Don't sign in" -> "Stay signed out"), so match on the
-    # stable button id first and fall back to the older text pattern.
+    # stable button id first and fall back to the older text pattern. On
+    # machines where Chrome is already signed in this prompt never appears,
+    # so use a short timeout + raise_error=False here instead of the global
+    # 10s default - otherwise each of these best-effort lookups blocks for
+    # the full default timeout before giving up.
     try:
         app = windows.find_window("regex:.*Google Chrome", timeout=5)
-        app.find(
+    except windows.ElementNotFound:
+        app = None
+
+    if app is not None:
+        decline_button = app.find(
             "(id:declineSignInButton or regex:Don.*sign.*in) and "
             'control:"ButtonControl"',
             search_depth=12,
-        ).click()
-    except windows.ElementNotFound:
-        pass  # Ignore if not there.
+            timeout=2,
+            raise_error=False,
+        )
+        if decline_button is not None:
+            decline_button.click()
 
-    try:
-        app = windows.find_window("regex:.*Google Chrome", timeout=5)
-        app.find('control:"ButtonControl" and name:Skip', search_depth=12).click()
-    except windows.ElementNotFound:
-        pass  # Ignore if not there.
+        skip_button = app.find(
+            'control:"ButtonControl" and name:Skip',
+            search_depth=12,
+            timeout=2,
+            raise_error=False,
+        )
+        if skip_button is not None:
+            skip_button.click()
 
     # The tab title may or may not carry a "New Tab" prefix depending on the
     # Chrome first-run state, so match either form. Note: the locator DSL
