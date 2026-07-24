@@ -276,7 +276,6 @@ def wait_for_condition(
             return f"Condition not reached in {timeout} seconds."
 
     initial_time = time.monotonic()
-    timeout = 8
     while True:
         if condition():
             break
