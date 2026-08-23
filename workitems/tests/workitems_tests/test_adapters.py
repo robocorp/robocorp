@@ -11,7 +11,7 @@ import pytest
 from requests import HTTPError as _HTTPError
 
 from robocorp.workitems._adapters import FileAdapter, RobocorpAdapter
-from robocorp.workitems._requests import DEBUG, HTTPError
+from robocorp.workitems._requests import DEBUG, DEFAULT_TIMEOUT, HTTPError
 from robocorp.workitems._types import State
 
 ITEMS_JSON = [{"payload": {"a-key": "a-value"}, "files": {"a-file": "file.txt"}}]
@@ -225,7 +225,9 @@ class TestRobocorpAdapter:
         assert reserved_item_id == "44"
 
         url = "https://api.process.com/process-v1/workspaces/1/processes/5/runs/2/robotRuns/3/reserve-next-work-item"
-        self.mock_post.assert_called_once_with(url, headers=self.HEADERS_PROCESS)
+        self.mock_post.assert_called_once_with(
+            url, headers=self.HEADERS_PROCESS, timeout=DEFAULT_TIMEOUT
+        )
 
     @pytest.mark.parametrize(
         "exception",
@@ -249,7 +251,7 @@ class TestRobocorpAdapter:
                 key: value for (key, value) in exception.items() if value
             }
         self.mock_post.assert_called_once_with(
-            url, headers=self.HEADERS_PROCESS, json=body
+            url, headers=self.HEADERS_PROCESS, json=body, timeout=DEFAULT_TIMEOUT
         )
 
     def test_load_payload(self, adapter):
@@ -272,7 +274,7 @@ class TestRobocorpAdapter:
 
         url = f"https://api.workitem.com/json-v1/workspaces/1/workitems/{item_id}/data"
         self.mock_put.assert_called_once_with(
-            url, headers=self.HEADERS_WORKITEM, json=payload
+            url, headers=self.HEADERS_WORKITEM, json=payload, timeout=DEFAULT_TIMEOUT
         )
 
     def test_remove_file(self, adapter):
@@ -285,7 +287,9 @@ class TestRobocorpAdapter:
         adapter.remove_file(item_id, name)
 
         url = f"https://api.workitem.com/json-v1/workspaces/1/workitems/{item_id}/files/{file_id}"
-        self.mock_delete.assert_called_once_with(url, headers=self.HEADERS_WORKITEM)
+        self.mock_delete.assert_called_once_with(
+            url, headers=self.HEADERS_WORKITEM, timeout=DEFAULT_TIMEOUT
+        )
 
     def test_list_files(self, adapter):
         expected_files = ["just.py", "mark.robot", "it.txt"]

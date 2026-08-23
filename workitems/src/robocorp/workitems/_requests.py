@@ -180,7 +180,9 @@ class Requests:
 
         LOGGER.debug("%s %r", verb.__name__.upper(), log_url)
         response = verb(url, *args, headers=headers, **kwargs)
-        LOGGER.debug("%s %r -> %s", verb.__name__.upper(), log_url, response.status_code)
+        LOGGER.debug(
+            "%s %r -> %s", verb.__name__.upper(), log_url, response.status_code
+        )
         handle_error(response)
         return response
 
