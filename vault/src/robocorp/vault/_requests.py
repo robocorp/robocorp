@@ -18,6 +18,10 @@ from tenacity import (
 
 LOGGER = logging.getLogger(__name__)
 DEBUG = bool(os.getenv("RC_DEBUG_API") or os.getenv("RPA_DEBUG_API"))
+# Without an explicit timeout, `requests` will wait indefinitely for a response,
+# so a stalled connection (e.g. dropped by a proxy/load balancer) hangs the task
+# forever instead of raising and letting the `retry` below kick in.
+DEFAULT_TIMEOUT = float(os.getenv("RC_API_REQUEST_TIMEOUT", "60"))
 
 
 def _needs_retry(exc: BaseException) -> bool:
@@ -172,8 +176,13 @@ class Requests:
         if os.getenv("RC_DISABLE_SSL"):
             kwargs["verify"] = False
 
+        kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+
         LOGGER.debug("%s %r", verb.__name__.upper(), log_url)
         response = verb(url, *args, headers=headers, **kwargs)
+        LOGGER.debug(
+            "%s %r -> %s", verb.__name__.upper(), log_url, response.status_code
+        )
         handle_error(response)
         return response
 
