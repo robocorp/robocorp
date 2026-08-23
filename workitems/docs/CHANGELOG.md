@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.5.1 - 2026-08-23
+
 - Add a default request timeout (60s, override with `RC_API_REQUEST_TIMEOUT`) to
   Control Room API calls, so a stalled connection raises and retries instead of
   hanging the run indefinitely.
