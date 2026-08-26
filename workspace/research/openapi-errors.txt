@@ -1,0 +1,173 @@
+Error(s) encountered while generating, client was not created
+
+Failed to parse OpenAPI document
+
+55 validation errors for OpenAPI
+paths./workspaces/{workspace_id}/workers/{worker_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/workers/{worker_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/workers/{worker_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/workers/{worker_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/workers/{worker_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/worker-groups/{worker_group_id}/link-tokens/{link_token_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs-integrations.post.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...d': {'type': 'string'}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs-integrations.post.responses.200.Response.content.application/json.schema.Schema.properties.started.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs-integrations.post.responses.200.Response.content.application/json.schema.Schema.properties.started.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs-integrations.post.responses.200.Response.content.application/json.schema.Schema.properties.started.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs-integrations.post.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Started ... {'type': 'string'}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'oneOf': [{'description'...: {'type': 'string'}}}]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.0.Reference.$ref
+  Field required [type=missing, input_value={'description': 'This sig...ean', 'enum': [False]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.0.Schema.properties.started.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [False]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.0.Schema.properties.started.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=False, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.0.Schema.properties.started.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=False, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.1.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...d': {'type': 'string'}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.1.Schema.properties.started.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.1.Schema.properties.started.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Response.content.application/json.schema.Schema.oneOf.1.Schema.properties.started.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/processes/{process_id}/process-runs.post.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Started ...'type': 'string'}}}]}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/process-runs/{process_run_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/process-runs/{process_run_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/process-runs/{process_run_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/process-runs/{process_run_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/process-runs/{process_run_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/work-items/batch.post.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/work-items/batch.post.responses.200.Response.content.application/json.schema.Schema.properties.accepted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/work-items/batch.post.responses.200.Response.content.application/json.schema.Schema.properties.accepted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/work-items/batch.post.responses.200.Response.content.application/json.schema.Schema.properties.accepted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/work-items/batch.post.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Work ite...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/task-packages/{task_package_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/task-packages/{task_package_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/task-packages/{task_package_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/task-packages/{task_package_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/task-packages/{task_package_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/assets/{asset_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/assets/{asset_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/assets/{asset_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/assets/{asset_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/assets/{asset_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/webhooks/{webhook_id}.delete.responses.200.Response.content.application/json.schema.Reference.$ref
+  Field required [type=missing, input_value={'type': 'object', 'requi...lean', 'enum': [True]}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/webhooks/{webhook_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Reference.$ref
+  Field required [type=missing, input_value={'type': 'boolean', 'enum': [True]}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+paths./workspaces/{workspace_id}/webhooks/{webhook_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[int]].0
+  Input should be a valid integer [type=int_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/int_type
+paths./workspaces/{workspace_id}/webhooks/{webhook_id}.delete.responses.200.Response.content.application/json.schema.Schema.properties.deleted.Schema.enum.list[nullable[str]].0
+  Input should be a valid string [type=string_type, input_value=True, input_type=bool]
+    For further information visit https://errors.pydantic.dev/2.4/v/string_type
+paths./workspaces/{workspace_id}/webhooks/{webhook_id}.delete.responses.200.Reference.$ref
+  Field required [type=missing, input_value={'description': 'Deleted ...n', 'enum': [True]}}}}}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.4/v/missing
+
+
+If you believe this was a mistake or this tool is missing a feature you need, please open an issue at https://github.com/openapi-generators/openapi-python-client/issues/new/choose
