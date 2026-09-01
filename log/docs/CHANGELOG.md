@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Fix `AttributeError: module 'ast' has no attribute 'Str'` on Python 3.14. `ast.Str` was
+  deprecated since 3.8 and removed in 3.14; the AST rewriter now uses `ast.Constant`
+  throughout. Also silences the related `DeprecationWarning` on 3.12/3.13.
+
 ## 3.1.3 - 2026-04-26
 
 - Fix 13 npm security vulnerabilities in log output React UI (dompurify, vite, lodash, flatted, picomatch, postcss, brace-expansion, tmp)

@@ -676,8 +676,10 @@ class NodeFactory:
 
         return self._set_line_col(self.Attribute(ref, builtin_name))
 
-    def Str(self, s) -> ast.Str:
-        return self._set_line_col(ast.Str(s))
+    def Str(self, s) -> ast.Constant:
+        # `ast.Str` was removed in Python 3.14 (deprecated since 3.8); `ast.Constant`
+        # is the correct representation for a string literal on every supported version.
+        return self.Constant(s)
 
     def Constant(self, s) -> ast.Constant:
         return self._set_line_col(ast.Constant(s))
