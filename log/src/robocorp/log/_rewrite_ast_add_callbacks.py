@@ -1051,7 +1051,9 @@ def _handle_for_or_while(
             call.args.append(factory.IntConstant(for_step_id))
             call.args.append(
                 factory.Tuple(
-                    factory.Constant(f"{stmt_name_upper}_STEP"),  # FOR_STEP / WHILE_STEP
+                    factory.Constant(
+                        f"{stmt_name_upper}_STEP"
+                    ),  # FOR_STEP / WHILE_STEP
                     factory.NameLoad("__name__"),
                     factory.NameLoad("__file__"),
                     step_name_str,
