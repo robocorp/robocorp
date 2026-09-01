@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.4 - 2026-09-01
+
 - Fix `AttributeError: module 'ast' has no attribute 'Str'` on Python 3.14. `ast.Str` was
   deprecated since 3.8 and removed in 3.14; the AST rewriter now uses `ast.Constant`
   throughout. Also silences the related `DeprecationWarning` on 3.12/3.13.
