@@ -60,7 +60,7 @@ def _make_after_yield_expr(
             "after_yield",
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
-            factory.Str(f"{class_name}{function.name}"),
+            factory.Constant(f"{class_name}{function.name}"),
             factory.LineConstantAt(node_lineno),
         )
     )
@@ -75,7 +75,7 @@ def _make_before_yield_from_exprs(
             "before_yield_from",
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
-            factory.Str(f"{class_name}{function.name}"),
+            factory.Constant(f"{class_name}{function.name}"),
             factory.LineConstantAt(node_lineno),
         )
     )
@@ -90,7 +90,7 @@ def _make_after_yield_from_expr(
             "after_yield_from",
             factory.NameLoad("__name__"),
             factory.NameLoad("__file__"),
-            factory.Str(f"{class_name}{function.name}"),
+            factory.Constant(f"{class_name}{function.name}"),
             factory.LineConstantAt(node_lineno),
         )
     )
@@ -120,10 +120,10 @@ def _create_method_with_stmt(
     call = factory.Call(factory.NameLoadRewriteCallback(name))
 
     tup_elts = [
-        factory.Str(log_method_type),
+        factory.Constant(log_method_type),
         factory.NameLoad("__name__"),
         factory.NameLoad("__file__"),
-        factory.Str(f"{class_name}{function.name}"),
+        factory.Constant(f"{class_name}{function.name}"),
         factory.LineConstantAt(function.lineno),
     ]
 
@@ -133,15 +133,15 @@ def _create_method_with_stmt(
     for arg in function.args.args:
         if class_name and arg.arg == "self":
             continue
-        keys.append(factory.Str(arg.arg))
+        keys.append(factory.Constant(arg.arg))
         values.append(factory.NameLoad(arg.arg))
 
     if function.args.vararg:
-        keys.append(factory.Str(function.args.vararg.arg))
+        keys.append(factory.Constant(function.args.vararg.arg))
         values.append(factory.NameLoad(function.args.vararg.arg))
 
     if function.args.kwarg:
-        keys.append(factory.Str(function.args.kwarg.arg))
+        keys.append(factory.Constant(function.args.kwarg.arg))
         values.append(factory.NameLoad(function.args.kwarg.arg))
     dct.keys = keys
     dct.values = values
@@ -314,9 +314,10 @@ def rewrite_ast_add_callbacks(
         if (
             expect_docstring
             and isinstance(item, ast.Expr)
-            and isinstance(item.value, ast.Str)
+            and isinstance(item.value, ast.Constant)
+            and isinstance(item.value.value, str)
         ):
-            doc = item.value.s
+            doc = item.value.value
             if isinstance(doc, str) and is_rewrite_disabled(doc):
                 return
             expect_docstring = False
@@ -431,7 +432,7 @@ def _handle_return(
         call = factory.Call(factory.NameLoadRewriteCallback("method_return"))
         call.args.append(factory.NameLoad("__name__"))
         call.args.append(factory.NameLoad("__file__"))
-        call.args.append(factory.Str(f"{class_name}{function.name}"))
+        call.args.append(factory.Constant(f"{class_name}{function.name}"))
         call.args.append(factory.LineConstantAt(node.lineno))
 
         if node.value:
@@ -492,7 +493,7 @@ def _handle_continue_break(
             factory.Tuple(
                 factory.NameLoad("__name__"),
                 factory.NameLoad("__file__"),
-                factory.Str(f"{class_name}{function.name}"),
+                factory.Constant(f"{class_name}{function.name}"),
                 factory.LineConstantAt(node.lineno),
             )
         ]
@@ -595,10 +596,10 @@ def _handle_full_log_if(
             call.args.append(factory.IntConstant(if_id))
             call.args.append(
                 factory.Tuple(
-                    factory.Str(f"IF_SCOPE"),
+                    factory.Constant(f"IF_SCOPE"),
                     factory.NameLoad("__name__"),
                     factory.NameLoad("__file__"),
-                    factory.Str(f"{stmt_name} {ast.unparse(node.test)}"),
+                    factory.Constant(f"{stmt_name} {ast.unparse(node.test)}"),
                     factory.LineConstantAt(node.lineno),
                     targets,
                 )
@@ -624,10 +625,10 @@ def _handle_full_log_if(
             call.args.append(factory.IntConstant(else_id))
             call.args.append(
                 factory.Tuple(
-                    factory.Str(f"ELSE_SCOPE"),
+                    factory.Constant(f"ELSE_SCOPE"),
                     factory.NameLoad("__name__"),
                     factory.NameLoad("__file__"),
-                    factory.Str(f"else (to if {ast.unparse(node.test)})"),
+                    factory.Constant(f"else (to if {ast.unparse(node.test)})"),
                     factory.LineConstantAt(node.lineno),
                     targets,
                 )
@@ -678,7 +679,7 @@ def _handle_generator_if(
             call = factory.Call(factory.NameLoadRewriteCallback("method_if"))
             call.args.append(factory.NameLoad("__name__"))
             call.args.append(factory.NameLoad("__file__"))
-            call.args.append(factory.Str(f"{stmt_name} {ast.unparse(node.test)}"))
+            call.args.append(factory.Constant(f"{stmt_name} {ast.unparse(node.test)}"))
             call.args.append(factory.LineConstantAt(node.lineno))
 
             targets = _collect_names_used_as_node_or_none(factory, node.test)
@@ -694,7 +695,7 @@ def _handle_generator_if(
             call = factory.Call(factory.NameLoadRewriteCallback("method_else"))
             call.args.append(factory.NameLoad("__name__"))
             call.args.append(factory.NameLoad("__file__"))
-            call.args.append(factory.Str(f"else (to if {ast.unparse(node.test)})"))
+            call.args.append(factory.Constant(f"else (to if {ast.unparse(node.test)})"))
             call.args.append(factory.LineConstantAt(node.orelse[0].lineno))
             targets = _collect_names_used_as_node_or_none(factory, node.test)
             call.args.append(targets)
@@ -757,7 +758,7 @@ def _handle_before_assert(
             call = factory.Call(factory.NameLoadRewriteCallback("assert_failed"))
             call.args.append(factory.NameLoad("__name__"))
             call.args.append(factory.NameLoad("__file__"))
-            call.args.append(factory.Str(unparsed))
+            call.args.append(factory.Constant(unparsed))
             call.args.append(factory.LineConstantAt(node.lineno))
 
             new_if_node: ast.If = factory.If(factory.NotUnaryOp(node.test))
@@ -834,9 +835,9 @@ def _handle_assign(
                     "after_assign",
                     factory.NameLoad("__name__"),
                     factory.NameLoad("__file__"),
-                    factory.Str(f"{class_name}{function.name}"),
+                    factory.Constant(f"{class_name}{function.name}"),
                     factory.LineConstantAt(node.lineno),
-                    factory.Str(target.id),
+                    factory.Constant(target.id),
                     factory.NameLoad(target.id),
                 )
 
@@ -985,15 +986,15 @@ def _handle_for_or_while(
             iter_desc = ast.unparse(node.iter)
             collect_names_from_node = node.target
             target_desc = ast.unparse(node.target)
-            name_str = factory.Str(f"for {target_desc} in {iter_desc}")
-            step_name_str = factory.Str(f"Step: for {target_desc} in {iter_desc}")
+            name_str = factory.Constant(f"for {target_desc} in {iter_desc}")
+            step_name_str = factory.Constant(f"Step: for {target_desc} in {iter_desc}")
             stmt_name = "for"
 
         elif isinstance(node, ast.While):
             while_desc = ast.unparse(node.test)
             collect_names_from_node = node.test
-            name_str = factory.Str(f"while {while_desc}")
-            step_name_str = factory.Str(f"Step: while {while_desc}")
+            name_str = factory.Constant(f"while {while_desc}")
+            step_name_str = factory.Constant(f"Step: while {while_desc}")
             stmt_name = "while"
         else:
             raise RuntimeError(f"Unexpected node: {node}.")
@@ -1027,7 +1028,7 @@ def _handle_for_or_while(
         call.args.append(factory.IntConstant(for_id))
         call.args.append(
             factory.Tuple(
-                factory.Str(stmt_name_upper),  # FOR/WHILE
+                factory.Constant(stmt_name_upper),  # FOR/WHILE
                 factory.NameLoad("__name__"),
                 factory.NameLoad("__file__"),
                 name_str,
@@ -1050,7 +1051,9 @@ def _handle_for_or_while(
             call.args.append(factory.IntConstant(for_step_id))
             call.args.append(
                 factory.Tuple(
-                    factory.Str(f"{stmt_name_upper}_STEP"),  # FOR_STEP / WHILE_STEP
+                    factory.Constant(
+                        f"{stmt_name_upper}_STEP"
+                    ),  # FOR_STEP / WHILE_STEP
                     factory.NameLoad("__name__"),
                     factory.NameLoad("__file__"),
                     step_name_str,
@@ -1112,7 +1115,7 @@ def _collect_names_used_as_node_or_none(
         target_load = factory.NameLoad(name_target.id)
         temp_targets.append(
             factory.Tuple(
-                factory.Str(replacement_dict.get(target_name, target_name)),
+                factory.Constant(replacement_dict.get(target_name, target_name)),
                 target_load,
             )
         )
@@ -1194,7 +1197,7 @@ def _handle_yield(
                             "before_yield",
                             factory.NameLoad("__name__"),
                             factory.NameLoad("__file__"),
-                            factory.Str(f"{class_name}{function.name}"),
+                            factory.Constant(f"{class_name}{function.name}"),
                             factory.LineConstantAt(node.lineno),
                             value_yielded,
                         )
@@ -1241,7 +1244,7 @@ def _handle_yield(
                             "before_yield",
                             factory.NameLoad("__name__"),
                             factory.NameLoad("__file__"),
-                            factory.Str(f"{class_name}{function.name}"),
+                            factory.Constant(f"{class_name}{function.name}"),
                             factory.LineConstantAt(node.lineno),
                             value_yielded,
                         )
