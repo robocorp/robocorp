@@ -7,6 +7,17 @@ from typing import Optional
 from robocorp.log._lifecycle_hooks import Callback
 
 
+def _compile_without_cache(pattern: str) -> Pattern[str]:
+    import re
+
+    compiler = getattr(re, "_compiler", None)
+    if compiler is not None:
+        return compiler.compile(pattern, 0)
+
+    re.purge()
+    return re.compile(pattern)
+
+
 class _SetWithChangeModification(MutableSet[str]):
     def __init__(self, initial=()):
         self._data = set()
@@ -124,7 +135,7 @@ class LogRedacter:
                     lst.append(re.escape(s))
 
         if lst:
-            self._hide_strings_re = re.compile("|".join(lst))
+            self._hide_strings_re = _compile_without_cache("|".join(lst))
         else:
             self._hide_strings_re = None
 
