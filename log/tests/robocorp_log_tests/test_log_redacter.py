@@ -31,3 +31,22 @@ def test_log_redacter() -> None:
 
     config.dont_hide_strings_smaller_or_equal_to = 1
     assert log_redacter.redact("mm") == "<redacted>"
+
+
+def test_log_redacter_does_not_cache_aggregate_patterns() -> None:
+    import re
+
+    from robocorp.log._log_redacter import LogRedacter
+
+    re.purge()
+    log_redacter = LogRedacter()
+    for i in range(3):
+        log_redacter.hide_from_output(f"cache-secret-{i}")
+        log_redacter.redact("cache-secret-0")
+
+    assert log_redacter.redact("cache-secret-2") == "<redacted>"
+    assert not any(
+        "cache-secret" in pattern
+        for _, pattern, _ in getattr(re, "_cache", {})
+        if isinstance(pattern, str)
+    )
