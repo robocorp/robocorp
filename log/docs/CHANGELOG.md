@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.5 - 2026-09-28
+
 - Fix unbounded memory growth in `LogRedacter`: the aggregate hide-strings pattern is now
   compiled outside CPython's process-wide `re` cache, so long-running processes that register
   many sensitive values no longer retain hundreds of stale patterns (#489, #490).
