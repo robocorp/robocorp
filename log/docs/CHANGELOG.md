@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Fix unbounded memory growth in `LogRedacter`: the aggregate hide-strings pattern is now
+  compiled outside CPython's process-wide `re` cache, so long-running processes that register
+  many sensitive values no longer retain hundreds of stale patterns (#489, #490).
+
 ## 3.1.4 - 2026-09-01
 
 - Fix `AttributeError: module 'ast' has no attribute 'Str'` on Python 3.14. `ast.Str` was
