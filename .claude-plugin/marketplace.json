@@ -1,0 +1,16 @@
+{
+  "name": "robocorp",
+  "description": "Agent skills for building Python automations with Robocorp",
+  "owner": {
+    "name": "Robocorp"
+  },
+  "plugins": [
+    {
+      "name": "robocorp-automation",
+      "source": "./",
+      "description": "Bootstrap, build, run and validate Robocorp task packages with robocorp.tasks and rcc",
+      "homepage": "https://github.com/robocorp/robocorp",
+      "license": "Apache-2.0"
+    }
+  ]
+}

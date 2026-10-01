@@ -1,5 +1,26 @@
 # Documentation
 
+## 🤖 AI coding agent skill
+
+Building automations with Claude Code, Codex, Cursor or another coding agent? Add the
+[`robocorp-automation`](skills/robocorp-automation/SKILL.md) skill to your project. It teaches the
+agent how to bootstrap, build, run and validate Robocorp task packages with `robocorp.tasks` and `rcc`.
+
+**Claude Code** — install it as a plugin from this repository:
+
+```
+/plugin marketplace add robocorp/robocorp
+/plugin install robocorp-automation@robocorp
+```
+
+**Other agents** — copy the skill into your automation project:
+
+```sh
+mkdir -p .agents/skills/robocorp-automation
+curl -fsSL https://raw.githubusercontent.com/robocorp/robocorp/master/skills/robocorp-automation/SKILL.md \
+  -o .agents/skills/robocorp-automation/SKILL.md
+```
+
 ## Overview
 
 The repository contains the essential parts of the Robocorp Automation Stack for Python:
