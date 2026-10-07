@@ -23,9 +23,6 @@ def download_file(url: str, filename: str) -> str:
     return filename
 ```
 
-> AI/LLM's are quite good with `requests`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [File download](snippets/download.py)

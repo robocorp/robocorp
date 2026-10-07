@@ -23,9 +23,6 @@ group_b.update_cell(1, 1, 'John')
 sh.share('my-personal-email@gmail.com', perm_type='user', role='writer')
 ```
 
-> AI/LLM's are quite good with `gspread`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Calculate total sales from worksheet](snippets/calculate_total_sales.py)

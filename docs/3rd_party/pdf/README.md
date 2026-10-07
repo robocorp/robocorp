@@ -47,9 +47,6 @@ pdf.cell(200, 10, txt="Hello World!", ln=1, align='C')
 pdf.output("info.pdf")
 ```
 
-> AI/LLM's are quite good with `pdfs`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Create an invoice PDF](snippets/fpdf2/create_invoice.py)

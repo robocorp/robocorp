@@ -21,9 +21,6 @@ print(f"Matrix multiplication result: {result}")
 ```
 
 
-> AI/LLM's are quite good with `numpy`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Find duplicate records in array](snippets/find_duplicate_records.py)

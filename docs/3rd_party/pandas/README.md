@@ -13,9 +13,6 @@ print(df.to_string())
 ```
 
 
-> AI/LLM's are quite good with `pandas`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Create CSV from a dictionary](snippets/export_to_csv.py)
