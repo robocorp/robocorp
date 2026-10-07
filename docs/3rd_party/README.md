@@ -22,7 +22,3 @@ bigger, we will consider creating fully-fledged wrapper libraries.
 - [Gspread: "Python interface for Google Sheets"](./gspread/README.md)
 - [ORMs: "Talk with the databases"](./orm/README.md)
 - ...
-
-
-> AI/LLM's are quite good with the most used Python libaries:  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)

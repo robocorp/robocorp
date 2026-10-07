@@ -23,9 +23,6 @@ with webdriver.Chrome() as driver:
     driver.get_screenshot_as_file("robotsparebin.png")
 ```
 
-> AI/LLM's are quite good with `Selenium`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Taking the screenshot after login](snippets/screenshot_after_login.py)

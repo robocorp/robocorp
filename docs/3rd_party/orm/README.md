@@ -87,9 +87,6 @@ db.connect()
 db.create_tables([User])
 ```
 
-> AI/LLM's are quite good with `orms`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Create, update, delete with SQLAlchemy](snippets/sqlalchemy/crud_operations.py)

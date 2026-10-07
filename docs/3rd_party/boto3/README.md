@@ -15,9 +15,6 @@ for bucket in s3.buckets.all():
 ```
 
 
-> AI/LLM's are quite good with `boto3`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ###### Various [snippets](snippets)
 
 - [Create a table in DynamoDB](snippets/create_table.py)

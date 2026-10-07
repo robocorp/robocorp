@@ -16,9 +16,6 @@ notifiers.notify(
 ```
 
 
-> AI/LLM's are quite good with `notifiers`.  
-> 👉 Try asking [ReMark](https://chat.robocorp.com)
-
 ## Links and references
 
 - [PyPI](https://pypi.org/project/notifiers/)
