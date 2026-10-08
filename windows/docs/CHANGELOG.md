@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Require `pillow` 12.3.0 or newer (fixes 13 security advisories, including CVE-2026-59205 and CVE-2026-59200).
+
 ## 1.1.2 - 2026-07-24
 
 - Fix `wait_for_condition()` ignoring the caller-supplied `timeout` and always waiting 8 seconds.
