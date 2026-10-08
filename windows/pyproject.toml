@@ -10,7 +10,7 @@ packages = [{ include = "robocorp/windows", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pillow = ">=10.0.1"
+pillow = ">=12.3.0"
 pywin32 = { version = ">=300,<=311", platform = "win32", python = "!=3.8.1" }
 psutil = ">=5.0,<8.0"
 comtypes = "^1.1.11"
