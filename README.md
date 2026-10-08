@@ -16,9 +16,10 @@ agent how to bootstrap, build, run and validate Robocorp task packages with `rob
 **Other agents** — copy the skill into your automation project:
 
 ```sh
-mkdir -p .agents/skills/robocorp-automation
-curl -fsSL https://raw.githubusercontent.com/robocorp/robocorp/master/skills/robocorp-automation/SKILL.md \
-  -o .agents/skills/robocorp-automation/SKILL.md
+base=https://raw.githubusercontent.com/robocorp/robocorp/master/skills/robocorp-automation
+mkdir -p .agents/skills/robocorp-automation/references
+curl -fsSL "$base/SKILL.md" -o .agents/skills/robocorp-automation/SKILL.md
+curl -fsSL "$base/references/api.md" -o .agents/skills/robocorp-automation/references/api.md
 ```
 
 ## Overview

@@ -7,7 +7,9 @@
   "plugins": [
     {
       "name": "robocorp-automation",
-      "source": "./",
+      "source": "./skills/robocorp-automation",
+      "strict": false,
+      "skills": ["./"],
       "description": "Bootstrap, build, run and validate Robocorp task packages with robocorp.tasks and rcc",
       "homepage": "https://github.com/robocorp/robocorp",
       "license": "Apache-2.0"
