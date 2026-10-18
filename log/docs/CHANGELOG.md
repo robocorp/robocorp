@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Rebuild the log viewer with `dompurify` 3.4.17 (fixes 11 security advisories, including
+  CVE-2026-49458, CVE-2026-49978 and CVE-2026-65898) and refreshed build tooling (`vite` 6.4.4,
+  `handlebars` 4.7.10, `js-yaml`, `postcss`, `browserslist` and friends).
+
 ## 3.1.5 - 2026-09-28
 
 - Fix unbounded memory growth in `LogRedacter`: the aggregate hide-strings pattern is now
