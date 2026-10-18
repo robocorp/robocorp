@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-excel"
-version = "0.5.0"
+version = "0.5.1"
 description = "Robocorp Excel automation library"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"

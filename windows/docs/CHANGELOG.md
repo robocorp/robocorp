@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.3 - 2026-10-18
+
 - Require `pillow` 12.3.0 or newer (fixes 13 security advisories, including CVE-2026-59205 and CVE-2026-59200).
 
 ## 1.1.2 - 2026-07-24

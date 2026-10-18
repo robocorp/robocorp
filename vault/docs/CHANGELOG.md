@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.2 - 2026-10-18
+
 - Require `cryptography` 50.0.0 or newer (fixes GHSA-537c-gmf6-5ccf, CVE-2026-69249, CVE-2026-69248 and CVE-2026-69247).
 
 ## 1.4.1 - 2026-08-23
