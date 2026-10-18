@@ -267,7 +267,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 groups = ["dev"]
-markers = "platform_system == \"Windows\" or sys_platform == \"win32\""
+markers = "sys_platform == \"win32\" or platform_system == \"Windows\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -1194,18 +1194,18 @@ robocorp-log = ">=2.4,<4"
 
 [[package]]
 name = "robocorp-vault"
-version = "1.4.1"
+version = "1.4.2"
 description = "Robocorp Control Room Vault API integration library"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "robocorp_vault-1.4.1-py3-none-any.whl", hash = "sha256:717a18ce38044d682edff1efb9de8aeb1e3d136209955bd8caeb858e2bdebe9e"},
-    {file = "robocorp_vault-1.4.1.tar.gz", hash = "sha256:ab4b41dae5b2a305ef6b4ab70b5049c463190445680494003351fdfcabd96159"},
+    {file = "robocorp_vault-1.4.2-py3-none-any.whl", hash = "sha256:77995a494cdb4bfaebb79a952435e2f2f230e8d4273d8eaaa7d977183ccde8cf"},
+    {file = "robocorp_vault-1.4.2.tar.gz", hash = "sha256:21faa82319f0c80024439f5d902b8ef6ba8bf72cdc485df3e9eb07f147984618"},
 ]
 
 [package.dependencies]
-cryptography = ">=46.0.5"
+cryptography = ">=50.0.0"
 pyyaml = ">=6.0,<7.0"
 requests = ">=2.28.2"
 tenacity = ">=8.0.1"
@@ -1470,4 +1470,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "884db5e6553813cef0b354c9f552e6e037594be80cf832ccec3c746104e4f59b"
+content-hash = "e937fd0d78f8235b55fca32d87133a5eec1f79bb58978213662e9b4cb485767f"
