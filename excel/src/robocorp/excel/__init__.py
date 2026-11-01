@@ -9,7 +9,7 @@ in your dependencies' configuration.
 from robocorp.excel.excel import create_workbook, open_workbook
 from robocorp.excel.tables import Table
 
-__version__ = "0.5.1"
+__version__ = "0.6.0"
 __all__ = [
     "create_workbook",
     "open_workbook",
