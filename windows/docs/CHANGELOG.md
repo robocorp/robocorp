@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.0.0 - 2026-11-01
+
+- **Breaking:** require Python 3.11 or newer. Python 3.10 reached end of life in October 2026,
+  and the `pillow` security fixes below exist only in releases that require Python 3.11.
+- Require `pillow` 13.0.0 or newer (fixes 41 security advisories, 5 of them critical: heap buffer
+  overflows in JPEG, FlashPix and TIFF decoding, stale native storage reuse in multi-frame loaders
+  and argument injection in the Ghostscript call).
+
 ## 1.1.3 - 2026-10-18
 
 - Require `pillow` 12.3.0 or newer (fixes 13 security advisories, including CVE-2026-59205 and CVE-2026-59200).

@@ -28,19 +28,19 @@ jobs:
       fail-fast: false
       matrix:
         name:
-        - ubuntu-py3.10-devmode
-        - windows-py3.10-devmode
-        - macos-py3.10-devmode
+        - ubuntu-py3.11-devmode
+        - windows-py3.11-devmode
+        - macos-py3.11-devmode
         include:
-        - name: ubuntu-py3.10-devmode
-          python: '3.10'
+        - name: ubuntu-py3.11-devmode
+          python: '3.11'
           os: ubuntu-latest
-        - name: windows-py3.10-devmode
-          python: '3.10'
+        - name: windows-py3.11-devmode
+          python: '3.11'
           os: windows-latest
-        - name: macos-py3.10-devmode
+        - name: macos-py3.11-devmode
           os: macos-14
-          python: '3.10'
+          python: '3.11'
     steps:
     - name: Checkout repository and submodules
       uses: actions/checkout@v4

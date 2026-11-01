@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 3.1.7 - 2026-11-01
+
+- Rebuild the log viewer with `vite` 6.4.5 (fixes CVE-2026-118662, `server.fs.deny` bypassed
+  with query strings in the development server) and `minimatch` 11 (fixes CVE-2026-118764,
+  denial of service via glob-parts amplification). Both are build-time only and do not end up
+  in the generated `log.html`.
+
 ## 3.1.6 - 2026-10-18
 
 - Rebuild the log viewer with `dompurify` 3.4.17 (fixes 11 security advisories, including
