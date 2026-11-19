@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Reuse HTTP connections to the Control Room APIs through a shared session, instead of
+  opening a new connection (TCP and TLS handshake) for every request. This cuts the
+  cost of each secret call, especially when Control Room is in a distant region.
+  Connections idle for longer than 30s are reopened instead of reused, in case a
+  firewall or NAT dropped them silently (override with `RC_API_CONNECTION_MAX_IDLE`).
+
 ## 1.4.2 - 2026-10-18
 
 - Require `cryptography` 50.0.0 or newer (fixes GHSA-537c-gmf6-5ccf, CVE-2026-69249, CVE-2026-69248 and CVE-2026-69247).
