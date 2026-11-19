@@ -188,10 +188,14 @@ class TestRobocorpAdapter:
             monkeypatch.setenv(name, value)
 
         with (
-            mock.patch("robocorp.workitems._requests.requests.get") as mock_get,
-            mock.patch("robocorp.workitems._requests.requests.post") as mock_post,
-            mock.patch("robocorp.workitems._requests.requests.put") as mock_put,
-            mock.patch("robocorp.workitems._requests.requests.delete") as mock_delete,
+            mock.patch("robocorp.workitems._requests.requests.Session.get") as mock_get,
+            mock.patch(
+                "robocorp.workitems._requests.requests.Session.post"
+            ) as mock_post,
+            mock.patch("robocorp.workitems._requests.requests.Session.put") as mock_put,
+            mock.patch(
+                "robocorp.workitems._requests.requests.Session.delete"
+            ) as mock_delete,
             mock.patch("time.sleep", return_value=None) as mock_sleep,
         ):
             self.mock_get = mock_get

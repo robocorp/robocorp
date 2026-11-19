@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reuse HTTP connections to the Control Room APIs through a shared session, instead of
+  opening a new connection (TCP and TLS handshake) for every request. This cuts the
+  cost of each work item call, especially when Control Room is in a distant region.
+
 ## 1.5.1 - 2026-08-23
 
 - Add a default request timeout (60s, override with `RC_API_REQUEST_TIMEOUT`) to

@@ -86,6 +86,9 @@ class Requests:
     def __init__(self, route_prefix: str = "", default_headers: Optional[dict] = None):
         self._route_prefix = route_prefix
         self._default_headers = default_headers
+        # Reuse connections across calls, so each request doesn't pay a new
+        # TCP and TLS handshake (costly when Control Room is far away).
+        self._session = requests.Session()
 
     def handle_error(self, response: Response):
         http_status = f"{response.status_code} {response.reason!r}"
@@ -187,13 +190,13 @@ class Requests:
         return response
 
     def post(self, *args, **kwargs) -> Response:
-        return self._request(requests.post, *args, **kwargs)
+        return self._request(self._session.post, *args, **kwargs)
 
     def get(self, *args, **kwargs) -> Response:
-        return self._request(requests.get, *args, **kwargs)
+        return self._request(self._session.get, *args, **kwargs)
 
     def put(self, *args, **kwargs) -> Response:
-        return self._request(requests.put, *args, **kwargs)
+        return self._request(self._session.put, *args, **kwargs)
 
     def delete(self, *args, **kwargs) -> Response:
-        return self._request(requests.delete, *args, **kwargs)
+        return self._request(self._session.delete, *args, **kwargs)
