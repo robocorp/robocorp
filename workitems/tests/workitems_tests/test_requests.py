@@ -1,4 +1,7 @@
 import importlib
+import threading
+import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest import mock
 
 import pytest
@@ -88,3 +91,79 @@ class TestConnectionReuse:
 
         mock_get.assert_not_called()
         mock_session_get.assert_called_once()
+
+
+@pytest.fixture
+def local_server():
+    """A real HTTP/1.1 server that counts the connections it accepts."""
+    state: dict = {"connections": 0, "hits": []}
+
+    class Handler(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+        timeout = 1  # close a keep-alive connection that is idle for 1 s
+
+        def setup(self):
+            state["connections"] += 1
+            super().setup()
+
+        def _ok(self):
+            self.rfile.read(int(self.headers.get("Content-Length") or 0))
+            state["hits"].append(f"{self.command} {self.path}")
+            self.send_response(200)
+            self.send_header("Content-Length", "2")
+            self.end_headers()
+            self.wfile.write(b"{}")
+
+        do_GET = do_POST = _ok
+
+        def log_message(self, *args):
+            pass
+
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    state["url"] = f"http://127.0.0.1:{httpd.server_port}/"
+    yield state
+    httpd.shutdown()
+    httpd.server_close()
+
+
+class TestConnectionReuseOverRealSocket:
+    def test_calls_reuse_one_connection(self, local_server):
+        client = _requests.Requests(local_server["url"])
+
+        client.post("reserve")
+        client.get("payload")
+        client.get("files")
+        client.post("output", json={})
+        client.post("release", json={})
+
+        assert len(local_server["hits"]) == 5
+        assert local_server["connections"] == 1
+
+    def test_recovers_when_server_closed_the_idle_connection(self, local_server):
+        client = _requests.Requests(local_server["url"])
+
+        client.post("reserve")
+        time.sleep(1.6)
+        start = time.monotonic()
+        client.post("release", json={})
+
+        assert time.monotonic() - start < 1, "no retry back-off expected"
+        assert local_server["hits"].count("POST /release") == 1
+        assert local_server["connections"] == 2
+
+    def test_connection_idle_past_the_limit_is_not_reused(
+        self, local_server, monkeypatch
+    ):
+        monkeypatch.setattr(_requests, "MAX_IDLE", 0.2)
+        client = _requests.Requests(local_server["url"])
+
+        client.post("reserve")
+        client.post("output", json={})
+        assert local_server["connections"] == 1
+
+        time.sleep(0.3)
+        client.post("release", json={})
+
+        assert local_server["connections"] == 2
+        assert local_server["hits"].count("POST /release") == 1

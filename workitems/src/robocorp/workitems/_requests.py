@@ -22,6 +22,10 @@ DEBUG = bool(os.getenv("RC_DEBUG_API") or os.getenv("RPA_DEBUG_API"))
 # so a stalled connection (e.g. dropped by a proxy/load balancer) hangs the task
 # forever instead of raising and letting the `retry` below kick in.
 DEFAULT_TIMEOUT = float(os.getenv("RC_API_REQUEST_TIMEOUT", "60"))
+# A pooled connection that sat idle may have been dropped by a firewall or NAT
+# without either side being told. Sending on it hangs until the request timeout,
+# so connections idle for longer than this are closed and reopened instead.
+MAX_IDLE = float(os.getenv("RC_API_CONNECTION_MAX_IDLE", "30"))
 
 
 def _needs_retry(exc: BaseException) -> bool:
@@ -89,6 +93,7 @@ class Requests:
         # Reuse connections across calls, so each request doesn't pay a new
         # TCP and TLS handshake (costly when Control Room is far away).
         self._session = requests.Session()
+        self._last_used = time.monotonic()
 
     def handle_error(self, response: Response):
         http_status = f"{response.status_code} {response.reason!r}"
@@ -180,6 +185,12 @@ class Requests:
             kwargs["verify"] = False
 
         kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
+
+        now = time.monotonic()
+        if now - self._last_used > MAX_IDLE:
+            # Drops the pooled connections; the session itself stays usable.
+            self._session.close()
+        self._last_used = now
 
         LOGGER.debug("%s %r", verb.__name__.upper(), log_url)
         response = verb(url, *args, headers=headers, **kwargs)
