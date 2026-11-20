@@ -267,7 +267,7 @@ description = "Cross-platform colored terminal text."
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 groups = ["dev"]
-markers = "platform_system == \"Windows\" or sys_platform == \"win32\""
+markers = "sys_platform == \"win32\" or platform_system == \"Windows\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
@@ -1160,14 +1160,14 @@ tomli = {version = ">=2.0.1,<3.0.0", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "robocorp-storage"
-version = "1.1.1"
+version = "1.2.0"
 description = "Robocorp Asset Storage library"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "robocorp_storage-1.1.1-py3-none-any.whl", hash = "sha256:4f54230a00ae163ca6e7fe58ec44e2b28a0a9c2256157273c72142bf2fcd96b1"},
-    {file = "robocorp_storage-1.1.1.tar.gz", hash = "sha256:0f86824a65308e7ec56df76326913d15d62bbce0f27dccb22074f97e653f1aaa"},
+    {file = "robocorp_storage-1.2.0-py3-none-any.whl", hash = "sha256:b871359ee80c60c45857bd0e66d52ad01cc8a8051aeb323254b17aa1367cca13"},
+    {file = "robocorp_storage-1.2.0.tar.gz", hash = "sha256:014470f2b9872c1a5784a0dab663c06f66a06c3aa48b64648c626dc376de9645"},
 ]
 
 [package.dependencies]
@@ -1194,14 +1194,14 @@ robocorp-log = ">=2.4,<4"
 
 [[package]]
 name = "robocorp-vault"
-version = "1.4.2"
+version = "1.5.0"
 description = "Robocorp Control Room Vault API integration library"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "robocorp_vault-1.4.2-py3-none-any.whl", hash = "sha256:77995a494cdb4bfaebb79a952435e2f2f230e8d4273d8eaaa7d977183ccde8cf"},
-    {file = "robocorp_vault-1.4.2.tar.gz", hash = "sha256:21faa82319f0c80024439f5d902b8ef6ba8bf72cdc485df3e9eb07f147984618"},
+    {file = "robocorp_vault-1.5.0-py3-none-any.whl", hash = "sha256:dc446e7bb49fcd9c4a0642db03ea835ebfc005a9970963aa590dc519ab3be78f"},
+    {file = "robocorp_vault-1.5.0.tar.gz", hash = "sha256:3d48071895b898c3e49504f17a48d42cf930ff771518cd19f4105ca962a157aa"},
 ]
 
 [package.dependencies]
@@ -1212,14 +1212,14 @@ tenacity = ">=8.0.1"
 
 [[package]]
 name = "robocorp-workitems"
-version = "1.5.1"
+version = "1.6.0"
 description = "Robocorp Work Items library"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "robocorp_workitems-1.5.1-py3-none-any.whl", hash = "sha256:653958545ae8375e05b61f7608bc13813ed65ea47cce0be1e7cf885e080f1460"},
-    {file = "robocorp_workitems-1.5.1.tar.gz", hash = "sha256:254b833f01b0c5ffcd421e15140212202f25383ef7e48fcfcc2de70c3970558b"},
+    {file = "robocorp_workitems-1.6.0-py3-none-any.whl", hash = "sha256:556ca3eb8da14989f92d4277436e8cdeb55d159ae41e93e32e44546c7501896d"},
+    {file = "robocorp_workitems-1.6.0.tar.gz", hash = "sha256:af205e420ac7aa45f13ad759ce999ef33eb6210e9aa4edba574e8436f8bf60b7"},
 ]
 
 [package.dependencies]
@@ -1470,4 +1470,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "1a3922d55aa2e83d910eee71085239b392ca0dcb95c6a3cf542ffc6301ad06b4"
+content-hash = "d3138f32bcad72ab054bc0ed8459771b762f8536c72d8d050d4814903906af3d"
