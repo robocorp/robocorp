@@ -47,6 +47,7 @@ In addition to the payload section, a work item can also contain files, which ar
 - [Collecting all inputs](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/04-collecting-inputs.md)
 - [Flow control with exceptions](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/05-input-exceptions.md)
 - [Modifying inputs](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/06-modifying-inputs.md)
+- [Control Room connection settings](https://github.com/robocorp/robocorp/blob/master/workitems/docs/guides/07-control-room-connection.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
