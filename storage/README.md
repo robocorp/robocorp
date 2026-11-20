@@ -16,6 +16,7 @@ def store_email():
 ## Guides
 
 - [Handling different asset types](https://github.com/robocorp/robocorp/blob/master/storage/docs/guides/00-asset-types.md)
+- [Control Room connection settings](https://github.com/robocorp/robocorp/blob/master/storage/docs/guides/01-control-room-connection.md)
 
 ## API Reference
 
