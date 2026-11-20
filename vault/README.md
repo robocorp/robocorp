@@ -24,6 +24,7 @@ def inspect_secret():
 - [Local development](https://github.com/robocorp/robocorp/blob/master/vault/docs/guides/00-local-development.md)
 - [Hiding values](https://github.com/robocorp/robocorp/blob/master/vault/docs/guides/01-hiding-values.md)
 - [Modifying secrets](https://github.com/robocorp/robocorp/blob/master/vault/docs/guides/02-modifying-secrets.md)
+- [Control Room connection settings](https://github.com/robocorp/robocorp/blob/master/vault/docs/guides/03-control-room-connection.md)
 
 Further user guides and tutorials can be found in [Robocorp Docs](https://robocorp.com/docs).
 
