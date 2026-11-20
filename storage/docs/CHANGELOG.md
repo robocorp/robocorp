@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.0 - 2026-11-20
+
 - Reuse HTTP connections to the Control Room APIs through a shared session, instead of
   opening a new connection (TCP and TLS handshake) for every request. This cuts the
   cost of each asset call and upload status poll, especially when Control Room is in a

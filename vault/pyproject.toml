@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "robocorp-vault"
-version = "1.4.2"
+version = "1.5.0"
 description = "Robocorp Control Room Vault API integration library"
 authors = ["Sema4.ai <dev@sema4.ai>"]
 readme = "README.md"

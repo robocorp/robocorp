@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.5.0 - 2026-11-20
+
 - Reuse HTTP connections to the Control Room APIs through a shared session, instead of
   opening a new connection (TCP and TLS handshake) for every request. This cuts the
   cost of each secret call, especially when Control Room is in a distant region.
