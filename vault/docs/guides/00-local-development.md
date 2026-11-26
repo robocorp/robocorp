@@ -30,7 +30,7 @@ and should only be used during development-time
 File-based secrets can be set by defining two environment variables.
 
 - ``RC_VAULT_SECRET_MANAGER``: `FileSecrets`
-- ``RC_VAULT_SECRET_FILE``: Absolute path to the secrets database file
+- ``RC_VAULT_SECRETS_FILE``: Absolute path to the secrets database file
 
 Example content of local secrets file as JSON:
 
